@@ -98,7 +98,6 @@ function private.HookAH()
 	private.buttons.pause.tex:SetVertexColor(1.0, 0.9, 0.1)
 
 	private.UpdateScanProgress()
-	
 end
 
 function private.UpdateScanProgress()
@@ -151,6 +150,7 @@ function private:OnUpdate(delay)
 	--Create the overlay filter buttons the (callbackType == "auctionui") is too early.
 	if not AuctioneerFilterButton1 and AuctionFilterButton1 then
 		private.CreateSecondaryFilterButtons()
+		hooksecurefunc("AuctionFrameFilters_Update", private.AuctionFrameFilters_UpdateClasses)
 	end
 	--if we still have filters pending process it
 	if #queue > 0 and not AucAdvanced.Scan.IsScanning() then
