@@ -1568,8 +1568,8 @@ function private.CreateFrames()
 				if frame.list[pos] then
 					sig = frame.list[pos][1]
 				end
-				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))
-				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))) then
+				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))
+				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))) then
 					frame.PostBySig(sig)
 				end
 			else
@@ -1600,8 +1600,8 @@ function private.CreateFrames()
 				if frame.list[pos] then
 					sig = frame.list[pos][1]
 				end
-				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))
-				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))) then
+				if sig and (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))
+				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))) then
 					frame.PostBySig(sig)
 				end
 			else
