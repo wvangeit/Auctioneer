@@ -178,7 +178,14 @@ function lib.GetPrice(link, _, match)
 		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 	end
 	if match then
-		newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+		local biddown
+		if curModel == "fixed" then
+			biddown = newBid/newBuy
+			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+			newBid = newBuy * biddown
+		else
+			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+		end
 	end
 	if curModel ~= "fixed" then
 		if newBuy and not newBid then
@@ -221,7 +228,6 @@ function lib.GetPrice(link, _, match)
 		print("Stack: "..stack.."  Number: "..number)
 		print("Stack: "..type(stack).."  Number: "..type(number))
 	end
-	
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
 end
 

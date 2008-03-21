@@ -1230,7 +1230,6 @@ function private.CreateFrames()
 					if AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bulk") then
 						obj.id = i
 
-						frame.SelectItem(obj)
 						if mode == "autopost" then
 							-- Auto post these items
 							frame.PostBySig(sig)
