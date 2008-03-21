@@ -143,6 +143,9 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
 
+	--if nothing is returned, return nil
+	if not dayCount then return end
+	
 	-- These 2 are the ones that most algorithms will look for
 	if (avg3 and seenDays > 3) or dayCount == 0 then
 		array.price = avg3
