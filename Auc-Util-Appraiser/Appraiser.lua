@@ -144,6 +144,7 @@ function lib.GetPrice(link, _, match)
 	end
 	
 	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
+	curModelText = curModel
 	
 	if match then
 		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
@@ -155,6 +156,7 @@ function lib.GetPrice(link, _, match)
 	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+		curModelText = curModelText.."("..curModel..")"
 		if curModel == "market" then
 			newBuy, seen = AucAdvanced.API.GetMarketValue(link)
 		else

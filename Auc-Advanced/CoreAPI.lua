@@ -444,96 +444,21 @@ end
 
 -- Allows the return of Appraiser price values to other functions.
 -- If Appraiser is not loaded it uses Market Price
+local AlertedtoDeprecation = false
 function lib.GetAppraiserValue(itemLink, useMatching)	
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
-	local sig = tostring(id)
-	local link=itemLink
-	local curModel, curModelText
-	
-	if not sig then 
-		return 0, 0, 0, "Unknown" 
-	end
-	
-	-- If Appraiser not loaded use Market value.
-	if (not AucAdvanced.Modules.Util.Appraiser) then 
-		market, seen = AucAdvanced.API.GetMarketValue(itemLink)
+	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
+	if not AucAdvanced.Modules.Util.Appraiser then
+		newBuy, seen = AucAdvanced.API.GetMarketValue(itemLink)
 		curModelText = "Market"
-		return market, market, seen, curModelText
+		return newBuy, newBuy, seen, curModelText
 	end
 	
-	
-	curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
-	curModelText = curModel
-	
-	if curModel == "default" then
-		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(link)) or (AucAdvanced.API.GetMarketValue(link) <= 0))) or
-		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
-		end
-		curModelText = curModelText.."("..curModel..")"
+	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, 0, useMatching)
+	if not AlertedtoDeprecation then
+		AucAdvanced.Print("AucAdvanced.API.GetAppraiserValue() has been deprecated.  Please use AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching) henceforth")
+		AlertedtoDeprecation = true
 	end
-
-	local defaultMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
-	local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match")
-	if curMatch == nil then
-		curMatch = defaultMatch
-	end
-	local match = false
-	if useMatching and (curMatch or (curMatch =="on")) then
-		match = true
-	end
-		
-	local newBuy, newBid, seen, _, DiffFromModel, MatchString
-	if curModel == "fixed" then
-		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
-		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
-		seen = 99
-	elseif curModel == "market" then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(link)
-	else
-		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
-	end
-	if match and (curModel ~= "fixed") then -- Don't match fixed values.
-		local _newBuy, _, _, _DiffFromModel, _MatchString = AucAdvanced.API.GetBestMatch(link, curModel)
-		if _newBuy then
-			newBuy, DiffFromModel, MatchString = _newBuy, _DiffFromModel, _MatchString
-			if MatchString then
-				curModelText = curModelText..MatchString
-			end
-		end
-	end
-	if curModel ~= "fixed" then
-		if newBuy and not newBid then
-			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-			if (deposit) then
-				local rate
-				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
-				if not rate then rate = AucAdvanced.depositRate or 0.05 end
-			end
-			if (not deposit) then deposit = 0 end
-
-			-- Scale up for duration > 12 hours
-			-- Assume 24 hours since we can't get this info
-			if deposit > 0 then
-				deposit = deposit * 2
-			end
-
-			markdown = newBuy * markdown
-
-			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-		end
-
-		if newBid and (not newBuy or newBid > newBuy) then
-			newBuy = newBid
-		end
-	end
-
-	-- Ok, market price is the Bid price, not the buyout. (by default. Can be changed in appraiser options)
-    --This makes it very conservative, but allows you to use your other settings better and is safer for beginners.
-	return newBid, newBuy, seen, curModelText
+	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
 end
 
 
