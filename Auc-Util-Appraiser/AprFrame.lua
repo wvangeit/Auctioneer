@@ -1250,11 +1250,8 @@ function private.CreateFrames()
 	end
 
 	function frame.PostBySig(sig, dryRun)
-		local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".stack")
-		local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".number")
-		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
-		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
-		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
+		local link = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
+		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, _, true) 
 		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
 		if success==false then
 			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
@@ -1373,10 +1370,7 @@ function private.CreateFrames()
 			if link then
 				if (button == "LeftButton") and (IsAltKeyDown()) then
 					frame.GetItemByLink(link)
-					if (IsShiftKeyDown()) 
-					and (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))
-					and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))) then
-						
+					if (IsShiftKeyDown()) then
 						local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack")
 						local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
 						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", count)
@@ -1384,7 +1378,6 @@ function private.CreateFrames()
 						frame.PostBySig(frame.salebox.sig)
 						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", stack)
 						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", number)
-						
 					end
 				end
 			end
@@ -1568,10 +1561,7 @@ function private.CreateFrames()
 				if frame.list[pos] then
 					sig = frame.list[pos][1]
 				end
-				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))
-				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))) then
-					frame.PostBySig(sig)
-				end
+				frame.PostBySig(sig)
 			else
 				frame.SelectItem(obj, button)
 			end
@@ -1600,10 +1590,7 @@ function private.CreateFrames()
 				if frame.list[pos] then
 					sig = frame.list[pos][1]
 				end
-				if sig and (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))
-				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid"))) then
-					frame.PostBySig(sig)
-				end
+				frame.PostBySig(sig)
 			else
 				frame.SelectItem(obj, button)
 			end
