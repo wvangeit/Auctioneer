@@ -148,7 +148,7 @@ function lib.GetPrice(link, _, match)
 	
 	if match then
 		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
-		if not match then
+		if match == nil then
 			match = AucAdvanced.Settings.GetSetting("util.appraiser.match")
 		end
 	end
