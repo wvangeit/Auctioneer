@@ -167,7 +167,7 @@ function lib.GetPrice(link, _, match)
 			if curModel == "market" then
 				newBuy, seen = AucAdvanced.API.GetMarketValue(link)
 			else
-				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(link)
+				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 			end
 		end
 	elseif curModel == "fixed" then
