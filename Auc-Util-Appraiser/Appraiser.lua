@@ -196,7 +196,7 @@ function lib.GetPrice(link, _, match)
 			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
 			if deposit then
 				local rate
-				deposit, rate = AucAdvnaced.Post.GetDepositAmount(sig)
+				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
 				if not rate then rate = AucAdvanced.depositRate or 0.05 end
 			end
 			if (not deposit) then deposit = 0 end
