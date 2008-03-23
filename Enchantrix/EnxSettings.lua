@@ -415,7 +415,6 @@ local function getter(setting)
 			table.insert(private.scanValueNames,{"baseline", _ENCH("GuiItemValueBaseline") })
 			if AucAdvanced then
 				table.insert(private.scanValueNames,{"adv:market", _ENCH("GuiItemValueAuc5Market") })
-				table.insert(private.scanValueNames,{"adv:stat:appraiser", _ENCH("GuiItemValueAuc5Appraiser") })
 				local algoList = AucAdvanced.API.GetAlgorithms()
 				for pos, name in ipairs(algoList) do
 					table.insert(private.scanValueNames,{"adv:stat:"..name, "AucAdv Stat:"..name})

@@ -66,6 +66,7 @@ end
 local array
 function lib.GetPriceArray(link)
 	local usable, itemId = lib.IsValidAlgorithm(link)
+    if not usable then return end
 	if array then recycle(array) end
 	array = acquire()
 

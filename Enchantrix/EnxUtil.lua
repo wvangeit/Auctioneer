@@ -366,11 +366,7 @@ function getReagentPrice(reagentID, extra)
 		if AucAdvanced then
 			if extra then
                 local _, reagentLink, _, _, _, _, _, _, _ = getReagentInfo(reagentID)
-				if extra == 'appraiser' then
-					_, price5, _, _= AucAdvanced.API.GetAppraiserValue(reagentLink,1)
-				else
-					price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentLink)
-				end
+				price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentLink)
 			else
 				price5 = AucAdvanced.API.GetMarketValue(reagentID)
 			end
