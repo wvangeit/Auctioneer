@@ -49,6 +49,7 @@ end
 
 function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanbutton.enabled", true)
+	AucAdvanced.Settings.SetDefault("util.scanbutton.message", true)
 end
 
 -- /run local t = AucAdvanced.Modules.Util.ScanButton.Private.buttons.stop.tex t:SetPoint("TOPLEFT", t:GetParent() "TOPLEFT", 3,-3) t:SetPoint("BOTTOMRIGHT", t:GetParent(), "BOTTOMRIGHT", -3,3)
@@ -150,7 +151,7 @@ function private:OnUpdate(delay)
 	--Create the overlay filter buttons the (callbackType == "auctionui") is too early.
 	if not AuctioneerFilterButton1 and AuctionFilterButton1 then
 		private.CreateSecondaryFilterButtons()
-		hooksecurefunc("AuctionFrameFilters_Update", private.AuctionFrameFilters_UpdateClasses)
+		hooksecurefunc("AuctionFrameFilters_Update", private.AuctionFrameFilters_UpdateClasses)--used to respond to scrollframe
 	end
 	--if we still have filters pending process it
 	if #queue > 0 and not AucAdvanced.Scan.IsScanning() then
@@ -171,6 +172,9 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the AuctionHouse")
 	gui:AddTip(id, "If enabled, shows the Stop/Play/Pause scan buttons in the title bar of the AuctionHouse")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections has been queued?")
+	gui:AddTip(id, "If enabled, shows the Starting search of filter...messages when using the ctr+click to selecting specific categorys of the AH to scan")
 end
 
 function private.ConfigChanged()
@@ -195,12 +199,13 @@ function private.play()
 	elseif not AucAdvanced.Scan.IsScanning() then
 		if #queue == 0 then queue = private.checkedFrames() end --check for user selected frames
 		if #queue > 0  then
-			print("Starting search on filter ", queue[1])
+			if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("Starting search on filter: |CFFFFFF00", CLASS_FILTERS[queue[1]]) end
 			AucAdvanced.Scan.StartScan("", "", "", nil, queue[1], nil, nil, nil)
-			--print(#queue)
 			table.remove(queue, 1)
-			--print(#queue)
-			if #queue == 0 then private.AuctionFrameFilters_ClearSelection() private.AuctionFrameFilters_ClearHighlight() print("Finished Queue") end
+			if #queue == 0 then
+				private.AuctionFrameFilters_ClearSelection() private.AuctionFrameFilters_ClearHighlight() 
+				if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("Last queued scan sent") end 
+			end
 		else
 			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
 		end
@@ -216,15 +221,14 @@ function private.pause()
 end
 
 
---[[frame test code for AH
-This adds a transparent replica of teh HA filters on the browse frame, we have scripts on this frame to select catagories a user chooses to scan
+--[[
+This adds a transparent replica of the AH filters on the browse frame, we have scripts on this frame to select catagories a user chooses to scan
 This means we do not have to directly modify blizzards filter frame
 ]]
-local base = CreateFrame("Frame", "AuctionTest", UIParent)
+local base = CreateFrame("Frame", nil, UIParent)
 base:SetFrameStrata("MEDIUM")
 base:Show()
 base:SetPoint("CENTER", UIParent, "CENTER")
---base:SetToplevel(true)
 base:EnableMouse(true)
 
 --store the primary AH filter catagories, this is a copy of the global table the AH uses
@@ -271,16 +275,13 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
 												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
 												getglobal("AuctionFilterButton"..i):UnlockHighlight()
-												--print("false", getglobal("AuctionFilterButton"..i):GetText())
 											else
 												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-												--print("true", getglobal("AuctionFilterButton"..i):GetText())
 												getglobal("AuctionFilterButton"..i):LockHighlight()
 											end
 										end
 									else
 										AuctionFrameFilter_OnClick() 
-										private.AuctionFrameFilters_UpdateClasses()
 										private.AuctionFrameFilters_ClearSelection()
 									end
 								end)
@@ -297,16 +298,13 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
 												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
 												getglobal("AuctionFilterButton"..i):UnlockHighlight()
-												--print("false", getglobal("AuctionFilterButton"..i):GetText())
 											else
 												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-												--print("true", getglobal("AuctionFilterButton"..i):GetText())
 												getglobal("AuctionFilterButton"..i):LockHighlight()
 											end
 										end
 									else
 										AuctionFrameFilter_OnClick() 
-										private.AuctionFrameFilters_UpdateClasses()
 										private.AuctionFrameFilters_ClearSelection()
 									end
 								end)
