@@ -396,7 +396,7 @@ function BtmScan.PageScan(resume)
 			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
 			item.remain = GetAuctionItemTimeLeft("list", item.pos)
 
-			if (item.owner ~= UnitName("player") and item.high ~= 1) then
+			if (item.owner ~= UnitName("player") and not item.high) then
 				-- Disassemble the link
 				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
@@ -408,7 +408,6 @@ function BtmScan.PageScan(resume)
 				else
 					itemconfig = {}
 				end
-				itemconfig.ownerTable=itemConfigTable
 				item.itemconfig=itemconfig
 
 				-- Check that we're not ignoring this item
@@ -489,8 +488,6 @@ function BtmScan.PageScan(resume)
 						BtmScan.resume = i - 1
 						return
 					end
-				-- check if itemConfig is used now
-				BtmScan.storeItemConfig(itemconfig, item.sig, itemConfigTable)
 				end
 			end
 		end
@@ -1546,7 +1543,7 @@ end
 BtmScan.IgnorePurchase = function()
 	local item = BtmScan.Prompt.item
 	item.itemconfig.isIgnore=true
-	BtmScan.Print(" ignoreStatusAfter:"..tostring(BtmScan.Prompt.item.itemconfig.isIgnore))
+	-- BtmScan.Print(" ignoreStatusAfter:"..tostring(BtmScan.Prompt.item.itemconfig.isIgnore))
 
 
 --	local ignore = BtmScan.Settings.GetSetting("ignore.list")
@@ -1919,83 +1916,89 @@ end
 -------------------------------------------------------------------------------
 -- Converts a itemconfiguration into a ';' delimited string.
 -------------------------------------------------------------------------------
+local tmp={}
 function BtmScan.packItemConfiguration(itemconfig)
-	return
-		tostring(itemconfig.maxPrice)..";"..
-		tostring(itemconfig.isIgnore)..";"..
-		tostring(itemconfig.ignoreModuleList)..";"..
-		tostring(itemconfig.buyBelow)
+	if type(itemconfig.maxPrice)=="number" and itemconfig.maxPrice>0 then
+		tmp[1] = tostring(ceil(itemconfig.maxPrice))
+	else
+		tmp[1]=nil
+	end
+	tmp[2] = itemconfig.isIgnore and true or nil
+	if type(itemconfig.ignoreModuleList)=="string" and itemconfig.ignoreModuleList~="" then
+		tmp[3] = itemconfig.ignoreModuleList
+	else
+		tmp[3] = nil
+	end
+	if type(itemconfig.buyBelow)=="number" and itemconfig.buyBelow>0 then
+		tmp[4] = tostring(itemconfig.buyBelow)
+	else
+		tmp[4] = nil
+	end
+	if type(itemconfig.maxCount)=="number" and itemconfig.maxCount>0 then
+		tmp[5] = tostring(itemconfig.maxCount)
+	else
+		tmp[5] = nil
+	end
+	-- see how many entries we actually have
+	local n
+	for i=5,1,-1 do
+		if tmp[i]~=nil then
+			n=i
+			break
+		end
+	end
+	if not n then	-- nothing to save!
+		return ""
+	end
+	-- turn nil entries into ""
+	for i=1,n do
+		if tmp[i]==nil then
+			tmp[i] = ""
+		end
+	end
+	return table.concat(tmp, ";", 1, n)
 end
 
 -------------------------------------------------------------------------------
--- Converts a ';' delimited string into a completed auction.
+-- Converts a ';' delimited string into a usable item configuration (optionally into the given table)
 -------------------------------------------------------------------------------
-function BtmScan.unpackItemConfiguration(packedItemConfiguration)
-	local itemconfig = {}
-	itemconfig.maxPrice, itemconfig.isIgnore, itemconfig.ignoreModuleList, itemconfig.buyBelow = (";"):split(packedItemConfiguration)
+function BtmScan.unpackItemConfiguration(packedItemConfiguration,   resultTable)
+	local itemconfig = resultTable or {}
+	itemconfig.maxPrice, 
+	itemconfig.isIgnore, 
+	itemconfig.ignoreModuleList, 
+	itemconfig.buyBelow, 
+	itemconfig.maxCount = strsplit(";",packedItemConfiguration)
 
 	itemconfig.maxPrice = tonumber(itemconfig.maxPrice)
+	itemconfig.isIgnore = (itemconfig.isIgnore == "true")
+	if itemconfig.ignoreModuleList == "nil" then	-- old items (prior to 23 mar 2008) will have been stored this way
+		itemconfig.ignoreModuleList = nil
+	end
 	itemconfig.buyBelow = tonumber(itemconfig.buyBelow)
-	itemconfig.isIgnore = BtmScan.booleanFromString(itemconfig.isIgnore)
-
+	itemconfig.maxCount = tonumber(itemconfig.maxCount)
+	
 	return itemconfig
-end
-
--------------------------------------------------------------------------------
--- Converts a ';' delimited string into a completed auction.
--------------------------------------------------------------------------------
-function BtmScan.checkEmptyItemConfig(itemconfig)
-	if (itemconfig.maxPrice) then
-		return true
-	end
-
-	if (itemconfig.isIgnore) then
-		return true
-	end
-
-	if (itemconfig.ignoreModuleList) then
-		return true
-	end
-
-	if (itemconfig.buyBelow) then
-		return true
-	end
-
-	return false
 end
 
 -------------------------------------------------------------------------------
 -- stores the itemConfig-Structure
 -------------------------------------------------------------------------------
 function BtmScan.storeItemConfig(itemconfig, itemid)
-	if (not BtmScan.checkEmptyItemConfig(itemconfig)) then return end
-	if (not itemconfig.ownerTable) then return end
+	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
 
 	local itemConfigString=BtmScan.packItemConfiguration(itemconfig)
-	itemconfig.ownerTable[itemid]=itemConfigString
-end
-
--------------------------------------------------------------------------------
--- Converts a numeric string into a boolean.
--------------------------------------------------------------------------------
-function BtmScan.booleanFromString(string)
-	if (string == NIL_VALUE) then
-		return nil
-	elseif (string == "true") then
-		return true
-	elseif (string == "false") then
-		return false
-	end
-end
-
-function BtmScan.getItemConfig(itemsig)
-	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
-	local itemconfig = itemConfigTable[itemsig]
-	if (itemconfig) then
-		itemconfig = BtmScan.unpackItemConfiguration(itemconfig)
+	BtmScan.Print("BtmScan.storeItemConfig: "..itemid..": "..itemConfigString)
+	if itemConfigString=="" then
+		itemConfigTable[itemid]=nil
 	else
-		itemconfig = {}
+		itemConfigTable[itemid]=itemConfigString
 	end
-	itemconfig.ownerTable =itemConfigTable
-	return itemconfig
+end
+
+-------------------------------------------------------------------------------
+-- retreives the itemConfig-Structure (optionally into a given table)
+-------------------------------------------------------------------------------
+function BtmScan.getItemConfig(itemsig,   resultTable)
+	return BtmScan.unpackItemConfiguration(BtmScan.Settings.GetSetting("itemconfig.list")[itemsig] or "", resultTable)
 end

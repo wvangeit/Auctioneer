@@ -88,8 +88,49 @@ function lib.PrintHelp()
 	BtmScan.Print("/btm snatch list")
 end
 
+function lib.AddSnatch(itemlink, price, count)	-- give price=(0 or nil) to stop snatching
+	local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemlink)
+	local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+	local itemconfig = BtmScan.getItemConfig(itemsig)
+	
+	if price and price<=0 then
+		price=nil
+	end
+	if count and count<=0 then
+		count=nil
+	end
+	
+	itemconfig.buyBelow = price
+	itemconfig.maxCount = count
+	
+	if not price then
+		BtmScan.Print(translate("BottomScanner will now %1 %2", translate("not snatch"), itemlink))
+		BtmScan.storeItemConfig(itemconfig, itemsig)
+		return
+	end
+
+	local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
+	if (not stack) then
+		stack = 1
+	end
+
+	local stackText = ""
+	if (stack > 1) then
+		stackText = " ("..translate("%1 per %2 stack", BtmScan.GSC(price*stack, 1), stack)..")"
+	end
+	local countText =""
+	if count then
+		countText = translate("up to %1", count).." "
+	else
+		countText = translate("unlimited").." "
+	end
+
+	BtmScan.Print(translate("BottomScanner will now %1 %2", translate("snatch"), countText..translate("%1 at %2", itemlink, translate("%1 per unit", BtmScan.GSC(price, 1)))..stackText))
+	BtmScan.storeItemConfig(itemconfig, itemsig)
+end
+
 function lib.CommandHandler(msg)
-	BtmScan.Print("called snatch-handler"..msg)
+	-- BtmScan.Print("called snatch-handler: "..msg)
 	if (string.lower(msg) == "snatch") then 
 		lib.snatchGUI()
 		return
@@ -111,57 +152,31 @@ function lib.CommandHandler(msg)
 			return
 		end
 
-		local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemlink)
-		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-		local itemconfig = BtmScan.getItemConfig(itemsig)
-
-
 		if (price <= 0) then
 			price = BtmScan.ParseGSC(remain) or 0
 		end
 
-		if (price <= 0) then
-			BtmScan.Print(translate("BottomScanner will now %1 %2", translate("not snatch"), itemlink))
-			itemconfig.buyBelow=price
-			BtmScan.storeItemConfig(itemconfig, itemsig)
-			return
-		end
-
-		local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
-		if (not stack) then
-			stack = 1
-		end
-
-		local stackText = ""
-		if (stack > 1) then
-			stackText = " ("..translate("%1 per %2 stack", BtmScan.GSC(price*stack, 1), stack)..")"
-		end
-		local countText =""
-		if (count > 0) then
-			countText = translate("up to %1", count).." "
-		else
-			countText = translate("unlimited").." "
-		end
-
-		BtmScan.Print(translate("BottomScanner will now %1 %2", translate("snatch"), countText..translate("%1 at %2", itemlink, translate("%1 per unit", BtmScan.GSC(price, 1)))..stackText))
-		itemconfig.buyBelow=price
-		BtmScan.storeItemConfig(itemconfig, itemsig)
+		lib.AddSnatch(itemlink, price, count)
 	end
 
 end
 
 function lib.PrintList()
 	local itemConfigTable = get("itemconfig.list")
-	for itemkey, itemConfig in pairs(itemConfigTable) do
-		itemConfig = BtmScan.unpackItemConfiguration(itemConfig)
+	local itemConfig = {}
+	for itemkey, itemConfigString in pairs(itemConfigTable) do
+		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
 		if itemConfig.buyBelow and itemConfig.buyBelow > 0 then
 			local itemID, itemsuffix, itemenchant = strsplit(":", itemkey)
 			itemkey = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
 			local _, itemlink = GetItemInfo(itemkey)
-			if itemlink then
-				BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+			if not itemlink then
+				itemlink="(Uncached item "..itemkey..")"
+			end
+			if itemConfig.maxCount and itemConfig.maxCount>0 then
+				BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1).." (<="..itemConfig.maxCount..")")
 			else
-				BtmScan.Print("Item not in cache: "..itemkey.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+				BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
 			end
 		end
 	end
@@ -191,385 +206,245 @@ end
  the ui has not modified any of the original snatch code 
  except adding the command handler]]
 
- local snatchconfigframe = CreateFrame("Frame", "snatchframe", UIParent); snatchconfigframe:Hide()	
-local bagcontents = {}
-local myworkingtable = {}
-local snatchprice
+local snatchconfigframe = CreateFrame("Frame", "snatchframe", UIParent)
+snatchconfigframe:Hide()	
 local print = BtmScan.Print
 local SelectBox = LibStub:GetLibrary("SelectBox")
 local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-local namefromenter, linkfromenter, itemkey
+local workingItemLink
 
-function lib.setWorkingItem(setname, setid)
-	for k, n in pairs(myworkingtable) do	
-		myworkingtable[k] = nil
-	end
-	if (setid == nil and setname == nil) then return end
-	if (setid == nil) then setid = setname end
-	local wrkname, wrklink, wrkrarity, wrklevel, wrkMinLevel, wrkType, wrkSubType, wrkStackCount, wrkEquipLoc, wrkTexture = GetItemInfo(setid)
-	local wrkid, _, _, _ = BtmScan.BreakLink(wrklink)
+local tmpItemConfig={}
+function lib.SetWorkingItem(link)
+	snatchconfigframe.ClearWorkingItem()
+	if type(link)~="string" then return false end
+	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
+	if not name or not texture then return false end
+	workingItemLink = link
 	
-	snatchconfigframe.workingname:SetText(wrkname)
-	snatchconfigframe.slot:SetTexture(wrkTexture)
-
-	myworkingtable[wrkid] = wrkname
+	snatchconfigframe.workingname:SetText(link)
+	snatchconfigframe.icon.tx:SetTexture(texture)
+	snatchconfigframe.icon.tx:Show()
+	snatchconfigframe.additem:Show()
+	
+	
+	BtmScan.getItemConfig(format("%d:%d:%d", BtmScan.BreakLink(link)),  tmpItemConfig)
+	if tmpItemConfig.buyBelow then
+		local g,s,c = BtmScan.GetGSC(tmpItemConfig.buyBelow)
+		snatchconfigframe.gold:SetText(g)
+		snatchconfigframe.silver:SetText(s)
+		snatchconfigframe.copper:SetText(c)
+		snatchconfigframe.additem:SetText("Update")
+		snatchconfigframe.removeitem:Show()
+	else
+		snatchconfigframe.gold:SetText("")
+		snatchconfigframe.silver:SetText("")
+		snatchconfigframe.copper:SetText("")
+		snatchconfigframe.additem:SetText("Add Item")
+		snatchconfigframe.removeitem:Hide()
+		
+	end
+	
+	return true
 end
 
 local snatch = {}
-function snatch.OnSnatchEnter(button, row, index)
-	local link, name
-	link = snatchconfigframe.snatchlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
-	if link:match("^(|c%x+|H.+|h%[.+%])") then
-		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
-	end
-	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-	if snatchconfigframe.snatchlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		if link and name then
-			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
-		else
-			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
-		end
-	end		
-	namefromenter = name
-	linkfromenter= link
-end
 
-local workingsnatchtable = {}
 function lib.populateSnatchSheet()
-	for k, v in pairs(workingsnatchtable)do workingsnatchtable[k] = nil; end --Reset 'data' table to ensure fresh data.
-
 	local itemConfigTable = get("itemconfig.list")
 	
-	for key, config in pairs(itemConfigTable) do
-		local itemID, itemSuffix, itemEnchant = strsplit(":", key)
-		local maxPrice, isIgnore, ignoreModuleList, buyBelow = strsplit(";", config)
-		if not(buyBelow == "nil") then
-			local snatchKey = strjoin(':', itemID, itemSuffix, itemEnchant)
-			local snatchValue = strjoin(';', maxPrice, isIgnore, ignoreModuleList, buyBelow)
-			local snatchKeyAndValue = strjoin('|', snatchKey, snatchValue)
-			workingsnatchtable[itemID] = snatchKeyAndValue	
-		end
-	end
-		
-	local displaysnatchtable = {}
-	for k, v in pairs(displaysnatchtable)do displaysnatchtable[k] = nil; end --Reset 'data' table to ensure fresh data.
-	for key, v in pairs(workingsnatchtable) do 
-		if (key == nil) then return end
-		local	btmskey, btmsvalue = strsplit('|', v)
-		local _, _, _, ibelow = strsplit(';', btmsvalue) 
-		local itemID, itemsuffix, itemenchant = strsplit(':', btmskey)
-		local itemkey = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
-		local _, itemlink = GetItemInfo(itemkey)
-		local _, itemlink, _, _, _, _, _, _, _, _ = GetItemInfo(key)
-		local a, b, c = BtmScan.GetGSC(ibelow)
-		local ibelow = strjoin('', a, "g ", b, "s ", c, "c")
-		if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
-			table.insert(displaysnatchtable,{
-				itemlink, --col2(itemname)as link form for mouseover tooltips to work
-				ibelow, --btm rule
-				key, --itemid
-			}) 
-		else
-			local a = tonumber(key)
-			local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(a, _,  true)
-			if newBuy == nil then newBuy = newBid end
-			if newBuy == nil then newBuy = "Not Available" end
-			if not(newBuy == "Not Available") then
-				newBuy = math.floor(tonumber(newBuy) or 0)
-				local g = math.floor(newBuy / 10000)
-				local s = math.floor(newBuy % 10000 / 100)
-				local c = newBuy % 100
-				newBuy = strjoin('',g,"g ",s,"s ",c,"c")
+	local display = {}
+	
+	local appraiser = AucAdvanced and AucAdvanced.Modules.Util.Appraiser
+	
+	local itemConfig = {}
+	for sig, itemConfigString in pairs(itemConfigTable) do
+		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
+		if itemConfig.buyBelow and itemConfig.buyBelow>0 then
+			local itemID, itemsuffix, itemenchant = strsplit(':', sig)
+			local itemString = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
+			local _, itemlink = GetItemInfo(itemString)
+			
+			if not appraiser then
+				table.insert(display,{
+					itemlink,
+					itemConfig.buyBelow,
+				}) 
+			else
+				local abid, abuy = appraiser.GetPrice(itemlink, nil, true)
+				table.insert(display,{
+					itemlink,
+					itemConfig.buyBelow,
+					tonumber(abuy) or tonumber(abid) --Appraisers buyout value
+				}) 
 			end
-			table.insert(displaysnatchtable,{
-				itemlink, --col2(itemname)as link form for mouseover tooltips to work
-				ibelow, --btm rule
-				newBuy, --Appraisers buyout value
-				key, --itemid
-			}) 
 		end
 	end
 		
-	snatchconfigframe.snatchlist.sheet:SetData(displaysnatchtable, style) --Set the GUI scrollsheet
+	snatchconfigframe.snatchlist.sheet:SetData(display)
 end 
 
-function lib.buildkeyfromid(itemid)
-	---------------------------------------------------------Need to grab this data from an updated working table / equiv else we are overwriting 
-	---- the current data with 0's or nil's
-	local key = strjoin(':', itemid, "0", "0")	
-	return key 
-end
-
-function lib.buildvaluefrombuyBelow(buyBelow)
-	---------------------------------------------------------Need to grab this data from an updated working table / equiv else we are overwriting 
-	---- the current data with 0's or nil's
-	local value = strjoin(';', "nil", "nil", "nil", buyBelow)	
-	return value
-end	
 
 function lib.snatchListClear()
-	local cleartable = {}
-	for k, v in pairs (cleartable) do
-		cleartable[k] = nil
+	local itemConfig = {}
+	for sig, itemConfigString in pairs(itemConfigTable) do
+		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
+		if itemConfig.buyBelow then
+			itemConfig.buyBelow = nil
+			itemConfig.maxCount = nil
+			 BtmScan.storeItemConfig(itemConfig, sig)
+		end
 	end
-	set("itemconfig.list", cleartable) --Inserts our re-built itemconfig.list take into BTM Settings
+			
 	lib.populateSnatchSheet()
 end
 
-function lib.commitSnatchList(commitfor, commitwhat)	
-	local snatchcommit = {}
-	local commitfor = commitfor
-	local commitwhat = commitwhat
-	local tempblanktable = {}
-	
-	for k, v in pairs(tempblanktable) do tempblanktable[k] = nil; end -- Clears our data table to ensure fresh data.
-	for k, v in pairs(snatchcommit) do snatchcommit[k] = nil; end -- Clears our data table to ensure fresh data.
-	if (commitfor == "add") then
-		snatchprice = 1
-		local gnum = snatchconfigframe.gold:GetNumLetters()
-		local snum = snatchconfigframe.silver:GetNumLetters()		
-		local cnum = snatchconfigframe.copper:GetNumLetters()		
-		local gold = snatchconfigframe.gold:GetText()
-		local silver = snatchconfigframe.silver:GetText()
-		local copper = snatchconfigframe.copper:GetText()
-		gold = tonumber(gold)
-		if (gold == nil) then 
-			gold = 0.01
-		else
-			gold = gold * 10000
-		end
-		silver = tonumber(silver)
-		
-		if (silver == nil) then
-			silver = 0.0001
-		else
-			silver = silver * 100
-		end
-		copper = tonumber(copper)
-		if (copper == nil) then
-			copper = 0.01
-		else
-			copper = copper * 1
-		end
-		snatchprice = copper + silver + gold
-		local snatchprice, _ = strsplit('.', snatchprice)
-		local key = lib.buildkeyfromid(commitwhat)
-		local value = lib.buildvaluefrombuyBelow(snatchprice)
-		local keyvalue = strjoin('|', key, value)
-		tempblanktable[commitwhat] = keyvalue
-		snatchcommit[key] = value
-		for k, v in pairs(workingsnatchtable) do 
-			if (k == nil) then return end
-			local	btmskey, btmsvalue = strsplit('|', v)
-			snatchcommit[btmskey] = btmsvalue
-		end
-	end
-	
-	if (commitfor == "remove") then
-		snatchprice = 10 -- doesn't matter we are removing it just need to be sure there is a number here to build the new value.
-		local key = lib.buildkeyfromid(commitwhat)
-		local value = lib.buildvaluefrombuyBelow(snatchprice)
-		local tone, ttwo, tthree, tfour = strsplit(';', value)
-		value = strjoin(';', tone, ttwo, tthree, "nil")
-		local keyvalue = strjoin('|', key, value)
-		tempblanktable[commitwhat] = keyvalue
-		for k, v in pairs(workingsnatchtable) do 
-			if (k == nil) then return end
-			local	btmskey, btmsvalue = strsplit('|', v)
-			snatchcommit[btmskey] = btmsvalue
-		end
-		snatchcommit[key] = value
-	end
-	
-	set("itemconfig.list", snatchcommit) --Inserts our re-built itemconfig.list take into BTM Settings
-	
-	for k, v in pairs (tempblanktable) do
-		tempblanktable[k] = nil
-	end
-	lib.populateSnatchSheet()
-end
+
 
 
 function snatchconfigframe.removeitemfromlist()
-	
-	for iid, n in pairs(myworkingtable) do
-		local asnum = tonumber(iid)
-		myworkingtable[iid] = nil
-		lib.commitSnatchList("remove", asnum)	
-	end
-	snatchconfigframe.ClearIcon()
+	lib.AddSnatch(workingItemLink, nil)
+	snatchconfigframe.ClearWorkingItem()
 	lib.populateSnatchSheet()
 end
 
 function snatchconfigframe.snatchadditemtolist()
-	for iid, n in pairs(myworkingtable) do
-		local asnum = tonumber(iid)
-		myworkingtable[iid] = nil
-		lib.commitSnatchList("add", asnum)	
-	end
-	snatchconfigframe.ClearIcon()
+	local g = tonumber(snatchconfigframe.gold:GetText()) or 0
+	local s = tonumber(snatchconfigframe.silver:GetText()) or 0
+	local c = tonumber(snatchconfigframe.copper:GetText()) or 0
+	
+	lib.AddSnatch(workingItemLink, g*10000 + s*100 + c)
+	snatchconfigframe.ClearWorkingItem()
 	lib.populateSnatchSheet()	
 end
 
-function snatch.OnBagListEnter(button, row, index)
-	local link, name
-	link = snatchconfigframe.baglist.sheet.rows[row][index]:GetText() or "FAILED LINK"
-	if link:match("^(|c%x+|H.+|h%[.+%])") then
-		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
-	end
-	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-	if snatchconfigframe.baglist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+function snatch.OnSnatchEnter(button, row, index)
+	if snatchconfigframe.snatchlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		local link = snatchconfigframe.snatchlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
+		local name = GetItemInfo(link)
 		if link and name then
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
-		else
-			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
 		end
 	end		
-	namefromenter = name
-	linkfromenter= link
+end
+
+function snatch.OnBagListEnter(button, row, index)
+	if snatchconfigframe.baglist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
+		local link = snatchconfigframe.baglist.sheet.rows[row][index]:GetText()
+		local name = GetItemInfo(link)
+		if link and name then
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
+		end
+	end		
 end
 
 function snatch.OnLeave(button, row, index)
 	GameTooltip:Hide()
-	linkfromenter = "emptylink"
-	namefromenter = "emptyname"
 end
 
-function snatch.OnClick(button, row, index)
-	if (linkfromenter == nil) then return end
-	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(linkfromenter)
-	local itemID, _, _, _ = BtmScan.BreakLink(linkfromenter)
-	lib.setWorkingItem(itemName, itemID)
+
+function snatch.OnClickSnatchList(button, row, index)
+	local link = snatchconfigframe.snatchlist.sheet.rows[row][1]:GetText()
+	lib.SetWorkingItem(link)
 end	
 
-function snatchconfigframe.ClearIcon()
-	snatchconfigframe.workingname:SetText("Item Name")
-	snatchconfigframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+function snatch.OnClickBagList(button, row, index)
+	local link = snatchconfigframe.baglist.sheet.rows[row][1]:GetText()
+	lib.SetWorkingItem(link)
+end	
+
+
+function snatchconfigframe.ClearWorkingItem()
+	snatchconfigframe.workingname:SetText("")
+	snatchconfigframe.icon.tx:Hide()
+	snatchconfigframe.additem:Hide()
+	snatchconfigframe.removeitem:Hide()
 	snatchconfigframe.gold:SetText("")
 	snatchconfigframe.silver:SetText("")
 	snatchconfigframe.copper:SetText("")
-	wrkname = nil	
-	wrkid = nil
 end
 
 function snatchconfigframe.IconClicked()
-	snatchconfigframe.ClearIcon()
+	snatchconfigframe.ClearWorkingItem()
 end 
-
-function lib.GetItemByLink(link)
-	local sig
-	local id, suffix, enchant, seed = BtmScan.BreakLink(link)
-	local factor = 0
-	if enchant ~= 0 then
-		sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-	elseif factor ~= 0 then
-		sig = ("%d:%d:%d"):format(id, suffix, factor)
-	elseif suffix ~= 0 then
-		sig = ("%d:%d"):format(id, suffix)
-	else
-		sig = tostring(id)
-	end
-end
-
 
 function lib.snatchIconDrag()
 	local objtype, _, itemlink = GetCursorInfo()
-	ClearCursor()
 	if objtype == "item" then
-		lib.GetItemByLink(itemlink)
-		if (itemlink == nil) then 
-			return 
-		end
-			local itemName, newlink, _, _, _, _, _, _, _, _ = GetItemInfo(itemlink) 
-			local itemID, _, _, _ = BtmScan.BreakLink(itemlink)
-			lib.setWorkingItem(itemName, itemID)
+		ClearCursor()
+		lib.SetWorkingItem(itemlink)
 	end
 end
 
 function lib.ClickLinkHook(_, _, _, link, button)
-	if (snatchconfigframe:IsVisible()) then
-		if link then
-			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-			if (itemID == nil) then return end
-			if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
-				lib.setWorkingItem(itemName, itemID)
-			end
+	if link and snatchconfigframe:IsVisible() then
+		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
+			lib.SetWorkingItem(link)
 		end
 	end
 end
 
-function lib.populateDataSheet()
-	for k, v in pairs(bagcontents) do bagcontents[k] = nil; end --Reset table to ensure fresh data.
-	for bag=0,4 do
+function lib.populateBagSheet()
+	
+	local unique={}
+	local bagcontents = {}
+	local appraiser = AucAdvanced and AucAdvanced.Modules.Util.Appraiser
+	
+	for bag=0,NUM_BAG_SLOTS do
 		for slot=1,GetContainerNumSlots(bag) do
-			if (GetContainerItemLink(bag,slot)) then
-				local _,itemCount = GetContainerItemInfo(bag,slot)
-				local itemLink = GetContainerItemLink(bag,slot)
-				local itemID, _, _, _ = BtmScan.BreakLink(itemLink)
-				if (itemLink == nil) then return end
-				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
-				local btmRule = "~"
-				local reason, bids
-				local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-				local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-				local bidlist = get("bid.list")
-				
-				if (bidlist) then
-					bids = bidlist[sig..":"..seed.."x"..itemCount]
-					if(bids and bids[1]) then 
-						btmRule = bids[1]
-					end 
+			local itemLink = GetContainerItemLink(bag,slot)
+			if itemLink then
+				local itemid, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+				local sig = ("%d:%d"):format(itemid,suffix)
+				if not unique[sig] then
+					unique[sig]=true
+					local _,itemCount = GetContainerItemInfo(bag,slot)
+					local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
+					local btmRule = ""
+					
+					local bidlist = get("bid.list")
+					if (bidlist) then
+						local bids = bidlist[("%d:%d:%d:%dx%d"):format(itemid,suffix,enchant,seed,itemCount)]
+						if(bids and bids[1]) then 
+							btmRule = bids[1]
+						end 
+					end
+					
+					if not appraiser then
+						tinsert(bagcontents, {
+							itemLink,
+							btmRule
+						})
+					else
+						local abid,abuy = appraiser.GetPrice(itemLink, nil, true)
+						tinsert(bagcontents, {
+							itemLink,
+							tonumber(abuy) or tonumber(abid),
+							btmRule
+						})
+					end
 				end
-								
-				local joinedBagString = strjoin('|', itemName, btmRule)
-				bagcontents[itemID] = joinedBagString	
 			end
 		end
 	end
-	local bagcontentsnodups = {}
-	for k, v in pairs(bagcontentsnodups) do bagcontentsnodups[k] = nil; end --Reset 'data' table to ensure fresh data.
-	for col1, col2 in pairs(bagcontents) do 
-		if (col1 == nil) then return end
-		local	iName, iRule = strsplit('|', col2)
-		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(col1)
-		if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
-			table.insert(bagcontentsnodups,{
-				itemLink, --col2(itemlink) for mouseover tooltips to work
-				iRule, --btm rule
-				col1, --itemid
-			}) 
-		else
-			local a = tonumber(col1)
-			local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(a, true)
-			if newBuy == nil then newBuy = newBid end
-			if newBuy == nil then newBuy = "Not Available" end
-			if not(newBuy == "Not Available") then
-				newBuy = math.floor(tonumber(newBuy) or 0)
-				local g = math.floor(newBuy / 10000)
-				local s = math.floor(newBuy % 10000 / 100)
-				local c = newBuy % 100
-				newBuy = strjoin('',g,"g ",s,"s ",c,"c")
-			end
-			table.insert(bagcontentsnodups,{
-				itemLink, --col2(itemlink) for mouseover tooltips to work
-				newBuy, --Appraisers buyout value
-				iRule, --btm rule
-				col1, --itemid
-			}) 
-		end
-	end 
-	snatchconfigframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
+	
+	snatchconfigframe.baglist.sheet:SetData(bagcontents) --Set the GUI scrollsheet
 	lib.populateSnatchSheet()
 end
 
 function lib.snatchGUI() 
 	if (snatchconfigframe:IsVisible()) then lib.closeSnatchGUI() end
 	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
-	snatchconfigframe:Show()		
-	lib.populateDataSheet()
-	snatchconfigframe.ClearIcon()
+	snatchconfigframe:Show()
+	lib.populateBagSheet()
+	snatchconfigframe.ClearWorkingItem()
 end
 
 function lib.closeSnatchGUI()
@@ -578,6 +453,7 @@ function lib.closeSnatchGUI()
 end
 
 function lib.makesnatchgui()
+	snatchconfigframe:SetToplevel(true)
 	snatchconfigframe:SetFrameStrata("HIGH")
 	snatchconfigframe:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
@@ -614,39 +490,42 @@ function lib.makesnatchgui()
 	
 	--Add Drag slot / Item icon
 	snatchconfigframe.slot = snatchconfigframe:CreateTexture(nil, "BORDER")
+	snatchconfigframe.slot:SetDrawLayer("Artwork") -- or the border shades it
 	snatchconfigframe.slot:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 23, -75)
 	snatchconfigframe.slot:SetWidth(45)
 	snatchconfigframe.slot:SetHeight(45)
-	snatchconfigframe.slot:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+	snatchconfigframe.slot:SetTexCoord(0.17, 0.83, 0.17, 0.83)
 	snatchconfigframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
 
 	snatchconfigframe.icon = CreateFrame("Button", nil, snatchconfigframe)
-	snatchconfigframe.icon:SetPoint("TOPLEFT", snatchconfigframe.slot, "TOPLEFT", 3, -3)
-	snatchconfigframe.icon:SetWidth(38)
-	snatchconfigframe.icon:SetHeight(38)
+	snatchconfigframe.icon:SetPoint("TOPLEFT", snatchconfigframe.slot, "TOPLEFT", 2, -2)
+	snatchconfigframe.icon:SetPoint("BOTTOMRIGHT", snatchconfigframe.slot, "BOTTOMRIGHT", -2, 2)
 	snatchconfigframe.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	snatchconfigframe.icon:SetScript("OnClick", snatchconfigframe.IconClicked)
 	snatchconfigframe.icon:SetScript("OnReceiveDrag", lib.snatchIconDrag)
+	snatchconfigframe.icon.tx = snatchconfigframe.icon:CreateTexture()
+	snatchconfigframe.icon.tx:SetAllPoints(snatchconfigframe.icon)
+	
 	
 	snatchconfigframe.slot.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	snatchconfigframe.slot.help:SetPoint("LEFT", snatchconfigframe.slot, "RIGHT", 2, 7)
 	snatchconfigframe.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
-	snatchconfigframe.slot.help:SetWidth(100)
+	snatchconfigframe.slot.help:SetWidth(80)
 	
 	snatchconfigframe.workingname = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	snatchconfigframe.workingname:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 15, -135)
-	snatchconfigframe.workingname:SetText(("")) 
-	snatchconfigframe.workingname:SetWidth(90)
+	snatchconfigframe.workingname:SetWidth(160)
+	snatchconfigframe.workingname:SetJustifyH("LEFT")
 	
 	
 	--Add Title text
 	local	snatchtitle = snatchconfigframe:CreateFontString(asuftitle, "OVERLAY", "GameFontNormalLarge")
-	snatchtitle:SetText("BTM Snatch Configuration!")
+	snatchtitle:SetText("BTM Snatch Configuration")
 	snatchtitle:SetJustifyH("CENTER")
 	snatchtitle:SetWidth(300)
 	snatchtitle:SetHeight(10)
 	snatchtitle:SetPoint("TOPLEFT",  snatchconfigframe, "TOPLEFT", 0, -17)
-	snatchconfigframe.snatchtitle = asnatchtitle	
+	snatchconfigframe.snatchtitle = snatchtitle
 	
 	-- Bag List
 	snatchconfigframe.baglist = CreateFrame("Frame", nil, snatchconfigframe)
@@ -665,21 +544,20 @@ function lib.makesnatchgui()
 	snatchconfigframe.bagscan = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
 	snatchconfigframe.bagscan:SetPoint("TOP", snatchconfigframe.baglist, "BOTTOM", 0, -15)
 	snatchconfigframe.bagscan:SetText(("Refresh Data"))
-	snatchconfigframe.bagscan:SetScript("OnClick", lib.populateDataSheet)
+	snatchconfigframe.bagscan:SetScript("OnClick", lib.populateBagSheet)
 	
-	if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
-		{ ('Bag Contents:'), "TOOLTIP", 150 }, 
-		{ ('BTM Rule'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
-		}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClick)
+			{ "Bag Contents", "TOOLTIP", 150 }, 
+			{ "BTM Rule", "TEXT", 25 }, 
+			}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClickBagList)
 	else
 		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
-		{ ('Bag Contents:'), "TOOLTIP", 150 }, 
-		{ ('Appraiser:'), "TEXT", 25 }, 
-		{ ('BTM Rule'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
-		}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClick)
+			{ "Bag Contents", "TOOLTIP", 150 }, 
+			{ "Appraiser", "COIN", 25 }, 
+			{ "BTM Rule", "TEXT", 25 }, 
+			{ "Test", "INT", -1 },
+			}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClickBagList)
 	end
 		
 	--Create the snatch list results frame
@@ -708,10 +586,12 @@ function lib.makesnatchgui()
 	snatchconfigframe.additem:SetText(('Add Item'))
 	snatchconfigframe.additem:SetScript("OnClick", snatchconfigframe.snatchadditemtolist)
 	
+	--[[
 	snatchconfigframe.additem.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	snatchconfigframe.additem.help:SetPoint("TOPLEFT", snatchconfigframe.additem, "TOPRIGHT", 1, 1)
 	snatchconfigframe.additem.help:SetText(("(to Snatch list)")) 
 	snatchconfigframe.additem.help:SetWidth(90)
+	]]
 	
 	--Add coin boxes
 	function lib.goldtosilver()
@@ -761,10 +641,12 @@ function lib.makesnatchgui()
 	snatchconfigframe.removeitem:SetText(('Remove Item'))
 	snatchconfigframe.removeitem:SetScript("OnClick", snatchconfigframe.removeitemfromlist)
 	
+	--[[
 	snatchconfigframe.removeitem.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	snatchconfigframe.removeitem.help:SetPoint("TOPLEFT",  snatchconfigframe.removeitem, "TOPRIGHT", 1, 1)
 	snatchconfigframe.removeitem.help:SetText(("(from Snatch list)")) 
 	snatchconfigframe.removeitem.help:SetWidth(90)
+	]]
 	
 	--Reset snatch list
 	snatchconfigframe.resetList = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
@@ -772,19 +654,17 @@ function lib.makesnatchgui()
 	snatchconfigframe.resetList:SetText(("Reset List"))
 	snatchconfigframe.resetList:SetScript("OnClick", lib.snatchListClear)
 	
-	if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
-		{ ('Snatching:'), "TOOLTIP", 150 }, 
-		{ ('Buy Below:'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
-		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClick) 
+		{ "Snatching", "TOOLTIP", 150 }, 
+		{ "Buy at", "COIN", 70 }, 
+		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClickSnatchList)
 	else
 		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
-		{ ('Snatching:'), "TOOLTIP", 150 }, 
-		{ ('Buy Below:'), "TEXT", 25 }, 
-		{ ('Appraiser:'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
-		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClick) 
+		{ "Snatching", "TOOLTIP", 150 }, 
+		{ "Buy at", "COIN", 70}, 
+		{ "Appraiser", "COIN", 70 }, 
+		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClickSnatchList)
 	end
 	lib.populateSnatchSheet()
 end
