@@ -49,6 +49,7 @@ table.insert(BtmScan.evaluators, lcName)
 local define = BtmScan.Settings.SetDefault
 local get = BtmScan.Settings.GetSetting
 local set = BtmScan.Settings.SetSetting
+local _
 
 BtmScan.evaluators[lcName] = lib
 
@@ -90,7 +91,7 @@ function lib:valuate(item, tooltip)
 		end
 	else 
 		-- GetAppraiserValue works whether or not Appraiser is installed. In this case it uses Market Value)
-		newBid, newBuy, seen, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.link, _, get(lcName..".matching.check"))
+		newBuy, newBid, _, seen, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.link, _, get(lcName..".matching.check"))
 		
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
