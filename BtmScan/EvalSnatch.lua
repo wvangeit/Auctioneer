@@ -272,7 +272,7 @@ function lib.populateSnatchSheet()
 			}) 
 		else
 			local a = tonumber(key)
-			local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(a, true)
+			local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(a, _,  true)
 			if newBuy == nil then newBuy = newBid end
 			if newBuy == nil then newBuy = "Not Available" end
 			if not(newBuy == "Not Available") then
@@ -542,7 +542,7 @@ function lib.populateDataSheet()
 			}) 
 		else
 			local a = tonumber(col1)
-			local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(a, true)
+			local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(a, true)
 			if newBuy == nil then newBuy = newBid end
 			if newBuy == nil then newBuy = "Not Available" end
 			if not(newBuy == "Not Available") then

@@ -90,7 +90,7 @@ function lib:valuate(item, tooltip)
 		end
 	else 
 		-- GetAppraiserValue works whether or not Appraiser is installed. In this case it uses Market Value)
-		newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
+		newBid, newBuy, seen, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.link, _, get(lcName..".matching.check"))
 		
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)

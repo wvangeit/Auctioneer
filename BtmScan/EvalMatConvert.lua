@@ -177,7 +177,7 @@ local convertToID = 0
 local newBid = 0
 local newBuy = 0
 local curModelText = "Unknown"
-local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
+local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.id, _,get(lcName..".matching.check"))
 local reagentPrice = 0		
 
 if newBuy == nil then newBuy = newBid end
@@ -235,7 +235,7 @@ end
 				local newBid = 0
 				local newBuy = 0
 				local curModelText = "Unknown"
-				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get(lcName..".matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
@@ -285,7 +285,7 @@ end
 				newBid = 0
 				newBuy = 0
 				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get(lcName..".matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
@@ -338,7 +338,7 @@ end
 				local newBid = 0
 				local newBuy = 0
 				local curModelText = "Unknown"
-				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get(lcName..".matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
@@ -397,7 +397,7 @@ end
 				newBid = 0
 				newBuy = 0
 				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get(lcName..".matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
