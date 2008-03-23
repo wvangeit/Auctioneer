@@ -51,6 +51,9 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.GetMatchArray(hyperlink, marketprice)
+	if not AucAdvanced.Settings.GetSetting("match.undercut.enable") then
+		return
+	end
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 
@@ -153,6 +156,7 @@ function lib.OnLoad()
 	--You should also set your Configator defaults here
 
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	AucAdvanced.Settings.SetDefault("match.undercut.enable", true)
 	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -10)
 	AucAdvanced.Settings.SetDefault("match.undermarket.overmarket", 10)
 	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 5)
@@ -174,6 +178,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	
 	gui:AddControl(id, "Subhead",    0,    "Competition Matching")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.enable", "Enable Auc-Match-Undercut")
 	
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
 	gui:AddTip(id, "This controls how much below the market price you are willing to undercut before giving up.\n"..
