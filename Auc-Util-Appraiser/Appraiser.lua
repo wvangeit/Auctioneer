@@ -140,7 +140,7 @@ function lib.GetPrice(link, _, match)
 	local curModel, curModelText
 	
 	if not sig then
-		return 0, 0, 0, "Unknown"
+       	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
 	
 	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
@@ -226,10 +226,10 @@ function lib.GetPrice(link, _, match)
 		number = -2
 	end
 	number = tonumber(number)
-	if (type(stack) ~= "number") or (type(number) ~= "number") then
-		print("Stack: "..stack.."  Number: "..number)
-		print("Stack: "..type(stack).."  Number: "..type(number))
-	end
+--	if (type(stack) ~= "number") or (type(number) ~= "number") then
+--		print("Stack: "..stack.."  Number: "..number)
+--		print("Stack: "..type(stack).."  Number: "..type(number))
+--	end
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
 end
 
