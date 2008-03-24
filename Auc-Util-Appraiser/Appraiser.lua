@@ -162,7 +162,7 @@ function lib.GetPrice(link, _, match)
 		else
 			newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 		end
-		if not newBuy then
+		if (not newBuy) or (newBuy == 0) then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
 			if curModel == "market" then
 				newBuy, seen = AucAdvanced.API.GetMarketValue(link)
