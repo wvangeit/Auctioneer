@@ -58,10 +58,10 @@ local rope = LibStub("StringRope"):New()
 local faction, scanid
 function private.process(operation, itemData, oldData)
 	if (faction and scanid) then
-		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemData.link)
-
 		if not rope:IsEmpty() then rope:Add(";") end
-		rope:AddDelimited(":", id, suffix, enchant, factor, seed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
+		rope:AddDelimited(":", itemData.itemId, itemData.itemSuffix, itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
+
+		AucDbData.names[("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,itemData.itemEnchant)] = itemData.itemName;
 	end
 end
 
@@ -86,12 +86,15 @@ end
 lib.LoadTriggers = { ["auc-db"] = true }
 function lib.OnLoad()
 	if not AucDbData then return end
+	if not AucDbData.names then AucDbData.names = {} end
 
 	local expires = time() - (86400 * 3) -- 3 day expiry
 	for realm, rData in pairs(AucDbData) do
-		for tStamp, tData in pairs(rData) do
-			if tStamp < expires then
-				rData[tStamp] = nil
+		if (realm ~= "names") then
+			for tStamp, tData in pairs(rData) do
+				if tStamp < expires then
+					rData[tStamp] = nil
+				end
 			end
 		end
 	end
