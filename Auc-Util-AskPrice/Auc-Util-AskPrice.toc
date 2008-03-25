@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Ask Price
-## Interface: 20300
+## Interface: 20400
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
