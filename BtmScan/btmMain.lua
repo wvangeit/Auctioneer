@@ -1923,7 +1923,7 @@ function BtmScan.packItemConfiguration(itemconfig)
 	else
 		tmp[1]=nil
 	end
-	tmp[2] = itemconfig.isIgnore and true or nil
+	tmp[2] = itemconfig.isIgnore and tostring(true) or nil
 	if type(itemconfig.ignoreModuleList)=="string" and itemconfig.ignoreModuleList~="" then
 		tmp[3] = itemconfig.ignoreModuleList
 	else
