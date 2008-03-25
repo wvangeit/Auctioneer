@@ -85,7 +85,7 @@ end
 
 lib.LoadTriggers = { ["auc-db"] = true }
 function lib.OnLoad()
-	if not AucDbData then return end
+	if not AucDbData then AucDbData = { names = {} } return end
 	if not AucDbData.names then AucDbData.names = {} end
 
 	local expires = time() - (86400 * 3) -- 3 day expiry
