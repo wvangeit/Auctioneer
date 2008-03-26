@@ -684,14 +684,13 @@ local autoselldata = {}; local bagcontents = {}; local bagcontentsnodups = {}
 function lib.populateDataSheet()
 	for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 		
-	for column1, column2 in pairs(autoSellList) do
-		if (column1 == nil) then return end
-		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(column1)
+	for id, column2 in pairs(autoSellList) do
+		if (id == nil) then return end
+		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		local sellReason = "manual add"
 		table.insert(autoselldata,{
 			itemLink, --col2(itemname)as link form for mouseover tooltips to work
 			sellReason, --sell why?
-			column1, --itemid
 		}) 
 	end
 		autosellframe.resultlist.sheet:SetData(autoselldata, style) --Set the GUI scrollsheet
@@ -726,14 +725,13 @@ function lib.populateDataSheet()
 		end
 	end
 	for k, v in pairs(bagcontentsnodups) do bagcontentsnodups[k] = nil; end --Reset 'data' table to ensure fresh data.
-	for col1, col2 in pairs(bagcontents) do 
-		if (col1 == nil) then return end
+	for id, col2 in pairs(bagcontents) do 
+		if (id == nil) then return end
 		local	iName, iRule = strsplit('|', col2)
-		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(col1)
+		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		table.insert(bagcontentsnodups,{
 		itemLink, --col2(itemname)as link form for mouseover tooltips to work
 		iRule, --btm rule
-		col1, --itemid
 		}) 
 	end 
 	autosellframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
@@ -913,7 +911,6 @@ function lib.makeautosellgui()
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
 		{ ('Sell Reason'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClick) 
 	
 	--lib.populateDataSheet()
@@ -942,7 +939,6 @@ function lib.makeautosellgui()
 	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
 		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
 		{ ('BTM Rule'), "TEXT", 25 }, 
-		{ ('ID #'), "TEXT", 25 }, 
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
 	
 	lib.populateDataSheet()
