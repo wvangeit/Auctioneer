@@ -3,6 +3,6 @@
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
-## SavedVariables: autoSellList
+## SavedVariables: autoSellList, autoSellIgnoreList, depositCostList
 Auc-Util-AutoMagic.lua
 Embed.xml
