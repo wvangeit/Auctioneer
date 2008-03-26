@@ -225,6 +225,7 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.autocloseenable", false)
 	default("util.automagic.showmailgui", false)
 	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
+	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
 end
 
 	-- define what event fires what function
@@ -255,6 +256,9 @@ function lib.SetupConfigGui(gui)
 			"Caution: There are no warnings, open a merchant window and if this is enabled the items are sold without warning!!!  Again... No warnings just poof gone... \n\n"..
 			"\n\n"..
 		"\n")
+		gui:AddControl(id, "Header",     0,    libName.." General options")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.chatspam", "Enable AutoMagic Chat Spam")
+		
 		gui:AddControl(id, "Header",     0,    libName.." vendor options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items ")
@@ -274,7 +278,9 @@ function lib.merchantShow()
 	if (get("util.automagic.autovendor")) then 
 		lib.doVendorSell()
 		if (get("util.automagic.autoclosemerchant")) then 
-			print("AutoMagic has closed the merchant window for you, to disable you must change this options in the settings.") 
+			if (get("util.automagic.chatspam")) then 
+				print("AutoMagic has closed the merchant window for you, to disable you must change this options in the settings.") 
+			end
 			CloseMerchant()	
 		end
 	end
@@ -326,24 +332,32 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 					
 			if amBTMRule == "demats" then	
 				if isDEMats[ itemID ] then
-					print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					if (get("util.automagic.chatspam")) then 
+						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					end
 					UseContainerItem(bag, slot) 
 				end
 			end
 			if amBTMRule == "gems" then	
 				if isGem[ itemID ] then
-					print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					if (get("util.automagic.chatspam")) then 
+						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					end
 					UseContainerItem(bag, slot) 
 				end
 			end
 			if amBTMRule == "vendor" then
 				if autoSellList[ itemID ] then 
-					print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
+					if (get("util.automagic.chatspam")) then 
+						print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
+					end
 					UseContainerItem(bag, slot)
 				elseif (get("util.automagic.autosellgrey")) then  
 					if itemRarity == 0 then
 						UseContainerItem(bag, slot)
-						print("AutoMagic has sold", itemName," due to item being grey")
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has sold", itemName," due to item being grey")
+						end
 					end			
 				end 			
 			end
@@ -358,21 +372,27 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 					bids = bidlist[sig..":"..seed.."x"..itemCount]
 					if amBTMRule == "vendor" then
 						if(bids and bids[1] and bids[1] == "vendor") then 
-							print("AutoMagic has sold", itemName, " due to vendor btm status")		
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has sold", itemName, " due to vendor btm status")		
+							end
 							UseContainerItem(bag, slot) 
 						end 
 					end
 		
 					if amBTMRule == "disenchant" then	
 						if(bids and bids[1] and bids[1] == "disenchant") then 
-							print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+							end
 							UseContainerItem(bag, slot) 
 						end 
 					end
 				
 					if amBTMRule == "prospect" then
 						if(bids and bids[1] and bids[1] == "prospect") then 
-							print("AutoMagic has loaded", itemName, " due to prospect btm status")
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to prospect btm status")
+							end
 							UseContainerItem(bag, slot) 
 						end 
 					end
@@ -651,10 +671,8 @@ function lib.ClickLinkHook(_, _, _, link, button)
 	if (autosellframe:IsVisible()) then
 		if link then
 			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-			if (itemID == nil) then return end
-			--local item_Name, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemID) 				
+			if (itemID == nil) then return end	
 			if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
-			--print(itemName, itemID, "@ click hook to working")
 			lib.setWorkingItem(itemName, itemID)
 			end
 		end
@@ -663,9 +681,8 @@ end
 
 
 local autoselldata = {}; local bagcontents = {}; local bagcontentsnodups = {}	
---function lib.populateBagDataSheet() lib.populateDataSheet(); end
 function lib.populateDataSheet()
-	for k, v in pairs(autoselldata) do autoselldata[k] = nil; end--print("removed ", k, "from autoselldata");  end --Reset table to ensure fresh data.
+	for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 		
 	for column1, column2 in pairs(autoSellList) do
 		if (column1 == nil) then return end
@@ -678,10 +695,8 @@ function lib.populateDataSheet()
 		}) 
 	end
 		autosellframe.resultlist.sheet:SetData(autoselldata, style) --Set the GUI scrollsheet
---end
 
---function lib.populateBagDataSheet()
-	for k, v in pairs(bagcontents) do bagcontents[k] = nil; end --print("removed ", k, "from bagscontent"); end --Reset table to ensure fresh data.
+	for k, v in pairs(bagcontents) do bagcontents[k] = nil; end  --Reset table to ensure fresh data.
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -702,15 +717,6 @@ function lib.populateDataSheet()
 						if(bids and bids[1]) then 
 							btmRule = bids[1]
 						end 
-						
-					--	if(bids and bids[1] and bids[1] == "disenchant") then 
-					--		bagBTMRule
-					--		bagcontents[itemName] = bagBTMRule
-					--	end 
-					--				
-					--	if(bids and bids[1] and bids[1] == "prospect") then 
-					--		bagcontents[itemName] = bagBTMRule
-					--	end 
 					end
 				end
 				
@@ -723,7 +729,6 @@ function lib.populateDataSheet()
 	for col1, col2 in pairs(bagcontents) do 
 		if (col1 == nil) then return end
 		local	iName, iRule = strsplit('|', col2)
-		--print(iName, iRule)
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(col1)
 		table.insert(bagcontentsnodups,{
 		itemLink, --col2(itemname)as link form for mouseover tooltips to work
