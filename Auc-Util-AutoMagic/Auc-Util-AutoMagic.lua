@@ -41,6 +41,8 @@ local ammailgui = CreateFrame("Frame", "", UIParent); ammailgui:Hide()
 local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellframe:Hide()
 local autoselldata = {}
 local autosell = {}
+local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+
 autoSellList ={}
 autoSellIgnoreList = {}
 depositCostList = {}
@@ -688,9 +690,11 @@ function lib.populateDataSheet()
 		if (id == nil) then return end
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		local sellReason = "manual add"
+		local abid,abuy = GetPrice(itemLink, nil, true)
 		table.insert(autoselldata,{
 			itemLink, --col2(itemname)as link form for mouseover tooltips to work
 			sellReason, --sell why?
+			tonumber(abuy) or tonumber(abid),
 		}) 
 	end
 		autosellframe.resultlist.sheet:SetData(autoselldata, style) --Set the GUI scrollsheet
@@ -729,9 +733,11 @@ function lib.populateDataSheet()
 		if (id == nil) then return end
 		local	iName, iRule = strsplit('|', col2)
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
+		local abid,abuy = GetPrice(itemLink, nil, true)
 		table.insert(bagcontentsnodups,{
 		itemLink, --col2(itemname)as link form for mouseover tooltips to work
 		iRule, --btm rule
+		tonumber(abuy) or tonumber(abid),
 		}) 
 	end 
 	autosellframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
@@ -911,6 +917,7 @@ function lib.makeautosellgui()
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
 		{ ('Sell Reason'), "TEXT", 25 }, 
+		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClick) 
 	
 	--lib.populateDataSheet()
@@ -939,6 +946,7 @@ function lib.makeautosellgui()
 	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
 		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
 		{ ('BTM Rule'), "TEXT", 25 }, 
+		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
 	
 	lib.populateDataSheet()
