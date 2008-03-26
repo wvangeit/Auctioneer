@@ -42,6 +42,8 @@ local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellf
 local autoselldata = {}
 local autosell = {}
 autoSellList ={}
+autoSellIgnoreList = {}
+depositCostList = {}
 
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats
@@ -181,23 +183,26 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-	
 	if (AucAdvanced and BtmScan) then
 		local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-		local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, quantity) 
-		--ttdepcost = 20
-		if (ttdepcost == 0 or ttdepcost == nil) then 
+		if depositCostList[itemid] then 
+			for k, v in pairs(depositCostList) do
+				if k == itemid then
+					ttdepcost = v
+				end
+			end
+		end
+		
+		if (ttdepcost == 0 or ttdepcost == nil) then 	
 			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
 		else
-			ttdepcost = ttdepcost * 2
 			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
-			EnhTooltip.AddLine(ttdesc,ttdepcost)	
+			EnhTooltip.AddLine(ttdesc,ttdepcost)
 		end
 	else
 		EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 	end
-	--TODO: Allow for notification of what AutoMagic wants to do to something...
 end
 
 function lib.OnLoad()
@@ -210,6 +215,7 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("MAIL_SHOW");
 	frame:RegisterEvent("MAIL_CLOSED");
 	frame:RegisterEvent("UI_ERROR_MESSAGE");
+	frame:RegisterEvent("AUCTION_HOUSE_SHOW");
 
 -- Sets defaults	
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -228,6 +234,7 @@ end
 		if event == 'MAIL_SHOW' 			then lib.mailShow() 			end  
 		if event == "MAIL_CLOSED" 		then lib.mailClosed() 			end
 		if event == "UI_ERROR_MESSAGE" 	then uiErrorMessage = 1 		end
+		if event == "AUCTION_HOUSE_SHOW" then lib.getDepCosts()		end
 	end
 
 function lib.SetupConfigGui(gui)
@@ -278,6 +285,28 @@ function lib.merchantClosed()
 	--Place holder: Is fired when the merchant window is closed.
 end
 
+function lib.getDepCosts() --We store our dep cost in 24hour format ------> /2 for 12 or *2 for 48
+	if BtmScan then
+		for bag=0,4 do
+			for slot=1,GetContainerNumSlots(bag) do
+				if (GetContainerItemLink(bag,slot)) then
+					local _,itemCount = GetContainerItemInfo(bag,slot)
+					local itemLink = GetContainerItemLink(bag,slot)
+					if (itemLink == nil) then return end
+					local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemLink)
+					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+					local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, quantity) 
+					if not (ttdepcost == nil or ttdepcost == 0) then
+						ttdepcost = ttdepcost * 2
+						local storedep = ttdepcost / itemCount
+						depositCostList[itemid] = storedep
+					end
+				end
+			end
+		end
+	end
+end
+	
 function lib.doScanAndUse(bag,bagType,amBTMRule)	
 	if amBTMRule == nil then 
 		print("AutoMagic:Debug: How did you get this message? amBTMRule is nil... please report") 
@@ -291,9 +320,10 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 		if (GetContainerItemLink(bag,slot)) then
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
-			local _, itemID, _, _, _, _ = decode(itemLink)
 			if (itemLink == nil) then return end
-			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
+			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 	
+			local _, itemID, _, _, _, _ = decode(itemLink)
+					
 			if amBTMRule == "demats" then	
 				if isDEMats[ itemID ] then
 					print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
