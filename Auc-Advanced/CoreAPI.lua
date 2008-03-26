@@ -354,7 +354,7 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 		end
 	end
 	
-	if (priceArray.price > 0) and (count > 0) then
+	if (priceArray.price > 0) then
 		return priceArray.price, total, count, diff/count, InfoString
 	end
 end
