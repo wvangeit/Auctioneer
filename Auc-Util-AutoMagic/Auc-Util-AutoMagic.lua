@@ -185,25 +185,27 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-	if (AucAdvanced and BtmScan) then
-		local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
-		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-		if depositCostList[itemid] then 
-			for k, v in pairs(depositCostList) do
-				if k == itemid then
-					ttdepcost = v
+	if not (get("util.automagic.depositTT")) then 
+		if (AucAdvanced and BtmScan) then
+			local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
+			local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+			if depositCostList[itemid] then 
+				for k, v in pairs(depositCostList) do
+					if k == itemid then
+						ttdepcost = v
+					end
 				end
 			end
-		end
-		
-		if (ttdepcost == 0 or ttdepcost == nil) then 	
-			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
+			
+			if (ttdepcost == 0 or ttdepcost == nil) then 	
+				EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
+			else
+				local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
+				EnhTooltip.AddLine(ttdesc,ttdepcost)
+			end
 		else
-			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
-			EnhTooltip.AddLine(ttdesc,ttdepcost)
+			EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 		end
-	else
-		EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 	end
 end
 
@@ -228,6 +230,7 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.showmailgui", false)
 	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
 	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
+	default("util.automagic.depositTT", false) 
 end
 
 	-- define what event fires what function
@@ -260,6 +263,7 @@ function lib.SetupConfigGui(gui)
 		"\n")
 		gui:AddControl(id, "Header",     0,    libName.." General options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.chatspam", "Enable AutoMagic Chat Spam")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in tooltip.")
 		
 		gui:AddControl(id, "Header",     0,    libName.." vendor options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
@@ -940,7 +944,6 @@ function lib.makeautosellgui()
 	autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
 	autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
 	autosellframe.bagList:SetText(("Re-Scan Bags"))
-	--autosellframe.bagList:Disable()
 	autosellframe.bagList:SetScript("OnClick", lib.populateDataSheet)
 	
 	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
@@ -948,6 +951,36 @@ function lib.makeautosellgui()
 		{ ('BTM Rule'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
+	
+
+	--[[
+	--Create the never sell frame
+	autosellframe.nosell = CreateFrame("Frame", nil, autosellframe)
+	autosellframe.nosell:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	
+	autosellframe.nosell:SetBackdropColor(0, 0, 0.0, 0.5)
+
+	autosellframe.nosell:SetPoint("TOPLEFT", autosellframe.baglist, "BOTTOMLEFT", 100, 150)
+	autosellframe.nosell:SetPoint("TOPRIGHT", autosellframe.baglist, "TOPLEFT", 100, 150)
+	autosellframe.nosell:SetPoint("BOTTOM", autosellframe.baglist, "BOTTOM", 100, 150)
+	
+	--autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	--autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
+	--autosellframe.bagList:SetText(("Re-Scan Bags"))
+	--autosellframe.bagList:SetScript("OnClick", lib.populateDataSheet)
+	
+	autosellframe.nosell.sheet = ScrollSheet:Create(autosellframe.nosell, {
+		{ ('Never sell:'), "TOOLTIP", 170 }, 
+		--{ ('BTM Rule'), "TEXT", 25 }, 
+		{ "Appraiser", "COIN", 70 }, 
+	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
+	
+	]]
 	
 	lib.populateDataSheet()
 end
