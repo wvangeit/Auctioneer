@@ -387,7 +387,18 @@ end
 local sideIcon
 local SlideBar = LibStub:GetLibrary("SlideBar", true)
 if SlideBar then
-	sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
+	--Need to figure out if we're embedded first
+	local embedded = false
+	for _, module in ipairs(AucAdvanced.EmbeddedModules) do 
+		if module == "Auc-Util-SearchUI"  then 
+			embedded = true 
+		end 
+	end 
+	if embedded then
+		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
+	else
+		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
+	end
 	sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 	sideIcon:SetScript("OnClick", lib.Toggle)
 	sideIcon.tip = {
