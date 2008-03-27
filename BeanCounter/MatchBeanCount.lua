@@ -71,6 +71,9 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local decrease = AucAdvanced.Settings.GetSetting("match.beancount.failed")
 	local maxincrease = AucAdvanced.Settings.GetSetting("match.beancount.maxup")
 	local maxdecrease = AucAdvanced.Settings.GetSetting("match.beancount.maxdown")
+	local daterange = AucAdvanced.Settings.GetSetting("match.beancount.daterange")
+	local numdays = AucAdvanced.Settings.GetSetting("match.beancount.numdays")
+	numdays = numdays * 86400
 	increase = (increase / 100) + 1
 	decrease = (decrease / 100) + 1
 	itemId = tostring(itemId)
@@ -84,6 +87,27 @@ function lib.GetMatchArray(hyperlink, marketprice)
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			failed = #BeanCounter.Private.playerData["failedAuctions"][itemId]
 		end
+	end
+	if daterange then
+		local now = time()
+		local tempnum = 0
+		for i = 1, success do
+			local _, _, _, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][i])
+			auctime = tonumber(auctime)
+			if (now - auctime) < (numdays) then
+				tempnum = tempnum + 1
+			end
+		end
+		success = tempnum
+		tempnum = 0
+		for i = 1, failed do
+			local _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][i])
+			auctime = tonumber(auctime)
+			if (now - auctime) < (numdays) then
+				tempnum = tempnum + 1
+			end
+		end
+		failed = tempnum
 	end
 	increase = math.pow(increase, math.pow(success, 0.8))
 	decrease = math.pow(decrease, math.pow(failed, 0.8))
@@ -126,6 +150,8 @@ end
 
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.beancount.enable", false)
+	AucAdvanced.Settings.SetDefault("match.beancount.daterange", false)
+	AucAdvanced.Settings.SetDefault("match.beancount.numdays", 30)
 	AucAdvanced.Settings.SetDefault("match.beancount.failed", -0.1)
 	AucAdvanced.Settings.SetDefault("match.beancount.success", 0.1)
 	AucAdvanced.Settings.SetDefault("match.beancount.maxup", 150)
@@ -166,6 +192,11 @@ function private.SetupConfigGui(gui)
 		
 	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.showhistory", "Show history of successes and failures")
 	gui:AddTip(id, "This will add the number of successes and failures for that item to Appraiser's right-hand panel")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.daterange", "Only use recent data")
+	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
+	gui:AddControl(id, "WideSlider", 0, 2, "match.beancount.numdays", 1, 300, 1, "Use data from last %g days")
+	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
 end
 
 AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Match-BeanCount/BeanCount.lua $", "$Rev: 2920 $")
