@@ -28,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "StringRope"
-local LIBRARY_VERSION_MINOR = 2
+local LIBRARY_VERSION_MINOR = 3
 
 --[[-----------------------------------------------------------------
 
@@ -80,8 +80,12 @@ local tconcat = table.concat
 local tinsert = table.insert
 
 -- Create a new StringRope instance
-function lib:New()
-	local new = { strings = {} }
+function lib:New(size)
+	if not size then size = 512 end
+	if size < 0 then size = 65500 end
+	if size > 65500 then size = 65500 end
+	if size < 25 then size = 25 end
+	local new = { strings = {}, size = size }
 	for k,v in pairs(self.kit) do
 		new[k] = v
 	end
@@ -106,7 +110,7 @@ function lib.kit:Get()
 end
 -- Adds a substring to the StringRope instance
 function lib.kit:Add(text)
-	if #self.strings > 245 then
+	if #self.strings >= self.size then
 		local text = self:Get()
 		self:Clear()
 		self:Add(text)

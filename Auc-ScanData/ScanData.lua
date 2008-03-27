@@ -302,17 +302,10 @@ end
 
 function lib.OnUnload()
 	local StringRope = LibStub:GetLibrary("StringRope")
-	local rope = StringRope:New()
+	local rope = StringRope:New(-1)
 
 	if not (AucScanData and AucScanData.scans) then return end
 	
-	-- If you only scan 3 servers, then you don't need the overflow protection
-	local count = 0
-	for server in pairs(AucScanData.scans) do
-		count = count+1
-	end
-	if count <= 3 then return end
-		
 	-- Convert all image data to loadstring strings
 	for server, sData in pairs(AucScanData.scans) do
 		for faction, fData in pairs(sData) do
