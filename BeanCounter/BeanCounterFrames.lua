@@ -474,7 +474,6 @@ function private.CreateFrames()
 	local style = {}
 	local temp ={}
 	local tbl = {}
-	local dateString = "%c"
 	--This is all handled by ITEMIDS need to remove/rename this to be a utility to convvert text searches to itemID searches
 	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
@@ -577,6 +576,7 @@ function private.CreateFrames()
 			return temp
 		end
 		--Format Data for display via scroll frame or if requesting addon wants formated data  --SLOW
+		local dateString = private.getOption("dateString") or "%c"
 		for i,v in pairs(temp.completedAuctions) do
 			table.insert(data, private.COMPLETEDAUCTIONS(v[1], v[2], v[3]))
 			style[#data] = {}
