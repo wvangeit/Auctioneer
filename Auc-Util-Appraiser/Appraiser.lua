@@ -182,9 +182,11 @@ function lib.GetPrice(link, _, match)
 	if match then
 		local biddown
 		if curModel == "fixed" then
-			biddown = newBid/newBuy
-			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
-			newBid = newBuy * biddown
+			if newBuy and newBuy > 0 then
+				biddown = newBid/newBuy
+				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+				newBid = newBuy * biddown
+			end
 		else
 			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
 		end
