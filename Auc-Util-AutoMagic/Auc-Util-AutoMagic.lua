@@ -185,6 +185,7 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+local ttdepcost
 	if not (get("util.automagic.depositTT")) then 
 		if (AucAdvanced and BtmScan) then
 			local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
