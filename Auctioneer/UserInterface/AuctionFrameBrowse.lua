@@ -177,6 +177,10 @@ function postAuctionFrameFiltersUpdateClassesHook()
 		if (obj) then
 			obj:SetParent("AuctionFilterButton"..i)
 			obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
+			if getglobal("AuctioneerFilterButton"..i) then
+				local level = obj:GetFrameLevel()
+				obj:SetFrameLevel(level + 1)
+			end
 		end
 	end
 end
