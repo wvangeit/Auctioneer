@@ -781,7 +781,7 @@ function autosell.OnLeave(button, row, index)
 end
 	
 function autosell.OnClickAutoSellSheet(button, row, index)
-	link = autosellframe.resultlist.sheet.rows[row][1]:GetText()
+	local link = autosellframe.resultlist.sheet.rows[row][1]:GetText()
 	if link == nil then return end
 	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
 	local _, itemID, _, _, _, _ = decode(link)
@@ -789,7 +789,7 @@ function autosell.OnClickAutoSellSheet(button, row, index)
 end	
 
 function autosell.OnClickBagSheet(button, row, index)
-	link = autosellframe.baglist.sheet.rows[row][1]:GetText() 
+	local link = autosellframe.baglist.sheet.rows[row][1]:GetText() 
 	if link == nil then return end
 	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
 	local _, itemID, _, _, _, _ = decode(link)
