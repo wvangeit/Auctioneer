@@ -464,6 +464,7 @@ function lib.autoSellGUI()
 	if (autosellframe:IsVisible()) then autosellframe:Hide() end
 	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
 	autosellframe:Show()		
+	lib.populateDataSheet()
 end
 
 function lib.closeAutoSellGUI()
@@ -620,47 +621,25 @@ function autosellframe.ClearIcon()
 	autosellframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
 end
 
+
 function autosellframe.IconClicked()
 	autosellframe.ClearIcon()
 end 
-
-function lib.GetItemByLink(link)
-	local sig
-	local itype, id, suffix, factor, enchant, seed = decode(link)
-
-	assert(itype and itype == "item", "Item must be a valid link")
-
-	if enchant ~= 0 then
-		sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-	elseif factor ~= 0 then
-		sig = ("%d:%d:%d"):format(id, suffix, factor)
-	elseif suffix ~= 0 then
-		sig = ("%d:%d"):format(id, suffix)
-	else
-		sig = tostring(id)
-	end
-end
 
 
 function lib.autoSellIconDrag()
 	local objtype, _, link = GetCursorInfo()
 	ClearCursor()
 	if objtype == "item" then
-		lib.GetItemByLink(link)
-		if (link == nil) then 
-			return 
-		end
-			lib.setWorkingItem(link)
+		lib.setWorkingItem(link)
 	end
 end
 
 
 function lib.ClickLinkHook(_, _, _, link, button)
-	if (autosellframe:IsVisible()) then
-		if link then
-			if (button == "LeftButton") then 
-			lib.setWorkingItem(link)
-			end
+	if link then
+		if (button == "LeftButton") then 
+		lib.setWorkingItem(link)
 		end
 	end
 end
@@ -673,11 +652,9 @@ function lib.populateDataSheet()
 	for id, column2 in pairs(autoSellList) do
 		if (id == nil) then return end
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
-		local sellReason = "manual add"
 		local abid,abuy = GetPrice(itemLink, nil, true)
 		table.insert(autoselldata,{
-			itemLink, --col2(itemname)as link form for mouseover tooltips to work
-			sellReason, --sell why?
+			itemLink, --link form for mouseover tooltips to work
 			tonumber(abuy) or tonumber(abid),
 		}) 
 	end
@@ -687,13 +664,12 @@ function lib.populateDataSheet()
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
-				local _,itemCount = GetContainerItemInfo(bag,slot)
 				local itemLink = GetContainerItemLink(bag,slot)
-				local _, itemID, _, _, _, _ = decode(itemLink)
 				if (itemLink == nil) then return end
-				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
+				local _, itemID, _, _, _, _ = decode(itemLink)
 				local btmRule = "~"
 				if BtmScan then
+					local _,itemCount = GetContainerItemInfo(bag,slot)
 					local reason, bids
 					local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
 					local sig = ("%d:%d:%d"):format(id, suffix, enchant)
@@ -706,21 +682,18 @@ function lib.populateDataSheet()
 						end 
 					end
 				end
-				
-				local joinedBagString = strjoin('|', itemName, btmRule)
-				bagcontents[itemID] = joinedBagString	
+				bagcontents[itemID] = btmRule	
 			end
 		end
 	end
 	for k, v in pairs(bagcontentsnodups) do bagcontentsnodups[k] = nil; end --Reset 'data' table to ensure fresh data.
-	for id, col2 in pairs(bagcontents) do 
+	for id, btmRule in pairs(bagcontents) do 
 		if (id == nil) then return end
-		local	iName, iRule = strsplit('|', col2)
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		local abid,abuy = GetPrice(itemLink, nil, true)
 		table.insert(bagcontentsnodups,{
-		itemLink, --col2(itemname)as link form for mouseover tooltips to work
-		iRule, --btm rule
+		itemLink, -- link form for mouseover tooltips to work
+		btmRule, --btm rule
 		tonumber(abuy) or tonumber(abid),
 		}) 
 	end 
@@ -891,11 +864,8 @@ function lib.makeautosellgui()
 	
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
-		{ ('Sell Reason'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClickAutoSellSheet) 
-	
-	--lib.populateDataSheet()
 	
 	--Create the bag contents frame
 	autosellframe.baglist = CreateFrame("Frame", nil, autosellframe)
@@ -949,11 +919,10 @@ function lib.makeautosellgui()
 		{ ('Never sell:'), "TOOLTIP", 170 }, 
 		--{ ('BTM Rule'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
-	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
+	}, autosell.OnNeverSellSheetEnter, autosell.OnLeave, autosell.OnClickNeverSellSheet) 
 	
 	]]
 	
-	lib.populateDataSheet()
 end
 lib.makeautosellgui()
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
