@@ -190,66 +190,69 @@ function lib:setup(gui)
 	
 	gui:AddHelp(id, "what snatch evaluator",
 		"What is the snatch evaluator?",
-		"This evaluator allows you to purchase items you want, based on criteria you specify.\n\n"..
-		""..
-		"Unfortunately, for right now, you must use slash commands in order to specify the items to purchase.\n\n"..
-		""..
-		"Please see /btm snatch help for more information.\n")
+		"This evaluator allows you to purchase specific items you want, for a maximum price set by you.\n\n"..
+		"Hint: When configuring the list of items to snatch, you can click any chat link to add a new item to the list."
+		)
 	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
+	
+	gui:AddControl(id, "Subhead",          0,    libName.." List")
+	gui:AddControl(id, "Button",           0, 2, lib.snatchGUI, "Edit")
+	
 end
 
 --[[ Everything below this point belongs to the snatch ui
  the ui has not modified any of the original snatch code 
  except adding the command handler]]
 
-local snatchconfigframe = CreateFrame("Frame", "snatchframe", UIParent)
-snatchconfigframe:Hide()	
+local snatchui = {
+	itemLink = nil,
+}
+
 local print = BtmScan.Print
 local SelectBox = LibStub:GetLibrary("SelectBox")
 local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-local workingItemLink
 
 local tmpItemConfig={}
-function lib.SetWorkingItem(link)
-	snatchconfigframe.ClearWorkingItem()
+function snatchui.SetWorkingItem(link)
+	snatchui.ClearWorkingItem()
 	if type(link)~="string" then return false end
 	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
 	if not name or not texture then return false end
 	workingItemLink = link
 	
-	snatchconfigframe.workingname:SetText(link)
-	snatchconfigframe.icon.tx:SetTexture(texture)
-	snatchconfigframe.icon.tx:Show()
-	snatchconfigframe.additem:Show()
+	snatchui.frame.workingname:SetText(link)
+	snatchui.frame.icon.tx:SetTexture(texture)
+	snatchui.frame.icon.tx:Show()
+	snatchui.frame.additem:Show()
 	
 	
 	BtmScan.getItemConfig(format("%d:%d:%d", BtmScan.BreakLink(link)),  tmpItemConfig)
 	if tmpItemConfig.buyBelow then
 		local g,s,c = BtmScan.GetGSC(tmpItemConfig.buyBelow)
-		snatchconfigframe.gold:SetText(g)
-		snatchconfigframe.silver:SetText(s)
-		snatchconfigframe.copper:SetText(c)
-		snatchconfigframe.additem:SetText("Update")
-		snatchconfigframe.removeitem:Show()
+		snatchui.frame.gold:SetText(g)
+		snatchui.frame.silver:SetText(s)
+		snatchui.frame.copper:SetText(c)
+		snatchui.frame.additem:SetText("Update")
+		snatchui.frame.removeitem:Show()
 	else
-		snatchconfigframe.gold:SetText("")
-		snatchconfigframe.silver:SetText("")
-		snatchconfigframe.copper:SetText("")
-		snatchconfigframe.additem:SetText("Add Item")
-		snatchconfigframe.removeitem:Hide()
+		snatchui.frame.gold:SetText("")
+		snatchui.frame.silver:SetText("")
+		snatchui.frame.copper:SetText("")
+		snatchui.frame.additem:SetText("Add Item")
+		snatchui.frame.removeitem:Hide()
 		
 	end
 	
 	return true
 end
 
-local snatch = {}
 
-function lib.populateSnatchSheet()
+
+function snatchui.PopulateSnatchSheet()
 	local itemConfigTable = get("itemconfig.list")
 	
 	local display = {}
@@ -280,46 +283,46 @@ function lib.populateSnatchSheet()
 		end
 	end
 		
-	snatchconfigframe.snatchlist.sheet:SetData(display)
+	snatchui.frame.snatchlist.sheet:SetData(display)
 end 
 
 
-function lib.snatchListClear()
+function snatchui.OnClickClearAllSnatches()
 	local itemConfig = {}
 	for sig, itemConfigString in pairs(itemConfigTable) do
 		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
 		if itemConfig.buyBelow then
 			itemConfig.buyBelow = nil
 			itemConfig.maxCount = nil
-			 BtmScan.storeItemConfig(itemConfig, sig)
+			BtmScan.storeItemConfig(itemConfig, sig)
 		end
 	end
-			
-	lib.populateSnatchSheet()
+
+	snatchui.PopulateSnatchSheet()
 end
 
 
 
 
-function snatchconfigframe.removeitemfromlist()
+function snatchui.OnClickRemoveSnatch()
 	lib.AddSnatch(workingItemLink, nil)
-	snatchconfigframe.ClearWorkingItem()
-	lib.populateSnatchSheet()
+	snatchui.ClearWorkingItem()
+	snatchui.PopulateSnatchSheet()
 end
 
-function snatchconfigframe.snatchadditemtolist()
-	local g = tonumber(snatchconfigframe.gold:GetText()) or 0
-	local s = tonumber(snatchconfigframe.silver:GetText()) or 0
-	local c = tonumber(snatchconfigframe.copper:GetText()) or 0
+function snatchui.OnClickAddSnatch()
+	local g = tonumber(snatchui.frame.gold:GetText()) or 0
+	local s = tonumber(snatchui.frame.silver:GetText()) or 0
+	local c = tonumber(snatchui.frame.copper:GetText()) or 0
 	
 	lib.AddSnatch(workingItemLink, g*10000 + s*100 + c)
-	snatchconfigframe.ClearWorkingItem()
-	lib.populateSnatchSheet()	
+	snatchui.ClearWorkingItem()
+	snatchui.PopulateSnatchSheet()	
 end
 
-function snatch.OnSnatchEnter(button, row, index)
-	if snatchconfigframe.snatchlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link = snatchconfigframe.snatchlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
+function snatchui.OnEnterSnatchSheet(button, row, index)
+	if snatchui.frame.snatchlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		local link = snatchui.frame.snatchlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
@@ -331,9 +334,9 @@ function snatch.OnSnatchEnter(button, row, index)
 	end		
 end
 
-function snatch.OnBagListEnter(button, row, index)
-	if snatchconfigframe.baglist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
-		local link = snatchconfigframe.baglist.sheet.rows[row][index]:GetText()
+function snatchui.OnEnterBagSheet(button, row, index)
+	if snatchui.frame.baglist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
+		local link = snatchui.frame.baglist.sheet.rows[row][index]:GetText()
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
@@ -345,53 +348,53 @@ function snatch.OnBagListEnter(button, row, index)
 	end		
 end
 
-function snatch.OnLeave(button, row, index)
+function snatchui.OnLeaveSheet(button, row, index)
 	GameTooltip:Hide()
 end
 
 
-function snatch.OnClickSnatchList(button, row, index)
-	local link = snatchconfigframe.snatchlist.sheet.rows[row][1]:GetText()
-	lib.SetWorkingItem(link)
+function snatchui.OnClickSnatchSheet(button, row, index)
+	local link = snatchui.frame.snatchlist.sheet.rows[row][1]:GetText()
+	snatchui.SetWorkingItem(link)
 end	
 
-function snatch.OnClickBagList(button, row, index)
-	local link = snatchconfigframe.baglist.sheet.rows[row][1]:GetText()
-	lib.SetWorkingItem(link)
+function snatchui.OnClickBagSheet(button, row, index)
+	local link = snatchui.frame.baglist.sheet.rows[row][1]:GetText()
+	snatchui.SetWorkingItem(link)
 end	
 
 
-function snatchconfigframe.ClearWorkingItem()
-	snatchconfigframe.workingname:SetText("")
-	snatchconfigframe.icon.tx:Hide()
-	snatchconfigframe.additem:Hide()
-	snatchconfigframe.removeitem:Hide()
-	snatchconfigframe.gold:SetText("")
-	snatchconfigframe.silver:SetText("")
-	snatchconfigframe.copper:SetText("")
+function snatchui.ClearWorkingItem()
+	snatchui.frame.workingname:SetText("")
+	snatchui.frame.icon.tx:Hide()
+	snatchui.frame.additem:Hide()
+	snatchui.frame.removeitem:Hide()
+	snatchui.frame.gold:SetText("")
+	snatchui.frame.silver:SetText("")
+	snatchui.frame.copper:SetText("")
 end
 
-function snatchconfigframe.IconClicked()
-	snatchconfigframe.ClearWorkingItem()
+function snatchui.OnClickIcon()
+	snatchui.ClearWorkingItem()
 end 
 
-function lib.snatchIconDrag()
+function snatchui.OnDragToIcon()
 	local objtype, _, itemlink = GetCursorInfo()
 	if objtype == "item" then
 		ClearCursor()
-		lib.SetWorkingItem(itemlink)
+		snatchui.SetWorkingItem(itemlink)
 	end
 end
 
-function lib.ClickLinkHook(_, _, _, link, button)
-	if link and snatchconfigframe:IsVisible() then
+function snatchui.ClickLinkHook(_, _, _, link, button)
+	if link then
 		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
-			lib.SetWorkingItem(link)
+			snatchui.SetWorkingItem(link)
 		end
 	end
 end
 
-function lib.populateBagSheet()
+function snatchui.PopulateBagSheet()
 	
 	local unique={}
 	local bagcontents = {}
@@ -435,237 +438,240 @@ function lib.populateBagSheet()
 		end
 	end
 	
-	snatchconfigframe.baglist.sheet:SetData(bagcontents) --Set the GUI scrollsheet
-	lib.populateSnatchSheet()
+	snatchui.frame.baglist.sheet:SetData(bagcontents) --Set the GUI scrollsheet
+	snatchui.PopulateSnatchSheet()
 end
 
+
+
 function lib.snatchGUI() 
-	if (snatchconfigframe:IsVisible()) then lib.closeSnatchGUI() end
-	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
-	snatchconfigframe:Show()
-	lib.populateBagSheet()
-	snatchconfigframe.ClearWorkingItem()
+	if not snatchui.frame then
+		snatchui.frame = CreateFrame("Frame", "snatchframe", UIParent)
+
+		snatchui.frame:SetToplevel(true)
+		snatchui.frame:SetFrameStrata("HIGH")
+		snatchui.frame:SetBackdrop({
+			bgFile = "Interface/Tooltips/ChatBubble-Background",
+			edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+			tile = true, tileSize = 32, edgeSize = 32,
+			insets = { left = 32, right = 32, top = 32, bottom = 32 }
+		})
+		snatchui.frame:SetBackdropColor(0,0,0, 1)
+		snatchui.frame:Hide()
+		
+		snatchui.frame:SetPoint("CENTER", UIParent, "CENTER")
+		snatchui.frame:SetWidth(950)
+		snatchui.frame:SetHeight(450)
+		
+		snatchui.frame:SetMovable(true)
+		snatchui.frame:EnableMouse(true)
+		snatchui.frame.Drag = CreateFrame("Button", nil, snatchui.frame)
+		snatchui.frame.Drag:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 10,-5)
+		snatchui.frame.Drag:SetPoint("TOPRIGHT", snatchui.frame, "TOPRIGHT", -10,-5)
+		snatchui.frame.Drag:SetHeight(6)
+		snatchui.frame.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+		snatchui.frame.Drag:SetScript("OnMouseDown", function() snatchui.frame:StartMoving() end)
+		snatchui.frame.Drag:SetScript("OnMouseUp", function() snatchui.frame:StopMovingOrSizing() end)
+		
+		snatchui.frame.DragBottom = CreateFrame("Button",nil, snatchui.frame)
+		snatchui.frame.DragBottom:SetPoint("BOTTOMLEFT", snatchui.frame, "BOTTOMLEFT", 10,5)
+		snatchui.frame.DragBottom:SetPoint("BOTTOMRIGHT", snatchui.frame, "BOTTOMRIGHT", -10,5)
+		snatchui.frame.DragBottom:SetHeight(6)
+		snatchui.frame.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+		snatchui.frame.DragBottom:SetScript("OnMouseDown", function() snatchui.frame:StartMoving() end)
+		snatchui.frame.DragBottom:SetScript("OnMouseUp", function() snatchui.frame:StopMovingOrSizing() end)
+		
+		--Add Drag slot / Item icon
+		snatchui.frame.slot = snatchui.frame:CreateTexture(nil, "BORDER")
+		snatchui.frame.slot:SetDrawLayer("Artwork") -- or the border shades it
+		snatchui.frame.slot:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 23, -75)
+		snatchui.frame.slot:SetWidth(45)
+		snatchui.frame.slot:SetHeight(45)
+		snatchui.frame.slot:SetTexCoord(0.17, 0.83, 0.17, 0.83)
+		snatchui.frame.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+
+		snatchui.frame.icon = CreateFrame("Button", nil, snatchui.frame)
+		snatchui.frame.icon:SetPoint("TOPLEFT", snatchui.frame.slot, "TOPLEFT", 2, -2)
+		snatchui.frame.icon:SetPoint("BOTTOMRIGHT", snatchui.frame.slot, "BOTTOMRIGHT", -2, 2)
+		snatchui.frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
+		snatchui.frame.icon:SetScript("OnClick", snatchui.OnClickIcon)
+		snatchui.frame.icon:SetScript("OnReceiveDrag", snatchui.OnDragToIcon)
+		snatchui.frame.icon.tx = snatchui.frame.icon:CreateTexture()
+		snatchui.frame.icon.tx:SetAllPoints(snatchui.frame.icon)
+		
+		
+		snatchui.frame.slot.help = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		snatchui.frame.slot.help:SetPoint("LEFT", snatchui.frame.slot, "RIGHT", 2, 7)
+		snatchui.frame.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
+		snatchui.frame.slot.help:SetWidth(80)
+		
+		snatchui.frame.workingname = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		snatchui.frame.workingname:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 15, -135)
+		snatchui.frame.workingname:SetWidth(160)
+		snatchui.frame.workingname:SetJustifyH("LEFT")
+		
+		
+		--Add Title text
+		local	snatchtitle = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		snatchtitle:SetText("BTM Snatch Configuration")
+		snatchtitle:SetJustifyH("CENTER")
+		snatchtitle:SetWidth(300)
+		snatchtitle:SetHeight(10)
+		snatchtitle:SetPoint("TOPLEFT",  snatchui.frame, "TOPLEFT", 0, -17)
+		snatchui.frame.snatchtitle = snatchtitle
+		
+			
+		--Create the snatch list results frame
+		snatchui.frame.snatchlist = CreateFrame("Frame", nil, snatchui.frame)
+		snatchui.frame.snatchlist:SetBackdrop({
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+			tile = true, tileSize = 32, edgeSize = 16,
+			insets = { left = 5, right = 5, top = 5, bottom = 5 }
+		})
+		
+		snatchui.frame.snatchlist:SetBackdropColor(0, 0, 0.0, 0.5)
+		snatchui.frame.snatchlist:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 187, -40)
+		snatchui.frame.snatchlist:SetPoint("BOTTOM", snatchui.frame, "BOTTOM", 0, 57)
+		snatchui.frame.snatchlist:SetWidth(360)
+
+		if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
+			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
+			{ "Snatching", "TOOLTIP", 150 }, 
+			{ "Buy at", "COIN", 70 }, 
+			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet)
+		else
+			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
+			{ "Snatching", "TOOLTIP", 150 }, 
+			{ "Buy at", "COIN", 70}, 
+			{ "Appraiser", "COIN", 70 }, 
+			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet)
+		end
+		
+
+
+		-- Bag List
+		snatchui.frame.baglist = CreateFrame("Frame", nil, snatchui.frame)
+		snatchui.frame.baglist:SetBackdrop({
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+			tile = true, tileSize = 32, edgeSize = 16,
+			insets = { left = 5, right = 5, top = 5, bottom = 5 }
+		})
+		
+		snatchui.frame.baglist:SetBackdropColor(0, 0, 0.0, 0.5)
+		snatchui.frame.baglist:SetPoint("TOPLEFT", snatchui.frame.snatchlist, "TOPRIGHT", 20, 0)
+		snatchui.frame.baglist:SetPoint("RIGHT", snatchui.frame, "RIGHT", -30, -0)
+		snatchui.frame.baglist:SetPoint("BOTTOM", snatchui.frame.snatchlist, "BOTTOM", 0, 0)
+		
+		snatchui.frame.bagscan = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
+		snatchui.frame.bagscan:SetPoint("TOP", snatchui.frame.baglist, "BOTTOM", 0, -15)
+		snatchui.frame.bagscan:SetText(("Refresh Data"))
+		snatchui.frame.bagscan:SetScript("OnClick", snatchui.PopulateBagSheet)
+		
+		if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
+			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
+				{ "Bag Contents", "TOOLTIP", 150 }, 
+				{ "BTM Rule", "TEXT", 25 }, 
+				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet)
+		else
+			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
+				{ "Bag Contents", "TOOLTIP", 150 }, 
+				{ "Appraiser", "COIN", 25 }, 
+				{ "BTM Rule", "TEXT", 25 }, 
+				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet)
+		end
+
+		
+		--Add close button
+		snatchui.frame.closeButton = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
+		snatchui.frame.closeButton:SetPoint("BOTTOMRIGHT", snatchui.frame, "BOTTOMRIGHT", -10, 10)
+		snatchui.frame.closeButton:SetText(("Close"))
+		snatchui.frame.closeButton:SetScript("OnClick",  lib.closeSnatchGUI)
+		
+		--Add Item to list button	
+		snatchui.frame.additem = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
+		snatchui.frame.additem:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 10, -210)
+		snatchui.frame.additem:SetText(('Add Item'))
+		snatchui.frame.additem:SetScript("OnClick", snatchui.OnClickAddSnatch)
+		
+		--[[
+		snatchui.frame.additem.help = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		snatchui.frame.additem.help:SetPoint("TOPLEFT", snatchui.frame.additem, "TOPRIGHT", 1, 1)
+		snatchui.frame.additem.help:SetText(("(to Snatch list)")) 
+		snatchui.frame.additem.help:SetWidth(90)
+		]]
+		
+		--Add coin boxes
+		local function goldtosilver()
+			snatchui.frame.silver:SetFocus()
+		end
+		
+		local function silvertocopper()
+			snatchui.frame.copper:SetFocus()
+		end
+		
+		local function copper()
+			snatchui.frame.copper:ClearFocus()
+		end
+
+			
+		snatchui.frame.gold = CreateFrame("EditBox", "snatchgold", snatchui.frame, "InputBoxTemplate")
+		snatchui.frame.gold:SetPoint("BOTTOMLEFT", snatchui.frame.additem, "TOPLEFT", 10, 10)
+		snatchui.frame.gold:SetAutoFocus(false)
+		snatchui.frame.gold:SetHeight(15)
+		snatchui.frame.gold:SetWidth(40)
+		snatchui.frame.gold:SetScript("OnEnterPressed", goldtosilver)
+		snatchui.frame.gold:SetScript("OnTabPressed", goldtosilver)
+		
+		snatchui.frame.silver = CreateFrame("EditBox", "snatchsilver", snatchui.frame, "InputBoxTemplate")
+		snatchui.frame.silver:SetPoint("TOPLEFT", snatchui.frame.gold, "TOPRIGHT", 10, 0)
+		snatchui.frame.silver:SetAutoFocus(false)
+		snatchui.frame.silver:SetHeight(15)
+		snatchui.frame.silver:SetWidth(20)
+		snatchui.frame.silver:SetMaxLetters(2)
+		snatchui.frame.silver:SetScript("OnEnterPressed", silvertocopper)
+		snatchui.frame.silver:SetScript("OnTabPressed", silvertocopper)
+		
+		snatchui.frame.copper = CreateFrame("EditBox", "snatchcopper", snatchui.frame, "InputBoxTemplate")
+		snatchui.frame.copper:SetPoint("TOPLEFT", snatchui.frame.silver, "TOPRIGHT", 10, 0)
+		snatchui.frame.copper:SetAutoFocus(false)
+		snatchui.frame.copper:SetHeight(15)
+		snatchui.frame.copper:SetWidth(20)
+		snatchui.frame.copper:SetMaxLetters(2)
+		snatchui.frame.copper:SetScript("OnEnterPressed", copper)
+		snatchui.frame.copper:SetScript("OnTabPressed", copper)
+		
+		--Remove Item from list button	
+		snatchui.frame.removeitem = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
+		snatchui.frame.removeitem:SetPoint("TOPLEFT", snatchui.frame.additem, "BOTTOMLEFT", 0, -20)
+		snatchui.frame.removeitem:SetText(('Remove Item'))
+		snatchui.frame.removeitem:SetScript("OnClick", snatchui.OnClickRemoveSnatch)
+		
+		--Reset snatch list
+		snatchui.frame.resetList = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
+		snatchui.frame.resetList:SetPoint("TOP", snatchui.frame.snatchlist, "BOTTOM", 0, -15)
+		snatchui.frame.resetList:SetText(("Clear List"))
+		snatchui.frame.resetList:SetScript("OnClick", snatchui.OnClickClearAllSnatches)
+		
+	elseif (snatchui.frame:IsVisible()) then 
+		lib.closeSnatchGUI()
+	end
+	
+	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, snatchui.ClickLinkHook)
+	
+	snatchui.frame:Show()
+	snatchui.PopulateBagSheet()
+	snatchui.PopulateSnatchSheet()
+	snatchui.ClearWorkingItem()
 end
 
 function lib.closeSnatchGUI()
-	snatchconfigframe:Hide()
-	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
+	snatchui.ClearWorkingItem()
+	snatchui.frame:Hide()
+	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
 end
 
-function lib.makesnatchgui()
-	snatchconfigframe:SetToplevel(true)
-	snatchconfigframe:SetFrameStrata("HIGH")
-	snatchconfigframe:SetBackdrop({
-		bgFile = "Interface/Tooltips/ChatBubble-Background",
-		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
-		tile = true, tileSize = 32, edgeSize = 32,
-		insets = { left = 32, right = 32, top = 32, bottom = 32 }
-	})
-	snatchconfigframe:SetBackdropColor(0,0,0, 1)
-	snatchconfigframe:Hide()
-	
-	snatchconfigframe:SetPoint("CENTER", UIParent, "CENTER")
-	snatchconfigframe:SetWidth(834.5)
-	snatchconfigframe:SetHeight(450)
-	
-	snatchconfigframe:SetMovable(true)
-	snatchconfigframe:EnableMouse(true)
-	snatchconfigframe.Drag = CreateFrame("Button", nil, snatchconfigframe)
-	snatchconfigframe.Drag:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 10,-5)
-	snatchconfigframe.Drag:SetPoint("TOPRIGHT", snatchconfigframe, "TOPRIGHT", -10,-5)
-	snatchconfigframe.Drag:SetHeight(6)
-	snatchconfigframe.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 
-	snatchconfigframe.Drag:SetScript("OnMouseDown", function() snatchconfigframe:StartMoving() end)
-	snatchconfigframe.Drag:SetScript("OnMouseUp", function() snatchconfigframe:StopMovingOrSizing() end)
-	
-	snatchconfigframe.DragBottom = CreateFrame("Button",nil, snatchconfigframe)
-	snatchconfigframe.DragBottom:SetPoint("BOTTOMLEFT", snatchconfigframe, "BOTTOMLEFT", 10,5)
-	snatchconfigframe.DragBottom:SetPoint("BOTTOMRIGHT", snatchconfigframe, "BOTTOMRIGHT", -10,5)
-	snatchconfigframe.DragBottom:SetHeight(6)
-	snatchconfigframe.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-
-	snatchconfigframe.DragBottom:SetScript("OnMouseDown", function() snatchconfigframe:StartMoving() end)
-	snatchconfigframe.DragBottom:SetScript("OnMouseUp", function() snatchconfigframe:StopMovingOrSizing() end)
-	
-	--Add Drag slot / Item icon
-	snatchconfigframe.slot = snatchconfigframe:CreateTexture(nil, "BORDER")
-	snatchconfigframe.slot:SetDrawLayer("Artwork") -- or the border shades it
-	snatchconfigframe.slot:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 23, -75)
-	snatchconfigframe.slot:SetWidth(45)
-	snatchconfigframe.slot:SetHeight(45)
-	snatchconfigframe.slot:SetTexCoord(0.17, 0.83, 0.17, 0.83)
-	snatchconfigframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
-
-	snatchconfigframe.icon = CreateFrame("Button", nil, snatchconfigframe)
-	snatchconfigframe.icon:SetPoint("TOPLEFT", snatchconfigframe.slot, "TOPLEFT", 2, -2)
-	snatchconfigframe.icon:SetPoint("BOTTOMRIGHT", snatchconfigframe.slot, "BOTTOMRIGHT", -2, 2)
-	snatchconfigframe.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
-	snatchconfigframe.icon:SetScript("OnClick", snatchconfigframe.IconClicked)
-	snatchconfigframe.icon:SetScript("OnReceiveDrag", lib.snatchIconDrag)
-	snatchconfigframe.icon.tx = snatchconfigframe.icon:CreateTexture()
-	snatchconfigframe.icon.tx:SetAllPoints(snatchconfigframe.icon)
-	
-	
-	snatchconfigframe.slot.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	snatchconfigframe.slot.help:SetPoint("LEFT", snatchconfigframe.slot, "RIGHT", 2, 7)
-	snatchconfigframe.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
-	snatchconfigframe.slot.help:SetWidth(80)
-	
-	snatchconfigframe.workingname = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	snatchconfigframe.workingname:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 15, -135)
-	snatchconfigframe.workingname:SetWidth(160)
-	snatchconfigframe.workingname:SetJustifyH("LEFT")
-	
-	
-	--Add Title text
-	local	snatchtitle = snatchconfigframe:CreateFontString(asuftitle, "OVERLAY", "GameFontNormalLarge")
-	snatchtitle:SetText("BTM Snatch Configuration")
-	snatchtitle:SetJustifyH("CENTER")
-	snatchtitle:SetWidth(300)
-	snatchtitle:SetHeight(10)
-	snatchtitle:SetPoint("TOPLEFT",  snatchconfigframe, "TOPLEFT", 0, -17)
-	snatchconfigframe.snatchtitle = snatchtitle
-	
-	-- Bag List
-	snatchconfigframe.baglist = CreateFrame("Frame", nil, snatchconfigframe)
-	snatchconfigframe.baglist:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
-	})
-	
-	snatchconfigframe.baglist:SetBackdropColor(0, 0, 0.0, 0.5)
-	snatchconfigframe.baglist:SetPoint("TOPLEFT", snatchconfigframe, "BOTTOMLEFT", 518, 417.5)
-	snatchconfigframe.baglist:SetPoint("TOPRIGHT", snatchconfigframe, "TOPLEFT", 823, 0)
-	snatchconfigframe.baglist:SetPoint("BOTTOM", snatchconfigframe, "BOTTOM", 0, 57)
-	
-	snatchconfigframe.bagscan = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
-	snatchconfigframe.bagscan:SetPoint("TOP", snatchconfigframe.baglist, "BOTTOM", 0, -15)
-	snatchconfigframe.bagscan:SetText(("Refresh Data"))
-	snatchconfigframe.bagscan:SetScript("OnClick", lib.populateBagSheet)
-	
-	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
-		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
-			{ "Bag Contents", "TOOLTIP", 150 }, 
-			{ "BTM Rule", "TEXT", 25 }, 
-			}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClickBagList)
-	else
-		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
-			{ "Bag Contents", "TOOLTIP", 150 }, 
-			{ "Appraiser", "COIN", 25 }, 
-			{ "BTM Rule", "TEXT", 25 }, 
-			{ "Test", "INT", -1 },
-			}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClickBagList)
-	end
-		
-	--Create the snatch list results frame
-	snatchconfigframe.snatchlist = CreateFrame("Frame", nil, snatchconfigframe)
-	snatchconfigframe.snatchlist:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
-	})
-	
-	snatchconfigframe.snatchlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	snatchconfigframe.snatchlist:SetPoint("TOPLEFT", snatchconfigframe, "BOTTOMLEFT", 187, 417.5)
-	snatchconfigframe.snatchlist:SetPoint("TOPRIGHT", snatchconfigframe, "TOPLEFT", 492, 0)
-	snatchconfigframe.snatchlist:SetPoint("BOTTOM", snatchconfigframe, "BOTTOM", 0, 57)
-	
-	--Add close button
-	snatchconfigframe.closeButton = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
-	snatchconfigframe.closeButton:SetPoint("BOTTOMRIGHT", snatchconfigframe, "BOTTOMRIGHT", -10, 10)
-	snatchconfigframe.closeButton:SetText(("Close"))
-	snatchconfigframe.closeButton:SetScript("OnClick",  lib.closeSnatchGUI)
-	
-	--Add Item to list button	
-	snatchconfigframe.additem = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
-	snatchconfigframe.additem:SetPoint("TOPLEFT", snatchconfigframe, "TOPLEFT", 10, -210)
-	snatchconfigframe.additem:SetText(('Add Item'))
-	snatchconfigframe.additem:SetScript("OnClick", snatchconfigframe.snatchadditemtolist)
-	
-	--[[
-	snatchconfigframe.additem.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	snatchconfigframe.additem.help:SetPoint("TOPLEFT", snatchconfigframe.additem, "TOPRIGHT", 1, 1)
-	snatchconfigframe.additem.help:SetText(("(to Snatch list)")) 
-	snatchconfigframe.additem.help:SetWidth(90)
-	]]
-	
-	--Add coin boxes
-	function lib.goldtosilver()
-		snatchconfigframe.gold:ClearFocus()
-		snatchconfigframe.silver:SetFocus()
-	end
-	
-	function lib.silvertocopper()
-		snatchconfigframe.silver:ClearFocus()
-		snatchconfigframe.copper:SetFocus()
-	end
-	
-	function lib.copper()
-		snatchconfigframe.copper:ClearFocus()
-	end
-
-		
-	snatchconfigframe.gold = CreateFrame("EditBox", "snatchgold", snatchconfigframe, "InputBoxTemplate")
-	snatchconfigframe.gold:SetPoint("BOTTOMLEFT", snatchconfigframe.additem, "TOPLEFT", 10, 10)
-	snatchconfigframe.gold:SetAutoFocus(false)
-	snatchconfigframe.gold:SetHeight(15)
-	snatchconfigframe.gold:SetWidth(40)
-	snatchconfigframe.gold:SetScript("OnEnterPressed", lib.goldtosilver)
-	snatchconfigframe.gold:SetScript("OnTabPressed", lib.goldtosilver)
-	
-	snatchconfigframe.silver = CreateFrame("EditBox", "snatchsilver", snatchconfigframe, "InputBoxTemplate")
-	snatchconfigframe.silver:SetPoint("TOPLEFT", snatchconfigframe.gold, "TOPRIGHT", 10, 0)
-	snatchconfigframe.silver:SetAutoFocus(false)
-	snatchconfigframe.silver:SetHeight(15)
-	snatchconfigframe.silver:SetWidth(20)
-	snatchconfigframe.silver:SetMaxLetters(2)
-	snatchconfigframe.silver:SetScript("OnEnterPressed", lib.silvertocopper)
-	snatchconfigframe.silver:SetScript("OnTabPressed", lib.silvertocopper)
-	
-	snatchconfigframe.copper = CreateFrame("EditBox", "snatchcopper", snatchconfigframe, "InputBoxTemplate")
-	snatchconfigframe.copper:SetPoint("TOPLEFT", snatchconfigframe.silver, "TOPRIGHT", 10, 0)
-	snatchconfigframe.copper:SetAutoFocus(false)
-	snatchconfigframe.copper:SetHeight(15)
-	snatchconfigframe.copper:SetWidth(20)
-	snatchconfigframe.copper:SetMaxLetters(2)
-	snatchconfigframe.copper:SetScript("OnEnterPressed", lib.copper)
-	snatchconfigframe.copper:SetScript("OnTabPressed", lib.copper)
-	
-	--Remove Item from list button	
-	snatchconfigframe.removeitem = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
-	snatchconfigframe.removeitem:SetPoint("TOPLEFT", snatchconfigframe.additem, "BOTTOMLEFT", 0, -20)
-	snatchconfigframe.removeitem:SetText(('Remove Item'))
-	snatchconfigframe.removeitem:SetScript("OnClick", snatchconfigframe.removeitemfromlist)
-	
-	--[[
-	snatchconfigframe.removeitem.help = snatchconfigframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	snatchconfigframe.removeitem.help:SetPoint("TOPLEFT",  snatchconfigframe.removeitem, "TOPRIGHT", 1, 1)
-	snatchconfigframe.removeitem.help:SetText(("(from Snatch list)")) 
-	snatchconfigframe.removeitem.help:SetWidth(90)
-	]]
-	
-	--Reset snatch list
-	snatchconfigframe.resetList = CreateFrame("Button", nil, snatchconfigframe, "OptionsButtonTemplate")
-	snatchconfigframe.resetList:SetPoint("TOP", snatchconfigframe.snatchlist, "BOTTOM", 0, -15)
-	snatchconfigframe.resetList:SetText(("Reset List"))
-	snatchconfigframe.resetList:SetScript("OnClick", lib.snatchListClear)
-	
-	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
-		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
-		{ "Snatching", "TOOLTIP", 150 }, 
-		{ "Buy at", "COIN", 70 }, 
-		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClickSnatchList)
-	else
-		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
-		{ "Snatching", "TOOLTIP", 150 }, 
-		{ "Buy at", "COIN", 70}, 
-		{ "Appraiser", "COIN", 70 }, 
-		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClickSnatchList)
-	end
-	lib.populateSnatchSheet()
-end
-lib.makesnatchgui()

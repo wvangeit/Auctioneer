@@ -160,6 +160,11 @@ function setter(setting, value)
 	elseif value == 'off' then
 		value = false
 	end
+	
+	-- is the setting actually a function ref? if so call it.
+	if type(setting)=="function" then
+		return setting(value)
+	end
 
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then

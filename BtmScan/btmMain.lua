@@ -1988,7 +1988,7 @@ function BtmScan.storeItemConfig(itemconfig, itemid)
 	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
 
 	local itemConfigString=BtmScan.packItemConfiguration(itemconfig)
-	BtmScan.Print("BtmScan.storeItemConfig: "..itemid..": "..itemConfigString)
+	-- BtmScan.Print("BtmScan.storeItemConfig: "..itemid..": "..itemConfigString)
 	if itemConfigString=="" then
 		itemConfigTable[itemid]=nil
 	else
