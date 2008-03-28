@@ -232,6 +232,9 @@ function lib.GetPrice(link, _, match)
 --		print("Stack: "..stack.."  Number: "..number)
 --		print("Stack: "..type(stack).."  Number: "..type(number))
 --	end
+	if not newBuy then
+		newBuy = 0
+	end
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
 end
 
