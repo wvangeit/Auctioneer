@@ -187,26 +187,24 @@ end
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 local ttdepcost
 	if not (get("util.automagic.depositTT")) then 
-		if (AucAdvanced and BtmScan) then
-			local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
-			local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-			if depositCostList[itemid] then 
-				for k, v in pairs(depositCostList) do
-					if k == itemid then
-						ttdepcost = v
-					end
+		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
+		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+		if depositCostList[itemid] then 
+			for k, v in pairs(depositCostList) do
+				if k == itemid then
+					ttdepcost = v
 				end
 			end
-			
-			if (ttdepcost == 0 or ttdepcost == nil) then 	
-				EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
-			else
-				local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
-				EnhTooltip.AddLine(ttdesc,ttdepcost)
-			end
-		else
-			EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 		end
+			
+		if (ttdepcost == 0 or ttdepcost == nil) then 	
+			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
+		else
+			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
+			EnhTooltip.AddLine(ttdesc,ttdepcost)
+		end
+	else
+		EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 	end
 end
 
@@ -299,21 +297,19 @@ function lib.merchantClosed()
 end
 
 function lib.getDepCosts() --We store our dep cost in 24hour format ------> /2 for 12 or *2 for 48
-	if BtmScan then
-		for bag=0,4 do
-			for slot=1,GetContainerNumSlots(bag) do
-				if (GetContainerItemLink(bag,slot)) then
-					local _,itemCount = GetContainerItemInfo(bag,slot)
-					local itemLink = GetContainerItemLink(bag,slot)
-					if (itemLink == nil) then return end
-					local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemLink)
-					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-					local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, quantity) 
-					if not (ttdepcost == nil or ttdepcost == 0) then
-						ttdepcost = ttdepcost * 2
-						local storedep = ttdepcost / itemCount
-						depositCostList[itemid] = storedep
-					end
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local _,itemCount = GetContainerItemInfo(bag,slot)
+				local itemLink = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(itemLink)  -- lType, id, suffix, factor, enchant, seed
+				local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+				local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, quantity) 
+				if not (ttdepcost == nil or ttdepcost == 0) then
+					ttdepcost = ttdepcost * 2
+					local storedep = ttdepcost / itemCount
+					depositCostList[itemid] = storedep
 				end
 			end
 		end
