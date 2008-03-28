@@ -259,8 +259,5 @@ function lib.GetPriceArray(link, _, match)
 	return array
 end
 
-function lib.GetPostSettings(link)
-
-end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

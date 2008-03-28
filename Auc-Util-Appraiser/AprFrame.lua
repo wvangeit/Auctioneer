@@ -1259,18 +1259,27 @@ function private.CreateFrames()
 		end
 
 		-- Just a quick bit of sanity checking first
-		assert(stack and stack >= 1, "Item doesn't have a stack size set")
-		assert(number and number >= -2, "Item doesn't have a valid number of stacks/items set")
-		assert(number ~= 0, "Item doesn't have a valid number of stacks/items set")
-		assert(itemBid and itemBid > 0, "No bid value set")
-		assert(itemBuy and (itemBuy == 0 or itemBuy >= itemBid), "Item doesn't have valid Buyout value")
-		assert(duration and (duration == 720 or duration == 1440 or duration == 2880), "Duration not valid")
-		if not (total and total > 0) or (number > 0 and number * stack > total) then
-			UIErrorsFrame:AddMessage("You do not have enough items to do that")
-			print("You do not have enough items to do that")
-		end
-		if (number == -2) then
-			assert(stack <= total, "Stack size larger than available")
+		if not (stack and stack >= 1) then
+			print("Skipping "..link..": no stack size set")
+			return
+		elseif (not number) or number < -2 or number == 0 then
+			print("Skipping "..link..": invalid number of stacks/items set")
+			return
+		elseif (not itemBid) or itemBid <= 0 then
+			print("Skipping "..link..": no bid value set")
+			return
+		elseif not (itemBuy and (itemBuy == 0 or itemBuy >= itemBid)) then
+			print("Skipping "..link..": invalid buyout value")
+			return
+		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
+			print("Skipping "..link..": invalid duration")
+			return
+		elseif not (total and total > 0) or (number > 0 and number * stack > total) then
+			print("Skipping "..link..": You do not have enough items to do that")
+			return
+		elseif (number == -2) and (stack > total) then
+			print("Skipping "..link..": Stack size larger than available")
+			return
 		end
 
 		print(("Posting batch of: %s"):format(link))
