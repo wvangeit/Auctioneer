@@ -639,7 +639,7 @@ end
 
 function lib.GetItemByLink(link)
 	local sig
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	local itype, id, suffix, factor, enchant, seed = decode(link)
 
 	assert(itype and itype == "item", "Item must be a valid link")
 
@@ -747,53 +747,52 @@ end
 local linkfromenter = "emptylink"
 local namefromenter = "emptyname"
 function autosell.OnBagListEnter(button, row, index)
-	local link, name
-	link = autosellframe.baglist.sheet.rows[row][index]:GetText() or "FAILED LINK"
-	if link:match("^(|c%x+|H.+|h%[.+%])") then
-		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
-	end
-	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if autosellframe.baglist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		local link, name
+		link = autosellframe.baglist.sheet.rows[row][index]:GetText() 
+		local name = GetItemInfo(link)
 		if link and name then
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
-		else
-			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
-		end
-	end		
-	namefromenter = name
-	linkfromenter= link
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
+		end		
+	end
 end
 
 function autosell.OnEnter(button, row, index)
-	local link, name
-	link = autosellframe.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
-	if link:match("^(|c%x+|H.+|h%[.+%])") then
-		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
-	end
-	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if autosellframe.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		local link, name
+		link = autosellframe.resultlist.sheet.rows[row][index]:GetText()
+		local name = GetItemInfo(link)
 		if link and name then
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
-		else
-			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
-		end
-	end		
-	namefromenter = name
-	linkfromenter= link
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
+		end		
+	end
 end
 	
 function autosell.OnLeave(button, row, index)
 	GameTooltip:Hide()
-	linkfromenter = "emptylink"
-	namefromenter = "emptyname"
 end
 	
-function autosell.OnClick(button, row, index)
-	if (linkfromenter == nil) then return end
-	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(linkfromenter)
-	local _, itemID, _, _, _, _ = decode(linkfromenter)
+function autosell.OnClickAutoSellSheet(button, row, index)
+	link = autosellframe.resultlist.sheet.rows[row][1]:GetText()
+	if link == nil then return end
+	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
+	local _, itemID, _, _, _, _ = decode(link)
+	lib.setWorkingItem(itemName, itemID)
+end	
+
+function autosell.OnClickBagSheet(button, row, index)
+	link = autosellframe.baglist.sheet.rows[row][1]:GetText() 
+	if link == nil then return end
+	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
+	local _, itemID, _, _, _, _ = decode(link)
 	lib.setWorkingItem(itemName, itemID)
 end	
 
@@ -919,7 +918,7 @@ function lib.makeautosellgui()
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
 		{ ('Sell Reason'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
-	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClick) 
+	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClickAutoSellSheet) 
 	
 	--lib.populateDataSheet()
 	
@@ -947,7 +946,7 @@ function lib.makeautosellgui()
 		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
 		{ ('BTM Rule'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
-	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
+	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClickBagSheet) 
 	
 
 	--[[
