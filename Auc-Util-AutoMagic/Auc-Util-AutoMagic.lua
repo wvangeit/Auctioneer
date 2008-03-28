@@ -581,23 +581,18 @@ function lib.autoSellListClear()
 	autosellframe.ClearIcon()
 end
 
-local wrkname;  local wrkid
 local myworkingtable = {}
-function lib.setWorkingItem(setname, setid)
-	if (setid == nil and setname == nil) then return end
-	if (setid == nil) then setid = setname end
-	local wrkname, wrklink, wrkrarity, wrklevel, wrkMinLevel, wrkType, wrkSubType, wrkStackCount, wrkEquipLoc, wrkTexture = GetItemInfo(setid)
-	local _, wrkid, _, _, _, _ = decode(wrklink)
-	autosellframe.workingname:SetText(wrkname)
-	autosellframe.slot:SetTexture(wrkTexture)
+function lib.setWorkingItem(link)
+	if link == nil then return end
+	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
+	local _, id, _, _, _, _ = decode(link)
+	autosellframe.workingname:SetText(name)
+	autosellframe.slot:SetTexture(texture)
+	myworkingtable = {}
 	for k, n in pairs(myworkingtable) do	
 		myworkingtable[k] = nil
 	end
-	myworkingtable = {}
-	for k, n in pairs(myworkingtable) do
-		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
-	end
-	myworkingtable[wrkid] = wrkname
+	myworkingtable[id] = name
 end
 
 function autosellframe.removeitemfromlist()
@@ -608,9 +603,6 @@ function autosellframe.removeitemfromlist()
 	myworkingtable = {}
 	lib.populateDataSheet()
 	autosellframe.ClearIcon()
-	for k, n in pairs(myworkingtable) do
-		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
-	end
 end
 
 function autosellframe.additemtolist()
@@ -621,16 +613,11 @@ function autosellframe.additemtolist()
 	myworkingtable = {}
 	lib.populateDataSheet()
 	autosellframe.ClearIcon()
-	for k, n in pairs(myworkingtable) do
-		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
-	end
 end
 
 function autosellframe.ClearIcon()
 	autosellframe.workingname:SetText("Item Name")
 	autosellframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
-	wrkname = nil	
-	wrkid = nil
 end
 
 function autosellframe.IconClicked()
@@ -656,16 +643,14 @@ end
 
 
 function lib.autoSellIconDrag()
-	local objtype, _, itemlink = GetCursorInfo()
+	local objtype, _, link = GetCursorInfo()
 	ClearCursor()
 	if objtype == "item" then
-		lib.GetItemByLink(itemlink)
-		if (itemlink == nil) then 
+		lib.GetItemByLink(link)
+		if (link == nil) then 
 			return 
 		end
-			local itemName, _, _, _, _, _, _, _, _, _ = GetItemInfo(itemlink) 
-			local _, itemID, _, _, _, _ = decode(itemlink)
-			lib.setWorkingItem(itemName, itemID)
+			lib.setWorkingItem(link)
 	end
 end
 
@@ -673,10 +658,8 @@ end
 function lib.ClickLinkHook(_, _, _, link, button)
 	if (autosellframe:IsVisible()) then
 		if link then
-			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-			if (itemID == nil) then return end	
-			if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
-			lib.setWorkingItem(itemName, itemID)
+			if (button == "LeftButton") then 
+			lib.setWorkingItem(link)
 			end
 		end
 	end
@@ -744,8 +727,6 @@ function lib.populateDataSheet()
 	autosellframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
 end
 
-local linkfromenter = "emptylink"
-local namefromenter = "emptyname"
 function autosell.OnBagListEnter(button, row, index)
 	if autosellframe.baglist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 		local link, name
@@ -782,18 +763,12 @@ end
 	
 function autosell.OnClickAutoSellSheet(button, row, index)
 	local link = autosellframe.resultlist.sheet.rows[row][1]:GetText()
-	if link == nil then return end
-	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
-	local _, itemID, _, _, _, _ = decode(link)
-	lib.setWorkingItem(itemName, itemID)
+	lib.setWorkingItem(link)
 end	
 
 function autosell.OnClickBagSheet(button, row, index)
 	local link = autosellframe.baglist.sheet.rows[row][1]:GetText() 
-	if link == nil then return end
-	local itemName, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(link)
-	local _, itemID, _, _, _, _ = decode(link)
-	lib.setWorkingItem(itemName, itemID)
+	lib.setWorkingItem(link)
 end	
 
 function lib.makeautosellgui()
