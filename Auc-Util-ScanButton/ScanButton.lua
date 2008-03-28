@@ -225,12 +225,6 @@ end
 This adds a transparent replica of the AH filters on the browse frame, we have scripts on this frame to select catagories a user chooses to scan
 This means we do not have to directly modify blizzards filter frame
 ]]
-local base = CreateFrame("Frame", nil, UIParent)
-base:SetFrameStrata("MEDIUM")
-base:Show()
-base:SetPoint("CENTER", UIParent, "CENTER")
-base:EnableMouse(true)
-
 --store the primary AH filter catagories, this is a copy of the global table the AH uses
 --CLASS_FILTERS generated via GetAuctionItemClasses()
 --Resets the selections table to 0 if an alt click is not used, or after a scan has been implemented
@@ -259,6 +253,7 @@ end
 
 function private.CreateSecondaryFilterButtons()
 local frame, prev
+local base = AuctionFrameBrowse
 private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 	for i = 1,15 do
 		frame = "AuctioneerFilterButton"..i
