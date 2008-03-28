@@ -47,9 +47,14 @@ function private.onEvent(frame, event, arg, ...)
 	end
 end
 
-local settings = {["selectbox"] = {"1", "server"} , ["bid"] =true, ["auction"] = true}
+local settings = nil
 function lib.GetPrice(hyperlink, faction, realm)
     if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
+    if not settings then
+        -- faction seems to be nil when passed in
+        faction = UnitFactionGroup("player"):lower() 
+        settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true}
+    end
     if cache[hyperlink] then
         if cache[hyperlink]=={} then return end
         return unpack(cache[hyperlink])
