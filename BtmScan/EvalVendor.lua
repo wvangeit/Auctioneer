@@ -58,9 +58,10 @@ function lib:valuate(item, tooltip)
 	-- Valuate this item
 	local pct = get(lcName..".profit.pct")
 	local min = get(lcName..".profit.min")
-	local vendor = BtmScan.GetVendorPrice(item.id, item.count)
+	local vendor = GetSellValue and GetSellValue(item.id) or 0
 	-- If there's no price, then we obviously can't sell it, ignore!
 	if not vendor or vendor == 0 then return end
+	vendor = vendor * item.count
 	item:info("Vendor price", vendor)
 
 	-- Mark it down
