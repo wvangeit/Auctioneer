@@ -574,13 +574,13 @@ function lib.makeMailGUI()
 	ammailgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 end 
 
-function lib.autoSellListClear()
+--[[function lib.autoSellListClear()
 	for itemID, itemName in pairs (autoSellList) do
 		autoSellList[itemID] = nil
 	end	
 	lib.populateDataSheet()
 	autosellframe.ClearIcon()
-end
+end]]
 
 local myworkingtable = {}
 function lib.setWorkingItem(link)
@@ -857,10 +857,10 @@ function lib.makeautosellgui()
 	autosellframe.resultlist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 492, 0)
 	autosellframe.resultlist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
 	
-	autosellframe.resetList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	--[[autosellframe.resetList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
 	autosellframe.resetList:SetPoint("TOP", autosellframe.resultlist, "BOTTOM", 0, -15)
 	autosellframe.resetList:SetText(("Reset List"))
-	autosellframe.resetList:SetScript("OnClick", lib.autoSellListClear)
+	autosellframe.resetList:SetScript("OnClick", lib.autoSellListClear)]]
 	
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
