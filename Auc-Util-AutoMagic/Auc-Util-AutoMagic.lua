@@ -653,8 +653,10 @@ function lib.populateDataSheet()
 		if (id == nil) then return end
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		local abid,abuy = GetPrice(itemLink, nil, true)
+		local	vendor = GetSellValue and GetSellValue(id) or 0
 		table.insert(autoselldata,{
 			itemLink, --link form for mouseover tooltips to work
+			vendor,
 			tonumber(abuy) or tonumber(abid),
 		}) 
 	end
@@ -861,10 +863,11 @@ function lib.makeautosellgui()
 	autosellframe.resetList:SetPoint("TOP", autosellframe.resultlist, "BOTTOM", 0, -15)
 	autosellframe.resetList:SetText(("Reset List"))
 	autosellframe.resetList:SetScript("OnClick", lib.autoSellListClear)]]
-	
+
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
 		{ "Appraiser", "COIN", 70 }, 
+		{ "Vendor Value", "COIN", 70 }, 		
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClickAutoSellSheet) 
 	
 	--Create the bag contents frame
