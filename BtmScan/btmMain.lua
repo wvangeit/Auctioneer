@@ -64,6 +64,9 @@ local upToDateConservativePrices = false
 local hookCanSendAuctionQuery = true -- (boolean)
 local TopScanActive = false
 
+--warn once per session if purchase would cause you to fall below reserve
+local reserveWarning = true
+
 BTMSCAN_VERSION = "<%version%>"
 if (BTMSCAN_VERSION == "<\037version%>") then
 	BTMSCAN_VERSION = "4.1.0-DEV"
@@ -428,12 +431,16 @@ function BtmScan.PageScan(resume)
 						if (not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
 					end
 					if (not BtmScan.Settings.GetSetting("allow.buy")) then item.canbuy = false end
+					
+					-- Check that item won't put us below reserve
 					if (item.canbid and balance - item.bid < reserve) then
 						item.canbid = false
 						item.canbuy = false
 					elseif (item.canbuy and balance - item.buy < reserve) then
 						item.canbuy = false
 					end
+					
+					-- Check maxprice setting and for buyout price
 					if (item.canbid and item.bid > maxprice) then
 						item.canbid = false
 						item.canbuy = false
@@ -443,6 +450,8 @@ function BtmScan.PageScan(resume)
 						-- can't buy if no buyout
 						item.canbuy = false
 					end
+					
+					-- Check that price isn't above ignore price, if any
 					local autoignore = BtmScan.NoPrompt[item.sig]
 					if (autoignore) then
 						if (item.canbid and item.bid >= autoignore) then
@@ -463,24 +472,19 @@ function BtmScan.PageScan(resume)
 					item.force = false  -- Forcefully purchase now!
 					item.ignore = false -- Forcefully ignore this item!
 
-					-- Run through all the evaluators to find the best purchase order
-                    -- Check money first, so we don't waste processing if we can't afford it
+					-- Don't waste processing if, for whatever reason, we can't bid or buyout
 					local purchasable = true
-					if balance - item.purchase < reserve then
-						purchasable = false
+					if (not (item.canbid or item.canbuy)) then purchasable = false end
+
+					-- Run through all the evaluators to find the best purchase order
+					if purchasable then
+						purchasable = BtmScan.EvaluateItem(item)
+						if item.force then
+							if balance - item.purchase < 0 then
+								purchasable = false
+							end
+						end
 					end
-					if item.purchase > maxprice then
-						purchasable = false
-					end
-                    if purchasable then
-                        purchasable = BtmScan.EvaluateItem(item)
-                        if item.force then
-                            if balance - item.purchase < 0 then
-                                purchasable = false
-                            end
-                        end
-                    end
-					-- check if itemConfig is used now
 
 					-- One last check to make sure this is a valid purchase order
 					if purchasable then
