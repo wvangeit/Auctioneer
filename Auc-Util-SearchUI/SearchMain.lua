@@ -333,8 +333,36 @@ function lib.MakeGuiConfig()
 	})
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
 
+
+
+function lib.OnEnterSheet(button, row, index)
+	if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		local link, name
+		link = gui.sheet.rows[row][index]:GetText() 
+		local name = GetItemInfo(link)
+		if link and name then
+			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
+		end		
+	end
+end
+
+function lib.OnLeaveSheet(button, row, index)
+	GameTooltip:Hide()
+end
+
+function lib.OnClickSheet(button, row, index)
+	local link = gui.sheet.rows[row][1]:GetText()
+--	lib.DoSomethingWithLinkFunctionHere(link)
+end	
+
+
+
 	gui.sheet = ScrollSheet:Create(gui.frame, {
-		{ "Item",   "TEXT", 120 },
+		{ "Item",   "TOOLTIP", 120 },
 		{ "Seller", "TEXT", 75  },
 		{ "Left",   "INT",  40  },
 		{ "Stk",    "INT",  30  },
@@ -344,7 +372,8 @@ function lib.MakeGuiConfig()
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	})
+	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet) 
+	
 
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
 	gui.Search:SetPoint("BOTTOMRIGHT", gui.frame, "TOPRIGHT", -10, 15)
