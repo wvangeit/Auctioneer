@@ -42,7 +42,6 @@ local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellf
 local autoselldata = {}
 local autosell = {}
 local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-
 autoSellList ={}
 autoSellIgnoreList = {}
 depositCostList = {}
@@ -229,7 +228,9 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.showmailgui", false)
 	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
 	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
-	default("util.automagic.depositTT", false) 
+	default("util.automagic.depositTT", false)
+	default("util.automagic.ammailguix", 100) 
+	default("util.automagic.ammailguiy", 100) 
 end
 
 	-- define what event fires what function
@@ -451,7 +452,9 @@ function lib.mailShow()
 end
 
 function lib.mailClosed() --Fires on mail box closed event & hides mailgui
-	lib.makeMailGUI()
+	local x,y = ammailgui:GetCenter() 
+	set("util.automagic.ammailguix" ,x)
+	set("util.automagic.ammailguiy" ,y)
 	ammailgui:Hide()
 end
 
@@ -498,8 +501,9 @@ end
 --Make mail GUI
 function lib.makeMailGUI()
 	-- Set frame visuals
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	ammailgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 70)
+	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)	
+	ammailgui:ClearAllPoints()	
+	ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
 	ammailgui:SetFrameStrata("DIALOG")
 	ammailgui:SetHeight(90)
 	ammailgui:SetWidth(220)
@@ -512,6 +516,7 @@ function lib.makeMailGUI()
 	ammailgui:SetBackdropColor(0,0,0, 0.8)
 	ammailgui:EnableMouse(true)
 	ammailgui:SetMovable(true)
+	ammailgui:SetClampedToScreen(true)
 	
 	-- Make highlightable drag bar
 	ammailgui.Drag = CreateFrame("Button", "", ammailgui)
