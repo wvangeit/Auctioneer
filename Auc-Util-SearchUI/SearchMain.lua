@@ -418,11 +418,13 @@ local SlideBar = LibStub:GetLibrary("SlideBar", true)
 if SlideBar then
 	--Need to figure out if we're embedded first
 	local embedded = false
-	for _, module in ipairs(AucAdvanced.EmbeddedModules) do 
-		if module == "Auc-Util-SearchUI"  then 
-			embedded = true 
-		end 
-	end 
+	if AucAdvanced and AucAdvanced.EmbeddedModules then
+		for _, module in ipairs(AucAdvanced.EmbeddedModules) do 
+			if module == "Auc-Util-SearchUI"  then 
+				embedded = true 
+			end 
+		end
+	end
 	if embedded then
 		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
 	else
