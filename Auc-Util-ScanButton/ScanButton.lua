@@ -129,7 +129,8 @@ function private.UpdateScanProgress()
 		end
 	end
 end
-local queue = {}
+
+local queue, queueFinished = {}, false
 function private:OnUpdate(delay)
 	if private.blink then
 		private.timer = (private.timer or 0) - delay
@@ -153,9 +154,16 @@ function private:OnUpdate(delay)
 		private.CreateSecondaryFilterButtons()
 		hooksecurefunc("AuctionFrameFilters_Update", private.AuctionFrameFilters_UpdateClasses)--used to respond to scrollframe
 	end
-	--if we still have filters pending process it
-	if #queue > 0 and not AucAdvanced.Scan.IsScanning() then
+	--if we still have filters pending process it, unless a scan is in progress or paused
+	if #queue > 0 and not AucAdvanced.Scan.IsScanning() and not AucAdvanced.Scan.IsPaused() then
 		private.play()
+	end
+	--Used to clear the selected filters/highlights AFTER the last queued scan has completed
+	if queueFinished and not AucAdvanced.Scan.IsScanning() and not AucAdvanced.Scan.IsPaused() then
+		queueFinished = false
+		if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("|CFFFFFF00 Last queued Auction Filter completed") end 
+		private.AuctionFrameFilters_ClearSelection() 
+		private.AuctionFrameFilters_ClearHighlight() 
 	end
 end
 
@@ -186,11 +194,12 @@ function private.ConfigChanged()
 	end
 end
 
-
 function private.stop()
 	AucAdvanced.Scan.SetPaused(false)
 	AucAdvanced.Scan.Cancel()
 	private.UpdateScanProgress()
+	queue = {}
+	queueFinished = true --Will clear currently selected scan filters with teh Next Onupdate event.
 end
 
 function private.play()
@@ -203,8 +212,7 @@ function private.play()
 			AucAdvanced.Scan.StartScan("", "", "", nil, queue[1], nil, nil, nil)
 			table.remove(queue, 1)
 			if #queue == 0 then
-				private.AuctionFrameFilters_ClearSelection() private.AuctionFrameFilters_ClearHighlight() 
-				if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("Last queued scan sent") end 
+				queueFinished = true --Used to clear the selected filters/highlights AFTER the last queued scan has completed
 			end
 		else
 			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
@@ -220,13 +228,11 @@ function private.pause()
 	private.UpdateScanProgress()
 end
 
-
 --[[
 This adds a transparent replica of the AH filters on the browse frame, we have scripts on this frame to select catagories a user chooses to scan
 This means we do not have to directly modify blizzards filter frame
 ]]
---store the primary AH filter catagories, this is a copy of the global table the AH uses
---CLASS_FILTERS generated via GetAuctionItemClasses()
+--store the primary AH filter categories, this is a copy of the global table the AH uses CLASS_FILTERS generated via GetAuctionItemClasses()
 --Resets the selections table to 0 if an alt click is not used, or after a scan has been implemented
 private.Filters = {}
 function private.AuctionFrameFilters_ClearSelection()
@@ -252,8 +258,7 @@ function private.checkedFrames()
 end
 
 function private.CreateSecondaryFilterButtons()
-local frame, prev
-local base = AuctionFrameBrowse
+local base, frame, prev = AuctionFrameBrowse, nil, nil
 private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 	for i = 1,15 do
 		frame = "AuctioneerFilterButton"..i
