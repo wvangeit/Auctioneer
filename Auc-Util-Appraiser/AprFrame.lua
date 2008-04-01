@@ -617,7 +617,6 @@ function private.CreateFrames()
 			frame.manifest:Hide()
 			frame.toggleManifest:Disable()
 			frame.age:SetText("")
-			frame.refresh:Disable()
 			frame.go:Disable()
 			frame.salebox.depositcost:SetText("")
 			frame.salebox.totalbid:SetText("")
@@ -1200,10 +1199,26 @@ function private.CreateFrames()
 		end
 	end
 
+	function frame.RefreshAll()
+		local bg = false
+		for i = 1, #(frame.list) do
+			local item = frame.list[i]
+			if item then
+				local link = item[7]
+				frame.RefreshView(bg, link)
+				bg = true
+			end
+		end
+	end
+	
 	-- We use this to make sure the correct number of parameters are passed to RefreshView; otherwise, we can end up with e.g. link="LeftButton".
 	function frame.SmartRefresh()
 		frame.refresh:Disable()
-		frame.RefreshView(false, nil)
+		if (not IsAltKeyDown()) then
+			frame.RefreshView()
+		else
+			frame.RefreshAll()
+		end
 	end
 
 	function frame.PostAuctions(obj)
@@ -1981,7 +1996,6 @@ function private.CreateFrames()
 	frame.refresh:SetText("Refresh")
 	frame.refresh:SetWidth(80)
 	frame.refresh:SetScript("OnClick", frame.SmartRefresh)
-	frame.refresh:Disable()
 	
 	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.switchUI:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -247,15)
