@@ -1513,7 +1513,7 @@ function mainHandler(command, source)
 	elseif (cmd == 'protect-window') then
 		protectWindow(param, khaosCommand);
 
-	--/auctioneer auction-duration (2h|8h|24h)
+	--/auctioneer auction-duration (12h|24h|48h)
 	elseif (cmd == 'auction-duration') then
 		auctionDuration(param, khaosCommand);
 
@@ -1963,13 +1963,13 @@ function auctionDuration(param, khaosCommand)
 	if (param == 'last' or param == _AUCT('CmdAuctionDuration0') or tonumber(param) == 0) then
 		mode = 0;
 
-	elseif (param == '2h' or param == _AUCT('CmdAuctionDuration1') or tonumber(param) == 1) then
+	elseif (param == '12h' or param == _AUCT('CmdAuctionDuration1') or tonumber(param) == 1) then
 		mode = 1;
 
-	elseif (param == '8h' or param == _AUCT('CmdAuctionDuration2') or tonumber(param) == 2) then
+	elseif (param == '24h' or param == _AUCT('CmdAuctionDuration2') or tonumber(param) == 2) then
 		mode = 2;
 
-	elseif (param == '24h' or param == _AUCT('CmdAuctionDuration3') or tonumber(param) == 3) then
+	elseif (param == '48h' or param == _AUCT('CmdAuctionDuration3') or tonumber(param) == 3) then
 		mode = 3;
 
 	else
