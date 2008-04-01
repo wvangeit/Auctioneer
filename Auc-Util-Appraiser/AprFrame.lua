@@ -1460,7 +1460,7 @@ function private.CreateFrames()
 					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
 					info = "Counts: "..exact.." +"..suffix.." +"..base
 					if (dist) then
-						info = AucAdvanced.Modules.Util.ScanData.Colored(true, dist)
+						info = AucAdvanced.Modules.Util.ScanData.Colored(true, dist, nil, true)	-- use shortened format
 					end
 				end
 				button.info:SetText(info)
