@@ -59,27 +59,50 @@ local colorDist = {
     stack = { },
 	all = { red=0, orange=0, yellow=0, green=0, blue=0 },
 }
-function lib.Colored(doIt, counts, alt)
-	local text
+local tmp = {}
+function lib.Colored(doIt, counts, alt, shorten)
+	local n=0
 	if (counts.blue > 0) then
-		text = ("|cff3399ff%d|r"):format(counts.blue)
+		n=n+1
+		if shorten and counts.blue>=1000 then
+			tmp[n] = format("|cff3399ff%dk|r", floor(counts.blue/1000+0.5))
+		else
+			tmp[n] = format("|cff3399ff%d|r", counts.blue)
+		end
 	end
 	if (counts.green > 0) then
-		if text then text = text .. " / " else text = "" end
-		text = text..("|cff33ff44%d|r"):format(counts.green)
+		n=n+1
+		if shorten and counts.green>=1000 then
+			tmp[n] = format("|cff33ff44%dk|r", floor(counts.green/1000+0.5))
+		else
+			tmp[n] = format("|cff33ff44%d|r", counts.green)
+		end
 	end
 	if (counts.yellow > 0) then
-		if text then text = text .. " / " else text = "" end
-		text = text..("|cffffff00%d|r"):format(counts.yellow)
+		n=n+1
+		if shorten and counts.yellow>=1000 then
+			tmp[n] = format("|cffffff00%dk|r", floor(counts.yellow/1000+0.5))
+		else
+			tmp[n] = format("|cffffff00%d|r", counts.yellow)
+		end
 	end
 	if (counts.orange > 0) then
-		if text then text = text .. " / " else text = "" end
-		text = text..("|cffff9900%d|r"):format(counts.orange)
+		n=n+1
+		if shorten and counts.orange>=1000 then
+			tmp[n] = format("|cffff9900%dk|r", floor(counts.orange/1000+0.5))
+		else
+			tmp[n] = format("|cffff9900%d|r", counts.orange)
+		end
 	end
 	if (counts.red > 0) then
-		if text then text = text .. " / " else text = "" end
-		text = text..("|cffff0000%d|r"):format(counts.red)
+		n=n+1
+		if shorten and counts.red>=1000 then
+			tmp[n] = format("|cffff0000%dk|r", floor(counts.red/1000+0.5))
+		else
+			tmp[n] = format("|cffff0000%d|r", counts.red)
+		end
 	end
+	local text = table.concat(tmp, " / ", 1, n)
 	if alt then
 		if text then
 			text = "( "..text.." )"
