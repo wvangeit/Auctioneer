@@ -105,8 +105,8 @@ function private.CreateFrames()
 									local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
 									
 									table.insert(frame.list, {
-										sig,name,texture,rarity,stack,itemCount,link,  
-										ignore=ignore 
+										sig,name,texture,rarity,stack,itemCount,link,
+										ignore=ignore
 									} )
 									
 									if AucAdvanced.Modules.Util
@@ -158,7 +158,7 @@ function private.CreateFrames()
 						local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
 						
 						table.insert(frame.list, {
-							sig,name,texture,rarity,stack,count,link,  
+							sig,name,texture,rarity,stack,count,link,
 							auction=true
 						} )
 						
@@ -558,7 +558,7 @@ function private.CreateFrames()
 		for i=1, GetNumAuctionItems("owner") do
 			local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
 			if itemName==name then
-				local r = results[count] 
+				local r = results[count]
 				if not r then
 					r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
 					results[count] = r
@@ -691,7 +691,7 @@ function private.CreateFrames()
 			factor = factor,
 		})
 		
-		if results[1] then 
+		if results[1] then
 			local seen = results[1][Const.TIME]
 			if (time() - seen) < 60 then
 				frame.age:SetText("Data is < 1 minute old")
@@ -866,7 +866,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d items"):format(curNumber))
 					bidVal = lib.RoundBid(curBid)
 					buyVal = lib.RoundBuy(curBuy)
-					local baseDeposit = AucAdvanced.Post.GetDepositAmount(sig) or 0 
+					local baseDeposit = AucAdvanced.Post.GetDepositAmount(sig) or 0
 					depositVal = baseDeposit * depositMult
 					r,g,b=nil,nil,nil
 					if colored then
@@ -1019,7 +1019,7 @@ function private.CreateFrames()
 			frame.itembox:Hide()
 			frame.salebox:SetPoint("TOPLEFT", frame, "TOPLEFT", 13, -71)
 			frame.salebox:SetPoint("RIGHT", frame, "LEFT", 253, 0)
-			frame.salebox:SetHeight(340) 
+			frame.salebox:SetHeight(340)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
@@ -1105,7 +1105,7 @@ function private.CreateFrames()
 			frame.salebox.name:SetHeight(20)
 			frame.salebox.warn:SetJustifyH("RIGHT")
 			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 0)
-			frame.salebox.note = frame.salebox.oldnote or frame.salebox.note 
+			frame.salebox.note = frame.salebox.oldnote or frame.salebox.note
 			frame.salebox.oldnote = nil
 		end
 		
@@ -1161,9 +1161,20 @@ function private.CreateFrames()
 		frame.GenerateList()
 	end
 
-	function frame.RefreshView(background)
-		frame.refresh:Disable()
-		local link = frame.salebox.link
+	function frame.RefreshView(background,link)
+		if not link then
+			link = frame.salebox.link
+			if not link then
+				-- The user attempted a single-item refresh without selecting anything, just re-enable the button and return.
+			    print("No items were selected for refresh.")
+				frame.refresh:Enable()
+				return
+			-- else
+				-- print(("Got link from salebox: {{%s}}"):format(link))
+			end
+		-- else
+			-- print(("Got link from parameter: {{%s}}"):format(link))
+		end
 		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack, equipLoc = GetItemInfo(link)
 		local itemTypeId, itemSubId
 		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
@@ -1187,6 +1198,12 @@ function private.CreateFrames()
 			AucAdvanced.Scan.PushScan()
 			AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
 		end
+	end
+
+	-- We use this to make sure the correct number of parameters are passed to RefreshView; otherwise, we can end up with e.g. link="LeftButton".
+	function frame.SmartRefresh()
+		frame.refresh:Disable()
+		frame.RefreshView(false, nil)
 	end
 
 	function frame.PostAuctions(obj)
@@ -1225,11 +1242,10 @@ function private.CreateFrames()
 			local bg = false
 			local obj = acquire()
 			for i = 1, #(frame.list) do
-				if frame.list[i] then
-					local sig = frame.list[i][1]
+				local item = frame.list[i]
+				if item then
+					local sig = item[1]
 					if AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bulk") then
-						obj.id = i
-
 						if mode == "autopost" then
 							-- Auto post these items
 							frame.PostBySig(sig)
@@ -1238,7 +1254,8 @@ function private.CreateFrames()
 							frame.PostBySig(sig, true)
 						elseif mode == "refresh" then
 							-- Refresh these items
-							frame.RefreshView(bg)
+							local link = item[7]
+							frame.RefreshView(bg, link)
 							bg = true
 						end
 					end
@@ -1250,7 +1267,7 @@ function private.CreateFrames()
 
 	function frame.PostBySig(sig, dryRun)
 		local link = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
-		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, _, true) 
+		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, _, true)
 		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
 		if success==false then
 			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
@@ -1882,20 +1899,20 @@ function private.CreateFrames()
 	frame.salebox.bid.element = "bid"
 	frame.salebox.bid:Hide()
 	AppraiserSaleboxBidGold:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 3, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBidGold:SetBackdropColor(0,0,0, 0)
 	AppraiserSaleboxBidSilver:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBidSilver:SetBackdropColor(0,0,0, 0)
 	AppraiserSaleboxBidCopper:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBidCopper:SetBackdropColor(0,0,0, 0)
@@ -1913,20 +1930,20 @@ function private.CreateFrames()
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
 	AppraiserSaleboxBuyGold:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 3, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuyGold:SetBackdropColor(0,0,0, 0)
 	AppraiserSaleboxBuySilver:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuySilver:SetBackdropColor(0,0,0, 0)
 	AppraiserSaleboxBuyCopper:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		tile = true, tileSize = 32, 
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuyCopper:SetBackdropColor(0,0,0, 0)
@@ -1963,7 +1980,7 @@ function private.CreateFrames()
 	frame.refresh:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -167,15)
 	frame.refresh:SetText("Refresh")
 	frame.refresh:SetWidth(80)
-	frame.refresh:SetScript("OnClick", frame.RefreshView)
+	frame.refresh:SetScript("OnClick", frame.SmartRefresh)
 	frame.refresh:Disable()
 	
 	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -2151,9 +2168,9 @@ function private.CreateFrames()
 		--set the resize script	
 		frame.labels[column].button:SetScript("OnMouseDown", function() frame.labels[column].button:StartSizing(frame.labels[column].button) end)
 		--resets the original onclick as well as setting new anchor points for our buttons
-		frame.labels[column].button:SetScript("OnMouseUp", function() 
-									frame.labels[column].button:StopMovingOrSizing() 
-									frame.labels[column].button:SetScript("OnMouseDown", originalScript) 
+		frame.labels[column].button:SetScript("OnMouseUp", function()
+									frame.labels[column].button:StopMovingOrSizing()
+									frame.labels[column].button:SetScript("OnMouseDown", originalScript)
 									frame.labels[column].button:ClearAllPoints()
 									frame.labels[column].button:SetPoint(point, relativeTo, relativePoint, xOfs,yOfs)
 					end)
