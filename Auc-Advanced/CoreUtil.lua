@@ -56,10 +56,10 @@ function lib.getFrameNames(option)
 	--If no option was specified, we return the Name=>Index table
 	if (not option) then
 		return frames
-	--If the option was a number, we return frameName	
+	--If the option was a number, we return frameName
 	elseif (type(option) == "number") then
 		return frameName
-	--If the option was the word "config" we return the Index=>Name table	
+	--If the option was the word "config" we return the Index=>Name table
 	elseif (option == "config") then
 		return configFrames
 	end
@@ -68,7 +68,7 @@ end
 --This function will retrieve the index we've got stored for the user
 function lib.getFrameIndex()
 	--Check to make sure AucAdvanced.Settings exists, if not initialize it
-	if (not AucAdvanced.Settings) then 
+	if (not AucAdvanced.Settings) then
 		AucAdvanced.Settings = {}
 	end
 	--Get the value of AucAdvanced.Settings["printwindow"]
@@ -85,6 +85,7 @@ end
 function lib.setFrame(frame)
 	local frameNumber
 	local frameVal
+	local allFrames = {}
 	frameVal = tonumber(frame)
 	--If no arguments are passed, then set the default frame of 1
 	if (not frame) then
@@ -122,7 +123,7 @@ function lib.Print(...)
 	--If we have a stored chat frame, print our output there
 	if (frameReference) then
 		frameReference:AddMessage(output, 0.3, 0.9, 0.8)
-	--Otherwise, print it to the client's DEFAULT_CHAT_FRAME	
+	--Otherwise, print it to the client's DEFAULT_CHAT_FRAME
 	else
 		DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 	end
