@@ -243,7 +243,7 @@ end
 --clear any current highlighting from a prev search
 function private.AuctionFrameFilters_ClearHighlight()
 	for i in pairs(CLASS_FILTERS) do
-		getglobal("AuctionFilterButton"..i):UnlockHighlight() 
+		_G["AuctionFilterButton"..i]:UnlockHighlight() 
 	end
 end
 
@@ -271,13 +271,13 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 			base[frame]:SetAlpha(0)
 			base[frame]:SetScript("OnClick", function()
 									if IsControlKeyDown() then
-										if private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] then
-											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
-												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
-												getglobal("AuctionFilterButton"..i):UnlockHighlight()
+										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] then
+											if  private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] == 1 then
+												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 0
+												 _G["AuctionFilterButton"..i]:UnlockHighlight()
 											else
-												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-												getglobal("AuctionFilterButton"..i):LockHighlight()
+												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 1
+												 _G["AuctionFilterButton"..i]:LockHighlight()
 											end
 										end
 									else
@@ -294,13 +294,13 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 			base[frame]:SetAlpha(0)
 			base[frame]:SetScript("OnClick", function()
 									if IsControlKeyDown() then
-										if private.Filters[getglobal("AuctionFilterButton"..i):GetText()] then
-											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
-												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
-												getglobal("AuctionFilterButton"..i):UnlockHighlight()
+										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()] then
+											if  private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] == 1 then
+												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 0
+												 _G["AuctionFilterButton"..i]:UnlockHighlight()
 											else
-												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-												getglobal("AuctionFilterButton"..i):LockHighlight()
+												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 1
+												 _G["AuctionFilterButton"..i]:LockHighlight()
 											end
 										end
 									else
@@ -320,7 +320,7 @@ function private.AuctionFrameFilters_UpdateClasses()
 	local offset = FauxScrollFrame_GetOffset(BrowseFilterScrollFrame)
 	index = offset
 	for i=1, NUM_FILTERS_TO_DISPLAY do
-		button = getglobal("AuctioneerFilterButton"..i)
+		button = _G["AuctioneerFilterButton"..i]
 			
 		if ( getn(OPEN_FILTER_LIST) > NUM_FILTERS_TO_DISPLAY ) then
 			button:SetWidth(136)
