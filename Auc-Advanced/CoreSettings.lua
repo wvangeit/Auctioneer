@@ -413,7 +413,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.3,1, "matcher.up", "Up")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
-	
+	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.getFrameNames("config"), "printwindow")
+	gui:AddTip(id, "This allows you to select which Chat Window Auctioneer Advanced prints its output to.")	
 	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
@@ -436,6 +438,9 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is priority",
 		"What is the Processing Priority?",
 		"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete.")
+	gui:AddHelp(id, "what is preferred output frame",
+		"What is Preferred Output Frame?",
+		"The Preferred Output Frame allows you to designate which of your Chat Windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the dropdown menu and Auctioneer Advanced will print all subsequent output to that window.")
 	
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")

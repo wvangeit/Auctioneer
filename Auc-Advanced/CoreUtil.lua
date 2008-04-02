@@ -34,15 +34,98 @@
 local lib = AucAdvanced
 local private = {}
 
+--The folowing function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
+function lib.getFrameNames(option)
+	local frames = {}
+	local frameName = ""
+	local configFrames = {}
+--This iterates through the first 10 ChatWindow#s, getting the name associated with it.
+	for i=1, 10 do
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i)
+		--If the name isn't blank, then we build a couple of tables, one where the Chat Frame names are the keys, and indexes the values, another which is the reverse.
+		if (name ~= "") then
+			frames[name] = i
+			table.insert(configFrames, {i, name})
+		end
+	end
+	--Next, if a number was passed as an option, we simply retrieve the frame name and assign it to frameName
+	if (type(option) == "number") then
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(option);
+		frameName = name
+	end
+	--If no option was specified, we return the Name=>Index table
+	if (not option) then
+		return frames
+	--If the option was a number, we return frameName	
+	elseif (type(option) == "number") then
+		return frameName
+	--If the option was the word "config" we return the Index=>Name table	
+	elseif (option == "config") then
+		return configFrames
+	end
+end
+
+--This function will retrieve the index we've got stored for the user
+function lib.getFrameIndex()
+	--Check to make sure AucAdvanced.Settings exists, if not initialize it
+	if (not AucAdvanced.Settings) then 
+		AucAdvanced.Settings = {}
+	end
+	--Get the value of AucAdvanced.Settings["printwindow"]
+	local value = AucAdvanced.Settings.GetSetting("printwindow")
+	--If that value doesn't exist, we return a default of "1"
+	if (not value) then
+		return 1
+	end
+	--Otherwise, we return the value
+	return value
+end
+
+--This function is used to store the user's preferred chatframe
+function lib.setFrame(frame)
+	local frameNumber
+	local frameVal
+	frameVal = tonumber(frame)
+	--If no arguments are passed, then set the default frame of 1
+	if (not frame) then
+		frameNumber = 1
+	--If the frame argument is a number, set that as the frameNumber
+	elseif ((frameVal) ~= nil) then
+			frameNumber = frameVal
+	--If the argument is a string, try to convert it to a frame number, if we can't, then set it to a default of 1
+	elseif (type(frame) == "string") then
+		allFrames = AucAdvanced.getFrameNames()
+		if (allFrames[frame]) then
+				frameNumber = allFrames[frame]
+		else
+				frameNumber = 1
+		end
+	--If the argument doesn't make sense, set the default to 1
+	else
+			frameNumber = 1;
+	end
+	--Finally, set our printwindow to whatever we ended up deciding on
+	AucAdvanced.Settings.SetSetting("printwindow", frameNumber)
+end
+
+--This is the printing function.  If the user has selected a preferred chatframe, we'll use it.  If not, we'll default to the first one.
 function lib.Print(...)
 	local output, part
+	local frameIndex = AucAdvanced.getFrameIndex();
+	local frameReference = _G["ChatFrame"..frameIndex]
 	for i=1, select("#", ...) do
 		part = select(i, ...)
 		part = tostring(part):gsub("{{", "|cffddeeff"):gsub("}}", "|r")
 		if (output) then output = output .. " " .. part
 		else output = part end
 	end
-	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
+	--If we have a stored chat frame, print our output there
+	if (frameReference) then
+		frameReference:AddMessage(output, 0.3, 0.9, 0.8)
+	--Otherwise, print it to the client's DEFAULT_CHAT_FRAME	
+	else
+		DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
+	end
 end
 
 local function breakHyperlink(match, matchlen, ...)
