@@ -485,8 +485,18 @@ function lib.slidebar()
 	if LibStub then
 		local SlideBar = LibStub:GetLibrary("SlideBar", true)    
 		if SlideBar then
-			sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+			function sideIconEnter()
+				local SlideBar = LibStub:GetLibrary("SlideBar", true)
+				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+			end
+			function sideIconLeave()
+				local SlideBar = LibStub:GetLibrary("SlideBar", true)
+				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+			end
+			sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+			sideIcon:SetScript("OnEnter", sideIconEnter)
+			sideIcon:SetScript("OnLeave", sideIconLeave)
 			sideIcon:SetScript("OnClick", lib.autosellslidebar)
 			sideIcon.tip = {
 				"AutoMagic: Auto Sell Config",
