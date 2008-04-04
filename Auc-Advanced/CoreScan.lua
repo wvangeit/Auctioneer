@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Auctioneer Advanced
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -787,6 +787,7 @@ Commitfunction = function()
 			end
 		end
 	end
+	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
 
 	--Hide the progress indicator
 	CommitProgressBar:Hide()

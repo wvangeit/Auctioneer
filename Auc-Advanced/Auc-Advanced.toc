@@ -24,6 +24,7 @@ CoreUtil.lua
 CoreConst.lua
 CoreConfig.lua
 CorePost.lua
+CoreBuy.lua
 CoreScan.lua
 CoreSettings.lua
 CoreReport.lua
