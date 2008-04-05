@@ -202,8 +202,6 @@ local ttdepcost
 			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
 			EnhTooltip.AddLine(ttdesc,ttdepcost)
 		end
-	else
-		EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
 	end
 end
 
