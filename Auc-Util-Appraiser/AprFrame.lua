@@ -548,35 +548,14 @@ function private.CreateFrames()
 	end
 	
 	function frame.ShowOwnAuctionDetails(itemString)
+        local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
 
-		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel
-		
 		local itemName, itemLink = GetItemInfo(itemString)
 		
-		local results={}
-		local counts={}
-		for i=1, GetNumAuctionItems("owner") do
-			local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
-			if itemName==name then
-				local r = results[count]
-				if not r then
-					r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
-					results[count] = r
-					tinsert(counts, count)
-				end
-				if (minBid or 0)>0 then
-					r.countBid = r.countBid + count
-					r.sumBid = r.sumBid + bidAmount
-				end
-				if (buyoutPrice or 0)>0 then
-					r.countBO = r.countBO + count
-					r.sumBO = r.sumBO + buyoutPrice
-				end
-				r.stackCount = r.stackCount + 1
-			end
-		end
+		local results = AucAdvanced.Modules.Util.Appraiser.ownResults[itemName]
+		local counts = AucAdvanced.Modules.Util.Appraiser.ownCounts[itemName]
 		
-		if #counts>0 then
+		if counts and #counts>0 then
 			table.sort(counts)
 		
 			frame.manifest.lines:Add("")
@@ -680,10 +659,7 @@ function private.CreateFrames()
 		factor = tonumber(factor) or 0
 
 		local itemKey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
-		itemId = tonumber(itemId)
-		suffix = tonumber(suffix) or 0
-		factor = tonumber(factor) or 0
-		
+	
 		local results = AucAdvanced.API.QueryImage({
 			itemId = itemId,
 			suffix = suffix,
@@ -2033,6 +2009,8 @@ function private.CreateFrames()
 			frame.cancel:Disable()
 			frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 		end
+        -- piggyback update of auction details
+        AucAdvanced.Modules.Util.Appraiser.GetOwnAuctionDetails()
 	end)
 	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
 	frame.cancel.tex:SetPoint("TOPLEFT", frame.cancel, "TOPLEFT", 4, -2)

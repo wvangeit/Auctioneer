@@ -36,12 +36,14 @@ if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 local data, _
+local ownResults = {}
+local ownCounts = {}
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "auctionui") then
-		private.CreateFrames(...)
+        private.CreateFrames(...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
@@ -125,6 +127,43 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	end
+    if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
+        -- Just to make sure it has the data seeing it likes to not load when you first load the auction house currently
+        local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
+        if numBatchAuctions > 0 and totalAuctions > 0 and #ownCounts == 0 then
+            lib.GetOwnAuctionDetails()
+        end
+    
+        local itemName = name
+        
+        local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
+		
+		local results = lib.ownResults[itemName]
+		local counts = lib.ownCounts[itemName]
+		
+		if counts and #counts>0 then
+            local sumBid, sumBO = 0, 0
+            local countBid, countBO = 0, 0
+			for _,count in ipairs(counts) do
+				local res = results[count]
+				sumBid = sumBid + res.sumBid --*res.stackCount
+                sumBO = sumBO + res.sumBO --*res.stackCount
+                countBid = countBid + res.countBid --*res.stackCount
+                countBO = countBO + res.countBO --*res.stackCount
+			end
+            local avgBid =  countBid>0 and (sumBid / countBid) or nil
+            local avgBO =  countBO>0 and (sumBO / countBO) or nil
+            local r,g,b,_
+			if colored then
+				_, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(hyperlink, 1, avgBid, avgBO)
+			end
+			r,g,b = r or 1,g or 1, b or 1
+			
+            EnhTooltip.AddLine(format("  Posted %2d at avg/ea", countBO or countBid)..
+				(avgBO and "" or " (bid)"), avgBO or avgBid)
+            EnhTooltip.LineColor(r,g,b)    
+		end
+    end
 end
 
 function lib.OnLoad()
@@ -258,6 +297,37 @@ function lib.GetPriceArray(link, _, match)
 	
 	return array
 end
+
+function lib.GetOwnAuctionDetails()
+    local results = {}
+    local counts = {}		
+    local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
+	for i=1, totalAuctions do
+		local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
+        if not results[name] then
+            results[name] = {}
+            counts[name] = {}
+		end
+		local r = results[name][count] 
+		if not r then
+			r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
+			results[name][count] = r
+			tinsert(counts[name], count)
+		end
+		if (minBid or 0)>0 then
+			r.countBid = r.countBid + count
+            r.sumBid = r.sumBid + bidAmount
+        end
+        if (buyoutPrice or 0)>0 then
+            r.countBO = r.countBO + count
+            r.sumBO = r.sumBO + buyoutPrice
+        end
+        r.stackCount = r.stackCount + 1
+    end
+    lib.ownResults = results
+    lib.ownCounts = counts
+end
+
 
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
