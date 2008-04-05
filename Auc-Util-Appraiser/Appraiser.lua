@@ -130,9 +130,10 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
         -- Just to make sure it has the data seeing it likes to not load when you first load the auction house currently
         local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
-        if numBatchAuctions > 0 and totalAuctions > 0 and #ownCounts == 0 then
+        if numBatchAuctions > 0 and totalAuctions > 0 and not lib.ownResults then
             lib.GetOwnAuctionDetails()
         end
+        if not lib.ownResults then return end
     
         local itemName = name
         
