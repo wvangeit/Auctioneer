@@ -38,6 +38,7 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 
 local Const = AucAdvanced.Const
 local gui
+private.data = {}
 
 -- Our official name:
 AucSearchUI = lib
@@ -311,12 +312,26 @@ function lib.GetSearchLocals()
 	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const
 end
 
+function private.buyauction()
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout)
+	gui.sheet.selected = nil
+	lib.UpdateControls()
+end
+
+function private.bidauction()
+	local bid = MoneyInputFrame_GetCopper(gui.frame.bidbox)
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, bid)
+	gui.sheet.selected = nil
+	lib.UpdateControls()
+end
+
 function lib.MakeGuiConfig()
 	if gui then return end
 
 	local Configator = LibStub("Configator")
 	local ScrollSheet = LibStub("ScrollSheet")
 	local id, last, cont
+	local selected
 
 	gui = Configator:Create(setter,getter, 900, 500, 0, 300)
 
@@ -332,34 +347,74 @@ function lib.MakeGuiConfig()
 		insets = { left = 32, right = 32, top = 32, bottom = 32 }
 	})
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
-
-
-
-function lib.OnEnterSheet(button, row, index)
-	if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link, name
-		link = gui.sheet.rows[row][index]:GetText() 
-		local name = GetItemInfo(link)
-		if link and name then
-			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+	
+	function lib.UpdateControls()
+		if selected ~= gui.sheet.selected then
+			selected = gui.sheet.selected
+			local data = gui.sheet:GetSelection()
+			if not data then
+				private.data = {}
+			else
+				private.data.link = data[1]
+				private.data.seller = data[2]
+				private.data.stack = data[4]
+				private.data.minbid = data[8]
+				private.data.curbid = data[9]
+				private.data.buyout = data[10]
 			end
-		end		
+			if private.data.buyout and (private.data.buyout > 0) then
+				gui.frame.buyout:Enable()
+				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(private.data.buyout, true))
+			else
+				gui.frame.buyout:Disable()
+				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(0, true))
+			end
+		
+			if private.data.minbid then
+				if private.data.curbid and private.data.curbid > 0 then
+					MoneyInputFrame_SetCopper(gui.frame.bidbox, math.ceil(private.data.curbid*1.05))
+				else
+					MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.minbid)
+				end
+				gui.frame.bid:Enable()
+			else
+				gui.frame.bid:Disable()
+			end
+		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable 
+			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < math.ceil(private.data.curbid*1.05) then
+				MoneyInputFrame_SetCopper(gui.frame.bidbox, math.ceil(private.data.curbid*1.05))
+			end
+			gui.frame.bid:Enable()
+		end
+		--if bid >= buyout, it's going to be a buyout anyway, so disable bid button to indicate that
+		if private.data.buyout and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
+			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
+			gui.frame.bid:Disable()
+		end
 	end
-end
 
-function lib.OnLeaveSheet(button, row, index)
-	GameTooltip:Hide()
-end
+	function lib.OnEnterSheet(button, row, index)
+		if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+			local link, name
+			link = gui.sheet.rows[row][index]:GetText() 
+			local name = GetItemInfo(link)
+			if link and name then
+				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+				GameTooltip:SetHyperlink(link)
+				if (EnhTooltip) then 
+					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+				end
+			end		
+		end
+	end
 
-function lib.OnClickSheet(button, row, index)
-	local link = gui.sheet.rows[row][1]:GetText()
---	lib.DoSomethingWithLinkFunctionHere(link)
-end	
+	function lib.OnLeaveSheet(button, row, index)
+		GameTooltip:Hide()
+	end
 
-
+	function lib.OnClickSheet(button, row, index)
+	--	lib.DoSomethingWithLinkFunctionHere(link)
+	end	
 
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", 120 },
@@ -372,9 +427,10 @@ end
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet) 
+	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls) 
 	
 
+	gui.sheet:EnableSelect(true)
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
 	gui.Search:SetPoint("BOTTOMRIGHT", gui.frame, "TOPRIGHT", -10, 15)
 	gui.Search:SetText("Search")
@@ -397,9 +453,30 @@ end
 	gui:AddControl(id, "Button",     0.5, 1, "search.save", "Create new")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.7, 1, "search.copy", "Create copy")
+	
+	gui:SetScript("OnKeyDown", lib.UpdateControls)
+	
+	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.buyout:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -30, 0)
+	gui.frame.buyout:SetText("Buyout")
+	gui.frame.buyout:SetScript("OnClick", private.buyauction)
+	gui.frame.buyout:Disable()
+	
+	gui.frame.buyoutbox = gui.frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	gui.frame.buyoutbox:SetPoint("BOTTOMRIGHT", gui.frame.buyout, "BOTTOMLEFT", -4, 4)
+	gui.frame.buyoutbox:SetWidth(100)
 
-
-	lib.gui = gui
+	gui.frame.bid = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.bid:SetPoint("BOTTOMRIGHT", gui.frame.buyoutbox, "BOTTOMLEFT", -10, -4)
+	gui.frame.bid:SetText("Bid")
+	gui.frame.bid:SetScript("OnClick", private.bidauction)
+	gui.frame.bid:Disable()
+	
+	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
+	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
+	MoneyInputFrame_SetOnvalueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
+	
+	--lib.gui = gui
 
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
