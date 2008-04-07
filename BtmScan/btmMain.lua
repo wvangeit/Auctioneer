@@ -1419,11 +1419,11 @@ end
 
 
 BtmScan.GetDisplayPrice = function(total, count)
-	totalCoins = BtmScan.Coins(total, true)
-	result = totalCoins
+	local totalCoins = BtmScan.Coins(total, true)
+	local result = totalCoins
 	if (count > 1) and not (displayType == "total") then
-		unitCoins = BtmScan.Coins((total / count), true)
-		displayType = BtmScan.Settings.GetSetting("price.display")
+		local unitCoins = BtmScan.Coins((total / count), true)
+		local displayType = BtmScan.Settings.GetSetting("price.display")
 		if (displayType == "unit") or (count == 1) then
 			result = unitCoins
 		elseif (displayType == "total_unit") then
