@@ -116,6 +116,7 @@ local settingDefaults = {
 	['EnableTopScan'] = false,
 	['override.nobid'] = false,
 	['show.tooltip'] = true,
+	['price.display'] = 'unit_total',
 }
 
 function getDefault(setting)
@@ -353,6 +354,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",           0, 1, "profile.save", "Save")
 
 	id = gui:AddTab("General")
+	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",           0,    "Main BtmScanner options")
 	gui:AddControl(id, "Subhead",          0,    "Scan Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "scan.always", "Look for bargains while browsing")
@@ -362,6 +364,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",         0, 1, "override.nobid", "Override 'Allow bid on items' when topscanning")
 	gui:AddControl(id, "Subhead",          0,    "Display Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "show.tooltip", "Display evaluations in tooltip")
+	gui:AddControl(id, "Label",            0, 3,  nil, "Display prices as:")
+	gui:AddControl(id, "Selectbox",        0, 4, {{"total","Total"},{"unit","Unit"},{"total_unit","Total / Unit"},{"unit_total","Unit / Total"}}, "price.display", "Display prices as:")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.reserve", 1, 99999999, "Reserve Amount")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.maxprice", 1, 99999999, "Maximum Price")

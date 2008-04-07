@@ -1418,12 +1418,30 @@ function BtmScan.AuctionFrameTabClickHook(_,_, index)
 end
 
 
+BtmScan.GetDisplayPrice = function(total, count)
+	totalCoins = BtmScan.Coins(total, true)
+	result = totalCoins
+	if (count > 1) and not (displayType == "total") then
+		unitCoins = BtmScan.Coins((total / count), true)
+		displayType = BtmScan.Settings.GetSetting("price.display")
+		if (displayType == "unit") or (count == 1) then
+			result = unitCoins
+		elseif (displayType == "total_unit") then
+			result = totalCoins .. " / " .. unitCoins
+		else
+			result = unitCoins .. " / " .. totalCoins
+		end	
+	end
+	return result
+end
+
+
 BtmScan.PromptPurchase = function(item)
 	BtmScan.scanStage = 3
 	BtmScan.Prompt.item = item
 
 	-- format the profit percentage as an integer (can still be huge)
-	local Vi, Vf = item.purchase, item.valuation
+	local Vi, Vf, Vc = item.purchase, item.valuation, item.count
 
 	local profit = Vf - Vi
 	local roi = math.floor( (100 * profit / Vi) + 0.5 )
@@ -1440,15 +1458,15 @@ BtmScan.PromptPurchase = function(item)
 	end
 
 	BtmScan.Prompt.Lines[1]:SetLine(tr("Do you want to %1:", bidText))
-	BtmScan.Prompt.Lines[2]:SetLine("  "..item.link.." x"..item.count)
+	BtmScan.Prompt.Lines[2]:SetLine("  "..item.link.." x"..Vc)
 	BtmScan.Prompt.Lines[3]:SetLine("  "..tr("Seller: %1, Remain: %2h", item.owner, hours))
-	BtmScan.Prompt.Lines[4]:SetLine("  "..tr("%1 price:", BidText), BtmScan.Coins(Vi,true))
+	BtmScan.Prompt.Lines[4]:SetLine("  "..tr("%1 price:", BidText), BtmScan.GetDisplayPrice(Vi, Vc))
 	BtmScan.Prompt.Lines[5]:SetLine("  "..tr("Purchasing for:"), item.reason)
-	BtmScan.Prompt.Lines[6]:SetLine("  "..tr("Valuation estimate:"), BtmScan.Coins(Vf,true))
-	BtmScan.Prompt.Lines[7]:SetLine("  "..tr("Potential profit:"), BtmScan.Coins(profit,true))
+	BtmScan.Prompt.Lines[6]:SetLine("  "..tr("Valuation estimate:"), BtmScan.GetDisplayPrice(Vf, Vc))
+	BtmScan.Prompt.Lines[7]:SetLine("  "..tr("Potential profit:"), BtmScan.GetDisplayPrice(profit, Vc))
 	BtmScan.Prompt.Lines[8]:SetLine("  "..tr("Return on investment:"), roi.."%")
 	BtmScan.Prompt.Lines[9]:SetLine("  "..tr("Discounted rate:"), disc.."%")
-	BtmScan.Prompt.Lines[10]:SetLine("  "..tr("Profit above requirements:"), BtmScan.Coins(item.profit,true))
+	BtmScan.Prompt.Lines[10]:SetLine("  "..tr("Profit above requirements:"), BtmScan.GetDisplayPrice(item.profit, Vc))
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(item.tex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
 	if BtmScan.Settings.GetSetting("playSound") then PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3") end
