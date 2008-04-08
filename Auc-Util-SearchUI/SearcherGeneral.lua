@@ -4,6 +4,7 @@ local lib, parent, private = AucSearchUI.NewSearcher("General")
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
+lib.tabname = "General parameters"
 
 -- Set our defaults
 default("general.name", "")
@@ -17,7 +18,7 @@ default("general.clevel.max", 80)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	id = gui:AddTab("General parameters", "Searches")
+	id = gui:AddTab(lib.tabname, "Searches")
 
 	gui:AddControl(id, "Header",     0,      "General search criteria")
 

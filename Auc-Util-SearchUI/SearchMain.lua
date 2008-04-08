@@ -39,6 +39,7 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 local Const = AucAdvanced.Const
 local gui
 private.data = {}
+local coSearch
 
 -- Our official name:
 AucSearchUI = lib
@@ -83,6 +84,7 @@ end
 
 -- Default setting values
 local settingDefaults = {
+	["searchspeed"] = 100,
 }
 
 local function getDefault(setting)
@@ -356,11 +358,11 @@ function lib.MakeGuiConfig()
 				private.data = {}
 			else
 				private.data.link = data[1]
-				private.data.seller = data[2]
-				private.data.stack = data[4]
-				private.data.minbid = data[8]
-				private.data.curbid = data[9]
-				private.data.buyout = data[10]
+				private.data.seller = data[7]
+				private.data.stack = data[3]
+				private.data.minbid = data[4]
+				private.data.curbid = data[5]
+				private.data.buyout = data[6]
 			end
 			if private.data.buyout and (private.data.buyout > 0) then
 				gui.frame.buyout:Enable()
@@ -418,15 +420,16 @@ function lib.MakeGuiConfig()
 
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", 120 },
-		{ "Seller", "TEXT", 75  },
-		{ "Left",   "INT",  40  },
+		{ "Pct",    "TEXT", 30  },
 		{ "Stk",    "INT",  30  },
-		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
+		{ "Seller", "TEXT", 75  },
+		{ "Left",   "INT",  40  },
+		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
 	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls) 
 	
 
@@ -454,6 +457,11 @@ function lib.MakeGuiConfig()
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.7, 1, "search.copy", "Create copy")
 	
+	gui:AddCat("Options")
+	id = gui:AddTab("General Options", "Options")
+	gui:AddControl(id, "Header",    0,     "Setup General Options")
+	gui:AddControl(id, "WideSlider",   0, 1, "searchspeed", 10, 500, 10, "Search Process Priority: %s")
+	
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 	
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
@@ -476,8 +484,27 @@ function lib.MakeGuiConfig()
 	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
 	MoneyInputFrame_SetOnvalueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
 	
-	--lib.gui = gui
-
+	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
+	gui.frame.progressbar:SetWidth(400)
+	gui.frame.progressbar:SetHeight(30)
+	gui.frame.progressbar:SetPoint("BOTTOM", gui.frame, "BOTTOM", 0, 100)
+	gui.frame.progressbar:SetBackdrop({
+	  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
+	  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
+	  tile=1, tileSize=10, edgeSize=10, 
+	  insets={left=3, right=3, top=3, bottom=3}
+	})
+	gui.frame.progressbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	gui.frame.progressbar:SetStatusBarColor(0.6, 0, 0, 0.4)
+	gui.frame.progressbar:SetMinMaxValues(0, 1000)
+	gui.frame.progressbar:SetValue(0)
+	gui.frame.progressbar:Hide()
+	
+	gui.frame.progressbar.text = gui.frame.progressbar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	gui.frame.progressbar.text:SetPoint("CENTER", gui.frame.progressbar, "CENTER")
+	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching")
+	gui.frame.progressbar.text:SetTextColor(1,1,1)
+	
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher.MakeGuiConfig then
@@ -516,22 +543,56 @@ if SlideBar then
 	}
 end
 
-
-function private.QueryFilter(item)
+function private.FindSearcher(item)
+	if not gui.config.selectedTab then
+		return
+	end
 	for name, searcher in pairs(lib.Searchers) do
-		if searcher and searcher.Search then
-			if not searcher.Search(item) then -- The search fails
-				return true -- "Yes, filter OUT this item"
-			end
+		if searcher and searcher.tabname and searcher.tabname == gui.config.selectedTab and searcher.Search then
+			return searcher
 		end
 	end
 end
 
-local queryFilter = { filter = private.QueryFilter }
-function lib.PerformSearch()
+local PerformSearch = function()
 	gui:ClearFocus()
-	local results = AucAdvanced.API.QueryImage(queryFilter)
-
+	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
+	local scandata = AucAdvanced.Scan.GetScanData()
+	local speed = lib.GetSetting("searchspeed")
+	if not speed then speed = 1000 end
+	local searcher = private.FindSearcher()
+	if not searcher then
+		print("No valid Searcher selected")
+		return
+	end
+	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)
+	gui.frame.progressbar:Show()
+	
+	local results = {}
+	for i, data in ipairs(scandata.image) do
+		if (i % speed) == 0 then
+			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
+			coroutine.yield()
+		end
+		if searcher.Search(data) then
+			local level,_, r, g, b
+			local pctstring = ""
+			if AucAdvanced.Modules.Util.PriceLevel then
+				level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
+				if level then
+					level = math.floor(level)
+					r = r*255
+					g = g*255
+					b = b*255
+					pctstring = string.format("|cff%02x%02x%02x"..level, r, g, b)
+				end
+			else
+			end
+			data["pct"] = pctstring
+			table.insert(results, data)
+		end
+	end
+	
 	-- Now we have the results, it's time to populate the sheet
 	local sheetData = acquire()
 
@@ -545,21 +606,50 @@ function lib.PerformSearch()
 		local buy = data[Const.BUYOUT]
 		table.insert(sheetData, acquire(
 			data[Const.LINK],
-			data[Const.SELLER],
-			data[Const.TLEFT],
+			data["pct"],
 			count,
-			min/count,
-			cur/count,
-			buy/count,
 			min,
 			cur,
-			buy
+			buy,
+			data[Const.SELLER],
+			data[Const.TLEFT],
+			min/count,
+			cur/count,
+			buy/count
 		))
 	end
 
+	gui.frame.progressbar:Hide()
 	gui.sheet:SetData(sheetData)
-
 	recycle(sheetData)
+
 end
+
+function lib.PerformSearch(searcher)
+	if (not coSearch) or (coroutine.status(coSearch) == "dead") then
+		coSearch = coroutine.create(PerformSearch)
+		local status, result = coroutine.resume(coSearch, searcher)
+		if not status and result then
+			print("Error in search coroutine: " .. result)
+		end	else
+		print("coroutine already running: "..coroutine.status(coSearch))
+	end
+end
+
+local flip = false
+function private.OnUpdate()
+	if coSearch and coroutine.status(coSearch) ~= "dead" then
+		flip = not flip
+		if flip then
+			local status, result = coroutine.resume(coSearch)
+			if not status and result then
+				print("Error in search coroutine: " .. result)
+			end
+		end
+	end
+end
+
+private.updater = CreateFrame("Frame", nil, UIParent)
+private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
