@@ -100,6 +100,12 @@ end
 function lib.FinishedSearch(query)
 	if private.CurAuction["link"] then
 		local _, _, rarity, _, minlevel, _, _, _, equiploc = GetItemInfo(private.CurAuction["link"])
+		if minlevel == 0 then
+			minlevel = nil
+		end
+		if equiploc == "" then
+			equiploc = nil
+		end
 		if (rarity == query.quality) and (minlevel == query.minUseLevel) and (equiploc == query.invType)
 		and (private.CurAuction["itemname"] == query.name) then
 			print("Auction for "..private.CurAuction["link"].." no longer exists")
