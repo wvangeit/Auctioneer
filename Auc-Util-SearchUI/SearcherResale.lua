@@ -10,14 +10,9 @@ default("resale.profit.min", 1)
 default("resale.profit.pct", 50)
 default("resale.seen.check", false)
 default("resale.seen.min", 10)
-default("resale.adjust.basis", "faction")
+default("resale.adjust.brokerage", true)
 default("resale.adjust.deposit", true)
 default("resale.adjust.listings", 3)
-
-local ahList = {
-	{"faction", "Faction AH Fees"},
-	{"neutral", "Neutral AH Fees"},
-}
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -45,7 +40,6 @@ function lib.Search(item)
 	if (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
 		return
 	end
-	local price = 0
 	local market, seen, _, curModel
 	
 	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
@@ -84,6 +78,18 @@ function lib.Search(item)
 		value = market - minprofit
 	end
 	if item[Const.BUYOUT] <= value then
+		if AucAdvanced.Modules.Util.PriceLevel then
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.BUYOUT], market)
+			if level then
+				level = math.floor(level)
+				r = r*255
+				g = g*255
+				b = b*255
+				local pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
+				item["pct"] = pctstring
+			end
+		end
+		item["profit"] = (market - item[Const.BUYOUT])
 		return true
 	end
 end

@@ -381,11 +381,11 @@ function lib.MakeGuiConfig()
 				private.data = {}
 			else
 				private.data.link = data[1]
-				private.data.seller = data[7]
-				private.data.stack = data[3]
-				private.data.minbid = data[4]
-				private.data.curbid = data[5]
-				private.data.buyout = data[6]
+				private.data.seller = data[8]
+				private.data.stack = data[4]
+				private.data.minbid = data[5]
+				private.data.curbid = data[6]
+				private.data.buyout = data[7]
 			end
 			if private.data.buyout and (private.data.buyout > 0) then
 				gui.frame.buyout:Enable()
@@ -444,6 +444,7 @@ function lib.MakeGuiConfig()
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", 120 },
 		{ "Pct",    "TEXT", 30  },
+		{ "Profit", "COIN", 85, { DESCENDING=true } },
 		{ "Stk",    "INT",  30  },
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
@@ -600,18 +601,18 @@ local PerformSearch = function()
 		if searcher.Search(data) then
 			local level,_, r, g, b
 			local pctstring = ""
-			if AucAdvanced.Modules.Util.PriceLevel then
+			if not data["pct"] and AucAdvanced.Modules.Util.PriceLevel then
 				level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
 				if level then
 					level = math.floor(level)
 					r = r*255
 					g = g*255
 					b = b*255
-					pctstring = string.format("|cff%02x%02x%02x"..level, r, g, b)
+					pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
+					data["pct"] = pctstring
 				end
 			else
 			end
-			data["pct"] = pctstring
 			table.insert(results, data)
 		end
 	end
@@ -630,6 +631,7 @@ local PerformSearch = function()
 		table.insert(sheetData, acquire(
 			data[Const.LINK],
 			data["pct"],
+			data["profit"],
 			count,
 			min,
 			cur,
