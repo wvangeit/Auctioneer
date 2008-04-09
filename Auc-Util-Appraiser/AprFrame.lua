@@ -350,7 +350,8 @@ function private.CreateFrames()
 				math.floor(0.5+result[Const.BUYOUT]/count),
 				result[Const.MINBID],
 				result[Const.CURBID],
-				result[Const.BUYOUT]
+				result[Const.BUYOUT],
+				result[Const.LINK]
 			)
 			local r,g,b = frame.SetPriceColor(itemkey, count, result[Const.CURBID], result[Const.BUYOUT])
 			if r then
@@ -2146,7 +2147,7 @@ function private.CreateFrames()
 	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
 	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
 	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
-	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
+	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 
 	function private.onResize(column, name, frame)
 		local originalScript = frame.labels[column].button:GetScript("OnMouseDown") --store the original Sort onclick script will reset it when we are done resizing
@@ -2170,6 +2171,67 @@ function private.CreateFrames()
 		frame.labels[column].button:StartSizing(frame.labels[column].button)
 	end
 	
+	function private.BuyAuction()
+		print(private.buyselection.link)
+		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
+		frame.imageview.sheet.selected = nil
+		frame.imageviewclassic.sheet.selected = nil
+		private.onSelect()
+		private.onClassicSelect()
+	end
+	function private.BidAuction()
+		local bid = private.buyselection.minbid
+		if private.buyselection.curbid and private.buyselection.curbid > 0 then
+			bid = math.ceil(private.buyselection.curbid*1.05)
+		end
+		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, bid)
+		frame.imageview.sheet.selected = nil
+		frame.imageviewclassic.sheet.selected = nil
+		private.onSelect()
+		private.onClassicSelect()
+	end
+	
+	private.buyselection = {}
+	function private.onSelect()
+		if frame.imageview.sheet.selected and frame.imageviewclassic.sheet.selected then
+			frame.imageviewclassic.sheet.selected = nil
+			private.onClassicSelect()
+		end
+		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
+			frame.imageview.sheet.prevselected = frame.imageview.sheet.selected
+			local selected = frame.imageview.sheet:GetSelection()
+			if not selected then
+				private.buyselection = {}
+			else
+				private.buyselection.link = selected[11]
+				private.buyselection.seller = selected[2]
+				private.buyselection.stack = selected[4]
+				private.buyselection.minbid = selected[8]
+				private.buyselection.curbid = selected[9]
+				private.buyselection.buyout = selected[10]
+			end
+			if private.buyselection.buyout and (private.buyselection.buyout > 0) then
+				frame.imageview.purchase.buy:Enable()
+				frame.imageview.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
+			else
+				frame.imageview.purchase.buy:Disable()
+				frame.imageview.purchase.buy.price:SetText("")
+			end
+			
+			if private.buyselection.minbid then
+				if private.buyselection.curbid and private.buyselection.curbid > 0 then
+					frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
+				else
+					frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
+				end
+				frame.imageview.purchase.bid:Enable()
+			else
+				frame.imageview.purchase.bid:Disable()
+				frame.imageview.purchase.bid.price:SetText("")
+			end
+		end
+	end
+	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		{ "Item",   "TEXT", 105 },
 		{ "Seller", "TEXT", 75  },
@@ -2181,7 +2243,41 @@ function private.CreateFrames()
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	}, nil, nil, nil, private.onResize)
+		{ "", "TEXT", 0}, --Hidden column to carry the link
+	}, nil, nil, nil, private.onResize, private.onSelect)
+	frame.imageview.sheet:EnableSelect(true)
+	
+	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
+	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
+	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
+	frame.imageview.purchase:SetBackdrop({
+		bgFile = "Interface\\QuestFrame\\UI-QuestTitleHighlight"
+	})
+	frame.imageview.purchase:SetBackdropColor(0.5, 0.5, 0.5, 1)
+
+	frame.imageview.purchase.buy = CreateFrame("Button", nil, frame.imageview.purchase, "OptionsButtonTemplate")
+	frame.imageview.purchase.buy:SetPoint("TOPLEFT", frame.imageview.purchase, "TOPLEFT", 5, 0)
+	frame.imageview.purchase.buy:SetWidth(30)
+	frame.imageview.purchase.buy:SetText("Buy")
+	frame.imageview.purchase.buy:SetScript("OnClick", private.BuyAuction)
+	frame.imageview.purchase.buy:Disable()
+	
+	frame.imageview.purchase.buy.price = frame.imageview.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.imageview.purchase.buy.price:SetPoint("TOPLEFT", frame.imageview.purchase.buy, "TOPRIGHT")
+	frame.imageview.purchase.buy.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.buy, "BOTTOMRIGHT")
+	frame.imageview.purchase.buy.price:SetJustifyV("MIDDLE")
+	
+	frame.imageview.purchase.bid = CreateFrame("Button", nil, frame.imageview.purchase, "OptionsButtonTemplate")
+	frame.imageview.purchase.bid:SetPoint("TOPLEFT", frame.imageview.purchase.buy, "TOPLEFT", 120, 0)
+	frame.imageview.purchase.bid:SetWidth(30)
+	frame.imageview.purchase.bid:SetText("Bid")
+	frame.imageview.purchase.bid:SetScript("OnClick", private.BidAuction)
+	frame.imageview.purchase.bid:Disable()
+	
+	frame.imageview.purchase.bid.price = frame.imageview.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.imageview.purchase.bid.price:SetPoint("TOPLEFT", frame.imageview.purchase.bid, "TOPRIGHT")
+	frame.imageview.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.bid, "BOTTOMRIGHT")
+	frame.imageview.purchase.bid.price:SetJustifyV("MIDDLE")
 	
 	frame.imageviewclassic = CreateFrame("Frame", nil, frame)
 	frame.imageviewclassic:SetBackdrop({
@@ -2191,10 +2287,50 @@ function private.CreateFrames()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
 	
-	frame.imageviewclassic:SetBackdropColor(0, 0, 0, 0.8)
+	function private.onClassicSelect()
+		if frame.imageviewclassic.sheet.selected and frame.imageview.sheet.selected then
+			frame.imageview.sheet.selected = nil
+			private.onSelect()
+		end
+		if frame.imageviewclassic.sheet.prevselected ~= frame.imageviewclassic.sheet.selected then
+			frame.imageviewclassic.sheet.prevselected = frame.imageviewclassic.sheet.selected
+			local selected = frame.imageviewclassic.sheet:GetSelection()
+			if not selected then
+				private.buyselection = {}
+			else
+				private.buyselection.link = selected[11]
+				private.buyselection.seller = selected[2]
+				private.buyselection.stack = selected[4]
+				private.buyselection.minbid = selected[8]
+				private.buyselection.curbid = selected[9]
+				private.buyselection.buyout = selected[10]
+			end
+			if private.buyselection.buyout and (private.buyselection.buyout > 0) then
+				frame.imageviewclassic.purchase.buy:Enable()
+				frame.imageviewclassic.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
+			else
+				frame.imageviewclassic.purchase.buy:Disable()
+				frame.imageviewclassic.purchase.buy.price:SetText("")
+			end
+			
+			if private.buyselection.minbid then
+				if private.buyselection.curbid and private.buyselection.curbid > 0 then
+					frame.imageviewclassic.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
+				else
+					frame.imageviewclassic.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
+				end
+				frame.imageviewclassic.purchase.bid:Enable()
+			else
+				frame.imageviewclassic.purchase.bid:Disable()
+				frame.imageviewclassic.purchase.bid.price:SetText("")
+			end
+		end
+	end
+	
+	frame.imageviewclassic:SetBackdropColor(0, 0, 0, 1)
 	frame.imageviewclassic:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
-	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
+	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
+	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 	frame.imageviewclassic.sheet = ScrollSheet:Create(frame.imageviewclassic, {
 		{ "Item",   "TEXT", 105 },
 		{ "Seller", "TEXT", 75  },
@@ -2206,9 +2342,43 @@ function private.CreateFrames()
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	}, nil, nil, nil, private.onResize)
+		{ "", "TEXT", 0}, --Hidden column to carry the link
+	}, nil, nil, nil, private.onResize, private.onClassicSelect)
+	frame.imageviewclassic.sheet:EnableSelect(true)
 	frame.imageviewclassic:Hide()
+
+	frame.imageviewclassic.purchase = CreateFrame("Frame", nil, frame.imageviewclassic)
+	frame.imageviewclassic.purchase:SetPoint("TOPLEFT", frame.imageviewclassic, "BOTTOMLEFT", 0, 4)
+	frame.imageviewclassic.purchase:SetPoint("BOTTOMRIGHT", frame.imageviewclassic, "BOTTOMRIGHT", 0, -16)
+	frame.imageviewclassic.purchase:SetBackdrop({
+		bgFile = "Interface\\QuestFrame\\UI-QuestTitleHighlight"		
+	})
+	frame.imageviewclassic.purchase:SetBackdropColor(0.5, 0.5, 0.5, 1)
+
+	frame.imageviewclassic.purchase.buy = CreateFrame("Button", nil, frame.imageviewclassic.purchase, "OptionsButtonTemplate")
+	frame.imageviewclassic.purchase.buy:SetPoint("TOPLEFT", frame.imageviewclassic.purchase, "TOPLEFT", 5, 0)
+	frame.imageviewclassic.purchase.buy:SetWidth(30)
+	frame.imageviewclassic.purchase.buy:SetText("Buy")
+	frame.imageviewclassic.purchase.buy:SetScript("OnClick", private.BuyAuction)
+	frame.imageviewclassic.purchase.buy:Disable()
 	
+	frame.imageviewclassic.purchase.buy.price = frame.imageviewclassic.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.imageviewclassic.purchase.buy.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPRIGHT")
+	frame.imageviewclassic.purchase.buy.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.buy, "BOTTOMRIGHT")
+	frame.imageviewclassic.purchase.buy.price:SetJustifyV("MIDDLE")
+	
+	frame.imageviewclassic.purchase.bid = CreateFrame("Button", nil, frame.imageviewclassic.purchase, "OptionsButtonTemplate")
+	frame.imageviewclassic.purchase.bid:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPLEFT", 120, 0)
+	frame.imageviewclassic.purchase.bid:SetWidth(30)
+	frame.imageviewclassic.purchase.bid:SetText("Bid")
+	frame.imageviewclassic.purchase.bid:SetScript("OnClick", private.BidAuction)
+	frame.imageviewclassic.purchase.bid:Disable()
+	
+	frame.imageviewclassic.purchase.bid.price = frame.imageviewclassic.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.imageviewclassic.purchase.bid.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.bid, "TOPRIGHT")
+	frame.imageviewclassic.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.bid, "BOTTOMRIGHT")
+	frame.imageviewclassic.purchase.bid.price:SetJustifyV("MIDDLE")
+
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("Appraiser")
 	frame.ScanTab:Show()
