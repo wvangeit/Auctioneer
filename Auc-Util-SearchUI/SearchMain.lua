@@ -57,22 +57,33 @@ end
 
 local function getSearchParamName()
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	return AucAdvancedData.UtilSearchUI.lastSearch or "Default"
+	local realmKey = AucAdvanced.GetFaction()
+	if not realmKey then
+		return
+	end
+	if (not AucAdvancedData.UtilSearchUI[realmKey]) then AucAdvancedData.UtilSearchUI[realmKey] = {} end
+	return AucAdvancedData.UtilSearchUI[realmKey]["lastSearch"] or "Default"
 end
 
 local function getSearchParam()
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
+	local realmKey = AucAdvanced.GetFaction()
+	if not realmKey then
+		return
+	end
+	if (not AucAdvancedData.UtilSearchUI[realmKey]) then AucAdvancedData.UtilSearchUI[realmKey] = {} end
+	local SearchUISettings = AucAdvancedData.UtilSearchUI[realmKey]
 	local searchName = getSearchParamName()
-	if (not AucAdvancedData.UtilSearchUI["search."..searchName]) then
+	if (not SearchUISettings["search."..searchName]) then
 		if searchName ~= "Default" then
 			searchName = "Default"
-			AucAdvancedData.UtilSearchUI[getSearchParamName()] = "Default"
+			SearchUISettings[getSearchParamName()] = "Default"
 		end
 		if searchName == "Default" then
-			AucAdvancedData.UtilSearchUI["search."..searchName] = {}
+			SearchUISettings["search."..searchName] = {}
 		end
 	end
-	return AucAdvancedData.UtilSearchUI["search."..searchName]
+	return SearchUISettings["search."..searchName]
 end
 
 
@@ -104,6 +115,12 @@ end
 
 local function setter(setting, value)
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
+	local realmKey = AucAdvanced.GetFaction()
+	if not realmKey then
+		return
+	end
+	if (not AucAdvancedData.UtilSearchUI[realmKey]) then AucAdvancedData.UtilSearchUI[realmKey] = {} end
+	local SearchUISettings = AucAdvancedData.UtilSearchUI[realmKey]
 
 	-- turn value into a canonical true or false
 	if value == 'on' then
@@ -124,10 +141,10 @@ local function setter(setting, value)
 			value = gui.elements["search.name"]:GetText()
 
 			-- Create the new search 
-			AucAdvancedData.UtilSearchUI["search."..value] = {}
+			SearchUISettings["search."..value] = {}
 
 			-- Set the current search to the new search 
-			AucAdvancedData.UtilSearchUI[getSearchParamName()] = value
+			SearchUISettings[getSearchParamName()] = value
 			-- Get the new current search 
 			local newSearch = getSearchParam()
 
@@ -136,10 +153,10 @@ local function setter(setting, value)
 			gui:Resave()
 
 			-- Add the new search to the searches list
-			local searches = AucAdvancedData.UtilSearchUI["searches"]
+			local searches = SearchUISettings["searches"]
 			if (not searches) then
 				searches = { "Default" }
-				AucAdvancedData.UtilSearchUI["searches"] = searches
+				SearchUISettings["searches"] = searches
 			end
 
 			-- Check to see if it already exists
@@ -161,13 +178,13 @@ local function setter(setting, value)
 			-- If there's a search name supplied
 			if (value) then
 				-- Clean it's search container of values
-				cleanse(AucAdvancedData.UtilSearchUI["search."..value])
+				cleanse(SearchUISettings["search."..value])
 
 				-- Delete it's search container
-				AucAdvancedData.UtilSearchUI["search."..value] = nil
+				SearchUISettings["search."..value] = nil
 
 				-- Find it's entry in the searches list
-				local searches = AucAdvancedData.UtilSearchUI["searches"]
+				local searches = SearchUISettings["searches"]
 				if (searches) then
 					for pos, name in ipairs(searches) do
 						-- If this is it, then extract it
@@ -179,7 +196,7 @@ local function setter(setting, value)
 
 				-- If the user was using this one, then move them to Default
 				if (getSearchParamName() == value) then
-					AucAdvancedData.UtilSearchUI[getSearchParamName()] = 'Default'
+					SearchUISettings[getSearchParamName()] = 'Default'
 				end
 			end
 
@@ -190,14 +207,14 @@ local function setter(setting, value)
 			value = gui.elements["search"].value
 
 			-- Clean it's search container of values
-			AucAdvancedData.UtilSearchUI["search."..value] = {}
+			SearchUISettings["search."..value] = {}
 
 		elseif (setting == "search") then
 			-- User selected a different value in the select box, get it
 			value = gui.elements["search"].value
 
 			-- Change the user's current search to this new one
-			AucAdvancedData.UtilSearchUI[getSearchParamName()] = value
+			SearchUISettings[getSearchParamName()] = value
 
 		end
 
@@ -229,12 +246,18 @@ end
 
 local function getter(setting)
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
+	local realmKey = AucAdvanced.GetFaction()
+	if not realmKey then
+		return
+	end
+	if (not AucAdvancedData.UtilSearchUI[realmKey]) then AucAdvancedData.UtilSearchUI[realmKey] = {} end
+	local SearchUISettings = AucAdvancedData.UtilSearchUI[realmKey]
 	if not setting then return end
 
 	local a,b,c = strsplit(".", setting)
 	if (a == 'search') then
 		if (b == 'searches') then
-			local pList = AucAdvancedData.UtilSearchUI["searches"]
+			local pList = SearchUISettings["searches"]
 			if (not pList) then
 				pList = { "Default" }
 			end
