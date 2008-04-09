@@ -46,7 +46,7 @@ function lib.Search(item)
 	if item[Const.QUALITY] <= 1 then
 		return
 	end
-	local market
+	local market, _
 	local minskill = 0
 	local maxskill = 375
 	if get("disenchant.level.custom") then
