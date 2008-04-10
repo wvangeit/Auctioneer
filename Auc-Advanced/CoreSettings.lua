@@ -141,12 +141,17 @@ end
 
 local function setter(setting, value)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-
+	
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
+	end
+	
+	-- is the setting actually a function ref? if so call it.
+	if type(setting)=="function" then
+		return setting(value)
 	end
 
 	-- for defaults, just remove the value and it'll fall through
