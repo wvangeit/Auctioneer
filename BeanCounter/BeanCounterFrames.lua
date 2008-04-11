@@ -202,8 +202,6 @@ function private.CreateFrames()
 		if objtype == "item" then
 			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
 			local itemTexture = select(2, private.getItemInfo(link, "name")) 
-			frame.icon.tootip = {itemName, link}
-			--frame.icon:SetNormalTexture(itemTexture)
 			frame.searchBox:SetText(itemName)
 			private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 		end
@@ -413,52 +411,35 @@ function private.CreateFrames()
 	function private.scrollSheetOnLeave(button, row, index)
 			GameTooltip:Hide()
 	end
-	
-	function private.onResize(column, name, frame)
-		
-		if IsShiftKeyDown() then
-			print(column)
+	--records the column width changes
+	 --store width by header name, that way if column reorginizing is added we apply size to proper column
+	function private.onResize(self, column,  width)
+		if not width then 
+			private.setOption("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(private.getOption("columnwidth."..self.labels[column]:GetText()))
 		else
-			local originalScript = frame.labels[column].button:GetScript("OnMouseDown") --store the original Sort onclick script will reset it when we are done resizing
-			local point, relativeTo, relativePoint, xOfs, yOfs = frame.labels[column].button:GetPoint() --Store the anchor point since its niled when resize tha button
-			--limit the size we will allow buttons to get
-			local width = frame.labels[column].button:GetWidth()
-			local height = frame.labels[column].button:GetHeight()
-			frame.labels[column].button:SetResizable(true)
-			frame.labels[column].button:SetMaxResize(400, height)
-			frame.labels[column].button:SetMinResize(10, height)
-			--set the resize script	
-			frame.labels[column].button:SetScript("OnMouseDown", function() frame.labels[column].button:StartSizing(frame.labels[column].button) end)
-			--resets the original onclick as well as setting new anchor points for our buttons
-			frame.labels[column].button:SetScript("OnMouseUp", function() 
-										frame.labels[column].button:StopMovingOrSizing() 
-										frame.labels[column].button:SetScript("OnMouseDown", originalScript) 
-										frame.labels[column].button:ClearAllPoints()
-										frame.labels[column].button:SetPoint(point, relativeTo, relativePoint, xOfs,yOfs)
-						end)
-			--start resizing frame			
-			frame.labels[column].button:StartSizing(frame.labels[column].button)
+			private.setOption("columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
 		
 	--localize UI text
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
-		{ _BC('UiNameHeader'), "TOOLTIP", 120 },
-		{ _BC('UiTransactions'), "TEXT", 100 },
+		{ _BC('UiNameHeader'), "TOOLTIP",  private.getOption("columnwidth.".._BC('UiNameHeader')) },
+		{ _BC('UiTransactions'), "TEXT", private.getOption("columnwidth.".._BC('UiTransactions')) },
 		
-		{_BC('UiBidTransaction') , "COIN", 60 },
-		{ _BC('UiBuyTransaction') , "COIN", 60 },
-		{ _BC('UiNetHeader'), "COIN", 65},
-		{ _BC('UiQuantityHeader'), "TEXT", 40},
-		{ _BC('UiPriceper'), "COIN", 70}, 
+		{_BC('UiBidTransaction') , "COIN", private.getOption("columnwidth.".._BC('UiBidTransaction')) },
+		{ _BC('UiBuyTransaction') , "COIN", private.getOption("columnwidth.".._BC('UiBuyTransaction')) },
+		{ _BC('UiNetHeader'), "COIN", private.getOption("columnwidth.".._BC('UiNetHeader')) },
+		{ _BC('UiQuantityHeader'), "TEXT", private.getOption("columnwidth.".._BC('UiQuantityHeader')) },
+		{ _BC('UiPriceper'), "COIN", private.getOption("columnwidth.".._BC('UiPriceper')) }, 
 		
-		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", 90 },
+		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", private.getOption("columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer) },
 				
-		{ _BC('UiDepositTransaction'), "COIN", 58 },
-		{ _BC("UiFee"), "COIN", 50 }, 
-		{ _BC('UiWealth'), "COIN", 70 }, 
-		{ _BC('UiDateHeader'), "text", 250 },
+		{ _BC('UiDepositTransaction'), "COIN", private.getOption("columnwidth.".._BC('UiDepositTransaction')) },
+		{ _BC("UiFee"), "COIN", private.getOption("columnwidth.".._BC("UiFee")) }, 
+		{ _BC('UiWealth'), "COIN", private.getOption("columnwidth.".._BC('UiWealth')) }, 
+		{ _BC('UiDateHeader'), "text", private.getOption("columnwidth.".._BC('UiDateHeader')) },
 	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
 		
 	
@@ -474,7 +455,7 @@ function private.CreateFrames()
 	local style = {}
 	local temp ={}
 	local tbl = {}
-	--This is all handled by ITEMIDS need to remove/rename this to be a utility to convvert text searches to itemID searches
+	--This is all handled by ITEMIDS need to remove/rename this to be a utility to convert text searches to itemID searches
 	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		tbl = {}

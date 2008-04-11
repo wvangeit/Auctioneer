@@ -78,6 +78,7 @@ end
 
 
 -- Default setting values
+local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)") --We have no direct translation so this is a temp workaround	
 private.settingDefaults = {
 	["util.beancounter.ButtonExactCheck"] = false,
 	["util.beancounter.ButtonClassicCheck"] = false,
@@ -108,6 +109,23 @@ private.settingDefaults = {
 	
 	--["util.beancounter.dateFormat"] = "%c",
 	["dateString"] = "%c", 
+	
+	--GUI column default widths
+	["columnwidth.".._BC('UiNameHeader')] = 120,
+	["columnwidth.".._BC('UiTransactions')] = 100,
+	["columnwidth.".._BC('UiBidTransaction')] = 60,
+	["columnwidth.".._BC('UiBuyTransaction')] = 60,
+	["columnwidth.".._BC('UiNetHeader')] = 65,
+	["columnwidth.".._BC('UiQuantityHeader')] = 40,
+	["columnwidth.".._BC('UiPriceper')] = 70, 
+		
+	["columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer] = 90,
+				
+	["columnwidth.".._BC('UiDepositTransaction')] = 58,
+	["columnwidth.".._BC('UiPriceper')] = 50, 
+	["columnwidth.".._BC("UiFee")] = 70, 
+	["columnwidth.".._BC('UiWealth')] = 70, 
+	["columnwidth.".._BC('UiDateHeader')] = 250,
     }
 
 local function getDefault(setting)
