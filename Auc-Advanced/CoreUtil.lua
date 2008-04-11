@@ -58,20 +58,25 @@ function lib.windowProtect(action, setvalue)
 		--it isn't, we take care of that here.
 		if (not UIPanelWindows["AuctionFrame"]) then
 			AuctionFrame_LoadUI()
+			local info = UIPanelWindows[AuctionFrame:GetName()]
 			AuctionFrame:SetAttribute("UIPanelLayout-defined", true)
+			for name,value in pairs(info) do
+				AuctionFrame:SetAttribute("UIPanelLayout-"..name, value)
+			end
 		end
 		--If UIPanelLayout-defined is true, and UIPanelLayout-enabled
 		--equals the value we're about to set our config to (setvalue),
 		--we need to change the value of UPL-e.
-		if (AuctionFrame:GetAttribute("UIPanelLayout-defined") and (AuctionFrame:GetAttribute("UIPanelLayout-enabled")) == setvalue) then
+		if (AuctionFrame:GetAttribute("UIPanelLayout-defined")) then
+			local bholder = not setvalue
 			--This doesn't work if the AH Windows if visible
 			if (AuctionFrame:IsVisible()) then
 				AuctionFrame_Hide()
-				AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", bholder)
 				AuctionFrame_Show()
 			else
 				--Set our UIPanelLayout-enabled value
-				AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", bholder)
 			end
 		end
 		--Set our config value
