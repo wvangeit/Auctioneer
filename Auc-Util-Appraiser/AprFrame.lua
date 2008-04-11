@@ -2148,27 +2148,16 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
 	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-
-	function private.onResize(column, name, frame)
-		local originalScript = frame.labels[column].button:GetScript("OnMouseDown") --store the original Sort onclick script will reset it when we are done resizing
-		local point, relativeTo, relativePoint, xOfs, yOfs = frame.labels[column].button:GetPoint() --Store the anchor point since its niled when resizing the button
-		--limit the size we will allow buttons to get
-		local width = frame.labels[column].button:GetWidth()
-		local height = frame.labels[column].button:GetHeight()
-		frame.labels[column].button:SetResizable(true)
-		frame.labels[column].button:SetMaxResize(400, height)
-		frame.labels[column].button:SetMinResize(10, height)
-		--set the resize script	
-		frame.labels[column].button:SetScript("OnMouseDown", function() frame.labels[column].button:StartSizing(frame.labels[column].button) end)
-		--resets the original onclick as well as setting new anchor points for our buttons
-		frame.labels[column].button:SetScript("OnMouseUp", function()
-									frame.labels[column].button:StopMovingOrSizing()
-									frame.labels[column].button:SetScript("OnMouseDown", originalScript)
-									frame.labels[column].button:ClearAllPoints()
-									frame.labels[column].button:SetPoint(point, relativeTo, relativePoint, xOfs,yOfs)
-					end)
-		--start resizing frame			
-		frame.labels[column].button:StartSizing(frame.labels[column].button)
+	
+	--records the column width changes
+	--store width by header name, that way if column reorginizing is added we apply size to proper column
+	function private.onResize(self, column, width)
+		if not width then 
+			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText()))
+		else
+			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), width)
+		end
 	end
 	
 	function private.BuyAuction()
@@ -2233,17 +2222,17 @@ function private.CreateFrames()
 	end
 	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Item",   "TEXT", 105 },
-		{ "Seller", "TEXT", 75  },
-		{ "Left",   "INT",  40  },
-		{ "Stk",    "INT",  30  },
-		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
-		{ "MinBid", "COIN", 85, { DESCENDING=true } },
-		{ "CurBid", "COIN", 85, { DESCENDING=true } },
-		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-		{ "", "TEXT", 0}, --Hidden column to carry the link
+		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")},
+		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")},
+		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")},
+		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")},
+		{ "Min/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Min/ea"), { DESCENDING=true } },
+		{ "Cur/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Cur/ea"), { DESCENDING=true } },
+		{ "Buy/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } },
+		{ "MinBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.MinBid"), { DESCENDING=true } },
+		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } },
+		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } },
+		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link
 	}, nil, nil, nil, private.onResize, private.onSelect)
 	frame.imageview.sheet:EnableSelect(true)
 	

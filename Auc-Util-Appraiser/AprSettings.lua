@@ -260,6 +260,18 @@ AucAdvanced.Settings.SetDefault("util.appraiser.stack", "max")
 AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
 AucAdvanced.Settings.SetDefault("util.appraiser.clickhook", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.reselect", true)
+--Default sizes for the scrollframe column widths
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Item", 105)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Seller", 75)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Left", 40)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Stk", 30 )
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Min/ea", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Cur/ea", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Buy/ea", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.MinBid", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.CurBid", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Buyout", 85)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
