@@ -171,9 +171,33 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	while (#array > 0) do table.remove(array) end
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
+	
 	-- These 2 are the ones that most algorithms will look for
-	array.price = avg3 or dayAverage
+	if not AucAdvanced.Settings.GetSetting("stat.purchased.reportsafe") then
+		array.price = avg3 or dayAverage
+	else
+		-- Safe mode: prefer longer-running averages for low-volume items
+		if seenCount>100 and seenCount > seenDays*10 then
+			array.price = avg3 or dayAverage
+			-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
+		else
+			local a3 = avg3 or dayAverage
+			local a7 = avg7 or a3
+			local a14 = avg14 or a7
+			if seenCount >= seenDays*7 then
+				array.price = (a3+a7)/2
+				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
+			else
+				local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
+				local mix14 = 0.5-mix3
+				local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
+				array.price = a3*mix3 + a7*mix7 + a14*mix14			
+				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
+			end
+		end
+	end
 	array.seen = seenCount
+	
 	-- This is additional data
 	array.avgday = dayAverage
 	array.avg3 = avg3
@@ -197,6 +221,7 @@ function lib.OnLoad(addon)
 end
 
 AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", true)
+AucAdvanced.Settings.SetDefault("stat.purchased.reportsafe", false)
 
 function private.SetupConfigGui(gui)
 	id = gui:AddTab(lib.libName, lib.libType.." Modules")
@@ -228,9 +253,18 @@ function private.SetupConfigGui(gui)
 		"Why have the option to multiply stack size?",
 		"The original Stat-Purchased multiplied by the stack size of the item, "..
 		"but some like dealing on a per-item basis.")
+	
+	gui:AddHelp(id, "report safe safer price prices value low volume item items",
+		"How are the \"safer\" prices computed?",
+		"For anything seen more than 100 times and selling more than 10 items per day (on average), we simply use the 3 day average.\n\n"..
+		"For others, we value the 7-day average at 50%, and the 3- and 14-day averages at between 0--50% and 50--0%, respectively, depending on how many are seen per day (between 1 and 7).\n"
+		)
+		
 		
 	gui:AddControl(id, "Header",     0,    libName.." options")
+
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.tooltip", "Show purchased stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Purchased module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
@@ -239,10 +273,17 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of 7-Day Average from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg14", "Display Moving 14 Day Average")
 	gui:AddTip(id, "Toggle display of 14-Day Average from the Simple module on or off")
+	
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.reportsafe", "Report safer prices for low volume items")
+	gui:AddTip(id, "Returns longer averages (7-day, or even 14-day) for low-volume items")
+
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.quantmul", "Multiply by Stack Size")
 	gui:AddTip(id, "Multiplies by current Stack Size if on")
-	
+
 end
 
 
