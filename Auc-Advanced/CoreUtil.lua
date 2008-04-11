@@ -34,6 +34,51 @@
 local lib = AucAdvanced
 local private = {}
 
+--This function sets up Protect-Window functionality.
+--We had to modify the getter and setter in CoreSettings,
+--so much of this code is to cope with that.
+function lib.windowProtect(action, setvalue)
+	if (not AucAdvanced.Settings) then
+		AucAdvanced.Settings = {}
+	end
+	--If this was called by the getter, we'll receive an argument
+	--of "getsetting"  So we get the setting and return it for
+	--CoreSettings.lua
+	if (action == "getsetting") then
+		return AucAdvanced.Settings.GetSetting("protectwindow")
+	--If this was called by the getDefault, we'll receive an argument
+	--of "getdefault"
+	elseif (action == "getdefault") then
+		return AucAdvanced.Settings.getDefault("protectwindow")
+	--If it was called by the setter, we'll receive and argument of
+	--"set".  This is where we do most of our work.
+	elseif (action == "set") then
+		--We need the AuctionFrame to have been created and for
+		--it to be associated with the UIPanelLayout tables.  If
+		--it isn't, we take care of that here.
+		if (not UIPanelWindows["AuctionFrame"]) then
+			AuctionFrame_LoadUI()
+			AuctionFrame:SetAttribute("UIPanelLayout-defined", true)
+		end
+		--If UIPanelLayout-defined is true, and UIPanelLayout-enabled
+		--equals the value we're about to set our config to (setvalue),
+		--we need to change the value of UPL-e.
+		if (AuctionFrame:GetAttribute("UIPanelLayout-defined") and (AuctionFrame:GetAttribute("UIPanelLayout-enabled")) == setvalue) then
+			--This doesn't work if the AH Windows if visible
+			if (AuctionFrame:IsVisible()) then
+				AuctionFrame_Hide()
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+				AuctionFrame_Show()
+			else
+				--Set our UIPanelLayout-enabled value
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+			end
+		end
+		--Set our config value
+		return AucAdvanced.Settings.SetSetting("protectwindow", setvalue)
+	end
+end
+
 --The folowing function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
 function lib.getFrameNames(option)
 	local frames = {}
