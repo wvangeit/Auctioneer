@@ -115,6 +115,8 @@ local settingDefaults = {
 	['scancommit.speed'] = 20,
 	['scancommit.progressbar'] = true,
 	['alwaysHomeFaction'] = false,
+	['printwindow'] = 1,
+	['protectwindow'] = false,
 }
 
 local function getDefault(setting)
@@ -123,6 +125,14 @@ local function getDefault(setting)
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
+
+	--If settings is a function reference, call it.
+	-- This was added to enable Protect Window to update its
+	-- status without a UI reload by calling a function rather
+	-- than a setting in the Control definition.
+	if (type(setting) == "function") then
+		return setting("getdefault")
+	end
 
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
@@ -150,8 +160,11 @@ local function setter(setting, value)
 	end
 	
 	-- is the setting actually a function ref? if so call it.
+	-- This was added to enable Protect Window to update its
+	-- status without a UI reload by calling a function rather
+	-- than a setting in the Control definition.
 	if type(setting)=="function" then
-		return setting(value)
+		return setting("set", value)
 	end
 
 	-- for defaults, just remove the value and it'll fall through
@@ -291,6 +304,14 @@ local function getter(setting)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 	if not setting then return end
 
+	--Is the setting actually a function reference? If so, call it.
+	-- This was added to enable Protect Window to update its
+	-- status without a UI reload by calling a function rather
+	-- than a setting in the Control definition.
+	if type(setting)=="function" then
+		return setting("getsetting")
+	end
+
 	local a,b,c = strsplit(".", setting)
 	if (a == 'profile') then
 		if (b == 'profiles') then
@@ -421,7 +442,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.getFrameNames("config"), "printwindow")
 	gui:AddTip(id, "This allows you to select which Chat Window Auctioneer Advanced prints its output to.")	
-	
+	--Note the function reference in the place of the setting name.  See changes in getter, setter, and getDefault to accomodate this.
+	gui:AddControl(id, "Checkbox", 0, 1, AucAdvanced.windowProtect, "Prevent other windows from closing the Auction House window.")
+	gui:AddTip(id, "This will allow prevent other windows from closing the Auction House Window when you open them.")
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
 		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auctionhouse image.")
@@ -446,6 +469,9 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is preferred output frame",
 		"What is Preferred Output Frame?",
 		"The Preferred Output Frame allows you to designate which of your Chat Windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the dropdown menu and Auctioneer Advanced will print all subsequent output to that window.")
+	gui:AddHelp(id, "what is protect window",
+		"What does Protecting the AH Window do?",
+		"The Auction House window is normally closed when you open other windows, such as the Social window, the Quest Log, or your profession windows.  This option allows it to remain open, behind those other windows.")
 	
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
