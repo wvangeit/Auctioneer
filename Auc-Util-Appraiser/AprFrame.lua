@@ -2222,17 +2222,17 @@ function private.CreateFrames()
 	end
 	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")},
-		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")},
-		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")},
-		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")},
-		{ "Min/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Min/ea"), { DESCENDING=true } },
-		{ "Cur/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Cur/ea"), { DESCENDING=true } },
-		{ "Buy/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } },
-		{ "MinBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.MinBid"), { DESCENDING=true } },
-		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } },
-		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } },
-		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link
+		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
+		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
+		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")}, --40
+		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")}, --30
+		{ "Min/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Min/ea"), { DESCENDING=true } }, --85
+		{ "Cur/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Cur/ea"), { DESCENDING=true } }, --85
+		{ "Buy/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
+		{ "MinBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.MinBid"), { DESCENDING=true } }, --85
+		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } }, --85
+		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
+		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, nil, private.onResize, private.onSelect)
 	frame.imageview.sheet:EnableSelect(true)
 	
@@ -2321,17 +2321,17 @@ function private.CreateFrames()
 	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
 	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 	frame.imageviewclassic.sheet = ScrollSheet:Create(frame.imageviewclassic, {
-		{ "Item",   "TEXT", 105 },
-		{ "Seller", "TEXT", 75  },
-		{ "Left",   "INT",  40  },
-		{ "Stk",    "INT",  30  },
-		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
-		{ "MinBid", "COIN", 85, { DESCENDING=true } },
-		{ "CurBid", "COIN", 85, { DESCENDING=true } },
-		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-		{ "", "TEXT", 0}, --Hidden column to carry the link
+		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
+		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
+		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")}, --40
+		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")}, --30
+		{ "Min/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Min/ea"), { DESCENDING=true } }, --85
+		{ "Cur/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Cur/ea"), { DESCENDING=true } }, --85
+		{ "Buy/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
+		{ "MinBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.MinBid"), { DESCENDING=true } }, --85
+		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } }, --85
+		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
+		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, nil, private.onResize, private.onClassicSelect)
 	frame.imageviewclassic.sheet:EnableSelect(true)
 	frame.imageviewclassic:Hide()
