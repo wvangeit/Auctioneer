@@ -1524,6 +1524,16 @@ function private.GtHookSetGuildBankItem(funcArgs, retVal, frame, tab, slot)
 	end
 end
 
+function private.GtHookSetHyperlink(funcArgs, retVal, frame, link)
+	if (link) then
+		local name, link, quality = GetItemInfo(link)
+		if (name) then
+			return public.TooltipCall(GameTooltip, name, link, quality)
+		end
+	end
+end
+
+
 function private.GtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (private.currentGametip == frame) then
@@ -1729,6 +1739,7 @@ function private.TtInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetGuildBankItem", 200, private.GtHookSetGuildBankItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradePlayerItem", 200, private.GtHookSetTradePlayerItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeTargetItem", 200, private.GtHookSetTradeTargetItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetHyperlink", 200, private.GtHookSetHyperlink)
 	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, private.GtHookSetText)
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, private.GtHookAppendText)
 	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, private.GtHookShow)
