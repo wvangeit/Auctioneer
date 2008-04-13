@@ -117,7 +117,11 @@ local function getDisenchantOrProspectValue(link, count)
 			if (not hsp) or (hsp == 0) then
 				-- what to do when Auc4 isn't loaded, but Auc5 is
 				-- or when you have no data for mat prices
-				hsp = valFive or baseline;
+				if valFive and valFive > 0 then
+					hsp = valFive
+				else
+					hsp = baseline
+				end
 			end
 			if hsp and hsp > 0 then
 				return hsp, _ENCH('ArgSpellname')
