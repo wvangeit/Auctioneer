@@ -32,7 +32,6 @@ for fn in files(".") do
 				active = active + 1
 				embeddedModules[active] = fn
 				print("  + Activating: "..fn)
-				output:write("\t<Include file=\""..fn.."\\Embed.xml\"/>\n");
 			else
 				invalid = invalid + 1
 				print("  ! Module \""..fn.."\" is not embeddable")
@@ -41,13 +40,16 @@ for fn in files(".") do
 	end
 end
 
-output:write("\n\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n")
+output:write("\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n")
 for index, module in ipairs(embeddedModules) do
 	output:write("\t\t\t\""..module.."\",\n")
 end
 output:write("\t\t}\n\t\t")
 output:write([[AucAdvanced.RegisterRevision("$URL$", "$Rev$")]])
-output:write("\n\t</Script>\n")
+output:write("\n\t</Script>\n\n")
+for index, module in ipairs(embeddedModules) do
+	output:write("\t<Include file=\""..module.."\\Embed.xml\"/>\n");
+end
 output:write("</Ui>")
 
 print("Activated: "..active.." modules.")

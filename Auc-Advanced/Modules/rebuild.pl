@@ -13,7 +13,6 @@ for $fn (<[aA]uc-*>) {
 			@embeddedModules[$active] = $fn;
 			$active++;
 			print "  + Activating: $fn\n";
-			print OUTPUT "\t<Include file=\"$fn\\Embed.xml\"/>\n";
 		}
 		else {
 			$invalid++;
@@ -22,7 +21,7 @@ for $fn (<[aA]uc-*>) {
 	}
 }
 
-print OUTPUT "\n\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n";
+print OUTPUT "\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n";
 while ($count < @embeddedModules) {
 	print OUTPUT "\t\t\t\"$embeddedModules[$count]\",\n";
 	$count++
@@ -30,7 +29,13 @@ while ($count < @embeddedModules) {
 print OUTPUT "\t\t}";
 print OUTPUT "\n\t\t";
 print OUTPUT 'AucAdvanced.RegisterRevision("$URL$", "$Rev$")';
-print OUTPUT "\n\t</Script>\n";
+print OUTPUT "\n\t</Script>\n\n";
+
+$count = 0;
+while ($count < @embeddedModules) {
+	print OUTPUT "\t<Include file=\"$embeddedModules[$count]\\Embed.xml\"/>\n";
+	$count++
+}
 print OUTPUT "</Ui>";
 
 print "Activated: $active modules.\n";
