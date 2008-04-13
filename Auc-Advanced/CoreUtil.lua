@@ -89,7 +89,7 @@ function lib.getFrameNames(option)
 	local frames = {}
 	local frameName = ""
 	local configFrames = {}
---This iterates through the first 10 ChatWindow#s, getting the name associated with it.
+--This iterates through the first 10 ChatWindows, getting the name associated with it.
 	for i=1, 10 do
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i)
 		--If the name isn't blank, then we build a couple of tables, one where the Chat Frame names are the keys, and indexes the values, another which is the reverse.

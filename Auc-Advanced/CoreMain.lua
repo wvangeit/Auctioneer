@@ -175,6 +175,10 @@ function private.OnLoad(addon)
 			end
 		end
 	end
+	--Check to see if we want the AH Window Protected, if so, do it.
+	if (AucAdvanced.Settings.GetSetting("protectwindow")) then
+		AucAdvanced.windowProtect("set", true)
+	end
 end
 
 function private.OnUnload()
@@ -297,5 +301,4 @@ end
 function AucAdvanced.Debug.Assert(test, message)
 	return DebugLib.Assert(addonName, test, message)
 end
-
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
