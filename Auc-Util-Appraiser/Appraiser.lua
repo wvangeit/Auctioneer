@@ -267,6 +267,7 @@ function lib.GetPrice(link, _, match)
 	elseif number == "maxfull" then
 		number = -2
 	end
+	stack = tonumber(stack)
 	number = tonumber(number)
 --	if (type(stack) ~= "number") or (type(number) ~= "number") then
 --		print("Stack: "..stack.."  Number: "..number)
