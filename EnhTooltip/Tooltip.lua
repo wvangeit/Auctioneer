@@ -571,7 +571,21 @@ end
 --                               window in pixel
 -------------------------------------------------------------------------------
 function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
-	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
+	-- We have to be careful in doing the placement calculations to take into
+	-- scaling of the various frames we're placing.  GetEffectiveScale() will
+	-- give us the conversion factor to the root scale.  However, the UIParent
+	-- frame may not be in that scale itself.  In particular this is very important
+	-- for vertical placement.
+	local UIScale       = UIParent:GetEffectiveScale()
+	local EnhancedScale = EnhancedTooltip:GetEffectiveScale()
+	local currentScale  = currentTooltip:GetEffectiveScale()
+	local ownerScale    = 1
+	local screenWidth   = GetScreenWidth() * UIScale
+	local screenHeight  = GetScreenHeight() * UIScale
+
+	-- Convert the requested height and width to root units.
+	requestedWidth  = requestedWidth  * EnhancedScale
+	requestedHeight = requestedHeight * EnhancedScale
 
 	-- Get the frame which the currentTooltip is attached to.
 	-- We are using the first point, only, even if the gameTooltip is attached
@@ -587,6 +601,11 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		_, currentTooltipOwner = currentTooltipOwner:GetPoint(1)
 	end
 
+	-- Now that we know the owner grab their effective scale.
+        if (currentTooltipOwner) then 
+          ownerScale = currentTooltipOwner:GetEffectiveScale()
+	end
+	
 	-- In case the current tooltip is attached to the cursor, currentTooltipOwner
 	-- is nil and align is "ANCHOR_CURSOR".
 	if align == "ANCHOR_CURSOR" then
@@ -611,15 +630,27 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		-- If currentTooltipOwner is nil or UIParent, the current tooltip is not
 		-- attached to any other frame, so we don't have to bother about correct
 		-- alignment. The only thing to do is put the object
-		-- underneath / shuffle it up, if there ain't enuough room.
+		-- underneath / shuffle it up, if there ain't enough room.
 		private.showIgnore = true
 		currentTooltip:Show()
 		private.showIgnore = false
 
 		local top, left, bottom, right, width, height, xCenter, yCenter = public.GetBounds(currentTooltip)
+
+		-- Convert the bounds to root units, this could be moved to GetBounds
+		-- but being a public function it may break other addons to do so.
+		top     = top     * currentScale
+		bottom  = bottom  * currentScale
+		right   = right   * currentScale
+		width   = width   * currentScale
+		height  = height  * currentScale
+		xCenter = xCenter * currentScale
+		yCenter = yCenter * currentScale
+		
 		if (bottom - requestedHeight < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, requestedHeight+60)
+			-- Note the conversion of offsets back to UIParent scale
+			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left / UIScale, (requestedHeight+60) / UIScale)
 		end
 		EnhancedTooltip:ClearAllPoints()
 		if (xCenter < 6*screenWidth/10) then
@@ -630,9 +661,20 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		EnhancedTooltip:SetScale(currentTooltip:GetScale())
 	else
 		-- The tooltip is anchored to another frame but not to the cursor. So
-		-- we should properly align it.
+		-- we should properly align it.  Note when aligning to another frame we
+		-- have to be especially careful of scales not matching.
 		local top, left, bottom, right, width, height, xCenter, yCenter = public.GetBounds(currentTooltipOwner)
 
+		-- Convert the bounds to root units, this could be moved to GetBounds
+		-- but being a public function it may break other addons to do so.
+		top     = top     * ownerScale
+		bottom  = bottom  * ownerScale
+		right   = right   * ownerScale
+		width   = width   * ownerScale
+		height  = height  * ownerScale
+		xCenter = xCenter * ownerScale
+		yCenter = yCenter * ownerScale
+		
 		local xAnchor
 		if (left - requestedWidth < screenWidth * 0.2) then
 			xAnchor = "RIGHT"
@@ -665,8 +707,13 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0
-		local totalHeight = requestedHeight + (currentTooltip:GetHeight())*(currentTooltip:GetScale())
-		if (yAnchor == "TOP" and top + totalHeight > screenHeight - 5) then
+		local totalHeight = requestedHeight + (currentTooltip:GetHeight())*(currentScale)
+		if (totalHeight > screenHeight) then
+			-- In the case we absolutely can not make it fit just force a bottom 
+			-- alignment and display as much as we can
+			yAnchor = "BOTTOM"
+			yOffset = -(bottom - totalHeight - 5)
+		elseif (yAnchor == "TOP" and top + totalHeight > screenHeight - 5) then
 			yOffset = -(top + totalHeight - screenHeight + 5)
 		elseif (yAnchor == "BOTTOM" and bottom - totalHeight < 5) then
 			yOffset = -(bottom - totalHeight - 5)
@@ -676,17 +723,19 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		EnhancedTooltip:ClearAllPoints()
 		local anchor = yAnchor..xAnchor
 
+		-- Apply the anchor noting that SetPoint uses UIParent units so our offsets
+		-- must all be converted to the UIParent scale.
 		if (anchor == "TOPLEFT") then
-			EnhancedTooltip:SetPoint("BOTTOMRIGHT", currentTooltipOwner, "TOPLEFT", -5 + xOffset, 5 + yOffset)
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", currentTooltipOwner, "TOPLEFT", (-5 + xOffset) / UIScale, (5 + yOffset) / UIScale)
 			currentTooltip:SetPoint("BOTTOMRIGHT", EnhancedTooltip, "TOPRIGHT", 0,0)
 		elseif (anchor == "TOPRIGHT") then
-			EnhancedTooltip:SetPoint("BOTTOMLEFT", currentTooltipOwner, "TOPRIGHT", 5 + xOffset, 5 + yOffset)
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", currentTooltipOwner, "TOPRIGHT", (5 + xOffset) / UIScale, (5 + yOffset) / UIScale)
 			currentTooltip:SetPoint("BOTTOMLEFT", EnhancedTooltip, "TOPLEFT", 0,0)
 		elseif (anchor == "BOTTOMLEFT") then
-			currentTooltip:SetPoint("TOPRIGHT", currentTooltipOwner, "BOTTOMLEFT", -5 + xOffset, -5 + yOffset)
+			currentTooltip:SetPoint("TOPRIGHT", currentTooltipOwner, "BOTTOMLEFT", (-5 + xOffset) / UIScale, (-5 + yOffset) / UIScale)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
 		else -- if (anchor == "BOTTOMRIGHT") then
-			currentTooltip:SetPoint("TOPLEFT", currentTooltipOwner, "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
+			currentTooltip:SetPoint("TOPLEFT", currentTooltipOwner, "BOTTOMRIGHT", (5 + xOffset) / UIScale, (-5 + yOffset) / UIScale)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		end
 		EnhancedTooltip:SetScale(currentTooltip:GetScale())
