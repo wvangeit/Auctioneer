@@ -376,9 +376,10 @@ function lib.GetDepositAmount(sig, count)
 	if not count then count = 1 end
 
 	local deposit, rate, sellBasis
+	local itemId = strsplit(":", sig)
 
-	if depositCache[sig] then
-		sellBasis = depositCache[sig]
+	if depositCache[itemId] then
+		sellBasis = depositCache[itemId]
 	end
 
 	if not (AuctionFrame and AuctionFrame:IsVisible()) then
@@ -402,7 +403,6 @@ function lib.GetDepositAmount(sig, count)
 
 	if not sellBasis and GetSellValue then
 		-- Check for a GetSellValue valuation
-		local itemId = strsplit(":", sig)
 		local sell = GetSellValue(itemId)
 		if (sell) then
 			deposit = math.floor(sell * rate * 3 * count)
@@ -441,7 +441,7 @@ function lib.GetDepositAmount(sig, count)
 
 	-- Work out the sell basis for this item and cache it
 	sellBasis = deposit / rate
-	depositCache[sig] = sellBasis
+	depositCache[itemId] = sellBasis
 
 	deposit = math.floor(sellBasis * rate * count)
 	-- Return the deposit cost and the auction rate
