@@ -62,6 +62,7 @@ function lib.Processor(callbackType, ...)
 			private.frame.cache = {}
 			private.frame.GenerateList()
 			private.frame.UpdateImage()
+			private.frame.SetPriceFromModel()
 		end
 	elseif (callbackType == "postresult") then
 		private.frame.Reselect(select(3, ...))

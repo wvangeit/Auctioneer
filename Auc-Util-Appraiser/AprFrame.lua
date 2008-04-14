@@ -263,10 +263,10 @@ function private.CreateFrames()
 			frame.UpdateControls()
 		end
 
-		if not (frame.direct and item and item[7] and frame.direct == item[7]) then
+		--[[if not (frame.direct and item and item[7] and frame.direct == item[7]) then
 			frame.direct = nil
 			frame.GenerateList()
-		end
+		end]]
 	end
 
 	function frame.Reselect(posted)
@@ -360,7 +360,6 @@ function private.CreateFrames()
 				style[i][1].textColor = acquire(r,g,b)
 			end
 		end
-		frame.SetPriceFromModel(curModel)
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
@@ -472,6 +471,8 @@ function private.CreateFrames()
 
 		MoneyInputFrame_ResetMoney(frame.salebox.bid)
 		MoneyInputFrame_ResetMoney(frame.salebox.buy)
+		frame.salebox.bidconfig = true
+		frame.salebox.buyconfig = true
 		MoneyInputFrame_SetCopper(frame.salebox.bid, newBid)
 		MoneyInputFrame_SetCopper(frame.salebox.buy, newBuy)
 		frame.salebox.bid.modelvalue = newBid
@@ -481,7 +482,6 @@ function private.CreateFrames()
 	function frame.InitControls()
 		if frame.salebox.config then return end
 		frame.salebox.config = true
-		frame.UpdateControls()
 
 		local curDuration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".duration") or
 			AucAdvanced.Settings.GetSetting('util.appraiser.duration') or 2880
@@ -506,7 +506,6 @@ function private.CreateFrames()
 		end
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetValue(curStack)
-		frame.UpdateControls()
 		
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
@@ -594,6 +593,7 @@ function private.CreateFrames()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
 			frame.salebox.warn:SetText("")
+			frame.manifest.lines:Clear()
 			frame.manifest:Hide()
 			frame.toggleManifest:Disable()
 			frame.age:SetText("")
@@ -752,6 +752,7 @@ function private.CreateFrames()
 					end
 					--frame.salebox.numberentry:SetNumber(maxStax)
 					if (maxStax > 0) then
+						frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 						bidVal = lib.RoundBid(curBid * curSize)
 						buyVal = lib.RoundBuy(curBuy * curSize)
@@ -777,6 +778,7 @@ function private.CreateFrames()
 						bidVal = lib.RoundBid(curBid * remain)
 						buyVal = lib.RoundBuy(curBuy * remain)
 						depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
+						frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
 						r,g,b=nil,nil,nil
 						if colored then
@@ -798,6 +800,7 @@ function private.CreateFrames()
 					frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
 					frame.salebox.totalsize:SetText("("..(curNumber*curSize)..")")
 					frame.salebox.numberentry:SetNumber(curNumber)
+					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
@@ -839,6 +842,7 @@ function private.CreateFrames()
 				end
 				
 				if curNumber > 0 then
+					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(("%d items"):format(curNumber))
 					bidVal = lib.RoundBid(curBid)
 					buyVal = lib.RoundBuy(curBuy)
@@ -914,7 +918,6 @@ function private.CreateFrames()
 		if frame.salebox.config then return end
 		frame.salebox.config = true
 
-		frame.UpdateControls()
 		local curStack = frame.salebox.stack:GetValue()
 		local curNumber = frame.salebox.number:GetAdjustedValue()
 		local curDurationIdx = frame.salebox.duration:GetValue()
@@ -960,8 +963,6 @@ function private.CreateFrames()
 			frame.salebox.model.value = curModel
 			frame.salebox.model:UpdateValue()
 		end
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".bid", curBid)
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".buy", curBuy)
 
 		local good = true
 		if curModel == "fixed" and curBid <= 0 then
@@ -1750,7 +1751,7 @@ function private.CreateFrames()
 	frame.salebox.stack:SetValueStep(1)
 	frame.salebox.stack:SetValue(20)
 	frame.salebox.stack:SetWidth(255)
-	frame.salebox.stack:SetScript("OnValueChanged", frame.ChangeControls)
+	frame.salebox.stack:SetScript("OnValueChanged", frame.UpdateControls)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
 	
@@ -1774,7 +1775,7 @@ function private.CreateFrames()
 	frame.salebox.number:SetValueStep(1)
 	frame.salebox.number:SetValue(1)
 	frame.salebox.number:SetWidth(255)
-	frame.salebox.number:SetScript("OnValueChanged", frame.ChangeControls)
+	frame.salebox.number:SetScript("OnValueChanged", frame.UpdateControls)
 	frame.salebox.number.element = "number"
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
@@ -1830,7 +1831,7 @@ function private.CreateFrames()
 	frame.salebox.duration:SetValueStep(1)
 	frame.salebox.duration:SetValue(3)
 	frame.salebox.duration:SetWidth(80)
-	frame.salebox.duration:SetScript("OnValueChanged", frame.ChangeControls)
+	frame.salebox.duration:SetScript("OnValueChanged", frame.UpdateControls)
 	frame.salebox.duration.element = "duration"
 	frame.salebox.duration:Hide()
 	AppraiserSaleboxDurationLow:SetText("")
@@ -1863,7 +1864,7 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetHeight(20)
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
-	frame.salebox.matcher:SetScript("OnClick", frame.ChangeControls)
+	frame.salebox.matcher:SetScript("OnClick", frame.UpdateControls)
 	frame.salebox.matcher:Hide()
 	
 	frame.salebox.matcher.label = frame.salebox.matcher:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -1887,7 +1888,7 @@ function private.CreateFrames()
 	frame.salebox.bulk:SetHeight(20)
 	frame.salebox.bulk:SetWidth(20)
 	frame.salebox.bulk:SetChecked(false)
-	frame.salebox.bulk:SetScript("OnClick", frame.ChangeControls)
+	frame.salebox.bulk:SetScript("OnClick", frame.UpdateControls)
 	frame.salebox.bulk:Hide()
 	
 	frame.salebox.bulk.label = frame.salebox.bulk:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -1897,7 +1898,13 @@ function private.CreateFrames()
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
 	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
-	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, frame.ChangeControls)
+	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, function()
+		if not frame.salebox.bidconfig then
+			frame.UpdateControls()
+		else
+			frame.salebox.bidconfig = nil
+		end
+	end)
 	frame.salebox.bid.element = "bid"
 	frame.salebox.bid:Hide()
 	AppraiserSaleboxBidGold:SetBackdrop({
@@ -1928,7 +1935,13 @@ function private.CreateFrames()
 
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
-	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, frame.ChangeControls)
+	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, function()
+		if not frame.salebox.buyconfig then
+			frame.UpdateControls()
+		else
+			frame.salebox.bidconfig = nil
+		end
+	end)
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
 	AppraiserSaleboxBuyGold:SetBackdrop({
