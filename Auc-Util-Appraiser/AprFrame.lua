@@ -1939,7 +1939,7 @@ function private.CreateFrames()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
 		else
-			frame.salebox.bidconfig = nil
+			frame.salebox.buyconfig = nil
 		end
 	end)
 	frame.salebox.buy.element = "buy"
