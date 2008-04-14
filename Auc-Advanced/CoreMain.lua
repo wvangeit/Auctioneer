@@ -175,10 +175,6 @@ function private.OnLoad(addon)
 			end
 		end
 	end
-	--Check to see if we want the AH Window Protected, if so, do it.
-	if (AucAdvanced.Settings.GetSetting("protectwindow")) then
-		AucAdvanced.windowProtect("set", true)
-	end
 end
 
 function private.OnUnload()
