@@ -68,21 +68,71 @@ function lib.windowProtect(action, setvalue)
 		--equals the value we're about to set our config to (setvalue),
 		--we need to change the value of UPL-e.
 		if (AuctionFrame:GetAttribute("UIPanelLayout-defined")) then
-			local bholder = not setvalue
-			--This doesn't work if the AH Windows if visible
-			if (AuctionFrame:IsVisible()) then
-				AuctionFrame_Hide()
-				AuctionFrame:SetAttribute("UIPanelLayout-enabled", bholder)
-				AuctionFrame_Show()
+			----local bholder = not setvalue
+			--We can't change window protection if the UI thinks
+			--the window is open.
+			if (AuctionFrame:IsShown()) then
+				if (setvalue) then
+					--Thanks to Esamynn for this trick.  This 
+					--tricks the UI into thinking we've hidden
+					--the AuctionFrame so we can protect the 
+					--window.
+					AuctionFrame.Hide = function() end
+					HideUIPanel(AuctionFrame)
+					AuctionFrame.Hide = nil
+					AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+				else
+					--Thanks to Esamynn for this trick, too. This
+					--forces the protection off without closing the
+					--window.
+					AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
+					AuctionFrame.IsShown = function() end
+					ShowUIPanel(AuctionFrame, 1)
+					AuctionFrame.IsShown = nil
+				end
 			else
 				--Set our UIPanelLayout-enabled value
-				AuctionFrame:SetAttribute("UIPanelLayout-enabled", bholder)
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", not setvalue)
 			end
 		end
 		--Set our config value
 		return AucAdvanced.Settings.SetSetting("protectwindow", setvalue)
 	end
 end
+
+--Now let's create a structure to check and set our Window Protection at
+--startup. Thanks go to Mikk for suggestions on the following few code
+--blocks.
+local myFrame = CreateFrame("Frame")
+myFrame:Hide()
+
+--This script will protect the AuctionFrame on first open if we've
+--got protection turned on.  It works on a delay to give the client
+--time to build the AuctionFrame and attributes completely before
+--we run our code. Then rehides itself so this only happens once.
+myFrame:SetScript("OnUpdate", function()
+	if (AucAdvanced.Settings.GetSetting("protectwindow")) and (AuctionFrame:GetAttribute("UIPanelLayout-enabled")) then
+	if (AuctionFrame:IsShown()) then 
+		AuctionFrame.Hide = function() end 
+		HideUIPanel(AuctionFrame) 
+		AuctionFrame.Hide = nil 
+	end
+		AuctionFrame:SetAttribute("UIPanelLayout-enabled", nil)
+		this:Hide()
+	end
+end)
+
+--Register our frame for the ADDON_LOADED event
+myFrame:RegisterEvent("ADDON_LOADED")
+
+--When we catch the blizzard_auctionui addon loading, unhide our frame
+--which will just sit there for a bit until the frame updates, when
+--our code will fire.
+myFrame:SetScript("OnEvent", function(name, event, addon)
+	if addon:lower()=="blizzard_auctionui" then
+	this:Show()
+	end
+end)
 
 --The folowing function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
 function lib.getFrameNames(option)
