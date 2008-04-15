@@ -101,8 +101,7 @@ function lib.windowProtect(action, setvalue)
 end
 
 --Now let's create a structure to check and set our Window Protection at
---startup. Thanks go to Mikk for suggestions on the following few code
---blocks.
+--startup.
 local myFrame = CreateFrame("Frame")
 myFrame:Hide()
 
