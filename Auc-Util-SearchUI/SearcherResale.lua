@@ -4,7 +4,7 @@ local lib, parent, private = AucSearchUI.NewSearcher("Resale")
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "Resale-Buyout"
+lib.tabname = "Resale"
 -- Set our defaults
 default("resale.profit.min", 1)
 default("resale.profit.pct", 50)
@@ -13,6 +13,8 @@ default("resale.seen.min", 10)
 default("resale.adjust.brokerage", true)
 default("resale.adjust.deposit", true)
 default("resale.adjust.listings", 3)
+default("resale.allow.bid", true)
+default("resale.allow.buy", true)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -29,18 +31,18 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Slider",            0, 2, "resale.seen.min", 1, 100, 1, "Min seen count: %s")
 	
 	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.allow.bid", "Allow Bids")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0.56, 1, "resale.allow.buy", "Allow Buyouts")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.deposit", "Subtract deposit")
 	gui:AddControl(id, "Slider",            0.42, 1, "resale.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
-	
 end
 
 function lib.Search(item)
-	if (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
-		return
-	end
-	local market, seen, _, curModel
+	local market, seen, _, curModel, pctstring
 	
 	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
 	if not market then
@@ -77,20 +79,30 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if item[Const.BUYOUT] <= value then
+	if get("resale.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
 		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.BUYOUT], market)
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], market)
 			if level then
 				level = math.floor(level)
 				r = r*255
 				g = g*255
 				b = b*255
-				local pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-				item["pct"] = pctstring
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
 			end
 		end
-		item["profit"] = (market - item[Const.BUYOUT])
-		return true
+		return "buy", market, pctstring
+	elseif get("resale.allow.bid") and (item[Const.PRICE] <= value) then
+		if AucAdvanced.Modules.Util.PriceLevel then
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], market)
+			if level then
+				level = math.floor(level)
+				r = r*255
+				g = g*255
+				b = b*255
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
+			end
+		end
+		return "bid", market, pctstring
 	end
 end
 

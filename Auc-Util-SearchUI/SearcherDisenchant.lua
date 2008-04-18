@@ -12,6 +12,8 @@ default("disenchant.level.custom", false)
 default("disenchant.level.min", 0)
 default("disenchant.level.max", 375)
 default("disenchant.adjust.brokerage", true)
+default("disenchant.allow.bid", true)
+default("disenchant.allow.buy", true)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -29,6 +31,10 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.max", 25, 375, 25, "Maximum skill: %s")
 	
 	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.allow.bid", "Allow Bids")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0.56, 1, "disenchant.allow.buy", "Allow Buyouts")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.brokerage", "Subtract auction fees")
 	
@@ -46,7 +52,7 @@ function lib.Search(item)
 	if item[Const.QUALITY] <= 1 then
 		return
 	end
-	local market, _
+	local market, _, pctstring
 	local minskill = 0
 	local maxskill = 375
 	if get("disenchant.level.custom") then
@@ -76,7 +82,7 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if item[Const.BUYOUT] <= value then
+	if get("disenchant.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
 		if AucAdvanced.Modules.Util.PriceLevel then
 			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.BUYOUT], market)
 			if level then
@@ -84,12 +90,22 @@ function lib.Search(item)
 				r = r*255
 				g = g*255
 				b = b*255
-				local pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-				item["pct"] = pctstring
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
 			end
 		end
-		item["profit"] = (market - item[Const.BUYOUT])
-		return true
+		return "buy", market, pctstring
+	elseif get("disenchant.allow.bid") and (item[Const.PRICE] <= value) then
+		if AucAdvanced.Modules.Util.PriceLevel then
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.CURBID], market)
+			if level then
+				level = math.floor(level)
+				r = r*255
+				g = g*255
+				b = b*255
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
+			end
+		end
+		return "bid", market, pctstring
 	end
 end
 

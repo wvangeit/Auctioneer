@@ -41,6 +41,13 @@ local gui
 private.data = {}
 local coSearch
 
+local tleft = {
+	"|cff000001|cffe5e5e530m", -- 30m
+	"|cff000002|cffe5e5e52h",  --2h
+	"|cff000003|cffe5e5e512h", --12h
+	"|cff000004|cffe5e5e548h"  --48h
+}
+
 -- Our official name:
 AucSearchUI = lib
 
@@ -383,9 +390,10 @@ function lib.MakeGuiConfig()
 				private.data.link = data[1]
 				private.data.seller = data[8]
 				private.data.stack = data[4]
-				private.data.minbid = data[5]
-				private.data.curbid = data[6]
-				private.data.buyout = data[7]
+				private.data.bid = data[6]
+				private.data.minbid = data[12]
+				private.data.curbid = data[13]
+				private.data.buyout = data[5]
 			end
 			if private.data.buyout and (private.data.buyout > 0) then
 				gui.frame.buyout:Enable()
@@ -395,14 +403,11 @@ function lib.MakeGuiConfig()
 				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(0, true))
 			end
 		
-			if private.data.minbid then
-				if private.data.curbid and private.data.curbid > 0 then
-					MoneyInputFrame_SetCopper(gui.frame.bidbox, math.ceil(private.data.curbid*1.05))
-				else
-					MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.minbid)
-				end
+			if private.data.bid then
+				MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.bid)
 				gui.frame.bid:Enable()
 			else
+				MoneyInputFrame_SetCopper(gui.frame.bidbox, 0)
 				gui.frame.bid:Disable()
 			end
 		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable 
@@ -446,14 +451,17 @@ function lib.MakeGuiConfig()
 		{ "Pct",    "TEXT", 30  },
 		{ "Profit", "COIN", 85, { DESCENDING=true } },
 		{ "Stk",    "INT",  30  },
+		{ "Buyout", "COIN", 85, { DESCENDING=true } },
+		{ "Bid",    "COIN", 85, { DESCENDING=true } },
+		{ "Reason", "TEXT", 85  },
+		{ "Seller", "TEXT", 75  },
+		{ "Left",   "TEXT", 40  },
+		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
+		{ "Bid/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
-		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-		{ "Seller", "TEXT", 75  },
-		{ "Left",   "INT",  40  },
 		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
 		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
 	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls) 
 	
 
@@ -596,20 +604,42 @@ local PerformSearch = function()
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
 			coroutine.yield()
 		end
-		if searcher.Search(data) then
+		
+		--buyorbid must be either "bid", "buy", true, false, or nil
+		--if string is returned for buyorbid, value must be returned
+		local buyorbid, value, pct, reason = searcher.Search(data)
+		if buyorbid then
 			local level,_, r, g, b
 			local pctstring = ""
-			if not data["pct"] and AucAdvanced.Modules.Util.PriceLevel then
-				level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
+			if not pct and AucAdvanced.Modules.Util.PriceLevel then
+				if buyorbid == "bid" then
+					level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.CURBID])
+				else
+					level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
+				end
 				if level then
 					level = math.floor(level)
 					r = r*255
 					g = g*255
 					b = b*255
 					pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-					data["pct"] = pctstring
+					pct = pctstring
+				end
+			end
+			data["pct"] = pct
+			if type(buyorbid) == "string" then
+				data["reason"] = searcher.tabname..":"..buyorbid
+				if reason then
+					data["reason"] = data["reason"]..":"..reason
+				end
+				if buyorbid == "bid" then
+					data["profit"] = value - data[Const.PRICE]
+				else
+					data["profit"] = value - data[Const.BUYOUT]
 				end
 			else
+				data["reason"] = searcher.tabname
+				data["profit"] = nil
 			end
 			table.insert(results, data)
 		end
@@ -626,19 +656,23 @@ local PerformSearch = function()
 		local min = data[Const.MINBID]
 		local cur = data[Const.CURBID]
 		local buy = data[Const.BUYOUT]
+		local price = data[Const.PRICE]
 		table.insert(sheetData, acquire(
 			data[Const.LINK],
 			data["pct"],
 			data["profit"],
 			count,
+			buy,
+			price,
+			data["reason"],
+			data[Const.SELLER],
+			tleft[data[Const.TLEFT]],
+			buy/count,
+			price/count,
 			min,
 			cur,
-			buy,
-			data[Const.SELLER],
-			data[Const.TLEFT],
 			min/count,
-			cur/count,
-			buy/count
+			cur/count
 		))
 	end
 
