@@ -196,16 +196,16 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 		EnhTooltip.AddLine(libName.." prices:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
     
-        if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
-            if (boughtqty3 > 0) then
-                EnhTooltip.AddLine("  3 Days Bought |cffddeeff"..(boughtqty3).."|r at avg each", bought3)
+        if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
+            if (boughtseen > 0) then
+                EnhTooltip.AddLine("  Total Bought |cffddeeff"..(boughtqty).."|r at avg each", bought)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
-            if (soldqty3 > 0) then
-                EnhTooltip.AddLine("  3 Days Sold |cffddeeff"..(soldqty3).."|r at avg each", sold3)
+            if (soldseen > 0) then
+                EnhTooltip.AddLine("  Total Sold |cffddeeff"..(soldqty).."|r at avg each", sold)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
-        end
+        end 
         if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
             if (boughtqty7 > 0) then
                 EnhTooltip.AddLine("  7 Days Bought |cffddeeff"..(boughtqty7).."|r at avg each", bought7)
@@ -216,16 +216,17 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
         end
-        if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
-            if (boughtseen > 0) then
-                EnhTooltip.AddLine("  Total Bought |cffddeeff"..(boughtqty).."|r at avg each", bought)
+        if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
+            if (boughtqty3 > 0) then
+                EnhTooltip.AddLine("  3 Days Bought |cffddeeff"..(boughtqty3).."|r at avg each", bought3)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
-            if (soldseen > 0) then
-                EnhTooltip.AddLine("  Total Sold |cffddeeff"..(soldqty).."|r at avg each", sold)
+            if (soldqty3 > 0) then
+                EnhTooltip.AddLine("  3 Days Sold |cffddeeff"..(soldqty3).."|r at avg each", sold3)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
         end
+        
 	end
 end
 
