@@ -76,6 +76,13 @@ function lib.PushSearch()
 		private.CurAuction["price"] = private.CurAuction["buyout"]
 	end
 	table.remove(private.BuyRequests, 1)
+	local money = GetMoney()
+	if money < private.CurAuction["price"] then
+		print("Not enough money to buy "..private.CurAuction["link"])
+		private.CurAuction = {}
+		return
+	end
+
 	local minlevel, equiploc, itemType, itemSubType, stack, rarity, TypeID, SubTypeID
 	private.CurAuction["itemname"], _, rarity, _, minlevel, itemType, itemSubType, stack, equiploc = GetItemInfo(private.CurAuction["link"])
 	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
@@ -124,6 +131,8 @@ function private.PromptPurchase()
 	end
 	private.Prompt.Value:SetText(private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
+	local width = private.Prompt.Value:GetStringWidth() or 0
+	private.Prompt:SetWidth(math.max((width + 70), 400))
 end
 
 function lib.ScanPage()
