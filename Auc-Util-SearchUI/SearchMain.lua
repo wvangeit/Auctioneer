@@ -344,17 +344,39 @@ function lib.GetSearchLocals()
 	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const
 end
 
+function private.removeline()
+	table.remove(private.sheetData, gui.sheet.selected)
+	gui.sheet.selected = nil
+	gui.sheet:SetData(private.sheetData)
+end
+
 function private.buyauction()
 	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout)
-	gui.sheet.selected = nil
-	lib.UpdateControls()
+	private.removeline()
 end
 
 function private.bidauction()
 	local bid = MoneyInputFrame_GetCopper(gui.frame.bidbox)
 	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, bid)
-	gui.sheet.selected = nil
+	private.removeline()
+end
+
+function private.buyfirst()
+	gui.sheet.selected = gui.sheet.sort[1]
+	if not gui.sheet.selected then
+		return
+	end
 	lib.UpdateControls()
+	if string.match(private.data.reason, ":buy") then
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout)
+	elseif string.match(private.data.reason, ":bid") then
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid)
+	elseif private.data.buyout then
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout)
+	else
+	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid)
+	end
+	private.removeline()
 end
 
 function lib.MakeGuiConfig()
@@ -394,6 +416,7 @@ function lib.MakeGuiConfig()
 				private.data.minbid = data[12]
 				private.data.curbid = data[13]
 				private.data.buyout = data[5]
+				private.data.reason = data[7]
 			end
 			if private.data.buyout and (private.data.buyout > 0) then
 				gui.frame.buyout:Enable()
@@ -417,7 +440,7 @@ function lib.MakeGuiConfig()
 			gui.frame.bid:Enable()
 		end
 		--if bid >= buyout, it's going to be a buyout anyway, so disable bid button to indicate that
-		if private.data.buyout and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
+		if private.data.buyout and (private.data.buyout > 0) and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
 			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
 			gui.frame.bid:Disable()
 		end
@@ -515,6 +538,12 @@ function lib.MakeGuiConfig()
 	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
 	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
 	MoneyInputFrame_SetOnvalueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
+	
+	gui.frame.buyfirst = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.buyfirst:SetPoint("BOTTOMRIGHT", gui.frame.bidbox, "BOTTOMLEFT", -30, -4)
+	gui.frame.buyfirst:SetText("Buy First")
+	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
+	gui.frame.buyfirst:Enable()
 	
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
@@ -646,7 +675,7 @@ local PerformSearch = function()
 	end
 	
 	-- Now we have the results, it's time to populate the sheet
-	local sheetData = acquire()
+	private.sheetData = {}
 
 	-- LINK ILEVEL ITYPE ISUB IEQUIP PRICE TLEFT TIME NAME TEXTURE
 	-- COUNT QUALITY CANUSE ULEVEL MINBID MININC BUYOUT CURBID
@@ -657,7 +686,7 @@ local PerformSearch = function()
 		local cur = data[Const.CURBID]
 		local buy = data[Const.BUYOUT]
 		local price = data[Const.PRICE]
-		table.insert(sheetData, acquire(
+		table.insert(private.sheetData, acquire(
 			data[Const.LINK],
 			data["pct"],
 			data["profit"],
@@ -677,8 +706,7 @@ local PerformSearch = function()
 	end
 
 	gui.frame.progressbar:Hide()
-	gui.sheet:SetData(sheetData)
-	recycle(sheetData)
+	gui.sheet:SetData(private.sheetData)
 
 end
 
@@ -687,8 +715,9 @@ function lib.PerformSearch(searcher)
 		coSearch = coroutine.create(PerformSearch)
 		local status, result = coroutine.resume(coSearch, searcher)
 		if not status and result then
-			print("Error in search coroutine: " .. result)
-		end	else
+			error("Error in search coroutine: " .. result)
+		end
+	else
 		print("coroutine already running: "..coroutine.status(coSearch))
 	end
 end
