@@ -398,12 +398,14 @@ function BtmScan.PageScan(resume)
 			item.use, item.lvl, item.min, item.inc, item.buy,
 			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
 			item.remain = GetAuctionItemTimeLeft("list", item.pos)
+			
+			item.count = item.count or 1
 
 			if (item.owner ~= UnitName("player") and not item.high) then
 				-- Disassemble the link
 				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
-
+				
 				-- read ItemConfig
 				local itemconfig = itemConfigTable[item.sig]
 				if (itemconfig) then
@@ -454,14 +456,14 @@ function BtmScan.PageScan(resume)
 					-- Check that price isn't above ignore price, if any
 					local autoignore = BtmScan.NoPrompt[item.sig]
 					if (autoignore) then
-						if (item.canbid and item.bid >= autoignore) then
+						if (item.canbid and item.bid/item.count >= autoignore) then
 							item.canbid = false
 							item.canbuy = false
-						elseif (item.canbuy and item.buy >= autoignore) then
+						elseif (item.canbuy and item.buy/item.count >= autoignore) then
 							item.canbuy = false
 						end
 					end
-
+					
 					-- Initialize the purchasing variables
 					item.purchase = 0   -- The amount to purchase for
 					item.reason = ""    -- The reason why we are purchasing
