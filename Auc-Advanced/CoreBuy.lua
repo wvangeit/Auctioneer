@@ -45,14 +45,16 @@ if (not AucAdvanced.Buy) then AucAdvanced.Buy = {} end
 local lib = AucAdvanced.Buy
 local private = {}
 lib.Private = private
+local LibRecycle = LibStub("LibRecycle")
 
 lib.Print = AucAdvanced.Print
+local print, clone = AucAdvanced.Print, LibRecycle.Clone
 local Const = AucAdvanced.Const
-local print = lib.Print
 local _
 
 private.BuyRequests = {}
 private.CurAuction = {}
+private.PendingBids = {}
 
 --[[
 	to add an auction to the Queue:
@@ -61,8 +63,30 @@ private.CurAuction = {}
 	AucAdv will buy the first auction it sees fitting the specifics at price.
 	If item cannot be found in current scandata, entry is removed.
 ]]
-function lib.QueueBuy(link, seller, count, minbid, buyout, price)
-	table.insert(private.BuyRequests, {link, seller, count, minbid, buyout, price})
+function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
+	local canbuy, problem = lib.CanBuy(price, seller)
+	if not canbuy then
+		print("AucAdv: Can't buy "..link.." : "..problem)
+		return
+	end
+
+	table.insert(private.BuyRequests, {link, seller, count, minbid, buyout, price, reason})
+end
+
+--[[
+	This function will return false, reason if an auction by seller at price cannot be bought
+	Else it will return true.
+	Note that this will not catch all, but if it says you can't, you can't
+]]
+function lib.CanBuy(price, seller)
+	local money = GetMoney()
+	local realm = GetRealmName()
+	if seller and AucAdvancedConfig["users."..realm.."."..seller] then
+		return false, "own auction"
+	elseif price and (money < price) then
+		return false, "not enough money"
+	end
+	return true
 end
 
 function lib.PushSearch()
@@ -75,10 +99,11 @@ function lib.PushSearch()
 	if private.CurAuction["price"] > private.CurAuction["buyout"] then
 		private.CurAuction["price"] = private.CurAuction["buyout"]
 	end
+	private.CurAuction["reason"] = private.BuyRequests[1][7]
 	table.remove(private.BuyRequests, 1)
-	local money = GetMoney()
-	if money < private.CurAuction["price"] then
-		print("Not enough money to buy "..private.CurAuction["link"])
+	local canbuy, reason = lib.CanBuy(private.CurAuction["price"], private.CurAuction["sellername"])
+	if not canbuy then
+		print("AucAdv: Can't buy "..private.CurAuction["link"].." : "..reason)
 		private.CurAuction = {}
 		return
 	end
@@ -115,7 +140,7 @@ function lib.FinishedSearch(query)
 		end
 		if (rarity == query.quality) and (minlevel == query.minUseLevel) and (equiploc == query.invType)
 		and (private.CurAuction["itemname"] == query.name) then
-			print("Auction for "..private.CurAuction["link"].." no longer exists")
+			print("AucAdv: Auction for "..private.CurAuction["link"].." no longer exists")
 			private.CurAuction = {}
 		end
 	end
@@ -163,9 +188,32 @@ end
 
 function private.PerformPurchase()
 	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
+	
+	--Add bid to list of bids we're watching for
+	local pendingBid = clone(private.CurAuction)
+	table.insert(private.PendingBids, pendingBid)
+	--register for the Response events if this is the first pending bid
+	if (#private.PendingBids == 1) then
+		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
+		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "AucAdv_CoreBuy", private.onEventHookBid)
+	end
+	
+	--get ready for next bid action
 	private.CurAuction = {}
 	private.Prompt:Hide()
 	AucAdvanced.Scan.SetPaused(false)
+end
+
+function private.removePendingBid()
+	if (#private.PendingBids > 0) then
+		table.remove(private.PendingBids, 1)
+		
+		--Unregister events if no more bids pending
+		if (#private.PendingBids == 0) then
+			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
+			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "AucAdv_CoreBuy", private.onEventHookBid)
+		end
+	end
 end
 
 function private.CancelPurchase()
@@ -186,6 +234,34 @@ function private.SendProcessor(...)
 			end
 		end
 	end
+end
+
+function private.onEventHookBid(_, event, arg1)
+	if (event == "CHAT_MSG_SYSTEM" and arg1) then
+		if (arg1 == ERR_AUCTION_BID_PLACED) then
+		 	private.onBidAccepted()
+		end
+	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
+		if (arg1 == ERR_ITEM_NOT_FOUND or
+			arg1 == ERR_NOT_ENOUGH_MONEY or
+			arg1 == ERR_AUCTION_BID_OWN or
+			arg1 == ERR_AUCTION_HIGHER_BID or 
+			arg1 == ERR_ITEM_MAX_COUNT) then
+			private.onBidFailed()
+		end
+	end
+end
+
+function private.onBidAccepted()
+	--"itemlink;seller;count;buyout;price;reason"
+	local bid = private.PendingBids[1]
+	local CallBackString = string.join(";", tostring(bid["link"]), tostring(bid["sellername"]), tostring(bid["count"]), tostring(bid["buyout"]), tostring(bid["price"]), tostring(bid["reason"]))
+	private.SendProcessor("bidplaced", CallBackString)
+	private.removePendingBid()
+end
+
+function private.onBidFailed()
+	private.removePendingBid()
 end
 
 function private.OnUpdate()
