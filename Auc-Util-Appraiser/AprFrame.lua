@@ -1259,8 +1259,8 @@ function private.CreateFrames()
 	end
 
 	function frame.PostBySig(sig, dryRun)
-		local link = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
-		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, _, true)
+		local generallink = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
+		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(generallink, _, true)
 		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
 		if success==false then
 			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
@@ -1269,7 +1269,10 @@ function private.CreateFrames()
 		end
 
 		-- Just a quick bit of sanity checking first
-		if not (stack and stack >= 1) then
+		if not link then
+			print("Skipping "..generallink..": no auctionable item in bags.  May need to repair item")
+			return
+		elseif not (stack and stack >= 1) then
 			print("Skipping "..link..": no stack size set")
 			return
 		elseif (not number) or number < -2 or number == 0 then
