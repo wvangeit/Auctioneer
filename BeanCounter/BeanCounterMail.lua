@@ -87,7 +87,7 @@ function private.getInvoice(n,sender, subject)
 	if (sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse')) then
 		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")) or (string.match( subject , _BC('MailAuctionWonSubject')..".-:.-(%w.*)")) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
-			if  playerName then
+			if  playerName and playerName ~= "" then
 				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes", time()
 			else
