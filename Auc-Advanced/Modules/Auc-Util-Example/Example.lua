@@ -37,10 +37,10 @@ end
 local libName = "Example"
 local libType = "Util"
 
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
+local libType, libName = "Util", "AskPrice"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 --[[
 The following functions are part of the module's exposed methods:
