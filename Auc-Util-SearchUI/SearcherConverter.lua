@@ -1,0 +1,509 @@
+
+-- Create a new instance of our lib with our parent
+local lib, parent, private = AucSearchUI.NewSearcher("Converter")
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local get,set,default,Const = AucSearchUI.GetSearchLocals()
+lib.tabname = "Converter"
+
+-- Set our defaults
+--Essences
+local GPLANAR = 22446
+local GETERNAL = 16203
+local GNETHER = 11175
+local GMYSTIC = 11135
+local GASTRAL = 11082
+local GMAGIC = 10939
+local LPLANAR = 22447
+local LETERNAL = 16202
+local LNETHER = 11174
+local LMYSTIC = 11134
+local LASTRAL = 10998
+local LMAGIC = 10938	
+--Motes/Primals
+local PAIR = 22451
+local MAIR = 22572	
+local PEARTH= 22452
+local MEARTH = 22573
+local PFIRE = 21884
+local MFIRE = 22574
+local PLIFE = 21886
+local MLIFE = 22575
+local PMANA = 22457
+local MMANA = 22576
+local PSHADOW = 22456
+local MSHADOW = 22577
+local PWATER = 21885
+local MWATER = 22578
+--Depleted items
+local DCBRACER = 0		
+local DCBRACERTO = 32655	-- crystalweave bracers
+local DMGAUNTLETS = 0		
+local DMGAUNTLETSTO = 32656	-- crystalhide handwraps
+local DBADGE = 0			
+local DBADGETO = 32658			-- badge of tenacity
+local DCLOAK = 32677			
+local DCLOAKTO = 32665 	-- crystalweave cape
+local DDAGGER = 32673		
+local DDAGGERTO = 0	-- crystal-infused shiv
+local DMACE = 0		
+local DMACETO = 32661	-- apexis crystal mace
+local DRING = 32678			
+local DRINGTO = 0	-- dreamcrystal band
+local DSTAFF = 0		
+local DSTAFFTO = 32662	-- flaming quartz staff
+local DSWORD = 0		
+local DSWORDTO = 32660	-- crystalforged sword
+local DTHAXE = 32676	
+local DTHAXETO = 32663	-- apexis cleaver
+
+--Set convertable items table up
+local convertableMat = {
+	[GPLANAR] = true,
+	[GETERNAL] = true,
+	[GNETHER] = true,
+	[GMYSTIC] = true,
+	[GASTRAL] = true,
+	[GMAGIC] = true,
+	[LPLANAR] = true,
+	[LETERNAL] = true,
+	[LNETHER] = true,
+	[LMYSTIC] = true,
+	[LASTRAL] = true,
+	[LMAGIC] = true,
+	--[PAIR] = false,  leaving the placeholders for the primals but keeping them commented for possible future use
+	[MAIR] = true,
+	--[PEARTH] = false, 	-- Blacksmiths can convert them back
+	[MEARTH] = true,
+	--[PFIRE] = false,           -- Blacksmiths can convert them back
+	[MFIRE] = true,
+	--[PLIFE] = false,
+	[MLIFE] = true,
+	--[PMANA] = false,
+	[MMANA] = true,
+	--[PSHADOW]= false,
+	[MSHADOW] = true,
+	--[PWATER] = false,
+	[MWATER] = true,
+--	[DCBRACER] = true,   --depleted items are disabled until the function is completed and I have all the item id numbers for them and their converted items
+--	[DMGAUNTLETS] = true,
+--	[DBADGE] = true,
+	[DCLOAK] = true,
+--	[DDAGGER] = true,
+--	[DMACE] = true,
+--	[DRING] = true,
+--	[DSTAFF] = true,
+--	[DSWORD] = true,
+	[DTHAXE] = true,
+}
+
+--local ahList = {    ---- from old not sure if needed... should kinda automate this so it just knows which faction to use based on current snapshot data / location
+	--{'faction', "Faction AH Fees"},
+--	{'neutral', "Neutral AH Fees"},
+-- }
+--~ --Setup GUI and GUI Defaults 
+--~ define(lcName..'.enable', false) -- Evals all default to false ---no need to be done duh
+--~ define(lcName..'.allow.buy', true)			--done
+--~ define(lcName..'.allow.bid', true)			--done
+--~ define(lcName..'.profit.min', 1) 			 --done
+--~ define(lcName..'.profit.pct', 50)			 --done
+
+--~ define(lcName..'.adjust.brokerage', true)	--done
+--~ define(lcName..'.adjust.basis', "faction")        -- done 
+--~ define(lcName..'.matching.check', true)		--ddone
+--~ define(lcName..'.buyout.check', false)		--done
+
+--~ define(lcName..'.enableEssence', true)		done --	
+--~ define(lcName..'.enableMote', true)		done--	
+--~ define(lcName..'.enableDepleted', false)		done	
+--~ define(lcName..'.disabletooltip', false)		done
+
+
+default("converter.profit.min", 1) --.......
+default("converter.profit.pct", 50)--...................
+--? default("resale.seen.check", false)
+--? default("resale.seen.min", 10)
+default("converter.adjust.brokerage", true)--......................
+default("converter.adjust.deposit", true)
+--default("converter.adjust.basis", true) 
+default("converter.allow.bid", true)--....................
+default("converter.allow.buy", true)--.................
+default("converter.matching.check", true)--.................
+default("converter.buyout.check", true)--.......................
+default("converter.enableEssence", true)--................
+default("converter.enableMote", true)--.....................
+default("converter.enableDepleted", true)--................
+--default("converter.disabletooltip", false) -------not sure we will continue this in this manor commenting for now...
+
+-- This function is automatically called when we need to create our search parameters
+function lib:MakeGuiConfig(gui)
+	-- Get our tab and populate it with our controls
+	local id = gui:AddTab(lib.tabname, "Searches")
+	
+	
+	local last = gui:GetLast(id)
+	gui:AddControl(id, "Header",     0,      "Converter search criteria")
+	
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0, 1, "converter.allow.bid", "Allow Bids")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0, 11,  "converter.allow.buy", "Allow Buyouts")	
+	
+	local last = gui:GetLast(id)
+	gui:AddControl(id, "MoneyFramePinned",  0, 1, "converter.profit.min", 1, 99999999, "Minimum Profit")
+	gui:AddControl(id, "Slider",            0, 1, "converter.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
+	
+	gui:AddControl(id, "Subhead",           0.0,    "Fees Adjustment")
+	gui:AddControl(id, "Checkbox",          0.0, 1, "converter.adjust.brokerage", "Subtract auction fees")
+	gui:AddControl(id, "Checkbox",          0.0, 1, "converter.adjust.deposit", "Subtract deposit cost")	
+	
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Subhead",           0.42,  "Appraiser Value Origination")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.matching.check", "Use Market Matched")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.buyout.check", "Use buyout not bid")
+	
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Subhead",           0.76,   "Include in search")
+	gui:AddControl(id, "Checkbox",          0.76, 1, "converter.enableEssence", "Essence <> lesser")
+	gui:AddControl(id, "Checkbox",          0.76, 1, "converter.enableMote", "Mote > Primal")
+	gui:AddControl(id, "Checkbox",          0.76, 1, "converter.enableDepleted", "Depleted Items")
+	
+	--config tab
+	--local cid = gui:AddTab(lib.tabname, "Searcher Config")
+	--local last = gui:GetLast(cid)
+	
+	--gui:AddControl(id, "Checkbox",          0, 1, "resale.seen.check", "Check Seen count")
+	--gui:AddControl(id, "Slider",            0, 2, "resale.seen.min", 1, 100, 1, "Min seen count: %s")
+	--gui:AddControl(id, "Slider",            0.42, 1, "resale.adjust.listings", 1, 10, .1, "Avg relistings: %0.1fx"
+
+	
+
+
+end
+
+function lib.Search(item)
+	-- LINK ILEVEL ITYPE ISUB IEQUIP PRICE TLEFT TIME NAME TEXTURE
+	-- COUNT QUALITY CANUSE ULEVEL MINBID MININC BUYOUT CURBID
+	-- AMHIGH SELLER FLAG ID ITEMID SUFFIX FACTOR ENCHANT SEED
+
+	if not convertableMat[item[Const.ITEMID]] then
+		--if (not get(lcName..".disabletooltip")) then
+		--	item:info("EMC Fail: Not convertable", item.id)
+		--end
+		return
+	end
+	
+	--get and set the item we are looking at's base appraiser value
+	local convertsToValue = 0
+	local convertToID = 0
+	local newBid = 0
+	local newBuy = 0
+	local curModelText = "Unknown"
+	local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.ITEMID], _,get("conveter.matching.check"))
+	local evalPrice = 0		
+
+	if newBuy == nil then newBuy = newBid end
+	if newBuy == nil then 
+		--item:info("EMC Fail: Something went wrong and we have no prices.") 
+	return end
+	
+	if get("converter.buyout.check") then
+		evalPrice = newBuy
+	else
+		evalPrice = newBid
+	end
+	
+	--No appraiser price? Can't evaluate this item.
+	if (evalPrice == nill or evalPrice == 0) then return end
+	--if (not get(lcName..".disabletooltip")) then
+	--	item:info("EMC Fail: No appraiser data available")
+	--	item:info("EMC debug: evalPrice = reagentPrice", evalPrice)
+	--end
+
+	--get stack size we are dealing with
+	local stackSize = item[Const.COUNT]
+	
+	-- set evalPrice to stack value for tooltip use
+	local evalPrice = evalPrice * stackSize	
+	
+		local convertsToL = {
+		[GPLANAR] = true,
+		[GETERNAL] = true,
+		[GNETHER] = true,
+		[GMYSTIC] = true,
+		[GASTRAL] = true,
+		[GMAGIC] = true,
+	}
+	
+	if convertsToL[ item[Const.ITEMID] ] then
+		--If category is disabled we are done here.
+		if (not get("converter.enableEssence")) then 
+			--if (not get(lcName..".disabletooltip")) then
+			--	item:info("EMC Fail: Category disabled.")
+			--end
+		return end
+	
+		if item[Const.ITEMID] == GPLANAR then convertToID = LPLANAR end
+		if item[Const.ITEMID] == GETERNAL then convertToID = LETERNAL end
+		if item[Const.ITEMID] == GNETHER then convertToID = LNETHER end
+		if item[Const.ITEMID] == GMYSTIC then convertToID = LMYSTIC end
+		if item[Const.ITEMID] == GASTRAL then convertToID = LASTRAL end
+		if item[Const.ITEMID] == GMAGIC then convertToID = LMAGIC end
+				local newBid = 0
+				local newBuy = 0
+				local curModelText = "Unknown"
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then 
+					--item:info("EMC Fail: Something went wrong and we have no prices.") 
+				return end
+				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
+				if get("converter.buyout.check") then
+					convertsToValue = newBuy * 3
+				else
+					convertsToValue = newBid * 3
+				end
+					
+				--Fail and end if appraiser has no value for the item we want to convert
+				if (convertsToValue == nill or convertsToValue == 0) then
+					--if (not get(lcName..".disabletooltip")) then
+					--	item:info("EMC Fail: No appraiser data available")
+					--	item:info("EMC debug: convertsToValue @ to lesser")	
+					--end
+					return
+				end
+				
+			convertsToValue = convertsToValue * stackSize
+		value = convertsToValue
+	end
+	
+	local convertsToG = {
+		[LPLANAR] = true,
+		[LETERNAL] = true,
+		[LNETHER] = true,
+		[LMYSTIC] = true,
+		[LASTRAL] = true,
+		[LMAGIC] = true,
+	}
+	
+	if convertsToG[ item[Const.ITEMID] ] then
+		--If category is disabled we are done here.
+		if (not get("converter.enableEssence")) then 
+		--	if (not get(lcName..".disabletooltip")) then
+		--		item:info("EMC Fail: Category disabled.")
+		--	end		
+		return end
+		
+		if item[Const.ITEMID] == LPLANAR then convertToID = GPLANAR end
+		if item[Const.ITEMID] == LETERNAL then convertToID = GETERNAL end
+		if item[Const.ITEMID] == LNETHER then convertToID = GNETHER end
+		if item[Const.ITEMID] == LMYSTIC then convertToID = GMYSTIC end
+		if item[Const.ITEMID] == LASTRAL then convertToID = GASTRAL end
+		if item[Const.ITEMID] == LMAGIC then convertToID = GMAGIC end
+				newBid = 0
+				newBuy = 0
+				curModelText = "Unknown"
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then 
+					--item:info("EMC Fail: Something went wrong and we have no prices.")
+					return 
+				end
+		
+				--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )				
+					if get("converter.buyout.check") then
+						convertsToValue = newBuy / 3
+					else
+						convertsToValue = newBid / 3
+					end
+				--Fail and end if appraiser has no value for the item we want to convert
+				if (convertsToValue == nill or convertsToValue == 0) then
+					--if (not get(lcName..".disabletooltip")) then
+					--	item:info("EMC Fail: No appraiser data available")
+					--	item:info("EMC debug: convertsToValue @ to greater")
+					--end	
+				return
+				end
+			convertsToValue = convertsToValue * stackSize
+
+		value = convertsToValue
+	end	
+	
+	local convertsToP = {
+		[MAIR] = true,
+		[MEARTH] = true,
+		[MFIRE] = true,
+		[MLIFE] = true,
+		[MMANA] = true,
+		[MSHADOW] = true,
+		[MWATER] = true,
+	}
+	
+	if convertsToP[ item[Const.ITEMID] ] then
+		--If category is disabled we are done here.
+		if (not get("converter.enableMote")) then 
+			--if (not get(lcName..".disabletooltip")) then
+			--	item:info("EMC Fail: Category disabled.")		
+			--end	
+		return end
+		
+		if item[Const.ITEMID] == MAIR then convertToID = PAIR end
+		if item[Const.ITEMID] == MEARTH then convertToID = PEARTH end
+		if item[Const.ITEMID] == MFIRE then convertToID = PFIRE end
+		if item[Const.ITEMID] == MLIFE then convertToID = PLIFE end
+		if item[Const.ITEMID] == MMANA then convertToID = PMANA end
+		if item[Const.ITEMID] == MSHADOW then convertToID = PSHADOW end
+		if item[Const.ITEMID] == MWATER then convertToID = PWATER end
+		
+				local newBid = 0
+				local newBuy = 0
+				local curModelText = "Unknown"
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then 
+				--item:info("EMC Fail: Something went wrong and we have no prices.") 
+				return end
+				
+			--update value since 10 motes = 1 primal do primal price / 10 				
+					if get("converter.buyout.check") then
+						convertsToValue = newBuy / 10
+					else
+						convertsToValue = newBid / 10
+					end				
+				--Fail and end if appraiser has no value for the item we want to convert
+				if (convertsToValue == nill or convertsToValue == 0) then
+					--if (not get(lcName..".disabletooltip")) then
+					--	item:info("EMC Fail: No appraiser data available")
+					--	item:info("EMC debug: convertsToValue @ to primal")	
+					--end	
+					return
+				end					
+
+			convertsToValue = convertsToValue * stackSize
+		value = convertsToValue
+	end
+	
+	local convertsFromDepleted = {
+	--	[DCBRACER] = true,   --depleted items are disabled until the function is completed and I have all the item id numbers for them and their converted items
+	--	[DMGAUNTLETS] = true,
+	--	[DBADGE] = true,
+	--	[DCLOAK] = true,
+	--	[DDAGGER] = true,
+	--	[DMACE] = true,
+	--	[DRING] = true,
+	--	[DSTAFF] = true,
+	--	[DSWORD] = true,
+		[DTHAXE] = true,
+	}
+	
+	if convertsFromDepleted[ item[Const.ITEMID] ] then
+		--If category is disabled we are done here.
+		if (not get("converter.enableDepleted")) then 
+			--if (not get(lcName..".disabletooltip")) then
+			--	item:info("EMC Fail: Category disabled.")			
+			--end	
+		return end
+		
+		if item[Const.ITEMID] == DCBRACER then convertToID = DCBRACERTO end
+		if item[Const.ITEMID] == DMGAUNTLETS then convertToID = DMGAUNTLETSTO end
+		if item[Const.ITEMID] == DBADGE then convertToID = DBADGETO end
+		if item[Const.ITEMID] == DCLOAK then convertToID = DCLOAKTO end
+		if item[Const.ITEMID] == DDAGGER then convertToID = DDAGGERTO end
+		if item[Const.ITEMID] == DMACE then convertToID = DMACETO end
+		if item[Const.ITEMID] == DRING then convertToID = DRINGTO end
+		if item[Const.ITEMID] == DSTAFF then convertToID = DSTAFFTO end
+		if item[Const.ITEMID] == DSWORD then convertToID = DSWORDTO end
+		if item[Const.ITEMID] == DTHAXE then convertToID = DTHAXETO end
+				
+				newBid = 0
+				newBuy = 0
+				curModelText = "Unknown"
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then 
+				--item:info("EMC Fail: Something went wrong and we have no prices.") 
+				return end
+				
+			--update value 1 depleted = 1 non depleted item (meaning no modified to newbid or buy below)				
+					if get("converter.buyout.check") then
+						convertsToValue = newBuy
+					else
+						convertsToValue = newBid
+					end									
+					--Fail and end if appraiser has no value for the item we want to convert
+					if (convertsToValue == nill or convertsToValue == 0) then
+						--if (not get(lcName..".disabletooltip")) then
+						--	item:info("EMC Fail: No appraiser data available")
+						--	item:info("EMC debug: convertsToValue @ from depleted")
+						--end
+					return end
+			convertsToValue = convertsToValue * stackSize
+		value = convertsToValue
+	end
+	
+	--[[if (get("resale.seen.check")) and curModel ~= "fixed" then
+		if ((not seen) or (seen < get("resale.seen.min"))) then
+			return
+		end
+	end]]
+		
+
+	--adjust for brokerage/deposit costs
+	local deposit = get("converter.adjust.deposit")
+	local brokerage = get("converter.adjust.brokerage")
+	
+	if brokerage then
+		value = value * 0.95
+	end
+	if deposit then
+		--local relistings = get("resale.adjust.listings")
+		local amount = AucAdvanced.Post.GetDepositAmount(item[Const.LINK], item[Const.COUNT])
+		if not amount then
+			amount = 0
+		else
+			amount = amount --* relistings
+		end
+		value = value - amount
+	end
+	
+	local pct = get("converter.profit.pct")
+	local minprofit = get("converter.profit.min")
+	local market = value
+	local value = market * (100-pct) / 100
+	if value > (market - minprofit) then
+		value = market - minprofit
+	end
+	
+	--Return bid or buy if item is below the searchers evaluated value
+	if get("converter.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+		if AucAdvanced.Modules.Util.PriceLevel then
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], market)
+			if level then
+				level = math.floor(level)
+				r = r*255
+				g = g*255
+				b = b*255
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) 
+			end
+		end
+		return "buy", market, pctstring
+	elseif get("converter.allow.bid") and (item[Const.PRICE] <= value) then
+		if AucAdvanced.Modules.Util.PriceLevel then
+			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], market)
+			if level then
+				level = math.floor(level)
+				r = r*255
+				g = g*255
+				b = b*255
+				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) 
+			end
+		end
+		return "bid", market, pctstring
+	end
+end
+
+AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherConverter.lua $", "$Rev: 2531 $")
