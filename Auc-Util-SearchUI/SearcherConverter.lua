@@ -6,6 +6,8 @@ local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Converter"
 
+local vendor, pctstring
+
 -- Set our defaults
 --Essences
 local GPLANAR = 22446
