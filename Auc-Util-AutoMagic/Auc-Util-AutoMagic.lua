@@ -26,7 +26,6 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]] 
-
 --Set up our module with AADV
 local libName, libType = "AutoMagic", "Util"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
@@ -39,7 +38,6 @@ local uiErrorMessage = 0
 function lib.GetName()
 	return libName
 end
-local ammailgui = CreateFrame("Frame", "", UIParent); ammailgui:Hide()
 local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellframe:Hide()
 local autoselldata = {}
 local autosell = {}
@@ -452,15 +450,15 @@ function lib.mailShow()
 end
 
 function lib.mailClosed() --Fires on mail box closed event & hides mailgui
-	local x,y = ammailgui:GetCenter() 
+	local x,y = lib.ammailgui:GetCenter() 
 	set("util.automagic.ammailguix" ,x)
 	set("util.automagic.ammailguiy" ,y)
-	ammailgui:Hide()
+	lib.ammailgui:Hide()
 end
 
 function lib.mailGUI() --Function is called from lib.mailShow()
 	lib.makeMailGUI()
-	ammailgui:Show()
+	lib.ammailgui:Show()
 end
 
 function lib.autoSellGUI() 
@@ -507,95 +505,6 @@ function lib.slidebar()
 		end
 	end
 end
-
---Make mail GUI
-function lib.makeMailGUI()
-	-- Set frame visuals
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)	
-	ammailgui:ClearAllPoints()	
-	ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
-	ammailgui:SetFrameStrata("DIALOG")
-	ammailgui:SetHeight(90)
-	ammailgui:SetWidth(220)
-	ammailgui:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 32,
-		insets = { left = 9, right = 9, top = 9, bottom = 9 }
-	})
-	ammailgui:SetBackdropColor(0,0,0, 0.8)
-	ammailgui:EnableMouse(true)
-	ammailgui:SetMovable(true)
-	ammailgui:SetClampedToScreen(true)
-	
-	-- Make highlightable drag bar
-	ammailgui.Drag = CreateFrame("Button", "", ammailgui)
-	ammailgui.Drag:SetPoint("TOPLEFT", ammailgui, "TOPLEFT", 10,-5)
-	ammailgui.Drag:SetPoint("TOPRIGHT", ammailgui, "TOPRIGHT", -10,-5)
-	ammailgui.Drag:SetHeight(6)
-	ammailgui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-	ammailgui.Drag:SetScript("OnMouseDown", function() ammailgui:StartMoving() end)
-	ammailgui.Drag:SetScript("OnMouseUp", function() ammailgui:StopMovingOrSizing() end)
-	
-	-- Text Header
-	local	mguiheader = ammailgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
-	mguiheader:SetText("AutoMagic: Mail Loader")
-	mguiheader:SetJustifyH("CENTER")
-	mguiheader:SetWidth(200)
-	mguiheader:SetHeight(10)
-	mguiheader:SetPoint("TOPLEFT",  ammailgui, "TOPLEFT", 0, 0)
-	mguiheader:SetPoint("TOPRIGHT", ammailgui, "TOPRIGHT", 0, 0)
-	ammailgui.mguiheader = mguiheader
-	
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	-- LEFT COLUMN
-	ammailgui.loadprospect = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
-	ammailgui.loadprospect:SetText(("Prospect"))
-	ammailgui.loadprospect:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 35)
-	ammailgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
-		
-	local	mguibtmrules = ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
-	mguibtmrules:SetText("BTM Rule:")
-	mguibtmrules:SetJustifyH("LEFT")
-	mguibtmrules:SetWidth(250)
-	mguibtmrules:SetHeight(10)
-	mguibtmrules:SetPoint("BOTTOMLEFT",  ammailgui.loadprospect, "TOPLEFT", 0, 0)
-	mguibtmrules:SetPoint("BOTTOMRIGHT", ammailgui.loadprospect, "TOPRIGHT", 0, 0)
-	ammailgui.mguibtmrules = mguibtmrules
-	
-	ammailgui.loadde = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
-	ammailgui.loadde:SetText(("Disenchant"))
-	ammailgui.loadde:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 12)
-	ammailgui.loadde:SetScript("OnClick", lib.doMailDE)
-	
-	--RIGHT COLUMN
-	ammailgui.loadgems = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
-	ammailgui.loadgems:SetText(("Gems"))
-	ammailgui.loadgems:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 35)
-	ammailgui.loadgems:SetScript("OnClick", lib.doMailGems)
-	
-	local	mguimailfor = ammailgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
-	mguimailfor:SetText("Other:")
-	mguimailfor:SetJustifyH("RIGHT")
-	mguimailfor:SetWidth(220)
-	mguimailfor:SetHeight(10)
-	mguimailfor:SetPoint("BOTTOMLEFT",  ammailgui.loadgems, "TOPLEFT", 0, 0)
-	mguimailfor:SetPoint("BOTTOMRIGHT", ammailgui.loadgems, "TOPRIGHT", 0, 0)
-	ammailgui.mguimailfor = mguimailfor
-	
-	ammailgui.loaddemats = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
-	ammailgui.loaddemats:SetText(("Chant Mats"))
-	ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 12)
-	ammailgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
-end 
-
---[[function lib.autoSellListClear()
-	for itemID, itemName in pairs (autoSellList) do
-		autoSellList[itemID] = nil
-	end	
-	lib.populateDataSheet()
-	autosellframe.ClearIcon()
-end]]
 
 local myworkingtable = {}
 function lib.setWorkingItem(link)
@@ -874,11 +783,6 @@ function lib.makeautosellgui()
 	autosellframe.resultlist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 492, 0)
 	autosellframe.resultlist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
 	
-	--[[autosellframe.resetList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
-	autosellframe.resetList:SetPoint("TOP", autosellframe.resultlist, "BOTTOM", 0, -15)
-	autosellframe.resetList:SetText(("Reset List"))
-	autosellframe.resetList:SetScript("OnClick", lib.autoSellListClear)]]
-
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
 		{ "Appraiser", "COIN", 70 }, 
@@ -910,37 +814,6 @@ function lib.makeautosellgui()
 		{ ('BTM Rule'), "TEXT", 25 }, 
 		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClickBagSheet) 
-	
-
-	--[[
-	--Create the never sell frame
-	autosellframe.nosell = CreateFrame("Frame", nil, autosellframe)
-	autosellframe.nosell:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
-	})
-	
-	autosellframe.nosell:SetBackdropColor(0, 0, 0.0, 0.5)
-
-	autosellframe.nosell:SetPoint("TOPLEFT", autosellframe.baglist, "BOTTOMLEFT", 100, 150)
-	autosellframe.nosell:SetPoint("TOPRIGHT", autosellframe.baglist, "TOPLEFT", 100, 150)
-	autosellframe.nosell:SetPoint("BOTTOM", autosellframe.baglist, "BOTTOM", 100, 150)
-	
-	--autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
-	--autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
-	--autosellframe.bagList:SetText(("Re-Scan Bags"))
-	--autosellframe.bagList:SetScript("OnClick", lib.populateDataSheet)
-	
-	autosellframe.nosell.sheet = ScrollSheet:Create(autosellframe.nosell, {
-		{ ('Never sell:'), "TOOLTIP", 170 }, 
-		--{ ('BTM Rule'), "TEXT", 25 }, 
-		{ "Appraiser", "COIN", 70 }, 
-	}, autosell.OnNeverSellSheetEnter, autosell.OnLeave, autosell.OnClickNeverSellSheet) 
-	
-	]]
-	
 end
 lib.makeautosellgui()
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
