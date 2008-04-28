@@ -34,7 +34,6 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 
 --Start Module Code
 local amBTMRule, itemName, itemID
-local uiErrorMessage = 0
 function lib.GetName()
 	return libName
 end
@@ -228,17 +227,18 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
 	default("util.automagic.depositTT", false)
 	default("util.automagic.ammailguix", 100) 
-	default("util.automagic.ammailguiy", 100) 
+	default("util.automagic.ammailguiy", 100)
+	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
 end
 
 	-- define what event fires what function
 	function lib.onEventDo(this, event)
-		if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 		end
-		if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 		end
-		if event == 'MAIL_SHOW' 			then lib.mailShow() 			end  
-		if event == "MAIL_CLOSED" 		then lib.mailClosed() 			end
-		if event == "UI_ERROR_MESSAGE" 	then uiErrorMessage = 1 		end
-		if event == "AUCTION_HOUSE_SHOW" then lib.getDepCosts()		end
+		if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 				end
+		if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 				end
+		if event == 'MAIL_SHOW' 			then lib.mailShow() 					end  
+		if event == "MAIL_CLOSED" 		then lib.mailClosed() 					end
+		if event == "UI_ERROR_MESSAGE" 	then set("util.automagic.uierrormsg", 1) 	end
+		if event == "AUCTION_HOUSE_SHOW" then lib.getDepCosts()				end
 	end
 
 function lib.SetupConfigGui(gui)
@@ -323,7 +323,7 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 
 	for slot=1,GetContainerNumSlots(bag) do
 	
-	if uiErrorMessage == 1 then return end   -- Return if ui error msg event is fired.
+	if (get("util.automagic.uierrormsg")) == 1 then return end   -- Return if ui error msg event is fired.
 	
 		if (GetContainerItemLink(bag,slot)) then
 			local _,itemCount = GetContainerItemInfo(bag,slot)
@@ -407,20 +407,20 @@ end
 
 -- The next few functions just set the bid/list reason check for the scan function depending one why we are using it.		
 function lib.doVendorSell()
-	uiErrorMessage = 0
+	set("util.automagic.uierrormsg", 0)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","vendor")
 	end
 end
 function lib.doMailDE()
-	uiErrorMessage = 0
+	set("util.automagic.uierrormsg", 0)
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","disenchant") 
 	end
 end
 function lib.doMailProspect()
-	uiErrorMessage = 0
+	set("util.automagic.uierrormsg", 0)
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","prospect")
@@ -428,7 +428,7 @@ function lib.doMailProspect()
 end
 
 function lib.doMailGems()
-	uiErrorMessage = 0
+	set("util.automagic.uierrormsg", 0)
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","gems")
@@ -436,7 +436,7 @@ function lib.doMailGems()
 end
 
 function lib.doMailDEMats()
-	uiErrorMessage = 0
+	set("util.automagic.uierrormsg", 0)
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","demats")
