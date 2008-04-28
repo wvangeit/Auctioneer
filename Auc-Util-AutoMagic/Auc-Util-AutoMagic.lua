@@ -26,12 +26,14 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]] 
-local libName = "AutoMagic"
-local libType = "Util"
 
-AucAdvanced.Modules[libType][libName] = {}
-local lib,private = AucAdvanced.Modules[libType][libName]
+--Set up our module with AADV
+local libName, libType = "AutoMagic", "Util"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+
+--Start Module Code
 local amBTMRule, itemName, itemID
 local uiErrorMessage = 0
 function lib.GetName()
