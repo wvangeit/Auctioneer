@@ -183,7 +183,9 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-local ttdepcost
+	local aimethod, aivalue = lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
+	EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
+	local ttdepcost
 	if not (get("util.automagic.depositTT")) then 
 		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
@@ -198,8 +200,7 @@ local ttdepcost
 		if (ttdepcost == 0 or ttdepcost == nil) then 	
 			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
 		else
-			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
-			EnhTooltip.AddLine(ttdesc,ttdepcost)
+			EnhTooltip.AddLine("|cffCCFF99".." Deposit x"..quantity.. " (24h) ".. "|r" , ttdepcost)
 		end
 	end
 end
@@ -229,6 +230,15 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.ammailguix", 100) 
 	default("util.automagic.ammailguiy", 100)
 	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
+	default("util.automagic.enchantskill", 0) -- Used for item AI
+	default("util.automagic.jewelcraftskill", 0)-- Used for item AI
+	default("util.automagic.vendorweight", 100)-- Used for item AI
+	default("util.automagic.auctionweight", 100)-- Used for item AI
+	default("util.automagic.prospectweight", 100)-- Used for item AI
+	default("util.automagic.disenchantweight", 100)-- Used for item AI
+	default("util.automagic.relisttimes", 1)-- Used for item AI
+	default("util.automagic.includebrokerage", 0)-- Used for item AI
+	default("util.automagic.includedeposit", 0)-- Used for item AI
 end
 
 	-- define what event fires what function
@@ -263,7 +273,7 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.chatspam", "Enable AutoMagic Chat Spam")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in tooltip.")
 		
-		gui:AddControl(id, "Header",     0,    libName.." vendor options")
+		gui:AddControl(id, "Header",     0,    " vendor options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
@@ -273,8 +283,21 @@ function lib.SetupConfigGui(gui)
 			"What is AutoMagic?",
 			"Mail GUI: This enables the mail interface that allows for auto-loading items into the sendmail window based on BTM Rules.\n\n"..
 		"\n")
-		gui:AddControl(id, "Header",     0,    libName.." GUI options")
+		gui:AddControl(id, "Header",     0,    " GUI options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for addition mail features")
+		
+		gui:AddControl(id, "Header",     0,    " Item Intellegence")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
+		
+		gui:AddControl(id, "Header",     0,    " Weights will adjust your preference higher or lower by % in Item Suggest	")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.vendorweight", 0, 200, 1, "Vendor Bias %s")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.auctionweight", 0, 200, 1, "Auction Bias %s")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.prospectweight", 0, 200, 1, "Prospect Bias %s")
+		gui:AddControl(id, "Checkbox",     0, 1, "util.automagic.includedeposit", "Include Deposit Costs?")
+		gui:AddControl(id, "Slider",           0, 2, "util.automagic.relisttimes", 1, 10, 1, "Amount of times to relist? %s")
+		gui:AddControl(id, "Checkbox",     0, 1, "util.automagic.includebrokerage", "Include AH Brokerage Costs?")
 end
 
 
