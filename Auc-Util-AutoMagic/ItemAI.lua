@@ -94,6 +94,7 @@ function lib.GetDisenchantValue(hyperlink, quantity)
 	local DisenchantValue = 0
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
+	local market
 	
 	if (skillneeded > get("util.automagic.enchantskill"))  then
 		return DisenchantValue
