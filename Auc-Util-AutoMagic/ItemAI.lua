@@ -88,6 +88,15 @@ end
 function lib.GetAppraiserValue(hyperlink, quantity)
 	AppraiserValue = GetAprPrice(hyperlink, nil, true) or 0
 	AppraiserValue = AppraiserValue * quantity
+	local brokerRate, depositRate = 0.05, 0.05
+	if (get("util.automagic.includedeposit")) then
+		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
+		AppraiserValue = BtmScan.GetDepositCost(itemid, 1, depositRate) * get("util.automagic.relisttimes")
+	end
+	if (get("util.automagic.includebrokerage")) then
+		AppraiserValue = AppraiserValue + AppraiserValue * brokerRate
+	end
+	
 return AppraiserValue end
 
 function lib.GetDisenchantValue(hyperlink, quantity)
