@@ -346,7 +346,7 @@ function lib.getDepCosts(hyperlink) --We store our dep cost in 24hour format ---
 					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 					local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, "1") 
 					if not (ttdepcost == nil or ttdepcost == 0) then
-						storedep = ttdepcost * 2
+						local storedep = ttdepcost * 2
 						depositCostList[itemid] = storedep
 					end
 				end
