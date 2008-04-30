@@ -346,8 +346,7 @@ function lib.getDepCosts(hyperlink) --We store our dep cost in 24hour format ---
 					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 					local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, "1") 
 					if not (ttdepcost == nil or ttdepcost == 0) then
-						ttdepcost = ttdepcost * 2
-						local storedep = ttdepcost --/ itemCount
+						storedep = ttdepcost * 2
 						depositCostList[itemid] = storedep
 					end
 				end
@@ -357,91 +356,107 @@ function lib.getDepCosts(hyperlink) --We store our dep cost in 24hour format ---
 end
 	
 function lib.doScanAndUse(bag,bagType,amBTMRule)	
-	if amBTMRule == nil then 
-		print("AutoMagic:Debug: How did you get this message? amBTMRule is nil... please report") 
-		return
-	end
-
-	for slot=1,GetContainerNumSlots(bag) do
-	
 	if (get("util.automagic.uierrormsg")) == 1 then return end   -- Return if ui error msg event is fired.
-	
+	for slot=1,GetContainerNumSlots(bag) do
 		if (GetContainerItemLink(bag,slot)) then
+		set("util.automagic.uierrormsg", 0)
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
 			if (itemLink == nil) then return end
 			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 	
 			local _, itemID, _, _, _, _ = decode(itemLink)
 					
-			if amBTMRule == "demats" then	
-				if isDEMats[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
-						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
-					end
-					UseContainerItem(bag, slot) 
-				end
-			end
-			if amBTMRule == "gems" then	
-				if isGem[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
-						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
-					end
-					UseContainerItem(bag, slot) 
-				end
-			end
-			if amBTMRule == "vendor" then
-				if autoSellList[ itemID ] then 
-					if (get("util.automagic.chatspam")) then 
-						print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
-					end
-					UseContainerItem(bag, slot)
-				elseif (get("util.automagic.autosellgrey")) then  
-					if itemRarity == 0 then
-						UseContainerItem(bag, slot)
+			
+			if (get("util.automagic.uierrormsg")) == 0 then
+				if amBTMRule == "demats" then	
+					if isDEMats[ itemID ] then
 						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has sold", itemName," due to item being grey")
+							print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
 						end
-					end			
-				end 			
+						UseContainerItem(bag, slot)
+						set("util.automagic.uierrormsg", 1)
+					end
+				end
+			end
+			if (get("util.automagic.uierrormsg")) == 0 then
+				if amBTMRule == "gems" then
+					if isGem[ itemID ] then
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+						end
+						UseContainerItem(bag, slot) 
+						set("util.automagic.uierrormsg", 1)
+					end
+				end
+			end
+			if (get("util.automagic.uierrormsg")) == 0 then	
+				if amBTMRule == "vendor" then
+					if autoSellList[ itemID ] then 
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
+						end
+						UseContainerItem(bag, slot)
+						set("util.automagic.uierrormsg", 1)
+					elseif (get("util.automagic.autosellgrey")) then
+						if itemRarity == 0 then
+							UseContainerItem(bag, slot)
+							set("util.automagic.uierrormsg", 1)
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has sold", itemName," due to item being grey")
+							end
+						end			
+					end 			
+				end
 			end
 			
-			if BtmScan then
-				local reason, bids
-				local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-				local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-				local bidlist = BtmScan.Settings.GetSetting("bid.list")
-				
-				if (bidlist) then
-					bids = bidlist[sig..":"..seed.."x"..itemCount]
-					if amBTMRule == "vendor" then
-						if(bids and bids[1] and bids[1] == "vendor") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has sold", itemName, " due to vendor btm status")		
+			if (get("util.automagic.uierrormsg")) == 0 then
+				if BtmScan then
+					local reason, bids
+					local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+					local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+					local bidlist = BtmScan.Settings.GetSetting("bid.list")
+					
+					if (bidlist) then
+						bids = bidlist[sig..":"..seed.."x"..itemCount]
+						
+						if (get("util.automagic.uierrormsg")) == 0 then
+							if amBTMRule == "vendor" then
+								if(bids and bids[1] and bids[1] == "vendor") then 
+									if (get("util.automagic.chatspam")) then 
+										print("AutoMagic has sold", itemName, " due to vendor btm status")		
+									end
+									UseContainerItem(bag, slot) 
+									set("util.automagic.uierrormsg", 1)
+								end 
 							end
-							UseContainerItem(bag, slot) 
-						end 
-					end
-		
-					if amBTMRule == "disenchant" then	
-						if(bids and bids[1] and bids[1] == "disenchant") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+						end
+						if (get("util.automagic.uierrormsg")) == 0 then
+							if amBTMRule == "disenchant" then	
+								if(bids and bids[1] and bids[1] == "disenchant") then 
+									if (get("util.automagic.chatspam")) then 
+										print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+									end
+									UseContainerItem(bag, slot) 
+									set("util.automagic.uierrormsg", 1)
+								end 
 							end
-							UseContainerItem(bag, slot) 
-						end 
-					end
-				
-					if amBTMRule == "prospect" then
-						if(bids and bids[1] and bids[1] == "prospect") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to prospect btm status")
+						end
+						if (get("util.automagic.uierrormsg")) == 0 then
+							if amBTMRule == "prospect" then
+								if(bids and bids[1] and bids[1] == "prospect") then 
+									if (get("util.automagic.chatspam")) then 
+										print("AutoMagic has loaded", itemName, " due to prospect btm status")
+									end
+									UseContainerItem(bag, slot) 
+									set("util.automagic.uierrormsg", 1)
+								end 
 							end
-							UseContainerItem(bag, slot) 
-						end 
+						end
 					end
 				end
 			end
 		end
+	set("util.automagic.uierrormsg", 0)
 	end
 end
 

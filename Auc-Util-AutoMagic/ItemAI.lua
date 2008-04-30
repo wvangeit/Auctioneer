@@ -93,12 +93,17 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 		local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, quantity) or 0
-		local depcost = depositCostList[itemid] * quantity or aadvdepcost
-		AppraiserValue = AppraiserValue - depcost * get("util.automagic.relisttimes")
+		if not (depositCostList[itemid]) then
+			aadvdepcost = aadvdepcost * 2
+			depositCostList[itemid] = aadvdepcost
+		end
+		local depcost = depositCostList[itemid] * quantity or 0
+		depcost = depcost * get("util.automagic.relisttimes")
+		AppraiserValue = AppraiserValue - depcost
 	end
 	if (get("util.automagic.includebrokerage")) then
 		AppraiserValue = AppraiserValue + AppraiserValue * brokerRate
-	end
+	end	
 	
 return AppraiserValue end
 
