@@ -91,7 +91,8 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 	local brokerRate, depositRate = 0.05, 0.05
 	if (get("util.automagic.includedeposit")) then
 		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
-		AppraiserValue = BtmScan.GetDepositCost(itemid, 1, depositRate) * get("util.automagic.relisttimes")
+		local depcost = depositCostList[itemid] or 0
+		AppraiserValue = AppraiserValue - depcost * get("util.automagic.relisttimes")
 	end
 	if (get("util.automagic.includebrokerage")) then
 		AppraiserValue = AppraiserValue + AppraiserValue * brokerRate
@@ -133,6 +134,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 	if (jcSkillRequired == nil or jcSkillRequired > get("util.automagic.jewelcraftskill"))  then
 		return ProspectValue
 	else
+		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 		local trashTotal, marketTotal, depositTotal, brokerTotal = 0, 0, 0, 0
 		local brokerRate, depositRate = 0.05, 0.05
 		
@@ -157,7 +159,8 @@ function lib.GetProspectValue(hyperlink, quantity)
 
 				-- calculate costs
 				if (get("util.automagic.includedeposit")) then
-					depositTotal = depositTotal + BtmScan.GetDepositCost(result, 1, depositRate) * get("util.automagic.relisttimes") * yield
+					local depcost = depositCostList[itemid] or 0
+					depositTotal = depositTotal + depcost * get("util.automagic.relisttimes") * yield
 				end
 				if (get("util.automagic.includebrokerage")) then
 					brokerTotal = brokerTotal + marketPrice * brokerRate
