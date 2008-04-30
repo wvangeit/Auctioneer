@@ -90,8 +90,10 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 	AppraiserValue = AppraiserValue * quantity
 	local brokerRate, depositRate = 0.05, 0.05
 	if (get("util.automagic.includedeposit")) then
-		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
-		local depcost = depositCostList[itemid] or 0
+		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
+		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+		local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, quantity) or 0
+		local depcost = depositCostList[itemid] * quantity or aadvdepcost
 		AppraiserValue = AppraiserValue - depcost * get("util.automagic.relisttimes")
 	end
 	if (get("util.automagic.includebrokerage")) then
@@ -159,7 +161,10 @@ function lib.GetProspectValue(hyperlink, quantity)
 
 				-- calculate costs
 				if (get("util.automagic.includedeposit")) then
-					local depcost = depositCostList[itemid] or 0
+					local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
+					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+					local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, 1) or 0
+					local depcost = depositCostList[itemid] or aadvdepcost
 					depositTotal = depositTotal + depcost * get("util.automagic.relisttimes") * yield
 				end
 				if (get("util.automagic.includebrokerage")) then
