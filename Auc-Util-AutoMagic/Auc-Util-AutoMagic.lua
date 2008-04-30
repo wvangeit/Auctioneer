@@ -334,7 +334,6 @@ function lib.getDepCosts(hyperlink) --We store our dep cost in 24hour format ---
 			ttdepcost = ttdepcost * 2
 			local storedep = ttdepcost
 			depositCostList[itemid] = storedep
-			print("I just got the deposit cost of ", storedep, " for id : ", itemid)
 		end
 	else
 		for bag=0,4 do
