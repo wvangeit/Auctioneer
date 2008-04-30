@@ -469,12 +469,18 @@ function private.CreateFrames()
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
 
+		local oldBid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		local oldBuy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		MoneyInputFrame_ResetMoney(frame.salebox.bid)
 		MoneyInputFrame_ResetMoney(frame.salebox.buy)
-		frame.salebox.bidconfig = true
-		frame.salebox.buyconfig = true
 		MoneyInputFrame_SetCopper(frame.salebox.bid, newBid)
 		MoneyInputFrame_SetCopper(frame.salebox.buy, newBuy)
+		if oldBid ~= newBid then
+			frame.salebox.buyconfig = true
+		end
+		if oldBuy ~= newBuy then
+			frame.salebox.buyconfig = true
+		end
 		frame.salebox.bid.modelvalue = newBid
 		frame.salebox.buy.modelvalue = newBuy
 	end
@@ -593,6 +599,7 @@ function private.CreateFrames()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
 			frame.salebox.warn:SetText("")
+			frame.salebox.note:SetText("")
 			frame.manifest.lines:Clear()
 			frame.manifest:Hide()
 			frame.toggleManifest:Disable()
@@ -887,10 +894,27 @@ function private.CreateFrames()
 		
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
+		frame.salebox.note:SetText("")
+		if GetSellValue then
+			local sellValue = GetSellValue(frame.salebox.link)
+			if (sellValue and sellValue > 0) then
+				if curBuy > 0 and curBuy < sellValue then
+					frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
+				elseif curBid > 0 and curBid < sellValue then
+					frame.salebox.note:SetText("Note: Min Bid < Vendor")
+				end
+			end
+		end
+		
 		local canAuction = true
-		local warnText = frame.salebox.warn:GetText()
-		if warnText and warnText ~= "" then
+		if curModel == "fixed" and curBid <= 0 then
+			frame.salebox.warn:SetText("Bid price must be > 0")
 			canAuction = false
+		elseif (curBuy > 0 and curBid > curBuy) then
+			frame.salebox.warn:SetText("Buy price must be > bid")
+			canAuction = false
+		else
+			frame.salebox.warn:SetText("")
 		end
 
 		if totalBid < 1 then
@@ -964,7 +988,7 @@ function private.CreateFrames()
 			frame.salebox.model:UpdateValue()
 		end
 
-		local good = true
+		--[[local good = true
 		if curModel == "fixed" and curBid <= 0 then
 			frame.salebox.warn:SetText("Bid price must be > 0")
 			good = false
@@ -974,9 +998,9 @@ function private.CreateFrames()
 		end
 		if (good and curModel == "fixed") then
 			frame.salebox.warn:SetText("")
-		end
+		end]]
 
-		frame.salebox.note:SetText("")
+		--[[frame.salebox.note:SetText("")
 		if GetSellValue then
 			local sellValue = GetSellValue(frame.salebox.link)
 			if (sellValue and sellValue > 0) then
@@ -986,7 +1010,7 @@ function private.CreateFrames()
 					frame.salebox.note:SetText("Note: Min Bid < Vendor")
 				end
 			end
-		end
+		end]]
 
 		frame.salebox.config = false
 	end
@@ -1902,10 +1926,10 @@ function private.CreateFrames()
 	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
 	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, function()
-		if not frame.salebox.bidconfig then
+		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
 		else
-			frame.salebox.bidconfig = nil
+			frame.salebox.buyconfig = nil
 		end
 	end)
 	frame.salebox.bid.element = "bid"
