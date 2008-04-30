@@ -183,8 +183,10 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-	local aimethod, aivalue = lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
-	EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
+	if (get("util.automagic.enableitemsuggesttt")) then
+		local aimethod, aivalue = lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
+		EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
+	end
 	local ttdepcost
 	if not (get("util.automagic.depositTT")) then 
 		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
@@ -222,14 +224,15 @@ local frame = CreateFrame("Frame","")
 	
 	default("util.automagic.autovendor", false) -- DO NOT SET TRUE ALL AUTOMAGIC OPTIONS SHOULD BE TURNED ON MANUALLY BY END USER!!!!!!!
 	default("util.automagic.autosellgrey", false)
-	default("util.automagic.autocloseenable", false)
+	default("util.automagic.autocloseenable", false) -- Enables auto close of vendor window after autosale completion
 	default("util.automagic.showmailgui", false)
 	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
 	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
-	default("util.automagic.depositTT", false)
-	default("util.automagic.ammailguix", 100) 
-	default("util.automagic.ammailguiy", 100)
+	default("util.automagic.depositTT", false) --Used for disabling the deposit costs TT
+	default("util.automagic.ammailguix", 100) --Used for storing mailgui location
+	default("util.automagic.ammailguiy", 100) --Used for storing mailgui location
 	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
+	default("util.automagic.enableitemsuggesttt", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
 	default("util.automagic.enchantskill", 0) -- Used for item AI
 	default("util.automagic.jewelcraftskill", 0)-- Used for item AI
 	default("util.automagic.vendorweight", 100)-- Used for item AI
@@ -290,7 +293,8 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
 		
-		gui:AddControl(id, "Header",     0,    " Weights will adjust your preference higher or lower by % in Item Suggest	")
+		gui:AddControl(id, "Header",     0,    " Weights will adjust your preference higher or lower by % in Item Suggest")
+		gui:AddControl(id, "Checkbox",      0, 1, "util.automagic.enableitemsuggesttt", "Display Item Suggest Tooltips")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.vendorweight", 0, 200, 1, "Vendor Bias %s")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.auctionweight", 0, 200, 1, "Auction Bias %s")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
