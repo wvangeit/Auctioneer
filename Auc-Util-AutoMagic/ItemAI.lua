@@ -174,6 +174,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 					local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 					local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, 1) or 0
+					local depcost
 					if (depositCostList[itemid]) then
 						local depcost = depositCostList[itemid]
 					else
