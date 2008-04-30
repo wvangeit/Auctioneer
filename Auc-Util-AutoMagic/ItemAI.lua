@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Auc-Util-AutoMagic.lua 3005 2008-04-05 15:13:13Z RockSlice $
+	Revision: $Id: ItemAI.lua 3005 2008-04-05 15:13:13Z testlek $
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -31,8 +31,9 @@ local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue
+
+
 function lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
-	
 	-- Determine Base Values
 	VendorValue = lib.GetVendorValue(hyperlink, quantity)
 	AppraiserValue = lib.GetAppraiserValue(hyperlink, quantity)
@@ -94,8 +95,12 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 		local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, quantity) or 0
 		if not (depositCostList[itemid]) then
-			aadvdepcost = aadvdepcost * 2
-			depositCostList[itemid] = aadvdepcost
+			if (aadvdepcost) then
+				aadvdepcost = aadvdepcost * 2
+				depositCostList[itemid] = aadvdepcost
+			else
+				aadvdepcost = 0 
+			end
 		end
 		local depcost = depositCostList[itemid] * quantity or 0
 		depcost = depcost * get("util.automagic.relisttimes")
@@ -169,7 +174,11 @@ function lib.GetProspectValue(hyperlink, quantity)
 					local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 					local aadvdepcost = AucAdvanced.Post.GetDepositAmount(itemsig, 1) or 0
-					local depcost = depositCostList[itemid] or aadvdepcost
+					if (depositCostList[itemid]) then
+						local depcost = depositCostList[itemid]
+					else
+						depcost = aadvdepcost or 0
+					end
 					depositTotal = depositTotal + depcost * get("util.automagic.relisttimes") * yield
 				end
 				if (get("util.automagic.includebrokerage")) then
