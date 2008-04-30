@@ -510,15 +510,33 @@ function lib.slidebar()
 	if LibStub then
 		local SlideBar = LibStub:GetLibrary("SlideBar", true)    
 		if SlideBar then
+			local embedded = false
+			for _, module in ipairs(AucAdvanced.EmbeddedModules) do 
+				if module == "Auc-Util-AutoMagic"  then 
+					embedded = true 
+				end 
+			end 
 			function lib.sideIconEnter()
 				local SlideBar = LibStub:GetLibrary("SlideBar", true)
-				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+				if embedded then
+					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+				else
+					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+				end
 			end
 			function lib.sideIconLeave()
 				local SlideBar = LibStub:GetLibrary("SlideBar", true)
+				if embedded then
+					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+				else
+					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+				end
+			end
+			if embedded then
+				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+			else
 				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 			end
-			sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 			sideIcon:SetScript("OnEnter", lib.sideIconEnter)
 			sideIcon:SetScript("OnLeave", lib.sideIconLeave)
