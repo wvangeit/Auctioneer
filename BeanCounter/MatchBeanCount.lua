@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BeanCount.lua 2920 2008-03-17 16:21:13Z rockslice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced Matcher module that returns an undercut price 
@@ -82,29 +82,45 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local failed = 0
 	if BeanCounter and BeanCounter.Private.playerData then
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
-			success = #BeanCounter.Private.playerData["completedAuctions"][itemId]
+			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
+				success = #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
+			end
 		end
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
-			failed = #BeanCounter.Private.playerData["failedAuctions"][itemId]
+			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
+				failed = #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
+			end
 		end
 	end
 	if daterange then
 		local now = time()
 		local tempnum = 0
-		for i = 1, success do
-			local _, _, _, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][i])
-			auctime = tonumber(auctime)
-			if (now - auctime) < (numdays) then
-				tempnum = tempnum + 1
+		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
+			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
+				for i = 1, success do
+					if BeanCounter.Private.playerData["completedAuctions"][itemId][key][i] then
+						local _, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][key][i])
+						auctime = tonumber(auctime)
+						if (now - auctime) < (numdays) then
+							tempnum = tempnum + 1
+						end
+					end
+				end
 			end
 		end
 		success = tempnum
 		tempnum = 0
-		for i = 1, failed do
-			local _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][i])
-			auctime = tonumber(auctime)
-			if (now - auctime) < (numdays) then
-				tempnum = tempnum + 1
+		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
+			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
+				for i = 1, failed do
+					if BeanCounter.Private.playerData["failedAuctions"][itemId][key][i] then
+						local _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][key][i])
+						auctime = tonumber(auctime)
+						if (now - auctime) < (numdays) then
+							tempnum = tempnum + 1
+						end
+					end
+				end
 			end
 		end
 		failed = tempnum
@@ -199,4 +215,4 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Match-BeanCount/BeanCount.lua $", "$Rev: 2920 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

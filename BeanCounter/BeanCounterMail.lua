@@ -39,6 +39,12 @@ local function debugPrint(...)
         private.debugPrint("BeanCounterMail",...)
     end
 end
+local expiredLocale = AUCTION_EXPIRED_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
+local salePendingLocale = AUCTION_INVOICE_MAIL_SUBJECT:gsub("(.+)%%s", "%1") --sale pending
+local outbidLocale = AUCTION_OUTBID_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
+local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
+local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
+local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
 
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
@@ -61,20 +67,21 @@ local HideMailGUI
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if ((sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse'))) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE)) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
+			local itemLink = GetInboxItemLink(n, 1)
+			local _, _, stack, _, _ = GetInboxItem(n)
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
-			table.insert(private.inboxStart, {["n"] = n,["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft, 
+			table.insert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft, 
 					["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout, 
-					["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime
+					["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack,
 					})
 			GetInboxText(n) --read message
 		end
 	end
 	
 	if HideMailGUI == true then
-		debugPrint("MailFrame Hidden")
 		InboxCloseButton:Hide()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
@@ -83,9 +90,9 @@ function private.updateInboxStart()
 	private.mailBoxColorStart()
 end
 
-function private.getInvoice(n,sender, subject)
-	if (sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse')) then
-		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")) or (string.match( subject , _BC('MailAuctionWonSubject')..".-:.-(%w.*)")) then
+function private.getInvoice(n, sender, subject)
+	if sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE) then
+		if subject:match(successLocale) or subject:match(wonLocale) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
 			if  playerName and playerName ~= "" then
 				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
@@ -95,8 +102,6 @@ function private.getInvoice(n,sender, subject)
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no", time()
 			end
 		end
-	else
-		return 
 	end
 	return 
 end
@@ -136,7 +141,6 @@ local total = #private.inboxStart
 		end
 	end
 	if (#private.inboxStart == 0) and (HideMailGUI == true) then
-		debugPrint("MailFrame Show")
 		InboxCloseButton:Show()
 		InboxFrame:Show()
 		MailFrameTab2:Show()
@@ -151,163 +155,201 @@ local total = #private.inboxStart
 end
 
 function private.mailSort()
-	for i,v in ipairs(private.reconcilePending) do
+	for i in pairs(private.reconcilePending) do
 		--Get Age of message for timestamp 
 		local messageAgeInSeconds = math.floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
-		
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
-		 
-		--debugPrint("mail sort")
 		
-		if (private.reconcilePending[i]["sender"] == _BC('MailAllianceAuctionHouse')) or (private.reconcilePending[i]["sender"] == _BC('MailHordeAuctionHouse')) then
-			if string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..".-:.*") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
-				debugPrint("Auction successful: ", i)
-				--Get itemID from database
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")
-				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
-				if itemID then  --Get the Bid and stack size if possible
-					local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, private.reconcilePending[i]["deposit"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"]) 
-					local value = private.packString(itemLink, "Auction successful", stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
-					private.databaseAdd("completedAuctions", itemID, value)
-				end
-				table.remove(private.reconcilePending, i)
+		if private.reconcilePending[i]["sender"]:match(FACTION_ALLIANCE) or private.reconcilePending[i]["sender"]:match(FACTION_HORDE) then
+			if private.reconcilePending[i].subject:match(successLocale) and (private.reconcilePending[i].retrieved == "yes" or private.reconcilePending[i].retrieved == "failed") then
+				private.sortCompletedAuctions( i )
 				
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..".-:.*")then
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..".-:.-(%w.*)")
-				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
-				if itemID then    
-					local _, _, stackSecondary, _, _ = GetInboxItem(i)
-					debugPrint("Auction Expired",i)
-					local stack, buyout, bid, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["time"])
-					local value = private.packString(itemLink, "Auction expired", stack or stackSecondary, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
-					private.databaseAdd("failedAuctions", itemID, value)
-				end
+			elseif private.reconcilePending[i].subject:match(expiredLocale)then
+				private.sortFailedAuctions( i )
+			
+			elseif private.reconcilePending[i].subject:match(wonLocale) and (private.reconcilePending[i].retrieved == "yes" or private.reconcilePending[i].retrieved == "failed") then
+				private.sortCompletedBidsBuyouts( i )
+			
+			elseif private.reconcilePending[i].subject:match(outbidLocale) then
+				private.sortFailedBids( i )
+			
+			elseif private.reconcilePending[i].subject:match(cancelledLocale) then
+				--Need to add a filter to remove/record canceled
 				table.remove(private.reconcilePending,i)
 			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..".-:.*") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
-				
-				--debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..".-:.-(%w.*)")
-				local itemID, itemLink = private.matchDB("postedBids", itemName)
-	
-				--try to get itemID from bids, if not then buyouts. One of these DB MUST have it
-				if not itemID then itemID, itemLink = private.matchDB("postedBuyouts", itemName) end
-				
-				if itemID and itemLink then
-					debugPrint("Auction won: ", itemID)
-					--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
-					local stack = private.findStackcompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], itemName)
-					local value = private.packString(itemLink, "Auction won",stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
-					private.databaseAdd("completedBids/Buyouts", itemID, value)
-				end				
-				table.remove(private.reconcilePending,i)			
-			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject')..".-") then --OUTBIDS DO NOT have  :  in the message unlike other AH messages
-				debugPrint("Outbid on ")
-				
-				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject')..".-(%w.*)")
-				local itemID, itemLink = private.matchDB("postedBids", itemName)
-				
-				if itemID then
-					local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
-					private.databaseAdd("failedBids", itemID, value)
-				end
-				 
-				table.remove(private.reconcilePending,i)
-			--Need localization			
-			elseif string.match(private.reconcilePending[i]["subject"], "Sale Pending:.-:.*") then
-				debugPrint("Sale Pending: " )	--ignore We dont care about this message
+			elseif private.reconcilePending[i].subject:match(salePendingLocale) then
+				--ignore We dont care about this message
 				table.remove(private.reconcilePending,i)
 			else
-				debugPrint("We had an Auction mail that failed mailsort() ")
+				debugPrint("We had an Auction mail that failed mailsort()", private.reconcilePending[i].subject)
 				table.remove(private.reconcilePending,i)	
 			end	
-	
 		else --if its not AH do we care? We need to record cash arrival from other toons
-			debugPrint("OTHER", private.reconcilePending[i]["subject"])
-			table.remove(private.reconcilePending,i)
+			debugPrint("OTHER", private.reconcilePending[i].subject)
+			table.remove(private.reconcilePending, i)
 				
 		end
 	end
 end
---|cffffffff|Hitem:4238:0:0:0:0:0:0:801147302|h[Linen Bag]|h|r
 --retrieves the itemID from the DB
-function private.matchDB(key, text)
-	local itemID = BeanCounterDB["ItemIDArray"][text:lower()] --All itemID array names are stored in lowercase ALWAYS use :lower() on any query
-	if itemID and private.playerData[key][itemID] then
-		for index = #private.playerData[key][itemID] , 1, -1 do
-			if private.playerData[key][itemID][index]:find(text, 1, true) then
-				local itemLink = private.playerData[key][itemID][index]:match("(.-);")
-				debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
-				return itemID, itemLink
-			end
+function private.matchDB(text)
+	local itemID
+	for i, itemLink in pairs(BeanCounterDB.ItemIDArray) do
+		if itemLink:match("%[("..text..")%]") then 
+			itemID = string.split(":", i)
+			--debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
+			return itemID, itemLink
 		end
-		--debugPrint("Searching", key,"for" ,text, "Item Name does not match any in this database")
 	end
-	debugPrint("Searching DB for ItemID..", key, text, "Failed ItemID does not exist")
+	debugPrint("Searching DB for ItemID..", key, text, "Failed Item does not exist in the name array")
 	return nil
 end
+
+function private.sortCompletedAuctions( i )
+	--Get itemID from database
+	local itemName = private.reconcilePending[i].subject:match(successLocale.."(.*)")
+	local itemID, itemLink = private.matchDB(itemName) 
+	if itemID then  --Get the Bid and stack size if possible
+		local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, itemLink, private.reconcilePending[i].deposit, private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"])
+		if stack then
+			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+			private.databaseAdd("completedAuctions", itemID, itemLink, value)
+			debugPrint("databaseAdd completedAuctions", itemID, itemLink)
+		end
+	end
+	table.remove(private.reconcilePending, i)
+end
 --Find the stack information in postedAuctions to add into the completedAuctions DB on mail arrivial
-function private.findStackcompletedAuctions(key , itemID, soldDeposit, soldBuy, soldTime)
-	local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(soldDeposit), tonumber(soldBuy),tonumber(soldTime), tonumber(soldTime - 173900)
-	for index = #private.playerData[key][itemID] , 1, -1 do
-		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
-		local postDeposit, postBuy, postTime = tonumber(tbl2[6]), tonumber(tbl2[4]),tonumber(tbl2[7])
-		--if the deposits and buyouts match, check if time range would make this a possible match
-		if postDeposit ==  soldDeposit and postBuy == soldBuy then
-			if (soldTime > postTime) and (oldestPossible < postTime) then
-				table.remove(private.playerData[key][itemID], index) --remove the matched item From postedAuctions DB
-				if not private.playerData[key][itemID][1] then private.playerData[key][itemID] = nil end --remove itemID from postedAuctionsDB if empty
-				return tonumber(tbl2[2]), tonumber(tbl2[3])
+function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, soldBuy, soldTime)
+	if not private.playerData[key][itemID] then return end --if no keys present abort
+	
+	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
+	--ItemLink will be used minus its unique ID
+	local itemString = itemLink:match("^.*(item:.+):%d-")
+	
+	for i,v in pairs (private.playerData[key][itemID]) do
+		if i:match(itemString) or i == itemString then
+			for index, text in pairs(v) do
+				if not text:match(".*USED.*") then
+					local tbl2 = private.unpackString(private.playerData[key][itemID][i][index])
+					local postDeposit, postBuy, postTime = tonumber(tbl2[5]), tonumber(tbl2[3]),tonumber(tbl2[6])
+					--if the deposits and buyouts match, check if time range would make this a possible match
+					if postDeposit ==  soldDeposit and postBuy == soldBuy then
+						if (soldTime > postTime) and (oldestPossible < postTime) then
+							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
+							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Sold"
+							debugPrint("postedAuction removed as sold", itemID, itemLink)
+							return tonumber(tbl2[1]), tonumber(tbl2[2])
+						end
+					end
+				end
 			end
 		end
 	end
 	--return 1 if the item is nonstackable and no match was found
 	if private.getItemInfo(itemID, "stack") == 1 then return 1 end
 end
---find stack, bid and buy info for failedauctions
-function private.findStackfailedAuctions(key, itemID, expiredTime)
-	for index = #private.playerData[key][itemID], 1, -1 do
-		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
-		local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(expiredTime - (tbl2[5]*60)) --Time this message should have been posted
-		if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
-			table.remove(private.playerData[key][itemID], index) --remove the matched item From postedAuctions DB
-			if not private.playerData[key][itemID][1] then private.playerData[key][itemID] = nil end --remove itemID from postedAuctionsDB if empty
-			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
+
+function private.sortFailedAuctions( i )
+	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
+	if itemID then
+		local stack, buyout, bid, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
+		if stack then 
+			local value = private.packString(stack or stackSecondary, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
+			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
+			debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		end
 	end
-	--return 1 if the item is nonstackable and no match was found
-	if private.getItemInfo(itemID, "stack") == 1 then return 1  end
+	table.remove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
 end
---find stack information from postedBids and postedBuyouts add into the completedBids/Buyouts table
-function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
-	local buy, bid = tonumber(buy),tonumber(bid)
-	if private.playerData["postedBids"][itemID] then
-		for index = #private.playerData["postedBids"][itemID] , 1, -1 do
-			local tbl = private.unpackString(private.playerData["postedBids"][itemID][index])
-			local stack, postBid, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
-			if seller ==  postSeller and postBid == bid and itemName == tbl[1]:match(".-%[(.-)%].-") then
-				table.remove(private.playerData["postedBids"][itemID], index) --remove the matched item From postedBids DB
-				if not private.playerData["postedBids"][itemID][1] then private.playerData["postedBids"][itemID] = nil end --remove itemID from postedBidsDB if empty
-				return stack
-			end
+--find stack, bid and buy info for failedauctions
+function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, expiredTime)
+	if not private.playerData[key][itemID] then return end --if no keys present abort
+	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
+ 	for i,v in pairs (private.playerData[key][itemID]) do
+		if i:match(itemString) or i == itemString then --we still stack check and data range check but match should be assured by now
+ 			for index, text in pairs(v) do
+				if not text:match(".*USED.*") then
+					local tbl2 = private.unpackString(private.playerData[key][itemID][i][index])
+					if returnedStack == tonumber(tbl2[1]) then --stacks same see if we can match time
+						local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[6]), tonumber(expiredTime - (tbl2[4]*60)) --Time this message should have been posted
+						if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 800) then
+							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
+							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
+							debugPrint("postedAuction removed as Failed", itemID, itemLink )
+							return tbl2[1], tbl2[2], tbl2[3], tbl2[5]
+						end
+					end
+				end
+ 			end
 		end
 	end
-	if private.playerData["postedBuyouts"][itemID] then
-		for index = #private.playerData["postedBuyouts"][itemID] , 1, -1 do
-			local tbl = private.unpackString(private.playerData["postedBuyouts"][itemID][index])
-			local stack, postBuy, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
-			if seller ==  postSeller and postBuy == buy  and itemName == tbl[1]:match(".-%[(.-)%].-") then
-				table.remove(private.playerData["postedBuyouts"][itemID], index) --remove the matched item From postedBuyouts DB
-				if not private.playerData["postedBuyouts"][itemID][1] then private.playerData["postedBuyouts"][itemID] = nil end --remove itemID from postedBuyouts DB if empty
-				return stack
-			end
-		end
-	end
-	--return 1 if the item is nonstackable and no match was found
-	if private.getItemInfo(itemID, "stack") == 1 then return 1 else return 0 end
 end
 
+ --No need to reconcile, all needed data has been provided in the invoice We do need to clear entries so outbid has less to wade through
+function private.sortCompletedBidsBuyouts( i )
+	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
+	if itemID then
+		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
+		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+		private.databaseAdd("completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
+		debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
+	end
+	private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
+	table.remove(private.reconcilePending,i)		
+end
+--Used only to clear postedBid entries so failed bids is less likely to miss
+function private.findCompletedBids(itemID, seller, bid, itemLink)
+	local buy, bid = tonumber(buy),tonumber(bid)
+	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
+	debugPrint("Starting search to remove posted Bid")
+	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
+		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
+ 			if not text:match(".*USED.*") then
+				local tbl = private.unpackString(text)
+				local stack, postBid, postSeller = tonumber(tbl[1]), tonumber(tbl[2]), tbl[3]
+				if seller ==  postSeller and postBid == bid then
+					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
+					debugPrint("posted Bid removed as Won", itemString, index)
+					break
+				end
+			end
+		end
+	end
+end
+function private.sortFailedBids( i )
+	local itemName = private.reconcilePending[i].subject:match(outbidLocale.."(.*)") 
+	local itemID, itemLink = private.matchDB(itemName)
+	if itemID then
+		local value = private.packString(private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
+		private.databaseAdd("failedBids", itemID, itemLink, value)
+		debugPrint("databaseAdd failedBids", itemID, itemLink, value)
+	end
+	private.findFailedBids(itemID, itemLink, private.reconcilePending[i]["money"])
+	table.remove(private.reconcilePending,i)
+end
+function private.findFailedBids(itemID, itemLink, gold)
+	gold = tonumber(gold)
+	if not itemLink then debugPrint("Failed auction ItemStrig nil", itemID, itemLink) return end
+	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
+	
+	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
+		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
+ 			if not text:match(".*USED.*") then
+				local tbl = private.unpackString(text)
+				local postBid = tonumber(tbl[2])
+				if postBid == gold then
+					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED FAILED"
+					debugPrint("posted Bid removed as Failed", itemString, index)
+					break
+				end
+			end
+		end
+	end
+
+end
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 local inboxHookMessage = false --Stops spam of the message.
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
@@ -327,13 +369,16 @@ function private.PreTakeInboxItemHook( ignore, retVal, index)
 	end
 end
 
+--[[
+The below code manages the mailboxes Icon color /read/unread status
 
---[[The below code manages the mailboxes Icon color /read/unread status]]--
+]]--
 function private.mailFrameClick(index)
 	if BeanCounterDB[private.realmName][private.playerName]["mailbox"][index] then
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
 	end
 end
+
 function private.mailFrameUpdate()
 --Change Icon back color if only addon read
 if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
@@ -370,7 +415,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 	end
 
 end
-
+--CHANGE THIS TO REVERSE ORDER
 local mailCurrent
 local group = {["n"] = "", ["start"] = 1, ["end"] = 1} --stores the start and end locations for a group of same name items
 function private.mailBoxColorStart()
@@ -385,7 +430,7 @@ function private.mailBoxColorStart()
 	if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {} end 
 	--Create Characters Mailbox, or resync if we get more that 5 mails out of tune
 	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+2) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
-		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
+		--debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 		for i, v in pairs(mailCurrent) do
 			BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] = v
@@ -401,16 +446,16 @@ function private.mailBoxColorStart()
 			end
 			
 			if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
-				debugPrint("group = ",group["n"], group["start"], group["end"])
+				--debugPrint("group = ",group["n"], group["start"], group["end"])
 				if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] == 2 then
-					debugPrint("This is marked read so removing ", i)
+					--debugPrint("This is marked read so removing ", i)
 					table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
 					break
 				elseif BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] < 2 then
 	--This message has not been read, so we have a sequence of messages with the same name. Need to go back recursivly till we find the "Real read" message that need removal
 					for V = group["end"], group["start"], -1 do
 						if BeanCounterDB[private.realmName][private.playerName]["mailbox"][V]["read"] == 2 then
-							debugPrint("recursive read group",group["end"] ,"--",group["start"], "found read at",V )
+							--debugPrint("recursive read group",group["end"] ,"--",group["start"], "found read at",V )
 							table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], V)
 							break
 						end
@@ -423,11 +468,11 @@ function private.mailBoxColorStart()
 		for i,v in ipairs(mailCurrent) do
 			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] then
 				if mailCurrent[i]["subject"] ~=  BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
-					debugPrint("#private.mailData < #mailCurrent adding", i, mailCurrent[i]["subject"])
+					--debugPrint("#private.mailData < #mailCurrent adding", i, mailCurrent[i]["subject"])
 					table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
 				end
 			else
-			debugPrint("need to add key ", i)
+			--debugPrint("need to add key ", i)
 				table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
 			end
 		end

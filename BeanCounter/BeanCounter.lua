@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(),
 	faction = nil,
-	version = 1.11,
+	version = 2.00,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -160,7 +160,7 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName]["failedAuctions"] = {}
 		
 		BeanCounterDB[private.realmName][private.playerName]["postedBids"] = {}
-		BeanCounterDB[private.realmName][private.playerName]["postedBuyouts"] = {}
+		--BeanCounterDB[private.realmName][private.playerName]["postedBuyouts"] = {} removed as unneccessary
 		BeanCounterDB[private.realmName][private.playerName]["completedBids/Buyouts"]  = {}
 		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
 		
@@ -272,7 +272,7 @@ function lib.externalSearch(name, settings, queryReturn, count)
 				private.searchByItemID(itemName, settings, queryReturn, count)
 			else
 				frame.searchBox:SetText(itemName)
-				private.startSearch(itemName, settings)
+				private.startSearch(itemName, settings, queryReturn, count)
 			end
 		else
 			if itemlink then
@@ -316,30 +316,36 @@ function private.unpackString(text)
 	return tbl
 end
 --Add data to DB
-function private.databaseAdd(key, itemID, value)
-	if private.playerData[key][itemID] then
-		table.insert(private.playerData[key][itemID], value)
+function private.databaseAdd(key, itemID, itemLink, value)
+	if not key or not itemID or not itemLink or not value then print("database add error: Missing required data") print("Database", key, "itemID", itemID, "itemLink", itemLink, "Data", data) return end
+	local itemString, suffix = itemLink:match("^|c%x+|H(item:%d+.+:(.-):.+)|h%[.+%].-")
+	if private.playerData[key][itemID] then --if ltemID exsists
+		if private.playerData[key][itemID][itemString] then
+			table.insert(private.playerData[key][itemID][itemString], value)
+		else
+			private.playerData[key][itemID][itemString] = {value}
+		end
 	else
-		private.playerData[key][itemID]={value}
+		private.playerData[key][itemID]={[itemString] = {value}}
 	end
 	--Insert into the ItemName:ItemID dictionary array
-	local name = value:match("^|c%x+|H.+|h%[(.+)%].-;.*")
-	if name and itemID then BeanCounterDB["ItemIDArray"][name:lower()] = itemID end
+	if itemID and suffix and itemLink then
+		--debugPrint("Added to name array", itemID, suffix, itemLink)
+		BeanCounterDB["ItemIDArray"][itemID..":"..suffix] =  itemLink
+	end
 end
 --remove item (for pending bids only atm)
-function private.databaseRemove(key, itemID, ITEM, NAME, COUNT)
+function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 	if key == "postedBids" then
-		for i,v in pairs(private.playerData[key][itemID]) do
-			local tbl = private.unpackString(v)
-			if tbl and itemID and ITEM and NAME then
-				if tbl[1] == ITEM and tbl[4] == NAME and tonumber(tbl[2]) == COUNT then
-					debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
-					if (#private.playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value
-						private.playerData[key][itemID] = nil
-						break
-					else
-						table.remove(private.playerData[key][itemID],i)--Just remove the key
-						break
+	local itemString, suffix = itemLink:match("^|c%x+|H(item:%d+.+:(.-):.+)|h%[.+%].-")
+		if private.playerData[key][itemID] and private.playerData[key][itemID][itemString] then
+			for i, v in pairs(private.playerData[key][itemID][itemString]) do
+				local tbl = private.unpackString(v)
+				if tbl and itemID  and NAME then
+					if tbl[3] == NAME and tonumber(tbl[1]) == COUNT then
+						debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
+						table.remove(private.playerData[key][itemID][itemString], i)--Just remove the key
+							break
 					end
 				end
 			end
@@ -366,27 +372,31 @@ local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSub
 end
 --Recreate/refresh ItemIName to ItemID array
 function private.refreshItemIDArray()
-	for player, v in pairs(private.serverData)do
+	--[[for player, v in pairs(private.serverData)do
 		for DB,data in pairs(private.serverData[player]) do
-			if type(data) == "table" then
+			if DB ~= "mailbox" and type(data) == "table" then
 				for itemID, value in pairs(data) do
-					for index, text in ipairs(value) do
-						local item = text:match("^|c%x+|H.+|h%[(.+)%].-;.*")
-						if item then
-							BeanCounterDB["ItemIDArray"][item:lower()] = itemID
+					for itemString, text in pairs(value) do
+						local key, suffix = itemString:match("^item:(%d-):.+:(.+):.-")
+						if not BeanCounterDB["ItemIDArray"][key..":"..suffix] then
+							local _, itemLink = private.getItemInfo(itemString, "itemid")
+							if itemLink then
+								print("Added to array, missing value",  itemLink)
+								BeanCounterDB["ItemIDArray"][key..":"..suffix] = itemLink
+							end
 						end
 					end
 				end
 			end
 		end
-	end
+	end]]
 end
 --Prune Old keys from postedXXXX tables
 --First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
 function private.prunePostedDB()
-	for player, v in pairs(private.serverData)do
+	--[[for player, v in pairs(private.serverData)do
 		for DB,data in pairs(private.serverData[player]) do
-			if  DB == "postedBids" or DB == "postedAuctions" or DB == "postedBuyouts"  then
+			if  DB == "postedBids" or DB == "postedAuctions"  then
 				for itemID, value in pairs(data) do
 					if private.serverData[player][DB][itemID][1] then
 						local tbl = private.unpackString(private.serverData[player][DB][itemID][1])
@@ -407,7 +417,7 @@ function private.prunePostedDB()
 				end
 			end
 		end
-	end
+	end]]
 end
 
 function private.debugPrint(...)

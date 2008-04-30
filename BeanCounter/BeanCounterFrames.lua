@@ -459,29 +459,42 @@ function private.CreateFrames()
 	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		tbl = {}
-		if settings.exact and  frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
-			if BeanCounterDB["ItemIDArray"][itemName:lower()] then 
-				table.insert(tbl, BeanCounterDB["ItemIDArray"][itemName:lower()])
-			end
-		else
-			for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
-				if i:lower():find(itemName:lower(), 1, true)  then
-					--Create a list of itemIDs that match the search text
-					tbl[v] = v --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
+		for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
+			if itemLink:lower():find(itemName:lower(), 1, true)  then
+				if settings.exact and frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
+					local name = itemLink:match("^|c%x+|H.+|h%[(.+)%].*") or "failed name"
+					if itemName:lower() == name:lower() then
+						local itemID = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+						tbl[itemID] = itemID --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
+						break
+					end
+				else
+					local itemID = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+					tbl[itemID] = itemID --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
 				end
 			end
 		end
+		
 		if queryReturn then --need to return the ItemID results to calling function
 			return(private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName))
 		else
-			itemTexture = select(2, private.getItemInfo(BeanCounterDB["ItemIDArray"][itemName:lower()] or 0, "name"))
-			private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName) 
+			--get the itemTexture for display in the drop box
+			for i, itemLink in pairs(BeanCounterDB.ItemIDArray) do
+				if itemLink:lower():match("%[("..itemName:lower()..")%]")then
+					itemTexture = select(2, private.getItemInfo(itemLink, "name"))
+					break
+				end
+			end
+			private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName)
 		end
 	end
 	
-	function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic) 
-		if not id then return end
-		if not settings then settings = frame.getCheckboxSettings() end
+	function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic)
+	
+	if not id then return end
+	if not settings then settings = frame.getCheckboxSettings() end
+	if not count then count = 500 end --count determines how many results we show or display High # ~to display all
+	
 		tbl = {}
 		if type(id) == "table" then --we can search for a silng itemID or an array of itemIDs
 			for i,v in pairs(id)do
@@ -490,16 +503,19 @@ function private.CreateFrames()
 		else
 			tbl[1] = tostring(id)
 		end
-		if not count then count = 500 end --count determines how many results we show or display High # ~to display all
+
 		data = {}
 		style = {}
-		temp = {}
-		temp.completedAuctions = {}
-		temp["completedBids/Buyouts"] = {}
-		temp.failedAuctions = {}
-		temp.failedBids = {}
+		data.temp = {}
+		data.temp.completedAuctions = {}
+		data.temp["completedBids/Buyouts"] = {}
+		data.temp.failedAuctions = {}
+		data.temp.failedBids = {}
+		
 		debugPrint(id, settings, queryReturn, count, itemTexture)
+		
 		--Retrives all matching results
+		local link
 		for i in pairs(private.serverData) do
 			if settings.selectbox[2] == "alliance" and private.serverData[i]["faction"] and private.serverData[i]["faction"]:lower() ~= settings.selectbox[2] then
 				--If looking for alliance and player is not alliance fall into this null
@@ -511,92 +527,106 @@ function private.CreateFrames()
 			else
 				for _, id in pairs(tbl) do
 					if settings.auction and private.serverData[i]["completedAuctions"][id] then
-						for index,text in ipairs(private.serverData[i]["completedAuctions"][id]) do
-							table.insert(temp.completedAuctions, {i, id, text})
+						for index, itemKey in pairs(private.serverData[i]["completedAuctions"][id]) do
+							for _, text in ipairs(itemKey) do
+								table.insert(data.temp.completedAuctions, {i, id, index,text})
+							end
 						end
 					end
 					if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
-						for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
-							table.insert(temp["failedAuctions"], {i, id, text})
+						for index, itemKey in pairs(private.serverData[i]["failedAuctions"][id]) do
+							for _, text in ipairs(itemKey) do
+								table.insert(data.temp["failedAuctions"], {i, id, index,text})
+							end
+							
 						end
 					end
 					if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
-						for index,text in ipairs(private.serverData[i]["completedBids/Buyouts"][id]) do
-							table.insert(temp["completedBids/Buyouts"],{ i, id, text})
+						for index, itemKey in pairs(private.serverData[i]["completedBids/Buyouts"][id]) do
+							for _, text in ipairs(itemKey) do
+								table.insert(data.temp["completedBids/Buyouts"], {i, id, index,text})
+							end
+							
 						end
 					end
 					if settings.failedbid and private.serverData[i]["failedBids"][id] then
-						for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
-							table.insert(temp.failedBids, {i, id, text})
+						for index, itemKey in pairs(private.serverData[i]["failedBids"][id]) do
+							for _, text in ipairs(itemKey) do
+								table.insert(data.temp.failedBids, {i, id, index,text})
+							end
+							
 						end
 					end
 				end
 			end
 		end
 		--reduce results to the latest XXXX ammount based on how many user wants returned or displayed
-		if #temp.completedAuctions > count then
-			temp.completedAuctions = private.reduceSize(temp.completedAuctions, count)
+		if #data.temp.completedAuctions > count then
+			data.temp.completedAuctions = private.reduceSize(data.temp.completedAuctions, count)
 		end
-		if #temp.failedAuctions > count then
-			temp.failedAuctions = private.reduceSize(temp.failedAuctions, count)
+		if #data.temp.failedAuctions > count then
+			data.temp.failedAuctions = private.reduceSize(data.temp.failedAuctions, count)
 		end
-		if #temp["completedBids/Buyouts"] > count then
-			temp["completedBids/Buyouts"] = private.reduceSize(temp["completedBids/Buyouts"], count)
+		if #data.temp["completedBids/Buyouts"] > count then
+			data.temp["completedBids/Buyouts"] = private.reduceSize(data.temp["completedBids/Buyouts"], count)
 		end
-		if #temp.failedBids > count then
-			temp.failedBids = private.reduceSize(temp.failedBids, count)
+		if #data.temp.failedBids > count then
+			data.temp.failedBids = private.reduceSize(data.temp.failedBids, count)
 		end
 		
 		--Return Data as raw if requesting addon wants un-formated data --FAST
 		if queryReturn == "none" then
-			for i,v in pairs(temp)do
+			for i,v in pairs(data.temp)do
 				for a,b in pairs(v)do
-					b[4], b[5] = b[3]:match(".-;(.-);.*;(.-);") --Makes the time stamp more accesable so addon can sort easier
+					b[5] = b[4]:match(".*;(.-);") --Makes the time stamp more accesable so addon can sort easier
 				end
 			end
-			return temp
+			return data.temp
 		end
 		--Format Data for display via scroll frame or if requesting addon wants formated data  --SLOW
 		local dateString = private.getOption("dateString") or "%c"
-		for i,v in pairs(temp.completedAuctions) do
-			table.insert(data, private.COMPLETEDAUCTIONS(v[1], v[2], v[3]))
-			style[#data] = {}
-			style[#data][12] = {["date"] = dateString}	
-			style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
-			style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+		for i,v in pairs(data.temp.completedAuctions) do
+			table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4]))
+			if not queryReturn then --do not create style tables if this data is being returned to an addon
+				style[#data] = {}
+				style[#data][12] = {["date"] = dateString}
+				style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
+				style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+			end
 		end
-		for i,v in pairs(temp.failedAuctions) do
-			table.insert(data, private.FAILEDAUCTIONS(v[1], v[2], v[3]))
-			style[#data] = {}
-			style[#data][12] = {["date"] = dateString}	
-			style[#data][2] = {["textColor"] = {1,0,0}}
-			style[#data][8] ={["textColor"] = {1,0,0}}
+		for i,v in pairs(data.temp.failedAuctions) do
+			table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
+			if not queryReturn then
+				style[#data] = {}
+				style[#data][12] = {["date"] = dateString}
+				style[#data][2] = {["textColor"] = {1,0,0}}
+				style[#data][8] ={["textColor"] = {1,0,0}}
+			end
 		end
-		for i,v in pairs(temp["completedBids/Buyouts"]) do
-			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[1], v[2], v[3]))
-			style[#data] = {}
-			style[#data][12] = {["date"] = dateString}	
-			style[#data][2] = {["textColor"] = {1,1,0}}
-			style[#data][8] ={["textColor"] = {1,1,0}}
+		for i,v in pairs(data.temp["completedBids/Buyouts"]) do
+			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
+			if not queryReturn then
+				style[#data] = {}
+				style[#data][12] = {["date"] = dateString}
+				style[#data][2] = {["textColor"] = {1,1,0}}
+				style[#data][8] ={["textColor"] = {1,1,0}}
+			end
 		end
-		for i,v in pairs(temp.failedBids) do
-			table.insert(data, private.FAILEDBIDS(v[1], v[2], v[3]))
-			style[#data] = {}
-			style[#data][12] = {["date"] = dateString}	
-			style[#data][2] = {["textColor"] = {1,1,1}}
-			style[#data][8] ={["textColor"] = {1,1,1}}
-			
+		for i,v in pairs(data.temp.failedBids) do
+			table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
+			if not queryReturn then
+				style[#data] = {}
+				style[#data][12] = {["date"] = dateString}
+				style[#data][2] = {["textColor"] = {1,1,1}}
+				style[#data][8] ={["textColor"] = {1,1,1}}
+			end
 		end
+		
 		--BC CLASSIC DATA SEARCH Only usable when a plain text search is used
 		if settings.classic and classic and not tonumber(classic)then
 			data, style = private.classicSearch(data, style, classic, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-			if not itemTexture and id[1] then --set search box itemTexture if possible
-				itemTexture = select(2, private.getItemInfo(id[1], "name"))
-			end				
-			frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
-			
 			frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
 			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
@@ -609,108 +639,121 @@ function private.CreateFrames()
 			return(data)
 		end
 	end
-	
-	function private.reduceSize(fin, count)
-		tbl = {}
+	function private.reduceSize(tbl, count)
 		--The data provided is from multiple toons tables, so we need to resort the merged data back into sequential time order
-		table.sort(fin, function(a,b) return a[3]:match(".-;.-;.*;(.-);") > b[3]:match(".-;.-;.*;(.-);") end)
-		
+		table.sort(tbl, function(a,b) return a[4]:match(".*;(%d+);.-") > b[4]:match(".*;(%d+);.-") end)
+		tbl.sort = {}
 		for i = 1, count do
-			table.insert(tbl, fin[i])
+			table.insert(tbl.sort, tbl[i])
 		end
-		return tbl
+		return tbl.sort
 	end
 
-	--To simplify having two seperate search routines, the Data creation of each table has been made a local function so both searches can use it. 
-		function private.COMPLETEDAUCTIONS(player, id, text) --this passes the player, itemID and text as string or as an already seperated table
+	--To simplify having two seperate search routines, the Data creation of each table has been made a local function
+		function private.COMPLETEDAUCTIONS(id, itemKey, text) --this passes the player, itemID and text as string or as an already seperated table
 				tbl = text
-				if type(text) == "string" then tbl= private.unpackString(text) end
+				if type(text) == "string" then tbl = private.unpackString(text) end
 			
 				local pricePer = 0
-				local stack = tonumber(tbl[3]) or 0
-				if stack > 0 then pricePer =  (tbl[4]-tbl[5]+tbl[6])/stack end
-	
+				local stack = tonumber(tbl[1]) or 0
+				if stack > 0 then pricePer =  (tbl[2]-tbl[3]+tbl[4])/stack end
+								
+				local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
+				local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+				if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
+				
 				return({
-					tbl[1], --itemname
+					itemLink or "Failed to get Link", --itemname
 					_BC('UiAucSuccessful'), --status
 					 
-					tonumber(tbl[8]) or 0,  --bid
-					tonumber(tbl[7]) or 0,  --buyout
-					tonumber(tbl[4]), --Profit,
+					tonumber(tbl[6]) or 0,  --bid
+					tonumber(tbl[5]) or 0,  --buyout
+					tonumber(tbl[2]), --Profit,
 					tonumber(stack),  --stacksize
 					tonumber(pricePer), --Profit/per
 
-					tbl[9], -- "-",  --seller/seller
+					tbl[7],  --seller/seller
 
-					tonumber(tbl[5]), --deposit
-					tonumber(tbl[6]), --fee
-					tonumber(tbl[11]) or 0, --current wealth
-					tbl[10], --time, --Make this a user choosable option.
+					tonumber(tbl[3]), --deposit
+					tonumber(tbl[4]), --fee
+					tonumber(tbl[9]) or 0, --current wealth
+					tbl[8], --time, --Make this a user choosable option.
 				})
 		end
-		--"|cffffffff|Hitem:32381:0:0:0:0:0:0:0|h[Schematic: Fused Wiring]|h|r;     Auction expired;   0;   new4BUY;  new5BID ; new6DEPOSIT ;  1194214443;     15881251"
-		function private.FAILEDAUCTIONS(player, id, text)
+		--STACK; BUY; BID; DEPOSIT; TIME; DATE; WEALTH
+		function private.FAILEDAUCTIONS(id, itemKey, text)
 				tbl = text
 				if type(text) == "string" then tbl = private.unpackString(text) end
 				
+				local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
+				local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+				if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
+				
 				return({
-					tbl[1], --itemname
+					itemLink, --itemname
 					_BC('UiAucExpired'), --status
 
-					tonumber(tbl[5]) or 0, --bid
-					tonumber(tbl[4]) or 0, --buyout
+					tonumber(tbl[3]) or 0, --bid
+					tonumber(tbl[2]) or 0, --buyout
 					0, --money,
-					tonumber(tbl[3]) or 0,
+					tonumber(tbl[1]) or 0,
 					0, --Profit/per
 
-					"-",  --seller/buyer
+					"...",  --seller/buyer
 
-					tonumber(tbl[6]) or 0, --deposit
+					tonumber(tbl[4]) or 0, --deposit
 					0, --fee
-					tonumber(tbl[8]) or 0, --current wealth
-					tbl[7], --time,
+					tonumber(tbl[6]) or 0, --current wealth
+					tbl[5], --time,
 				})
 		end
-		function private.COMPLETEDBIDSBUYOUTS(player, id, text)
+		function private.COMPLETEDBIDSBUYOUTS(id, itemKey, text)
 				tbl = text
 				if type(text) == "string" then tbl= private.unpackString(text) end
 				
-				local pricePer, stack, text = 0, tonumber(tbl[3]), _BC('UiWononBuyout')
+				local pricePer, stack, text = 0, tonumber(tbl[1]), _BC('UiWononBuyout')
 				--If the auction was won on bid change text, and adjust ProfitPer
-				if tbl[7] ~= tbl[6] then	
+				if tbl[5] ~= tbl[4] then	
 					text = _BC('UiWononBid') 
-					if stack > 0 then	pricePer = (tbl[7]-tbl[4]+tbl[5])/stack end
+					if stack > 0 then	pricePer = (tbl[5]-tbl[2]+tbl[3])/stack end
 				else --Devide by BUY price if it was won on Buy
-					if stack > 0 then	pricePer = (tbl[6]-tbl[4]+tbl[5])/stack end
+					if stack > 0 then	pricePer = (tbl[4]-tbl[2]+tbl[3])/stack end
 				end
-								
+				
+				local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
+				local itemLink =  BeanCounterDB["ItemIDArray"][key..":"..suffix]
+				if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
+				
 				return({
-					tbl[1], --itemname
-					text,--tbl[2], --status
+					itemLink, --itemname
+					text, --status
 
-					tonumber(tbl[7]), --bid
-					tonumber(tbl[6]), --buyout
+					tonumber(tbl[5]), --bid
+					tonumber(tbl[4]), --buyout
 					tonumber(0), --money,
 					tonumber(stack),  --stacksize
 					pricePer, --Profit/per
 
-					tbl[8],   --seller/buyer
+					tbl[6],   --seller/buyer
 
-					tonumber(tbl[4]), --deposit
-					tonumber(tbl[5]), --fee
-					tonumber(tbl[10]) or 0, --current wealth
-					tbl[9], --time,
+					tonumber(tbl[2]), --deposit
+					tonumber(tbl[3]), --fee
+					tonumber(tbl[8]) or 0, --current wealth
+					tbl[7], --time,
 				})
 		end
-		function private.FAILEDBIDS(player, id, text)
+		function private.FAILEDBIDS(id, itemKey, text)
 				tbl = text
 				if type(text) == "string" then tbl= private.unpackString(text) end
 
+				local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
+				local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+				if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 				return({
-					tbl[1], --itemname
-					tbl[2], --status Should already be a localized text
+					itemLink, --itemname
+					_BC('UiOutbid'), --status
 
-					tonumber(tbl[3]), --bid
+					tonumber(tbl[1]), --bid
 					0, --buyout
 					0, --money,
 					0, --stack
@@ -720,9 +763,8 @@ function private.CreateFrames()
 
 					0, --deposit
 					0, --fee
-					tonumber(tbl[5]) or 0, --current wealth
-					tbl[4], --time,
-					--tbl[6], --date
+					tonumber(tbl[3]) or 0, --current wealth
+					tbl[2], --time,
 				})
 		end
 	--Only used by classic search now	

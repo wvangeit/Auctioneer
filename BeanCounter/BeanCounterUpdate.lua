@@ -34,7 +34,7 @@ local libType = "Util"
 local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
-
+private.update = {}
 
 local function debugPrint(...) 
     if private.getOption("util.beancounter.debugUpdate") then
@@ -142,14 +142,16 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_10()
 	elseif private.playerData["version"] < 1.11 then
 		private.updateTo1_11A()
+	elseif private.playerData["version"] < 2.00 then --very new DB format
+		private.update._2_00A()
 	end	
 	
-	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
+	--[[Integrity checks of the DB after upgrades to make sure no invalid entries remain
 	if not private.getOption("util.beancounter.integrityCheckComplete") then 
 		private.integrityCheck(true) 
 	elseif not private.getOption("util.beancounter.integrityCheck") then
 		private.integrityCheck()
-	end
+	end]]
 	
 end
 
@@ -459,22 +461,6 @@ end
 				end
 			end
 		end
-		for itemID ,values in pairs(private.serverData[player]["postedBuyouts"]) do
-			--"|cff1eff00|Hitem:7475:0:0:0:0:0:1024:1250482484|h[Regal Cuffs of the Whale]|h|r;1;9484;Imyourpal;boolean true;4;1198790630;5725595", -- [1]
-			for i = #values, 1, -1 do
-				text = values[i]
-				local tbl = private.unpackString(text)
-				if #tbl ~= 8 or (complete and private.IC(tbl, "postedBuyouts")) then
-					print("BeanCounter is removing corupted entry",tbl[1],"from the postedBuyouts database")
-					if #values == 1 then
-						private.serverData[player]["postedBuyouts"][itemID] = nil
-					else
-						table.remove(private.serverData[player]["postedBuyouts"][itemID], i)
-						
-					end
-				end
-			end
-		end
 		for itemID ,values in pairs(private.serverData[player]["postedBids"]) do
 			--"|cff1eff00|Hitem:7924:248:0:0:0:0:0:1436734832|h[Mithril Scale Bracers]|h|r;1;6454;Dviyan;boolean false;4;1198790141;7968164", -- [6]
 			for i = #values, 1, -1 do
@@ -560,9 +546,8 @@ local integrity = {}
 	integrity["failedBids"] = {"string", "string", "number", "number", "number"} --5
 	integrity["failedAuctions"] = {"string", "string", "number", "number", "number", "number", "number", "number"} --8
 	integrity["postedBids"] = {"string", "number", "number", "string", "string", "number", "number", "number" } --8
-	integrity["postedBuyouts"] = {"string", "number", "number", "string", "string", "number", "number", "number" } --8
 	integrity["postedAuctions"] = {"string", "number", "number", "number", "number", "number" ,"number", "number"} --8
-function private.IC(tbl, DB)
+	function private.IC(tbl, DB)
 		for i,v in pairs(tbl) do
 			v = tonumber(v) or v
 			if type(v) ~= integrity[DB][i] then
@@ -572,5 +557,69 @@ function private.IC(tbl, DB)
 		return false
 	end
 
+--[[2.0 DATABASE UPDATES]]--
 
-
+--Creates new format itemID to itemLink/name Array
+--Recreate/refresh ItemIName to ItemID array
+function private.update._2_00A()
+	private.fixMissingItemlinks() --use these util functions before we upgrade.
+	private.fixMissingStack()
+	--start the DB migration to new format. Do Array first
+	BeanCounterDB["ItemIDArray"] = {}
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if type(data) == "table" then
+				for itemID, value in pairs(data) do
+					for index, text in ipairs(value) do
+						local link , key, suffix = text:match("^(|c%x+|Hitem:(%d+).+:(%d+):%d+|h%[.+%].-);.*")
+						if key and suffix and link then
+							BeanCounterDB["ItemIDArray"][key..":"..suffix] = link
+						end
+					end
+				end
+			end
+		end
+	end
+	private.update._2_00B()
+end
+function private.update._2_00B()
+	for player, v in pairs(private.serverData)do
+		private.serverData[player]["postedBuyouts"] = nil --no longer needed in new DB
+		for DB,data in pairs(private.serverData[player]) do
+			if DB == "postedBids" or DB == "postedAuctions" or DB == "completedAuctions"  or DB == "failedAuctions" or DB == "completedBids/Buyouts" or DB == "failedBids" or DB == "vendorsell" or DB == "vendorbuy" then
+				for itemID, values in pairs(data) do
+					for index, text in ipairs(values) do --use ipairs so we do not see new array additions
+						local itemKey = text:match("^|c%x+|H(.+)|h%[.+%].-;.*") --extract the itemstring
+						text = private.update._2_00D(text) --remove reason text(s)
+						if player and DB and itemID and itemKey and text then
+							private.update._2_00C(player, DB, itemID, itemKey, text) --send data back to DB to be "re-added" in new format
+							private.serverData[player][DB][itemID][index] = nil --remove old entry after conversion
+						end
+					end
+				end
+			end
+		end
+		private.serverData[player]["version"] = 2.0
+	end
+end
+--2.0 updgrade utility functions
+function private.update._2_00D(text)
+	text = text:gsub("^(|c%x+|H.+|h%[.+%].-;)","",1) --remove itemLink
+	text = text:gsub("^Auction won;","",1)
+	text = text:gsub("^Auction successful;","",1)
+	text = text:gsub("^Auction failed;","",1)
+	text = text:gsub("^Auction expired;","",1)
+	text = text:gsub("^Outbid;","",1)
+	return text
+end
+function private.update._2_00C(player, key, itemID, itemLink, value)
+	if private.serverData[player][key][itemID] then --if ltemID exsists
+		if private.serverData[player][key][itemID][itemLink] then
+			table.insert(private.serverData[player][key][itemID][itemLink], value)
+		else
+			private.serverData[player][key][itemID][itemLink] = {value}
+		end
+	else
+		private.serverData[player][key][itemID]={[itemLink] = {value}}
+	end
+end

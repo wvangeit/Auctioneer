@@ -130,18 +130,18 @@ function private.onBidAccepted()
 	if (bid) then
 	
 	local itemID = bid.itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
-	local text = private.packString(bid.itemLink, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), private.wealth)
+	local text = private.packString(bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), private.wealth)
 		debugPrint(bid.isBuyout, bid.isHighBidder)		
 		if (bid.isBuyout) then
 			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid
 				debugPrint('private.databaseRemove(',"postedBids", itemID, bid.name, bid.owner, bid.bid)
-				private.databaseRemove("postedBids", itemID, bid.itemLink, bid.owner, bid.count)
+				private.databaseRemove("postedBids", itemID, bid.itemLink, bid.owner, bid.count) --remove old entry
+				--private.databaseAdd("postedBids", itemID, bid.itemLink, text) --replace with new entry
+				--Why replace the entry? It is only a placeholder and will be matched and removed. Just dont record it
 			end	
-			private.databaseAdd("postedBuyouts", itemID, text) 
 		else
-		
 		debugPrint('private.databaseAdd(pendingBids',itemID, text)
-		private.databaseAdd("postedBids", itemID, text)
+		private.databaseAdd("postedBids", itemID, bid.itemLink, text)
 		end
 	end
 end
