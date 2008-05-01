@@ -66,9 +66,21 @@ function lib.GetPrice(hyperlink, faction, realm)
         for i,v in pairs(tbl) do
             -- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
             -- true price per = (net+fee-deposit)/Qty
+--1 [Void Crystal]
+--2 Won on Buyout
+--3 1650000
+--4 1650000
+--5 0
+--6 20
+--7 82500
+--8 Yyzer
+--9 0
+--10 0
+--11 10387318
+--12 1198401769
             local reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
             thistime = tonumber(thistime)
-            if priceper>0 and qty>0 then
+            if priceper and qty and priceper>0 and qty>0 then
                 if reason == "Won on Buyout" or reason == "Won on Bid" then
                     boughtqty = boughtqty + qty
                     bought = bought + priceper*qty
@@ -104,7 +116,7 @@ function lib.GetPrice(hyperlink, faction, realm)
         if soldqty7>0 then sold7 = sold7 / soldqty7 end
     end
     cache[hyperlink] = {bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
-    if not sold or sold==0 then cache[hyperlink]={}; return end
+    if (not sold or sold==0) and (not bought or bought==0) then cache[hyperlink]={}; return end
     return bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
@@ -191,7 +203,6 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	
 	local bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
-    
     if (boughtseen+soldseen>0) then
 		EnhTooltip.AddLine(libName.." prices:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
