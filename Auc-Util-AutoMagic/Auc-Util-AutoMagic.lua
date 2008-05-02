@@ -43,7 +43,7 @@ local autosell = {}
 local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 autoSellList ={}
 autoSellIgnoreList = {}
-depositCostList = {}
+depositCostList = nil
 
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats
@@ -187,11 +187,12 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 		local aimethod, aivalue = lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
 		EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
 	end
-	if (AuctionFrame and AuctionFrame:IsVisible()) then
-		lib.getDepCosts(hyperlink)
-	end
+	--if (AuctionFrame and AuctionFrame:IsVisible()) then
+		
+	--end
 	if not (get("util.automagic.depositTT")) then 
-		local ttdepcost
+	lib.getDepCosts(hyperlink, quantity)
+	--[[	local ttdepcost
 		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 		if depositCostList[itemid] then 
@@ -200,13 +201,9 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 					ttdepcost = v * quantity
 				end
 			end
-		end
+		end]]
 			
-		if (ttdepcost == 0 or ttdepcost == nil) then 	
-			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
-		else
-			EnhTooltip.AddLine("|cffCCFF99".." Deposit x"..quantity.. " (24h) ".. "|r" , ttdepcost)
-		end
+
 	end
 end
 
@@ -325,32 +322,17 @@ function lib.merchantClosed()
 	--Place holder: Is fired when the merchant window is closed.
 end
 
-function lib.getDepCosts(hyperlink) --We store our dep cost in 24hour format ------> /2 for 12 or *2 for 48
+function lib.getDepCosts(hyperlink, quantity, name) --We store our dep cost in 24hour format ------> /2 for 12 or *2 for 48
 	if hyperlink then
-		local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
-		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-		local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, "1") 
-		if not (ttdepcost == nil or ttdepcost == 0) then
+		local ttdepcost = GetDepositCost(hyperlink, quantity) 
+		
+		if (ttdepcost == nil) then 	
+			EnhTooltip.AddLine("|cff336699 Unknown deposit cost |r")
+		elseif (ttdepcost == 0) then 	
+			EnhTooltip.AddLine("|cff336699 No deposit cost |r")				
+		else 
 			ttdepcost = ttdepcost * 2
-			local storedep = ttdepcost
-			depositCostList[itemid] = storedep
-		end
-	else
-		for bag=0,4 do
-			for slot=1,GetContainerNumSlots(bag) do
-				if (GetContainerItemLink(bag,slot)) then
-					local _,itemCount = GetContainerItemInfo(bag,slot)
-					local itemLink = GetContainerItemLink(bag,slot)
-					if (itemLink == nil) then return end
-					local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(itemLink)  -- lType, id, suffix, factor, enchant, seed
-					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-					local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, "1") 
-					if not (ttdepcost == nil or ttdepcost == 0) then
-						local storedep = ttdepcost * 2
-						depositCostList[itemid] = storedep
-					end
-				end
-			end
+			EnhTooltip.AddLine("|cffCCFF99".." Deposit  (24h) ".. "|r" , ttdepcost)
 		end
 	end
 end
