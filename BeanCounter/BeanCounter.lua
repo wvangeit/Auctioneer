@@ -244,47 +244,11 @@ end
 --External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
 --Can be item Name or link or itemID 
 --If itemID or link search will be much faster than a plain text lookup
-local lastSearchRequest = {}
 function lib.externalSearch(name, settings, queryReturn, count)
-	if private.getOption("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
-		if lastSearchRequest[name] then 
-			lastSearchRequest[name] = lastSearchRequest[name] + 1
-			if lastSearchRequest[name] > 2 then return {} end  --We will only respond to 3 search requests for the same item before ignoring those requests.
-		else
-			lastSearchRequest = {}
-			lastSearchRequest[name] = 0
-		end
-		local frame = private.frame
-		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
-		local itemName, itemlink = private.getItemInfo(name, "itemid")
-		if not itemlink then itemName, itemlink = tostring(name) end
-		
-		if not settings then
-			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 
-						["bid"] = true, ["outbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = true,
-						["failedauction"] = frame.auctionFailedCheck:GetChecked() 
-						}
-		end
-		if not queryReturn then 
-			if itemlink then
-				local name = itemlink:match("^|c%x+|H.+|h%[(.+)%]")
-				frame.searchBox:SetText(name)
-				private.searchByItemID(itemName, settings, queryReturn, count)
-			else
-				frame.searchBox:SetText(itemName)
-				private.startSearch(itemName, settings, queryReturn, count)
-			end
-		else
-			if itemlink then
-				return(private.searchByItemID(itemName, settings, queryReturn, count))
-			else
-				return(private.startSearch(itemName, settings, queryReturn, count))
-			end
-		end
-	--else
-		--print("Search failed: Option is ", private.getOption("util.beancounter.externalSearch"), "and last search was ", lastSearchRequest,"This search" , name)
-	end
-	
+	--print("|CFFFF3300 WARNING: |CFFFFFFFF A module just called a depreciated  Beancounter API")
+	--print(" |CFFFF3300 BeanCounter.externalSearch() ")
+	--print("Please update the module to use the function |CFFFFFF00 BeanCounter.API.search()  ")
+	return lib.API.search(name, settings, queryReturn, count) or {}
 end
 
 --will return any length arguments into a ; seperated string

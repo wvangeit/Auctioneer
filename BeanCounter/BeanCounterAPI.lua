@@ -36,6 +36,56 @@ local private = lib.Private
 local print =  BeanCounter.Print
 local _BC = private.localizations
 
+local function debugPrint(...) 
+    if private.getOption("util.beancounter.debugAPI") then
+        private.debugPrint("BeanCounterAPI",...)
+    end
+end
+--[[External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
+Can be item Name or link or itemID 
+If itemID or link search will be faster than a plain text lookup
+]]
+local SearchRequest = {}
+function lib.API.search(name, settings, queryReturn, count)
+	if private.getOption("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
+		--lets create a cache of the last search
+		if SearchRequest[name] then 
+			debugPrint("Cached search results returned")
+			return(SearchRequest[1])
+		else
+			SearchRequest = {}
+			SearchRequest[name] = 0
+		end
+		
+		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
+		local itemName, itemlink = private.getItemInfo(name, "itemid")
+		if not itemlink then itemName, itemlink = tostring(name) end
+		
+		if not settings then
+			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = private.frame.classicCheck:GetChecked(), 
+						["bid"] = true, ["outbid"] = private.frame.bidFailedCheck:GetChecked(), ["auction"] = true,
+						["failedauction"] = private.frame.auctionFailedCheck:GetChecked() 
+						}
+		end
+		--search data
+		if itemlink then
+			SearchRequest[1] = private.searchByItemID(itemName, settings, queryReturn, count)
+		else
+			SearchRequest[1] = private.startSearch(itemName, settings, queryReturn, count)
+		end
+		--return data or displayItemName in select box
+		if queryReturn then 
+			return(SearchRequest[1])
+		else
+			if itemlink then
+				private.frame.searchBox:SetText(itemlink:match("^|c%x+|H.+|h%[(.+)%]"))
+			else
+				private.frame.searchBox:SetText(itemName)
+			end
+		end
+	end	
+end
+
 --[[ Returns the Sum of all AH sold vs AH buys along with the date range
 If no player name is supplied then the entire server profit will be totaled
 if no item name is provided then all items will be returned
