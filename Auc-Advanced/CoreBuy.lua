@@ -96,7 +96,7 @@ function lib.PushSearch()
 	private.CurAuction["minbid"] = private.BuyRequests[1][4]
 	private.CurAuction["buyout"] = private.BuyRequests[1][5]
 	private.CurAuction["price"] = private.BuyRequests[1][6]
-	if private.CurAuction["price"] > private.CurAuction["buyout"] then
+	if (private.CurAuction["buyout"] > 0) and (private.CurAuction["price"] > private.CurAuction["buyout"]) then
 		private.CurAuction["price"] = private.CurAuction["buyout"]
 	end
 	private.CurAuction["reason"] = private.BuyRequests[1][7]
@@ -149,7 +149,7 @@ end
 function private.PromptPurchase()
 	AucAdvanced.Scan.SetPaused(true)
 	private.Prompt:Show()
-	if private.CurAuction["price"] < private.CurAuction["buyout"] then
+	if (private.CurAuction["price"] < private.CurAuction["buyout"]) or (private.CurAuction["buyout"] == 0) then
 		private.Prompt.Text:SetText("Are you sure you want to bid on")
 	else
 		private.Prompt.Text:SetText("Are you sure you want to buyout")
