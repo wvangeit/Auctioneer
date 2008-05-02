@@ -444,9 +444,10 @@ function private.CreateFrames()
 				local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
 				local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
 				if (deposit) then
-					local rate
-					deposit, rate = AucAdvanced.Post.GetDepositAmount(frame.salebox.sig)
-					if not rate then rate = AucAdvanced.depositRate or 0.05 end
+					local rate = AucAdvanced.depositRate or 0.05
+					local newfaction
+					if rate == .25 then newfaction = "neutral" end
+					deposit = GetDepositCost(frame.salebox.link, 12, newfaction)
 				else deposit = 0 end
 
 				-- Scale up for duration > 12 hours
@@ -763,7 +764,11 @@ function private.CreateFrames()
 						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 						bidVal = lib.RoundBid(curBid * curSize)
 						buyVal = lib.RoundBuy(curBuy * curSize)
-						depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
+											
+						local rate = AucAdvanced.depositRate or 0.05
+						local newfaction
+						if rate == .25 then newfaction = "neutral" end
+						depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, curSize) * depositMult
 						
 						r,g,b=nil,nil,nil
 						if colored then
@@ -784,7 +789,12 @@ function private.CreateFrames()
 					if (curNumber == -1 and remain > 0) then
 						bidVal = lib.RoundBid(curBid * remain)
 						buyVal = lib.RoundBuy(curBuy * remain)
-						depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
+						
+						local rate = AucAdvanced.depositRate or 0.05
+						local newfaction
+						if rate == .25 then newfaction = "neutral" end
+						depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, remain) * depositMult
+						
 						frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
 						r,g,b=nil,nil,nil
@@ -811,7 +821,12 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-					depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
+					
+					local rate = AucAdvanced.depositRate or 0.05
+					local newfaction
+					if rate == .25 then newfaction = "neutral" end
+					depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, curSize) * depositMult
+					
 					r,g,b=nil,nil,nil
 					if colored then
 						r,g,b = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
@@ -853,7 +868,12 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d items"):format(curNumber))
 					bidVal = lib.RoundBid(curBid)
 					buyVal = lib.RoundBuy(curBuy)
-					local baseDeposit = AucAdvanced.Post.GetDepositAmount(sig) or 0
+					
+					local rate = AucAdvanced.depositRate or 0.05
+					local newfaction
+					if rate == .25 then newfaction = "neutral" end
+					local baseDeposit = GetDepositCost(frame.salebox.link, 12, newfaction) or 0
+					
 					depositVal = baseDeposit * depositMult
 					r,g,b=nil,nil,nil
 					if colored then
