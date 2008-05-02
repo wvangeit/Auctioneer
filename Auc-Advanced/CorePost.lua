@@ -360,91 +360,40 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 end
 
 --[[
-    GetDepositAmount(sig, [count])
-      Returns: deposit, rate, accuracy
-      Where accuracy is:
-        true = Calculated just now from the actual AH data
-        nil = Cached result from past actual AH data
-        false = Best guess deposit rate from GetSellValue() provider
-                and/or guessed AH rate based off location.
-
-       Pass it a sig, it will do it's best to determine the deposit rate
-	   for the "count" number of that item (or 1 if not supplied)
+    GetDepositAmount(sig, [count]) has been depreciated in favor of GetDepositCost(item, duration, faction, count)
+    You must pass item where item is -- itemID or "itemString" or "itemName" or "itemLink" --but faction duration(12, 24, or 48)[defaults to 24], faction("home" or "neutral")[defaults to home] 
+    and count(stacksize)[defaults to 1] are optional
 ]]
-local depositCache = {}
-function lib.GetDepositAmount(sig, count)
+
+function GetDepositCost(item, duration, faction, count)
+	-- Die if unable to complete function
+	if not item then return end
+	-- Set up function defaults if not specifically provided
+	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 	end
+	if (faction == "neutral") then faction = .75 else faction = .15 end
 	if not count then count = 1 end
-
-	local deposit, rate, sellBasis
-	local itemId = strsplit(":", sig)
-
-	if depositCache[itemId] then
-		sellBasis = depositCache[itemId]
-	end
-
-	if not (AuctionFrame and AuctionFrame:IsVisible()) then
-		if sellBasis then
-			AucAdvanced.GetFaction()
-			rate = AucAdvanced.depositRate
-			deposit = math.floor(sellBasis * rate * count)
-
-			return deposit, rate, nil
+	
+	if (GetSellValue) then
+		local gsv = GetSellValue(item)
+		local deposit
+		if gsv == nil then
+			deposit = 0
+			return deposit
 		else
-			return
+			deposit = math.floor(faction * gsv * count) * duration
+			return deposit
 		end
-	end
+	return nil end
+end
 
-	rate = GetAuctionHouseDepositRate() / 100
-	AucAdvanced.depositRate = rate
-	if sellBasis then
-		deposit = math.floor(sellBasis * rate * count)
-		return deposit, rate, nil
-	end
-
-	if not sellBasis and GetSellValue then
-		-- Check for a GetSellValue valuation
-		local sell = GetSellValue(itemId)
-		if (sell) then
-			deposit = math.floor(sell * rate * 3 * count)
-		end
-	end
-
-	-- Well, there's no cached price, we'll have to get it ourselves!
-
-	-- If there's an item on the cursor, we can't do it
-	if CursorHasItem() or SpellIsTargeting() then return deposit, rate, false end
-
-	-- Check to see if there's an item already in the AuctionSlot
-	ClickAuctionSellItemButton()
-	if (CursorHasItem()) then
-		ClickAuctionSellItemButton()
-		return deposit, rate, false
-	end
-
-	-- Ok, so find the item in our bags
-	local success, matches = pcall(lib.FindMatchesInBags, sig)
-	if success==false or #matches <= 0 then return deposit, rate, false end
-
-	-- For the best resolution, find the largest stack
-	table.sort(matches, function (a,b) return a[3] > b[3] end)
-	local match = matches[1]
-	local bag, slot, count = unpack(match)
-
-	-- Drop it in the auction slot, so we can get the per item / 12 hour deposit rate
-	PickupContainerItem(bag, slot)
-	ClickAuctionSellItemButton()
-	deposit = CalculateAuctionDeposit(720)
-	deposit = deposit / count
-	-- Take it back out of the auction slot again
-	ClickAuctionSellItemButton()
-	ClearCursor()
-
-	-- Work out the sell basis for this item and cache it
-	sellBasis = deposit / rate
-	depositCache[itemId] = sellBasis
-
-	deposit = math.floor(sellBasis * rate * count)
-	-- Return the deposit cost and the auction rate
+-- lib.GetDepositAmount(sig, count) has been depreciated please use new global GetDepositCost(item, duration, faction, count)
+function lib.GetDepositAmount(sig, count)
+	print("AucAdvanced.Post.GetDepositAmount() has been depreciated. Please use the new global function GetDepositCost(item, duration, faction, count) --where item is itemID or \"itemString\" or \"itemName\" or \"itemLink\" -- instead. note: item sig will nolonger be support.Thank you!")
+	local itemid = strsplit(":", sig)
+	local rate = AucAdvanced.depositRate
+	local newfaction
+	if rate == .25 then newfaction = "neutral" end
+	local deposit = GetDepositCost(itemid, 12, newfaction, count)
 	return deposit, rate, true
 end
 
