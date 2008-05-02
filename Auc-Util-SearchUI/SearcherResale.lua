@@ -64,7 +64,10 @@ function lib.Search(item)
 	end
 	if deposit then
 		local relistings = get("resale.adjust.listings")
-		local amount = AucAdvanced.Post.GetDepositAmount(item[Const.LINK], item[Const.COUNT])
+		local rate = AucAdvanced.depositRate or 0.05
+		local newfaction
+		if rate == .25 then newfaction = "neutral" end
+		local amount = AucAdvanced.Post.GetDepositAmount(item[Const.LINK], 12, newfaction, item[Const.COUNT])
 		if not amount then
 			amount = 0
 		else
