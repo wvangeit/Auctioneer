@@ -92,7 +92,7 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 	local brokerRate, depositRate = 0.05, 0.05
 	if (get("util.automagic.includedeposit")) then
 		local aadvdepcost = GetDepositCost(hyperlink, 24, nil, quantity) or 0
-		depcost = aadvdepcost * get("util.automagic.relisttimes")
+		local depcost = aadvdepcost * get("util.automagic.relisttimes")
 		AppraiserValue = AppraiserValue - depcost
 	end
 	if (get("util.automagic.includebrokerage")) then
