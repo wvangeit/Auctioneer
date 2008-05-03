@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Auc-Util-AutoMagic.lua 3005 2008-04-05 15:13:13Z RockSlice $
+	Revision: $Id: Mail-GUI.lua 3005 2008-04-05 15:13:13Z RockSlice $
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -77,7 +77,7 @@ function lib.makeMailGUI()
 	lib.ammailgui.loadprospect = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadprospect:SetText(("Prospect"))
 	lib.ammailgui.loadprospect:SetPoint("BOTTOMLEFT", lib.ammailgui, "BOTTOMLEFT", 12, 35)
-	lib.ammailgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
+	lib.ammailgui.loadprospect:SetScript("OnClick", lib.prospectAction)	
 		
 	lib.mguibtmrules = lib.ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguibtmrules:SetText("BTM Rule:")
@@ -91,13 +91,13 @@ function lib.makeMailGUI()
 	lib.ammailgui.loadde = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadde:SetText(("Disenchant"))
 	lib.ammailgui.loadde:SetPoint("BOTTOMLEFT", lib.ammailgui, "BOTTOMLEFT", 12, 12)
-	lib.ammailgui.loadde:SetScript("OnClick", lib.doMailDE)
+	lib.ammailgui.loadde:SetScript("OnClick", lib.disenchantAction)
 	
 	--RIGHT COLUMN
 	lib.ammailgui.loadgems = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadgems:SetText(("Gems"))
 	lib.ammailgui.loadgems:SetPoint("BOTTOMRIGHT", lib.ammailgui, "BOTTOMRIGHT", -12, 35)
-	lib.ammailgui.loadgems:SetScript("OnClick", lib.doMailGems)
+	lib.ammailgui.loadgems:SetScript("OnClick", lib.gemAction)
 	
 	lib.mguimailfor = lib.ammailgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguimailfor:SetText("Other:")
@@ -111,5 +111,6 @@ function lib.makeMailGUI()
 	lib.ammailgui.loaddemats = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loaddemats:SetText(("Chant Mats"))
 	lib.ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", lib.ammailgui, "BOTTOMRIGHT", -12, 12)
-	lib.ammailgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
+	lib.ammailgui.loaddemats:SetScript("OnClick", lib.dematAction)
 end 
+AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Mail-GUI.lua $", "$Rev: 3005 $")

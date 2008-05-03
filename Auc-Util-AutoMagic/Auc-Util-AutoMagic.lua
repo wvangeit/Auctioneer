@@ -58,15 +58,29 @@ end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 	if (get("util.automagic.enableitemsuggesttt")) then
-		local aimethod, aivalue = lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
+		local aimethod = lib.itemsuggest(hyperlink, quantity)
 		EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
 	end
 
 	if not (get("util.automagic.depositTT")) then 
-		lib.getDepCosts(hyperlink, quantity)
+		if hyperlink then
+			local ttdepcost = GetDepositCost(hyperlink, get("util.automagic.deplength"), nil, quantity) 
+			
+			if (ttdepcost == nil) then 	
+				EnhTooltip.AddLine("|cff336699 Unknown deposit cost |r")
+			elseif (ttdepcost == 0) then 	
+				EnhTooltip.AddLine("|cff336699 No deposit cost |r")				
+			else 
+				EnhTooltip.AddLine("|cffCCFF99"..get("util.automagic.deplength").."hr Deposit : |r" , ttdepcost)
+			end
+		end
 	end
 end
-
+local ahdeplength = {
+	{'12', "12 hour"},
+	{'24', "24 hour"},
+	{'48', "48 hour"},
+}
 function lib.OnLoad()
 -- Create a dummy frame for catching events
 lib.slidebar()
@@ -77,7 +91,7 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("MAIL_SHOW");
 	frame:RegisterEvent("MAIL_CLOSED");
 	frame:RegisterEvent("UI_ERROR_MESSAGE");
-	frame:RegisterEvent("AUCTION_HOUSE_SHOW");
+	--frame:RegisterEvent("AUCTION_HOUSE_SHOW");
 
 -- Sets defaults	
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -93,26 +107,28 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.ammailguiy", 100) --Used for storing mailgui location
 	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
 	default("util.automagic.enableitemsuggesttt", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-	default("util.automagic.enchantskill", 0) -- Used for item AI
-	default("util.automagic.jewelcraftskill", 0)-- Used for item AI
+	default("util.automagic.enchantskill", 375) -- Used for item AI
+	default("util.automagic.jewelcraftskill", 375)-- Used for item AI
 	default("util.automagic.vendorweight", 100)-- Used for item AI
 	default("util.automagic.auctionweight", 100)-- Used for item AI
 	default("util.automagic.prospectweight", 100)-- Used for item AI
 	default("util.automagic.disenchantweight", 100)-- Used for item AI
 	default("util.automagic.relisttimes", 1)-- Used for item AI
-	default("util.automagic.includebrokerage", 0)-- Used for item AI
-	default("util.automagic.includedeposit", 0)-- Used for item AI
+	default("util.automagic.includebrokerage", 1)-- Used for item AI
+	default("util.automagic.includedeposit", 1)-- Used for item AI
+	default("util.automagic.deplength", "24")
+	default("util.automagic.overidebtm", false) -- Item AI for mail rule instead of BTM rule.
 end
 
 	-- define what event fires what function
-	function lib.onEventDo(this, event)
-		if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 				end
-		if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 				end
-		if event == 'MAIL_SHOW' 			then lib.mailShow() 					end  
-		if event == "MAIL_CLOSED" 		then lib.mailClosed() 					end
-		if event == "UI_ERROR_MESSAGE" 	then set("util.automagic.uierrormsg", 1) 	end
-		if event == "AUCTION_HOUSE_SHOW" then lib.getDepCosts()				end
-	end
+function lib.onEventDo(this, event)
+	if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 				end
+	if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 				end
+	if event == 'MAIL_SHOW' 			then lib.mailShow() 					end  
+	if event == "MAIL_CLOSED" 		then lib.mailClosed() 					end
+	if event == "UI_ERROR_MESSAGE" 	then set("util.automagic.uierrormsg", 1) 	end
+	--if event == "AUCTION_HOUSE_SHOW" then dosomefunc()				end
+end
 
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
@@ -148,11 +164,11 @@ function lib.SetupConfigGui(gui)
 		"\n")
 		gui:AddControl(id, "Header",     0,    " GUI options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for addition mail features")
-		
+					
 		gui:AddControl(id, "Header",     0,    " Item Intellegence")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
-		
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtm", "Use ItemSuggest values instead of BTM buy rule for Mail Loader")	
 		gui:AddControl(id, "Header",     0,    " Bias (weights) adjusts your preference up or down by % of value in Item Suggest")
 		gui:AddControl(id, "Checkbox",      0, 1, "util.automagic.enableitemsuggesttt", "Display Item Suggest Tooltips")
 		gui:AddControl(id, "WideSlider",           0, 2, "util.automagic.vendorweight", 0, 200, 1, "Vendor Bias %s")
@@ -160,6 +176,7 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "WideSlider",           0, 2, "util.automagic.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
 		gui:AddControl(id, "WideSlider",           0, 2, "util.automagic.prospectweight", 0, 200, 1, "Prospect Bias %s")
 		gui:AddControl(id, "Checkbox",     0, 1, "util.automagic.includedeposit", "Include Deposit Costs?")
+		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength", "Base deposits on what length of auction.")
 		gui:AddControl(id, "WideSlider",       0, 2, "util.automagic.relisttiimes", 1, 10, 0.1, "Average # of relistings: %0.1fx")
 		gui:AddControl(id, "Checkbox",     0, 1, "util.automagic.includebrokerage", "Include AH Brokerage Costs?")
 end
@@ -167,7 +184,7 @@ end
 
 function lib.merchantShow()
 	if (get("util.automagic.autovendor")) then 
-		lib.doVendorSell()
+		lib.vendorAction()
 		if (get("util.automagic.autoclosemerchant")) then 
 			if (get("util.automagic.chatspam")) then 
 				print("AutoMagic has closed the merchant window for you, to disable you must change this options in the settings.") 
@@ -181,59 +198,7 @@ end
 function lib.merchantClosed()
 	--Place holder: Is fired when the merchant window is closed.
 end
-
-function lib.getDepCosts(hyperlink, quantity, name)
-	if hyperlink then
-		local ttdepcost = GetDepositCost(hyperlink, nil, nil, quantity) 
-		
-		if (ttdepcost == nil) then 	
-			EnhTooltip.AddLine("|cff336699 Unknown deposit cost |r")
-		elseif (ttdepcost == 0) then 	
-			EnhTooltip.AddLine("|cff336699 No deposit cost |r")				
-		else 
-			EnhTooltip.AddLine("|cffCCFF99".." Deposit  (24h) ".. "|r" , ttdepcost)
-		end
-	end
-end
 	
--- The next few functions just set the bid/list reason check for the scan function depending one why we are using it.		
-function lib.doVendorSell()
-	set("util.automagic.uierrormsg", 0)
-	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","vendor")
-	end
-end
-function lib.doMailDE()
-	set("util.automagic.uierrormsg", 0)
-	MailFrameTab_OnClick(2)
-	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","disenchant") 
-	end
-end
-function lib.doMailProspect()
-	set("util.automagic.uierrormsg", 0)
-	MailFrameTab_OnClick(2)
-	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","prospect")
-	end
-end
-
-function lib.doMailGems()
-	set("util.automagic.uierrormsg", 0)
-	MailFrameTab_OnClick(2)
-	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","gems")
-	end	
-end
-
-function lib.doMailDEMats()
-	set("util.automagic.uierrormsg", 0)
-	MailFrameTab_OnClick(2)
-	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","demats")
-	end	
-end
-
 function lib.mailShow()
 	if (get("util.automagic.showmailgui")) then 
 		lib.mailGUI()

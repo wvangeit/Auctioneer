@@ -154,107 +154,211 @@ local isDEMats =
 	[SOUL] = true,
 	[STRANGE] = true,
 }
-
-function lib.doScanAndUse(bag,bagType,amBTMRule)	
-	if (get("util.automagic.uierrormsg")) == 1 then return end   -- Return if ui error msg event is fired.
-	for slot=1,GetContainerNumSlots(bag) do
-		if (GetContainerItemLink(bag,slot)) then
-			local _,itemCount = GetContainerItemInfo(bag,slot)
-			local itemLink = GetContainerItemLink(bag,slot)
-			if (itemLink == nil) then return end
-			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 	
-			local _, itemID, _, _, _, _ = decode(itemLink)
-					
-			
-			if amBTMRule == "demats" then	
-				if (get("util.automagic.uierrormsg")) == 0 then				
-					if isDEMats[ itemID ] then
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
-						end
-						UseContainerItem(bag, slot)
-						set("util.automagic.uierrormsg", 1)
-					end
-				end
-			end
-			if amBTMRule == "gems" then
-				if (get("util.automagic.uierrormsg")) == 0 then
-					if isGem[ itemID ] then
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
-						end
-						UseContainerItem(bag, slot) 
-						set("util.automagic.uierrormsg", 1)
-					end
-				end
-			end
-			if amBTMRule == "vendor" then
-				if (get("util.automagic.uierrormsg")) == 0 then	
+function lib.vendorAction()
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+			local runstop = 0
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				print(itemLink, itemCount)
+				if (itemLink == nil) then print("nil, end")return end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				print(itemID)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				print(itemName)
+				if runstop == 0 then	
 					if autoSellList[ itemID ] then 
 						if (get("util.automagic.chatspam")) then 
 							print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
 						end
 						UseContainerItem(bag, slot)
-						set("util.automagic.uierrormsg", 1)
-					elseif (get("util.automagic.autosellgrey")) then
-						if itemRarity == 0 then
-							UseContainerItem(bag, slot)
-							set("util.automagic.uierrormsg", 1)
+						runstop = 1
+					elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
+						UseContainerItem(bag, slot)
+						runstop = 1
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has sold", itemName," due to item being grey")
+						end
+					--end
+					--[[if (get("util.automagic.overidebtm") == true and runstop == 0) then
+						local aimethod = lib.itemsuggest(itemLink, itemCount)
+						if(aimethod == "Vendor") then 
 							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has sold", itemName," due to item being grey")
+								print("AutoMagic has sold", itemName, " due to Item Suggest(Vendor)")		
 							end
-						end			
-					end 			
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end ]]
+					--elseif (BtmScan and get("util.automagic.overidebtm") == false and runstop == 0) then
+					elseif (BtmScan and runstop == 0) then
+						local bidlist = BtmScan.Settings.GetSetting("bid.list")
+						if (bidlist) then
+							local reason, bids
+							local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+							local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+							bids = bidlist[sig..":"..seed.."x"..itemCount]
+							if(bids and bids[1] and bids[1] == "vendor") then 
+								if (get("util.automagic.chatspam")) then 
+									print("AutoMagic has sold", itemName, " due to vendor btm status")		
+								end
+								UseContainerItem(bag, slot) 
+								runstop = 1
+							end 
+						end
+					end
 				end
+				
 			end
-			
-			if BtmScan then
-				if (get("util.automagic.uierrormsg")) == 0 then
-					local reason, bids
-					local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-					local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					
-					if (bidlist) then
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						
-						if amBTMRule == "vendor" then
-							if (get("util.automagic.uierrormsg")) == 0 then
-								if(bids and bids[1] and bids[1] == "vendor") then 
-									if (get("util.automagic.chatspam")) then 
-										print("AutoMagic has sold", itemName, " due to vendor btm status")		
-									end
-									UseContainerItem(bag, slot) 
-									set("util.automagic.uierrormsg", 1)
-								end 
+		end
+	end
+end
+
+function lib.disenchantAction()
+	MailFrameTab_OnClick(2)
+	local loaded = 0
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			--loaded = loaded + 1; if loaded >= 12 then return end
+			if (GetContainerItemLink(bag,slot)) then
+			local runstop = 0
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if runstop == 0 then	
+					if (get("util.automagic.overidebtm") == true and runstop == 0) then
+						local aimethod = lib.itemsuggest(itemLink, itemCount)
+						if(aimethod == "Disenchant") then 
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")		
 							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					elseif (BtmScan and get("util.automagic.overidebtm") == false and runstop == 0) then
+						local bidlist = BtmScan.Settings.GetSetting("bid.list")
+						if (bidlist) then
+							local reason, bids
+							local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+							local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+							bids = bidlist[sig..":"..seed.."x"..itemCount]
+							if(bids and bids[1] and bids[1] == "disenchant") then 
+								if (get("util.automagic.chatspam")) then 
+									print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")	
+								end
+								UseContainerItem(bag, slot) 
+								runstop = 1
+							end 
 						end
-						if amBTMRule == "disenchant" then	
-							if (get("util.automagic.uierrormsg")) == 0 then
-								if(bids and bids[1] and bids[1] == "disenchant") then 
-									if (get("util.automagic.chatspam")) then 
-										print("AutoMagic has loaded", itemName, " due to disenchant btm status")
-									end
-									UseContainerItem(bag, slot) 
-									set("util.automagic.uierrormsg", 1)
-								end 
+					end
+				end
+				
+			end
+		end
+	end
+end
+
+function lib.prospectAction()
+	MailFrameTab_OnClick(2)
+	local loaded = 0
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			--loaded = loaded + 1; if loaded >= 12 then return end
+			if (GetContainerItemLink(bag,slot)) then
+			local runstop = 0
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if runstop == 0 then	
+					if (get("util.automagic.overidebtm") == true and runstop == 0) then
+						local aimethod = lib.itemsuggest(itemLink, itemCount)
+						if(aimethod == "Prospect") then 
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")		
 							end
-						end
-						if amBTMRule == "prospect" then
-							if (get("util.automagic.uierrormsg")) == 0 then
-								if(bids and bids[1] and bids[1] == "prospect") then 
-									if (get("util.automagic.chatspam")) then 
-										print("AutoMagic has loaded", itemName, " due to prospect btm status")
-									end
-									UseContainerItem(bag, slot) 
-									set("util.automagic.uierrormsg", 1)
-								end 
-							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					elseif (BtmScan and get("util.automagic.overidebtm") == false and runstop == 0) then
+						local bidlist = BtmScan.Settings.GetSetting("bid.list")
+						if (bidlist) then
+							local reason, bids
+							local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+							local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+							bids = bidlist[sig..":"..seed.."x"..itemCount]
+							if(bids and bids[1] and bids[1] == "prospect") then 
+								if (get("util.automagic.chatspam")) then 
+									print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")	
+								end
+								UseContainerItem(bag, slot) 
+								runstop = 1
+							end 
 						end
 					end
 				end
 			end
 		end
-	set("util.automagic.uierrormsg", 0)
 	end
 end
+
+function lib.gemAction()
+	MailFrameTab_OnClick(2)
+	local loaded = 0
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+		--	loaded = loaded + 1; if loaded >= 12 then return end
+			if (GetContainerItemLink(bag,slot)) then
+			local runstop = 0
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if runstop == 0 then	
+					if runstop == 0 then
+						if isGem[ itemID ] then
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " because it is a gem!")
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					end
+				end
+			end
+		end
+	end
+end
+
+function lib.dematAction()
+	MailFrameTab_OnClick(2)
+	local loaded = 0
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+		--	local loaded = loaded + 1; if loaded >= 12 then return end
+			if (GetContainerItemLink(bag,slot)) then
+			local runstop = 0
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if runstop == 0 then	
+					if runstop == 0 then
+						if isDEMats[ itemID ] then
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					end
+				end
+			end
+		end
+	end
+end
+AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Core.lua $", "$Rev: 3005 $")

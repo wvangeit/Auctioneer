@@ -33,8 +33,9 @@ local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue
 
 
-function lib.itemsuggest(frame, name, hyperlink, quality, quantity, cost, additional)
+function lib.itemsuggest(hyperlink, quantity)
 	-- Determine Base Values
+	if (quantity == nil) then quantity = 1 end
 	VendorValue = lib.GetVendorValue(hyperlink, quantity)
 	AppraiserValue = lib.GetAppraiserValue(hyperlink, quantity)
 	
@@ -96,7 +97,7 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 		AppraiserValue = AppraiserValue - depcost
 	end
 	if (get("util.automagic.includebrokerage")) then
-		AppraiserValue = AppraiserValue + AppraiserValue * brokerRate
+		AppraiserValue = AppraiserValue - AppraiserValue * brokerRate
 	end	
 	
 return AppraiserValue end
@@ -181,3 +182,4 @@ function lib.GetVendorValue(hyperlink, quantity)
 	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
 	VendorValue = VendorValue * quantity
 return VendorValue end
+AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/itemAI.lua $", "$Rev: 3005 $")
