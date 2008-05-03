@@ -2063,14 +2063,15 @@ function private.CreateFrames()
 	frame.cancel:SetScript("OnUpdate", function()
 		local postnum = #AucAdvanced.Post.Private.postRequests
 		frame.cancel.label:SetText(tostring(postnum))
-		if postnum > 0 then
+		if (postnum > 0) and (frame.cancel:IsEnabled() == 0) then
 			frame.cancel:Enable()
 			frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
-		else
+		elseif (postnum == 0) and (frame.cancel:IsEnabled() == 1) then
 			frame.cancel:Disable()
 			frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 		end
-        -- piggyback update of auction details
+	end)
+	frame.cancel:SetScript("OnEvent", function()
         AucAdvanced.Modules.Util.Appraiser.GetOwnAuctionDetails()
 	end)
 	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
@@ -2078,7 +2079,7 @@ function private.CreateFrames()
 	frame.cancel.tex:SetPoint("BOTTOMRIGHT", frame.cancel, "BOTTOMRIGHT", -4, 2)
 	frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
 	frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
-	frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
+	frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
 	
 	frame.cancel.label = frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.cancel.label:SetPoint("LEFT", frame.cancel, "RIGHT", 5, 0)
