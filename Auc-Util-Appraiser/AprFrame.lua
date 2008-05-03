@@ -487,7 +487,6 @@ function private.CreateFrames()
 	end
 
 	function frame.InitControls()
-		if frame.salebox.config then return end
 		frame.salebox.config = true
 
 		local curDuration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".duration") or
@@ -512,6 +511,7 @@ function private.CreateFrames()
 			defStack = frame.salebox.stacksize
 		end
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
+		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
 		
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
