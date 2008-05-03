@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Mail-GUI.lua 3005 2008-04-05 15:13:13Z RockSlice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -113,4 +113,4 @@ function lib.makeMailGUI()
 	lib.ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", lib.ammailgui, "BOTTOMRIGHT", -12, 12)
 	lib.ammailgui.loaddemats:SetScript("OnClick", lib.dematAction)
 end 
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Mail-GUI.lua $", "$Rev: 3005 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: ItemAI.lua 3005 2008-04-05 15:13:13Z testlek $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -182,4 +182,4 @@ function lib.GetVendorValue(hyperlink, quantity)
 	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
 	VendorValue = VendorValue * quantity
 return VendorValue end
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/itemAI.lua $", "$Rev: 3005 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

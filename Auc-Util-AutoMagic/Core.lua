@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Core.lua 3005 2008-04-05 15:13:13Z testleK $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -361,4 +361,4 @@ function lib.dematAction()
 		end
 	end
 end
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Core.lua $", "$Rev: 3005 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
