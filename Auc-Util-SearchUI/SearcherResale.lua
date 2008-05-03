@@ -67,7 +67,7 @@ function lib.Search(item)
 		local rate = AucAdvanced.depositRate or 0.05
 		local newfaction
 		if rate == .25 then newfaction = "neutral" end
-		local amount = AucAdvanced.Post.GetDepositAmount(item[Const.LINK], 12, newfaction, item[Const.COUNT])
+		local amount = GetDepositCost(item[Const.LINK], 12, newfaction, item[Const.COUNT])
 		if not amount then
 			amount = 0
 		else
