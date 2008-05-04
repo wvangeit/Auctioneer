@@ -1677,6 +1677,13 @@ BtmScan.Prompt.Item:SetHeight(37)
 BtmScan.Prompt.Item:SetWidth(37)
 BtmScan.Prompt.Item:SetScript("OnEnter", BtmScan.PurchaseTooltip)
 BtmScan.Prompt.Item:SetScript("OnLeave", BtmScan.UndoTooltip)
+BtmScan.Prompt.Item:SetScript("OnClick", function(this,button)
+	local item = BtmScan.Prompt.item
+	if item and item.link and GetItemInfo(item.link) then
+		SetItemRef(item.link, item.link, button)
+	end
+end)
+	
 
 BtmScan.Prompt.Lines = {}
 for i = 1, 10 do
