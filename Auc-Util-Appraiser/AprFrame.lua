@@ -42,6 +42,21 @@ local frame
 
 local NUM_ITEMS = 12
 
+local function SigFromLink(link)
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	if itype=="item" then
+		if enchant ~= 0 then
+			return ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+		elseif factor ~= 0 then
+			return ("%d:%d:%d"):format(id, suffix, factor)
+		elseif suffix ~= 0 then
+			return ("%d:%d"):format(id, suffix)
+		end
+		return tostring(id)
+	end
+	-- returns nil
+end
+
 function private.CreateFrames()
 	if frame then return end
 
@@ -71,19 +86,8 @@ function private.CreateFrames()
 					end
 
 					if AucAdvanced.Post.IsAuctionable(bag, slot) or isDirect then
-						local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-						if itype == "item" then
-							local sig
-							if enchant ~= 0 then
-								sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-							elseif factor ~= 0 then
-								sig = ("%d:%d:%d"):format(id, suffix, factor)
-							elseif suffix ~= 0 then
-								sig = ("%d:%d"):format(id, suffix)
-							else
-								sig = tostring(id)
-							end
-
+						local sig = SigFromLink(link)
+						if sig then
 							local texture, itemCount, locked, special, readable = GetContainerItemInfo(bag,slot)
 							if special == -1 then special = true else special = false end
 							if not itemCount or itemCount < 0 then itemCount = 1 end
@@ -132,19 +136,8 @@ function private.CreateFrames()
 				local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", auc)
 				local link = GetAuctionItemLink("owner", auc)
 
-				local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-				if itype == "item" then
-					local sig
-					if enchant ~= 0 then
-						sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-					elseif factor ~= 0 then
-						sig = ("%d:%d:%d"):format(id, suffix, factor)
-					elseif suffix ~= 0 then
-						sig = ("%d:%d"):format(id, suffix)
-					else
-						sig = tostring(id)
-					end
-				
+				local sig = SigFromLink(link)
+				if sig then
 					local found = false
 					for i = 1, #(frame.list) do
 						if frame.list[i][1] == sig and frame.list[i].auction then
@@ -208,24 +201,44 @@ function private.CreateFrames()
 	end
 
 	private.empty = {}
-	function frame.SelectItem(obj, button)
-		if not obj.id then obj = obj:GetParent() end
-		local pos = math.floor(frame.scroller:GetValue())
-		local id = obj.id
-		pos = math.min(pos + id, #frame.list)
-		local item = frame.list[pos]
-		local sig = nil
-		if item then
-			sig = item[1] or nil
-		end
-		if button and sig == frame.selected then
-			sig = nil
-			pos = nil
+	function frame.SelectItem(obj, button, rawlink)
+		local item,sig,pos
+		
+		if obj then
+			assert(not rawlink)
+			if not obj.id then obj = obj:GetParent() end
+			pos = math.floor(frame.scroller:GetValue())
+			local id = obj.id
+			pos = math.min(pos + id, #frame.list)
+			item = frame.list[pos]
+			sig = item and item[1] or nil
+			if button and sig == frame.selected then
+				sig = nil
+				pos = nil
+			end
+		elseif rawlink then
+			sig = SigFromLink(rawlink)
+			if not sig then return end
+			for i,itm in ipairs(frame.list) do
+				if itm[1]==sig then
+					item=itm
+					pos=i
+					break
+				end
+			end
+			if not item then
+				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+					itemEquipLoc, itemTexture = GetItemInfo(rawlink)
+				local myCount = GetItemCount(rawlink)
+				item = { 
+					sig, itemName, itemTexture, itemRarity, itemStackCount, myCount, rawlink
+				}
+			end
 		end
 		frame.selected = sig
 		frame.selectedPos = pos
 		frame.selectedObj = obj
-		frame.selectedAuction = item and item.auction
+		frame.selectedPostable = item and not (item.auction or item[6]<1)
 		frame.SetScroll()
 
 		frame.salebox.sig = sig
@@ -298,17 +311,6 @@ function private.CreateFrames()
 	function frame.DirectSelect(link)
 		if frame.direct == link then return end
 		frame.direct = link
-		local sig
-		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-		if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
-		else
-			sig = tostring(id)
-		end
 		frame.GenerateList()
 		frame.GetItemByLink(link)
 		frame.GenerateList(true)
@@ -587,7 +589,7 @@ function private.CreateFrames()
 
 	function frame.UpdateControls()
 		if ( not frame.salebox.sig ) or	-- nothing selected
-		   ( frame.selectedAuction and not frame.itembox:IsShown()) -- old UI: don't show auctions
+		   ( not frame.selectedPostable and not frame.itembox:IsShown()) -- old UI: don't show auctions
 		   then
 			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
@@ -625,7 +627,7 @@ function private.CreateFrames()
 			-- new UI
 			frame.salebox.ignore:Show()
 			frame.salebox.bulk:Show()
-			if frame.selectedAuction then
+			if not frame.selectedPostable then
 				frame.salebox.number:Hide()
 				frame.salebox.stack:Hide()
 				frame.salebox.stackentry:Hide()
@@ -726,7 +728,7 @@ function private.CreateFrames()
 		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
 		
-		if not frame.selectedAuction then
+		if frame.selectedPostable then
 
 			local depositMult = curDurationMins / 720
 			local curNumber = frame.salebox.number:GetAdjustedValue()
@@ -910,7 +912,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("------------------------------"))
 				frame.manifest.lines:Add(("Note: No auctionable items"))
 			end
-		end -- if not frame.selectedAuction then
+		end -- if frame.selectedPostable then
 		
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
@@ -941,7 +943,7 @@ function private.CreateFrames()
 			canAuction = false
 		end
 		
-		if frame.selectedAuction then
+		if not frame.selectedPostable then
 			canAuction = false
 		end
 
@@ -1134,19 +1136,8 @@ function private.CreateFrames()
 	end
 
 	function frame.GetItemByLink(link)
-		local sig
-		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-		assert(itype and itype == "item", "Item must be a valid link")
-
-		if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
-		else
-			sig = tostring(id)
-		end
+		local sig = SigFromLink(link)
+		assert(sig, "Item must be a valid link")
 		for i = 1, #(frame.list) do
 			if frame.list[i] then
 				if frame.list[i][1] == sig then
@@ -1448,6 +1439,15 @@ function private.CreateFrames()
 			end
 		end
 	end
+	
+	function frame.ClickAnythingHook(link)
+		if not AucAdvanced.Settings.GetSetting("util.appraiser.clickhookany") then return end
+		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
+		if (arg1=="LeftButton" or arg3=="LeftButton") and IsAltKeyDown() then
+			frame.SelectItem(nil, nil, link)
+		end
+	end
+	
 	
 	function frame.SetScroll(...)
 		local pos = math.floor(frame.scroller:GetValue())
@@ -2582,6 +2582,9 @@ function private.CreateFrames()
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
+
+	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+	
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
