@@ -103,6 +103,7 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 return AppraiserValue end
 
 function lib.GetDisenchantValue(hyperlink, quantity)
+	if not Enchantrix then return end
 	local DisenchantValue = 0
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
@@ -130,6 +131,7 @@ function lib.GetDisenchantValue(hyperlink, quantity)
 return DisenchantValue end
 
 function lib.GetProspectValue(hyperlink, quantity)
+	if not Enchantrix then return end
 	local ProspectValue = 0
 	local prospects = Enchantrix.Storage.GetItemProspects(hyperlink)
 	local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(hyperlink)
