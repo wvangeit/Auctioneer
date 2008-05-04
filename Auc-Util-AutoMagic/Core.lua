@@ -160,12 +160,10 @@ function lib.vendorAction()
 			if (GetContainerItemLink(bag,slot)) then
 			local runstop = 0
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
-				print(itemLink, itemCount)
-				if (itemLink == nil) then print("nil, end")return end
+				if (itemLink == nil) then return end	
+				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				print(itemID)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
-				print(itemName)
 				if runstop == 0 then	
 					if autoSellList[ itemID ] then 
 						if (get("util.automagic.chatspam")) then 
