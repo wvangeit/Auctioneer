@@ -35,7 +35,7 @@ local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Converter"
 
-local vendor, pctstring
+local vendor, pctstring, value
 
 -- Set our defaults
 --Essences
@@ -404,7 +404,7 @@ function lib.Search(item)
 	local pct = get("converter.profit.pct")
 	local minprofit = get("converter.profit.min")
 	local market = value
-	local value = market * (100-pct) / 100
+	value = market * (100-pct) / 100
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
