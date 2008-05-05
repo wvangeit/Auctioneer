@@ -117,7 +117,7 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.includebrokerage", 1)-- Used for item AI
 	default("util.automagic.includedeposit", 1)-- Used for item AI
 	default("util.automagic.deplength", "24")
-	default("util.automagic.overidebtm", false) -- Item AI for mail rule instead of BTM rule.
+	default("util.automagic.overidebtmmail", false) -- Item AI for mail rule instead of BTM rule.
 end
 
 	-- define what event fires what function
@@ -168,7 +168,7 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Header",     0,    " Item Intellegence")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
 		gui:AddControl(id, "Slider",           0, 2, "util.automagic.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtm", "Use ItemSuggest values instead of BTM buy rule for Mail Loader")	
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of BTM buy rule for Mail Loader")	
 		gui:AddControl(id, "Header",     0,    " Bias (weights) adjusts your preference up or down by % of value in Item Suggest")
 		gui:AddControl(id, "Checkbox",      0, 1, "util.automagic.enableitemsuggesttt", "Display Item Suggest Tooltips")
 		gui:AddControl(id, "WideSlider",           0, 2, "util.automagic.vendorweight", 0, 200, 1, "Vendor Bias %s")
