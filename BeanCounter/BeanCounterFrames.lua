@@ -99,9 +99,8 @@ function private.AuctionUI()
 	
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
---Change parent to our GUI base frame
-
-function private.GUI(_,button)
+--Change parent to our GUI base frame/ Also used to display our Config frame
+function private.GUI(_, button)
 	if (button == "LeftButton") then
 		if private.frame:GetParent() == AuctionFrame then 
 			--BeanCounterBaseFrame:SetWidth(800)
@@ -110,7 +109,6 @@ function private.GUI(_,button)
 			private.frame:SetParent("BeanCounterBaseFrame")
 			private.frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
 			--BeanCounterBaseFrame:SetPoint("TOPLEFT", lib.Gui, "TOPLEFT")
-			
 			--private.frame:SetPoint("BOTTOMRIGHT", lib.Gui, "BOTTOMRIGHT", 0,0)
 		end
 		if not BeanCounterBaseFrame:IsVisible() then
@@ -170,8 +168,7 @@ function private.CreateFrames()
 
 	base.DragBottom:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.DragBottom:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
-	
-		
+			
 	--Launch BeanCounter GUI Config frame
 	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
 	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
@@ -195,6 +192,12 @@ function private.CreateFrames()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 		
+	--Add Configuration Button for those who dont use sidebar.
+	frame.Config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.Config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -139, -13)
+	frame.Config:SetScript("OnClick", function() private.GUI() end)
+	frame.Config:SetText("Configure")
+	
 	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
 	function frame.IconClicked()
 	local objtype, _, link = GetCursorInfo()
@@ -457,6 +460,9 @@ function private.CreateFrames()
 	local tbl = {}
 	--This is all handled by ITEMIDS need to remove/rename this to be a utility to convert text searches to itemID searches
 	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
+		--Run the compression function once per session, use first search as trigger
+		--if not private.compressed then private.refreshItemIDArray() private.compactDB() private.compressed = true end
+		
 		if not itemName then return end
 		tbl = {}
 		for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
