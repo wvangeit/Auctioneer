@@ -29,7 +29,7 @@
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
-local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop
+local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats

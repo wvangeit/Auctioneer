@@ -29,7 +29,7 @@
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
-
+local _
 ---------------------------------------------------------
 -- Mail Interface
 ---------------------------------------------------------

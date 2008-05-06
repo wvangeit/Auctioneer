@@ -30,7 +30,7 @@
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue
+local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _
 
 
 function lib.itemsuggest(hyperlink, quantity)

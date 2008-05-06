@@ -33,7 +33,7 @@ if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 --Start Module Code
-local amBTMRule, itemName, itemID
+local amBTMRule, itemName, itemID, _
 function lib.GetName()
 	return libName
 end
