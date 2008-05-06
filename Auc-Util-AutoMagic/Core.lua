@@ -160,7 +160,7 @@ function lib.vendorAction()
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
-				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
@@ -216,6 +216,7 @@ function lib.disenchantAction()
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
@@ -257,10 +258,11 @@ function lib.prospectAction()
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
-				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				runstop = 0
 				if (get("util.automagic.overidebtmmail") == true) then
 					local aimethod = lib.itemsuggest(itemLink, itemCount)
 					if(aimethod == "Prospect") then 
@@ -298,6 +300,7 @@ function lib.gemAction()
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
@@ -319,6 +322,7 @@ function lib.dematAction()
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
