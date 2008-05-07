@@ -225,7 +225,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 	
 	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
 	--ItemLink will be used minus its unique ID
-	local itemString = itemLink:match("^.*(item:.+):%d-")
+	local itemString = itemLink:match("^.*(item:.+):.-") -- ignore Unique ID
 	
 	for i,v in pairs (private.playerData[key][itemID]) do
 		if i:match(itemString) or i == itemString then
@@ -253,9 +253,9 @@ end
 function private.sortFailedAuctions( i )
 	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
 	if itemID then
-		local stack, buyout, bid, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
+		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then 
-			local value = private.packString(stack or stackSecondary, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
+			local value = private.packString(stack, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
 			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
 			debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		end
