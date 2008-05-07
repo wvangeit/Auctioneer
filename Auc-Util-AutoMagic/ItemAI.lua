@@ -103,9 +103,10 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 return AppraiserValue end
 
 function lib.GetDisenchantValue(hyperlink, quantity)
-	if not Enchantrix then return end
+	if not (Enchantrix and Enchantrix.Storage) then return end
 	local DisenchantValue = 0
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
+	if not (iQual >= 1 or iLevel == nil) then return end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
 	local market
 	
