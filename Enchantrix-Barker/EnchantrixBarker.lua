@@ -74,6 +74,8 @@ local print_order = {
 	-- print is what we print for the output
  -- TODO: check for mistakes and mis-classifications/exceptions, need high level enchanters to check output!
 local attributes = {
+
+	{ search = _BARKLOC("EnchSearchHealing"), key = "factor_stat.other", print = _BARKLOC("ShortHealing") },		-- INCORRECTLY matches spell power after Blizzard changed the strings
 	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("Crusader") },	-- incorrectly matched strength
 	{ search = _BARKLOC("EnchSearchIntellect"), key = 'factor_stat.intellect', print = _BARKLOC("INT") },
 	{ search = _BARKLOC("EnchSearchBoarSpeed"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortBoarSpeed") },		-- INCORRECTLY matches stamina?
@@ -85,7 +87,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchAgility"), key = "factor_stat.agility", print = _BARKLOC("AGI") },
 	{ search = _BARKLOC("EnchSearchFireRes"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
 	{ search = _BARKLOC("EnchSearchResFire"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
-	{ search = _BARKLOC("EnchSearchFrostRes"), key = "factor_stat.frostRes", print = _BARKLOC("FrostFes") },
+	{ search = _BARKLOC("EnchSearchFrostRes"), key = "factor_stat.frostRes", print = _BARKLOC("FrostRes") },
 	{ search = _BARKLOC("EnchSearchNatureRes"), key = "factor_stat.natureRes", print = _BARKLOC("NatureRes") },
 	{ search = _BARKLOC("EnchSearchResShadow"), key = "factor_stat.shadowRes", print = _BARKLOC("ShadowRes") },
 	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
@@ -117,7 +119,6 @@ Other possible exceptions or additions
 
 	{ search = 'damage against elementals', key = "factor_stat.other", print = "Elemental" },		-- probably safe
 	{ search = 'damage to demons', key = "factor_stat.other", print = "Demon" },					-- probably safe
-	{ search = 'healing', key = "factor_stat.other", print = "heal" },								-- probably safe
 	{ search = 'frost spells', key = "factor_stat.other", print = "frost" },						-- probably safe
 	{ search = 'frost damage', key = "factor_stat.other", print = "frost" },						-- probably safe
 	{ search = 'shadow damage', key = "factor_stat.other", print = "shadow" },						-- probably safe
@@ -961,7 +962,6 @@ function Enchantrix_CreateBarker()
 
 	for index=1, GetNumCrafts() do
 		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-
 		if ( numEnchantsAvailable > 0 ) then -- user has reagents
 
 			-- does this skill produce an enchant, or a trade good?

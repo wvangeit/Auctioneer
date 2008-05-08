@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://norganna.org/localizer/
+	http://localizer.norganna.org/
 
 	AddOn: EnchantrixBarker
 	Revision: $Id$
@@ -418,8 +418,8 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchArmor"]	= "armor";
 		["EnchSearchBattlemaster"]	= "heal nearby party members";
 		["EnchSearchBeastslayer"]	= "damage to beasts";
-		["EnchSearchBoarSpeed"]	= "movement speed increase and [0-9]+ Stamina";
-		["EnchSearchCatSwiftness"]	= "movement speed increase and [0-9]+ Agility";
+		["EnchSearchBoarSpeed"]	= "movement speed increase and [0-9]+ stamina";
+		["EnchSearchCatSwiftness"]	= "movement speed increase and [0-9]+ agility";
 		["EnchSearchCrusader"]	= "heals for [0-9]+ to [0-9]+ and increases strength";
 		["EnchSearchDamage1"]	= "points? of damage";
 		["EnchSearchDamage2"]	= "\+[0-9]+ damage";
@@ -427,6 +427,7 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchDMGAbsorption"]	= "absorption";
 		["EnchSearchFireRes"]	= "fire resistance";
 		["EnchSearchFrostRes"]	= "frost resistance";
+		["EnchSearchHealing"]	= "healing";
 		["EnchSearchHealth"]	= "health";
 		["EnchSearchIntellect"]	= "intellect";
 		["EnchSearchMana"]	= "mana";
@@ -493,6 +494,7 @@ EnchantrixBarkerLocalizations = {
 		["ShortBeastslayer"]	= "Beast";
 		["ShortBoarSpeed"]	= "Boar Speed";
 		["ShortCatSwiftness"]	= "Cat Swiftness";
+		["ShortHealing"]	= "heal";
 		["ShortHealth"]	= "health";
 		["ShortMana"]	= "mana";
 		["ShortManaPerFive"]	= "mana/5sec";
@@ -700,20 +702,108 @@ EnchantrixBarkerLocalizations = {
 		["ShowValue"]	= "evaluer";
 
 		-- Section: Game Constants
+		["AnyWeapon"]	= "toute arme";
 		["BarkerOpening"]	= "Vends enchantements :";
+		["Boots"]	= "bottes";
+		["Bracer"]	= "brassards";
+		["Chest"]	= "plastron";
+		["Cloak"]	= "cape";
+		["Darnassus"]	= "Cité de Darnassus";
+		["EnchSearchAgility"]	= "agilité";
+		["EnchSearchAllResistance1"]	= "résistance à toutes les écoles de magie";
+		["EnchSearchAllResistance2"]	= "résistances aux écoles de magie";
+		["EnchSearchAllResistance3"]	= "toutes les résistances";
+		["EnchSearchAllStats"]	= "toutes les caractéristiques";
+		["EnchSearchArmor"]	= "points d'armure";
+		["EnchSearchBattlemaster"]	= "rend au groupe entier \+[0-9]+ à \+[0-9]+ points de vie";
+		["EnchSearchBeastslayer"]	= "dégâts aux bêtes";
+		["EnchSearchBoarSpeed"]	= "vitesse de déplacement et confèrent un bonus de [0-9]+ en endurance";
+		["EnchSearchCatSwiftness"]	= "vitesse de déplacement et confèrent un bonus de [0-9]+ en agilité";
+		["EnchSearchCrusader"]	= "rend régulièrement \+[0-9]+ à \+[0-9]+ points de vie et augmente votre force";
+		["EnchSearchDamage1"]	= "\+[0-9]+ points de dégâts";
+		["EnchSearchDamage2"]	= "\+[0-9]+ dégâts";
+		["EnchSearchDefense"]	= "défense";
+		["EnchSearchDMGAbsorption"]	= "absorber \+[0-9]+ points de dégâts";
+		["EnchSearchFireRes"]	= "résistance au feu";
+		["EnchSearchFrostRes"]	= "résistance au givre";
+		["EnchSearchHealth"]	= "points de vie";
+		["EnchSearchIntellect"]	= "intelligence";
+		["EnchSearchMana"]	= "points de mana";
+		["EnchSearchManaPerFive"]	= "mana toutes les 5 secondes";
+		["EnchSearchMongoose"]	= "augmente l'agilité de \+[0-9]+ et augmente légèrement la vitesse d'attaque";
+		["EnchSearchNatureRes"]	= "résistance à la nature";
+		["EnchSearchResFire"]	= "résistance au feu";
+		["EnchSearchResShadow"]	= "résistance à l'ombre";
+		["EnchSearchSoulfrost"]	= "sorts de givre et d'ombre";
+		["EnchSearchSpellPower1"]	= "dégât des sorts";
+		["EnchSearchSpellPower2"]	= "dégâts de tous les sorts";
+		["EnchSearchSpellPower3"]	= "dégâts de sorts";
+		["EnchSearchSpellsurge"]	= "[0-9]+ points de mana à tous les membres du groupe";
+		["EnchSearchSpirit"]	= "esprit";
+		["EnchSearchStamina"]	= "endurance";
+		["EnchSearchStrength"]	= "force";
+		["EnchSearchSunfire"]	= "sorts de feu et des arcanes";
+		["EnchSearchVitality"]	= "rendent [0-9]+ de vie et de mana";
+		["Gloves"]	= "gants";
+		["Ironforge"]	= "Cité de Forgefer";
 		["OneLetterGold"]	= "po";
 		["OneLetterSilver"]	= "pa";
+		["Orgrimmar"]	= "Cité d'Orgrimmar";
+		["Ring"]	= "anneau";
+		["Shattrath"]	= "Cité de Shattrath";
+		["Shield"]	= "bouclier";
 		["ShortDarnassus"]	= "Darna";
-		["ShortIronForge"]	= "IF";
+		["ShortExodar"]	= "Exo";
+		["ShortIronForge"]	= "FF";
 		["ShortOrgrimmar"]	= "Orgri";
 		["ShortShattrath"]	= "Sha";
+		["ShortSilvermoon"]	= "SmC";
 		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
+		["ShortThunderBluff"]	= "PdT";
 		["ShortUndercity"]	= "UC";
+		["SilvermoonCity"]	= "Cité de Lune d'Argent";
+		["StormwindCity"]	= "Cité de Hurlevent";
+		["TheExodar"]	= "Cité de L'Exodar";
+		["ThunderBluff"]	= "Cité de Pitons-du-Tonnerre";
+		["TradeChannel"]	= "Commerce - Capitales";
+		["TwoHandWeapon"]	= "Arme à 2 mains";
+		["Undercity"]	= "Cité de Fossoyeuse";
+		["Weapon"]	= "Arme";
 
 		-- Section: Generic Messages
 		["BarkerLoaded"]	= "Echantrix Barker chargé...";
 		["BarkerNotTradeZone"]	= "Enchantrix Barker: Vous n'êtes pas dans une zone de commerce.";
+
+		-- Section: Generic Strings
+		["AGI"]	= "AGI";
+		["AllStats"]	= "toutes carac";
+		["Crusader"]	= "Croisé";
+		["DEF"]	= "DEF";
+		["DMG"]	= "DMG";
+		["DMGAbsorb"]	= "DMG Absorb";
+		["FireRes"]	= "rés. feu";
+		["FrostRes"]	= "rés. froid";
+		["INT"]	= "INT";
+		["NatureRes"]	= "rés. nature";
+		["ShadowRes"]	= "rés. ombre";
+		["ShortAllRes"]	= "toutes rés.";
+		["ShortArmor"]	= "armure";
+		["ShortBattlemaster"]	= "Maître de guerre";
+		["ShortBeastslayer"]	= "Bête";
+		["ShortBoarSpeed"]	= "Vitesse du sanglier";
+		["ShortCatSwiftness"]	= "Rapidité du félin";
+		["ShortHealth"]	= "vie";
+		["ShortMana"]	= "mana";
+		["ShortManaPerFive"]	= "mana/5sec";
+		["ShortMongoose"]	= "Mangouste";
+		["ShortSoulfrost"]	= "Ame de givre";
+		["ShortSpellPower"]	= "sort";
+		["ShortSpellSurge"]	= "Frappe-sort";
+		["ShortSunfire"]	= "Feu Solaire";
+		["ShortVitality"]	= "Vitalité";
+		["SPI"]	= "ESP";
+		["STA"]	= "END";
+		["STR"]	= "FOR";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prix Trader (marge : %d%%)";
@@ -726,12 +816,47 @@ EnchantrixBarkerLocalizations = {
 		["OpenBarkerWindow"]	= "Ouvre la fenêtre du Barker.";
 
 		-- Section: User Interface
+		["BarkerOptions2HWeaponPriorityTooltip"]	= "Priorité pour les enchantements d'armes à 2 mains.";
+		["BarkerOptionsAgilityPriority"]	= "Agilité";
+		["BarkerOptionsAgilityPriorityTooltip"]	= "Priorité pour les enchantements d'agilité.";
+		["BarkerOptionsAllResistances"]	= "Toutes Résistances";
+		["BarkerOptionsAllResistancesTooltip"]	= "Priorité pour les enchantements augmentant toutes les résistances.";
+		["BarkerOptionsAllStatsPriority"]	= "Toutes Caractéristiques";
+		["BarkerOptionsAllStatsPriorityTooltip"]	= "Priorité pour les enchantements augmentant toutes les caractéristiques.";
+		["BarkerOptionsAnyWeaponPriorityTooltip"]	= "Priorité pour les enchantements des armes.";
+		["BarkerOptionsArmorPriority"]	= "Armure";
+		["BarkerOptionsArmorPriorityTooltip"]	= "Priorité pour les enchantements d'armure.";
+		["BarkerOptionsBootsPriorityTooltip"]	= "Priorité pour les enchantements de bottes.";
+		["BarkerOptionsBracerPriorityTooltip"]	= "Priorité pour les enchantements de brassards.";
+		["BarkerOptionsChestPriorityTooltip"]	= "Priorité pour les enchantements de torse.";
+		["BarkerOptionsCloakPriorityTooltip"]	= "Priorité pour les enchantements de cape.";
+		["BarkerOptionsDamage"]	= "Dégâts";
+		["BarkerOptionsDamageTooltip"]	= "Priorité pour les enchantements de dégâts.";
+		["BarkerOptionsDefense"]	= "Défense";
+		["BarkerOptionsDefenseTooltip"]	= "Priorité pour les enchantements de défense.";
+		["BarkerOptionsFireResistance"]	= "Résistance au feu";
+		["BarkerOptionsFireResistanceTooltip"]	= "Priorité pour les enchantements de résistance au feu.";
+		["BarkerOptionsFrostResistance"]	= "Résistance au froid";
+		["BarkerOptionsFrostResistanceTooltip"]	= "Priorité pour les enchantements de résistance au froid.";
+		["BarkerOptionsGlovesPriorityTooltip"]	= "Priorité pour les enchantements de gants.";
+		["BarkerOptionsHealth"]	= "Vie";
+		["BarkerOptionsHealthTooltip"]	= "Priorité pour les enchantements de vie.";
 		["BarkerOptionsHighestPriceForFactorTitle"]	= "Plus haut facteur prix";
 		["BarkerOptionsHighestPriceForFactorTooltip"]	= "Les enchantements ont un score de zéro pour les priorités de prix égales ou supérieures à cette valeur";
 		["BarkerOptionsHighestProfitTitle"]	= "Bénéfice le plus élevé";
 		["BarkerOptionsHighestProfitTooltip"]	= "Le profit maximal par enchantement.";
+		["BarkerOptionsIntellectPriority"]	= "Intelligence";
+		["BarkerOptionsIntellectPriorityTooltip"]	= "Priorité pour les enchantements d'intelligence.";
+		["BarkerOptionsItemsPriority"]	= "Priorité générale pour les objets";
+		["BarkerOptionsItemsPriorityTooltip"]	= "Ceci détermine l'importance des enchantements d'objets dans la priorité générale pour la publicité.";
 		["BarkerOptionsLowestPriceTitle"]	= "Plus bas Prix";
 		["BarkerOptionsLowestPriceTooltip"]	= "Le prix minimal à annoncer par enchantement.";
+		["BarkerOptionsMana"]	= "Mana";
+		["BarkerOptionsManaTooltip"]	= "Priorité pour les enchantements de mana.";
+		["BarkerOptionsNatureResistance"]	= "Résistance à la nature";
+		["BarkerOptionsNatureResistanceTooltip"]	= "Priorité pour les enchantements de résistance à la nature.";
+		["BarkerOptionsOther"]	= "Autre";
+		["BarkerOptionsOtherTooltip"]	= "Priorité pour les enchantements de dépeuçage, minage, etc.";
 		["BarkerOptionsPricePriorityTitle"]	= "Priorité de prix générale";
 		["BarkerOptionsPricePriorityTooltip"]	= "Spécifie l'importance du prix lors des annonces.";
 		["BarkerOptionsPriceSweetspotTitle"]	= "Sweetspot pour le facteur prix";
@@ -740,6 +865,18 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsProfitMarginTooltip"]	= "Le pourcentage de bénéfice à ajouter au coût des matériaux de base";
 		["BarkerOptionsRandomFactorTitle"]	= "Facteur aléatoire";
 		["BarkerOptionsRandomFactorTooltip"]	= "La quantité de hasard dans les enchantements choisis pour les cris de commerce";
+		["BarkerOptionsRingPriorityTooltip"]	= "Priorité pour les enchantements d'anneaux.";
+		["BarkerOptionsShadowResistance"]	= "Résistance à l'ombre";
+		["BarkerOptionsShadowResistanceTooltip"]	= "Priorité pour les enchantements de résistance à l'ombre.";
+		["BarkerOptionsShieldPriorityTooltip"]	= "Priorité pour les enchantements de bouclier.";
+		["BarkerOptionsSpiritPriority"]	= "Esprit";
+		["BarkerOptionsSpiritPriorityTooltip"]	= "Priorité pour les enchantements d'esprit.";
+		["BarkerOptionsStaminaPriority"]	= "Endurance";
+		["BarkerOptionsStaminaPriorityTooltip"]	= "Priorité pour les enchantements d'endurance.";
+		["BarkerOptionsStatsPriority"]	= "Priorité générale des caractéristiques";
+		["BarkerOptionsStatsPriorityTooltip"]	= "Ceci détermine l'importance des enchantements de caractéristiques dans la priorité générale pour la publicité.";
+		["BarkerOptionsStrengthPriority"]	= "Force";
+		["BarkerOptionsStrengthPriorityTooltip"]	= "Priorité pour les enchantements de force.";
 		["BarkerOptionsTab1Title"]	= "Priorités de bénéfice et de prix";
 
 	};
@@ -840,32 +977,66 @@ EnchantrixBarkerLocalizations = {
 		["ShowValue"]	= "평가";
 
 		-- Section: Game Constants
+		["AnyWeapon"]	= "모든 무기";
 		["BarkerOpening"]	= "마법부여 판매:";
 		["Boots"]	= "장화";
-		["Chest"]	= "가슴보호구";
+		["Bracer"]	= "손목";
+		["Chest"]	= "가슴";
 		["Cloak"]	= "망토";
 		["Darnassus"]	= "다르나서스";
-		["EnchSearchAllResistance3"]	= "저항력";
-		["EnchSearchAllStats"]	= "능력치";
+		["EnchSearchAgility"]	= "민첩성";
+		["EnchSearchAllResistance1"]	= "모든 계열 마법 저항";
+		["EnchSearchAllResistance2"]	= "모든 계열 마법 저항";
+		["EnchSearchAllResistance3"]	= "모든 저항력";
+		["EnchSearchAllStats"]	= "모든 능력치";
+		["EnchSearchArmor"]	= "방어도";
+		["EnchSearchBattlemaster"]	= "주위 파티원 생명력 회복";
+		["EnchSearchBeastslayer"]	= "야수에 대한 전투력";
+		["EnchSearchBoarSpeed"]	= "이동속도를 약간 증가시키고 체력을 [0-9]만큼 증가";
+		["EnchSearchCatSwiftness"]	= "이동속도를 약간 증가시키고 민첩성을 [0-9]만큼 증가";
+		["EnchSearchCrusader"]	= "[0-9]~[0-9]의 생명력을 회복하고 힘을 증가";
+		["EnchSearchDamage2"]	= "\+[0-9]+ 피해";
+		["EnchSearchDefense"]	= "방어";
+		["EnchSearchDMGAbsorption"]	= "흡수";
 		["EnchSearchFireRes"]	= "화염 저항력";
+		["EnchSearchFrostRes"]	= "냉기 저항력";
+		["EnchSearchHealth"]	= "체력";
 		["EnchSearchIntellect"]	= "지능";
 		["EnchSearchMana"]	= "마나";
+		["EnchSearchManaPerFive"]	= "5초당 마나 회복";
+		["EnchSearchMongoose"]	= "민첩성을 [0-9]만큼 증가시키고 공격속도를 약간 증가";
 		["EnchSearchNatureRes"]	= "자연 저항력";
+		["EnchSearchResFire"]	= "화염 저항력";
+		["EnchSearchResShadow"]	= "암흑 저항력";
+		["EnchSearchSoulfrost"]	= "냉기 및 암흑 주문";
+		["EnchSearchSpellsurge"]	= "모든 파티원의 마나를 [0-9]+만큼 회복";
 		["EnchSearchSpirit"]	= "정신력";
+		["EnchSearchStamina"]	= "체력";
+		["EnchSearchStrength"]	= "힘";
+		["EnchSearchSunfire"]	= "화염 및 비전 주문";
+		["EnchSearchVitality"]	= "생명력과 마나를 [0-9]+ 만큼 회복";
 		["Gloves"]	= "장갑";
+		["Ironforge"]	= "아이언포지";
 		["OneLetterGold"]	= "골드";
 		["OneLetterSilver"]	= "실버";
 		["Orgrimmar"]	= "오그리마";
+		["Ring"]	= "반지";
 		["Shattrath"]	= "샤트라스";
 		["Shield"]	= "방패";
 		["ShortDarnassus"]	= "다르";
+		["ShortExodar"]	= "엑소";
 		["ShortIronForge"]	= "아포";
 		["ShortOrgrimmar"]	= "오그";
 		["ShortShattrath"]	= "샤트";
+		["ShortSilvermoon"]	= "실버";
 		["ShortStormwind"]	= "스톰";
 		["ShortThunderBluff"]	= "썬더";
 		["ShortUndercity"]	= "언더";
+		["SilvermoonCity"]	= "실버문";
+		["StormwindCity"]	= "스톰윈드";
+		["TheExodar"]	= "엑소다르";
 		["ThunderBluff"]	= "썬더 블러프";
+		["TradeChannel"]	= "거래 - 도시";
 		["TwoHandWeapon"]	= "양손 무기";
 		["Undercity"]	= "언더시티";
 		["Weapon"]	= "무기";
@@ -874,11 +1045,34 @@ EnchantrixBarkerLocalizations = {
 		["BarkerLoaded"]	= "Enchantrix Barker 로드됨.";
 
 		-- Section: Generic Strings
+		["AGI"]	= "민";
+		["AllStats"]	= "올능";
+		["Crusader"]	= "성전사";
+		["DEF"]	= "보호";
+		["DMG"]	= "뎀";
+		["DMGAbsorb"]	= "뎀흡수";
+		["FireRes"]	= "화저";
+		["FrostRes"]	= "냉저";
+		["INT"]	= "지";
+		["NatureRes"]	= "자저";
+		["ShadowRes"]	= "암저";
+		["ShortAllRes"]	= "올저";
+		["ShortArmor"]	= "방어도";
+		["ShortBattlemaster"]	= "전투의 대가";
+		["ShortBeastslayer"]	= "야수";
+		["ShortBoarSpeed"]	= "맷돼지의 속도";
+		["ShortCatSwiftness"]	= "살쾡이의 날렵함";
 		["ShortHealth"]	= "생명력";
 		["ShortMana"]	= "마나";
-		["ShortVitality"]	= "민첩성";
-		["SPI"]	= "정신력";
-		["STA"]	= "체력";
+		["ShortManaPerFive"]	= "5초당 마나회복";
+		["ShortMongoose"]	= "살쾡이";
+		["ShortSoulfrost"]	= "냉기의 영혼";
+		["ShortSpellPower"]	= "증뎀";
+		["ShortSpellSurge"]	= "마력의 폭풍";
+		["ShortSunfire"]	= "태양의 불꽃";
+		["ShortVitality"]	= "활력";
+		["SPI"]	= "정";
+		["STA"]	= "체";
 		["STR"]	= "힘";
 
 		-- Section: Tooltip Messages
@@ -1003,13 +1197,34 @@ EnchantrixBarkerLocalizations = {
 		["CmdToggle"]	= "переключить";
 		["ShowCount"]	= "отсчеты\n";
 
+		-- Section: Generic Messages
+		["BarkerLoaded"]	= "Enchantrix Barker загружен...";
+		["BarkerNotTradeZone"]	= "Enchantrix Barker: Вы не торговой зоне.";
+
+		-- Section: Generic Strings
+		["AGI"]	= "AGI";
+		["AllStats"]	= "Все параметры";
+		["DEF"]	= "DEF";
+		["DMG"]	= "DMG";
+		["INT"]	= "INT";
+		["ShortArmor"]	= "броня";
+		["ShortHealth"]	= "жизнь";
+		["ShortMana"]	= "мана";
+		["ShortManaPerFive"]	= "мана/5сек";
+		["ShortSpellPower"]	= "спелл";
+		["SPI"]	= "SPI";
+		["STA"]	= "STA";
+		["STR"]	= "STR";
+
 		-- Section: Tooltip Messages
+		["FrmtBarkerPrice"]	= "Barker Price (%d%% прибыль)";
 		["FrmtPriceEach"]	= "(%s каждая)";
 		["FrmtSuggestedPrice"]	= "Рекомендуемая цена:";
 		["FrmtTotal"]	= "Итого";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer не загружен, использую полученные ранее данные]";
 		["FrmtWarnNoPrices"]	= "[Цены неизвестны]";
 		["FrmtWarnPriceUnavail"]	= "[Некоторые цены неизвестны]";
+		["OpenBarkerWindow"]	= "Открыть Trade Barker";
 
 	};
 
