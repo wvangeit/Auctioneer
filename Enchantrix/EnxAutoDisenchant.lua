@@ -209,10 +209,12 @@ local function onEvent(...)
 		if isState("prompt") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- disenchant started - wait for completion
 			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3 .." ".. arg4)
-			if arg2 == _ENCH('ArgSpellProspectingName') then
-				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
-			else
-				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+			if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
+				if arg2 == _ENCH('ArgSpellProspectingName') then
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
+				else
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+				end
 			end
 			hidePrompt()
 			setState("cast")

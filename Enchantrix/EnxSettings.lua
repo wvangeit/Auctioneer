@@ -109,6 +109,8 @@ local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
 	['printframe'] = 1,
+	
+	['chatShowFindings'] = true,
 
 	['ToolTipEmbedInGameTip'] = false,
 	['ToolTipTerseFormat'] = false,
@@ -489,7 +491,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
-
+	gui:AddControl(id, "Checkbox",   0, 1, "chatShowFindings", _ENCH("GuiPrintYieldsInChat") )
 
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)

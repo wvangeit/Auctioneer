@@ -357,11 +357,16 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
 			local isDisenchant = nil
+			local chatPrintYield = Enchantrix.Settings.GetSetting('chatShowFindings')
 			if (DisenchantEvent.spellname == _ENCH('ArgSpellname')) then
-				Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
+				if (chatPrintYield) then
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
+				end
 				isDisenchant = true;
 			elseif (DisenchantEvent.spellname == _ENCH('ArgSpellProspectingName')) then
-				Enchantrix.Util.ChatPrint( _ENCH("FrmtProspectFound"):format(DisenchantEvent.finished))
+				if (chatPrintYield) then
+					Enchantrix.Util.ChatPrint( _ENCH("FrmtProspectFound"):format(DisenchantEvent.finished))
+				end
 				isDisenchant = nil;
 			end
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
@@ -370,7 +375,9 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				if LootSlotIsItem(i) then
 					local icon, name, quantity, rarity = GetLootSlotInfo(i)
 					local link = GetLootSlotLink(i)
-					Enchantrix.Util.ChatPrint(("  %s x%d"):format(link, quantity))
+					if (chatPrintYield) then
+						Enchantrix.Util.ChatPrint(("  %s x%d"):format(link, quantity))
+					end
 					-- Save result
 					local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
 					if reagentID then

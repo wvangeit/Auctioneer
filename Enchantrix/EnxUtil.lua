@@ -176,7 +176,7 @@ local function checkReagentCacheVersion()
 	if EnchantConfig.cache.CraftReagentCache.Version then
 		-- version stamp exists, check it
 		if (EnchantConfig.cache.CraftReagentCache.Version ~= versionString) then
-			Enchantrix.Util.DebugPrintQuick("Found a new WoW version, wiping out reagent cache");
+			--Enchantrix.Util.DebugPrintQuick("Found a new WoW version, wiping out reagent cache");
 			EnchantConfig.cache.CraftReagentCache = {}
 		end
 	end
