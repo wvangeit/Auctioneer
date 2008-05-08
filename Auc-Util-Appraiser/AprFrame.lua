@@ -467,9 +467,20 @@ function private.CreateFrames()
 				newBid = math.max(newBuy - markdown - subtract - deposit, 1)
 			end
 
+			if GetSellValue and AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then
+				local vendor = (GetSellValue(frame.salebox.link) or 0)
+				if vendor and vendor>0 then
+					vendor = math.ceil(vendor / (1 - (AucAdvanced.cutRate or 0.05)))
+					if newBid < vendor then
+						newBid = vendor
+					end
+				end
+			end
+			
 			if newBid and (not newBuy or newBid > newBuy) then
 				newBuy = newBid
 			end
+			
 		end
 
 		newBid = math.floor((newBid or 0) + 0.5)
@@ -938,10 +949,12 @@ function private.CreateFrames()
 		if GetSellValue then
 			local sellValue = GetSellValue(frame.salebox.link)
 			if (sellValue and sellValue > 0) then
-				if curBuy > 0 and curBuy < sellValue then
-					frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
-				elseif curBid > 0 and curBid < sellValue then
-					frame.salebox.note:SetText("Note: Min Bid < Vendor")
+				sellValue = sellValue + 1 -- the curBuy/curBid have been rounded up earlier, and they MAY be based on vendor values!
+				sellValue = math.ceil(sellValue / (1 - (AucAdvanced.cutRate or 0.05)))
+				if curBuy > 0 and curBuy <= sellValue then
+					frame.salebox.note:SetText("|cffff8010".."Note: Buyout <= Vendor")
+				elseif curBid > 0 and curBid <= sellValue then
+					frame.salebox.note:SetText("Note: Min Bid <= Vendor")
 				end
 			end
 		end

@@ -252,6 +252,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.round.magstep", 5)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.markdown", 10)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", false)
+AucAdvanced.Settings.SetDefault("util.appraiser.bid.vendor", true) 
 AucAdvanced.Settings.SetDefault("util.appraiser.color", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.manifest.color", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.tint.color", true)
@@ -335,6 +336,8 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "The subtract amount is a fixed amount that an item's calculated value will have subtracted to produce the bid value")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
 	gui:AddTip(id, "This option will cause the item's calculated value to be reduced by the value of the deposit rate to produce the bid value")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.appraiser.bid.vendor", "Vendor price as minimum")
+	gui:AddTip(id, "This option will cause the item's bid to never fall below the vendor price of the item, taking into account the auction house's cut")
 
 	gui:AddHelp(id, "what is bid",
 		"What is the starting bid?",
