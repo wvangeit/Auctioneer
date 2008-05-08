@@ -83,12 +83,12 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	if BeanCounter and BeanCounter.Private.playerData then
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
-				success = #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
+				success = success + #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
 			end
 		end
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
-				failed = #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
+				failed = failed + #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
 			end
 		end
 	end
