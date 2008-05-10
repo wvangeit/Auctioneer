@@ -355,7 +355,11 @@ function private.CreateFrames()
 				result[Const.BUYOUT],
 				result[Const.LINK]
 			)
-			local r,g,b = frame.SetPriceColor(itemkey, count, result[Const.CURBID], result[Const.BUYOUT])
+			local curbid = result[Const.CURBID]
+			if curbid == 0 then
+				curbid = result[Const.MINBID]
+			end
+			local r,g,b = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
 			if r then
 				style[i] = acquire()
 				style[i][1] = acquire()
