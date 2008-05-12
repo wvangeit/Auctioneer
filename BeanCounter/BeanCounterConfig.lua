@@ -100,6 +100,7 @@ private.settingDefaults = {
 	["util.beancounter.debugPost"] = true,
 	["util.beancounter.debugUpdate"] = true,
 	["util.beancounter.debugFrames"] = true,
+	["util.beancounter.debugAPI"] = true,
 	
 	["util.beacounter.invoicetime"] = 5,
 	["util.beancounter.mailrecolor"] = "both",
@@ -160,6 +161,14 @@ local function setter(setting, value)
 		-- Don't save default values
 		value = nil
 	end
+	
+	--button to check database integrity pushed
+	if (setting == "database.validate") then 
+		print("Checking")
+		private.integrityCheck(true)
+		return
+	end		
+		
 	--This is used to do the DateString
 	local a,b = strsplit(".", setting)
 	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string 
@@ -179,6 +188,8 @@ local function setter(setting, value)
 		local text = gui.elements.dateString:GetText()
 		gui.elements.dateStringdisplay.textEl:SetText(_BC('C_DateStringExample').." "..date(text, 1196303661))
 	end
+	
+	--[[Check for profile changes or store settings ]]
 	
 	if (a == "profile") then
 		if (setting == "profile.save") then
@@ -373,9 +384,11 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
+	
 	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
 	
@@ -383,6 +396,11 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
 	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", _BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
+	
+	gui:AddControl(id, "Subhead",    0,    "Scan Database for errors: Use if you have errors when searching BeanCounter \n Backup BeanCounter's saved variables before using.")
+	gui:AddControl(id, "Button",     0, 1, "database.validate", "Validate Database")
+	gui:AddTip(id, "This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search")
+	
 	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
@@ -404,7 +422,7 @@ function lib.MakeGuiConfig()
 			_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
 			_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
 			)			
-	
+		
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
@@ -418,5 +436,6 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugPost", "Post")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugUpdate", "Update")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugFrames", "Frames")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugAPI", "API")
 
 end
