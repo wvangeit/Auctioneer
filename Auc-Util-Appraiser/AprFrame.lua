@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Auctioneer Advanced - Appraisals and Auction Posting
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -548,6 +548,16 @@ function private.CreateFrames()
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
 		frame.salebox.number:SetAdjustedValue(curNumber)
 		
+		-- Only post above number of items, no more. (ie. keep track of current auctions)
+		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
+		if curNumberOnly == "on" then
+			frame.salebox.numberonly:SetChecked(true)
+		elseif curNumberOnly == "off" then
+			frame.salebox.numberonly:SetChecked(false)
+		else
+			frame.salebox.numberonly:SetChecked(curNumberOnly)
+		end
+		
 		local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
 		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match")
 		if curMatch == nil then
@@ -579,8 +589,8 @@ function private.CreateFrames()
 
 		local itemName, itemLink = GetItemInfo(itemString)
 		
-		local results = AucAdvanced.Modules.Util.Appraiser.ownResults[itemName]
-		local counts = AucAdvanced.Modules.Util.Appraiser.ownCounts[itemName]
+		local results = lib.ownResults[itemName]
+		local counts = lib.ownCounts[itemName]
 		
 		if counts and #counts>0 then
 			table.sort(counts)
@@ -612,6 +622,7 @@ function private.CreateFrames()
 			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
+            frame.salebox.numberonly:Hide()
 			frame.salebox.stackentry:Hide()
 			frame.salebox.numberentry:Hide()
 			frame.salebox.model:Hide()
@@ -639,6 +650,7 @@ function private.CreateFrames()
 		frame.salebox.model:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
+		frame.salebox.numberonly:Show()
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
 		if frame.itembox:IsShown() then
@@ -1001,7 +1013,8 @@ function private.CreateFrames()
 
 		local curStack = frame.salebox.stack:GetValue()
 		local curNumber = frame.salebox.number:GetAdjustedValue()
-		local curDurationIdx = frame.salebox.duration:GetValue()
+		local curNumberOnly = frame.salebox.numberonly:GetChecked()
+        local curDurationIdx = frame.salebox.duration:GetValue()
 		local curDuration = private.durations[curDurationIdx][1]
 		local curMatch = frame.salebox.matcher:GetChecked()
 		local curBulk = frame.salebox.bulk:GetChecked()
@@ -1020,6 +1033,12 @@ function private.CreateFrames()
 			curMatch = "off"
 		end  --must be something other than true/false, as false == nil, so false would cause default to be used
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".match", curMatch)
+		if curNumberOnly then
+			curNumberOnly = "on"
+		else
+			curNumberOnly = "off"
+		end  --must be something other than true/false, as false == nil, so false would cause default to be used
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly", curNumberOnly)
 
 		local curModel
 		if (obj and obj.element == "model") then
@@ -1080,6 +1099,7 @@ function private.CreateFrames()
 			frame.salebox:SetHeight(340)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
+			frame.salebox.numberonly:Hide()
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
 			frame.salebox.bid:ClearAllPoints()
 			frame.salebox.bid:SetPoint("TOP", frame.salebox.model, "BOTTOM", 0, -35)
@@ -1104,6 +1124,7 @@ function private.CreateFrames()
 				frame.salebox.stackentry:Show()
 				frame.salebox.stacksoflabel:Show()
 				frame.salebox.numberentry:Show()
+                frame.salebox.numberonly:Show()
 				frame.salebox.totalsize:Show()
 				frame.salebox.depositcost:Show()
 				frame.salebox.totalbid:Show()
@@ -1329,9 +1350,11 @@ function private.CreateFrames()
 	end
 
 	function frame.PostBySig(sig, dryRun)
-		local generallink = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
+		local generallink, itemName = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
 		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(generallink, _, true)
 		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
+		local numberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".numberonly")
+
 		if success==false then
 			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
 			print("Cannot post auctions: ", errortext)
@@ -1364,6 +1387,24 @@ function private.CreateFrames()
 			print("Skipping "..link..": Stack size larger than available")
 			return
 		end
+        if numberOnly and number>0 then 
+            -- get current number of posted auctions
+            local counts = AucAdvanced.Modules.Util.Appraiser.ownCounts[itemName]
+            local results = AucAdvanced.Modules.Util.Appraiser.ownResults[itemName]
+            local currentStackCount = 0
+		    if counts and #counts>0 then
+		    	for _,count in ipairs(counts) do
+				    local res = results[count]
+                    currentStackCount = currentStackCount + res.stackCount
+                end
+            end
+            -- reduce number to post by existing amount
+            number = number - currentStackCount
+            if number < 1 then
+                print(("%d stacks of %s already posted."):format(currentStackCount,link))
+                return
+            end
+        end
 
 		print(("Posting batch of: %s"):format(link))
 
@@ -1863,7 +1904,18 @@ function private.CreateFrames()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
 
-	
+   	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "UICheckButtonTemplate")
+    -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
+	frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number, "BOTTOMRIGHT", 250, 0)
+	frame.salebox.numberonly:SetHeight(20)
+	frame.salebox.numberonly:SetWidth(20)
+	frame.salebox.numberonly:SetChecked(false)
+	frame.salebox.numberonly:SetScript("OnClick", frame.ChangeControls)
+	frame.salebox.numberonly:Hide()   
+	frame.salebox.numberonly.label = frame.salebox.numberonly:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.numberonly.label:SetPoint("BOTTOMLEFT", frame.salebox.numberonly, "BOTTOMRIGHT", 0, 6)
+	frame.salebox.numberonly.label:SetText("Only")
+
 	function frame.salebox.number:GetAdjustedValue()
 		local maxStax = self.maxStax or 0
 		local value = self:GetValue()

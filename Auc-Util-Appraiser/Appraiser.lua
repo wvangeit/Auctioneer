@@ -44,6 +44,7 @@ function lib.Processor(callbackType, ...)
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "auctionui") then
         private.CreateFrames(...)
+        lib.GetOwnAuctionDetails()
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
@@ -89,15 +90,15 @@ function lib.GetSigFromLink(link)
 end
 
 function lib.GetLinkFromSig(sig)
-	local link
+	local link, name
 	local id, suffix, factor, enchant = strsplit(":", sig)
 	if not suffix then suffix = "0" end
 	if not factor then factor = "0" end
 	if not enchant then enchant = "0" end
 	
 	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
-	_, link = GetItemInfo(link)
-	return link
+	name, link = GetItemInfo(link)
+	return link, name -- name is ignored by most calls
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
@@ -306,8 +307,10 @@ function lib.GetOwnAuctionDetails()
     local results = {}
     local counts = {}		
     local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
+    if totalAuctions >0 then
 	for i=1, totalAuctions do
 		local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
+		if name then
         if not results[name] then
             results[name] = {}
             counts[name] = {}
@@ -327,6 +330,8 @@ function lib.GetOwnAuctionDetails()
             r.sumBO = r.sumBO + buyoutPrice
         end
         r.stackCount = r.stackCount + 1
+        end
+    end
     end
     lib.ownResults = results
     lib.ownCounts = counts
