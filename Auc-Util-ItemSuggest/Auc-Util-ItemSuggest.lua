@@ -1,9 +1,13 @@
 --[[
-	Auctioneer Advanced - AutoMagic Utility module
+	Auctioneer Advanced - Item Suggest module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	AutoMagic is an Auctioneer Advanced module.
+
+	This is an Auctioneer Advanced module that allows the added tooltip for suggesting 
+	what should be done with an item based on weights and skills set. This module is also
+	used by other modules in Auctioneer Advanced.
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -25,13 +29,79 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]] 
+--]]
 
-local lib = AucAdvanced.Modules.Util.AutoMagic
+
+local libType, libName = "Util", "ItemSuggest"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _
 
+function lib.GetName()
+	return libName
+end
+
+function lib.Processor(callbackType, ...)
+	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
+	elseif (callbackType == "config") then lib.SetupConfigGui(...) --Called when you should build your Configator tab.
+	elseif (callbackType == "listupdate") then --Called when the AH Browse screen receives an update.
+	elseif (callbackType == "configchanged") then --Called when your config options (if Configator) have been changed.
+	end
+end
+
+function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+	if (get("util.itemsuggest.enablett")) then
+		local aimethod = lib.itemsuggest(hyperlink, quantity)
+		EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
+	end
+end
+
+function lib.OnLoad()
+	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+end
+
+local ahdeplength = {
+	{'12', "12 hour"},
+	{'24', "24 hour"},
+	{'48', "48 hour"},
+}
+default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
+default("util.itemsuggest.enchantskill", 375) -- Used for item AI
+default("util.itemsuggest.jewelcraftskill", 375)-- Used for item AI
+default("util.itemsuggest.vendorweight", 100)-- Used for item AI
+default("util.itemsuggest.auctionweight", 100)-- Used for item AI
+default("util.itemsuggest.prospectweight", 100)-- Used for item AI
+default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
+default("util.itemsuggest.relisttimes", 1)-- Used for item AI
+default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
+default("util.itemsuggest.includedeposit", 1)-- Used for item AI
+default("util.itemsuggest.deplength", "24")
+
+function lib.SetupConfigGui(gui)
+	local id = gui:AddTab(libName)
+	gui:MakeScrollable(id)
+		
+	gui:AddControl(id, "Header",     0,    "ItemSuggest")
+	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display Item Suggest Tooltips")	
+	
+	gui:AddControl(id, "Header",     0,    "Set skill usage limits if desired")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
+	
+	gui:AddControl(id, "Header",     0,    "Bias (weights) adjusts your preference up or down by % of value in Item Suggest")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
+	
+	gui:AddControl(id, "Header",     0,    "Deposit cost influence?")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include Deposit Costs?")
+	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
+	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttiimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH Brokerage Costs?")
+end
 
 function lib.itemsuggest(hyperlink, quantity)
 	-- Determine Base Values
@@ -39,13 +109,13 @@ function lib.itemsuggest(hyperlink, quantity)
 	VendorValue = lib.GetVendorValue(hyperlink, quantity)
 	AppraiserValue = lib.GetAppraiserValue(hyperlink, quantity)
 	
-	if (get("util.automagic.jewelcraftskill") == 0) then 
+	if (get("util.itemsuggest.jewelcraftskill") == 0) then 
 		ProspectValue = 0
 	else 
 		ProspectValue = lib.GetProspectValue(hyperlink, quantity)
 	end
 	
-	if (get("util.automagic.enchantskill") == 0) then 
+	if (get("util.itemsuggest.enchantskill") == 0) then 
 		DisenchantValue = 0
 	else	
 		DisenchantValue = lib.GetDisenchantValue(hyperlink, quantity)
@@ -58,13 +128,13 @@ function lib.itemsuggest(hyperlink, quantity)
 	if DisenchantValue == nil then DisenchantValue = 0 end
 	
 	-- Adjust final values based on custom weights by enduser
-	local adjustment = get("util.automagic.vendorweight") or 0
+	local adjustment = get("util.itemsuggest.vendorweight") or 0
 	VendorValue = VendorValue * adjustment / 100
-	adjustment = get("util.automagic.auctionweight") or 0
+	adjustment = get("util.itemsuggest.auctionweight") or 0
 	AppraiserValue = AppraiserValue * adjustment / 100
-	adjustment = get("util.automagic.prospectweight") or 0
+	adjustment = get("util.itemsuggest.prospectweight") or 0
 	ProspectValue = ProspectValue * adjustment / 100
-	adjustment = get("util.automagic.disenchantweight") or 0
+	adjustment = get("util.itemsuggest.disenchantweight") or 0
 	DisenchantValue = DisenchantValue * adjustment / 100
 
 	-- Determine which method 'wins' the battle
@@ -83,7 +153,7 @@ function lib.itemsuggest(hyperlink, quantity)
 		bestmethod = "Disenchant"
 	end
 	
-	-- Hand the winner back to the asker....
+	-- Hand the winner back to caller...
 	return bestmethod, bestvalue 
 end
 
@@ -91,12 +161,12 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 	AppraiserValue = GetAprPrice(hyperlink, nil, true) or 0
 	AppraiserValue = AppraiserValue * quantity
 	local brokerRate, depositRate = 0.05, 0.05
-	if (get("util.automagic.includedeposit")) then
+	if (get("util.itemsuggest.includedeposit")) then
 		local aadvdepcost = GetDepositCost(hyperlink, 24, nil, quantity) or 0
-		local depcost = aadvdepcost * get("util.automagic.relisttimes")
+		local depcost = aadvdepcost * get("util.itemsuggest.relisttimes")
 		AppraiserValue = AppraiserValue - depcost
 	end
-	if (get("util.automagic.includebrokerage")) then
+	if (get("util.itemsuggest.includebrokerage")) then
 		AppraiserValue = AppraiserValue - AppraiserValue * brokerRate
 	end	
 	
@@ -106,11 +176,11 @@ function lib.GetDisenchantValue(hyperlink, quantity)
 	if not (Enchantrix and Enchantrix.Storage) then return end
 	local DisenchantValue = 0
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
-	if not (iQual >= 1 or iLevel == nil) then return end
+	if (iQual == nil or iQual <= 1 or iLevel == nil) then return end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
 	local market
 	
-	if (skillneeded > get("util.automagic.enchantskill"))  then
+	if (skillneeded > get("util.itemsuggest.enchantskill"))  then
 		return DisenchantValue
 	else
 		_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(hyperlink)
@@ -122,7 +192,7 @@ function lib.GetDisenchantValue(hyperlink, quantity)
 		
 	local adjusted = market or 0
 	
-	if (get("util.automagic.includebrokerage")) then
+	if (get("util.itemsuggest.includebrokerage")) then
 		local brokerRate, depositRate = 0.05, 0.05
 		local amount = (adjusted * brokerRate)
 		adjusted = adjusted - amount
@@ -136,7 +206,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 	local ProspectValue = 0
 	local prospects = Enchantrix.Storage.GetItemProspects(hyperlink)
 	local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(hyperlink)
-	if (jcSkillRequired == nil or jcSkillRequired > get("util.automagic.jewelcraftskill"))  then
+	if (jcSkillRequired == nil or jcSkillRequired > get("util.itemsuggest.jewelcraftskill"))  then
 		return ProspectValue
 	else
 		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
@@ -163,13 +233,13 @@ function lib.GetProspectValue(hyperlink, quantity)
 				marketTotal = marketTotal + marketPrice
 
 				-- calculate costs
-				if (get("util.automagic.includedeposit")) then
+				if (get("util.itemsuggest.includedeposit")) then
 					local _, itemid, itemsuffix, _, itemenchant, itemseed = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 					local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 					local aadvdepcost = GetDepositCost(hyperlink, 24, nil, nil) or 0
-					depositTotal = depositTotal + aadvdepcost * get("util.automagic.relisttimes") * yield
+					depositTotal = depositTotal + aadvdepcost * get("util.itemsuggest.relisttimes") * yield
 				end
-				if (get("util.automagic.includebrokerage")) then
+				if (get("util.itemsuggest.includebrokerage")) then
 					brokerTotal = brokerTotal + marketPrice * brokerRate
 				end
 			end
@@ -185,4 +255,5 @@ function lib.GetVendorValue(hyperlink, quantity)
 	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
 	VendorValue = VendorValue * quantity
 return VendorValue end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

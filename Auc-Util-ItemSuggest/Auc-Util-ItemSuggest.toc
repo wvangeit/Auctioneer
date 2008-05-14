@@ -1,0 +1,8 @@
+## Title: Auc:Util:ItemSuggest
+## Interface: 20400
+## Dependancies: Auc-Advanced
+##
+## Version: <%version%> (<%codename%>)
+## SavedVariables: 
+Auc-Util-ItemSuggest.lua
+Embed.xml

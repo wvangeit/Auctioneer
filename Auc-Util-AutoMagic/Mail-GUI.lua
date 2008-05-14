@@ -29,7 +29,265 @@
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
-local _
+local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
+
+---------------------------------------------------------
+-- Set ID's for ease of lookup
+---------------------------------------------------------
+-- enchant mats
+local VOID = 22450
+local NEXUS = 20725
+local LPRISMATIC = 22449
+local LBRILLIANT = 14344
+local LRADIANT = 11178
+local LGLOWING = 11139
+local LGLIMMERING = 11084
+local SPRISMATIC = 22448
+local SBRILLIANT = 14343
+local SRADIANT = 11177
+local SGLOWING = 11138
+local SGLIMMERING = 10978
+local GPLANAR = 22446
+local GETERNAL = 16203
+local GNETHER = 11175
+local GMYSTIC = 11135
+local GASTRAL = 11082
+local GMAGIC = 10939
+local LPLANAR = 22447
+local LETERNAL = 16202
+local LNETHER = 11174
+local LMYSTIC = 11134
+local LASTRAL = 10998
+local LMAGIC = 10938
+local ARCANE = 22445
+local ILLUSION = 16204
+local DREAM = 11176
+local VISION = 11137
+local SOUL = 11083
+local STRANGE = 10940
+-- gems
+local TIGERSEYE = 818
+local MALACHITE = 774
+local SHADOWGEM = 1210
+local LESSERMOONSTONE = 1705
+local MOSSAGATE = 1206
+local CITRINE = 3864
+local JADE = 1529
+local AQUAMARINE = 7909
+local STARRUBY = 7910
+local AZEROTHIANDIAMOND = 12800
+local BLUESAPPHIRE = 12361
+local LARGEOPAL = 12799
+local HUGEEMERALD = 12364
+local BLOODGARNET = 23077
+local FLAMESPESSARITE = 21929
+local GOLDENDRAENITE = 23112
+local DEEPPERIDOT = 23709
+local AZUREMOONSTONE = 23117
+local SHADOWDRAENITE = 23107
+local LIVINGRUBY = 23436
+local NOBLETOPAZ = 23439
+local DAWNSTONE = 23440
+local TALASITE = 23427
+local STAROFELUNE = 23428
+local NIGHTSEYE = 23441
+
+-- This table is validating that each ID within it is a gem from prospecting.
+local isGem = 
+	{
+	[TIGERSEYE] = true,
+	[MALACHITE] = true,
+	[SHADOWGEM] = true,
+	[LESSERMOONSTONE] = true,
+	[MOSSAGATE] = true,
+	[CITRINE] = true,
+	[JADE] = true,
+	[AQUAMARINE] = true,
+	[STARRUBY] = true,
+	[AZEROTHIANDIAMOND] = true,
+	[BLUESAPPHIRE] = true,
+	[LARGEOPAL] = true,
+	[HUGEEMERALD] = true,
+	[BLOODGARNET] = true,
+	[FLAMESPESSARITE] = true,
+	[GOLDENDRAENITE] = true,
+	[DEEPPERIDOT] = true,
+	[AZUREMOONSTONE] = true,
+	[SHADOWDRAENITE] = true,
+	[LIVINGRUBY] = true,
+	[NOBLETOPAZ] = true,
+	[DAWNSTONE] = true,
+	[TALASITE] = true,
+	[STAROFELUNE] = true,
+	[NIGHTSEYE] = true,
+}
+
+-- This table is validating that each ID within it is a mat from disenchanting.
+local isDEMats = 
+	{
+	[VOID] = true,
+	[NEXUS] = true,
+	[LPRISMATIC] = true,
+	[LBRILLIANT] = true,
+	[LRADIANT] = true,
+	[LGLOWING] = true,
+	[LGLIMMERING] = true,
+	[SPRISMATIC] = true,
+	[SBRILLIANT] = true,
+	[SRADIANT] = true,
+	[SGLOWING] = true,
+	[SGLIMMERING] = true,
+	[GPLANAR] = true,
+	[GETERNAL] = true,
+	[GNETHER] = true,
+	[GMYSTIC] = true,
+	[GASTRAL] = true,
+	[GMAGIC] = true,
+	[LPLANAR] = true,
+	[LETERNAL] = true,
+	[LNETHER] = true,
+	[LMYSTIC] = true,
+	[LASTRAL] = true,
+	[LMAGIC] = true,
+	[ARCANE] = true,
+	[ILLUSION] = true,
+	[DREAM] = true,
+	[VISION] = true,
+	[SOUL] = true,
+	[STRANGE] = true,
+}
+
+---------------------------------------------------------
+-- Mail Functions
+---------------------------------------------------------
+function lib.gemAction()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if isGem[ itemID ] then
+					if (get("util.automagic.chatspam")) then 
+						print("AutoMagic has loaded", itemName, " because it is a gem!")
+					end
+					UseContainerItem(bag, slot) 
+				end
+			end
+		end
+	end
+end
+
+function lib.dematAction()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if isDEMats[ itemID ] then
+					if (get("util.automagic.chatspam")) then 
+						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					end
+					UseContainerItem(bag, slot) 
+				end 
+			end
+		end
+	end
+end
+
+function lib.disenchantAction()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				runstop = 0
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
+					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
+					if(aimethod == "Disenchant") then 
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")		
+						end
+						UseContainerItem(bag, slot) 
+						runstop = 1
+					end 
+				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
+					local bidlist = BtmScan.Settings.GetSetting("bid.list")
+					if (bidlist) then
+						local reason, bids
+						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+						bids = bidlist[sig..":"..seed.."x"..itemCount]
+						if(bids and bids[1] and bids[1] == "disenchant") then 
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")	
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					end
+				end
+			end
+		end
+	end
+end
+
+function lib.prospectAction()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				runstop = 0
+				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
+					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
+					if(aimethod == "Prospect") then 
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")		
+						end
+						UseContainerItem(bag, slot) 
+						runstop = 1
+					end 
+				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
+					local bidlist = BtmScan.Settings.GetSetting("bid.list")
+					if (bidlist) then
+						local reason, bids
+						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+						bids = bidlist[sig..":"..seed.."x"..itemCount]
+						if(bids and bids[1] and bids[1] == "prospect") then 
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")	
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end 
+					end
+				end
+			end
+		end
+	end
+end
+
 ---------------------------------------------------------
 -- Mail Interface
 ---------------------------------------------------------
@@ -40,8 +298,8 @@ function lib.makeMailGUI()
 	lib.ammailgui:ClearAllPoints()	
 	lib.ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
 	lib.ammailgui:SetFrameStrata("DIALOG")
-	lib.ammailgui:SetHeight(90)
-	lib.ammailgui:SetWidth(220)
+	lib.ammailgui:SetHeight(75)
+	lib.ammailgui:SetWidth(240)
 	lib.ammailgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -73,44 +331,63 @@ function lib.makeMailGUI()
 	lib.ammailgui.mguiheader = lib.mguiheader
 	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	-- LEFT COLUMN
-	lib.ammailgui.loadprospect = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
-	lib.ammailgui.loadprospect:SetText(("Prospect"))
-	lib.ammailgui.loadprospect:SetPoint("BOTTOMLEFT", lib.ammailgui, "BOTTOMLEFT", 12, 35)
-	lib.ammailgui.loadprospect:SetScript("OnClick", lib.prospectAction)	
+	
 		
 	lib.mguibtmrules = lib.ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
-	lib.mguibtmrules:SetText("BTM Rule:")
+	lib.mguibtmrules:SetText("BTM/IS Rule:")
 	lib.mguibtmrules:SetJustifyH("LEFT")
-	lib.mguibtmrules:SetWidth(250)
+	lib.mguibtmrules:SetWidth(101)
 	lib.mguibtmrules:SetHeight(10)
-	lib.mguibtmrules:SetPoint("BOTTOMLEFT",  lib.ammailgui.loadprospect, "TOPLEFT", 0, 0)
-	lib.mguibtmrules:SetPoint("BOTTOMRIGHT", lib.ammailgui.loadprospect, "TOPRIGHT", 0, 0)
+	lib.mguibtmrules:SetPoint("TOPLEFT",  lib.ammailgui, "TOPLEFT", 8, -16)
 	lib.ammailgui.mguibtmrules = lib.mguibtmrules
 	
 	lib.ammailgui.loadde = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadde:SetText(("Disenchant"))
-	lib.ammailgui.loadde:SetPoint("BOTTOMLEFT", lib.ammailgui, "BOTTOMLEFT", 12, 12)
+	lib.ammailgui.loadde:SetPoint("TOPLEFT", lib.mguibtmrules, "BOTTOMLEFT", 0, 1)
 	lib.ammailgui.loadde:SetScript("OnClick", lib.disenchantAction)
 	
-	--RIGHT COLUMN
-	lib.ammailgui.loadgems = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
-	lib.ammailgui.loadgems:SetText(("Gems"))
-	lib.ammailgui.loadgems:SetPoint("BOTTOMRIGHT", lib.ammailgui, "BOTTOMRIGHT", -12, 35)
-	lib.ammailgui.loadgems:SetScript("OnClick", lib.gemAction)
+--[[	lib.ammailgui.mailto = CreateFrame("EditBox", "", lib.ammailgui, "InputBoxTemplate")
+	lib.ammailgui.mailto:SetPoint("TOPLEFT", lib.ammailgui.loaddemats, "BOTTOMRIGHT", 0, -12)
+	lib.ammailgui.mailto:SetAutoFocus(false)
+	lib.ammailgui.mailto:SetHeight(15)
+	lib.ammailgui.mailto:SetWidth(100)
+	lib.ammailgui.mailto:SetMaxLetters(12)
+	--lib.ammailgui.loaddemailto:SetScript("OnEnterPressed", silvertocopper)
+	--lib.ammailgui.loaddemailto:SetScript("OnTabPressed", silvertocopper)
+	
+	lib.mguimailtotxt = lib.ammailgui:CreateFontString(four, "OVERLAY", "NumberFontNormalYellow")
+	lib.mguimailtotxt:SetText("Set Recipiant to:")
+	lib.mguimailtotxt:SetJustifyH("LEFT")
+	lib.mguimailtotxt:SetWidth(101)
+	lib.mguimailtotxt:SetHeight(10)
+	lib.mguimailtotxt:SetPoint("TOPRIGHT",  lib.ammailgui.mailto, "TOPLEFT", 0, -25)
+	--lib.mguimailfor:SetPoint("TOPRIGHT", lib.ammailgui.loadprospect, "BOTTOMRIGHT", 0, 0)
+	lib.ammailgui.mguimailtotxt = lib.mguimailtotxt]]
+	
+	lib.ammailgui.loadprospect = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
+	lib.ammailgui.loadprospect:SetText(("Prospect"))
+	lib.ammailgui.loadprospect:SetPoint("TOPLEFT", lib.ammailgui.loadde, "BOTTOMLEFT", 0, 0)
+	lib.ammailgui.loadprospect:SetScript("OnClick", lib.prospectAction)	
 	
 	lib.mguimailfor = lib.ammailgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
-	lib.mguimailfor:SetText("Other:")
-	lib.mguimailfor:SetJustifyH("RIGHT")
-	lib.mguimailfor:SetWidth(220)
+	lib.mguimailfor:SetText("Misc:")
+	lib.mguimailfor:SetJustifyH("LEFT")
+	lib.mguimailfor:SetWidth(101)
 	lib.mguimailfor:SetHeight(10)
-	lib.mguimailfor:SetPoint("BOTTOMLEFT",  lib.ammailgui.loadgems, "TOPLEFT", 0, 0)
-	lib.mguimailfor:SetPoint("BOTTOMRIGHT", lib.ammailgui.loadgems, "TOPRIGHT", 0, 0)
+	lib.mguimailfor:SetPoint("TOPLEFT",  lib.mguibtmrules, "TOPRIGHT", 25, 0)
+	--lib.mguimailfor:SetPoint("TOPRIGHT", lib.ammailgui.loadprospect, "BOTTOMRIGHT", 0, 0)
 	lib.ammailgui.mguimailfor = lib.mguimailfor
+	
+	lib.ammailgui.loadgems = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
+	lib.ammailgui.loadgems:SetText(("Gems"))
+	lib.ammailgui.loadgems:SetPoint("TOPLEFT", lib.mguimailfor, "BOTTOMLEFT", 0, 0)
+	lib.ammailgui.loadgems:SetScript("OnClick", lib.gemAction)
 	
 	lib.ammailgui.loaddemats = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loaddemats:SetText(("Chant Mats"))
-	lib.ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", lib.ammailgui, "BOTTOMRIGHT", -12, 12)
+	lib.ammailgui.loaddemats:SetPoint("TOPLEFT", lib.ammailgui.loadgems, "BOTTOMLEFT", 0, 0)
 	lib.ammailgui.loaddemats:SetScript("OnClick", lib.dematAction)
+	
+
 end 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
