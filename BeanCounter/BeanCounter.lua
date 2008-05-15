@@ -41,9 +41,12 @@ local private = {
 	--BeanCounterCore
 	playerName = UnitName("player"),
 	realmName = GetRealmName(),
+	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
 	version = 2.00,
 	wealth, --This characters current net worth. This will be appended to each transaction.
+	compressed = false,
+	
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
 		
@@ -78,11 +81,12 @@ local function debugPrint(...)
 end
 
 --used to allow beancounter to recive Processor events from Auctioneer. Allows us to send a search request to BC GUI
-local AucModule ={}
 if AucAdvanced and AucAdvanced.NewModule then
-	AucModule = AucAdvanced.NewModule(libType, libName)
+	private.AucModule = AucAdvanced.NewModule(libType, libName) --register as an Adv Module for callbacks
+	local get, set, default = select(7, AucAdvanced.GetModuleLocals()) --Get locals for use getting settings
+	private.AucModule.locals = {["get"] = get, ["set"] = set, ["default"] = default}
 end
-function AucModule.Processor(callbackType, ...)
+function private.AucModule.Processor(callbackType, ...)
 	if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
 		local item = ...
 		if item.name then BeanCounter.externalSearch(item.name) end
@@ -280,9 +284,16 @@ function private.unpackString(text)
 	return tbl
 end
 --Add data to DB
-function private.databaseAdd(key, itemID, itemLink, value)
+--~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
+function private.databaseAdd(key, itemID, itemLink, value, compress)
 	if not key or not itemID or not itemLink or not value then print("database add error: Missing required data") print("Database", key, "itemID", itemID, "itemLink", itemLink, "Data", data) return end
+	
 	local itemString, suffix = itemLink:match("^|c%x+|H(item:%d+.+:(.-):.+)|h%[.+%].-")
+	--if this will be a compressed entry replace uniqueID with 0
+	if compress then 
+		itemString  = itemString:gsub("^(item:%d+:.+:.-):.*", "%1:0")
+	end	
+	
 	if private.playerData[key][itemID] then --if ltemID exsists
 		if private.playerData[key][itemID][itemString] then
 			table.insert(private.playerData[key][itemID][itemString], value)
@@ -307,7 +318,7 @@ function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 				local tbl = private.unpackString(v)
 				if tbl and itemID  and NAME then
 					if tbl[3] == NAME and tonumber(tbl[1]) == COUNT then
-						debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
+						--debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
 						table.remove(private.playerData[key][itemID][itemString], i)--Just remove the key
 							break
 					end
@@ -318,7 +329,7 @@ function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 end
 --Get item Info or a specific subset. accepts itemID or "itemString" or "itemName ONLY IF THE ITEM IS IN PLAYERS BAG" or "itemLink"
 function private.getItemInfo(link, cmd) 
-debugPrint(link, cmd)
+--debugPrint(link, cmd)
 local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
 	if not cmd and itemLink then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
@@ -334,9 +345,11 @@ local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSub
 		return itemStackCount
 	end
 end
+--[[ DATABASE MAINTIANACE FUNCTIONS
+]]
 --Recreate/refresh ItemIName to ItemID array
 function private.refreshItemIDArray()
-	--[[for player, v in pairs(private.serverData)do
+	for player, v in pairs(private.serverData)do
 		for DB,data in pairs(private.serverData[player]) do
 			if DB ~= "mailbox" and type(data) == "table" then
 				for itemID, value in pairs(data) do
@@ -345,7 +358,7 @@ function private.refreshItemIDArray()
 						if not BeanCounterDB["ItemIDArray"][key..":"..suffix] then
 							local _, itemLink = private.getItemInfo(itemString, "itemid")
 							if itemLink then
-								print("Added to array, missing value",  itemLink)
+								debugPrint("Added to array, missing value",  itemLink)
 								BeanCounterDB["ItemIDArray"][key..":"..suffix] = itemLink
 							end
 						end
@@ -353,35 +366,53 @@ function private.refreshItemIDArray()
 				end
 			end
 		end
-	end]]
+	end
 end
---Prune Old keys from postedXXXX tables
---First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
-function private.prunePostedDB()
-	--[[for player, v in pairs(private.serverData)do
-		for DB,data in pairs(private.serverData[player]) do
-			if  DB == "postedBids" or DB == "postedAuctions"  then
-				for itemID, value in pairs(data) do
-					if private.serverData[player][DB][itemID][1] then
-						local tbl = private.unpackString(private.serverData[player][DB][itemID][1])
-						local  date = tonumber(tbl[#tbl-1])
-						while date + 2678400 < time() do --date+31days
-							table.remove(private.serverData[player][DB][itemID], 1)
-							if private.serverData[player][DB][itemID][1] then
-								tbl = private.unpackString(private.serverData[player][DB][itemID][1])
-								date = tonumber(tbl[#tbl-1])
-							else--This itemID is now empty remove ItemID from postedDB
-								private.serverData[player][DB][itemID] = nil
-								break
+--Moves entrys older than 31 days into compressed( non uniqueID) Storage
+--Array refresh needs to run before this function
+function private.compactDB()
+	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+			for itemID, value in pairs(data) do
+				for itemString, index in pairs(value) do
+					if "0" ~= itemString:match(".*:(.-)$") then --ignore the already compacted keys 
+						local itemLink = lib.API.getItemLink(itemString)
+						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 2678400 then --we have an old index entry lets process this array
+							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 2678400 do --While the entrys remain 31 days old process
+								debugPrint("Compressed", itemLink, index[1])
+								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
+								table.remove(index, 1)
 							end
 						end
-					else
-						--print(player,DB,itemID)
+					end
+				--remove itemStrings that are now empty, all the keys have been moved to compressed format
+				if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end 
+				end
+			end
+		end
+	end
+end
+--Sort all array entries by Date oldest to newest
+--Helps make compact more efficent needs to run once per week or so
+function private.sortArrayByDate(announce)
+	for player, v in pairs(private.serverData)do
+		for DB, data in pairs(private.serverData[player]) do
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+				for itemID, value in pairs(data) do
+					for itemString, index in pairs(value) do
+						table.sort(index,  function(a,b) return a:match(".*;(%d+);.-") < b:match(".*;(%d+);.-") end)
+						private.serverData[player][DB][itemID][itemString] = index
 					end
 				end
 			end
 		end
-	end]]
+	end
+	if announce then print("Finished sorting database") end
+end
+--Prune Old keys from postedXXXX tables
+--First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
+function private.prunePostedDB()
+	--Used to clean up post DB
 end
 
 function private.debugPrint(...)

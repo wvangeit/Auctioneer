@@ -166,7 +166,10 @@ local function setter(setting, value)
 	if (setting == "database.validate") then 
 		print("Checking")
 		private.integrityCheck(true)
-		return
+		value = nil
+	elseif (setting == "database.sort") then
+		private.sortArrayByDate()
+		value = time()
 	end		
 		
 	--This is used to do the DateString
@@ -376,7 +379,7 @@ function lib.MakeGuiConfig()
 		
 	local baseGUI
 	lib.Gui = gui
-
+	
   	gui:AddCat("BeanCounter")
 	
 	id = gui:AddTab(_BC('C_BeanCounterConfig')) --"BeanCounter Config")
@@ -396,11 +399,6 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
 	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", _BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
-	
-	gui:AddControl(id, "Subhead",    0,    "Scan Database for errors: Use if you have errors when searching BeanCounter \n Backup BeanCounter's saved variables before using.")
-	gui:AddControl(id, "Button",     0, 1, "database.validate", "Validate Database")
-	gui:AddTip(id, "This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search")
-	
 	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
@@ -422,7 +420,20 @@ function lib.MakeGuiConfig()
 			_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
 			_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
 			)			
+	
+	id = gui:AddTab("Data Maintenance")
+	lib.Id = id
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",     0,    "BeanCounter Database Maintenance")
+	gui:AddControl(id, "Subhead",    0,    "Resort all entries by ascending time")
+	gui:AddControl(id, "Button",     0, 1, "database.sort", "Resort Database")
+	gui:AddTip(id, "This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions")
+	
+	gui:AddControl(id, "Subhead",    0,    "Scan Database for errors: Use if you have errors when searching BeanCounter \n Backup BeanCounter's saved variables before using.")
+	gui:AddControl(id, "Button",     0, 1, "database.validate", "Validate Database")
+	gui:AddTip(id, "This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search")
 		
+	
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
