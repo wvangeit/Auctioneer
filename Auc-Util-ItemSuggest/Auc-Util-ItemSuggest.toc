@@ -1,6 +1,6 @@
 ## Title: Auc:Util:ItemSuggest
 ## Interface: 20400
-## Dependancies: Auc-Advanced
+## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan
 ##
 ## Version: <%version%> (<%codename%>)
 ## SavedVariables: 

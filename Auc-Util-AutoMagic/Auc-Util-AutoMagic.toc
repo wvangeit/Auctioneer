@@ -1,6 +1,7 @@
 ## Title: Auc:Util:AutoMagic
 ## Interface: 20400
 ## Dependancies: Auc-Advanced
+## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan Auc-Util-ItemSuggest
 ##
 ## Version: <%version%> (<%codename%>)
 ## SavedVariables: autoSellList
