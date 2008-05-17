@@ -37,7 +37,12 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
+-- Eliminate some global lookups
 local data
+local select = select;
+local sqrt = sqrt;
+local ipairs = ipairs;
+local unpack = unpack;
 
 function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
@@ -106,6 +111,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 	if not faction then faction = AucAdvanced.GetFaction() end
 
 	local data = private.GetPriceData(faction, realm)
+    -- DevTools_Dump(data). Yeah, don't do that.
 	if not data then return end
 
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
@@ -167,6 +173,29 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array
+end
+
+local bellCurve = AucAdvanced.API.GenerateBellCurve();
+-- Gets the PDF curve for a given item. This curve indicates
+-- the probability of an item's mean price. Uses an estimation
+-- of the normally distributed bell curve by performing
+-- calculations on the daily, 3-day, 7-day, and 14-day averages
+-- stored by SIMP
+-- @param hyperlink The item to generate the PDF curve for
+-- @param faction The faction key from which to look up the data
+-- @param realm The realm from which to look up the data
+function lib.GetItemPDF(hyperlink, faction, realm)
+    -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
+    
+    -- Calculate the SE estimated standard deviation & mean
+    local mean, stddev = private.EstimateStandardDeviation(hyperlink, faction, realm);
+    
+    -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
+    -- the std dev is 10% of the mean
+    if stddev == 0 then stddev = .10 * mean; end
+    
+    bellCurve:SetParameters(mean, stddev);
+    return bellCurve;
 end
 
 function lib.OnLoad(addon)
@@ -504,6 +533,88 @@ function private.DataLoaded()
 			end
 		end
 	end
+end
+
+-- Determines the sample estimated standard deviation based on the deviation
+-- of the daily, 3day, 7day, and 14day averages. This is not technically
+-- correct because they are not independent samples (the 7 day average
+-- includes data from the 3 day and daily averages, for example). Still
+-- it provides a good estimation in the presence of lack of data. If you
+-- want to discuss the math behind this estimation, find Shirik
+-- @param hyperlink The item to look up
+-- @param faction The faction key from which to look up the data
+-- @param realm The realm from which to look up the data
+-- @return The estimated population mean
+-- @return The estimated population standard deviation
+function private.EstimateStandardDeviation(hyperlink, faction, realm)
+    local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	assert(linkType=="item", "Standard deviation estimation requires an item link");
+	if (factor ~= 0) then property = property.."x"..factor end
+
+	if not faction then faction = AucAdvanced.GetFaction() end
+
+	local data = private.GetPriceData(faction, realm)
+	if not data then 
+        print("Warning: GetPriceData for "..(faction or "").." | "..(realm or "").." returned nil in SIMP:EstimateStandardDeviation. Returning 0,0");
+        return 0, 0; 
+    end
+    
+    local dataset = acquire();
+    local count = 0;
+    
+    -- Pull up the data
+	if data.daily and data.daily[itemId] then
+		local stats = private.UnpackStats(data.daily[itemId]);
+		if stats[property] then
+			local dayTotal, dayCount, minBuyout = unpack(stats[property]);
+			table.insert(dataset, dayTotal/dayCount);			
+            count = count + dayCount;
+		end
+        
+		recycle(stats)
+	end
+    
+	if data.means and data.means[itemId] then
+		local stats = private.UnpackStats(data.means[itemId])
+		if stats[property] then
+			local seenDays, seenCount, avg3, avg7, avg14 = unpack(stats[property]);
+			count = count + seenCount;
+            -- WTB fall-through switch statement 
+            if seenDays >= 3 then
+                table.insert(dataset, avg3);
+                if seenDays >= 7 then
+                    table.insert(dataset, avg7);
+                    if seenDays >= 14 then
+                        table.insert(dataset, avg14);
+                    end
+                end
+            end
+            -- End hack
+		end
+		recycle(stats)
+	end
+	
+    local mean = private.sum(unpack(dataset))/#dataset;
+    local variance = 0;
+    for k,v in ipairs(dataset) do
+        variance = variance + (mean - v)^2;
+    end
+    
+    return mean, sqrt(1/(count-1) * variance);          -- 1/(count-1) due to estimation of population from sample
+end
+
+-- Simple function to total all of the values in the tuple
+-- @param ... The values to add. Note: tonumber() is called
+-- on all passed in values. Type checking is not performed.
+-- This may result in silent failures.
+-- @return The sum of all of the values passed in
+function private.sum(...)
+    local total = 0;
+    for x = 1, select('#', ...) do
+        total = total + select(x, ...);
+    end
+    
+    return total;
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -46,9 +46,9 @@ local clone = AucAdvanced.Clone
 	The following functions are defined for modules's exposed methods:
 
 	GetName()         (ALL*)  Should return this module's full name
-	OnLoad()          (ALL*)   Receives load message for all modules
-	Processor()       (ALL)  Processes messages sent by Auctioneer
-	CommandHandler()  (ALL)  Slash command handler for this module
+	OnLoad()          (ALL*)  Receives load message for all modules
+	Processor()       (ALL)   Processes messages sent by Auctioneer
+	CommandHandler()  (ALL)   Slash command handler for this module
 	ScanProcessor {}  (ALL)   Processes items from the scan manager
 	GetPrice()        (STAT*) Returns estimated price for item link
 	GetPriceColumns() (STAT)  Returns the column names for GetPrice
@@ -56,6 +56,7 @@ local clone = AucAdvanced.Clone
 	IsScanning()      (SCAN*) Indicates an AH scan is in session
 	AbortScan()       (SCAN)  Cancels the currently running scan
 	Hook { }          (ALL)   Functions that are hooked by the module
+    GetItemPDF()      (STAT*) Provides a probability distribution function for an item price
 
 
 	Module type in parentheses to describe which ones provide.
@@ -462,8 +463,42 @@ function lib.GetAppraiserValue(itemLink, useMatching)
 end
 
 
-
-
+-------------------------------------------------------------------------------
+-- Statistical devices created by Matthew 'Shirik' Del Buono
+-- For Auctioneer Advanced
+-------------------------------------------------------------------------------
+local sqrtpi = math.sqrt(math.pi);
+local sqrtpiinv = 1/sqrtpi;
+local sq2pi = math.sqrt(2*math.pi);
+local pi = math.pi;
+local exp = math.exp;
+local bellCurveMeta = {
+    __index = {
+        SetParameters = function(self, mean, stddev)
+            self.mean = mean;
+            self.stddev = stddev;
+            self.param1 = 1/(stddev*sq2pi);     -- Make __call a little faster where we can
+            self.param2 = 2*stddev^2;
+        end
+    },
+    -- Simple bell curve call
+    __call = function(self, x)
+        return self.param1*exp(-(x-self.mean)^2/self.param2);
+    end
+}
+-------------------------------------------------------------------------------
+-- Creates a bell curve object that can then be manipulated to pass
+-- as a PDF function. This is a recyclable object -- the mean and 
+-- standard deviation can be updated as necessary so that it does not have
+-- to be regenerated
+--
+-- Note: This creates a bell curve with a standard deviation of 1 and 
+-- mean of 0. You will probably want to update it to your own desired
+-- values by calling return:SetParameters(mean, stddev)
+-------------------------------------------------------------------------------
+function lib.GenerateBellCurve()
+    return setmetatable({mean=0, stddev=1, param1=sqrtpiinv, param2=2}, bellCurveMeta);
+end
 
 
 

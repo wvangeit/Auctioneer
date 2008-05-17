@@ -99,6 +99,21 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	recycle(stats)
 end
 
+local BellCurve = AucAdvanced.API.GenerateBellCurve();
+-----------------------------------------------------------------------------------
+-- The PDF for standard deviation data, standard bell curve
+-----------------------------------------------------------------------------------
+function lib.GetItemPDF(hyperlink, faction, realm)
+    -- Get the data
+    local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm);
+    
+    -- Build the PDF based on standard deviation & mean
+    BellCurve:SetParameters(mean, stddev);
+    return BellCurve;   -- This has a __call metamethod so it's ok
+end
+
+-----------------------------------------------------------------------------------
+
 function private.GetCfromZ(Z)
 	--C = 0.05*i
 	if (not Z) then
@@ -378,5 +393,6 @@ function private.makeData()
 	data = AucAdvancedStatStdDevData
 	private.DataLoaded()
 end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
