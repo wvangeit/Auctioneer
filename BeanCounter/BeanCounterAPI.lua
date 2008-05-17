@@ -183,3 +183,15 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	end
 	return tbl.sums, low, high
 end
+
+--[[ Retrives the itemLink from the name array when passed an itemKey
+we store itemKeys with a unique ID but our name array does not
+]]
+function lib.API.getItemLink(itemString)
+	itemID, key = itemString:match("item:(.-):.*:(.-):.-")
+	if BeanCounterDB.ItemIDArray[itemID..":"..key] then 
+		return BeanCounterDB.ItemIDArray[itemID..":"..key]
+	end
+	debugPrint("Searching DB for ItemID..", key, itemID, "Failed Item does not exist")
+	return nil
+end
