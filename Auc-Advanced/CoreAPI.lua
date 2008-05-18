@@ -501,6 +501,71 @@ function lib.GenerateBellCurve()
 end
 
 
+--[[===========================================================================
+--|| Deprecation Alert Functions
+--||=========================================================================]]
+do
+    local SOURCE_PATTERN = "([^\\/:]+:%d+): in function";
+    local seenCalls = {};
+    local tracebacks = {};
+    local uid = 0;
+
+    -------------------------------------------------------------------------------
+    -- Shows a deprecation alert. Indicates that a deprecated function has 
+    -- been called and provides a stack trace that can be used to help
+    -- find the culprit.
+    -- @param functionName The displayable name of the deprecated function
+    -- @param replacementName (Optional) The displayable name of the replacement function
+    -- @param comments (Optional) Any extra text to display
+    -------------------------------------------------------------------------------
+    function lib.ShowDeprecationAlert(functionName, replacementName, comments)
+        local source, caller =
+            debugstack(2):match(SOURCE_PATTERN),
+            debugstack(3):match(SOURCE_PATTERN);
+            
+        -- Check for this source & caller combination
+        seenCalls[source] = seenCalls[source] or {};
+        if not seenCalls[source][caller] then
+            -- Not warned yet, so warn them!
+            
+            -- Build a clickable link
+            seenCalls[source][caller] = uid;
+            --DevTools_Dump(source, caller);
+            --DevTools_Dump(caller:match("([^/\\]+)%.[lLxX][uUmM][aAlL]:.+"));
+            local problemCallLink = "|cFF7777DD|HAucDep:"..uid.."|h["..caller:match("([^/\\]+)%.[lLxX][uUmM][aAlL]:.+").."]|h|r";
+            tracebacks[uid] = debugstack(2);
+            uid = uid + 1;
+            
+            -- Display it            
+            AucAdvanced.Print(
+                "Auctioneer Advanced: "..
+                functionName .. " has been deprecated and was called by "..problemCallLink..
+                (replacementName and (". Please use "..replacementName.." instead. ") or ". ")..
+                (comments or "")
+            );
+        end
+    end
+    
+    -- Hook SetItemRef so that we can display the info appropriately
+    local oldSetItemRef = SetItemRef;
+    SetItemRef = function(link, text, button, ...)
+        local id = link:match("^AucDep:([0-9]+)");
+        
+        if not id then
+            return oldSetItemRef(link, text, button, ...);
+        end
+        
+        -- Process an AucDep link
+        ItemRefTooltip:SetOwner(UIParent, "ANCHOR_PRESERVE");
+        ItemRefTooltip:ClearLines();
+        
+        ItemRefTooltip:AddLine("Stack Traceback");
+        --DevTools_Dump(tracebacks[tonumber(id)]);
+        ItemRefTooltip:AddLine("|cFFFFFFFF"..tracebacks[tonumber(id)].."|r");
+        
+        ItemRefTooltip:Show();
+    end
+end
 
 
 
