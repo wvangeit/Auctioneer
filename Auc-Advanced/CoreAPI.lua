@@ -445,7 +445,6 @@ end
 
 -- Allows the return of Appraiser price values to other functions.
 -- If Appraiser is not loaded it uses Market Price
-local AlertedtoDeprecation = false
 function lib.GetAppraiserValue(itemLink, useMatching)	
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
 	if not AucAdvanced.Modules.Util.Appraiser then
@@ -455,10 +454,8 @@ function lib.GetAppraiserValue(itemLink, useMatching)
 	end
 	
 	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, 0, useMatching)
-	if not AlertedtoDeprecation then
-		AucAdvanced.Print("AucAdvanced.API.GetAppraiserValue() has been deprecated.  Please use AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching) henceforth")
-		AlertedtoDeprecation = true
-	end
+	lib.ShowDeprecationAlert("AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching)");
+    
 	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
 end
 

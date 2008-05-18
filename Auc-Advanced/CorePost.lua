@@ -368,6 +368,7 @@ end
 function GetDepositCost(item, duration, faction, count)
 	-- Die if unable to complete function
 	if not item then return end
+    
 	-- Set up function defaults if not specifically provided
 	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 	end
 	if (faction == "neutral") then faction = .75 else faction = .15 end
@@ -388,8 +389,9 @@ end
 
 -- lib.GetDepositAmount(sig, count) has been depreciated please use new global GetDepositCost(item, duration, faction, count)
 function lib.GetDepositAmount(sig, count)
-	print("AucAdvanced.Post.GetDepositAmount() has been depreciated. Please use the new global function GetDepositCost(item, duration, faction, count) --where item is itemID or \"itemString\" or \"itemName\" or \"itemLink\" -- instead. note: item sig will nolonger be support.Thank you!")
-	local itemid = strsplit(":", sig)
+	AucAdvanced.API.ShowDeprecationAlert("GetDepositCost(item, duration, faction, count)", "item must be itemID or \"itemString\" or \"itemName\" or \"itemLink\" instead. Item sig will no longer be supported.");
+    
+    local itemid = strsplit(":", sig)
 	local rate = AucAdvanced.depositRate
 	local newfaction
 	if rate == .25 then newfaction = "neutral" end
