@@ -85,14 +85,14 @@ if AucAdvanced and AucAdvanced.NewModule then
 	private.AucModule = AucAdvanced.NewModule(libType, libName) --register as an Adv Module for callbacks
 	local get, set, default = select(7, AucAdvanced.GetModuleLocals()) --Get locals for use getting settings
 	private.AucModule.locals = {["get"] = get, ["set"] = set, ["default"] = default}
-end
-function private.AucModule.Processor(callbackType, ...)
-	if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
-		local item = ...
-		if item.name then BeanCounter.externalSearch(item.name) end
+
+	function private.AucModule.Processor(callbackType, ...)
+		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
+			local item = ...
+			if item.name then BeanCounter.externalSearch(item.name) end
+		end
 	end
 end
-
 lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB
