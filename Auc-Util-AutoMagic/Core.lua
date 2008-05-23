@@ -155,6 +155,7 @@ local isDEMats =
 	[STRANGE] = true,
 }
 
+lib.vendorlist = {}
 function lib.vendorAction()
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
@@ -166,28 +167,11 @@ function lib.vendorAction()
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
 				if autoSellList[ itemID ] then 
-					if (get("util.automagic.chatspam")) then 
-						print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
-					end
-					UseContainerItem(bag, slot)
+					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":In custom AutoSell list"
 					runstop = 1
 				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
-					UseContainerItem(bag, slot)
+					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Item is grey"
 					runstop = 1
-					if (get("util.automagic.chatspam")) then 
-						print("AutoMagic has sold", itemName," due to item being grey")
-					end
-					--end
-					--[[if (get("util.automagic.overidebtmvendor") == true and runstop == 0) then
-						local aimethod = lib.itemsuggest(itemLink, itemCount)
-						if(aimethod == "Vendor") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has sold", itemName, " due to Item Suggest(Vendor)")		
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
-						end ]]
-					--elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
 				elseif (BtmScan and runstop == 0) then
 					local bidlist = BtmScan.Settings.GetSetting("bid.list")
 					if (bidlist) then
@@ -196,16 +180,22 @@ function lib.vendorAction()
 						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
 						bids = bidlist[sig..":"..seed.."x"..itemCount]
 						if(bids and bids[1] and bids[1] == "vendor") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has sold", itemName, " due to vendor btm status")		
-							end
-							UseContainerItem(bag, slot) 
+							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":BTM bought for vendor"
 							runstop = 1
 						end 
 					end
 				end
 			end
 		end
+	end
+	for k, v in pairs(lib.vendorlist) do	
+		local bag, slot = strsplit(":", k)
+		local iName, iID, iWhy = strsplit(":", v)
+		if (get("util.automagic.chatspam")) then 
+			print("AutoMagic is selling:", iName, "due to", iWhy)
+		end
+		UseContainerItem(bag, slot) 
+		lib.vendorlist[k] = nil
 	end
 end
 
