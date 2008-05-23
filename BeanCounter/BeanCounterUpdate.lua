@@ -433,6 +433,7 @@ function private.updateTo1_11B()
 		end
 		private.serverData[player]["version"] = 1.11
 	end
+	private.update._2_00A()
 end
 
 
