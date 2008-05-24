@@ -106,10 +106,18 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- Get the data
     local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm);
+    -- DEFAULT_CHAT_FRAME:AddMessage("-----");
+    -- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
+    
+    if not (mean and stddev) then
+        return nil;                 -- No data, cannot determine pricing
+    end
+    
+    local lower, upper = mean - 5 * stddev, mean + 5 * stddev;
     
     -- Build the PDF based on standard deviation & mean
     BellCurve:SetParameters(mean, stddev);
-    return BellCurve;   -- This has a __call metamethod so it's ok
+    return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
 end
 
 -----------------------------------------------------------------------------------

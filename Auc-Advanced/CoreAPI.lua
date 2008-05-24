@@ -67,53 +67,130 @@ local clone = AucAdvanced.Clone
 	more complete specification.
 ]]
 
-
+local cache = setmetatable({}, {__mode="kv"});
+local pdfList = {};
+local warned  = {};
+local tremove = table.remove;
+local tinsert = table.insert;
+local abs = math.abs;
+local ERROR = 0.10;
+-- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
 --[[
 	This function acquires the current market value of the mentioned item using
 	a configurable algorithm to process the data used by the other installed
 	algorithms.
-	The result of this function does not take into account competition, it
-	simply returns what a particular item is "Worth", and not what you could
-	currently sell it for.
+    
+    The returned value is the most probable value that the item is worth
+    using the algorithms in each of the STAT modules as specified
+    by the GetItemPDF() function.
 
 	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
 ]]
 function lib.GetMarketValue(itemLink, serverKey)
-	-- TODO: Make a configurable algorithm.
-	-- This algorithm is currently less than adequate.
-
-	local total, count, seen = 0, 0, 0
-	local weight, totalweight = 0, 0
-	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if not engineLib.CanSupplyMarket
-		or engineLib.CanSupplyMarket(itemLink, serverKey) then
-			weight = 0.25
-			if (engineLib.GetPriceArray) then
-				local array = engineLib.GetPriceArray(itemLink, serverKey)
-				if (array and array.price and array.price > 0) then
-					if array.confidence then
-						weight = array.confidence
-					end
-					if (weight > 1) then weight = 1 end
-					total = total + array.price * weight
-					totalweight = totalweight + weight
-					if (array.seen) and (array.seen > seen) then
-						seen = array.seen
-					end
-					count = count + 1
-				end
-			elseif (engineLib.GetPrice) then
-				local price = engineLib.GetPrice(itemLink, serverKey)
-				if (price and price > 0) then
-					total = total + price * weight
-					totalweight = totalweight + weight
-					count = count + 1
-				end
-			end
-		end
-	end
-	if (total > 0) and (count > 0) then
-		return total/totalweight, seen, count
+    local _;
+    if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
+    if not itemLink then return; end
+    -- DEFAULT_CHAT_FRAME:AddMessage("Estimation of market value for IL: "..tostring(itemLink).." SK: "..tostring(serverKey));
+    
+    -- Look up in the cache if it's recent enough
+    if cache[itemLink..":"..(serverKey or "")] then
+        if cache[itemLink..":"..(serverKey or "")].time > GetTime() - 10 then
+            recycle(cache[itemLink..":"..(serverKey or "")]);
+        else
+            return cache[itemLink..":"..(serverKey or "")].value
+        end
+    end
+    
+	-- Clear out the PDF list
+    while tremove(pdfList) do end           -- remove all items from table
+    
+    local upperLimit, lowerLimit = 0, 1e11;
+    
+    -- Run through all of the stat modules and get the PDFs 
+    for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+        local fn = engineLib.GetItemPDF;
+        if fn then
+            local i, min, max = fn(itemLink, serverKey);
+            if i then
+                tinsert(pdfList, i);
+                if min < lowerLimit then lowerLimit = min; end
+                if max > upperLimit then upperLimit = max; end
+            end
+        elseif not warned[engine] then
+            warned[engine] = true;
+            print("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+        end
+    end
+    
+    if #pdfList == 0 then
+        return;                 -- No PDFs available for this item
+    end
+    --do
+    --return;
+    --end
+    -- DevTools_Dump{lowerLimit = lowerLimit, upperLimit = upperLimit, delta = DELTA, count = (upperLimit - lowerLimit + 1)/DELTA, fns = #pdfList}
+    -- do return; end
+    
+    -- Ok, integrate from -10G to 10000G through all functions
+    local total, lastTotal = 0, 0;
+    local delta = (upperLimit - lowerLimit) * .01;
+    
+    -- DevTools_Dump{min = lowerLimit / 10000, max = upperLimit / 10000};
+    -- do return; end
+    
+    local i = 0;
+    
+    repeat
+        lastTotal = total;
+        total = 0;
+        delta = delta * 0.75;
+        
+        for i = 1, #pdfList do
+            local thisCall = pdfList[i];
+            for x = lowerLimit, upperLimit, delta do
+                total = total + thisCall(x);
+            end
+        end
+        
+        total = total * delta;
+        
+        -- DevTools_Dump{i=i, delta=delta}
+        -- do return end;
+        i = i + 1;
+        -- DEFAULT_CHAT_FRAME:AddMessage("Iteration "..i..": "..total.." = "..abs(total-lastTotal)/total);
+        
+    until abs(total-lastTotal)/total < ERROR or abs(total-lastTotal)/total ~= abs(total-lastTotal)/total or i > 3;
+    
+    -- DevTools_Dump{error=abs(total-lastTotal)/total, delta=delta, total=total, lastTotal=lastTotal};
+    -- do return; end
+    
+    local limit = total/2;
+    local midpoint;
+    
+    -- Now find the 50% point
+    total = 0;
+    for x = lowerLimit, upperLimit, delta do
+        for i = 1, #pdfList do
+            total = total + pdfList[i](x) * delta;
+        end
+        
+        if total > limit then
+            midpoint = x;
+            break;
+        end
+    end
+    
+    -- Cache before finishing up
+    cache[itemLink..":"..(serverKey or "")] = acquire();
+    cache[itemLink..":"..(serverKey or "")].time = GetTime();
+    cache[itemLink..":"..(serverKey or "")].value = midpoint;
+    
+	if midpoint and midpoint > 0 then
+        -- DevTools_Dump{midpoint = midpoint};
+        return midpoint;
+        -- return total/totalweight, seen, count
+    else
+		return 0;
 	end
 end
 
@@ -472,6 +549,11 @@ local exp = math.exp;
 local bellCurveMeta = {
     __index = {
         SetParameters = function(self, mean, stddev)
+            if (stddev == 0) then 
+                error("Standard deviation cannot be zero"); 
+            elseif (stddev ~= stddev) then
+                error("Standard deviation must be a real number");
+            end
             self.mean = mean;
             self.stddev = stddev;
             self.param1 = 1/(stddev*sq2pi);     -- Make __call a little faster where we can
@@ -480,7 +562,13 @@ local bellCurveMeta = {
     },
     -- Simple bell curve call
     __call = function(self, x)
-        return self.param1*exp(-(x-self.mean)^2/self.param2);
+        local n = self.param1*exp(-(x-self.mean)^2/self.param2);
+        if n ~= n then 
+            DEFAULT_CHAT_FRAME:AddMessage("-----------------");
+            DevTools_Dump{param1 = self.param1, param2 = self.param2, x = x, mean = self.mean, stddev = self.stddev, exp = exp(-(x-self.mean)^2/self.param2)};
+            error(x.." produced NAN ("..tostring(n)..")"); 
+        end
+        return n;
     end
 }
 -------------------------------------------------------------------------------

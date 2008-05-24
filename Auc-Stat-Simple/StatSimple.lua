@@ -184,18 +184,34 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- @param hyperlink The item to generate the PDF curve for
 -- @param faction The faction key from which to look up the data
 -- @param realm The realm from which to look up the data
+-- @return The PDF for the requested item, or nil if no data is available
+-- @return The lower limit of meaningful data for the PDF (determined
+-- as the mean minus 5 standard deviations)
+-- @return The upper limit of meaningful data for the PDF (determined
+-- as the mean plus 5 standard deviations)
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
     
     -- Calculate the SE estimated standard deviation & mean
     local mean, stddev = private.EstimateStandardDeviation(hyperlink, faction, realm);
     
+    if stddev ~= stddev then
+        error("Standard deviation is not real");
+    elseif mean ~= mean then
+        error("Mean is not real");
+    elseif not mean then
+        return;                         -- No available data
+    end
+    
+    -- Calculate the lower and upper bounds as +/- 5 standard deviations
+    local lower, upper = mean - 5*stddev, mean + 5*stddev;
+    
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 10% of the mean
     if stddev == 0 then stddev = .10 * mean; end
     
     bellCurve:SetParameters(mean, stddev);
-    return bellCurve;
+    return bellCurve, lower, upper;
 end
 
 function lib.OnLoad(addon)
@@ -555,8 +571,8 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 
 	local data = private.GetPriceData(faction, realm)
 	if not data then 
-        print("Warning: GetPriceData for "..(faction or "").." | "..(realm or "").." returned nil in SIMP:EstimateStandardDeviation. Returning 0,0");
-        return 0, 0; 
+        -- print("Warning: GetPriceData for "..(faction or "").." | "..(realm or "").." returned nil in SIMP:EstimateStandardDeviation.");
+        return;
     end
     
     local dataset = acquire();
@@ -593,6 +609,11 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 		end
 		recycle(stats)
 	end
+    
+    if #dataset == 0 then                               -- No data
+        -- print("Warning: StatSimple dataset for "..hyperlink.." is empty.");
+        return;
+    end
 	
     local mean = private.sum(unpack(dataset))/#dataset;
     local variance = 0;
