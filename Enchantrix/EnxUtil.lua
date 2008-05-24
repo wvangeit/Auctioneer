@@ -368,7 +368,8 @@ function getReagentPrice(reagentID, extra)
                 local _, reagentLink, _, _, _, _, _, _, _ = getReagentInfo(reagentID)
 				price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentLink)
 			else
-				price5 = AucAdvanced.API.GetMarketValue(reagentID)
+                local _, link = GetItemInfo(reagentID);
+				price5 = AucAdvanced.API.GetMarketValue(link);
 			end
 		end
 		if Auctioneer and Enchantrix.State.Auctioneer_Loaded 
