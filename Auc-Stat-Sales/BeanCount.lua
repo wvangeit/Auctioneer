@@ -59,7 +59,7 @@ function lib.GetPrice(hyperlink, faction, realm)
         if cache[hyperlink]=={} then return end
         return unpack(cache[hyperlink])
     end
-	local tbl = BeanCounter.externalSearch(hyperlink, settings, true)
+	local tbl = BeanCounter.API.search(hyperlink, settings, true)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
     local i,v
     if tbl then
