@@ -108,11 +108,11 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, "Minimum Quality: %d")
 	gui:AddTip(id, "Use this slider to choose the minimum quality to go into the storage.\n"..
 		"\n"..
-		"0 = Junk (Grey),\n"..
-		"1 = Common (White),\n"..
-		"2 = Uncommon (Green),\n"..
-		"3 = Rare (Blue),\n"..
-		"4 = Epic (Purple)")
+		"0 = Junk (|cff9d9d9d Grey|r),\n"..
+		"1 = Common (|cffffffff White|r),\n"..
+		"2 = Uncommon (|cff1eff00 Green|r),\n"..
+		"3 = Rare (|cff0070dd Blue|r),\n"..
+		"4 = Epic (|cffa335ee Purple|r)")
 	
 	gui:AddControl(id, "Subhead",	0, "Filter by Item Level")
 	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, "Minimum item level")
