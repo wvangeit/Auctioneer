@@ -195,12 +195,8 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- Calculate the SE estimated standard deviation & mean
     local mean, stddev = private.EstimateStandardDeviation(hyperlink, faction, realm);
     
-    if stddev ~= stddev then
-        error("Standard deviation is not real");
-    elseif mean ~= mean then
-        error("Mean is not real");
-    elseif not mean then
-        return;                         -- No available data
+    if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
+        return;                         -- No available data or cannot estimate
     end
     
     -- Calculate the lower and upper bounds as +/- 5 standard deviations

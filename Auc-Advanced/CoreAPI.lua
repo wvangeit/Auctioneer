@@ -118,7 +118,7 @@ function lib.GetMarketValue(itemLink, serverKey)
             end
         elseif not warned[engine] then
             warned[engine] = true;
-            print("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+            DEFAULT_CHAT_FRAME:AddMessage("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
         end
     end
     
@@ -138,7 +138,7 @@ function lib.GetMarketValue(itemLink, serverKey)
     -- DevTools_Dump{min = lowerLimit / 10000, max = upperLimit / 10000};
     -- do return; end
     
-    local i = 0;
+    -- local i = 0;
     
     repeat
         lastTotal = total;
@@ -156,29 +156,46 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         -- DevTools_Dump{i=i, delta=delta}
         -- do return end;
-        i = i + 1;
+        -- i = i + 1;
         -- DEFAULT_CHAT_FRAME:AddMessage("Iteration "..i..": "..total.." = "..abs(total-lastTotal)/total);
         
-    until abs(total-lastTotal)/total < ERROR or abs(total-lastTotal)/total ~= abs(total-lastTotal)/total or i > 3;
+        if total ~= total then
+            return;                 -- Cannot calculate: NaN
+        end
+        
+    until abs(total-lastTotal)/total < ERROR;
     
     -- DevTools_Dump{error=abs(total-lastTotal)/total, delta=delta, total=total, lastTotal=lastTotal};
     -- do return; end
     
     local limit = total/2;
-    local midpoint;
+    local midpoint, lastMidpoint = 0, 0;
     
     -- Now find the 50% point
     total = 0;
-    for x = lowerLimit, upperLimit, delta do
-        for i = 1, #pdfList do
-            total = total + pdfList[i](x) * delta;
+    
+    repeat
+        lastMidpoint = midpoint;
+        total = 0;
+    
+        for x = lowerLimit, upperLimit, delta do
+            for i = 1, #pdfList do
+                total = total + pdfList[i](x) * delta;
+            end
+            
+            if total > limit then
+                midpoint = x;
+                break;
+            end
         end
         
-        if total > limit then
-            midpoint = x;
-            break;
+        delta = delta * 0.8;
+        
+        if midpoint ~= midpoint then
+            return;                 -- Cannot calculate: NaN
         end
-    end
+        
+    until abs(midpoint - lastMidpoint)/midpoint < ERROR;
     
     -- Cache before finishing up
     cache[itemLink..":"..(serverKey or "")] = acquire();
@@ -186,12 +203,14 @@ function lib.GetMarketValue(itemLink, serverKey)
     cache[itemLink..":"..(serverKey or "")].value = midpoint;
     
 	if midpoint and midpoint > 0 then
-        -- DevTools_Dump{midpoint = midpoint};
+        -- DEFAULT_CHAT_FRAME:AddMessage("Midpoint of "..itemLink..": "..midpoint);
         return midpoint;
         -- return total/totalweight, seen, count
     else
+        -- DEFAULT_CHAT_FRAME:AddMessage(itemLink.." was skipped due to no data. Integration limits were "..lowerLimit.." to "..upperLimit);
 		return 0;
-	end
+	end 
+
 end
 
 function lib.ClearItem(itemLink, serverKey)
@@ -563,11 +582,11 @@ local bellCurveMeta = {
     -- Simple bell curve call
     __call = function(self, x)
         local n = self.param1*exp(-(x-self.mean)^2/self.param2);
-        if n ~= n then 
-            DEFAULT_CHAT_FRAME:AddMessage("-----------------");
-            DevTools_Dump{param1 = self.param1, param2 = self.param2, x = x, mean = self.mean, stddev = self.stddev, exp = exp(-(x-self.mean)^2/self.param2)};
-            error(x.." produced NAN ("..tostring(n)..")"); 
-        end
+        -- if n ~= n then 
+            -- DEFAULT_CHAT_FRAME:AddMessage("-----------------");
+            -- DevTools_Dump{param1 = self.param1, param2 = self.param2, x = x, mean = self.mean, stddev = self.stddev, exp = exp(-(x-self.mean)^2/self.param2)};
+            -- error(x.." produced NAN ("..tostring(n)..")"); 
+        -- end
         return n;
     end
 }

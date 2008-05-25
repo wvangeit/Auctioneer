@@ -109,7 +109,7 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- DEFAULT_CHAT_FRAME:AddMessage("-----");
     -- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
     
-    if not (mean and stddev) then
+    if not (mean and stddev) or mean == 0 or stddev == 0 then
         return nil;                 -- No data, cannot determine pricing
     end
     
