@@ -272,7 +272,6 @@ function private.CreateFrames()
 			end
 			frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 			frame.imageview.sheet:SetData(private.empty)
-			frame.imageviewclassic.sheet:SetData(private.empty)
 			frame.UpdateControls()
 		end
 
@@ -302,7 +301,6 @@ function private.CreateFrames()
 				end
 				frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 				frame.imageview.sheet:SetData(private.empty)
-				frame.imageviewclassic.sheet:SetData(private.empty)
 				frame.UpdateControls()
 			end
 		end
@@ -369,7 +367,6 @@ function private.CreateFrames()
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
-		frame.imageviewclassic.sheet:SetData(data, style)
 		recycle(data)
 		recycle(style)
 		--reset scroll position if new items list is too short to show
@@ -1093,6 +1090,7 @@ function private.CreateFrames()
 	
 	function frame.ChangeUI()
 		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+			--hide unecessary elements
 			frame.itembox:Hide()
 			frame.salebox:SetPoint("TOPLEFT", frame, "TOPLEFT", 13, -71)
 			frame.salebox:SetPoint("RIGHT", frame, "LEFT", 253, 0)
@@ -1114,8 +1112,12 @@ function private.CreateFrames()
 			frame.go:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -20, 15)
 			frame.salebox.info:ClearAllPoints()
 			frame.salebox.info:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, 8)
-			frame.imageview:Hide()
-			frame.imageviewclassic:Show()
+			--set scrollframe to match clasic ratio
+			frame.imageview:SetBackdropColor(0, 0, 0, 1)
+			frame.imageview:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
+			frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
+			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
+			
 			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
 			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
 			if not frame.salebox.sig then
@@ -1124,7 +1126,7 @@ function private.CreateFrames()
 				frame.salebox.stackentry:Show()
 				frame.salebox.stacksoflabel:Show()
 				frame.salebox.numberentry:Show()
-                frame.salebox.numberonly:Show()
+				frame.salebox.numberonly:Show()
 				frame.salebox.totalsize:Show()
 				frame.salebox.depositcost:Show()
 				frame.salebox.totalbid:Show()
@@ -1138,6 +1140,7 @@ function private.CreateFrames()
 			frame.salebox.ignore:Hide()
 			frame.salebox.bulk:Hide()
 		else
+			--Show normal elements
 			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 5, 0)
 			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.number, "TOPRIGHT", 5, 0)
 			frame.salebox.stacksoflabel:Hide()
@@ -1179,8 +1182,12 @@ function private.CreateFrames()
 			frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
 			frame.salebox.info:ClearAllPoints()
 			frame.salebox.info:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5,7)
-			frame.imageview:Show()
-			frame.imageviewclassic:Hide()
+			--set scrollframe to match appraiser ratio
+			frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
+			frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
+			frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
+			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
+			
 			frame.salebox.name:SetHeight(20)
 			frame.salebox.warn:SetJustifyH("RIGHT")
 			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 0)
@@ -2253,7 +2260,6 @@ function private.CreateFrames()
 		obj[obj.pos]:Set(text, coins, r,g,b)
 	end
 
-
 	local myStrata = frame.manifest:GetFrameStrata()
 
 	frame.manifest.header = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -2284,7 +2290,7 @@ function private.CreateFrames()
 		lines[i] = line
 	end
 	frame.manifest.lines = lines
-
+	Appraiser = frame 
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -2292,11 +2298,11 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
-	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
-	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
+	--set scrollframe area to the max height it will need to be (Classic) on creation to allows us to easily resize later.
+	frame.imageview:SetBackdropColor(0, 0, 0, 1)
+	frame.imageview:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
+	frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-	
 	--records the column width changes
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column, width)
@@ -2312,9 +2318,7 @@ function private.CreateFrames()
 		print(private.buyselection.link)
 		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
 		frame.imageview.sheet.selected = nil
-		frame.imageviewclassic.sheet.selected = nil
 		private.onSelect()
-		private.onClassicSelect()
 	end
 	function private.BidAuction()
 		local bid = private.buyselection.minbid
@@ -2323,17 +2327,11 @@ function private.CreateFrames()
 		end
 		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, bid)
 		frame.imageview.sheet.selected = nil
-		frame.imageviewclassic.sheet.selected = nil
 		private.onSelect()
-		private.onClassicSelect()
 	end
 	
 	private.buyselection = {}
 	function private.onSelect()
-		if frame.imageview.sheet.selected and frame.imageviewclassic.sheet.selected then
-			frame.imageviewclassic.sheet.selected = nil
-			private.onClassicSelect()
-		end
 		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
 			frame.imageview.sheet.prevselected = frame.imageview.sheet.selected
 			local selected = frame.imageview.sheet:GetSelection()
@@ -2382,6 +2380,7 @@ function private.CreateFrames()
 		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
 		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, nil, private.onResize, private.onSelect)
+	
 	frame.imageview.sheet:EnableSelect(true)
 	
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
@@ -2415,73 +2414,15 @@ function private.CreateFrames()
 	frame.imageview.purchase.bid.price:SetPoint("TOPLEFT", frame.imageview.purchase.bid, "TOPRIGHT")
 	frame.imageview.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.bid, "BOTTOMRIGHT")
 	frame.imageview.purchase.bid.price:SetJustifyV("MIDDLE")
-	
+	--[[Classic UI Style]]--
 	frame.imageviewclassic = CreateFrame("Frame", nil, frame)
 	frame.imageviewclassic:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+		insets = { left = 5, right = 5, top = 5, bottom = 5}
 	})
 	
-	function private.onClassicSelect()
-		if frame.imageviewclassic.sheet.selected and frame.imageview.sheet.selected then
-			frame.imageview.sheet.selected = nil
-			private.onSelect()
-		end
-		if frame.imageviewclassic.sheet.prevselected ~= frame.imageviewclassic.sheet.selected then
-			frame.imageviewclassic.sheet.prevselected = frame.imageviewclassic.sheet.selected
-			local selected = frame.imageviewclassic.sheet:GetSelection()
-			if not selected then
-				private.buyselection = {}
-			else
-				private.buyselection.link = selected[11]
-				private.buyselection.seller = selected[2]
-				private.buyselection.stack = selected[4]
-				private.buyselection.minbid = selected[8]
-				private.buyselection.curbid = selected[9]
-				private.buyselection.buyout = selected[10]
-			end
-			if private.buyselection.buyout and (private.buyselection.buyout > 0) then
-				frame.imageviewclassic.purchase.buy:Enable()
-				frame.imageviewclassic.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
-			else
-				frame.imageviewclassic.purchase.buy:Disable()
-				frame.imageviewclassic.purchase.buy.price:SetText("")
-			end
-			
-			if private.buyselection.minbid then
-				if private.buyselection.curbid and private.buyselection.curbid > 0 then
-					frame.imageviewclassic.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
-				else
-					frame.imageviewclassic.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
-				end
-				frame.imageviewclassic.purchase.bid:Enable()
-			else
-				frame.imageviewclassic.purchase.bid:Disable()
-				frame.imageviewclassic.purchase.bid.price:SetText("")
-			end
-		end
-	end
-	
-	frame.imageviewclassic:SetBackdropColor(0, 0, 0, 1)
-	frame.imageviewclassic:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
-	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
-	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-	frame.imageviewclassic.sheet = ScrollSheet:Create(frame.imageviewclassic, {
-		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
-		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
-		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")}, --40
-		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")}, --30
-		{ "Min/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Min/ea"), { DESCENDING=true } }, --85
-		{ "Cur/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Cur/ea"), { DESCENDING=true } }, --85
-		{ "Buy/ea", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
-		{ "MinBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.MinBid"), { DESCENDING=true } }, --85
-		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } }, --85
-		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
-		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
-	}, nil, nil, nil, private.onResize, private.onClassicSelect)
-	frame.imageviewclassic.sheet:EnableSelect(true)
 	frame.imageviewclassic:Hide()
 
 	frame.imageviewclassic.purchase = CreateFrame("Frame", nil, frame.imageviewclassic)
