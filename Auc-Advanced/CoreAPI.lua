@@ -122,9 +122,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         end
     end
     
-    if #pdfList == 0 then
-        return;                 -- No PDFs available for this item
-    end
+    
     --do
     --return;
     --end
@@ -135,12 +133,21 @@ function lib.GetMarketValue(itemLink, serverKey)
     local total, lastTotal = 0, 0;
     local delta = (upperLimit - lowerLimit) * .01;
     
+    
+    if #pdfList == 0 or delta == 0 then
+        return;                 -- No PDFs available for this item
+    end
+    
     -- DevTools_Dump{min = lowerLimit / 10000, max = upperLimit / 10000};
     -- do return; end
     
-    -- local i = 0;
+-- local n = 0;
     
     repeat
+    
+-- n= n + 1;
+-- if n > 5 then break; end
+
         lastTotal = total;
         total = 0;
         delta = delta * 0.75;
@@ -156,7 +163,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         -- DevTools_Dump{i=i, delta=delta}
         -- do return end;
-        -- i = i + 1;
+        
         -- DEFAULT_CHAT_FRAME:AddMessage("Iteration "..i..": "..total.." = "..abs(total-lastTotal)/total);
         
         if total ~= total then
@@ -165,6 +172,10 @@ function lib.GetMarketValue(itemLink, serverKey)
         
     until abs(total-lastTotal)/total < ERROR;
     
+-- if n > 10 then
+--    DEFAULT_CHAT_FRAME:AddMessage("Slow error propogation: After "..n..", got to "..total..", "..lastTotal.." = "..abs(total-lastTotal)/total);
+-- end
+        
     -- DevTools_Dump{error=abs(total-lastTotal)/total, delta=delta, total=total, lastTotal=lastTotal};
     -- do return; end
     
