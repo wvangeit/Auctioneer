@@ -2290,7 +2290,6 @@ function private.CreateFrames()
 		lines[i] = line
 	end
 	frame.manifest.lines = lines
-	Appraiser = frame 
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
