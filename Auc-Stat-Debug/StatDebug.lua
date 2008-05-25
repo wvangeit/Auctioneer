@@ -99,7 +99,7 @@ function lib.GetPrice(hyperlink)
 
 	local id = strjoin(":", itemId, property, factor)
 	local data = private.GetPriceData()
-	if not data then return end
+	if not data or not data[id] then return end
 	return unpack(data[id])
 end
 
@@ -123,6 +123,15 @@ function lib.GetPriceArray(hyperlink)
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array
+end
+
+local function fakePDF()
+    return 0;               -- Always return 0 probability - never gets added.
+end
+
+-- Send back a fake PDF. We don't want Debug to influence statistic scores
+function lib.GetItemPDF(hyperlink)
+    return fakePDF, private.getBounds(lib.GetPrice(hyperlink))
 end
 
 function lib.OnLoad(addon)
@@ -198,6 +207,34 @@ end
 
 function private.DataLoaded()
 	if (not StatData) then return end
+end
+
+-- Determines the minimum value in the tuple
+-- @param ... The values to iterate over, determining
+-- the minimum and maximum
+-- @return The minimum value in the tuple, or 0 if no values exist
+-- @return The maximum value in the tuple, or 0 if no values exist
+function private.getBounds(...)
+    local n = select('#', ...);
+    if n == 0 then
+        return 0, 0;
+    end
+    
+    local min = select(1, ...)
+    local max = min;
+    
+    for x = 2, n do
+        local val = select(x, ...);
+        if min > val then
+            min = val;
+        end
+        
+        if max < val then
+            max = val;
+        end
+    end
+    
+    return min, max;
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
