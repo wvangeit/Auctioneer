@@ -43,6 +43,8 @@ local select = select;
 local sqrt = sqrt;
 local ipairs = ipairs;
 local unpack = unpack;
+local tinsert = table.insert;
+local assert = assert;
 
 function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
@@ -579,7 +581,7 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 		local stats = private.UnpackStats(data.daily[itemId]);
 		if stats[property] then
 			local dayTotal, dayCount, minBuyout = unpack(stats[property]);
-			table.insert(dataset, dayTotal/dayCount);			
+			tinsert(dataset, dayTotal/dayCount);			
             count = count + dayCount;
 		end
         
@@ -593,11 +595,11 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 			count = count + seenCount;
             -- WTB fall-through switch statement 
             if seenDays >= 3 then
-                table.insert(dataset, avg3);
+                tinsert(dataset, avg3);
                 if seenDays >= 7 then
-                    table.insert(dataset, avg7);
+                    tinsert(dataset, avg7);
                     if seenDays >= 14 then
-                        table.insert(dataset, avg14);
+                        tinsert(dataset, avg14);
                     end
                 end
             end
@@ -617,7 +619,7 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
         variance = variance + (mean - v)^2;
     end
     
-    return mean, sqrt(1/(count-1) * variance);          -- 1/(count-1) due to estimation of population from sample
+    return mean, sqrt(variance);    
 end
 
 -- Simple function to total all of the values in the tuple

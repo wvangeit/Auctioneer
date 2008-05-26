@@ -73,7 +73,7 @@ local warned  = {};
 local tremove = table.remove;
 local tinsert = table.insert;
 local abs = math.abs;
-local ERROR = 0.10;
+local ERROR = 0.02;
 -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
 --[[
 	This function acquires the current market value of the mentioned item using
@@ -87,18 +87,26 @@ local ERROR = 0.10;
 	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
 ]]
 function lib.GetMarketValue(itemLink, serverKey)
+    -- DEFAULT_CHAT_FRAME:AddMessage("GMV Called");
     local _;
     if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
     if not itemLink then return; end
     -- DEFAULT_CHAT_FRAME:AddMessage("Estimation of market value for IL: "..tostring(itemLink).." SK: "..tostring(serverKey));
     
     -- Look up in the cache if it's recent enough
+    -- 60s in addition to __mode="kv" provides a dynamic compromise between the GC and a "good time"
+    -- so that we can calculate more frequently if we have CPU time, or otherwise wait up to 60s.
     if cache[itemLink..":"..(serverKey or "")] then
-        if cache[itemLink..":"..(serverKey or "")].time > GetTime() - 10 then
+        if cache[itemLink..":"..(serverKey or "")].time < GetTime() - 60 then
+            -- DEFAULT_CHAT_FRAME:AddMessage("Deleting cached version of "..itemLink);
             recycle(cache[itemLink..":"..(serverKey or "")]);
+            cache[itemLink..":"..(serverKey or "")] = nil;
         else
+            -- DEFAULT_CHAT_FRAME:AddMessage("Using cached version for "..itemLink.." from "..cache[itemLink..":"..(serverKey or "")].time);
             return cache[itemLink..":"..(serverKey or "")].value
         end
+    else
+        -- DEFAULT_CHAT_FRAME:AddMessage("No cache information available for "..itemLink);
     end
     
 	-- Clear out the PDF list
@@ -118,7 +126,7 @@ function lib.GetMarketValue(itemLink, serverKey)
             end
         elseif not warned[engine] then
             warned[engine] = true;
-            DEFAULT_CHAT_FRAME:AddMessage("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+            lib.Print("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
         end
     end
     
@@ -166,7 +174,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         -- DEFAULT_CHAT_FRAME:AddMessage("Iteration "..i..": "..total.." = "..abs(total-lastTotal)/total);
         
-        if total ~= total then
+        if total ~= total or total == 0 then
             return;                 -- Cannot calculate: NaN
         end
         
@@ -202,7 +210,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         delta = delta * 0.8;
         
-        if midpoint ~= midpoint then
+        if midpoint ~= midpoint or midpoint == 0 then
             return;                 -- Cannot calculate: NaN
         end
         
