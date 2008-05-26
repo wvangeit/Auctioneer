@@ -427,7 +427,7 @@ function lib.makeautosellgui()
 	autosellframe:Hide()
 	
 	autosellframe:SetPoint("CENTER", UIParent, "CENTER")
-	autosellframe:SetWidth(834.5)
+	autosellframe:SetWidth(640)
 	autosellframe:SetHeight(450)
 	
 	autosellframe:SetMovable(true)
@@ -460,7 +460,7 @@ function lib.makeautosellgui()
 
 	--Close Button
 	autosellframe.closeButton = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
-	autosellframe.closeButton:SetPoint("BOTTOMRIGHT", autosellframe, "BOTTOMRIGHT", -10, 10)
+	autosellframe.closeButton:SetPoint("BOTTOMRIGHT", autosellframe, "BOTTOMRIGHT", -530, 10)
 	autosellframe.closeButton:SetText(("Close"))
 	autosellframe.closeButton:SetScript("OnClick",  lib.closeAutoSellGUI)
 	
@@ -468,7 +468,7 @@ function lib.makeautosellgui()
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 		
 	autosellframe.slot = autosellframe:CreateTexture(nil, "BORDER")
-	autosellframe.slot:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 23, -75)
+	autosellframe.slot:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 23, -50)
 	autosellframe.slot:SetWidth(45)
 	autosellframe.slot:SetHeight(45)
 	autosellframe.slot:SetTexCoord(0.15, 0.85, 0.15, 0.85)
@@ -488,13 +488,13 @@ function lib.makeautosellgui()
 	autosellframe.slot.help:SetWidth(100)
 
 	autosellframe.workingname = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	autosellframe.workingname:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 15, -135)
+	autosellframe.workingname:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 15, -100)
 	autosellframe.workingname:SetText(("")) 
 	autosellframe.workingname:SetWidth(90)
 
 	--Add Item to list button	
 	autosellframe.additem = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
-	autosellframe.additem:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 10, -160)
+	autosellframe.additem:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 10, -150)
 	autosellframe.additem:SetText(('Add Item'))
 	autosellframe.additem:SetScript("OnClick", autosellframe.additemtolist)
 	
@@ -524,14 +524,14 @@ function lib.makeautosellgui()
 	})
 	
 	autosellframe.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	autosellframe.resultlist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 187, 417.5)
-	autosellframe.resultlist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 492, 0)
-	autosellframe.resultlist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
+	autosellframe.resultlist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 270, 250)
+	autosellframe.resultlist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT",630, 0)
+	autosellframe.resultlist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 10)
 	
 	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
 		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
-		{ "Appraiser", "COIN", 70 }, 
-		{ "Vendor Value", "COIN", 70 }, 		
+		{ "Vendor", "COIN", 70 }, 
+		{ "Appraiser", "COIN", 70 }, 		
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClickAutoSellSheet) 
 	
 	--Create the bag contents frame
@@ -545,18 +545,18 @@ function lib.makeautosellgui()
 	
 	autosellframe.baglist:SetBackdropColor(0, 0, 0.0, 0.5)
 
-	autosellframe.baglist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 518, 417.5)
-	autosellframe.baglist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 823, 0)
-	autosellframe.baglist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
+	autosellframe.baglist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 270, 445)
+	autosellframe.baglist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 630, 0)
+	autosellframe.baglist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 250)
 	
 	autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
-	autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
+	autosellframe.bagList:SetPoint("TOPRIGHT", autosellframe.baglist, "BOTTOMRIGHT", -530, -50)
 	autosellframe.bagList:SetText(("Re-Scan Bags"))
 	autosellframe.bagList:SetScript("OnClick", lib.populateDataSheet)
 	
 	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
 		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
-		{ ('BTM Rule'), "TEXT", 25 }, 
+		{ ('BTM Rule'), "TEXT", 70 },
 		{ "Appraiser", "COIN", 70 }, 
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClickBagSheet) 
 end
