@@ -35,7 +35,7 @@ if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local addShift;
 local CompactUImode = false
-local orig_AB_OC, BrowseButton_OnClick;
+local orig_AB_OC;
 
 function lib.GetName()
 	return libName
@@ -141,7 +141,7 @@ function private.EasyBuyout()
     
     if get("util.EasyBuyout.active") then
        for i=1,50 do
-            button = _G["BrowseButton"..i]
+            local button = _G["BrowseButton"..i]
             if not button then break end
             button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
             _G["BrowseButton"..i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
