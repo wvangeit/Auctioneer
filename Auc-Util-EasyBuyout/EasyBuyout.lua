@@ -93,11 +93,11 @@ end
 
 function private.BrowseButton_OnClick(...)
     if not get("util.EasyBuyout.active") then
-        return
+        return orig_AB_OC(...)
     end
     if get("util.EasyBuyout.shift.active") then
         if not (IsShiftKeyDown()) then
-            return
+            return orig_AB_OC(...)
         end
     end
     if (arg1 == "RightButton") then
