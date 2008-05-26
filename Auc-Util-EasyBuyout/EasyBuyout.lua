@@ -35,6 +35,7 @@ if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local addShift;
 local CompactUImode = false
+local orig_AB_OC, BrowseButton_OnClick;
 
 function lib.GetName()
 	return libName
