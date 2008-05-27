@@ -96,14 +96,15 @@ function lib.GetMarketValue(itemLink, serverKey)
     -- Look up in the cache if it's recent enough
     -- 60s in addition to __mode="kv" provides a dynamic compromise between the GC and a "good time"
     -- so that we can calculate more frequently if we have CPU time, or otherwise wait up to 60s.
-    if cache[itemLink..":"..(serverKey or "")] then
-        if cache[itemLink..":"..(serverKey or "")].time < GetTime() - 60 then
+    local cacheTable = cache[itemLink..":"..(serverKey or "")];
+    if cacheTable then
+        if cacheTable.time < GetTime() - 60 then
             -- DEFAULT_CHAT_FRAME:AddMessage("Deleting cached version of "..itemLink);
             recycle(cache[itemLink..":"..(serverKey or "")]);
             cache[itemLink..":"..(serverKey or "")] = nil;
         else
             -- DEFAULT_CHAT_FRAME:AddMessage("Using cached version for "..itemLink.." from "..cache[itemLink..":"..(serverKey or "")].time);
-            return cache[itemLink..":"..(serverKey or "")].value
+            return cacheTable.value, cacheTable.seen, cacheTable.stats;
         end
     else
         -- DEFAULT_CHAT_FRAME:AddMessage("No cache information available for "..itemLink);
@@ -222,13 +223,19 @@ function lib.GetMarketValue(itemLink, serverKey)
         
     until abs(midpoint - lastMidpoint)/midpoint < ERROR;
     
-    -- Cache before finishing up
-    cache[itemLink..":"..(serverKey or "")] = acquire();
-    cache[itemLink..":"..(serverKey or "")].time = GetTime();
-    cache[itemLink..":"..(serverKey or "")].value = midpoint;
     
 	if midpoint and midpoint > 0 then
         -- DEFAULT_CHAT_FRAME:AddMessage("Midpoint of "..itemLink..": "..midpoint);
+        
+        -- Cache before finishing up
+        local cacheTable = acquire();
+        cache[itemLink..":"..(serverKey or "")] = cacheTable;
+        cacheTable.time = GetTime();
+        cacheTable.value = midpoint;
+        cacheTable.seen = seen;
+        cacheTable.stats = #pdfList;
+        
+        
         return midpoint, seen, #pdfList;
         -- return total/totalweight, seen, count
     else
