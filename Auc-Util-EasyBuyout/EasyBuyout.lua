@@ -36,6 +36,7 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 local addShift;
 local CompactUImode = false
 local orig_AB_OC;
+local ebModifier = false
 
 function lib.GetName()
 	return libName
@@ -57,7 +58,8 @@ end
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", true)
-    AucAdvanced.Settings.SetDefault("util.EasyBuyout.shift.active", true)
+    AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
+    AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.select", 0)
 end
 
 --[[ Local functions ]]--
@@ -84,22 +86,38 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box!")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.active", "Enable EasyBuyout")
     gui:AddTip(id, "Ticking this box will enable or disable the addon")
-    gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.shift.active", "Enable shift + right-click")
-    gui:AddTip(id, "Ticking this box will add \"shift\" to the right-click")
+    gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.modifier.active", "Enable key modifier")
+    gui:AddControl(id, "Subhead",          0,   "Select your modifier below. (ex. shift+rightclick)")
+    gui:AddControl(id, "Selectbox",  0, 1, {
+		{0, "Shift"},
+		{1, "Alt"},
+		{2, "Shift+Alt"}
+	}, "util.EasyBuyout.modifier.select", "testing here")
+    gui:AddTip(id, "Select your key modifier")
     gui:AddHelp(id, "What is EasyBuyout?",
         "What is EasyBuyout?",
-        "EasyBuyout makes it easier to buy auctions in mass, faster! You simply right-click (or shift+right-click depending on your options) to buyout an auction with no confirmation box")
+        "EasyBuyout makes it easier to buy auctions in mass, faster! You simply right-click (or 'modifier'+right-click depending on your options) to buyout an auction with no confirmation box")
 end
 
 function private.BrowseButton_OnClick(...)
+    -- check for EB enabled
     if not get("util.EasyBuyout.active") then
         return orig_AB_OC(...)
     end
-    if get("util.EasyBuyout.shift.active") then
-        if not (IsShiftKeyDown()) then
+
+    -- check and assign modifier
+    if get("util.EasyBuyout.modifier.active") then
+        if (get("util.EasyBuyout.modifier.select") == 0) and IsShiftKeyDown() then
+            ebModifier = true;
+        elseif (get("util.EasyBuyout.modifier.select") == 1) and IsAltKeyDown() then
+            ebModifier = true;
+        elseif (get("util.EasyBuyout.modifier.select") == 2) and IsShiftKeyDown() and IsAltKeyDown() then
+            ebModifier = true;
+        else
             return orig_AB_OC(...)
         end
     end
+
     if (arg1 == "RightButton") then
         local button = select(1, ...) or this
 	
@@ -156,7 +174,6 @@ end
 function private.EasyBuyoutAuction()
     local EasyBuyoutIndex = GetSelectedAuctionItem("list");
     local EasyBuyoutPrice = select(9, GetAuctionItemInfo("list", EasyBuyoutIndex))
-    --DEFAULT_CHAT_FRAME:AddMessage(GetSelectedAuctionItem("list"));
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
 end
