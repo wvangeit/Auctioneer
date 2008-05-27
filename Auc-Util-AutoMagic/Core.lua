@@ -157,7 +157,7 @@ local isDEMats =
 
 lib.vendorlist = {}
 function lib.vendorAction()
-	for bag=0,4 do
+	for bag=0,4 do 
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
@@ -167,10 +167,10 @@ function lib.vendorAction()
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
 				if autoSellList[ itemID ] then 
-					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":In custom AutoSell list"
+					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Custom Add"
 					runstop = 1
 				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
-					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Item is grey"
+					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Grey"
 					runstop = 1
 				elseif (BtmScan and runstop == 0) then
 					local bidlist = BtmScan.Settings.GetSetting("bid.list")
@@ -180,7 +180,7 @@ function lib.vendorAction()
 						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
 						bids = bidlist[sig..":"..seed.."x"..itemCount]
 						if(bids and bids[1] and bids[1] == "vendor") then 
-							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":BTM bought for vendor"
+							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":BTM-vendor"
 							runstop = 1
 						end 
 					end
@@ -188,15 +188,7 @@ function lib.vendorAction()
 			end
 		end
 	end
-	for k, v in pairs(lib.vendorlist) do	
-		local bag, slot = strsplit(":", k)
-		local iName, iID, iWhy = strsplit(":", v)
-		if (get("util.automagic.chatspam")) then 
-			print("AutoMagic is selling:", iName, "due to", iWhy)
-		end
-		UseContainerItem(bag, slot) 
-		lib.vendorlist[k] = nil
-	end
+	lib.ASCPrompt()
 end
 
 function lib.disenchantAction()

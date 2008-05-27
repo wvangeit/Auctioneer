@@ -108,10 +108,10 @@ end
 	-- define what event fires what function
 function lib.onEventDo(this, event)
 	if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 				end
-	if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 				end
+	if event == 'MERCHANT_CLOSED' 	then lib.merchantClosed()				end
 	if event == 'MAIL_SHOW' 			then lib.mailShow() 					end  
-	if event == "MAIL_CLOSED" 		then lib.mailClosed() 					end
-	if event == "UI_ERROR_MESSAGE" 	then set("util.automagic.uierrormsg", 1) 	end
+	if event == 'MAIL_CLOSED' 		then lib.mailClosed() 					end
+	if event == 'UI_ERROR_MESSAGE'	then set("util.automagic.uierrormsg", 1) 	end
 end
 
 function lib.SetupConfigGui(gui)
@@ -167,7 +167,7 @@ end
 
 
 function lib.merchantClosed()
-	--Place holder: Is fired when the merchant window is closed.
+	if lib.confirmsellui:IsVisible() then lib.confirmsellui:Hide() end
 end
 	
 function lib.mailShow()

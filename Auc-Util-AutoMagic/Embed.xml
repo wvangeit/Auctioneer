@@ -3,7 +3,9 @@
 	<Script file="Auc-Util-AutoMagic.lua"/>
 	<Script file="Core.lua"/>
 	<Script file="Mail-GUI.lua"/>
+	<Script file="ConfirmSellUI.lua"/>
 	<Script>
 		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>
 </Ui>
+ 
