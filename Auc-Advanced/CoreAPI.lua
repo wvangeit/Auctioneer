@@ -112,13 +112,19 @@ function lib.GetMarketValue(itemLink, serverKey)
 	-- Clear out the PDF list
     while tremove(pdfList) do end           -- remove all items from table
     
-    local upperLimit, lowerLimit = 0, 1e11;
+    local upperLimit, lowerLimit, seen = 0, 1e11, 0;
     
     -- Run through all of the stat modules and get the PDFs 
     for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
         local fn = engineLib.GetItemPDF;
         if fn then
             local i, min, max = fn(itemLink, serverKey);
+            local priceArray = engineLib.GetPriceArray(itemLink, serverKey);
+            
+            if priceArray and (priceArray.seen or 0) > seen then
+                seen = priceArray.seen;
+            end
+            
             if i then
                 tinsert(pdfList, i);
                 if min < lowerLimit then lowerLimit = min; end
@@ -223,11 +229,11 @@ function lib.GetMarketValue(itemLink, serverKey)
     
 	if midpoint and midpoint > 0 then
         -- DEFAULT_CHAT_FRAME:AddMessage("Midpoint of "..itemLink..": "..midpoint);
-        return midpoint;
+        return midpoint, seen, #pdfList;
         -- return total/totalweight, seen, count
     else
         -- DEFAULT_CHAT_FRAME:AddMessage(itemLink.." was skipped due to no data. Integration limits were "..lowerLimit.." to "..upperLimit);
-		return 0;
+		return;
 	end 
 
 end
