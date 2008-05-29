@@ -663,7 +663,7 @@ do
         seenCalls[source] = seenCalls[source] or {};
         if not seenCalls[source][caller] then
             -- Not warned yet, so warn them!
-            
+            seenCalls[source][caller]=true
             -- Display it            
             AucAdvanced.Print(
                 "Auctioneer Advanced: "..
