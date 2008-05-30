@@ -45,6 +45,7 @@ end
 -- Called before StartAuction()
 -------------------------------------------------------------------------------
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
+	debugPrint("Prehook",minBid, buyoutPrice, runTime, GetCursorInfo(), "Info?")
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name and count and price) then
 		local deposit = CalculateAuctionDeposit(runTime)
@@ -125,7 +126,7 @@ function private.onAuctionCreated()
 		--debugPrint("first itemlink lookup", itemLink)
 		local Count = GetNumAuctionItems("owner")
 		Count = Count + 1
-		for i = 1, Count do
+		for i = Count, 1, -1 do
 			if post.name == GetAuctionItemInfo("owner",i) then
 				itemLink = GetAuctionItemLink("owner",i) or itemLink--so we try and replace with a better itemlink
 				--debugPrint("second itemlink lookup", itemLink)
@@ -135,6 +136,7 @@ function private.onAuctionCreated()
 		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
 		private.databaseAdd("postedAuctions", itemID, itemLink, text)
 		debugPrint("Added", itemLink, "to the postedAuctions DB")
+		--debugPrint(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
 	end
 end
 
