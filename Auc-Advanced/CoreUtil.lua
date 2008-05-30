@@ -299,23 +299,17 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("AUCTION_HOUSE_CLOSED");
 
 function lib.GetFactionGroup()
-	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
-	local testmyfaction = true
-
-	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
-	if AucAdvancedConfig.factions[currentZone] then
-		factionGroup = AucAdvancedConfig.factions[currentZone]
-	else
-		SetMapToCurrentZone()
-		local map = GetMapInfo()
-		if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
-			factionGroup = "Neutral"
-		end
+	
+	SetMapToCurrentZone()
+	local map = GetMapInfo()
+	if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+		factionGroup = "Neutral"
 	end
-	AucAdvancedConfig.factions[currentZone] = factionGroup
 	if auctionHouseStatus == 0 then
-		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = UnitFactionGroup("player") end 
+		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then
+			factionGroup = UnitFactionGroup("player")
+		end 
 	end
 	return factionGroup
 end
