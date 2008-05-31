@@ -56,7 +56,7 @@ function lib.GetPrice(hyperlink, faction, realm)
         settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true}
     end
     if cache[hyperlink] then
-        if cache[hyperlink]=={} then return end
+        if cache[hyperlink]==false then return end
         return unpack(cache[hyperlink])
     end
 	local tbl = BeanCounter.API.search(hyperlink, settings, true)
@@ -115,8 +115,8 @@ function lib.GetPrice(hyperlink, faction, realm)
         if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
         if soldqty7>0 then sold7 = sold7 / soldqty7 end
     end
+    if (not sold or sold==0) and (not bought or bought==0) then cache[hyperlink]=false; return end
     cache[hyperlink] = {bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
-    if (not sold or sold==0) and (not bought or bought==0) then cache[hyperlink]={}; return end
     return bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
@@ -150,17 +150,18 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	array.sold7 = sold7
     array.boughtqty7 = boughtqty7
     array.soldqty7 = soldqty7
-    if sold3 then
+    if sold3 and sold3>0 then
         array.price = sold3
-    elseif sold7 then
+		array.confidence = 1
+    elseif sold7 and sold7>0 then
         array.price = sold7
-    else
+		array.confidence = 0.66
+    elseif sold and sold>0 then
         array.price = sold
-    end
-    if sold then
-        array.confidence = 1
-    else
-        array.confidence = 0
+		array.confidence = 0.333
+	else
+		array.price = 0
+		array.confidence = 0
     end
     
 	return array
