@@ -284,15 +284,24 @@ function lib.IsValidAlgorithm(algorithm, itemLink)
 end
 
 private.algorithmstack = acquire()
-function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
 		error("No pricing algorithm supplied")
 	end
 	if (not itemLink) then
 		error("No itemLink supplied")
 	end
-	faction = faction or AucAdvanced.GetFaction()
-	realm = realm or GetRealmName()
+    
+    if reserved then
+        lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
+            "The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
+        );
+        
+        serverKey = reserved.."-"..serverKey;
+    end
+    
+	faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
+	realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -450,7 +459,17 @@ end
 
 --Market matcher APIs
 private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
-function lib.GetBestMatch(itemLink, algorithm, faction, realm)
+function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
+
+    if reserved then
+        lib.ShowDeprecationAlert("AucAdvanced.API.GetBestMatch(itemLink, algorithm, serverKey)",
+            "The 'realm' and 'faction' parameters have been removed in favor of a single "..
+            "variable 'serverKey' which should be used in the future."
+        );
+        
+        serverKey = reserved.."-"..serverKey;
+    end
+    
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
 
@@ -462,9 +481,9 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	local priceArray = {}
 	
 	if algorithm == "market" then
-		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, faction, realm)
+		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, serverKey)
 	elseif type(algorithm) == "string" then
-		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
 	else
 		priceArray.price = algorithm
 	end
