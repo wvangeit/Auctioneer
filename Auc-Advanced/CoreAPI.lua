@@ -300,8 +300,8 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
         serverKey = reserved.."-"..serverKey;
     end
     
-	faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
-	realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
+	local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
+	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -472,12 +472,14 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
     
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
+    
+    local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
+	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 
 	local matchers = lib.GetMatchers(itemLink)
 	local total, count, diff, _ = 0, 0, 0
 
-	faction = faction or AucAdvanced.GetFaction()
-	realm = realm or GetRealmName()
+	
 	local priceArray = {}
 	
 	if algorithm == "market" then
