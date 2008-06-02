@@ -299,17 +299,25 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("AUCTION_HOUSE_CLOSED");
 
 function lib.GetFactionGroup()
-	local factionGroup = UnitFactionGroup("player")
-	
-	SetMapToCurrentZone()
-	local map = GetMapInfo()
-	if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
-		factionGroup = "Neutral"
+	local currentZone = GetMinimapZoneText()
+	local factionGroup = "Faction" --Save only "Faction" or "Neutral", as non-neutral zones should always display the home faction's data
+
+	if not private.factions then private.factions = {} end
+	if private.factions[currentZone] then
+		factionGroup = private.factions[currentZone]
+	else
+		SetMapToCurrentZone()
+		local map = GetMapInfo()
+		if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+			factionGroup = "Neutral"
+		end
 	end
+	private.factions[currentZone] = factionGroup
 	if auctionHouseStatus == 0 then
-		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then
-			factionGroup = UnitFactionGroup("player")
-		end 
+		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = "Faction" end 
+	end
+	if factionGroup == "Faction" then
+		factionGroup = UnitFactionGroup("player")
 	end
 	return factionGroup
 end
