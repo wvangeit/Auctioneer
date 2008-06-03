@@ -67,7 +67,7 @@ local clone = AucAdvanced.Clone
 	more complete specification.
 ]]
 
-local cache = setmetatable({}, {__mode="kv"});
+local cache = {};
 local pdfList = {};
 local warned  = {};
 local tremove = table.remove;
@@ -87,27 +87,14 @@ local ERROR = 0.02;
 	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
 ]]
 function lib.GetMarketValue(itemLink, serverKey)
-    -- DEFAULT_CHAT_FRAME:AddMessage("GMV Called");
     local _;
     if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
     if not itemLink then return; end
-    -- DEFAULT_CHAT_FRAME:AddMessage("Estimation of market value for IL: "..tostring(itemLink).." SK: "..tostring(serverKey));
     
     -- Look up in the cache if it's recent enough
-    -- 60s in addition to __mode="kv" provides a dynamic compromise between the GC and a "good time"
-    -- so that we can calculate more frequently if we have CPU time, or otherwise wait up to 60s.
     local cacheTable = cache[itemLink..":"..(serverKey or "")];
     if cacheTable then
-        if cacheTable.time < GetTime() - 60 then
-            -- DEFAULT_CHAT_FRAME:AddMessage("Deleting cached version of "..itemLink);
-            recycle(cache[itemLink..":"..(serverKey or "")]);
-            cache[itemLink..":"..(serverKey or "")] = nil;
-        else
-            -- DEFAULT_CHAT_FRAME:AddMessage("Using cached version for "..itemLink.." from "..cache[itemLink..":"..(serverKey or "")].time);
-            return cacheTable.value, cacheTable.seen, cacheTable.stats;
-        end
-    else
-        -- DEFAULT_CHAT_FRAME:AddMessage("No cache information available for "..itemLink);
+        return cacheTable.value, cacheTable.seen, cacheTable.stats;
     end
     
 	-- Clear out the PDF list
@@ -137,32 +124,21 @@ function lib.GetMarketValue(itemLink, serverKey)
         end
     end
     
+    assert(lowerLimit > -1/0 and upperLimit < 1/0);
     
-    --do
-    --return;
-    --end
-    -- DevTools_Dump{lowerLimit = lowerLimit, upperLimit = upperLimit, delta = DELTA, count = (upperLimit - lowerLimit + 1)/DELTA, fns = #pdfList}
-    -- do return; end
+   
     
     -- Ok, integrate from -10G to 10000G through all functions
     local total, lastTotal = 0, 0;
     local delta = (upperLimit - lowerLimit) * .01;
     
     
-    if #pdfList == 0 or delta == 0 then
+    if #pdfList == 0 or delta < 0.000001 then
         return;                 -- No PDFs available for this item
     end
     
-    -- DevTools_Dump{min = lowerLimit / 10000, max = upperLimit / 10000};
-    -- do return; end
-    
--- local n = 0;
-    
     repeat
     
--- n= n + 1;
--- if n > 5 then break; end
-
         lastTotal = total;
         total = 0;
         delta = delta * 0.75;
@@ -176,30 +152,18 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         total = total * delta;
         
-        -- DevTools_Dump{i=i, delta=delta}
-        -- do return end;
-        
-        -- DEFAULT_CHAT_FRAME:AddMessage("Iteration "..i..": "..total.." = "..abs(total-lastTotal)/total);
-        
         if total ~= total or total == 0 then
             return;                 -- Cannot calculate: NaN
         end
         
     until abs(total-lastTotal)/total < ERROR;
     
--- if n > 10 then
---    DEFAULT_CHAT_FRAME:AddMessage("Slow error propogation: After "..n..", got to "..total..", "..lastTotal.." = "..abs(total-lastTotal)/total);
--- end
-        
-    -- DevTools_Dump{error=abs(total-lastTotal)/total, delta=delta, total=total, lastTotal=lastTotal};
-    -- do return; end
-    
     local limit = total/2;
     local midpoint, lastMidpoint = 0, 0;
     
     -- Now find the 50% point
     total = 0;
-    
+
     repeat
         lastMidpoint = midpoint;
         total = 0;
@@ -225,7 +189,6 @@ function lib.GetMarketValue(itemLink, serverKey)
     
     
 	if midpoint and midpoint > 0 then
-        -- DEFAULT_CHAT_FRAME:AddMessage("Midpoint of "..itemLink..": "..midpoint);
         
         -- Cache before finishing up
         local cacheTable = acquire();
@@ -237,12 +200,18 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         
         return midpoint, seen, #pdfList;
-        -- return total/totalweight, seen, count
     else
-        -- DEFAULT_CHAT_FRAME:AddMessage(itemLink.." was skipped due to no data. Integration limits were "..lowerLimit.." to "..upperLimit);
 		return;
 	end 
 
+end
+
+-- Clears the cache for AucAdvanced.API.GetMarketValue()
+function lib.ClearMarketCache()
+    for x = 1, #cache do
+        recycle(cache[x]);
+        cache[x] = nil;
+    end
 end
 
 function lib.ClearItem(itemLink, serverKey)

@@ -811,6 +811,7 @@ end
 
 function lib.Commit(wasIncomplete, wasGetAll)
 	if not private.curScan then return end
+
 	local Queuelength = #private.CommitQueue
 	private.CommitQueue[Queuelength + 1] = {}
 	private.CommitQueue[Queuelength + 1]["Query"], private.curQuery = private.curQuery, private.CommitQueue[Queuelength + 1]["Query"]
@@ -822,6 +823,8 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
 	recycle(private, "curQuery")
 	recycle(private, "curScan")
+    
+    AucAdvanced.API.ClearMarketCache();
 
 	if coroutine.status(CoCommit) ~= "dead" then
 		CoroutineResume(CoCommit)

@@ -113,7 +113,7 @@ function lib.GetItemPDF(hyperlink, faction, realm)
         return nil;                 -- No data, cannot determine pricing
     end
     
-    local lower, upper = mean - 5 * stddev, mean + 5 * stddev;
+    local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
     
     -- Build the PDF based on standard deviation & mean
     BellCurve:SetParameters(mean, stddev);

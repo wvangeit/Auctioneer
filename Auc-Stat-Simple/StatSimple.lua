@@ -201,8 +201,8 @@ function lib.GetItemPDF(hyperlink, faction, realm)
         return;                         -- No available data or cannot estimate
     end
     
-    -- Calculate the lower and upper bounds as +/- 5 standard deviations
-    local lower, upper = mean - 5*stddev, mean + 5*stddev;
+    -- Calculate the lower and upper bounds as +/- 3 standard deviations
+    local lower, upper = mean - 3*stddev, mean + 3*stddev;
     
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 10% of the mean
