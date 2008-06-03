@@ -44,14 +44,17 @@ end
 
 function lib.Processor(callbackType, ...)
     if (callbackType == "listupdate") then
+		private.EasyCancelMain()
         private.EasyBuyout()
 	elseif (callbackType == "auctionui") then
 		private.AHLoaded()
 		private.EasyBuyout()
+		private.EasyCancelMain()
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
 		private.EasyBuyout()
+		private.EasyCancelMain()
 	end
 end
 
@@ -60,6 +63,10 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", true)
     AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
     AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.select", 0)
+	
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.active", true)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.active", true)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.select", 0)
 end
 
 --[[ Local functions ]]--
@@ -82,21 +89,41 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
-    gui:AddControl(id, "Subhead",          0,    "EasyBuyout allows you to make auction buyout a lot easier!")
+
+	-- Easy Buyout
 	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box!")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.active", "Enable EasyBuyout")
-    gui:AddTip(id, "Ticking this box will enable or disable the addon")
+    gui:AddTip(id, "Ticking this box will enable or disable EasyBuyout")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.modifier.active", "Enable key modifier")
-    gui:AddControl(id, "Subhead",          0,   "Select your modifier below. (ex. shift+rightclick)")
+	gui:AddTip (id, "Ticking this box will add a key modifier to EasyBuyout")
     gui:AddControl(id, "Selectbox",  0, 1, {
 		{0, "Shift"},
 		{1, "Alt"},
 		{2, "Shift+Alt"}
 	}, "util.EasyBuyout.modifier.select", "testing here")
-    gui:AddTip(id, "Select your key modifier")
+    gui:AddTip(id, "Select your key modifier for EasyBuyout")
+	
+ 	-- Easy Cancel
+	gui:AddControl(id, "Header",		0,		"EasyCancel options")
+	gui:AddControl(id, "Subhead",		   0,   "Simply right-click an auction to cancel it out with no confirmation box!")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.active", "Enable EasyCancel")
+	gui:AddTip(id, "Ticking this box will enable or disable EasyCancel")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.modifier.active", "Enable key modifier")
+	gui:AddTip (id, "Ticking this box will add a key modifier to EasyCancel")
+    gui:AddControl(id, "Selectbox",  0, 1, {
+		{0, "Shift"},
+		{1, "Alt"},
+		{2, "Shift+Alt"}
+	}, "util.EasyBuyout.EC.modifier.select", "testing here")
+    gui:AddTip(id, "Select your key modifier for EasyCancel")
+	
     gui:AddHelp(id, "What is EasyBuyout?",
         "What is EasyBuyout?",
         "EasyBuyout makes it easier to buy auctions in mass, faster! You simply right-click (or 'modifier'+right-click depending on your options) to buyout an auction with no confirmation box")
+	
+	gui:AddHelp(id, "What is EasyCancel?",
+		"What is EasyCancel?",
+		"Take what EasyBuyout does and apply it to canceling auctions! All you do is right-click (or 'modifier'+right-click) to cancel an auction you have posted up with no conformation box")
 end
 
 function private.BrowseButton_OnClick(...)
@@ -105,7 +132,7 @@ function private.BrowseButton_OnClick(...)
         return orig_AB_OC(...)
     end
 
-    -- check and assign modifier
+     -- check and assign modifier
     if get("util.EasyBuyout.modifier.active") then
         if (get("util.EasyBuyout.modifier.select") == 0) and IsShiftKeyDown() then
             ebModifier = true;
@@ -136,13 +163,7 @@ function private.BrowseButton_OnClick(...)
             return
         end
         SetSelectedAuctionItem("list", id);
-        if get("util.EasyBuyout.shift.active") then
-            if (IsShiftKeyDown()) then
-                private.EasyBuyoutAuction();
-            end
-        else
-            private.EasyBuyoutAuction();
-        end
+		private.EasyBuyoutAuction();
     else
         return orig_AB_OC(...)
     end
@@ -177,5 +198,66 @@ function private.EasyBuyoutAuction()
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
 end
+
+
+--[[ EasyCancel Function - Easy Auction Cancel is a lot simpler to incorporate everything in it's own section
+	 rather than incorporating it into everything else coded before this comment. EasyCancel does not need to be
+	 hooked like EasyBuyout does with compactUI
+--]]
+
+local function OrigAuctionOnClick(...)
+	if ( IsModifiedClick() ) then
+		HandleModifiedItemClick(GetAuctionItemLink("owner", this:GetParent():GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame)));
+	else
+		AuctionsButton_OnClick(self);
+	end
+end
+-- handler for modifiers
+local function NewOnClick(self, button)
+	local active = get("util.EasyBuyout.EC.active")
+	local modified = get("util.EasyBuyout.EC.modifier.active")
+	local modselect = get("util.EasyBuyout.EC.modifier.select")
+
+	if active and button=="RightButton" and
+			(
+			(not modified)
+			or (modified and modselect == 0 and IsShiftKeyDown())
+			or (modified and modselect == 1 and IsAltKeyDown())
+			or (modified and modselect == 2 and IsAltKeyDown() and IsShiftKeyDown())
+			)	then
+		private.EasyCancel(self, button)
+	else
+		OrigAuctionOnClick(self, button)
+	end
+
+end
+
+function private.EasyCancelMain()
+	assert(AuctionsButton_OnClick)
+
+	for i=1,199 do
+		local button = _G["AuctionsButton"..i]
+		if not button then break end
+		button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+		_G["AuctionsButton"..i.."Item"]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+		button:SetScript("onclick", NewOnClick)
+	end
+end
+
+function private.EasyCancel(self, button)
+	local link = GetAuctionItemLink("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
+	if link then
+		local _,_,count = GetAuctionItemInfo("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
+		ChatFrame1:AddMessage("Rightclick - cancelling auction of " .. (count or "?") .. "x" .. link)
+	else
+		return ChatFrame1:AddMessage("Rightclick - not finding anything to cancel. If you are mass clicking - try going from the bottom up!")
+	end
+
+	SetSelectedAuctionItem("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame));
+	CancelAuction(GetSelectedAuctionItem("owner"))
+	CloseAuctionStaticPopups();
+	AuctionFrameBid_Update();
+end
+
 
 AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/Modules/Auc-Util-EasyBuyout/EasyBuyout.lua $", "$Rev: 3054 $")

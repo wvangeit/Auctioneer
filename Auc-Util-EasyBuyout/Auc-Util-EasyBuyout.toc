@@ -8,3 +8,4 @@
 ## URL: http://auctioneeraddon.com/
 ##
 Embed.xml
+EasyBuyout.lua
