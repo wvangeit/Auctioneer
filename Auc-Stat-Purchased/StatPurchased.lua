@@ -136,6 +136,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 		faction = AucAdvanced.GetFactionGroup()
 	end
 	realm = realm or GetRealmName()
+	
 	local data = private.GetPriceData(faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -165,49 +166,75 @@ function lib.GetPriceColumns()
 	return "Daily Avg", "3 Day Avg", "7 Day Avg", "14 Day Avg", false, "Daily Total", "Daily Count", "Seen Days", "Seen Count"
 end
 
-local array = {}
+
+local cacheFaction = ""
+local cache
+local cacheMeta = {__mode="kv"}	-- weak-everything
+
+local tmpReturn={} -- used to return stuff in
+
 function lib.GetPriceArray(hyperlink, faction, realm)
-	-- Get our statistics
-	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
+	if (not faction) or (faction == AucAdvanced.GetFaction()) then
+		faction = AucAdvanced.GetFactionGroup()
+	end
+	realm = realm or GetRealmName()
+
+	-- Keep a GCable cache of [hyperlink]={array}
+	-- It's tempting to use a single array for returns, but realize that unpacking our data results in dozens of new substrings and several new subtables!
+	if faction~=cacheFaction then	-- no we don't need to check the realm, that needs a relog!
+		cacheFaction = faction
+		cache = setmetatable({}, cacheMeta)
+	end
+	if not cache[hyperlink] then
 	
-	-- These 2 are the ones that most algorithms will look for
-	if not AucAdvanced.Settings.GetSetting("stat.purchased.reportsafe") then
-		array.price = avg3 or dayAverage
-	else
-		-- Safe mode: prefer longer-running averages for low-volume items
-		if seenCount>100 and seenCount > seenDays*10 then
+		local array = {}
+		cache[hyperlink] = array
+
+		-- Get our statistics
+		local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
+		
+		-- array.price and array.seen are the ones that most algorithms will look for
+		array.seen = seenCount
+		if not AucAdvanced.Settings.GetSetting("stat.purchased.reportsafe") then
 			array.price = avg3 or dayAverage
-			-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
 		else
-			local a3 = avg3 or dayAverage
-			local a7 = avg7 or a3
-			local a14 = avg14 or a7
-			if seenCount >= seenDays*7 then
-				array.price = (a3+a7)/2
-				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
+			-- Safe mode: prefer longer-running averages for low-volume items
+			if seenCount>100 and seenCount > seenDays*10 then
+				array.price = avg3 or dayAverage
+				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
 			else
-				local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
-				local mix14 = 0.5-mix3
-				local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
-				array.price = a3*mix3 + a7*mix7 + a14*mix14			
-				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
+				local a3 = avg3 or dayAverage
+				local a7 = avg7 or a3
+				local a14 = avg14 or a7
+				if seenCount >= seenDays*7 then
+					array.price = (a3+a7)/2
+					-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
+				else
+					local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
+					local mix14 = 0.5-mix3
+					local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
+					array.price = a3*mix3 + a7*mix7 + a14*mix14			
+					-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
+				end
 			end
 		end
+		
+		-- This is additional data
+		array.avgday = dayAverage
+		array.avg3 = avg3
+		array.avg7 = avg7
+		array.avg14 = avg14
+		array.daytotal = dayTotal
+		array.daycount = dayCount
+		array.seendays = seenDays
 	end
-	array.seen = seenCount
 	
-	-- This is additional data
-	array.avgday = dayAverage
-	array.avg3 = avg3
-	array.avg7 = avg7
-	array.avg14 = avg14
-	array.daytotal = dayTotal
-	array.daycount = dayCount
-	array.seendays = seenDays
-
-	-- Return a temporary array. Data in this array is
-	-- only valid until this function is called again.
-	return array
+	-- now it'd be wonderful to just be able to return it all out... 
+	-- but unfortunately some callers mess with the returned array! Nice going!
+	for k,v in pairs(cache[hyperlink]) do
+		tmpReturn[k]=v
+	end
+	return tmpReturn
 end
 
 function lib.OnLoad(addon)
@@ -386,27 +413,23 @@ function private.UnpackStatIter(data, ...)
 end
 
 
-local cache=setmetatable({}, {__mode="kv"})	-- [string]={stuff}.
--- weak-keyed as well as weak-valued to allow full garbage collection
-
 function private.UnpackStats(dataItem)
-	if cache[dataItem] then
-		return cache[dataItem]
-	end
 	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
-	-- DISABLED, something screws with tables. troubleshooting it. /mikk: cache[dataItem] = data
 	return data
 end
 
+local tmp={}
 function private.PackStats(data)
-	local stats = ""
-	local joiner = ""
+	local n=1
 	for property, info in pairs(data) do
-		stats = stats..joiner..property..":"..strjoin(";", unpack(info))
-		joiner = ","
+		tmp[n]=property
+		tmp[n+1]=":"
+		tmp[n+2]=strjoin(";", unpack(info))
+		tmp[n+3]=","
+		n=n+4
 	end
-	return stats
+	return table.concat(tmp, "", 1, n-1)   -- n-1 to skip last ","
 end
 
 -- The following Functions are the routines used to access the permanent store data
