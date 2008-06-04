@@ -167,8 +167,6 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
-	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
 	
@@ -387,9 +385,17 @@ function private.UnpackStatIter(data, ...)
 	end
 end
 
+
+local cache=setmetatable({}, {__mode="kv"})	-- [string]={stuff}.
+-- weak-keyed as well as weak-valued to allow full garbage collection
+
 function private.UnpackStats(dataItem)
+	if cache[dataItem] then
+		return cache[dataItem]
+	end
 	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
+	cache[dataItem] = data
 	return data
 end
 
