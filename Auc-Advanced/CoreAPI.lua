@@ -661,21 +661,14 @@ do
                 (replacementName and ("Please use "..replacementName.." instead. ") or "")..
                 (comments or "")
             );
-        end
-        
-
-        -- Always call this to keep count accurate
-        Swatter.OnError(
-            "Deprecated function call occurred in AuctioneerAdvanced API:\n     {{{Deprecated Function:}}} "..functionName..
-                "\n     {{{Source Module:}}} "..source:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
-                "\n     {{{Calling Module:}}} "..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
-                "\n     {{{Available Replacement:}}} "..replacementName..
-                "\n\n"..
-                (comments and comments.."\n\n" or ""),
-            nil,
-            debugstack(2)
-        );
-
+	        geterrorhandler()(
+	            "Deprecated function call occurred in AuctioneerAdvanced API:\n     {{{Deprecated Function:}}} "..functionName..
+	                "\n     {{{Source Module:}}} "..source:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
+	                "\n     {{{Calling Module:}}} "..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
+	                "\n     {{{Available Replacement:}}} "..replacementName..
+	                (comments and "\n\n"..comments or "")
+			)
+		end
 
         
         
