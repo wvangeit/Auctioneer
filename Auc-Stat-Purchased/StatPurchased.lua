@@ -395,7 +395,7 @@ function private.UnpackStats(dataItem)
 	end
 	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
-	cache[dataItem] = data
+	-- DISABLED, something screws with tables. troubleshooting it. /mikk: cache[dataItem] = data
 	return data
 end
 
