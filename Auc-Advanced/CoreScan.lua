@@ -1064,7 +1064,7 @@ StorePageFunction = function()
 			end
 		end
 		this = oldThis
-		recycle(EventFramesRegistered)
+		EventFramesRegistered=nil  -- do NOT attempt to recycle, subkeys are global tables!
 	end
 
 	-- Send the next page query or finish scanning
