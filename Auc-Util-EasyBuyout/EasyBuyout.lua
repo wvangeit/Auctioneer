@@ -60,13 +60,18 @@ end
 
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	-- EasyBuyout Default Settings
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", true)
     AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
     AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.select", 0)
 	
+	-- EasyCancel Default Settings
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.active", true)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.active", true)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.select", 0)
+	
+	-- EasyBid Default Settings
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EBid.active", true)
 end
 
 --[[ Local functions ]]--
@@ -75,8 +80,10 @@ function private.AHLoaded()
 	if AucAdvanced.Modules.Util.CompactUI and AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick and get("util.compactui.activated") then
 		orig_AB_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
 		AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick = private.BrowseButton_OnClick
+--~ 	orig_ABid_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
 		CompactUImode = true
 	else
+--~ 	assert(BrowseButton_OnDoubleClick, "BrowseButton_OnDoubleClick doesn't exist yet")
 		assert(BrowseButton_OnClick, "BrowseButton_OnClick doesn't exist yet")
 		orig_AB_OC = BrowseButton_OnClick
 		BrowseButton_OnClick = private.BrowseButton_OnClick
@@ -88,9 +95,9 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    libName.." options")
 
-	-- Easy Buyout
+	-- EasyBuyout
+	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box!")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.active", "Enable EasyBuyout")
     gui:AddTip(id, "Ticking this box will enable or disable EasyBuyout")
@@ -103,7 +110,7 @@ function private.SetupConfigGui(gui)
 	}, "util.EasyBuyout.modifier.select", "testing here")
     gui:AddTip(id, "Select your key modifier for EasyBuyout")
 	
- 	-- Easy Cancel
+ 	-- EasyCancel
 	gui:AddControl(id, "Header",		0,		"EasyCancel options")
 	gui:AddControl(id, "Subhead",		   0,   "Simply right-click an auction to cancel it out with no confirmation box!")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.active", "Enable EasyCancel")
@@ -117,6 +124,13 @@ function private.SetupConfigGui(gui)
 	}, "util.EasyBuyout.EC.modifier.select", "testing here")
     gui:AddTip(id, "Select your key modifier for EasyCancel")
 	
+	-- EasyBid
+	gui:AddControl(id, "Header",		0,		"EasyBid options")
+	gui:AddControl(id, "Subhead",		   0,   "Simply double-click an auction to bid minimum on it!")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EBid.active", "Enable EasyBid")
+	gui:AddTip(id, "Ticking this box will enable or disable EasyBid")
+	
+	-- help sections
     gui:AddHelp(id, "What is EasyBuyout?",
         "What is EasyBuyout?",
         "EasyBuyout makes it easier to buy auctions in mass, faster! You simply right-click (or 'modifier'+right-click depending on your options) to buyout an auction with no confirmation box")
@@ -124,6 +138,10 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "What is EasyCancel?",
 		"What is EasyCancel?",
 		"Take what EasyBuyout does and apply it to canceling auctions! All you do is right-click (or 'modifier'+right-click) to cancel an auction you have posted up with no conformation box")
+
+	gui:AddHelp(id, "What is EasyBid?",
+		"What is EasyBid?",
+		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers becuase of the use of \"left-click\". It conflicts with other parts of auctioneer.")
 end
 
 function private.BrowseButton_OnClick(...)
@@ -184,6 +202,7 @@ function private.EasyBuyout()
             if not button then break end
             button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
             _G["BrowseButton"..i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			button:SetScript("ondoubleclick", NewOnDoubleClick)
         end
     else
     
@@ -194,6 +213,7 @@ end
 
 function private.EasyBuyoutAuction()
     local EasyBuyoutIndex = GetSelectedAuctionItem("list");
+	DEFAULT_CHAT_FRAME:AddMessage(GetSelectedAuctionItem("list"))
     local EasyBuyoutPrice = select(9, GetAuctionItemInfo("list", EasyBuyoutIndex))
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
@@ -259,5 +279,49 @@ function private.EasyCancel(self, button)
 	AuctionFrameBid_Update();
 end
 
+-- EasyBid Function - This section listed below is for EasyBid: the utility that allows users to easily bid on an item simply by double clicking on it.
+
+
+function NewOnDoubleClick(self, button)
+	-- check for EBid enabled
+    if not get("util.EasyBuyout.EBid.active") then
+		DEFAULT_CHAT_FRAME:AddMessage("You are here!");
+        return
+    end
+
+	local id
+	if CompactUImode then
+		id = self.id
+	else
+		id = self:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame)
+	end
+	local link = GetAuctionItemLink("list", id)
+	if button == 'LeftButton' then
+		if (select(11, GetAuctionItemInfo("list", id))) then
+			DEFAULT_CHAT_FRAME:AddMessage("You are already the highest bidder on this item!")
+			return
+		end
+		if link then
+			local _,_,count = GetAuctionItemInfo("list", id)
+			ChatFrame1:AddMessage("Doubleclick - buying auction of " .. (count or "?") .. "x" .. link)
+		else
+			ChatFrame1:AddMessage("Doubleclick - not finding anything to bid on. If you are mass clicking - try going from the bottom up!")
+			return
+		end
+	SetSelectedAuctionItem("list", self:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame));
+	private.EasyBidAuction(id);
+	CloseAuctionStaticPopups();
+	end
+end
+
+function private.EasyBidAuction(getID)
+    local EasyBuyoutPrice = select(10, GetAuctionItemInfo("list", getID)) + select(8, GetAuctionItemInfo("list", getID))
+	if EasyBuyoutPrice == 0 then
+		EasyBuyoutPrice = EasyBuyoutPrice + select(7, GetAuctionItemInfo("list", getID))
+	end
+    DEFAULT_CHAT_FRAME:AddMessage(EasyBuyoutPrice)
+	PlaceAuctionBid("list", getID, EasyBuyoutPrice)
+    CloseAuctionStaticPopups();
+end
 
 AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/Modules/Auc-Util-EasyBuyout/EasyBuyout.lua $", "$Rev: 3054 $")
