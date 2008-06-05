@@ -202,7 +202,7 @@ function private.EasyBuyout()
             if not button then break end
             button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
             _G["BrowseButton"..i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-			button:SetScript("ondoubleclick", NewOnDoubleClick)
+			button:SetScript("ondoubleclick", private.NewOnDoubleClick)
         end
     else
     
@@ -213,7 +213,6 @@ end
 
 function private.EasyBuyoutAuction()
     local EasyBuyoutIndex = GetSelectedAuctionItem("list");
-	DEFAULT_CHAT_FRAME:AddMessage(GetSelectedAuctionItem("list"))
     local EasyBuyoutPrice = select(9, GetAuctionItemInfo("list", EasyBuyoutIndex))
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
@@ -282,10 +281,9 @@ end
 -- EasyBid Function - This section listed below is for EasyBid: the utility that allows users to easily bid on an item simply by double clicking on it.
 
 
-function NewOnDoubleClick(self, button)
+function private.NewOnDoubleClick(self, button)
 	-- check for EBid enabled
     if not get("util.EasyBuyout.EBid.active") then
-		DEFAULT_CHAT_FRAME:AddMessage("You are here!");
         return
     end
 
@@ -298,12 +296,12 @@ function NewOnDoubleClick(self, button)
 	local link = GetAuctionItemLink("list", id)
 	if button == 'LeftButton' then
 		if (select(11, GetAuctionItemInfo("list", id))) then
-			DEFAULT_CHAT_FRAME:AddMessage("You are already the highest bidder on this item!")
+			ChatFrame1:AddMessage("You are already the highest bidder on this item!")
 			return
 		end
 		if link then
 			local _,_,count = GetAuctionItemInfo("list", id)
-			ChatFrame1:AddMessage("Doubleclick - buying auction of " .. (count or "?") .. "x" .. link)
+			ChatFrame1:AddMessage("Doubleclick - bidding on auction of " .. (count or "?") .. "x" .. link)
 		else
 			ChatFrame1:AddMessage("Doubleclick - not finding anything to bid on. If you are mass clicking - try going from the bottom up!")
 			return
@@ -319,7 +317,6 @@ function private.EasyBidAuction(getID)
 	if EasyBuyoutPrice == 0 then
 		EasyBuyoutPrice = EasyBuyoutPrice + select(7, GetAuctionItemInfo("list", getID))
 	end
-    DEFAULT_CHAT_FRAME:AddMessage(EasyBuyoutPrice)
 	PlaceAuctionBid("list", getID, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
 end
