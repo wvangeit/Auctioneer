@@ -176,15 +176,16 @@ function lib.GetPrice(hyperlink, faction)
 		local price, stack = strsplit("/", stats[property][i])
 		price = tonumber(price) or 0
 		stack = tonumber(stack) or 1
-		if (stack < 1) then stack = 1 end
-		variance = variance + (math.abs(mean - price) ^ 2)
+		if (stack < 1) then stack = 1 end        
+		variance = variance + ((mean - price/stack) ^ 2);
 	end
-	variance = variance / number
+    
+	variance = variance / count;
 	local stdev = variance ^ 0.5
+	total = 0
 
 	local deviation = 1.5 * stdev
 
-	total = 0
 	number = 0
 	for i = 1, count do
 		local price, stack = strsplit("/", stats[property][i])
