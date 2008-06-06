@@ -318,8 +318,13 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.stdev") then
-				EnhTooltip.AddLine("  Std Deviation", stdev)
+				EnhTooltip.AddLine("  Std Deviation", stdev*quantity)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                if (quantity > 1) then
+                    EnhTooltip.AddLine("  (or individually)", stdev)
+                    EnhTooltip.LineColor(0.3, 0.9, 0.8);
+                end
+                    
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.confid") then
 				EnhTooltip.AddLine("  Confidence: "..(floor(confidence*1000))/1000)
