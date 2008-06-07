@@ -118,9 +118,9 @@ function lib.GetMarketValue(itemLink, serverKey)
                 if min < lowerLimit then lowerLimit = min; end
                 if max > upperLimit then upperLimit = max; end
             end
-        elseif not warned[engine] then
+        elseif not warned[engine] and nLog then
             warned[engine] = true;
-            lib.Print("Warning: Auctioneer Advanced engine "..engine.." does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+            nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engine.."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
         end
     end
     
