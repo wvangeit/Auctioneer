@@ -80,10 +80,8 @@ function private.AHLoaded()
 	if AucAdvanced.Modules.Util.CompactUI and AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick and get("util.compactui.activated") then
 		orig_AB_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
 		AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick = private.BrowseButton_OnClick
---~ 	orig_ABid_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
 		CompactUImode = true
 	else
---~ 	assert(BrowseButton_OnDoubleClick, "BrowseButton_OnDoubleClick doesn't exist yet")
 		assert(BrowseButton_OnClick, "BrowseButton_OnClick doesn't exist yet")
 		orig_AB_OC = BrowseButton_OnClick
 		BrowseButton_OnClick = private.BrowseButton_OnClick
@@ -141,7 +139,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "What is EasyBid?",
 		"What is EasyBid?",
-		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers becuase of the use of \"left-click\". It conflicts with other parts of auctioneer.")
+		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers because of the use of \"left-click\". It conflicts with other parts of auctioneer.")
 end
 
 function private.BrowseButton_OnClick(...)
@@ -252,8 +250,6 @@ local function NewOnClick(self, button)
 end
 
 function private.EasyCancelMain()
-	assert(AuctionsButton_OnClick)
-
 	for i=1,199 do
 		local button = _G["AuctionsButton"..i]
 		if not button then break end
