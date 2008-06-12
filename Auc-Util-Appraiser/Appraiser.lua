@@ -246,7 +246,14 @@ function lib.GetPrice(link, _, match)
 			end
 			if (not deposit) then deposit = 0 end
 			
-			deposit = deposit * 2
+			--scale up for duration > 12 hours
+			if deposit > 0 then
+				local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
+				if not duration then
+					duration = 1440
+				end
+				deposit = deposit * duration/720
+			end
 			
 			markdown = newBuy * markdown
 			
