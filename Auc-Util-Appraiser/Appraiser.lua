@@ -187,6 +187,7 @@ function lib.GetPrice(link, _, match)
 	
 	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
 	curModelText = curModel
+	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
 	
 	if match then
 		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
@@ -248,10 +249,6 @@ function lib.GetPrice(link, _, match)
 			
 			--scale up for duration > 12 hours
 			if deposit > 0 then
-				local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
-				if not duration then
-					duration = 1440
-				end
 				deposit = deposit * duration/720
 			end
 			
@@ -267,7 +264,6 @@ function lib.GetPrice(link, _, match)
 
 	local stack = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".stack") or AucAdvanced.Settings.GetSetting("util.appraiser.stack")
 	local number = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".number") or AucAdvanced.Settings.GetSetting("util.appraiser.number")
-	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
 		
 	if stack == "max" then
 		_, _, _, _, _, _, _, stack = GetItemInfo(link)
