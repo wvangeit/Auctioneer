@@ -633,7 +633,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(funcVars, retVal, frame, name, link, true)
 		end
-	elseif ltype == "enchant" then
+	elseif ltype == "enchant" or ltype == "spell" then
 		enchantTooltip(funcVars, retVal, frame, name, link, false)
 	end
 end
