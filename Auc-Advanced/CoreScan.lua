@@ -804,7 +804,7 @@ local CoCommit = coroutine.create(Commitfunction)
 local function CoroutineResume(...)
 	local status, result = coroutine.resume(...)
 	if not status and result then
-		print("error in coroutine: " .. result)
+		geterrorhandler()("Error occurred in coroutine: "..result, nil, debugstack((...)));
 	end
 	return status, result
 end
