@@ -61,17 +61,27 @@ end
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	-- EasyBuyout Default Settings
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", true)
-    AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
-    AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.select", 0)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", false)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.select", 0)
 	
 	-- EasyCancel Default Settings
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.active", true)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.active", false)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.active", true)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EC.modifier.select", 0)
 	
 	-- EasyBid Default Settings
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EBid.active", true)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EBid.active", false)
+	--This settting will be used to turn off the module for current users until THEY choose to activate it
+	--this will give us a new user friendly default state for builds past AuctioneerAdvancedSuite-5.0.PRE.3164
+	--Remove this function once on or two builds have been released.
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EB.Deactivate", false)
+	if not get("util.EasyBuyout.EB.Deactivate") then
+		set("util.EasyBuyout.active", false)
+		set("util.EasyBuyout.EC.active", false)
+		set("util.EasyBuyout.EBid.active", false)
+		set("util.EasyBuyout.EB.Deactivate", true)
+	end
 end
 
 --[[ Local functions ]]--
