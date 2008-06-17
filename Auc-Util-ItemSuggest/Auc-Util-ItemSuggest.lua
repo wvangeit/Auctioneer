@@ -222,8 +222,12 @@ function lib.GetProspectValue(hyperlink, quantity)
 			if quality == 0 then
 				-- vendor trash (lower level powders)
 				-- we need informant to get the vendor prices, if it is missing, use price of zero
-				local vendor = GetSellValue(result) or 0
-					trashTotal = trashTotal + vendor * yield
+				if GetSellValue then
+					local vendor = GetSellValue(result) or 0
+				else
+					vendor = 0
+				end
+				trashTotal = trashTotal + vendor * yield
 			else
 				-- gem or non-trashy powder
 				local _, _, _, market = Enchantrix.Util.GetReagentPrice(result)
@@ -252,8 +256,11 @@ function lib.GetProspectValue(hyperlink, quantity)
 return ProspectValue end
 
 function lib.GetVendorValue(hyperlink, quantity)
-	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
-	VendorValue = VendorValue * quantity
+	if GetSellValue then
+		VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
+		VendorValue = VendorValue * quantity
+	else VendorValue = 0
+	end
 return VendorValue end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
