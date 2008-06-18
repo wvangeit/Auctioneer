@@ -37,7 +37,7 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _, vendor
+local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _
 
 function lib.GetName()
 	return libName
@@ -221,12 +221,8 @@ function lib.GetProspectValue(hyperlink, quantity)
 			local _, _, quality = GetItemInfo(result)
 			if quality == 0 then
 				-- vendor trash (lower level powders)
-				-- we need informant to get the vendor prices, if it is missing, use price of zero
-				if GetSellValue then
-					local vendor = GetSellValue(result) or 0
-				else
-					vendor = 0
-				end
+				-- we need informant (or some other mod using GetSellValue) to get the vendor prices, if it is missing, use price of zero
+				local vendor = GetSellValue and GetSellValue(result) or 0
 				trashTotal = trashTotal + vendor * yield
 			else
 				-- gem or non-trashy powder
@@ -256,11 +252,8 @@ function lib.GetProspectValue(hyperlink, quantity)
 return ProspectValue end
 
 function lib.GetVendorValue(hyperlink, quantity)
-	if GetSellValue then
-		VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
-		VendorValue = VendorValue * quantity
-	else VendorValue = 0
-	end
+	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
+	VendorValue = VendorValue * quantity
 return VendorValue end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
