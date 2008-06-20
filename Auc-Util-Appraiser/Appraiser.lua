@@ -253,9 +253,19 @@ function lib.GetPrice(link, _, match)
 			end
 			
 			markdown = newBuy * markdown
-			
 			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
 		end
+		
+		if GetSellValue and AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then
+			local vendor = (GetSellValue(link) or 0)
+			if vendor and vendor>0 then
+				vendor = math.ceil(vendor / (1 - (AucAdvanced.cutRate or 0.05)))
+				if newBid < vendor then
+					newBid = vendor
+				end
+			end
+		end
+
 		
 		if newBid and (not newBuy or newBid > newBuy) then
 			newBuy = newBid
