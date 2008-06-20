@@ -256,6 +256,9 @@ function lib.GetPrice(link, _, match)
 			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
 		end
 		
+		if not newBid then
+			newBid = 0
+		end
 		if GetSellValue and AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then
 			local vendor = (GetSellValue(link) or 0)
 			if vendor and vendor>0 then
