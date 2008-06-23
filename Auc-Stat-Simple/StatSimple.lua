@@ -195,18 +195,20 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
     
     -- Calculate the SE estimated standard deviation & mean
-    local mean, stddev = private.EstimateStandardDeviation(hyperlink, faction, realm);
+    local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, faction, realm);
     
     if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
     end
     
-    -- Calculate the lower and upper bounds as +/- 3 standard deviations
-    local lower, upper = mean - 3*stddev, mean + 3*stddev;
     
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
-    -- the std dev is 10% of the mean
-    if stddev == 0 then stddev = .10 * mean; end
+    -- the std dev is 100% of the mean divided by square root of number of views
+    if stddev == 0 then stddev = mean / sqrt(count); end
+    
+        
+    -- Calculate the lower and upper bounds as +/- 3 standard deviations
+    local lower, upper = mean - 3*stddev, mean + 3*stddev;
     
     bellCurve:SetParameters(mean, stddev);
     return bellCurve, lower, upper;
@@ -560,6 +562,7 @@ end
 -- @param realm The realm from which to look up the data
 -- @return The estimated population mean
 -- @return The estimated population standard deviation
+-- @return The number of views found to base the standard deviation upon
 function private.EstimateStandardDeviation(hyperlink, faction, realm)
     local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	assert(linkType=="item", "Standard deviation estimation requires an item link");
@@ -619,7 +622,7 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
         variance = variance + (mean - v)^2;
     end
     
-    return mean, sqrt(variance);    
+    return mean, sqrt(variance), count;    
 end
 
 -- Simple function to total all of the values in the tuple
