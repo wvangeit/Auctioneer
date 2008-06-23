@@ -38,10 +38,6 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
-private.raidUsers = {}
-private.raidRoster = {}
-private.guildUsers = {}
-private.guildRoster = {}
 private.whisperList = {}
 private.sentRequest = {}
 private.requestQueue = {}
@@ -67,11 +63,7 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("CHAT_MSG_GUILD")
 	private.frame:RegisterEvent("CHAT_MSG_RAID")
 
-	private.frame:RegisterEvent("PARTY_MEMBERS_CHANGED")
-	private.frame:RegisterEvent("GUILD_ROSTER_UPDATE")
-	private.frame:RegisterEvent("RAID_ROSTER_UPDATE")
 	private.frame:RegisterEvent("CHAT_MSG_ADDON")
-	private.frame:RegisterEvent("PLAYER_LOGIN")
 
 	private.frame:SetScript("OnEvent", private.onEvent)
 	private.frame:SetScript("OnUpdate", private.onUpdate)
@@ -87,16 +79,14 @@ function lib.OnLoad(addon)
 end
 
 --[[ Local functions ]]--
+--This function now runs even if AskPrice is disabled so that we don't leave stranded queries in the queue
 function private.onUpdate(frame, secondsSinceLastUpdate)
-	--Nothing to do if AskPrice is disabled
-	if (not private.getOption('util.askprice.activated')) then
-		return
-	end
-
 	--Check the request queue for timeouts (We've finished waiting for other clients to send prices)
 	for request, details in pairs(private.requestQueue) do
 		if ((GetTime() - details.timer) >= private.timeToWaitForPrices) then
-			private.sendRequest(request, details)
+			if (details.querySeenBy == private.playerName) then --If we were the one who claimed the original query, then respond, else destroy the request.
+				private.sendRequest(request, details)
+			end
 			private.requestQueue[request] = nil
 		end
 	end
@@ -110,40 +100,33 @@ function private.onUpdate(frame, secondsSinceLastUpdate)
 end
 
 function private.onEvent(frame, event, ...)
+	--Nothing to do if AskPrice is disabled
+	if (not private.getOption('util.askprice.activated')) then
+		return
+	end
+
 	if (event == "CHAT_MSG_ADDON") then
 		return private.addOnEvent(...)
-	elseif (event == "GUILD_ROSTER_UPDATE") then
-		return private.guildRosterEvent(...)
-	elseif (event == "PARTY_MEMBERS_CHANGED") or (event == "RAID_ROSTER_UPDATE") then
-		return private.raidRosterEvent(...)
-	elseif (event == "PLAYER_LOGIN") then
-		return private.playerLoginEvent(...)
+
 	elseif (event == "CHAT_MSG_IGNORED") then
 		return private.beingIgnored(...)
+
 	else
 		return private.chatEvent(event, ...)
 	end
 end
 
-function private.playerLoginEvent()
-	if (IsInGuild()) then
-		GuildRoster() --Request the Guild data
-		private.sendAddOnMessage("GUILD", "MAINR", "login")
-	end
-	private.sendAddOnMessage("RAID", "MAINR", "login")
-end
-
 function private.chatEvent(event, text, player)
 	local channel
-	if (((event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID_LEADER")) and (private.raidUsers[1] == private.playerName))then
+	if (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID_LEADER") then
 		channel = "RAID"
 	end
 
-	if (((event == "CHAT_MSG_GUILD") or (event == "CHAT_MSG_OFFICER") and (private.guildUsers[1] == private.playerName))) then
+	if (event == "CHAT_MSG_GUILD") or (event == "CHAT_MSG_OFFICER") then
 		channel = "GUILD"
 	end
 
-	if (((event == "CHAT_MSG_WHISPER") and (private.getOption('util.askprice.activated')))) then
+	if (event == "CHAT_MSG_WHISPER") then
 		channel = "WHISPER"
 	end
 
@@ -153,13 +136,7 @@ function private.chatEvent(event, text, player)
 		(
 			text:sub(1, 1) == private.getOption('util.askprice.trigger')
 			or
-			(
-				private.getOption('util.askprice.smart')
-				and
-				text:lower():find(private.getOption('util.askprice.word1'):lower(), 1, true)
-				and
-				text:lower():find(private.getOption('util.askprice.word2'):lower(), 1, true)
-			)
+			private.isSmartWordsRequest(text:lower())
 		)
 	)) then
 		return
@@ -173,7 +150,8 @@ function private.chatEvent(event, text, player)
 
 			private.sendAddOnMessage(channel, "QUERY", link, count, player, channel)
 		end
-	elseif (channel == "WHISPER") then
+
+		elseif (channel == "WHISPER") then
 		for i = 1, #items, 2 do
 			local count = items[i]
 			local link = items[i+1]
@@ -191,9 +169,9 @@ function private.sendRequest(request, details)
 	local vendorPrice = details.vendorPrice
 	local answerCount = details.answerCount
 	local totalSeenCount = details.totalSeenCount
-	
+
 	--Format pricing data
-	totalPrice = math.floor(totalPrice/totalSeenCount) 
+	totalPrice = math.floor(totalPrice/totalSeenCount)
 
 	--Reset the timer and move the request over to the sent queue.
 	details.timer = GetTime()
@@ -241,7 +219,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	end
 
 	--Send out vendor info if we have it
-	if --[[private.getOption('util.askprice.vendor') and ]](vendorPrice and (vendorPrice > 0)) then
+	if --[[private.getOption('util.askprice.vendor') and ]](vendorPrice and (vendorPrice > 0)) then --Vendor pricing option is still disabled
 
 		local strVendOne
 		--Again if the stack Size is greater than one, add the unit price to the message
@@ -264,7 +242,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 			player
 		)
 	end
-	
+
 	if (not (count > 1)) and (private.getOption('util.askprice.ad')) then
 		if (not private.sentAskPriceAd[player]) then --If the player in question has been sent the ad message in this session, don't spam them again.
 			private.sentAskPriceAd[player] = true
@@ -294,7 +272,6 @@ end
 --Many thanks to the guys at irc://chat.freenode.net/wowi-lounge for their help in creating this function
 local itemList = {}
 function private.getItems(str)
-	if (not str) then return nil end
 	for i = #itemList, 1, -1 do
 		itemList[i] = nil
 	end
@@ -308,12 +285,12 @@ end
 
 function private.sendWhisper(message, player)
 	private.whisperList[message] = true
-	SendChatMessage(message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
+	ChatThrottleLib:SendChatMessage("ALERT", "AucAdvAskPrice", message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
 end
 
 function private.sendAddOnMessage(channel, ...)
 	local message = string.join(";", ...)
-	SendAddonMessage("AucAdvAskPrice", message, channel)
+	ChatThrottleLib:SendAddonMessage("NORMAL", "AucAdvAskPrice", message, channel)
 end
 
 function private.addOnEvent(prefix, message, sourceChannel, sourcePlayer)
@@ -322,7 +299,7 @@ function private.addOnEvent(prefix, message, sourceChannel, sourcePlayer)
 	end
 
 	--Decode the message
-	local requestType, link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount = string.split(";", message)
+	local requestType, link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount, ignoreList = string.split(";", message)
 	local request
 	if (link and count and player and channel) then
 		request = link..count..player..channel
@@ -333,102 +310,87 @@ function private.addOnEvent(prefix, message, sourceChannel, sourcePlayer)
 	end
 
 	if (requestType == "QUERY") then --AskPrice query was received by someone and is requesting prices for that query.
-		if (
-			(
-				(channel == "GUILD")
-				and
-				(private.guildUsers[1] == private.playerName)
-			) or (
-				(channel == "RAID")
-				and
-				(private.raidUsers[1] == private.playerName)
-			)
-		) then
-			private.requestQueue[request] = {
-				timer = GetTime(),
+		private.requestQueue[request] = private.requestQueue[request] or {
+			timer = GetTime(),
+			querySeenBy = sourcePlayer,
 
-				itemLink = link,
-				stackCount = tonumber(count),
-				sourcePlayer = player,
-				sourceChannel = channel,
+			itemLink = link,
+			stackCount = tonumber(count),
+			sourcePlayer = player,
+			sourceChannel = channel,
 
-				totalPrice = 0,
-				answerCount = 0,
-				totalSeenCount = 0,
-			}
+			totalPrice = 0,
+			answerCount = 0,
+			totalSeenCount = 0,
+		}
+
+		if not private.requestQueue[request].sentPrice then --Only respond if we have not already done so
+			local seenCount, marketValue, vendorPrice = private.getData(link)
+			private.sendAddOnMessage(sourceChannel, "PRICE", link, count, player, channel, marketValue, seenCount, vendorPrice)
+			private.requestQueue[request].sentPrice = true
 		end
 
-		local seenCount, marketValue, vendorPrice = private.getData(link)
-		private.sendAddOnMessage(sourceChannel, "PRICE", link, count, player, channel, marketValue, seenCount, vendorPrice)
-	elseif (requestType == "PRICE") then --AskPrice users are responding to the query. We only listen to these if we were the announcer when the QUERY event that pertained to this PRICE event was fired (see above)
-		if (private.requestQueue[request]) then
-			--Better stat average formula for each response: total = total + (price * seen) count = count + seen end  average = total/count
-			local request = private.requestQueue[request]
-			local count = request.totalSeenCount + totalSeenCount
-			local total = request.totalPrice + (totalPrice * totalSeenCount)
+	elseif (requestType == "PRICE") then --AskPrice users are responding to the query. We only listen to these if we were the first to send out the QUERY event that pertains to this PRICE event (see above)
+		local request = private.requestQueue[request]
+		if (request and (request.querySeenBy == private.playerName)) then
+			if not (request.priceProviders and request.priceProviders:find(sourcePlayer)) then
+				--Better stat average formula for each response: total = total + (price * seen); count = count + seen; average = total/count
+				local count = request.totalSeenCount + totalSeenCount
+				local total = request.totalPrice + (totalPrice * totalSeenCount)
 
-			request.totalPrice = total
-			request.totalSeenCount = count
-			request.vendorPrice = request.vendorPrice or tonumber(vendorPrice)
-			request.answerCount = request.answerCount + 1
+				request.totalPrice = total
+				request.totalSeenCount = count
+				request.vendorPrice = request.vendorPrice or tonumber(vendorPrice)
+				request.answerCount = request.answerCount + 1
+			end
 		end
-	elseif (requestType == "WFAIL") then --Whisper failed (Announcer is being ignored)
-		if (
-			(
-				(channel == "GUILD")
-				and
-				private.binarySearch(private.guildUsers, private.playerName) == private.binarySearch(private.guildUsers, sourcePlayer) + 1
-			) or (
-				(channel == "RAID")
-				and
-				private.binarySearch(private.raidUsers, private.playerName) == private.binarySearch(private.raidUsers, sourcePlayer) + 1
-			)
-		) then
-			local details = {
-				timer = GetTime(),
 
-				itemLink = link,
-				stackCount = count,
-				sourcePlayer = player,
-				sourceChannel = channel,
-
-				totalPrice = totalPrice,
-				vendorPrice = vendorPrice,
-				answerCount = answerCount,
-				totalSeenCount = totalSeenCount
-			}
-
-			private.sendRequest(request, details)
+		if request then --Record providers, even if we are not going to answer the query
+			if not request.priceProviders then
+				request.priceProviders = sourcePlayer
+			else
+				request.priceProviders = request.priceProviders..":"..sourcePlayer
+			end
 		end
+
+	elseif (requestType == "WFAIL") and (not ignoreList:find(private.playerName)) then --Whisper failed (Announcer is being ignored)
+		private.requestQueue[request] = {
+			timer = GetTime(),
+			ignoreList = ignoreList,
+
+			itemLink = link,
+			stackCount = count,
+			sourcePlayer = player,
+			sourceChannel = channel,
+
+			totalPrice = totalPrice,
+			vendorPrice = vendorPrice,
+			answerCount = answerCount,
+			totalSeenCount = totalSeenCount
+		}
+
+		private.sendAddOnMessage(sourceChannel, "MFAIL", link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount, ignoreList)
+
+	elseif (requestType == "MFAIL") then --New type for v2, means "My Fail", if the current user receives one for a request in the queue, its either killed if it was not us that sent it, or answered if it was.
+		if (sourcePlayer == private.playerName) and (private.requestQueue[request]) then
+			private.sendRequest(request, private.requestQueue[request])
+			private.requestQueue[request] = nil
+
+		else
+			private.requestQueue[request] = nil
+		end
+
 	elseif (requestType == "MAINR") then --General type of request (Version, login, etc)
 		local subRequest = link
 
-		if (subRequest == "login") then
-			private.sendAddOnMessage(sourceChannel, "MAINR", "online")
+		if (subRequest == "version") then
+			private.sendAddOnMessage(sourceChannel, "MAINR", "version:", private.GetVersion()) --Extended for v2 comms (See GetVersion() definition)
 
-		elseif (subRequest == "online") or (subRequest == "logout") then
-			local askPriceUserList
-			if (sourceChannel == "GUILD") then
-				askPriceUserList = private.guildUsers
-			elseif ((sourceChannel == "PARTY") or (sourceChannel == "RAID")) then
-				askPriceUserList = private.raidUsers
-			end
+		elseif (subRequest == "version:") then
+			--Responses to the above "version" request, currently ignored
 
-			local insertOrRemoveLocation = private.binarySearch(askPriceUserList, sourcePlayer)
-
-			if (subRequest == "online") then
-				if (not (askPriceUserList[insertOrRemoveLocation] == sourcePlayer)) then
-					table.insert(askPriceUserList, insertOrRemoveLocation, sourcePlayer)
-				end
-
-			elseif (subRequest == "logout") then
-				if (askPriceUserList[insertOrRemoveLocation] == sourcePlayer) then
-					table.remove(askPriceUserList, insertOrRemoveLocation, sourcePlayer)
-				end
-			end
-
-		elseif (subRequest == "version") then
-			private.sendAddOnMessage(sourceChannel, "MAINR", "version:", private.GetVersion())
+		elseif (subRequest == "login") or (subRequest == "logout") or (subRequest == "online") then
+			--Used in v1 comms, currently ignored
 		end
 	end
 end
@@ -438,70 +400,35 @@ function private.beingIgnored(sourcePlayer)
 	for request, details in pairs(private.sentRequest) do
 		if (details.sourcePlayer == sourcePlayer) then
 			local link, count, player, channel = details.itemLink, details.stackCount, details.sourcePlayer, details.sourceChannel
-			local totalPrice, totalSeenCount, vendorPrice, answerCount = details.totalPrice, details.totalSeenCount, details.vendorPrice, details.answerCount
-			private.sendAddOnMessage(sourceChannel, "WFAIL", link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount)
+			local totalPrice, totalSeenCount, vendorPrice, answerCount, ignoreList = details.totalPrice, details.totalSeenCount, details.vendorPrice, details.answerCount, details.ignoreList
+
+			if ignoreList then --Either add our list to the existent ignoreList or make our name the first entry
+				ignoreList = ignoreList..":"..private.playerName
+
+			else
+				ignoreList = private.playerName
+			end
+
+			private.sendAddOnMessage(sourceChannel, "WFAIL", link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount, ignoreList) --Expanded in v2 comms to include the ignoreList
 		end
 	end
 end
 
---This will retrieve current online Guild members and remove anyone no longer online from the Guild AskPrice users list
-function private.guildRosterEvent()
-	if not (IsInGuild() and GetGuildInfo("player")) then
-		return
-	end
-
-	for name in pairs(private.guildRoster) do
-		private.guildRoster[name] = nil
-	end
-
-	for i = 1, GetNumGuildMembers(true) do
-		local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
-		if (name and online) then
-			private.guildRoster[name] = true
-		end
-	end
-
-	for index, name in ipairs(private.guildUsers) do
-	    if not private.guildRoster[name] then --Person is no longer online
-			table.remove(private.guildUsers, index)
-	    end
-	end
-end
-
-function private.raidRosterEvent(...) --TODO: There MUST be a better way of doing this
-	private.sendAddOnMessage("RAID", "MAINR", "login") --Always send a login event, since groups are volatile
-
-	--Clear out the table in preparation for the online events to fire
-	for i = #private.raidUsers, 1, -1 do
-		private.raidUsers[i] = nil
-	end
-end
-
+--This function changed after AskPrice revision 2825 to include AucAdvanced's revision number in adition to AskPrice's
 function private.GetVersion()
-	return tonumber(("$Revision$"):match("(%d+)"))
+	return tonumber(("$Revision$"):match("(%d+)")), (AucAdvanced.GetCurrentRevision()) --We just want the first return from GetCurrentRevision()
 end
 
-local function compDefault(a, b) return a < b end
-function private.binarySearch(table, value, compFunction)
-	compFunction = compFunction or compDefault
-
-	local startIndex, endIndex, middleIndex, stateIndex = 1, #table, 1, 0
-
-	while (startIndex <= endIndex) do
-		middleIndex = math.floor((startIndex + endIndex) / 2)
-
-		if (compFunction(value, table[middleIndex])) then
-			endIndex, stateIndex = middleIndex - 1, 0
+--This function is used to check if the received request (which should be lowercased before the function is called) is a valid SmartWords request
+function private.isSmartWordsRequest(text)
+	if private.getOption('util.askprice.smart') then
+		if private.getOption('util.askprice.smartOr') == 1 then
+			return text:find(private.getOption('util.askprice.word1'):lower(), 1, true)
+				or text:find(private.getOption('util.askprice.word2'):lower(), 1, true)
 		else
-			startIndex, stateIndex = middleIndex + 1, 1
+			return text:find(private.getOption('util.askprice.word1'):lower(), 1, true)
+				and text:find(private.getOption('util.askprice.word2'):lower(), 1, true)
 		end
-	end
-
-	local finalIndex = middleIndex + stateIndex
-	if (table[finalIndex - 1] == value) then
-		return finalIndex - 1
-	else
-		return finalIndex
 	end
 end
 
@@ -515,6 +442,7 @@ private.defaults = {
 	["util.askprice.whispers"]     = true,
 	["util.askprice.word1"]        = "what",
 	["util.askprice.word2"]        = "worth",
+	["util.askprice.smartOr"]      = 0, --1/0 instead of true/false due to limitations in the Configator API
 }
 
 function private.getOption(option)
@@ -540,27 +468,31 @@ function private.SetupConfigGui(gui)
 		"The triggers control how someone needs to ask you for the price.\n"..
 		"The Custom Smartwords allow Auctioneer to respond to natural language queries, while the Trigger Character allows for querying stack sizes\n\n"..
 		"Custom smartwords defaults respond to \"what is [item link] worth?\"\n"..
-		"Trigger character defaults respond to \"? (stack size) [item link]\"")
+		"Trigger character defaults respond to \"? (stack size) [item link]\""
+	)
 
-	gui:AddControl(id, "Subhead",    0,    "Smart word triggers:")
-	local last = gui:GetLast(id) -- Get the current position so we can return here for the second column
-	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", "Askprice Custom SmartWord #1        And")
-	gui:AddTip(id, "The smart words allow for natural language queries")
-	gui:SetLast(id, last) -- Return to the saved position
-	gui:AddControl(id, "Text",       0.5, 1, "util.askprice.word2", "Askprice Custom SmartWord #2")
-	gui:AddTip(id, "The smart words allow for natural language queries, both words must be present")
-	
 	gui:AddControl(id, "Subhead",    0,    "Simple trigger:")
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", "Askprice Trigger character")
 	gui:AddTip(id, "The trigger character allows for simple querying of a price")
 
-	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
-	gui:AddTip(id, "If enabled, will send players who ask for prices a message telling them how to use the trigger character")
+	gui:AddControl(id, "Subhead",    0,    "SmartWords:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable SmartWords checking.")
 	gui:AddTip(id, "If enabled, will enable responses to the SmartWords")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable the sending of vendor pricing data.")
-	gui:AddTip(id, "Allows you to enable sending the vendor price")
+	local last = gui:GetLast(id) -- Get the current position so we can return here for the second column
+	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", "Askprice Custom SmartWord #1")
+	gui:AddTip(id, "The smart words allow for natural language queries")
+	gui:SetLast(id, last) -- Return to the saved position
+	gui:AddControl(id, "Text",       0.5, 1, "util.askprice.word2", "Askprice Custom SmartWord #2")
+	gui:AddTip(id, "The smart words allow for natural language queries")
+	gui:AddControl(id, "Selectbox",  0, 1, {
+		{1, "Either"},
+		{0, "Both"}
+	}, "util.askprice.smartOr", "Either or both SmartWords") --1/0 instead of true/false due to limitations in the Configator API
+	gui:AddTip(id, "Require both SmartWords to be present or just one or the other in order for it to trigger a query")
+
+	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable sending of tutorial message.")
+	gui:AddTip(id, "If enabled, will send players who ask for prices a message telling them how to use the trigger character in conjunction with a stacksize parameter")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Show outgoing whispers from Askprice.")
 	gui:AddTip(id, "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
 
