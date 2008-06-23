@@ -167,6 +167,10 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	return array
 end
 
+function lib.ClearItem(hyperlink, faction, realm)
+	print(libType.."-"..libName.." does not store data itself. It uses your Beancounter data.")
+end
+
 --function lib.IsValidAlgorithm()
 --	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
 --	return true
