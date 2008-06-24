@@ -126,7 +126,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     end
 	local tbl = BeanCounter.API.search(hyperlink, settings, true)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    local i,v
+    local i,v, reason, qty, priceper, thistime
     if tbl then
         for i,v in pairs(tbl) do
             -- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
@@ -143,7 +143,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 --10 0
 --11 10387318
 --12 1198401769
-            local reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
+            reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
             thistime = tonumber(thistime)
             if priceper and qty and priceper>0 and qty>0 then
                 if reason == "Won on Buyout" or reason == "Won on Bid" then
