@@ -151,17 +151,24 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 
     local dataset = acquire();
-    tinsert(dataset, dayAverager);
+    local count = 0
+    if dayAverage then
+        tinsert(dataset, dayAverage);
+        count = count + 1
+    end
     if seenDays >= 3 then
         tinsert(dataset, avg3);
+        count = count + 1
         if seenDays >= 7 then
             tinsert(dataset, avg7);
+            count = count + 1
             if seenDays >= 14 then
                 tinsert(dataset, avg14);
-            end
+                count = count + 1
+           end
         end
     end
-    
+        
     if #dataset == 0 then                               -- No data
          print("Warning: Purchased dataset for "..hyperlink.." is empty.");
         return;
@@ -214,7 +221,13 @@ function lib.GetItemPDF(hyperlink, faction, realm)
         return;                         -- No available data or cannot estimate
     end
     
-    
+    if not count or count == 0 then
+    print(mean)
+    print(stddev)
+    print(count)
+    print("count broken! for "..hyperlink)
+    count = 1
+    end
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
     if stddev == 0 then stddev = mean / sqrt(count); end
