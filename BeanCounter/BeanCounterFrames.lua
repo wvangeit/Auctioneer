@@ -289,7 +289,7 @@ function private.CreateFrames()
 				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
 				local itemTexture = select(2, private.getItemInfo(link, "name")) 
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
-					debugPrint(itemName, itemID,itemTexture, link)
+					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
 					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
@@ -304,7 +304,7 @@ function private.CreateFrames()
 				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
 				local itemTexture = select(2, private.getItemInfo(link, "name")) 
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
-					debugPrint(itemName, itemID,itemTexture, link)
+					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
 					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
@@ -497,12 +497,12 @@ function private.CreateFrames()
 	
 	function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic)
 	
-	if not id then return end
-	if not settings then settings = frame.getCheckboxSettings() end
-	if not count then count = 500 end --count determines how many results we show or display High # ~to display all
+		if not id then return end
+		if not settings then settings = frame.getCheckboxSettings() end
+		if not count then count = 500 end --count determines how many results we show or display High # ~to display all
 	
 		tbl = {}
-		if type(id) == "table" then --we can search for a silng itemID or an array of itemIDs
+		if type(id) == "table" then --we can search for a sinlge itemID or an array of itemIDs
 			for i,v in pairs(id)do
 				table.insert(tbl, tostring(v))
 			end
@@ -518,7 +518,7 @@ function private.CreateFrames()
 		data.temp.failedAuctions = {}
 		data.temp.failedBids = {}
 		
-		debugPrint(id, settings, queryReturn, count, itemTexture)
+		--debugPrint(id, settings, queryReturn, count, itemTexture)
 		
 		--Retrives all matching results
 		local link
@@ -544,7 +544,6 @@ function private.CreateFrames()
 							for _, text in ipairs(itemKey) do
 								table.insert(data.temp["failedAuctions"], {i, id, index,text})
 							end
-							
 						end
 					end
 					if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
@@ -552,7 +551,6 @@ function private.CreateFrames()
 							for _, text in ipairs(itemKey) do
 								table.insert(data.temp["completedBids/Buyouts"], {i, id, index,text})
 							end
-							
 						end
 					end
 					if settings.failedbid and private.serverData[i]["failedBids"][id] then
@@ -592,39 +590,87 @@ function private.CreateFrames()
 		--Format Data for display via scroll frame or if requesting addon wants formated data  --SLOW
 		local dateString = private.getOption("dateString") or "%c"
 		for i,v in pairs(data.temp.completedAuctions) do
-			table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4]))
-			if not queryReturn then --do not create style tables if this data is being returned to an addon
-				style[#data] = {}
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
-				style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+			local match = true
+			--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
+			if settings.exact and settings.itemKey then
+				if v[3]:match(".*:("..settings.itemKey.."):.-") then
+					-- do nothing and add item to data table
+				else
+					match = false --we want exact matches and this is not one
+				end
+			end
+			
+			if match then
+				table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4], settings))
+				if not queryReturn then --do not create style tables if this data is being returned to an addon
+					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}
+					style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
+					style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+				end
 			end
 		end
 		for i,v in pairs(data.temp.failedAuctions) do
-			table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,0,0}}
-				style[#data][8] ={["textColor"] = {1,0,0}}
+			local match = true
+			--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
+			if settings.exact and settings.itemKey then
+				if v[3]:match(".*:("..settings.itemKey.."):.-") then
+					-- do nothing and add item to data table
+				else
+					match = false --we want exact matches and this is not one
+				end
+			end
+			
+			if match then
+				table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
+				if not queryReturn then
+					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}
+					style[#data][2] = {["textColor"] = {1,0,0}}
+					style[#data][8] ={["textColor"] = {1,0,0}}
+				end
 			end
 		end
 		for i,v in pairs(data.temp["completedBids/Buyouts"]) do
-			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,1,0}}
-				style[#data][8] ={["textColor"] = {1,1,0}}
+			local match = true
+			--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
+			if settings.exact and settings.itemKey then
+				if v[3]:match(".*:("..settings.itemKey.."):.-") then
+					-- do nothing and add item to data table
+				else
+					match = false --we want exact matches and this is not one
+				end
+			end
+			
+			if match then
+				table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
+				if not queryReturn then
+					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}
+					style[#data][2] = {["textColor"] = {1,1,0}}
+					style[#data][8] ={["textColor"] = {1,1,0}}
+				end
 			end
 		end
 		for i,v in pairs(data.temp.failedBids) do
-			table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,1,1}}
-				style[#data][8] ={["textColor"] = {1,1,1}}
+			local match = true
+			--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
+			if settings.exact and settings.itemKey then
+				if v[3]:match(".*:("..settings.itemKey.."):.-") then
+					-- do nothing and add item to data table
+				else
+					match = false --we want exact matches and this is not one
+				end
+			end
+			
+			if match then
+				table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
+				if not queryReturn then
+					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}
+					style[#data][2] = {["textColor"] = {1,1,1}}
+					style[#data][8] ={["textColor"] = {1,1,1}}
+				end
 			end
 		end
 		
