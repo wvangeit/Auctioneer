@@ -131,6 +131,102 @@ end
 
 lib.Private = private
 
+
+-- Determines the sample estimated standard deviation based on the deviation
+-- of the daily, 3day, 7day, and 14day averages. This is not technically
+-- correct because they are not independent samples (the 7 day average
+-- includes data from the 3 day and daily averages, for example). Still
+-- it provides a good estimation in the presence of lack of data. If you
+-- want to discuss the math behind this estimation, find Shirik
+-- @param hyperlink The item to look up
+-- @param faction The faction key from which to look up the data
+-- @param realm The realm from which to look up the data
+-- @return The estimated population mean
+-- @return The estimated population standard deviation
+-- @return The number of views found to base the standard deviation upon
+function private.EstimateStandardDeviation(hyperlink, faction, realm)
+    local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	assert(linkType=="item", "Standard deviation estimation requires an item link");
+	
+	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
+
+    local dataset = acquire();
+    tinsert(dataset, dayAverager);
+    if seenDays >= 3 then
+        tinsert(dataset, avg3);
+        if seenDays >= 7 then
+            tinsert(dataset, avg7);
+            if seenDays >= 14 then
+                tinsert(dataset, avg14);
+            end
+        end
+    end
+    
+    if #dataset == 0 then                               -- No data
+         print("Warning: Purchased dataset for "..hyperlink.." is empty.");
+        return;
+    end
+	
+    local mean = private.sum(unpack(dataset))/#dataset;
+    local variance = 0;
+    for k,v in ipairs(dataset) do
+        variance = variance + (mean - v)^2;
+    end
+
+    return mean, sqrt(variance), count;    
+end
+
+-- Simple function to total all of the values in the tuple
+-- @param ... The values to add. Note: tonumber() is called
+-- on all passed in values. Type checking is not performed.
+-- This may result in silent failures.
+-- @return The sum of all of the values passed in
+function private.sum(...)
+    local total = 0;
+    for x = 1, select('#', ...) do
+        total = total + select(x, ...);
+    end
+    
+    return total;
+end
+
+local bellCurve = AucAdvanced.API.GenerateBellCurve();
+-- Gets the PDF curve for a given item. This curve indicates
+-- the probability of an item's mean price. Uses an estimation
+-- of the normally distributed bell curve by performing
+-- calculations on the daily, 3-day, 7-day, and 14-day averages
+-- stored by SIMP
+-- @param hyperlink The item to generate the PDF curve for
+-- @param faction The faction key from which to look up the data
+-- @param realm The realm from which to look up the data
+-- @return The PDF for the requested item, or nil if no data is available
+-- @return The lower limit of meaningful data for the PDF (determined
+-- as the mean minus 5 standard deviations)
+-- @return The upper limit of meaningful data for the PDF (determined
+-- as the mean plus 5 standard deviations)
+function lib.GetItemPDF(hyperlink, faction, realm)
+    -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
+    
+    -- Calculate the SE estimated standard deviation & mean
+    local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, faction, realm);
+    
+    if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
+        return;                         -- No available data or cannot estimate
+    end
+    
+    
+    -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
+    -- the std dev is 100% of the mean divided by square root of number of views
+    if stddev == 0 then stddev = mean / sqrt(count); end
+    
+        
+    -- Calculate the lower and upper bounds as +/- 3 standard deviations
+    local lower, upper = mean - 3*stddev, mean + 3*stddev;
+    
+    bellCurve:SetParameters(mean, stddev);
+    return bellCurve, lower, upper;
+end
+
 function lib.GetPrice(hyperlink, faction, realm)
 	if (not faction) or (faction == AucAdvanced.GetFaction()) then
 		faction = AucAdvanced.GetFactionGroup()
