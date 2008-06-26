@@ -117,7 +117,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     if not settings then
         -- faction seems to be nil when passed in
         faction = UnitFactionGroup("player"):lower() 
-        settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true}
+        settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true, ["exact"] = true}
     end
     local sig = lib.GetSigFromLink(hyperlink)
     if cache[sig] then
@@ -186,7 +186,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     -- Calculate Variance
     local variance = 0
     local count = 0
-    print(hyperlink.." here "..mean)
+    
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
         if priceper and qty and priceper>0 and qty>0 and reason == "Auc Successful" then
@@ -196,9 +196,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 	end
 	variance = variance / count;
 	local stdev = variance ^ 0.5
-	
-    print(hyperlink.." here2 "..stdev)
-	
+		
 	local deviation = 1.5 * stdev
 	
 	-- Trim down to those within 1.5 stddev
