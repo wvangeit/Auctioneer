@@ -766,16 +766,23 @@ function private.CreateFrames()
 				frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 				local curSize = frame.salebox.stack:GetValue()
 				local extra = ""
-				if (curSize > count) then
-					extra = "  |cffffaa40" .. "(Stack > Available)"
-				end
-				frame.salebox.stack.label:SetText(("Stack size: %d"):format(curSize)..extra)
 				frame.salebox.stack:SetAlpha(1)
 				frame.salebox.stackentry:SetNumber(curSize)
 
 				local maxStax = math.floor(count / curSize)
 				local fullPop = maxStax*curSize
 				local remain = count - fullPop
+				--we don't want to lose any saved settings, so don't let the maxStax get below the saved value
+				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
+				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
+					maxStax = SavedNumber
+				end
+				if (curSize > count) then
+					extra = "  |cffffaa40" .. "(Stack > Available)"
+				elseif ((curSize * maxStax) > count) then
+					extra = "  |cffffaa40" .. "(Number > Available)"
+				end
+				frame.salebox.stack.label:SetText(("Stack size: %d"):format(curSize)..extra)
 				frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
 				if (curNumber >= -2 and curNumber < 0) then
 					if (curNumber == -2) then
@@ -895,7 +902,8 @@ function private.CreateFrames()
 				frame.salebox.stackentry:SetNumber(1)
 				frame.salebox.stack:SetAlpha(0.6)
 
-				frame.salebox.number:SetAdjustedRange(frame.salebox.count, -1)
+				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
+				frame.salebox.number:SetAdjustedRange(math.max(frame.salebox.count, tonumber(SavedNumber)), -1)
 				if (curNumber == -1) then
 					curNumber = frame.salebox.count
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
