@@ -773,7 +773,7 @@ function private.CreateFrames()
 				local fullPop = maxStax*curSize
 				local remain = count - fullPop
 				--we don't want to lose any saved settings, so don't let the maxStax get below the saved value
-				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
+				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
 				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
 					maxStax = SavedNumber
 				end
@@ -902,7 +902,7 @@ function private.CreateFrames()
 				frame.salebox.stackentry:SetNumber(1)
 				frame.salebox.stack:SetAlpha(0.6)
 
-				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
+				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
 				frame.salebox.number:SetAdjustedRange(math.max(frame.salebox.count, tonumber(SavedNumber)), -1)
 				if (curNumber == -1) then
 					curNumber = frame.salebox.count
