@@ -50,7 +50,6 @@ function lib.API.search(name, settings, queryReturn, count)
 	if private.getOption("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
 		--lets create a cache of the last search
 		if SearchRequest[name] then
-			name = name:gsub("|", "-")
 			debugPrint("Cached search results returned", name, time())
 			return(SearchRequest[1])
 		else
