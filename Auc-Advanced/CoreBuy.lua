@@ -247,7 +247,7 @@ function private.onEventHookBid(_, event, arg1)
 			arg1 == ERR_AUCTION_BID_OWN or
 			arg1 == ERR_AUCTION_HIGHER_BID or 
 			arg1 == ERR_ITEM_MAX_COUNT) then
-			private.onBidFailed()
+			private.onBidFailed(arg1)
 		end
 	end
 end
@@ -260,7 +260,22 @@ function private.onBidAccepted()
 	private.removePendingBid()
 end
 
-function private.onBidFailed()
+--private.onBidFailed(arg1)
+--This function is called when a bid fails
+--purpose is to output to chat the reason for the failure, and then pass the Bid on to private.removePendingBid()
+--The output may duplicate some client output.  If so, those lines need to be removed.
+function private.onBidFailed(arg1)
+	if arg1 == ERR_ITEM_NOT_FOUND then
+		print("Bid Failed: Item not found")
+	elseif arg1 == ERR_NOT_ENOUGH_MONEY then
+		print("Bid Failed: Not enough money")
+	elseif arg1 == ERR_AUCTION_BID_OWN then
+		print("Bid Failed: Can't bid on own auction")
+	elseif arg1 == ERR_AUCTION_HIGHER_BID then
+		print("Bid Failed: Auction already has higher bid")
+	elseif arg1 == ERR_ITEM_MAX_COUNT then
+		print("Bid Failed: You already have too many of that item")
+	end
 	private.removePendingBid()
 end
 
