@@ -70,36 +70,10 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.GetSigFromLink(link)
-	local sig
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-	if itype == "item" then
-		if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
-		else
-			sig = tostring(id)
-		end
-	else
-		print("Link is not item")
-	end
-	return sig
-end
+-- For backwards compatibility, leave these here. This is now a capability of the core API
+lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
+lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;
 
-function lib.GetLinkFromSig(sig)
-	local link, name
-	local id, suffix, factor, enchant = strsplit(":", sig)
-	if not suffix then suffix = "0" end
-	if not factor then factor = "0" end
-	if not enchant then enchant = "0" end
-	
-	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
-	name, link = GetItemInfo(link)
-	return link, name -- name is ignored by most calls
-end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end

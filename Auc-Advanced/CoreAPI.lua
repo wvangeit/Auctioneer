@@ -92,7 +92,7 @@ function lib.GetMarketValue(itemLink, serverKey)
     if not itemLink then return; end
     
     -- Look up in the cache if it's recent enough
-    local cacheTable = cache[itemLink..":"..(serverKey or "")];
+    local cacheTable = cache[lib.GetSigFromLink(itemLink)];
     if cacheTable then
         return cacheTable.value, cacheTable.seen, cacheTable.stats;
     end
@@ -575,6 +575,41 @@ function lib.GetAppraiserValue(itemLink, useMatching)
 	lib.ShowDeprecationAlert("AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching)");
     
 	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
+end
+
+-- Signature conversion functions
+
+-- Creates an AucAdvanced signature from an item link
+function lib.GetSigFromLink(link)
+	local sig
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	if itype == "item" then
+		if enchant ~= 0 then
+			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+		elseif factor ~= 0 then
+			sig = ("%d:%d:%d"):format(id, suffix, factor)
+		elseif suffix ~= 0 then
+			sig = ("%d:%d"):format(id, suffix)
+		else
+			sig = tostring(id)
+		end
+	else
+		print("Link is not item")
+	end
+	return sig
+end
+
+-- Creates an item link from an AucAdvanced signature
+function lib.GetLinkFromSig(sig)
+	local link, name
+	local id, suffix, factor, enchant = strsplit(":", sig)
+	if not suffix then suffix = "0" end
+	if not factor then factor = "0" end
+	if not enchant then enchant = "0" end
+	
+	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
+	name, link = GetItemInfo(link)
+	return link, name -- name is ignored by most calls
 end
 
 
