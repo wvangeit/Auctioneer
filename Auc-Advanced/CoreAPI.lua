@@ -92,7 +92,7 @@ function lib.GetMarketValue(itemLink, serverKey)
     if not itemLink then return; end
     
     -- Look up in the cache if it's recent enough
-    local cacheTable = cache[lib.GetSigFromLink(itemLink)];
+    local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
     if cacheTable then
         return cacheTable.value, cacheTable.seen, cacheTable.stats;
     end
@@ -192,7 +192,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         -- Cache before finishing up
         local cacheTable = acquire();
-        cache[itemLink..":"..(serverKey or "")] = cacheTable;
+        cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
         cacheTable.time = GetTime();
         cacheTable.value = midpoint;
         cacheTable.seen = seen;
