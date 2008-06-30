@@ -1,0 +1,9 @@
+## Title: Auc:Util:ProtectWindow
+## Interface: 20400
+## Dependancies: Auc-Advanced
+##
+## Version: <%version%> (<%codename%>)
+## Revision: $Id: Auc-Util-ProtectWindow.toc 3185 2008-06-28 03:29:55Z Hirsute $
+## URL: http://auctioneeraddon.com/
+##
+Embed.xml
