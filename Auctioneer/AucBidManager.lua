@@ -264,10 +264,12 @@ end
 -------------------------------------------------------------------------------
 function isBidAllowed(listType, index)
 	--If AucAdv bidding, let it through
-	local AAindex = AucAdvanced.Buy.Private.CurAuction["index"]
-	if AAindex and AAindex == index then
-		debugPrint("Letting AucAdv bid go through", "Letting AucAdv bid go through", DebugLib.Level.Info)
-		return true
+	if AucAdvanced then
+		local AAindex = AucAdvanced.Buy.Private.CurAuction["index"]
+		if AAindex and AAindex == index then
+			debugPrint("Letting AucAdv bid go through", "Letting AucAdv bid go through", DebugLib.Level.Info)
+			return true
+		end
 	end
 	
 	-- Must be a valid auction.
