@@ -263,6 +263,13 @@ end
 -- Checks if a bid is allowed on the specified auction.
 -------------------------------------------------------------------------------
 function isBidAllowed(listType, index)
+	--If AucAdv bidding, let it through
+	local AAindex = AucAdvanced.Buy.Private.CurAuction["index"]
+	if AAindex and AAindex == index then
+		debugPrint("Letting AucAdv bid go through", "Letting AucAdv bid go through", DebugLib.Level.Info)
+		return true
+	end
+	
 	-- Must be a valid auction.
 	local auction = Auctioneer.QueryManager.GetAuctionByIndex(listType, index)
 	if (not Auctioneer.QueryManager.IsAuctionValid(auction)) then
