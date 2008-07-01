@@ -1067,6 +1067,15 @@ StorePageFunction = function()
 		EventFramesRegistered=nil  -- do NOT attempt to recycle, subkeys are global tables!
 	end
 
+	--Send a Processor event to modules letting them know we are done with the page
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("pagefinished", pageNumber)
+			end
+		end
+	end
+
 	-- Send the next page query or finish scanning
 
 	if private.isScanning then
