@@ -484,41 +484,32 @@ end
 local ahFrameProtected
 local originalToggleWorldMap
 function protectAuctionFrame(enable)
+	--If AucAdvanced is loaded, defer to it.
+	if AucAdvanced then
+		if AucAdvanced.Modules.Util.Protectwindow then
+			return
+		end
+	end
+	--Otherwise, behave as normal.
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
-		-- helper functions necessary to allow the dressing room feature to
-		-- work correctly
-		function enableAuctionFrame()
-			UIPanelWindows.AuctionFrame = AuctionFrame
-		end
-		function disableAuctionFrame()
-			UIPanelWindows.AuctionFrame = nil
-		end
-
 		-- Handle enabling of protection
 		if (enable and not ahFrameProtected and AuctionFrame:IsShown()) then
 			--Remember that we are now protecting the frame
-			ahFrameProtected = true;
-			--If the frame is the current doublewide frame, then clear the doublewide
-
-			if ( GetUIPanel("doublewide") == AuctionFrame ) then
-				UIParent.doublewide = nil
-			end
-			--Remove the frame from the UI frame handling system
-			UIPanelWindows.AuctionFrame = nil
-
-			Stubby.RegisterFunctionHook("AuctionDressUpFrame_OnShow", -200, enableAuctionFrame)
-			Stubby.RegisterFunctionHook("AuctionDressUpFrame_OnShow", 200, disableAuctionFrame)
-			Stubby.RegisterFunctionHook("AuctionDressUpFrame_OnHide", -200, enableAuctionFrame)
-			Stubby.RegisterFunctionHook("AuctionDressUpFrame_OnHide", 200, disableAuctionFrame)
+			ahFrameProtected = true
+			--Protect the frame.
+			AuctionFrame.Hide = function() end
+			HideUIPanel(AuctionFrame)
+			AuctionFrame.Hide = nil
+			AuctionFrame:SetAttribute("UIPanelLayout-enabled", false)
 
 			--If mobile frames is around, then remove AuctionFrame from Mobile Frames handling system
 			if (MobileFrames_UIPanelWindowBackup) then
-				MobileFrames_UIPanelWindowBackup.AuctionFrame = nil;
+				MobileFrames_UIPanelWindowBackup.AuctionFrame = nil
 			end
 
 			if (MobileFrames_UIPanelsVisible) then
-				MobileFrames_UIPanelsVisible.AuctionFrame = nil;
+				MobileFrames_UIPanelsVisible.AuctionFrame = nil
 			end
 			--Hook the function to show the WorldMap, WorldMap has internal code that forces all these frames to close
 			--so for it, we have to prevent it from showing at all
@@ -539,6 +530,10 @@ function protectAuctionFrame(enable)
 		elseif (not enable and ahFrameProtected) then
 			--Handle disabling of protection
 			ahFrameProtected = nil;
+			AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+			AuctionFrame.IsShown = function() end
+			ShowUIPanel(AuctionFrame, 1)
+			AuctionFrame.IsShown = nil
 			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
 
 			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList.AuctionFrame ) then
@@ -548,17 +543,7 @@ function protectAuctionFrame(enable)
 					MobileFrames_UIPanelsVisible.AuctionFrame = 0;
 				end
 
-			else
-				--Put the frame back into the UI frame handling system
-				UIPanelWindows.AuctionFrame = { area = "doublewide", pushable = 0 };
 			end
-
-			-- remove the hooks to bypass the dressing feature needing to alter
-			-- the AH width
-			Stubby.UnregisterFunctionHook("AuctionDressUpFrame_OnShow", enableAuctionFrame)
-			Stubby.UnregisterFunctionHook("AuctionDressUpFrame_OnShow", disableAuctionFrame)
-			Stubby.UnregisterFunctionHook("AuctionDressUpFrame_OnHide", enableAuctionFrame)
-			Stubby.UnregisterFunctionHook("AuctionDressUpFrame_OnHide", disableAuctionFrame)
 
 		end
 	end

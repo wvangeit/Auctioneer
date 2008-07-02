@@ -1929,20 +1929,45 @@ function protectWindow(param, khaosCommand)
 	local mode;
 
 	if (param == 'never' or param == 'off' or param == _AUCT('CmdProtectWindow0') or param == _AUCT('CmdOff') or tonumber(param) == 0) then
-		mode = 0;
-		Auctioneer.Util.ProtectAuctionFrame(false);
+		--If AucAdvanced is Loaded, defer to it
+		if AucAdvanced then 
+			if AucAdvanced.Modules.Util.ProtectWindow then
+				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 1)
+				mode = 0;
+			end
+		--Otherwise, behave as normal	
+		else
+			mode = 0;
+			Auctioneer.Util.ProtectAuctionFrame(false);
+		end
 
 	elseif (param == 'scan' or param == _AUCT('CmdProtectWindow1') or tonumber(param) == 1) then
 		mode = 1;
-		if (Auctioneer.ScanManager.IsScanning()) then
-			Auctioneer.Util.ProtectAuctionFrame(true);
+		--If AucAdvanced is loaded, defer to it.
+		if AucAdvanced then
+			if AucAdvanced.Modules.Util.ProtectWindow then
+				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 3)
+			end
+		--Otherwise, behave as normal.
 		else
-			Auctioneer.Util.ProtectAuctionFrame(false);
+			if (Auctioneer.ScanManager.IsScanning()) then
+				Auctioneer.Util.ProtectAuctionFrame(true);
+			else
+				Auctioneer.Util.ProtectAuctionFrame(false);
+			end
 		end
 
 	elseif (param == 'always' or param == _AUCT('CmdProtectWindow2') or tonumber(param) == 2) then
 		mode = 2;
-		Auctioneer.Util.ProtectAuctionFrame(true);
+		--If AucAdvanced is loaded, defer to it.
+		if AucAdvanced then
+			if AucAdvanced.Modules.Util.ProtectWindow then
+				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 2)
+			end
+		--Otherwise, behave as normal.
+		else
+			Auctioneer.Util.ProtectAuctionFrame(true);
+		end
 
 	else
 		Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, Auctioneer.Util.LocalizeCommand("protect-window")));
