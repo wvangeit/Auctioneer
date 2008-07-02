@@ -260,7 +260,7 @@ function private.CreateFrames()
 			frame.InitControls()
 			--Also pass this search to BeanCounter's frame
 			if BeanCounter and BeanCounter.API.search and BeanCounter.API.isLoaded then
-				BeanCounter.API.search(item[1], nil, nil, 50)
+				BeanCounter.API.search(item[7], nil, nil, 50)
 			end			
 		else
 			frame.salebox.name:SetText("No item selected")
