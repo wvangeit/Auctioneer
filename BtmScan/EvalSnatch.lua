@@ -363,6 +363,9 @@ function snatchui.OnClickBagSheet(button, row, index)
 	snatchui.SetWorkingItem(link)
 end	
 
+function snatchui.OnResize()
+	--empty function needed to resize columns. This function can be used later if we want to save columns across sessions
+end
 
 function snatchui.ClearWorkingItem()
 	snatchui.frame.workingname:SetText("")
@@ -541,13 +544,13 @@ function lib.snatchGUI()
 			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
 			{ "Snatching", "TOOLTIP", 150 }, 
 			{ "Buy at", "COIN", 70 }, 
-			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet)
+			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet, snatchui.OnResize)
 		else
 			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
 			{ "Snatching", "TOOLTIP", 150 }, 
 			{ "Buy at", "COIN", 70}, 
 			{ "Appraiser", "COIN", 70 }, 
-			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet)
+			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet, snatchui.OnResize)
 		end
 		
 
@@ -574,14 +577,14 @@ function lib.snatchGUI()
 		if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
 				{ "Bag Contents", "TOOLTIP", 150 }, 
-				{ "BTM Rule", "TEXT", 25 }, 
-				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet)
+				{ "BTM Rule", "TEXT", 70 }, 
+				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet, snatchui.OnResize)
 		else
 			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
 				{ "Bag Contents", "TOOLTIP", 150 }, 
-				{ "Appraiser", "COIN", 25 }, 
-				{ "BTM Rule", "TEXT", 25 }, 
-				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet)
+				{ "Appraiser", "COIN", 70 }, 
+				{ "BTM Rule", "TEXT", 70 }, 
+				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet, snatchui.OnResize)
 		end
 
 		
