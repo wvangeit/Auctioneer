@@ -265,7 +265,7 @@ function lib.ScanPage()
 			if curBid and curBid > 0 then
 				price = curBid + minInc
 			else
-				curbid = 0
+				curBid = 0
 			end
 			
 			-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
