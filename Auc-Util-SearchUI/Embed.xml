@@ -6,6 +6,7 @@
 	<Script file="SearcherDisenchant.lua"/>
 	<Script file="SearcherConverter.lua"/>
 	<Script file="SearcherVendor.lua"/>
+	<Script file="SearchRealTime.lua"/>
 	<Script>
 		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>

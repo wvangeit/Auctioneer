@@ -41,7 +41,7 @@ local gui
 private.data = {}
 local coSearch
 
-local tleft = {
+private.tleft = {
 	"|cff000001|cffe5e5e530m", -- 30m
 	"|cff000002|cffe5e5e52h",  --2h
 	"|cff000003|cffe5e5e512h", --12h
@@ -59,6 +59,19 @@ function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
 		--private.SetupConfigGui(...)
 		-- We don't have one of these
+	elseif (callbackType == "auctionui") then
+		if lib.Searchers.RealTime then
+			lib.Searchers.RealTime.HookAH()
+		end
+		
+		--we need to make sure that the GUI is made by the time the AH opens, as RealTime could be trying to add lines to it.
+		if not gui then
+			lib.MakeGuiConfig()
+		end
+	elseif (callbackType == "pagefinished") then
+		if lib.Searchers.RealTime then
+			lib.Searchers.RealTime.FinishedPage(...)
+		end
 	end
 end
 
@@ -294,7 +307,9 @@ function lib.GetSetting(setting, default)
 end
 
 function lib.Show()
-	lib.MakeGuiConfig()
+	if not gui then --no need to make the GUI if it already exists
+		lib.MakeGuiConfig()
+	end
 	gui:Show()
 end
 
@@ -347,6 +362,7 @@ end
 function private.removeline()
 	table.remove(private.sheetData, gui.sheet.selected)
 	gui.sheet.selected = nil
+	gui.frame.remove:Disable()
 	gui.sheet:SetData(private.sheetData)
 end
 
@@ -398,9 +414,9 @@ function lib.MakeGuiConfig()
 
 	private.gui = gui
 	gui.frame = CreateFrame("Frame", nil, gui)
-	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,0) 
+	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25) 
 	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0) 
-	gui.frame:SetHeight(300)
+	gui.frame:SetHeight(275)
 	gui.frame:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
 		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
@@ -410,12 +426,17 @@ function lib.MakeGuiConfig()
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
 	
 	function lib.UpdateControls()
+		if not gui.sheet.selected then
+			gui.frame.remove:Disable()
+		end
 		if selected ~= gui.sheet.selected then
 			selected = gui.sheet.selected
 			local data = gui.sheet:GetSelection()
 			if not data then
 				private.data = {}
+				gui.frame.remove:Disable()
 			else
+				gui.frame.remove:Enable()
 				private.data.link = data[1]
 				private.data.seller = data[8]
 				private.data.stack = data[4]
@@ -527,7 +548,7 @@ function lib.MakeGuiConfig()
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 	
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.buyout:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -30, 0)
+	gui.frame.buyout:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -30, 25)
 	gui.frame.buyout:SetText("Buyout")
 	gui.frame.buyout:SetScript("OnClick", private.buyauction)
 	gui.frame.buyout:Disable()
@@ -551,6 +572,22 @@ function lib.MakeGuiConfig()
 	gui.frame.buyfirst:SetText("Buy First")
 	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
 	gui.frame.buyfirst:Enable()
+	
+	gui.frame.remove = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.remove:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -120, 0)
+	gui.frame.remove:SetText("Remove")
+	gui.frame.remove:SetScript("OnClick", private.removeline)
+	gui.frame.remove:Disable()
+	
+	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.notnow:SetPoint("BOTTOMRIGHT", gui.frame.remove, -120, 0)
+	gui.frame.notnow:SetText("Not Now")
+	gui.frame.notnow:Disable()
+	
+	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.ignore:SetPoint("BOTTOMRIGHT", gui.frame.notnow, -120, 0)
+	gui.frame.ignore:SetText("Ignore")
+	gui.frame.ignore:Disable()
 	
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
@@ -693,7 +730,7 @@ local PerformSearch = function()
 		local cur = data[Const.CURBID]
 		local buy = data[Const.BUYOUT]
 		local price = data[Const.PRICE]
-		table.insert(private.sheetData, acquire(
+		table.insert(private.sheetData, {
 			data[Const.LINK],
 			data["pct"],
 			data["profit"],
@@ -702,14 +739,14 @@ local PerformSearch = function()
 			price,
 			data["reason"],
 			data[Const.SELLER],
-			tleft[data[Const.TLEFT]],
+			private.tleft[data[Const.TLEFT]],
 			buy/count,
 			price/count,
 			min,
 			cur,
 			min/count,
 			cur/count
-		))
+		})
 	end
 
 	gui.frame.progressbar:Hide()
@@ -736,7 +773,7 @@ function private.OnUpdate()
 		if flip then
 			local status, result = coroutine.resume(coSearch)
 			if not status and result then
-				print("Error in search coroutine: " .. result)
+				error("Error in search coroutine: " .. result)
 			end
 		end
 	end

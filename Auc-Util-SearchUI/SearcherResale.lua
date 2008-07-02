@@ -77,6 +77,7 @@ function lib.Search(item)
 	if not market then
 		return
 	end
+	market = market * item[Const.COUNT]
 	
 	if (get("resale.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("resale.seen.min"))) then
