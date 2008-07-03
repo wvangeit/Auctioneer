@@ -426,7 +426,9 @@ function lib.MakeGuiConfig()
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
 	
 	function lib.UpdateControls()
-		if not gui.sheet.selected then
+		if gui.sheet.selected then
+			gui.frame.remove:Enable()
+		else
 			gui.frame.remove:Disable()
 		end
 		if selected ~= gui.sheet.selected then
@@ -434,9 +436,7 @@ function lib.MakeGuiConfig()
 			local data = gui.sheet:GetSelection()
 			if not data then
 				private.data = {}
-				gui.frame.remove:Disable()
 			else
-				gui.frame.remove:Enable()
 				private.data.link = data[1]
 				private.data.seller = data[8]
 				private.data.stack = data[4]

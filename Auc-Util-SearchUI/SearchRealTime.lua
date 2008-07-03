@@ -340,11 +340,11 @@ function lib.ScanPage()
 								end
 							end
 							private.ItemTable["pct"] = pct
-							local count = private.ItemTable[Const.COUNT]
-							local min = private.ItemTable[Const.MINBID]
-							local cur = private.ItemTable[Const.CURBID]
-							local buy = private.ItemTable[Const.BUYOUT]
-							local price = private.ItemTable[Const.PRICE]
+							local count = private.ItemTable[Const.COUNT] or 1
+							local min = private.ItemTable[Const.MINBID] or 0
+							local cur = private.ItemTable[Const.CURBID] or 0
+							local buy = private.ItemTable[Const.BUYOUT] or 0
+							local price = private.ItemTable[Const.PRICE] or 0
 							table.insert(AucSearchUI.Private.sheetData, {
 								private.ItemTable[Const.LINK],
 								private.ItemTable["pct"],
