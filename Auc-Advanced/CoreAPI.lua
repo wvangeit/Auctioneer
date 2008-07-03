@@ -73,6 +73,7 @@ local warned  = {};
 local tremove = table.remove;
 local tinsert = table.insert;
 local abs = math.abs;
+local floor = math.floor;
 local ERROR = 0.02;
 -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
 --[[
@@ -142,7 +143,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         lastTotal = total;
         total = 0;
         delta = delta * 0.75;
-        
+               
         for i = 1, #pdfList do
             local thisCall = pdfList[i];
             for x = lowerLimit, upperLimit, delta do
@@ -189,6 +190,7 @@ function lib.GetMarketValue(itemLink, serverKey)
     
     
 	if midpoint and midpoint > 0 then
+        midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
         
         -- Cache before finishing up
         local cacheTable = acquire();
