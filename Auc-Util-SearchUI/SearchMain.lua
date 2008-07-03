@@ -603,12 +603,19 @@ function lib.MakeGuiConfig()
 	gui.frame.progressbar:SetStatusBarColor(0.6, 0, 0, 0.4)
 	gui.frame.progressbar:SetMinMaxValues(0, 1000)
 	gui.frame.progressbar:SetValue(0)
+	gui.frame.progressbar:SetFrameLevel(10)
 	gui.frame.progressbar:Hide()
 	
 	gui.frame.progressbar.text = gui.frame.progressbar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	gui.frame.progressbar.text:SetPoint("CENTER", gui.frame.progressbar, "CENTER")
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching")
 	gui.frame.progressbar.text:SetTextColor(1,1,1)
+	
+	gui.frame.progressbar.cancel = CreateFrame("Button", nil, gui.frame.progressbar, "OptionsButtonTemplate")
+	gui.frame.progressbar.cancel:SetPoint("BOTTOMRIGHT", gui.frame.progressbar, "BOTTOMRIGHT", -5, 5)
+	gui.frame.progressbar.cancel:SetPoint("TOPLEFT", gui.frame.progressbar, "TOPRIGHT", -25, -5)
+	gui.frame.progressbar.cancel:SetText("X")
+	gui.frame.progressbar.cancel:SetScript("OnClick", private.cancelSearch)
 	
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
@@ -657,6 +664,10 @@ function private.FindSearcher(item)
 	end
 end
 
+function private.cancelSearch()
+	private.SearchCancel = true
+end
+
 local PerformSearch = function()
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
@@ -676,6 +687,10 @@ local PerformSearch = function()
 		if (i % speed) == 0 then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
 			coroutine.yield()
+			if private.SearchCancel then
+				private.SearchCancel = nil
+				break
+			end
 		end
 		
 		--buyorbid must be either "bid", "buy", true, false, or nil
