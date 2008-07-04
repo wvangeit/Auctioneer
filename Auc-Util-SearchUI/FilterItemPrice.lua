@@ -98,7 +98,6 @@ end
 function private.remove()
 	local data = private.ignorelistGUI.sheet:GetSelection()
 	local sig = AucAdvanced.API.GetSigFromLink(data[1])
-	print("removing "..tostring(sig))
 	lib.AddIgnore(sig)
 end
 
@@ -168,15 +167,18 @@ function lib.Filter(item, searcher)
 			or (searcher and (not get("ignoreitemprice.filter."..searcher))) then
 		return
 	end
+	local price = item[Const.PRICE]
+	local count = item[Const.COUNT] or 1
+	price = math.floor(price/count)
 	
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
-		if item[Const.PRICE] >= ignorelist[sig] then
+		if price >= ignorelist[sig] then
 			return true
 		end
 	end
 	if private.tempignorelist[sig] then
-		if item[Const.PRICE] >= private.tempignorelist[sig] then
+		if price >= private.tempignorelist[sig] then
 			return true
 		end
 	end
@@ -195,6 +197,9 @@ function lib.PostFilter(item, searcher, buyorbid)
 	else
 		price = item[Const.BUYOUT]
 	end
+	local count = item[Const.COUNT] or 1
+	price = math.floor(price/count)
+
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then
