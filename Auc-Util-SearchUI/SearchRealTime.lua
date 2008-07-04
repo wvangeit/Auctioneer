@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Search UI - Realtime module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: SearchRealTime.lua 3197 2008-07-02 01:37:19Z RockSlice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds a price level indicator
@@ -463,4 +463,4 @@ function lib.HookAH()
 	private.button.control.tex:SetVertexColor(1, 0.9, 0.1)
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearchRealTime.lua $", "$Rev: 3197 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Search UI - Filter IgnoreItemPrice
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: FilterItemPrice.lua 3197 2008-07-02 01:37:19Z RockSlice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is a plugin module for the SearchUI that assists in searching by refined paramaters
@@ -213,4 +213,4 @@ function lib.PostFilter(item, searcher, buyorbid)
 	end
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/FilterItemPrice.lua $", "$Rev: 3197 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
