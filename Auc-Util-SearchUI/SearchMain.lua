@@ -398,6 +398,13 @@ function private.removeline()
 	lib.UpdateControls()
 end
 
+function private.removeall()
+	lib.CleanTable(private.sheetData)
+	gui.sheet.selected = nil
+	gui.sheet:SetData(private.sheetData)
+	lib.UpdateControls()
+end
+
 function private.cropreason(reason)
 	if reason then
 		reason = string.split(":", reason)
@@ -646,23 +653,29 @@ function lib.MakeGuiConfig()
 	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
 	gui.frame.buyfirst:Enable()
 	
+	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.clear:SetPoint("TOPLEFT", gui.frame.buyfirst, "BOTTOMLEFT", 10, -5)
+	gui.frame.clear:SetText("Clear")
+	gui.frame.clear:SetScript("OnClick", private.removeall)
+	gui.frame.clear:Enable()
+	
 	gui.frame.remove = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.remove:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -120, 0)
+	gui.frame.remove:SetPoint("BOTTOMLEFT", gui.frame.clear, "BOTTOMRIGHT", 30, 0)
 	gui.frame.remove:SetText("Remove")
 	gui.frame.remove:SetScript("OnClick", private.removeline)
 	gui.frame.remove:Disable()
 	
-	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.notnow:SetPoint("BOTTOMRIGHT", gui.frame.remove, -120, 0)
-	gui.frame.notnow:SetText("Not Now")
-	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
-	gui.frame.notnow:Disable()
-	
 	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignore:SetPoint("BOTTOMRIGHT", gui.frame.notnow, -120, 0)
+	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui.frame.remove, "BOTTOMRIGHT", 120, 0)
 	gui.frame.ignore:SetText("Ignore")
 	gui.frame.ignore:SetScript("OnClick", private.ignore)
 	gui.frame.ignore:Disable()
+	
+	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui.frame.ignore, "BOTTOMRIGHT", 30, 0)
+	gui.frame.notnow:SetText("Not Now")
+	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
+	gui.frame.notnow:Disable()
 	
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
@@ -885,6 +898,17 @@ function private.OnUpdate()
 			local status, result = coroutine.resume(coSearch)
 			if not status and result then
 				error("Error in search coroutine: " .. result)
+			end
+		end
+	end
+	if gui and gui:IsShown() then 
+		if gui.config.selectedCat == "Searches" then
+			if not gui.Search:IsShown() then
+				gui.Search:Show()
+			end
+		else
+			if gui.Search:IsShown() then
+				gui.Search:Hide()
 			end
 		end
 	end
