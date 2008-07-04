@@ -125,7 +125,7 @@ private.settingDefaults = {
 	["columnwidth.".._BC('UiDepositTransaction')] = 58,
 	["columnwidth.".._BC('UiPriceper')] = 50, 
 	["columnwidth.".._BC("UiFee")] = 70, 
-	["columnwidth.".._BC('UiWealth')] = 70, 
+	["columnwidth.".._BC('UiReason')] = 70, 
 	["columnwidth.".._BC('UiDateHeader')] = 250,
     }
 

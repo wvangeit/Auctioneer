@@ -90,9 +90,13 @@ if AucAdvanced and AucAdvanced.NewModule then
 		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
 			local item = ...
 			if item.name then BeanCounter.externalSearch(item.name) end
+		
+		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
+			private.storeReasonForBid(...)
 		end
 	end
 end
+
 lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB
@@ -327,6 +331,30 @@ function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 		end
 	end
 end
+
+--Store reason Code for BTM/SearchUI
+--tostring(bid["link"]), tostring(bid["sellername"]), tostring(bid["count"]), tostring(bid["buyout"]), tostring(bid["price"]), tostring(bid["reason"]))
+function private.storeReasonForBid(...)
+		debugPrint("bidplaced", ...)
+	local itemLink, seller, count, buyout, price, reason = strsplit(";", ...)
+	 
+	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
+	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
+		for i, v in pairs(private.playerData.postedBids[itemID][itemString]) do
+			local tbl = private.unpackString(v)
+			if tbl and itemID and price and count then
+				if tbl[1] == count and tbl[2] == price and tbl[7] == "" then
+					local text = v:gsub("(.*)","%1"..reason , 1)
+						debugPrint("before", private.playerData.postedBids[itemID][itemString][i])
+					private.playerData.postedBids[itemID][itemString][i] = text
+						debugPrint("after", private.playerData.postedBids[itemID][itemString][i])
+					break
+				end
+			end
+		end
+	end
+end
+
 --Get item Info or a specific subset. accepts itemID or "itemString" or "itemName ONLY IF THE ITEM IS IN PLAYERS BAG" or "itemLink"
 function private.getItemInfo(link, cmd) 
 --debugPrint(link, cmd)

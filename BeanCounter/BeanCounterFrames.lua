@@ -441,7 +441,7 @@ function private.CreateFrames()
 				
 		{ _BC('UiDepositTransaction'), "COIN", private.getOption("columnwidth.".._BC('UiDepositTransaction')) },
 		{ _BC("UiFee"), "COIN", private.getOption("columnwidth.".._BC("UiFee")) }, 
-		{ _BC('UiWealth'), "COIN", private.getOption("columnwidth.".._BC('UiWealth')) }, 
+		{ _BC('UiReason'), "TEXT", private.getOption("columnwidth.".._BC('UiReason')) }, 
 		{ _BC('UiDateHeader'), "text", private.getOption("columnwidth.".._BC('UiDateHeader')) },
 	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
 		
@@ -728,7 +728,7 @@ function private.CreateFrames()
 
 					tonumber(tbl[3]), --deposit
 					tonumber(tbl[4]), --fee
-					tonumber(tbl[9]) or 0, --current wealth
+					tbl[9], --current wealth
 					tbl[8], --time, --Make this a user choosable option.
 				})
 		end
@@ -755,7 +755,7 @@ function private.CreateFrames()
 
 					tonumber(tbl[4]) or 0, --deposit
 					0, --fee
-					tonumber(tbl[6]) or 0, --current wealth
+					tbl[6], --current wealth
 					tbl[5], --time,
 				})
 		end
@@ -790,7 +790,7 @@ function private.CreateFrames()
 
 					tonumber(tbl[2]), --deposit
 					tonumber(tbl[3]), --fee
-					tonumber(tbl[8]) or 0, --current wealth
+					tbl[8], --current wealth
 					tbl[7], --time,
 				})
 		end
@@ -815,7 +815,7 @@ function private.CreateFrames()
 
 					0, --deposit
 					0, --fee
-					tonumber(tbl[3]) or 0, --current wealth
+					tbl[3], --current wealth
 					tbl[2], --time,
 				})
 		end

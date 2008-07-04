@@ -276,6 +276,7 @@ BeanCounterLocalizations = {
 		["UiPricePerHeader"]	= "Price Header";
 		["UiPurchases"]	= "Purchases";
 		["UiQuantityHeader"]	= "Qty";
+		["UiReason"]	= "Reason";
 		["UiSales"]	= "Sales";
 		["UiSearch"]	= "Search";
 		["UiSearchForLabel"]	= "Search for:";

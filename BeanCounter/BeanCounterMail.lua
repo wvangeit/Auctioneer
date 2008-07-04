@@ -289,13 +289,14 @@ end
  --No need to reconcile, all needed data has been provided in the invoice We do need to clear entries so outbid has less to wade through
 function private.sortCompletedBidsBuyouts( i )
 	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
+	local reason = private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
-		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason)
 		private.databaseAdd("completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
 		debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
 	end
-	private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
+	
 	table.remove(private.reconcilePending,i)		
 end
 --Used only to clear postedBid entries so failed bids is less likely to miss
@@ -309,10 +310,11 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
 				local tbl = private.unpackString(text)
 				local stack, postBid, postSeller = tonumber(tbl[1]), tonumber(tbl[2]), tbl[3]
 				if seller ==  postSeller and postBid == bid then
-					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
-					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
-					debugPrint("posted Bid removed as Won", itemString, index)
-					break
+					
+					--table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
+					debugPrint("posted Bid removed as Won", itemString, index, tbl[7])
+					return tbl[7]
 				end
 			end
 		end
