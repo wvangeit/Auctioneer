@@ -7,6 +7,10 @@
 	<Script file="SearcherConverter.lua"/>
 	<Script file="SearcherVendor.lua"/>
 	<Script file="SearchRealTime.lua"/>
+	<script file="FilterTimeLeft.lua"/>
+	<script file="FilterItemQuality.lua"/>
+	<script file="FilterItemLevel.lua"/>
+	<script file="FilterItemPrice.lua"/>
 	<Script>
 		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>

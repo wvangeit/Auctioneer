@@ -51,6 +51,15 @@ private.tleft = {
 -- Our official name:
 AucSearchUI = lib
 
+-- lib.CleanTable(temp)
+-- used to clean out a table for reuse
+-- temp must be a table
+function lib.CleanTable(temp)
+	for i,j in pairs(temp) do
+		temp[i] = nil
+	end
+end
+
 function lib.GetName()
 	return libName
 end
@@ -355,15 +364,38 @@ function lib.NewSearcher(searcherName)
 	end
 end
 
+local filterKit = {}
+function filterKit:GetName()
+	return self.name
+end
+
+lib.Filters = {}
+function lib.NewFilter(filterName)
+	if not lib.Filters[filterName] then
+		local filter = {}
+		filter.name = filterName
+		for k,v in pairs(filterKit) do
+			filter[k] = v
+		end
+		
+		lib.Filters[filterName] = filter
+		return filter, lib, {}
+	end
+end
+
 function lib.GetSearchLocals()
 	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const
 end
 
 function private.removeline()
+	--print("selected: "..tostring(gui.sheet.selected))
+	--DevTools_Dump(private.sheetData)
 	table.remove(private.sheetData, gui.sheet.selected)
+	--DevTools_Dump(private.sheetData)
 	gui.sheet.selected = nil
 	gui.frame.remove:Disable()
 	gui.sheet:SetData(private.sheetData)
+	lib.UpdateControls()
 end
 
 function private.cropreason(reason)
@@ -391,14 +423,48 @@ function private.buyfirst()
 	end
 	lib.UpdateControls()
 	if string.match(private.data.reason, ":buy") then
-	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
 	elseif string.match(private.data.reason, ":bid") then
-	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
 	elseif private.data.buyout then
-	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
 	else
-	AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
 	end
+	private.removeline()
+end
+
+function private.ignore()
+	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
+	local price
+	if string.match(private.data.reason, ":buy") then
+		price = private.data.buyout
+	elseif string.match(private.data.reason, ":bid") then
+		price = private.data.bid
+	elseif private.data.buyout then
+		price = private.data.buyout
+	else
+		price = private.data.bid
+	end
+	AucSearchUI.Filters.IgnoreItemPrice.AddIgnore(sig, price)
+	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
+	private.removeline()
+end
+
+function private.ignoretemp()
+	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
+	local price
+	if string.match(private.data.reason, ":buy") then
+		price = private.data.buyout
+	elseif string.match(private.data.reason, ":bid") then
+		price = private.data.bid
+	elseif private.data.buyout then
+		price = private.data.buyout
+	else
+		price = private.data.bid
+	end
+	AucSearchUI.Filters.IgnoreItemPrice.AddIgnore(sig, price, true)
+	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true).." for the session")
 	private.removeline()
 end
 
@@ -428,14 +494,18 @@ function lib.MakeGuiConfig()
 	function lib.UpdateControls()
 		if gui.sheet.selected then
 			gui.frame.remove:Enable()
+			gui.frame.ignore:Enable()
+			gui.frame.notnow:Enable()
 		else
 			gui.frame.remove:Disable()
+			gui.frame.ignore:Disable()
+			gui.frame.notnow:Disable()
 		end
 		if selected ~= gui.sheet.selected then
 			selected = gui.sheet.selected
 			local data = gui.sheet:GetSelection()
 			if not data then
-				private.data = {}
+				lib.CleanTable(private.data)
 			else
 				private.data.link = data[1]
 				private.data.seller = data[8]
@@ -478,13 +548,11 @@ function lib.MakeGuiConfig()
 		if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 			local link, name
 			link = gui.sheet.rows[row][index]:GetText() 
-			local name = GetItemInfo(link)
+			name = GetItemInfo(link)
 			if link and name then
 				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 				GameTooltip:SetHyperlink(link)
-				if (EnhTooltip) then 
-					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
-				end
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
 			end		
 		end
 	end
@@ -523,6 +591,7 @@ function lib.MakeGuiConfig()
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 
 	gui:AddCat("Searches")
+	gui:AddCat("Filters")
 	id = gui:AddTab("General parameters", "Searches") -- Merely a place holder
 
 	id = gui:AddTab("Saved searches")
@@ -582,11 +651,13 @@ function lib.MakeGuiConfig()
 	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.notnow:SetPoint("BOTTOMRIGHT", gui.frame.remove, -120, 0)
 	gui.frame.notnow:SetText("Not Now")
+	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
 	gui.frame.notnow:Disable()
 	
 	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.ignore:SetPoint("BOTTOMRIGHT", gui.frame.notnow, -120, 0)
 	gui.frame.ignore:SetText("Ignore")
+	gui.frame.ignore:SetScript("OnClick", private.ignore)
 	gui.frame.ignore:Disable()
 	
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
@@ -621,6 +692,12 @@ function lib.MakeGuiConfig()
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher.MakeGuiConfig then
 			searcher:MakeGuiConfig(gui)
+		end
+	end
+	--Alert our Filters
+	for name, filter in pairs(lib.Filters) do
+		if filter.MakeGuiConfig then
+			filter:MakeGuiConfig(gui)
 		end
 	end
 	-- Any callbacks?
@@ -659,7 +736,7 @@ function private.FindSearcher(item)
 	end
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher and searcher.tabname and searcher.tabname == gui.config.selectedTab and searcher.Search then
-			return searcher
+			return searcher, name
 		end
 	end
 end
@@ -674,7 +751,7 @@ local PerformSearch = function()
 	local scandata = AucAdvanced.Scan.GetScanData()
 	local speed = lib.GetSetting("searchspeed")
 	if not speed then speed = 1000 end
-	local searcher = private.FindSearcher()
+	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
 		print("No valid Searcher selected")
 		return
@@ -693,43 +770,58 @@ local PerformSearch = function()
 			end
 		end
 		
+		--first, pass the item through the filters
+		local isfiltered = false
+		for filtername, filter in pairs(lib.Filters) do
+			if filter.Filter(data, searcherName) then
+				isfiltered = true
+				break
+			end
+		end
+		
 		--buyorbid must be either "bid", "buy", true, false, or nil
 		--if string is returned for buyorbid, value must be returned
-		local buyorbid, value, pct, reason = searcher.Search(data)
+		local buyorbid, value, pct, reason
+		if not isfiltered then
+			buyorbid, value, pct, reason = searcher.Search(data)
+		end
 		if buyorbid then
-			local level,_, r, g, b
-			local pctstring = ""
-			if not pct and AucAdvanced.Modules.Util.PriceLevel then
-				if buyorbid == "bid" then
-					level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.CURBID])
+			--make sure that the price we found isn't being ignored
+			if not AucSearchUI.Filters.IgnoreItemPrice.PostFilter(data, searcher.name, buyorbid) then
+				local level,_, r, g, b
+				local pctstring = ""
+				if not pct and AucAdvanced.Modules.Util.PriceLevel then
+					if buyorbid == "bid" then
+						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.CURBID])
+					else
+						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
+					end
+					if level then
+						level = math.floor(level)
+						r = r*255
+						g = g*255
+						b = b*255
+						pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
+						pct = pctstring
+					end
+				end
+				data["pct"] = pct
+				if type(buyorbid) == "string" then
+					data["reason"] = searcher.tabname..":"..buyorbid
+					if reason then
+						data["reason"] = data["reason"]..":"..reason
+					end
+					if buyorbid == "bid" then
+						data["profit"] = value - data[Const.PRICE]
+					else
+						data["profit"] = value - data[Const.BUYOUT]
+					end
 				else
-					level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
+					data["reason"] = searcher.tabname
+					data["profit"] = nil
 				end
-				if level then
-					level = math.floor(level)
-					r = r*255
-					g = g*255
-					b = b*255
-					pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-					pct = pctstring
-				end
+				table.insert(results, data)
 			end
-			data["pct"] = pct
-			if type(buyorbid) == "string" then
-				data["reason"] = searcher.tabname..":"..buyorbid
-				if reason then
-					data["reason"] = data["reason"]..":"..reason
-				end
-				if buyorbid == "bid" then
-					data["profit"] = value - data[Const.PRICE]
-				else
-					data["profit"] = value - data[Const.BUYOUT]
-				end
-			else
-				data["reason"] = searcher.tabname
-				data["profit"] = nil
-			end
-			table.insert(results, data)
 		end
 	end
 	
