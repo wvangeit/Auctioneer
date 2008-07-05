@@ -45,10 +45,12 @@ if (not AucAdvanced.Buy) then AucAdvanced.Buy = {} end
 local lib = AucAdvanced.Buy
 local private = {}
 lib.Private = private
-local LibRecycle = LibStub("LibRecycle")
 
 lib.Print = AucAdvanced.Print
-local print, clone = AucAdvanced.Print, LibRecycle.Clone
+local print = AucAdvanced.Print
+local recycle = AucAdvanced.Recycle
+local acquire = AucAdvanced.Acquire
+local clone = AucAdvanced.Clone
 local Const = AucAdvanced.Const
 local _
 
@@ -168,8 +170,13 @@ function lib.ScanPage()
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		if link == private.CurAuction["link"] then
-			local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, owner = GetAuctionItemInfo("list", i)
+			local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", i)
+			if ishigh then
+				print("Unable to bid on "..link..". Already highest bidder")
+				private.CurAuction = {}
+			end
 			if ((not owner) or (owner == private.CurAuction["sellername"])) 
+			and (not ishigh)
 			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"]) 
 			and (buyout == private.CurAuction["buyout"]) then --found the auction we were looking for
 				if (private.CurAuction["price"] >= (curBid + minIncrement)) or (private.CurAuction["price"] >= buyout) then
