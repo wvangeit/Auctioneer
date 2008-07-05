@@ -35,10 +35,12 @@ local libType, libName = "Util", "SearchUI"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local Const = AucAdvanced.Const
 local gui
 private.data = {}
+private.sheetData = {}
 local coSearch
 
 private.tleft = {
@@ -125,6 +127,8 @@ end
 -- Default setting values
 local settingDefaults = {
 	["searchspeed"] = 100,
+	["reserve"] = 1,
+	["maxprice"] = 10000000,
 }
 
 local function getDefault(setting)
@@ -622,8 +626,12 @@ function lib.MakeGuiConfig()
 	
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")
-	gui:AddControl(id, "Header",    0,     "Setup General Options")
-	gui:AddControl(id, "WideSlider",   0, 1, "searchspeed", 10, 500, 10, "Search Process Priority: %s")
+	gui:AddControl(id, "Header",           0,    "Setup General Options")
+	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search Process Priority: %s")
+	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "reserve", 1, 99999999, "Reserve Amount")
+	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxprice", 1, 99999999, "Maximum Price")
 	
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 	
@@ -762,6 +770,120 @@ function private.cancelSearch()
 	private.SearchCancel = true
 end
 
+--lib.SearchItem(searcherName, item, nodupes)
+--purpose: handles sending the item to the specified searcher, and if necessary, adds it to the SearchUI results
+--nodupes is boolean flag.  If true, no duplicate checking is done.  This flag is true for searching from the cache, but false for realtime.
+--returns true when an item gets added to the SearchUI panel
+function lib.SearchItem(searcherName, item, nodupes)
+	if not searcherName or not item then
+		return
+	end
+	local searcher = lib.Searchers[searcherName]
+	if not searcher then
+		return
+	end
+	
+	--next, pass the item through the filters
+	local isfiltered = false
+	for filtername, filter in pairs(lib.Filters) do
+		if filter.Filter(item, searcherName) then
+			return false, "Filtered: "..filtername
+		end
+	end
+	
+	--buyorbid must be either "bid", "buy", true, false, or nil
+	--if string is returned for buyorbid, value must be returned
+	local buyorbid, value, pct, reason
+	buyorbid, value, pct, reason = searcher.Search(item)
+	if buyorbid then
+		--make sure that the price we found isn't being ignored
+		if lib.Filters.IgnoreItemPrice.PostFilter(item, searcher.name, buyorbid) then
+			return
+		else
+			local cost = 0
+			if type(buyorbid) == "string" then
+				item["reason"] = searcher.tabname..":"..buyorbid
+				if reason then
+					item["reason"] = item["reason"]..":"..reason
+				end
+				if buyorbid == "bid" then
+					--don't show result if we're already the highest bidder
+					if item[Const.AMHIGH] then
+						return
+					end
+					cost = item[Const.PRICE]
+				else
+					cost = item[Const.BUYOUT]
+				end
+				item["profit"] = value - cost
+			end
+			local maxprice = lib.GetSetting("maxprice") or 10000000
+			local reserve = lib.GetSetting("reserve") or 1
+			local balance = GetMoney()
+			
+			if (cost <= maxprice) and (balance > reserve) then
+				--Check to see whether the item already exists in the results table
+				local isdupe = false
+				if not nodupes then
+					if not private.sheetData then
+						private.sheetData = {}
+					end
+					for j,k in pairs(private.sheetData) do
+						if k[1] == item[Const.LINK] then
+							isdupe = true
+						end
+					end
+				end
+				if nodupes or (not isdupe) then
+					local level, _, r, g, b
+					local pctstring = ""
+					if not pct and AucAdvanced.Modules.Util.PriceLevel then
+						if buyorbid == "bid" then
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.CURBID])
+						else
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.BUYOUT])
+						end
+						if level then
+							r = r*255
+							g = g*255
+							b = b*255
+							--first color code here is for sorting purposes
+							pctstring = string.format("|cff%06d|cff%02x%02x%02x"..math.floor(level), 100*level, r, g, b)
+							pct = pctstring
+						end
+					end
+					item["pct"] = pct
+					item["cost"] = cost
+					local count = item[Const.COUNT] or 1
+					local min = item[Const.MINBID] or 0
+					local cur = item[Const.CURBID] or 0
+					local buy = item[Const.BUYOUT] or 0
+					local price = item[Const.PRICE] or 0
+					table.insert(private.sheetData, {
+						item[Const.LINK],
+						item["pct"],
+						item["profit"],
+						count,
+						buy,
+						price,
+						item["reason"],
+						item[Const.SELLER],
+						private.tleft[item[Const.TLEFT]],
+						buy/count,
+						price/count,
+						min,
+						cur,
+						min/count,
+						cur/count
+					})
+					gui.sheet:SetData(private.sheetData)
+					return true
+				end
+			end
+		end
+	end
+end
+
 local PerformSearch = function()
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
@@ -776,7 +898,10 @@ local PerformSearch = function()
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)
 	gui.frame.progressbar:Show()
 	
-	local results = {}
+	--clear the results table
+	lib.CleanTable(private.sheetData)
+	gui.sheet:SetData(private.sheetData)
+	
 	for i, data in ipairs(scandata.image) do
 		if (i % speed) == 0 then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
@@ -786,96 +911,11 @@ local PerformSearch = function()
 				break
 			end
 		end
-		
-		--first, pass the item through the filters
-		local isfiltered = false
-		for filtername, filter in pairs(lib.Filters) do
-			if filter.Filter(data, searcherName) then
-				isfiltered = true
-				break
-			end
-		end
-		
-		--buyorbid must be either "bid", "buy", true, false, or nil
-		--if string is returned for buyorbid, value must be returned
-		local buyorbid, value, pct, reason
-		if not isfiltered then
-			buyorbid, value, pct, reason = searcher.Search(data)
-		end
-		if buyorbid then
-			--make sure that the price we found isn't being ignored
-			if not AucSearchUI.Filters.IgnoreItemPrice.PostFilter(data, searcher.name, buyorbid) then
-				local level,_, r, g, b
-				local pctstring = ""
-				if not pct and AucAdvanced.Modules.Util.PriceLevel then
-					if buyorbid == "bid" then
-						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.CURBID])
-					else
-						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(data[Const.LINK], data[Const.COUNT], data[Const.CURBID], data[Const.BUYOUT])
-					end
-					if level then
-						level = math.floor(level)
-						r = r*255
-						g = g*255
-						b = b*255
-						pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-						pct = pctstring
-					end
-				end
-				data["pct"] = pct
-				if type(buyorbid) == "string" then
-					data["reason"] = searcher.tabname..":"..buyorbid
-					if reason then
-						data["reason"] = data["reason"]..":"..reason
-					end
-					if buyorbid == "bid" then
-						data["profit"] = value - data[Const.PRICE]
-					else
-						data["profit"] = value - data[Const.BUYOUT]
-					end
-				else
-					data["reason"] = searcher.tabname
-					data["profit"] = nil
-				end
-				table.insert(results, data)
-			end
-		end
+		lib.SearchItem(searcher.name, data, true)
 	end
 	
-	-- Now we have the results, it's time to populate the sheet
-	private.sheetData = {}
-
-	-- LINK ILEVEL ITYPE ISUB IEQUIP PRICE TLEFT TIME NAME TEXTURE
-	-- COUNT QUALITY CANUSE ULEVEL MINBID MININC BUYOUT CURBID
-	-- AMHIGH SELLER FLAG ID ITEMID SUFFIX FACTOR ENCHANT SEED
-	for pos, data in ipairs(results) do
-		local count = data[Const.COUNT]
-		local min = data[Const.MINBID]
-		local cur = data[Const.CURBID]
-		local buy = data[Const.BUYOUT]
-		local price = data[Const.PRICE]
-		table.insert(private.sheetData, {
-			data[Const.LINK],
-			data["pct"],
-			data["profit"],
-			count,
-			buy,
-			price,
-			data["reason"],
-			data[Const.SELLER],
-			private.tleft[data[Const.TLEFT]],
-			buy/count,
-			price/count,
-			min,
-			cur,
-			min/count,
-			cur/count
-		})
-	end
 
 	gui.frame.progressbar:Hide()
-	gui.sheet:SetData(private.sheetData)
-
 end
 
 function lib.PerformSearch(searcher)

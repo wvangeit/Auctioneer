@@ -76,18 +76,11 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",      0, 2, "realtime.reload.topscan", "Refresh first page as well")
 	gui:AddTip(id, "Refreshes the first page, looking for bids about to expire")
 
-	local last = gui:GetLast(id)
-	gui:AddControl(id, "Subhead",       0,    "Purchase Settings")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "realtime.reserve", 1, 99999999, "Reserve Amount")
-	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "realtime.maxprice", 1, 99999999, "Maximum Price")
-
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Subhead",       .5,    "Alert Settings")
-	gui:AddControl(id, "Checkbox",      .5, 1, "realtime.alert.chat", "Show alert in chat window")
-	gui:AddControl(id, "Checkbox",      .5, 1, "realtime.alert.showwindow", "Show SearchUI window")
+	gui:AddControl(id, "Subhead",       0,    "Alert Settings")
+	gui:AddControl(id, "Checkbox",      0, 1, "realtime.alert.chat", "Show alert in chat window")
+	gui:AddControl(id, "Checkbox",      0, 1, "realtime.alert.showwindow", "Show SearchUI window")
 	gui:AddTip(id, "When a bargain is found, opens the SearchUI window to facilitate buying the bargain")
-	gui:AddControl(id, "Selectbox",     .5, 1, {
+	gui:AddControl(id, "Selectbox",     0, 1, {
 		{"none", "None (do not play a sound)"},
 		{"LEVELUP", "Level Up"},
 		{"AuctionWindowOpen", "AuctionHouse Open"},
@@ -281,103 +274,8 @@ function lib.ScanPage()
 			private.ItemTable[Const.SELLER]  = owner
 			
 			for i, searcher in pairs(private.searchertable) do
-				--first, pass the item through the filters
-				local isfiltered = false
-				for filtername, filter in pairs(AucSearchUI.Filters) do
-					if filter.Filter(private.ItemTable, searcher.name) then
-						isfiltered = true
-						break
-					end
-				end
-
-				local buyorbid, value, pct, reason
-				if not isfiltered then
-					buyorbid, value, pct, reason = searcher.Search(private.ItemTable)
-				end
-				if AucSearchUI.Filters.IgnoreItemPrice then
-					if AucSearchUI.Filters.IgnoreItemPrice.PostFilter(private.ItemTable, searcher.name, buyorbid) then
-						buyorbid = nil
-					end
-				end
-				if buyorbid then
-					--make sure that the price we found isn't being ignored
-					if not AucSearchUI.Filters.IgnoreItemPrice.PostFilter(private.ItemTable, searcher.name, buyorbid) then
-						local cost = 0
-						if type(buyorbid) == "string" then
-							private.ItemTable["reason"] = searcher.tabname..":"..buyorbid
-							if reason then
-								private.ItemTable["reason"] = private.ItemTable["reason"]..":"..reason
-							end
-							if buyorbid == "bid" then
-								cost = private.ItemTable[Const.PRICE]
-							else
-								cost = private.ItemTable[Const.BUYOUT]
-							end
-							private.ItemTable["profit"] = value - cost
-						else
-							private.ItemTable["reason"] = searcher.tabname
-							private.ItemTable["profit"] = nil
-						end
-						local maxprice = get("realtime.maxprice")
-						local reserve = get("realtime.reserve")
-						local balance = GetMoney()
-						if (cost <= maxprice) and (balance > reserve) then
-							--Check to see whether the item already exists in the results table
-							local isdupe = false
-							if not AucSearchUI.Private.sheetData then
-								AucSearchUI.Private.sheetData = {}
-							end
-							for j,k in pairs(AucSearchUI.Private.sheetData) do
-								if k[1] == private.ItemTable[Const.LINK] then
-									isdupe = true
-								end
-							end
-							if not isdupe then
-								local level,_, r, g, b
-								local pctstring = ""
-								if not pct and AucAdvanced.Modules.Util.PriceLevel then
-									if buyorbid == "bid" then
-										level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(private.ItemTable[Const.LINK], private.ItemTable[Const.COUNT], private.ItemTable[Const.CURBID], private.ItemTable[Const.CURBID])
-									else
-										level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(private.ItemTable[Const.LINK], private.ItemTable[Const.COUNT], private.ItemTable[Const.CURBID], private.ItemTable[Const.BUYOUT])
-									end
-									if level then
-										level = math.floor(level)
-										r = r*255
-										g = g*255
-										b = b*255
-										pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-										pct = pctstring
-									end
-								end
-								private.ItemTable["pct"] = pct
-								local count = private.ItemTable[Const.COUNT] or 1
-								local min = private.ItemTable[Const.MINBID] or 0
-								local cur = private.ItemTable[Const.CURBID] or 0
-								local buy = private.ItemTable[Const.BUYOUT] or 0
-								local price = private.ItemTable[Const.PRICE] or 0
-								table.insert(AucSearchUI.Private.sheetData, {
-									private.ItemTable[Const.LINK],
-									private.ItemTable["pct"],
-									private.ItemTable["profit"],
-									count,
-									buy,
-									price,
-									private.ItemTable["reason"],
-									private.ItemTable[Const.SELLER],
-									AucSearchUI.Private.tleft[private.ItemTable[Const.TLEFT]],
-									buy/count,
-									price/count,
-									min,
-									cur,
-									min/count,
-									cur/count
-								})
-								AucSearchUI.Private.gui.sheet:SetData(AucSearchUI.Private.sheetData)
-								private.alert(private.ItemTable[Const.LINK], cost, private.ItemTable["reason"])
-							end
-						end
-					end
+				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false) then
+					private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])
 				end
 			end
 		end

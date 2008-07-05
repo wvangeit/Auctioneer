@@ -113,29 +113,9 @@ function lib.Search(item)
 		value = market - minprofit
 	end
 	if get("resale.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "buy", market, pctstring
+		return "buy", market
 	elseif get("resale.allow.bid") and (item[Const.PRICE] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "bid", market, pctstring
+		return "bid", market
 	end
 end
 
