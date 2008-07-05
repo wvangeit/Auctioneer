@@ -197,7 +197,7 @@ function lib.FinishedPage()
 	--if we don't have searching while browsing on, then don't do anything if we're not actively refreshing
 	local always = get("realtime.always")
 	if not private.IsRefresh then
-		private.interval = get("realtime.reload.manpause")
+		private.timer = private.timer - get("realtime.reload.manpause")
 	end
 	if (not private.IsScanning)
 			or ((not always) and (not private.IsRefresh))
