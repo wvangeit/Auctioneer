@@ -183,14 +183,15 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
 	gui:AddTip(id, "This controls how much below the market price you are willing to undercut before giving up.\n"..
-		"If Auctioneer cannot beat the lowest price, it will revert back to the market price.")
+		"If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.")
 	
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
 	gui:AddTip(id, "This controls how much above the market price you are willing to mark up.\n"..
-		"If the competition is marked up at 200%, and you set max markup to 10%, Auctioneer will go no more than 10% above market")
+		"If there is no competition, or the competition is marked up higher than this value,\n"..
+		"AucAdvanced will set the price to this value above market.")
 	
 	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, "Undercut: %g%%")
-	gui:AddTip(id, "This controls the minimum undercut.  If there is no competition, or the competition is at market price, Auctioneer will undercut by this amount")
+	gui:AddTip(id, "This controls the minimum undercut.  AucAdvanced will try to undercut the competition by this amount")
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", "Specify undercut amount by coin value")
 	gui:AddTip(id, "Specify the amount to undercut by a specific amount, instead of by a percentage")
