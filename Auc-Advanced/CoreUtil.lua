@@ -343,13 +343,14 @@ end
 --[[
 
 Usage:
-  local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+  local print,decode,recycle,acquire,clone,scrub,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
 
 -- ]]
 function lib.GetModuleLocals()
 	return lib.Print, lib.DecodeLink,
 	lib.Recycle, lib.Acquire, lib.Clone, lib.Scrub,
-	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault
+	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault,
+	lib.Debug.DebugPrint
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
