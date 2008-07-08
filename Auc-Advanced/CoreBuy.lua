@@ -175,7 +175,7 @@ function lib.ScanPage()
 				print("Unable to bid on "..link..". Already highest bidder")
 				private.CurAuction = {}
 			end
-			if ((not owner) or (owner == private.CurAuction["sellername"])) 
+			if ((not owner) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"])) 
 			and (not ishigh)
 			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"]) 
 			and (buyout == private.CurAuction["buyout"]) then --found the auction we were looking for
