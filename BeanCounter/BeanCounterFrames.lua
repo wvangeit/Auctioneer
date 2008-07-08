@@ -950,6 +950,32 @@ function private.relevelFrames(myLevel, ...)
 		private.relevelFrame(child)
 	end
 end
+
+function private.processTooltip(frame, name, itemLink, quality, quantity, cost, ...)
+	
+	if not itemLink then return end
+	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
+	
+	--print(itemID, type(itemID))
+	local quan, bid, reason, D
+	
+	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
+		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
+			--print(i,v)
+			quan, bid, D, reason = v:match("^(.-);.*;(.-);.-;(.-);(%w*)")
+			D= date("%c", D)
+		end
+	end
+	
+	if not reason then return end
+	
+	if tonumber(quan) == tonumber(quantity) then
+		EnhTooltip.AddLine( string.format("Last bought for: %s { %s }", reason, D ), tonumber(bid))
+		EnhTooltip.LineColor(0.5, 0.5, 0)
+	end
+end
+
+
 local tbl = {}
 --Search BeancounterClassic Data
 function private.classicSearch(data, style, itemName, settings, dateString)

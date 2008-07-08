@@ -93,6 +93,10 @@ if AucAdvanced and AucAdvanced.NewModule then
 		
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
+		
+		elseif (callbackType == "tooltip") then
+			--Called when the tooltip is being drawn.
+			private.processTooltip(...)
 		end
 	end
 end
@@ -334,9 +338,11 @@ end
 
 --Store reason Code for BTM/SearchUI
 --tostring(bid["link"]), tostring(bid["sellername"]), tostring(bid["count"]), tostring(bid["buyout"]), tostring(bid["price"]), tostring(bid["reason"]))
-function private.storeReasonForBid(...)
-		debugPrint("bidplaced", ...)
-	local itemLink, seller, count, buyout, price, reason = strsplit(";", ...)
+function private.storeReasonForBid(CallBack)
+	debugPrint("bidplaced", CallBack)
+	if not CallBack then return end
+	
+	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
 	 
 	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
 	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
@@ -373,6 +379,7 @@ function private.getItemInfo(link, cmd)
 		return itemStackCount
 	end
 end
+
 --[[ DATABASE MAINTIANACE FUNCTIONS
 ]]
 --Recreate/refresh ItemIName to ItemID array
@@ -405,8 +412,8 @@ function private.compactDB()
 				for itemString, index in pairs(value) do
 					if "0" ~= itemString:match(".*:(.-)$") then --ignore the already compacted keys 
 						local itemLink = lib.API.getItemLink(itemString)
-						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 2678400 then --we have an old index entry lets process this array
-							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 2678400 do --While the entrys remain 31 days old process
+						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
+							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 31 days old process
 								debugPrint("Compressed", itemLink, index[1])
 								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
 								table.remove(index, 1)

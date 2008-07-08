@@ -39,6 +39,7 @@ local function debugPrint(...)
         private.debugPrint("BeanCounterMail",...)
     end
 end
+
 local expiredLocale = AUCTION_EXPIRED_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
 local salePendingLocale = AUCTION_INVOICE_MAIL_SUBJECT:gsub("(.+)%%s", "%1") --sale pending
 local outbidLocale = AUCTION_OUTBID_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
@@ -212,7 +213,7 @@ function private.sortCompletedAuctions( i )
 	if itemID then  --Get the Bid and stack size if possible
 		local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, itemLink, private.reconcilePending[i].deposit, private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"])
 		if stack then
-			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], "")
 			private.databaseAdd("completedAuctions", itemID, itemLink, value)
 			debugPrint("databaseAdd completedAuctions", itemID, itemLink)
 		end
@@ -255,7 +256,7 @@ function private.sortFailedAuctions( i )
 	if itemID then
 		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then 
-			local value = private.packString(stack, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
+			local value = private.packString(stack, buyout, bid, deposit, private.reconcilePending[i]["time"], "")
 			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
 			debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		end
@@ -314,7 +315,7 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
 					--table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
 					debugPrint("posted Bid removed as Won", itemString, index, tbl[7])
-					return tbl[7]
+					return tbl[7] --return the reason code provided for why we bid/bought item
 				end
 			end
 		end
@@ -324,7 +325,7 @@ function private.sortFailedBids( i )
 	local itemName = private.reconcilePending[i].subject:match(outbidLocale.."(.*)") 
 	local itemID, itemLink = private.matchDB(itemName)
 	if itemID then
-		local value = private.packString(private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
+		local value = private.packString(private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], "")
 		private.databaseAdd("failedBids", itemID, itemLink, value)
 		debugPrint("databaseAdd failedBids", itemID, itemLink, value)
 	end
