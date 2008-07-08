@@ -269,6 +269,8 @@ function lib.GetPrice(link, _, match)
 	if not newBuy then
 		newBuy = 0
 	end
+	newBid = math.floor((newBid or 0) + 0.5)
+	newBuy = math.floor((newBuy or 0) + 0.5)
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
 end
 

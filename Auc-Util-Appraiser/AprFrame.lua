@@ -65,6 +65,7 @@ function private.CreateFrames()
 
 	frame = CreateFrame("Frame", "AucAdvAppraiserFrame", AuctionFrame)
 	private.frame = frame
+	private.realmKey, private.realm = AucAdvanced.GetFaction()
 	local DiffFromModel = 0
 	local MatchString = ""
 	frame.list = {}
@@ -2350,8 +2351,12 @@ function private.CreateFrames()
 		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
 			frame.imageview.sheet.prevselected = frame.imageview.sheet.selected
 			local selected = frame.imageview.sheet:GetSelection()
-			if not selected then
+			if (not selected) or (not selected[11]) then
 				private.buyselection = {}
+				frame.imageview.purchase.buy:Disable()
+				frame.imageview.purchase.buy.price:SetText("")
+				frame.imageview.purchase.bid:Disable()
+				frame.imageview.purchase.bid.price:SetText("")
 			else
 				private.buyselection.link = selected[11]
 				private.buyselection.seller = selected[2]
@@ -2359,25 +2364,33 @@ function private.CreateFrames()
 				private.buyselection.minbid = selected[8]
 				private.buyselection.curbid = selected[9]
 				private.buyselection.buyout = selected[10]
-			end
-			if private.buyselection.buyout and (private.buyselection.buyout > 0) then
-				frame.imageview.purchase.buy:Enable()
-				frame.imageview.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
-			else
-				frame.imageview.purchase.buy:Disable()
-				frame.imageview.purchase.buy.price:SetText("")
-			end
-			
-			if private.buyselection.minbid then
-				if private.buyselection.curbid and private.buyselection.curbid > 0 then
-					frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
+				--make sure that it's not one of our auctions, then enable based on buy/bid availability
+				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
+					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
+						frame.imageview.purchase.buy:Enable()
+						frame.imageview.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
+					else
+						frame.imageview.purchase.buy:Disable()
+						frame.imageview.purchase.buy.price:SetText("")
+					end
+					
+					if private.buyselection.minbid then
+						if private.buyselection.curbid and private.buyselection.curbid > 0 then
+							frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
+						else
+							frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
+						end
+						frame.imageview.purchase.bid:Enable()
+					else
+						frame.imageview.purchase.bid:Disable()
+						frame.imageview.purchase.bid.price:SetText("")
+					end
 				else
-					frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
+					frame.imageview.purchase.buy:Disable()
+					frame.imageview.purchase.buy.price:SetText("")
+					frame.imageview.purchase.bid:Disable()
+					frame.imageview.purchase.bid.price:SetText("")
 				end
-				frame.imageview.purchase.bid:Enable()
-			else
-				frame.imageview.purchase.bid:Disable()
-				frame.imageview.purchase.bid.price:SetText("")
 			end
 		end
 	end
