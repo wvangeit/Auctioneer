@@ -30,12 +30,12 @@
 ]]
 
 local libType, libName = "Util", "Mover"
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
+local lib, parent, private = AucAdvanced.NewModule(libType, libName)
 
 if not lib then return end
+
+local print, decode, recycle, acquire, clone, scrub, get, set, default = AucAdvanced.GetModuleLocals()
+
 lib.Private = private
 
 function lib.GetName()
@@ -44,6 +44,7 @@ end
 
 function lib.Processor(callbackType, ...)
 	if callbackType == "auctionui" then
+		private.auctionHook() ---When AuctionHouse loads hook the auction function we need
 		private.MoveFrame()
 	elseif callbackType == "configchanged" then
 		private.MoveFrame()	
@@ -53,7 +54,14 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("util.mover.activated", false)
+	default("util.mover.activated", false)
+	default("util.mover.rememberlastpos", false)
+	default("util.mover.anchors", {})
+end
+
+--after Auction House Loads Hook the Window Display event
+function private.auctionHook()
+	hooksecurefunc("AuctionFrame_Show", private.recallLastPos)
 end
 
 function private.SetupConfigGui(gui)
@@ -68,20 +76,40 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is mover",
 		"What is this Utility?",
 		"This Utility allows you to drag and relocate the Auction Frame for this play session. Just click and move where you desire.")
+	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.rememberlastpos", "Remember last known window position?")
+	gui:AddTip(id, "If this box is checked, the Auction frame will reopen in the last location it was moved to.")
+	gui:AddHelp(id, "what is remeberpos",
+		"Remember last known window position?",
+		"This will remember the Auction Frame's last position and re-apply it each session.")
 end
 		
 --[[ Local functions ]]--
+
+--Enable or Disable the move scripts
 function private.MoveFrame()
 	if not AuctionFrame then return end
 	
-	if AucAdvanced.Settings.GetSetting ("util.mover.activated") then
+	if get("util.mover.activated") then
 		AuctionFrame:SetMovable(true)
-		AuctionFrame:SetScript("OnMouseDown", function() AuctionFrame:StartMoving() end)
-		AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing() end)
+		AuctionFrame:SetClampedToScreen(true)
+		AuctionFrame:SetScript("OnMouseDown", function()  AuctionFrame:StartMoving() end)
+		AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing() 
+						set("util.mover.anchors", {AuctionFrame:GetPoint()}) --store the current anchor points
+					end)
 	else
 		AuctionFrame:SetMovable(false)
 		AuctionFrame:SetScript("OnMouseDown", function() end)
 		AuctionFrame:SetScript("OnMouseUp", function() end)
 	end
 end
+
+--Restore previous sessions Window position
+function private.recallLastPos()
+	if get("util.mover.rememberlastpos") then
+		local anchors = get("util.mover.anchors")
+		AuctionFrame:ClearAllPoints()
+		AuctionFrame:SetPoint(anchors[1], anchors[2], anchors[3], anchors[4], anchors[5])
+	end
+end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
