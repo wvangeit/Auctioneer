@@ -182,6 +182,7 @@ BtmScan.OnEvent = function(...)
 	end
 end
 --hook beancounters storeage event
+local CallBackString
 function BtmScan.BeanCounterStored(_, _, event)
 	if CallBackString and event == "postedBids" then 
 		--BeanCounter.Print("Sent to beanc @", time(), T)
