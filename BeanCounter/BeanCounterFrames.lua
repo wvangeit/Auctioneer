@@ -951,9 +951,9 @@ function private.relevelFrames(myLevel, ...)
 	end
 end
 
-function private.processTooltip(frame, name, itemLink, quality, quantity, cost, ...)
-	
+function private.processTooltip(funcVars, retVal, frame, name, itemLink, quality, quantity, cost, ...)
 	if not itemLink then return end
+	
 	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
 	
 	--print(itemID, type(itemID))
@@ -963,15 +963,15 @@ function private.processTooltip(frame, name, itemLink, quality, quantity, cost, 
 		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
 			--print(i,v)
 			quan, bid, D, reason = v:match("^(.-);.*;(.-);.-;(.-);(%w*)")
-			D= date("%c", D)
+			D= SecondsToTime((time() - D))
 		end
 	end
 	
 	if not reason then return end
 	
 	if tonumber(quan) == tonumber(quantity) then
-		EnhTooltip.AddLine( string.format("Last bought for: %s { %s }", reason, D ), tonumber(bid))
-		EnhTooltip.LineColor(0.5, 0.5, 0)
+		EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, D ), tonumber(bid))
+		EnhTooltip.LineColor(0.9,0.6,0.2)
 	end
 end
 

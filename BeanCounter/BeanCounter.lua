@@ -94,9 +94,6 @@ if AucAdvanced and AucAdvanced.NewModule then
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
 		
-		elseif (callbackType == "tooltip") then
-			--Called when the tooltip is being drawn.
-			private.processTooltip(...)
 		end
 	end
 end
@@ -143,6 +140,10 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
+	
+	--ToolTip Hooks here rather than Aunctioneer's Callback so we can choose Placement @ bottom of frame 
+	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 700, private.processTooltip)
+	
 	lib.API.isLoaded = true
 end
 
