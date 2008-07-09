@@ -951,28 +951,18 @@ function private.relevelFrames(myLevel, ...)
 	end
 end
 
-function private.processTooltip(funcVars, retVal, frame, name, itemLink, quality, quantity, cost, ...)
+function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
+
+	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	
-	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
-	
-	--print(itemID, type(itemID))
-	local quan, bid, reason, D
-	
-	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
-		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
-			--print(i,v)
-			quan, bid, D, reason = v:match("^(.-);.*;(.-);.-;(.-);(%w*)")
-			D= SecondsToTime((time() - D))
-		end
-	end
-	
+	print(reason, Time, bid)
 	if not reason then return end
+	if reason == "" then reason = "Unknown" end
+	Time = SecondsToTime((time() - Time))
 	
-	if tonumber(quan) == tonumber(quantity) then
-		EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, D ), tonumber(bid))
-		EnhTooltip.LineColor(0.9,0.6,0.2)
-	end
+	EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, Time ), tonumber(bid))
+	EnhTooltip.LineColor(0.9,0.6,0.2)
 end
 
 

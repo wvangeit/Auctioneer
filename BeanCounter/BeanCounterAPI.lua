@@ -245,3 +245,28 @@ do
 	end
 			
 end
+
+--[[Return REASON codes for tooltip or other use
+This allows a way to get it that wont break if I change the internal DB layout
+Pass a itemlink and stack count   
+Returns :  "Reason, time of purchase, what you payed"  or nil
+NOTE: Reason could possibly be "", decided to return data anyways, calling module can decide if it want to use data or not
+]]
+function lib.API.getBidReason(itemLink, quantity)
+	if not itemLink or not quantity then return end
+	
+	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
+	local quan, bid, reason, Time
+	
+	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
+		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
+			quan, bid, Time, reason = v:match("^(.-);.*;(.-);.-;(.-);(%w*)")
+						
+			if tonumber(quan) == tonumber(quantity) and reason and Time then
+				return reason, Time, tonumber(bid)
+			end
+		end
+	end
+	return --if nothing found return nil
+end
+
