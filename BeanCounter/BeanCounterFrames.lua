@@ -956,7 +956,6 @@ function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	
-	print(reason, Time, bid)
 	if not reason then return end
 	if reason == "" then reason = "Unknown" end
 	Time = SecondsToTime((time() - Time))
