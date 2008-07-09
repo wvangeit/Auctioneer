@@ -102,6 +102,8 @@ BtmScan.OnLoad = function ()
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
 	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.PostCanSendAuctionQuery)
 
+	Stubby.RegisterFunctionHook("BeanCounter.Private.databaseAdd", 600, BtmScan.BeanCounterStored)
+		
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("BtmScan", "CommandHandler", [[
 		local function cmdHandler(msg)
@@ -179,7 +181,14 @@ BtmScan.OnEvent = function(...)
 		BtmScan.ClosePrompt()
 	end
 end
-
+--hook beancounters storeage event
+function BtmScan.BeanCounterStored(_, _, event)
+	if CallBackString and event == "postedBids" then 
+		--BeanCounter.Print("Sent to beanc @", time(), T)
+		BeanCounter.Private.storeReasonForBid(CallBackString)
+		CallBackString = nil
+	end
+end
 -- Timing routines
 BtmScan.interval = 30
 BtmScan.offset = 0
@@ -1549,6 +1558,9 @@ BtmScan.PerformPurchase = function()
 	BtmScan.scanStage = 2
 	BtmScan.timer = 0
 	BtmScan.pageScan = 0.001
+	if BeanCounter and BeanCounter.Private.storeReasonForBid then
+		CallBackString = string.join(";", tostring(item.link), tostring(item.owner), tostring(item.count), tostring(item.buy), tostring(item.purchase), tostring(item.what))
+	end
 end
 
 BtmScan.CancelPurchase = function()
