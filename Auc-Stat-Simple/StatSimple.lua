@@ -142,7 +142,6 @@ function lib.GetPrice(hyperlink, faction, realm)
 			-- Stddev calculations for market price
             if seenDays >= 3 then
                 for count = 1, 3-daysUsed do
-                    print(count)
                     tinsert(dataset, avg3);
                 end
                 daysUsed = 3
