@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: CorePost.lua 2904 2008-03-05 16:22:10Z rockslice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
@@ -377,4 +377,4 @@ private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -20,
 private.Prompt.No:SetScript("OnClick", private.CancelPurchase)
 
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/CorePost.lua $", "$Rev: 2904 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
