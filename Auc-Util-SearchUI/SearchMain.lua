@@ -34,7 +34,7 @@
 local libType, libName = "Util", "SearchUI"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local Const = AucAdvanced.Const
@@ -83,6 +83,84 @@ function lib.Processor(callbackType, ...)
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.FinishedPage(...)
 		end
+	elseif (callbackType == "tooltip") then
+		lib.ProcessTooltip(...)
+	end
+end
+
+function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+	if not additional or additional[0] ~= "AuctionPrices" then
+		--this isn't an auction, so we're not interested
+		return
+	end
+	if not lib.GetSetting("debug.show") then
+		--we're not interested in adding debug
+		return
+	end
+	local button = GetMouseFocus():GetParent() --Note: check that it works without CompactUI
+	local id = button.id --CompactUI's layout
+	if not id then
+		id = button:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame) --without CompactUI
+	end
+	local price = additional[3] --only thing we need from this table, as  minBid and buyout can come from GetAuctionItemInfo
+	
+	local name, _, count, _, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
+	local timeleft = GetAuctionItemTimeLeft("list", id)
+	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
+	local _, itemid, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
+	local ItemTable = {}
+	-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
+	ItemTable[Const.LINK]    = hyperlink
+	ItemTable[Const.ILEVEL]  = iLevel
+	ItemTable[Const.ITYPE]   = iType
+	ItemTable[Const.ISUB]    = iSubType
+	ItemTable[Const.IEQUIP]  = iEquip
+	ItemTable[Const.PRICE]   = price
+	ItemTable[Const.TLEFT]   = timeleft
+	ItemTable[Const.NAME]    = name
+	ItemTable[Const.COUNT]   = count
+	ItemTable[Const.QUALITY] = quality
+	ItemTable[Const.CANUSE]  = canUse
+	ItemTable[Const.ULEVEL]  = level
+	ItemTable[Const.MINBID]  = minBid
+	ItemTable[Const.MININC]  = minInc
+	ItemTable[Const.BUYOUT]  = buyout
+	ItemTable[Const.CURBID]  = curBid
+	ItemTable[Const.AMHIGH]  = isHigh
+	ItemTable[Const.SELLER]  = owner
+	ItemTable[Const.ITEMID]  = itemid
+	ItemTable[Const.SUFFIX]  = suffix
+	ItemTable[Const.FACTOR]  = factor
+	ItemTable[Const.ENCHANT]  = enchant
+	ItemTable[Const.SEED]  = seed
+
+	EnhTooltip.AddLine("SearchUI:")
+	EnhTooltip.LineColor(1,0.7,0.3)
+	local active = false
+	for name, searcher in pairs(lib.Searchers) do
+		if lib.GetSetting("debug."..name) then
+			active = true
+			local success, returnvalue, value = lib.SearchItem(name, ItemTable, true, true)
+			if success then
+				if value then
+					EnhTooltip.AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue)
+					EnhTooltip.LineColor(1,0.7,0.3)
+				elseif returnvalue then
+					EnhTooltip.AddLine("  "..name.." profit:", returnvalue)
+					EnhTooltip.LineColor(1,0.7,0.3)
+				else
+					EnhTooltip.AddLine("  "..name.." success")
+					EnhTooltip.LineColor(1,0.7,0.3)
+				end
+			else
+				EnhTooltip.AddLine("  "..name..":"..returnvalue)
+				EnhTooltip.LineColor(1,0.7,0.3)
+			end
+		end
+	end
+	if not active then --if it hasn't changed, we're not enabled for any searcher
+		EnhTooltip.AddLine("  No debugging enabled")
+		EnhTooltip.LineColor(1,0.7,0.3)
 	end
 end
 
@@ -626,12 +704,22 @@ function lib.MakeGuiConfig()
 	
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")
+	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",           0,    "Setup General Options")
 	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search Process Priority: %s")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "reserve", 1, 99999999, "Reserve Amount")
 	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxprice", 1, 99999999, "Maximum Price")
+	
+	gui:AddControl(id, "Subhead",          0,    "Tooltip")
+	gui:AddControl(id, "Checkbox",         0, 1, "debug.show", "Show debug line in tooltip for auctions")
+	for name, searcher in pairs(lib.Searchers) do
+		if searcher and searcher.Search then
+			gui:AddControl(id, "Checkbox",  0, 2, "debug."..name, "Show debug for "..name)
+			gui:AddTip(id, "Show a debug line in the tooltip over auctions for searcher: "..name)
+		end
+	end
 	
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 	
@@ -773,21 +861,27 @@ end
 --lib.SearchItem(searcherName, item, nodupes)
 --purpose: handles sending the item to the specified searcher, and if necessary, adds it to the SearchUI results
 --nodupes is boolean flag.  If true, no duplicate checking is done.  This flag is true for searching from the cache, but false for realtime.
---returns true when an item gets added to the SearchUI panel
-function lib.SearchItem(searcherName, item, nodupes)
-	if not searcherName or not item then
+--debugonly is boolean flag, If true, nothing gets added to the results list
+--returns true, value, profit when successful
+--returns false, reason when not
+function lib.SearchItem(searcherName, item, nodupes, debugonly)
+	if not searcherName or not item or #item == 0 then
 		return
 	end
 	local searcher = lib.Searchers[searcherName]
 	if not searcher then
 		return
 	end
+	local debugstring
 	
 	--next, pass the item through the filters
 	local isfiltered = false
 	for filtername, filter in pairs(lib.Filters) do
-		if filter.Filter(item, searcherName) then
-			return false, "Filtered: "..filtername
+		if filter.Filter then
+			local dofilter, filterreturn = filter.Filter(item, searcherName)
+			if dofilter then
+				return false, "Filter:"..filtername..": "..tostring(filterreturn)
+			end
 		end
 	end
 	
@@ -796,52 +890,61 @@ function lib.SearchItem(searcherName, item, nodupes)
 	local buyorbid, value, pct, reason
 	buyorbid, value, pct, reason = searcher.Search(item)
 	if buyorbid then
-		--make sure that the price we found isn't being ignored
-		if lib.Filters.IgnoreItemPrice.PostFilter(item, searcher.name, buyorbid) then
-			return
-		else
-			local cost = 0
-			if type(buyorbid) == "string" then
-				item["reason"] = searcher.tabname..":"..buyorbid
-				if reason then
-					item["reason"] = item["reason"]..":"..reason
+		--give the filters a second chance to filter out, based on bid/buy differences
+		for filtername, filter in pairs(lib.Filters) do
+			if filter.PostFilter then
+				local dofilter, filterreturn = filter.PostFilter(item, searcherName)
+				if dofilter then
+					return false, "Filtered by "..filtername..": "..filterreturn
 				end
-				if buyorbid == "bid" then
-					--don't show result if we're already the highest bidder
-					if item[Const.AMHIGH] then
-						return
-					end
-					cost = item[Const.PRICE]
-				else
-					cost = item[Const.BUYOUT]
-				end
-				item["profit"] = value - cost
 			end
-			local maxprice = lib.GetSetting("maxprice") or 10000000
-			local reserve = lib.GetSetting("reserve") or 1
-			local balance = GetMoney()
-			
-			if (cost <= maxprice) and (balance > reserve) then
-				--Check to see whether the item already exists in the results table
-				local isdupe = false
-				if not nodupes then
-					if not private.sheetData then
-						private.sheetData = {}
-					end
-					for j,k in pairs(private.sheetData) do
-						if k[1] == item[Const.LINK] then
-							isdupe = true
-						end
+		end
+
+		local cost = 0
+		if type(buyorbid) == "string" then
+			item["reason"] = searcher.tabname..":"..buyorbid
+			if reason then
+				item["reason"] = item["reason"]..":"..reason
+			end
+			if buyorbid == "bid" then
+				--don't show result if we're already the highest bidder
+				if item[Const.AMHIGH] then
+					return false, "Bid blocked: Already high bidder"
+				end
+				cost = item[Const.PRICE]
+			else
+				cost = item[Const.BUYOUT]
+			end
+			item["profit"] = value - cost
+		else
+			item["reason"] = searcher.tabname
+		end
+		local maxprice = lib.GetSetting("maxprice") or 10000000
+		local reserve = lib.GetSetting("reserve") or 1
+		local balance = GetMoney()
+		
+		if (cost <= maxprice) and (balance > reserve) then
+			--Check to see whether the item already exists in the results table
+			local isdupe = false
+			if not nodupes then
+				if not private.sheetData then
+					private.sheetData = {}
+				end
+				for j,k in pairs(private.sheetData) do
+					if k[1] == item[Const.LINK] then
+						isdupe = true
 					end
 				end
-				if nodupes or (not isdupe) then
+			end
+			if nodupes or (not isdupe) then
+				if not debugonly then
 					local level, _, r, g, b
 					local pctstring = ""
 					if not pct and AucAdvanced.Modules.Util.PriceLevel then
 						if buyorbid == "bid" then
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE])
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], value/item[Const.COUNT])
 						else
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT])
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], value/item[Const.COUNT])
 						end
 						if level then
 							r = r*255
@@ -877,17 +980,22 @@ function lib.SearchItem(searcherName, item, nodupes)
 						cur/count
 					})
 					gui.sheet:SetData(private.sheetData)
-					return true
 				end
+				return true, item["profit"], value
 			end
+		elseif cost > maxprice then
+			return false, "Price higher than maxprice"
+		else
+			return false, "Balance lower than reserve"
 		end
 	end
+	return false, value
 end
 
 local PerformSearch = function()
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
-	local scandata = AucAdvanced.Scan.GetScanData()
+	local scandata = clone(AucAdvanced.Scan.GetScanData())
 	local speed = lib.GetSetting("searchspeed")
 	if not speed then speed = 1000 end
 	local searcher, searcherName = private.FindSearcher()
@@ -913,8 +1021,7 @@ local PerformSearch = function()
 		end
 		lib.SearchItem(searcher.name, data, true)
 	end
-	
-
+	recycle(scandata)
 	gui.frame.progressbar:Hide()
 end
 

@@ -29,11 +29,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
-local lib, parent, private = AucSearchUI.NewFilter("IgnoreItemQuality")
+local lib, parent, private = AucSearchUI.NewFilter("ItemQuality")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "IgnoreItemQuality"
+lib.tabname = "ItemQuality"
 -- Set our defaults
 default("ignoreitemquality.enable", false)
 
@@ -52,6 +52,7 @@ local typename = {
 	[12] = "Trade Goods",
 	[13] = "Weapon",
 }
+
 local qualname = {
 	[0] = "Poor",
 	[1] = "Common",
@@ -68,7 +69,7 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
-	gui:AddControl(id, "Header",     0,      "IgnoreItemQuality Filter Criteria")
+	gui:AddControl(id, "Header",     0,      "ItemQuality Filter Criteria")
 	
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemquality.enable", "Enable ItemQuality filtering")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
@@ -113,8 +114,9 @@ function lib.Filter(item, searcher)
 	quality = qualname[quality]
 
 	if get("ignoreitemquality."..itype.."."..quality) then
-		return true
+		return true, quality.." "..itype.." filtered"
 	end
+	return false
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

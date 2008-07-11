@@ -31,7 +31,7 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Resale")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Resale"
 -- Set our defaults
@@ -75,13 +75,13 @@ function lib.Search(item)
 	
 	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
 	if not market then
-		return
+		return false, "No appraiser price"
 	end
 	market = market * item[Const.COUNT]
 	
 	if (get("resale.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("resale.seen.min"))) then
-			return
+			return false, "Seen count too low"
 		end
 	end
 	
@@ -117,6 +117,7 @@ function lib.Search(item)
 	elseif get("resale.allow.bid") and (item[Const.PRICE] <= value) then
 		return "bid", market
 	end
+	return false, "Not enough profit"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

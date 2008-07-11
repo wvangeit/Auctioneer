@@ -197,7 +197,8 @@ function lib.FinishedPage()
 	--if we don't have searching while browsing on, then don't do anything if we're not actively refreshing
 	local always = get("realtime.always")
 	if not private.IsRefresh then
-		private.timer = private.timer - get("realtime.reload.manpause")
+		private.timer = 0
+		private.interval = get("realtime.reload.manpause")
 	end
 	if (not private.IsScanning)
 			or ((not always) and (not private.IsRefresh))
@@ -246,6 +247,7 @@ function lib.ScanPage()
 			local name, _, count, quality, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
 			local timeleft = GetAuctionItemTimeLeft("list", i)
+			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 			local price = minBid
 			if curBid and curBid > 0 then
 				price = curBid + minInc
@@ -272,6 +274,11 @@ function lib.ScanPage()
 			private.ItemTable[Const.CURBID]  = curBid
 			private.ItemTable[Const.AMHIGH]  = isHigh
 			private.ItemTable[Const.SELLER]  = owner
+			private.ItemTable[Const.ITEMID]  = id
+			private.ItemTable[Const.SUFFIX]  = suffix
+			private.ItemTable[Const.FACTOR]  = factor
+			private.ItemTable[Const.ENCHANT]  = enchant
+			private.ItemTable[Const.SEED]  = seed
 			
 			for i, searcher in pairs(private.searchertable) do
 				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false) then

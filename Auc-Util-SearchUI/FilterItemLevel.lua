@@ -29,11 +29,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
-local lib, parent, private = AucSearchUI.NewFilter("IgnoreItemLevel")
+local lib, parent, private = AucSearchUI.NewFilter("ItemLevel")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "IgnoreItemLevel"
+lib.tabname = "ItemLevel"
 -- Set our defaults
 default("ignoreitemlevel.enable", false)
 
@@ -59,7 +59,7 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
-	gui:AddControl(id, "Header",     0,      "IgnoreItemLevel Filter Criteria")
+	gui:AddControl(id, "Header",     0,      "ItemLevel Filter Criteria")
 	
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemlevel.enable", "Enable ItemLevel filtering")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
@@ -91,7 +91,7 @@ function lib.Filter(item, searcher)
 	local ilevel = item[Const.ILEVEL]
 
 	if ilevel < get("ignoreitemlevel.minlevel."..itype) then
-		return true
+		return true, "ItemLevel too low"
 	end
 end
 

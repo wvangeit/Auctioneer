@@ -29,11 +29,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
-local lib, parent, private = AucSearchUI.NewFilter("IgnoreItemPrice")
+local lib, parent, private = AucSearchUI.NewFilter("ItemPrice")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "IgnoreItemPrice"
+lib.tabname = "ItemPrice"
 
 -- Set our defaults
 default("ignoreitemprice.enable", true)
@@ -109,7 +109,7 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
-	gui:AddControl(id, "Header",     0,      "IgnoreItemPrice Filter Criteria")
+	gui:AddControl(id, "Header",     0,      "ItemPrice Filter Criteria")
 	
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemprice.enable", "Enable ItemPrice filtering")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
@@ -167,6 +167,7 @@ function lib.Filter(item, searcher)
 			or (searcher and (not get("ignoreitemprice.filter."..searcher))) then
 		return
 	end
+	if not item[Const.PRICE] then DevTools_Dump(item) end
 	local price = item[Const.PRICE]
 	local count = item[Const.COUNT] or 1
 	price = math.floor(price/count)
@@ -174,12 +175,12 @@ function lib.Filter(item, searcher)
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then
-			return true
+			return true, "Item ignored at "..EnhTooltip.GetTextGSC(ignorelist[sig], true)
 		end
 	end
 	if private.tempignorelist[sig] then
 		if price >= private.tempignorelist[sig] then
-			return true
+			return true, "Item ignored for session at "..EnhTooltip.GetTextGSC(private.tempignorelist[sig], true)
 		end
 	end
 end
@@ -203,12 +204,12 @@ function lib.PostFilter(item, searcher, buyorbid)
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then
-			return true
+			return true, "Item ignored at "..EnhTooltip.GetTextGSC(ignorelist[sig], true)
 		end
 	end
 	if private.tempignorelist[sig] then
 		if price >= private.tempignorelist[sig] then
-			return true
+			return true, "Item ignored for session at "..EnhTooltip.GetTextGSC(private.tempignorelist[sig], true)
 		end
 	end
 end

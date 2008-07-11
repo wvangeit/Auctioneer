@@ -29,11 +29,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
-local lib, parent, private = AucSearchUI.NewFilter("IgnoreTimeLeft")
+local lib, parent, private = AucSearchUI.NewFilter("TimeLeft")
 if not lib then return end
 local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "IgnoreTimeleft"
+lib.tabname = "Timeleft"
 -- Set our defaults
 default("ignoretimeleft.enable", false)
 default("ignoretimeleft.maxtime", 2)
@@ -44,7 +44,7 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
-	gui:AddControl(id, "Header",     0,      "IgnoreTimeLeft Filter Criteria")
+	gui:AddControl(id, "Header",     0,      "TimeLeft Filter Criteria")
 	
 	local last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoretimeleft.enable", "Enable time-left filtering")
@@ -78,8 +78,9 @@ function lib.Filter(item, searcher)
 	--now to check the time left on the auction
 	local tleft = item[Const.TLEFT]
 	if tleft > maxtime then
-		return true
+		return true, "Time left too high"
 	end
+	return false
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

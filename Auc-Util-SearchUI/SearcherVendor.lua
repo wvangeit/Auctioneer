@@ -64,9 +64,14 @@ function lib.Search(item)
 	-- Valuate this item
 	local pct = get("vendor.profit.pct")
 	local min = get("vendor.profit.min")
-	local market = GetSellValue and GetSellValue(item[Const.ITEMID]) or 0
+	if not GetSellValue then
+		return false, "No vendor price"
+	end
+	local market = GetSellValue(item[Const.ITEMID]) or 0
 	-- If there's no price, then we obviously can't sell it, ignore!
-	if not market or market == 0 then return end
+	if not market or market == 0 then
+		return false, "No vendor price"
+	end
 	market = market * item[Const.COUNT]
 	
 	
@@ -78,30 +83,11 @@ function lib.Search(item)
 	end
 	
 	if get("vendor.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "buy", market, pctstring
+		return "buy", market
 	elseif get("vendor.allow.bid") and (item[Const.PRICE] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "bid", market, pctstring
+		return "bid", market
 	end
+	return false, "Not enough profit"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -31,7 +31,7 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Converter")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Converter"
 
@@ -180,7 +180,7 @@ function lib.Search(item)
 	-- AMHIGH SELLER FLAG ID ITEMID SUFFIX FACTOR ENCHANT SEED
 
 	if not convertableMat[item[Const.ITEMID]] then
-		return
+		return false, "Item not convertable"
 	end
 	
 	--get and set the item we are looking at's base appraiser value
@@ -193,7 +193,9 @@ function lib.Search(item)
 	local evalPrice = 0		
 
 	if newBuy == nil then newBuy = newBid end
-	if newBuy == nil then return end
+	if newBuy == nil then
+		return false, "No appraiser price"
+	end
 	
 	if get("converter.buyout.check") then
 		evalPrice = newBuy
@@ -202,7 +204,9 @@ function lib.Search(item)
 	end
 	
 	--No appraiser price? Can't evaluate this item.
-	if (evalPrice == nill or evalPrice == 0) then return end
+	if (evalPrice == nill or evalPrice == 0) then
+		return false, "No appraiser price"
+	end
 
 	--get stack size we are dealing with
 	local stackSize = item[Const.COUNT]
@@ -221,7 +225,9 @@ function lib.Search(item)
 	
 	if convertsToL[ item[Const.ITEMID] ] then
 		--If category is disabled we are done here.
-		if (not get("converter.enableEssence")) then return end
+		if (not get("converter.enableEssence")) then
+			return false, "Category disabled"
+		end
 	
 		if item[Const.ITEMID] == GPLANAR then convertToID = LPLANAR end
 		if item[Const.ITEMID] == GETERNAL then convertToID = LETERNAL end
@@ -235,7 +241,9 @@ function lib.Search(item)
 				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
-				if newBuy == nil then return end
+				if newBuy == nil then
+					return false, "No appraiser price for final product"
+				end
 				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 				if get("converter.buyout.check") then
 					convertsToValue = newBuy * 3
@@ -244,7 +252,9 @@ function lib.Search(item)
 				end
 					
 				--Fail and end if appraiser has no value for the item we want to convert
-				if (convertsToValue == nill or convertsToValue == 0) then return end
+				if (convertsToValue == nill or convertsToValue == 0) then
+					return false, "No appraiser price for final product"
+				end
 				
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
@@ -261,7 +271,9 @@ function lib.Search(item)
 	
 	if convertsToG[ item[Const.ITEMID] ] then
 		--If category is disabled we are done here.
-		if (not get("converter.enableEssence")) then return end
+		if (not get("converter.enableEssence")) then
+			return false, "Category is disabled"
+		end
 		
 		if item[Const.ITEMID] == LPLANAR then convertToID = GPLANAR end
 		if item[Const.ITEMID] == LETERNAL then convertToID = GETERNAL end
@@ -275,7 +287,9 @@ function lib.Search(item)
 				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
-				if newBuy == nil then return end
+				if newBuy == nil then
+					return false, "No appraiser price for final product"
+				end
 		
 				--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )				
 					if get("converter.buyout.check") then
@@ -284,7 +298,9 @@ function lib.Search(item)
 						convertsToValue = newBid / 3
 					end
 				--Fail and end if appraiser has no value for the item we want to convert
-				if (convertsToValue == nill or convertsToValue == 0) then return end
+				if (convertsToValue == nill or convertsToValue == 0) then
+					return false, "No appraiser price for final product"
+				end
 			convertsToValue = convertsToValue * stackSize
 
 		value = convertsToValue
@@ -302,7 +318,9 @@ function lib.Search(item)
 	
 	if convertsToP[ item[Const.ITEMID] ] then
 		--If category is disabled we are done here.
-		if (not get("converter.enableMote")) then return end
+		if (not get("converter.enableMote")) then
+			return false, "Category is disabled"
+		end
 		
 		if item[Const.ITEMID] == MAIR then convertToID = PAIR end
 		if item[Const.ITEMID] == MEARTH then convertToID = PEARTH end
@@ -318,7 +336,9 @@ function lib.Search(item)
 				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
-				if newBuy == nil then return end
+				if newBuy == nil then
+					return false, "No appraiser price for final product"
+				end
 				
 			--update value since 10 motes = 1 primal do primal price / 10 				
 					if get("converter.buyout.check") then
@@ -327,7 +347,9 @@ function lib.Search(item)
 						convertsToValue = newBid / 10
 					end				
 				--Fail and end if appraiser has no value for the item we want to convert
-				if (convertsToValue == nill or convertsToValue == 0) then return end					
+				if (convertsToValue == nill or convertsToValue == 0) then
+					return false, "No appraiser price for final product"
+				end
 
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
@@ -348,7 +370,9 @@ function lib.Search(item)
 	
 	if convertsFromDepleted[ item[Const.ITEMID] ] then
 		--If category is disabled we are done here.
-		if (not get("converter.enableDepleted")) then return end
+		if (not get("converter.enableDepleted")) then
+			return false, "Category is disabled"
+		end
 		
 		if item[Const.ITEMID] == DCBRACER then convertToID = DCBRACERTO end
 		if item[Const.ITEMID] == DMGAUNTLETS then convertToID = DMGAUNTLETSTO end
@@ -367,16 +391,20 @@ function lib.Search(item)
 				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
-				if newBuy == nil then return end
+				if newBuy == nil then
+					return false, "No appraiser price for final product"
+				end
 				
 			--update value 1 depleted = 1 non depleted item (meaning no modified to newbid or buy below)				
-					if get("converter.buyout.check") then
-						convertsToValue = newBuy
-					else
-						convertsToValue = newBid
-					end									
-					--Fail and end if appraiser has no value for the item we want to convert
-					if (convertsToValue == nill or convertsToValue == 0) then return end
+				if get("converter.buyout.check") then
+					convertsToValue = newBuy
+				else
+					convertsToValue = newBid
+				end									
+				--Fail and end if appraiser has no value for the item we want to convert
+				if (convertsToValue == nill or convertsToValue == 0) then
+					return false, "No appraiser price for final product"
+				end
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
 	end
@@ -411,30 +439,11 @@ function lib.Search(item)
 	
 	--Return bid or buy if item is below the searchers evaluated value
 	if get("converter.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) 
-			end
-		end
-		return "buy", market, pctstring
+		return "buy", market
 	elseif get("converter.allow.bid") and (item[Const.PRICE] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) 
-			end
-		end
-		return "bid", market, pctstring
+		return "bid", market
 	end
+	return false, "Not enough profit"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

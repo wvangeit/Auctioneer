@@ -31,7 +31,7 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Disenchant")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,scrub, _, _, _, debugPrint = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Disenchant"
 -- Set our defaults
@@ -73,13 +73,13 @@ end
 
 function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage) then
-		return
+		return false, "Enchantrix not detected"
 	end
 	if (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
-		return
+		return false, "No buyout"
 	end
 	if item[Const.QUALITY] <= 1 then
-		return
+		return false, "Item not DEable"
 	end
 	local market, _, pctstring
 	local minskill = 0
@@ -92,11 +92,11 @@ function lib.Search(item)
 	end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], item[Const.QUALITY])
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
-		return
+		return false, "Skill not high enough to DE"
 	end
 	_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
-		return
+		return false, "Item not DEable"
 	end
 	
 	--adjust for brokerage costs
@@ -112,30 +112,12 @@ function lib.Search(item)
 		value = market - minprofit
 	end
 	if get("disenchant.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.BUYOUT], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "buy", market, pctstring
+		print(market)
+		return "buy", market
 	elseif get("disenchant.allow.bid") and (item[Const.PRICE] <= value) then
-		if AucAdvanced.Modules.Util.PriceLevel then
-			local level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.CURBID], item[Const.CURBID], market)
-			if level then
-				level = math.floor(level)
-				r = r*255
-				g = g*255
-				b = b*255
-				pctstring = string.format("|cff%06d|cff%02x%02x%02x"..level, level, r, g, b) -- first color code is to allow
-			end
-		end
-		return "bid", market, pctstring
+		return "bid", market
 	end
+	return false, "Not enough profit"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
