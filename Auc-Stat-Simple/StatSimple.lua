@@ -241,15 +241,13 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
     
-    if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
+    if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
     end
-    
     
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
     if stddev == 0 then stddev = mean / sqrt(seenCount); end
-    
         
     -- Calculate the lower and upper bounds as +/- 3 standard deviations
     local lower, upper = mean - 3*stddev, mean + 3*stddev;
