@@ -48,6 +48,7 @@ function lib:MakeGuiConfig(gui)
 	
 	local last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoretimeleft.enable", "Enable time-left filtering")
+	gui:AddControl(id, "Checkbox",    0, 2,  "ignoretimeleft.onlyonbids", "Only filter for bids")
 	gui:AddControl(id, "Subhead",     0,     "Filter if more than")
 	gui:AddControl(id, "Selectbox",   0, 2, {
 			{1, "less than 30 min"},
@@ -71,6 +72,24 @@ end
 --Item is the itemtable, and searcher is the name of the searcher being called. If searcher is not given, it will assume you want it active.
 function lib.Filter(item, searcher)
 	if (not get("ignoretimeleft.enable"))
+			or (get("ignoretimeleft.onlyonbids"))
+			or (searcher and (not get("ignoretimeleft.filter."..searcher))) then
+		return
+	end
+	local maxtime = get("ignoretimeleft.maxtime")
+	--now to check the time left on the auction
+	local tleft = item[Const.TLEFT]
+	if tleft > maxtime then
+		return true, "Time left too high"
+	end
+	return false
+end
+
+--PostFilter is only needed when we're restricting to bids
+function lib.PostFilter(item, searcher, buyorbid)
+	if (not get("ignoretimeleft.enable"))
+			or (not get("ignoretimeleft.onlyonbids"))
+			or (buyorbid ~= "bid")
 			or (searcher and (not get("ignoretimeleft.filter."..searcher))) then
 		return
 	end

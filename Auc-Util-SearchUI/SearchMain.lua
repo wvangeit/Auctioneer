@@ -893,7 +893,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		--give the filters a second chance to filter out, based on bid/buy differences
 		for filtername, filter in pairs(lib.Filters) do
 			if filter.PostFilter then
-				local dofilter, filterreturn = filter.PostFilter(item, searcherName)
+				local dofilter, filterreturn = filter.PostFilter(item, searcherName, buyorbid)
 				if dofilter then
 					return false, "Filtered by "..filtername..": "..filterreturn
 				end
