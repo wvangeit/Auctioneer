@@ -70,29 +70,29 @@ local tbl = {}
 
 end
 function private.fixMissingStack()
-    local tbl = {}
-    for player, v in pairs(private.serverData)do
-        for DB,data in pairs(private.serverData[player]) do
-            if DB == "completedAuctions" or DB =="failedAuctions" or DB =="completedBids/Buyouts" then
-                for itemID, value in pairs(data) do
-                    for index, text in ipairs(value) do
-                        tbl = {strsplit(";", text)}
-                        if tbl[3] == "0" or tbl[3] == "<nil>" and tbl[1] ~= "<nil>" and tbl[1] ~= 0 then
-                            local stack = private.getItemInfo(itemID, "stack")
-                            if stack == 1 then 
-                                print("Fixing stack count on Database ", DB," entry ", private.serverData[player][DB][itemID][index])
-                                if tbl[3] == "<nil>" then  
-                                    private.serverData[player][DB][itemID][index] = text:gsub("(<nil>)", stack, 1)
-                                else
-                                    private.serverData[player][DB][itemID][index] = text:gsub(";0", ";"..stack, 1)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+	local tbl = {}
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if DB == "completedAuctions" or DB =="failedAuctions" or DB =="completedBids/Buyouts" then
+				for itemID, value in pairs(data) do
+					for index, text in ipairs(value) do
+						tbl = {strsplit(";", text)}
+						if tbl[3] == "0" or tbl[3] == "<nil>" and tbl[1] ~= "<nil>" and tbl[1] ~= 0 then
+							local stack = private.getItemInfo(itemID, "stack")
+							if stack == 1 then
+								print("Fixing stack count on Database ", DB," entry ", private.serverData[player][DB][itemID][index])
+								if tbl[3] == "<nil>" then
+									private.serverData[player][DB][itemID][index] = text:gsub("(<nil>)", stack, 1)
+								else
+									private.serverData[player][DB][itemID][index] = text:gsub(";0", ";"..stack, 1)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end
 --[[end manually run functions]]
 
@@ -144,6 +144,8 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_11A()
 	elseif private.playerData["version"] < 2.00 then --very new DB format
 		private.update._2_00A()
+	elseif private.playerData["version"] < 2.01 then --very new DB format
+		private.update._2_01()
 	end	
 	
 	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
@@ -441,15 +443,16 @@ end
 --Make sure the DB format is correct removing any entries that were missed by updating.
 --To be run after every DB update
 local integrity = {} --table containing teh DB layout
-	integrity["completedBids/Buyouts"] = {"number", "number", "number", "number", "number", "string", "number", "number" } --8
-	integrity["completedAuctions"] = {"number", "number", "number", "number", "number", "number", "string", "number", "number"}--9
-	integrity["failedBids"] = {"number", "number", "number"} --3
-	integrity["failedAuctions"] = {"number", "number", "number", "number", "number", "number"} --6
-	integrity["postedBids"] = {"number", "number", "string", "string", "number", "number", "number" } --7
-	integrity["postedAuctions"] = {"number", "number", "number", "number", "number" ,"number", "number"} --7
-	
+	integrity["completedBids/Buyouts"] = {"number", "number", "number", "number", "number", "string", "number", "string" } --8
+	integrity["completedAuctions"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string"}--9
+	integrity["failedBids"] = {"number", "number", "string"} --3
+	integrity["failedAuctions"] = {"number", "number", "number", "number", "number", "string"} --6
+	integrity["postedBids"] = {"number", "number", "string", "string", "number", "number", "string" } --7
+	integrity["postedAuctions"] = {"number", "number", "number", "number", "number" ,"number", "string"} --7
+local integrityClean, integrityCount = true, 0	
  function private.integrityCheck(complete)
 	local tbl
+	debugPrint(integrityCount)
 	for player, v in pairs(private.serverData)do
 		for DB, data in pairs(v) do
 			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedBids" or DB == "postedAuctions" then
@@ -458,18 +461,21 @@ local integrity = {} --table containing teh DB layout
 						--check that the data is a string and table
 						if type(itemString) ~= "string"  or  type(data) ~= "table" then 
 							private.serverData[player][DB][itemID][itemString] = nil
-							print("Failed: Invalid format", DB, data, "", itemString)
+							debugPrint("Failed: Invalid format", DB, data, "", itemString)
+							integrityClean = false
 						else
 							for index, text in pairs(data) do
 								tbl = {strsplit(";", text)}
 									--check entries for missing data points
 								if #integrity[DB] ~= #tbl then 
-									print("Failed: Number of entries invalid", player, DB, #tbl) 
+									debugPrint("Failed: Number of entries invalid", player, DB, #tbl) 
 									table.remove(data, index)
+									integrityClean = false
 								elseif complete and private.IC(tbl, DB) then 
 									--do a full check type() = check
-									print("Failed type() check", player, DB) 
+									debugPrint("Failed type() check", player, DB) 
 									table.remove(data, index)
+									integrityClean = false
 								end
 							end
 						end
@@ -479,8 +485,16 @@ local integrity = {} --table containing teh DB layout
 			end
 		end
 	end
-	private.setOption("util.beancounter.integrityCheckComplete", true)
-	private.setOption("util.beancounter.integrityCheck", true)
+	--rerun integrity 10 times or until it goes cleanly
+	if not integrityClean and  integrityCount < 10 then
+		integrityCount = integrityCount + 1
+		integrityClean = true
+		private.integrityCheck(complete)
+	else
+		integrityClean, integrityCount = true, 0
+		private.setOption("util.beancounter.integrityCheckComplete", true)
+		private.setOption("util.beancounter.integrityCheck", true)
+	end
 	
 end	
 --look at each value and compare to the number, string, number pattern for that specific DB
@@ -540,6 +554,7 @@ function private.update._2_00B()
 		end
 		private.serverData[player]["version"] = 2.0
 	end
+	private.update._2_01()
 end
 --2.0 updgrade utility functions
 function private.update._2_00D(text)
@@ -561,4 +576,29 @@ function private.update._2_00C(player, key, itemID, itemLink, value)
 	else
 		private.serverData[player][key][itemID]={[itemLink] = {value}}
 	end
+end
+--removes old "Wealth entry to make room for reason codes
+function private.update._2_01()
+	private.integrityCheck()
+	
+	for player, v in pairs(private.serverData)do
+		for DB, data in pairs(private.serverData[player]) do
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+				for itemID, value in pairs(data) do
+					for itemString, index in pairs(value) do
+						for i, item in pairs(index) do
+							local reason = item:match(".+;(.-)$")
+							if tonumber(reason) or reason == "<nil>" then
+								item = item:gsub("(.+);.-$", "%1;", 1)
+								private.serverData[player][DB][itemID][itemString][i] = item
+							end
+						end
+					end
+				end
+			end
+		end
+		private.serverData[player]["version"] = 2.01
+	end
+	
+	private.integrityCheck(true)
 end
