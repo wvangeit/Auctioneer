@@ -682,7 +682,8 @@ function lib.MakeGuiConfig()
 	gui.Search:SetPoint("BOTTOMRIGHT", gui.frame, "TOPRIGHT", -10, 15)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
-
+	gui.Search:SetFrameLevel(11)
+	
 	gui:AddCat("Searches")
 	gui:AddCat("Filters")
 	id = gui:AddTab("General parameters", "Searches") -- Merely a place holder
