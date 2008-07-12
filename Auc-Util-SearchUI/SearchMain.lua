@@ -537,7 +537,7 @@ function private.ignore()
 	end
 	local count = private.data.stack or 1
 	price = math.floor(price/count)
-	AucSearchUI.Filters.IgnoreItemPrice.AddIgnore(sig, price)
+	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price)
 	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
 	private.removeline()
 end
@@ -556,7 +556,7 @@ function private.ignoretemp()
 	end
 	local count = private.data.stack or 1
 	price = math.floor(price/count)
-	AucSearchUI.Filters.IgnoreItemPrice.AddIgnore(sig, price, true)
+	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
 	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true).." for the session")
 	private.removeline()
 end
