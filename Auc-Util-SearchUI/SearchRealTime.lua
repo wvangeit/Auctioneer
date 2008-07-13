@@ -116,8 +116,9 @@ function lib.RefreshPage()
 	end
 	
 	--Check to see if AucAdv is already scanning
-	if AucAdvanced.Scan.IsScanning() then
-		private.interval = get("realtime.reload.interval")
+	if AucAdvanced.Scan.IsScanning() or AucAdvanced.Scan.IsPaused() then
+		private.timer = 0
+		private.interval = get("realtime.reload.manpause")
 		return
 	end
 	
@@ -203,7 +204,12 @@ function lib.FinishedPage()
 	if (not private.IsScanning)
 			or ((not always) and (not private.IsRefresh))
 			or ((not always) and (AucAdvanced.Scan.IsScanning())) then
+			private.timer = 0
+			private.interval = get("realtime.reload.manpause")
+			private.IsRefresh = false
 		return
+	else
+		private.IsRefresh = false
 	end
 	local reserve = get("realtime.reserve")
 	local balance = GetMoney()
