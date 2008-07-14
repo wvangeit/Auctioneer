@@ -310,8 +310,8 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
  			if not text:match(".*USED.*") then
 				local tbl = private.unpackString(text)
 				local stack, postBid, postSeller = tonumber(tbl[1]), tonumber(tbl[2]), tbl[3]
-				if seller ==  postSeller and postBid == bid then
-					
+				--if seller ==  postSeller and postBid == bid then --Seller is mostly useless thanks to blizzards item name cahce chamges. Can often be nil  esp after a getall
+				if postBid == bid then
 					--table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
 					debugPrint("posted Bid removed as Won", itemString, index, tbl[7])
