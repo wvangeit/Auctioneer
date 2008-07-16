@@ -56,7 +56,7 @@ end
 
 function lib.GetMatchArray(hyperlink, marketprice)
 	local matchArray = {}
-	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") then
+	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") or not BeanCounter or not BeanCounter.API.isLoaded then --check setting is on, beancounter exists, and that the database is sound
 		return 
 	end
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
@@ -72,6 +72,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local maxincrease = AucAdvanced.Settings.GetSetting("match.beancount.maxup")
 	local maxdecrease = AucAdvanced.Settings.GetSetting("match.beancount.maxdown")
 	local daterange = AucAdvanced.Settings.GetSetting("match.beancount.daterange")
+	local matchstacksize = AucAdvanced.Settings.GetSetting("match.beancount.matchstacksize")
 	local numdays = AucAdvanced.Settings.GetSetting("match.beancount.numdays")
 	numdays = numdays * 86400
 	increase = (increase / 100) + 1
@@ -80,6 +81,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 
 	local success = 0
 	local failed = 0
+
 	if BeanCounter and BeanCounter.Private.playerData then
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
@@ -99,9 +101,14 @@ function lib.GetMatchArray(hyperlink, marketprice)
 			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
 				for i = 1, success do
 					if BeanCounter.Private.playerData["completedAuctions"][itemId][key][i] then
-						local _, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][key][i])
-						auctime = tonumber(auctime)
-						if (now - auctime) < (numdays) then
+						local stack, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][key][i])
+						auctime, stack = tonumber(auctime), tonumber(stack)
+						
+						if matchstacksize then
+							if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
+								tempnum = tempnum + 1
+							end
+						elseif (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
 					end
@@ -114,9 +121,14 @@ function lib.GetMatchArray(hyperlink, marketprice)
 			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
 				for i = 1, failed do
 					if BeanCounter.Private.playerData["failedAuctions"][itemId][key][i] then
-						local _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][key][i])
-						auctime = tonumber(auctime)
-						if (now - auctime) < (numdays) then
+						local stack, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][key][i])
+						auctime, stack = tonumber(auctime), tonumber(stack)
+						
+						if matchstacksize then
+							if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
+								tempnum = tempnum + 1
+							end
+						elseif (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
 					end
@@ -167,6 +179,7 @@ end
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.beancount.enable", false)
 	AucAdvanced.Settings.SetDefault("match.beancount.daterange", false)
+	AucAdvanced.Settings.SetDefault("match.beancount.matchstacksize", false)
 	AucAdvanced.Settings.SetDefault("match.beancount.numdays", 30)
 	AucAdvanced.Settings.SetDefault("match.beancount.failed", -0.1)
 	AucAdvanced.Settings.SetDefault("match.beancount.success", 0.1)
@@ -213,6 +226,9 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
 	gui:AddControl(id, "WideSlider", 0, 2, "match.beancount.numdays", 1, 300, 1, "Use data from last %g days")
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.matchstacksize", "Seprerate data by stack size. Only available if Use recent data is set")
+	gui:AddTip(id, "Only use data for the current stack size.")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
