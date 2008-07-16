@@ -54,7 +54,6 @@ default("realtime.reload.enable", true)
 default("realtime.reload.interval", 20)
 default("realtime.reload.topscan", false)
 default("realtime.reload.manpause", 60)
-default("realtime.reserve", 1)
 default("realtime.maxprice", 10000000)
 default("realtime.alert.chat", true)
 default("realtime.alert.showwindow", true)
@@ -210,11 +209,6 @@ function lib.FinishedPage()
 		return
 	else
 		private.IsRefresh = false
-	end
-	local reserve = get("realtime.reserve")
-	local balance = GetMoney()
-	if balance < reserve then
-		return
 	end
 	--scan the current page
 	lib.ScanPage()

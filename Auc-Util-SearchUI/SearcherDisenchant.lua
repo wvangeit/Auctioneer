@@ -112,7 +112,6 @@ function lib.Search(item)
 		value = market - minprofit
 	end
 	if get("disenchant.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
-		print(market)
 		return "buy", market
 	elseif get("disenchant.allow.bid") and (item[Const.PRICE] <= value) then
 		return "bid", market

@@ -942,10 +942,14 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 					local level, _, r, g, b
 					local pctstring = ""
 					if not pct and AucAdvanced.Modules.Util.PriceLevel then
+						local valueper
+						if value then
+							valueper = value/item[Const.COUNT]
+						end
 						if buyorbid == "bid" then
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], value/item[Const.COUNT])
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], valueper)
 						else
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], value/item[Const.COUNT])
+							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
 						end
 						if level then
 							r = r*255
