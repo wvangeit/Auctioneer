@@ -149,6 +149,15 @@ function lib.FinishedSearch(query)
 end
 
 function private.PromptPurchase()
+	if type(private.CurAuction["price"])~="number" then
+		AucAdvanced.Print("Cancelling bid: invalid price: "..type(private.CurAuction["price"])..":"..tostring(private.CurAuction["price"]))
+		private.CurAuction = {}
+		return
+	elseif type(private.CurAuction["index"]) ~= "number" then
+		AucAdvanced.Print("Cancelling bid: invalid index: "..type(private.CurAuction["index"])..":"..tostring(private.CurAuction["index"]))
+		private.CurAuction = {}
+		return
+	end
 	AucAdvanced.Scan.SetPaused(true)
 	private.Prompt:Show()
 	if (private.CurAuction["price"] < private.CurAuction["buyout"]) or (private.CurAuction["buyout"] == 0) then
@@ -194,6 +203,20 @@ function lib.ScanPage()
 end
 
 function private.PerformPurchase()
+	if type(private.CurAuction["price"])~="number" then
+		AucAdvanced.Print("Cancelling bid: invalid price: "..type(private.CurAuction["price"])..":"..tostring(private.CurAuction["price"]))
+		private.CurAuction = {}
+		private.Prompt:Hide()
+		AucAdvanced.Scan.SetPaused(false)
+		return
+	elseif type(private.CurAuction["index"]) ~= "number" then
+		AucAdvanced.Print("Cancelling bid: invalid index: "..type(private.CurAuction["index"])..":"..tostring(private.CurAuction["index"]))
+		private.CurAuction = {}
+		private.Prompt:Hide()
+		AucAdvanced.Scan.SetPaused(false)
+		return
+	end
+
 	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
 	
 	--Add bid to list of bids we're watching for
