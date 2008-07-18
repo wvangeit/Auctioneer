@@ -82,35 +82,21 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local success = 0
 	local failed = 0
 
-	if BeanCounter and BeanCounter.Private.playerData then
-		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
-			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
-				success = success + #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
-			end
-		end
-		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
-			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
-				failed = failed + #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
-			end
-		end
-	end
-	if daterange then
+if daterange then
 		local now = time()
 		local tempnum = 0
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
-				for i = 1, success do
-					if BeanCounter.Private.playerData["completedAuctions"][itemId][key][i] then
-						local stack, _, _, _, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["completedAuctions"][itemId][key][i])
-						auctime, stack = tonumber(auctime), tonumber(stack)
-						
-						if matchstacksize then
-							if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
-								tempnum = tempnum + 1
-							end
-						elseif (now - auctime) < (numdays) then
+				for i, text in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId][key]) do
+					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
+					auctime, stack = tonumber(auctime), tonumber(stack)
+					
+					if matchstacksize then
+						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
+					elseif (now - auctime) < (numdays) then
+						tempnum = tempnum + 1
 					end
 				end
 			end
@@ -119,24 +105,36 @@ function lib.GetMatchArray(hyperlink, marketprice)
 		tempnum = 0
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
-				for i = 1, failed do
-					if BeanCounter.Private.playerData["failedAuctions"][itemId][key][i] then
-						local stack, _, _, _, auctime = strsplit(";", BeanCounter.Private.playerData["failedAuctions"][itemId][key][i])
-						auctime, stack = tonumber(auctime), tonumber(stack)
-						
-						if matchstacksize then
-							if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
-								tempnum = tempnum + 1
-							end
-						elseif (now - auctime) < (numdays) then
+				for i, text in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId][key]) do
+					local stack, _, _, _, auctime = strsplit(";", text)
+					auctime, stack = tonumber(auctime), tonumber(stack)
+					
+					if matchstacksize then
+						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
+					elseif (now - auctime) < (numdays) then
+						tempnum = tempnum + 1
 					end
 				end
 			end
 		end
 		failed = tempnum
+	else
+		if BeanCounter and BeanCounter.Private.playerData then
+			if BeanCounter.Private.playerData["completedAuctions"][itemId] then
+				for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
+					success = success + #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
+				end
+			end
+			if BeanCounter.Private.playerData["failedAuctions"][itemId] then
+				for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
+					failed = failed + #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
+				end
+			end
+		end
 	end
+	
 	increase = math.pow(increase, math.pow(success, 0.8))
 	decrease = math.pow(decrease, math.pow(failed, 0.8))
 	matchprice = matchprice * increase
