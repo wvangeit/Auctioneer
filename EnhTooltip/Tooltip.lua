@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	EnhTooltip - Additional function hooks to allow hooks into more tooltips
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -205,9 +205,13 @@ local private = {
 	lastMoneyObjectIndex = 0,
 	lastHeaderFontStringIndex = 1,
 	numberHeaderLines = 0,
+	suppressEnhancedTooltip = false,
+	forceSuppresedTooltipKey = "alt"
 }
 
-EnhTooltip = {}
+if not EnhTooltip then 
+	EnhTooltip = {}
+end
 EnhTooltip.Version = ENHTOOLTIP_VERSION
 EnhTooltip.Private = private
 
@@ -460,8 +464,21 @@ function public.GetRect(object)
 end
 
 function public.ShowTooltip(currentTooltip, skipEmbedRender)
+
 	-- prevent recursive calls to public.ShowTooltip()
 	if (private.showIgnore) then
+		return
+	end
+	
+	local forceKeyPressed = (
+		(private.forceSuppresedTooltipKey == "ctrl" and IsControlKeyDown()) or
+		(private.forceSuppresedTooltipKey == "alt" and IsAltKeyDown()) or
+		(private.forceSuppresedTooltipKey == "shift" and IsShiftKeyDown())
+	)
+	
+	if (private.suppressEnhancedTooltip and not forceKeyPressed) then
+		public.ClearTooltip()
+		currentTooltip:Show()
 		return
 	end
 
@@ -1632,6 +1649,18 @@ function public.SetPopupKey(key)
 end
 
 
+function public.SetSuppressEnhancedTooltip(suppress)
+	if suppress ~= nil then
+		private.suppressEnhancedTooltip = suppress
+	end
+	return private.suppressEnhancedTooltip
+end
+
+function public.SetForceTooltipKey(key)
+	private.forceSuppresedTooltipKey = key or private.forceSuppresedTooltipKey
+	return private.forceSuppresedTooltipKey
+end
+
 local DebugLib = LibStub("DebugLib")
 local debug, assert
 if DebugLib then
@@ -1717,6 +1746,7 @@ function private.HookCraft()
 	Stubby.RegisterFunctionHook("CraftFrame_SetSelection", 200, private.CallTradeHook, "craft", "")
 end
 
+
 function private.TtInitialize()
 	----  Establish hooks to all the game tooltips.
 
@@ -1770,4 +1800,5 @@ function public.OnLoad()
 	EnhancedTooltip:SetBackdropColor(0,0,0)
 	public.ClearTooltip()
 	private.TtInitialize()
+	Stubby.RegisterAddOnHook("Auc-Advanced","EnhTooltip", EnhTooltip.WireUpConfigurator)
 end

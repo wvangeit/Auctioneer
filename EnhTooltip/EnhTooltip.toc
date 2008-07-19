@@ -13,6 +13,7 @@
 Libs\Load.xml
 TinyMoneyFrame.lua
 TinyMoneyFrame.xml
+AucModule.lua 
 Tooltip.lua
 Tooltip.xml
-
+Command.lua
