@@ -83,7 +83,7 @@ function private.merchantBuy(id, amount) --Hooked function
 	
 	if amount then quantity = amount end --Amount only send for stacked items
 	
-	local value = private.packString(link, price, quantity, time(), private.wealth)
+	local value = private.packString(link, price, quantity, time())
 	
 	private.databaseAdd("vendorbuy", itemID, value)
 	debugPrint("Vendor buy added..",itemID, value)

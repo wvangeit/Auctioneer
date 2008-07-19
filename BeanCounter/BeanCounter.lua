@@ -185,9 +185,7 @@ function private.initializeDB()
 	private.playerData = BeanCounterDB[private.realmName][private.playerName]
 	private.serverData = BeanCounterDB[private.realmName]
 	private.wealth = private.playerData["wealth"]
-	private.UpgradeDatabaseVersion() 
-	private.prunePostedDB() --Check the postedDB tablesand remove any entries that are older than 31 Days
-	 
+	private.UpgradeDatabaseVersion()  
 end
 
 --[[ Configator Section ]]--
@@ -407,6 +405,7 @@ end
 --Moves entrys older than 31 days into compressed( non uniqueID) Storage
 --Array refresh needs to run before this function
 function private.compactDB()
+	debugPrint("Compressing database entries older than 40 days")
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
 		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
 			for itemID, value in pairs(data) do
@@ -414,7 +413,7 @@ function private.compactDB()
 					if "0" ~= itemString:match(".*:(.-)$") then --ignore the already compacted keys 
 						local itemLink = lib.API.getItemLink(itemString)
 						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
-							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 31 days old process
+							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 40 days old process
 								debugPrint("Compressed", itemLink, index[1])
 								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
 								table.remove(index, 1)
@@ -449,6 +448,37 @@ end
 --First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
 function private.prunePostedDB()
 	--Used to clean up post DB
+	debugPrint("Cleaning posted Databases")
+	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
+		if  DB == "postedBids" or DB == "postedAuctions"  then
+			for itemID, value in pairs(data) do
+				for itemString, index in pairs(value) do
+					--While the entrys remain 40 days old remove entry
+					while index[1] and (time() - index[1]:match(".*;(%d-);.-$")) >= 3456000 do
+						--debugPrint("Removed Old posted entry", itemString)
+						table.remove(index, 1)
+					end
+					-- remove empty itemString tables			
+					if #index == 0 then 
+						--debugPrint("Removed empty itemString table", itemID, itemString)
+						private.playerData[DB][itemID][itemString] = nil
+					end
+				end
+			end
+			--after removing the itemStrings look to see if there are itemID's that need removing
+			local empty = true	
+			for itemID, value in pairs(data) do
+				for itemString, index in pairs(value) do
+					empty = false
+				end
+				if empty then
+					--debugPrint("Removed empty ItemID tables", itemID)
+					private.playerData[DB][itemID] = nil 
+				end
+				empty = true
+			end		
+		end
+	end
 end
 
 function private.debugPrint(...)

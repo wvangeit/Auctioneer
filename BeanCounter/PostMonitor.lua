@@ -133,10 +133,10 @@ function private.onAuctionCreated()
 				break
 			end
 		end 
-		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
+		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 		private.databaseAdd("postedAuctions", itemID, itemLink, text)
 		debugPrint("Added", itemLink, "to the postedAuctions DB", post.minBid, post.buyoutPrice)
-		--debugPrint(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
+		--debugPrint(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 	end
 end
 
