@@ -387,14 +387,14 @@ function private.mailFrameUpdate()
 if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
 if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 
-	local numItems = GetInboxNumItems();
+	local numItems = GetInboxNumItems()
 	local  index
 	if (InboxFrame.pageNum * 7) < numItems then
 		index = 7
 	else
 		index = 7 - ((InboxFrame.pageNum * 7) - numItems)
 	end
-	for i = 1,index do
+	for i = 1, index do
 		local button = getglobal("MailItem"..i.."Button")
 		local buttonIcon = getglobal("MailItem"..i.."ButtonIcon")
 		local senderText = getglobal("MailItem"..i.."Sender")
@@ -404,14 +404,17 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		local itemindex = ((InboxFrame.pageNum * 7) - 7 + i) --this gives us the actual itemindex as oposed to teh 1-7 button index
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex);
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
-			if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
-				if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
-					getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
-					SetDesaturation(buttonIcon, nil)
-				end
-				if private.getOption("util.beancounter.mailrecolor") == "text" or private.getOption("util.beancounter.mailrecolor") == "both" then 
-					senderText = getglobal("MailItem"..i.."Sender");senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
-					subjectText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
+			if (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) then
+				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
+					if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
+						SetDesaturation(buttonIcon, nil)
+					end
+					if private.getOption("util.beancounter.mailrecolor") == "text" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+						senderText = getglobal("MailItem"..i.."Sender");senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+						subjectText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+					end
 				end
 			end
 		end
