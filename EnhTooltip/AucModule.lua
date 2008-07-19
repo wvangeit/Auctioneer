@@ -62,7 +62,7 @@ end
 
 function private.SetupConfigGui(gui)
 	EnhTooltip.Gui = gui
-	id = gui:AddTab(libName,"Core Options")
+	local id = gui:AddTab(libName,"Core Options")
 
 	gui:AddControl(id, "Checkbox", 0, 1, private.enhancedTooltipSuppress, "Hide enhanced tooltip")
 	gui:AddTip(id, "Disables Auctioneer enhanced tooltip")
