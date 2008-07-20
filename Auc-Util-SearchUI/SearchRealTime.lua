@@ -356,6 +356,13 @@ function lib.HookAH()
 	private.button.control.tex = private.button.control:CreateTexture(nil, "OVERLAY")
 	private.button.control.tex:SetPoint("TOPLEFT", private.button.control, "TOPLEFT", 4, -2)
 	private.button.control.tex:SetPoint("BOTTOMRIGHT", private.button.control, "BOTTOMRIGHT", -4, 2)
+	private.button.control:SetScript("OnEnter", function()
+			GameTooltip:SetOwner(private.button.control, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Click to start Realtime Search\nRightclick to open SearchUI")
+		end)
+	private.button.control:SetScript("OnLeave", function()
+			GameTooltip:Hide()
+		end)
 
 	--Figure out whether we're embedded or not.  If we are, adjust the path to the texture accordingly.
 	for _, module in ipairs(AucAdvanced.EmbeddedModules) do
