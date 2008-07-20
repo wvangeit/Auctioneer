@@ -4,8 +4,9 @@
 ## Interface: 20400
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
-## OptionalDeps: !nLog
+## OptionalDeps: !nLog, DebugLib, Configator, SlideBar
 ##
+## SavedVariables: EnhTooltipConfig
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
@@ -13,7 +14,7 @@
 Libs\Load.xml
 TinyMoneyFrame.lua
 TinyMoneyFrame.xml
-AucModule.lua 
+ConfigUI.lua
 Tooltip.lua
 Tooltip.xml
 Command.lua

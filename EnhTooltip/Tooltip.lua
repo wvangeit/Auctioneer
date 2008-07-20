@@ -205,13 +205,12 @@ local private = {
 	lastMoneyObjectIndex = 0,
 	lastHeaderFontStringIndex = 1,
 	numberHeaderLines = 0,
-	suppressEnhancedTooltip = false,
-	forceSuppresedTooltipKey = "alt"
 }
 
 if not EnhTooltip then 
 	EnhTooltip = {}
 end
+
 EnhTooltip.Version = ENHTOOLTIP_VERSION
 EnhTooltip.Private = private
 
@@ -256,10 +255,19 @@ end
 -- Function definitions
 ------------------------
 
-function public.HideTooltip()
+function private.HideTooltip(pvt)
+	debugPrint(debugstack(2,20,20),"HideTooltip","Debug")
+	--if (not pvt) and (EnhTooltip.Settings.GetSetting("blockExternalCalls")) then
+	--	return
+	--end
 	EnhancedTooltip:Hide()
 	private.currentItem = nil
-	private.hideTime = 0
+	private.hideTime = 0	
+	debugPrint("End","HideTooltip","Debug")
+end
+
+function public.HideTooltip()
+	private.HideTooltip(false)
 end
 
 -- Iterate over numbered global objects
@@ -317,6 +325,14 @@ function private.CreateNewHeaderFontString(tooltip)
 	return newFontString
 end
 
+function private.IsForceKeyPressed()
+	return (
+		(EnhTooltip.Settings.GetSetting("forceSuppresedTooltipKey") == "ctrl" and IsControlKeyDown()) or
+		(EnhTooltip.Settings.GetSetting("forceSuppresedTooltipKey") == "alt" and IsAltKeyDown()) or
+		(EnhTooltip.Settings.GetSetting("forceSuppresedTooltipKey") == "shift" and IsShiftKeyDown())
+	)
+end	
+	
 -------------------------------------------------------------------------------
 -- This function returns the requested line object.
 -- If the requested line does not exist, it will be created.
@@ -393,8 +409,13 @@ function private.reuse(...)
 	return item
 end
 
-function public.ClearTooltip()
-	public.HideTooltip()
+function private.ClearTooltip(pvt)
+	debugPrint(debugstack(2,20,20),"ClearTooltip","Debug")
+	if (not pvt) and (EnhTooltip.Settings.GetSetting("blockExternalCalls")) then
+		return
+	end
+
+	private.HideTooltip(pvt)
 
 	EnhancedTooltip.curEmbed       = false
 	EnhancedTooltip.hasData        = false
@@ -433,6 +454,11 @@ function public.ClearTooltip()
 	-- clear the embedLines table, using ipairs instead of = {} to allow
 	-- reusing old tables, which should be quite common for this table
 	private.recycle(private.embedLines)
+	debugPrint("End","ClearTooltip","Debug")
+end
+
+function public.ClearTooltip()
+	private.ClearTooltip(false)
 end
 
 function public.GetBounds(object)
@@ -463,24 +489,23 @@ function public.GetRect(object)
 	}
 end
 
-function public.ShowTooltip(currentTooltip, skipEmbedRender)
+function private.ShowTooltip(pvt, currentTooltip, skipEmbedRender)
+
+	debugPrint(debugstack(2,20,20),"ShowTooltip","Debug")
 
 	-- prevent recursive calls to public.ShowTooltip()
 	if (private.showIgnore) then
 		return
 	end
-	
-	local forceKeyPressed = (
-		(private.forceSuppresedTooltipKey == "ctrl" and IsControlKeyDown()) or
-		(private.forceSuppresedTooltipKey == "alt" and IsAltKeyDown()) or
-		(private.forceSuppresedTooltipKey == "shift" and IsShiftKeyDown())
-	)
-	
-	if (private.suppressEnhancedTooltip and not forceKeyPressed) then
-		public.ClearTooltip()
-		currentTooltip:Show()
+		
+	if (EnhTooltip.Settings.GetSetting("suppressEnhancedTooltip") and not private.IsForceKeyPressed()) then
 		return
 	end
+		
+	if (not pvt) and (EnhTooltip.Settings.GetSetting("blockExternalCalls")) then
+		return
+	end
+
 
 	-- if set to true, the flag indicates, that we have already repainted the
 	-- game tooltip once and it is now properly aligned (i.e. has the correct
@@ -559,6 +584,11 @@ function public.ShowTooltip(currentTooltip, skipEmbedRender)
 			end
 		end
 	end
+	debugPrint("End","ShowTooltip","Debug")
+end
+
+function public.ShowTooltip(currentTooltip, skipEmbedRender)
+	private.ShowTooltip(false, currentTooltip, skipEmbedRender)
 end
 
 -------------------------------------------------------------------------------
@@ -1115,7 +1145,7 @@ function private.DoHyperlink(reference, link, button)
 			if (button == "RightButton") then
 				testPopup = true
 			end
-			local callRes = public.TooltipCall(ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
+			local callRes = private.TooltipCall(true, ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #private.embedLines > 0
 				private.oldChatItem = private.reuse(reference, link, button, hasEmbed)
@@ -1130,7 +1160,7 @@ function private.CheckHide()
 	if (private.hideTime == 0) then return end
 
 	if (private.eventTimer >= private.hideTime) then
-		public.HideTooltip()
+		private.HideTooltip(true)
 		if (HideObj and HideObj == "ItemRefTooltip") then
 			-- closing chatreferenceTT?
 			private.recycle(private.oldChatItem)
@@ -1231,7 +1261,10 @@ end
 -- Tooltip generating function
 ------------------------
 
-function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
+function private.TooltipCall(pvt, frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
+	if (not pvt) and (EnhTooltip.Settings.GetSetting("blockExternalCalls")) then
+		return
+	end
 	if not link then return end
 
 	private.currentGametip = frame
@@ -1250,7 +1283,7 @@ function public.TooltipCall(frame, name, link, quality, count, price, forcePopup
 
 	if (private.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
-		public.ShowTooltip(private.currentGametip)
+		private.ShowTooltip(pvt, private.currentGametip)
 		return
 	end
 
@@ -1277,16 +1310,20 @@ function public.TooltipCall(frame, name, link, quality, count, price, forcePopup
 	end
 
 	if (showTip) then
-		public.ClearTooltip()
+		private.ClearTooltip(pvt)
 		EnhTooltip.AddTooltip(frame, name, link, quality, count, price, additional)
-		public.ShowTooltip(frame)
+		private.ShowTooltip(pvt, frame)
 		private.currentItem = itemSig
 		return true
 	else
 		frame:Hide()
-		public.HideTooltip()
+		public.HideTooltip(pvt)
 		return false
 	end
+end
+
+function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
+	private.TooltipCall(false, frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
 end
 
 ------------------------
@@ -1329,10 +1366,14 @@ end
 ------------------------
 
 function private.chatHookOnHyperlinkShow(reference, link, button)
+	debugPrint("Enter","chatHookOnHyperlinkShow","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithChatHyperlink") and not private.IsForceKeyPressed()) then return end	
 	private.DoHyperlink(reference, link, button)
 end
 
 function private.AfHookOnEnter(funcArgs, retVal, type, index)
+	debugPrint("Enter","AfHookOnEnter","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithAuction") and not private.IsForceKeyPressed()) then return end	
 	local link = GetAuctionItemLink(type, index)
 	if (link) then
 		local name = public.NameFromLink(link)
@@ -1350,41 +1391,49 @@ function private.AfHookOnEnter(funcArgs, retVal, type, index)
 			private.priceTable[2] = aiMinBid
 			private.priceTable[3] = aiNextBid
 
-			return public.TooltipCall(GameTooltip, name, link, aiQuality, aiCount, nil, nil, nil, private.priceTable)
+			return private.TooltipCall(true, GameTooltip, name, link, aiQuality, aiCount, nil, nil, nil, private.priceTable)
 		end
 	end
 end
 
 function private.GtHookSetLootItem(funcArgs, retVal, frame, slot)
+	debugPrint("Enter","GtHookSetLootItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithLootAndLootRoll") and not private.IsForceKeyPressed()) then return end	
 	local link = GetLootSlotLink(slot)
 	local name = public.NameFromLink(link)
 	if (name) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot)
 		quality = quality or public.QualityFromLink(link)
-		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 	end
 end
 
 function private.GtHookSetQuestItem(funcArgs, retVal, frame, qtype, slot)
+	debugPrint("Enter","GtHookSetQuestItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithQuests") and not private.IsForceKeyPressed()) then return end	
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot)
-		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 	end
 end
 
 function private.GtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
+	debugPrint("Enter","GtHookSetQuestLogItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithQuests") and not private.IsForceKeyPressed()) then return end	
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot)
 		name = name or public.NameFromLink(link)
 		quality = public.QualityFromLink(link) -- I don't trust the quality returned from the above function.
 
-		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 	end
 end
 
 function private.GtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
+	debugPrint("Enter","GtHookSetBagItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithBagsAndKeyRing") and not private.IsForceKeyPressed()) then return end	
 	local link = GetContainerItemLink(frameID, buttonID)
 	local name = public.NameFromLink(link)
 
@@ -1392,20 +1441,55 @@ function private.GtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
 		quality = (quality ~= -1 and quality) or public.QualityFromLink(link)
 
-		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
 	end
 end
 
 function private.GtHookSetInboxItem(funcArgs, retVal, frame, index, attachIndex)
+	debugPrint("Enter","GtHookSetInboxItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithMail") and not private.IsForceKeyPressed()) then return end	
 	local name, _, count, quality = GetInboxItem(index, attachIndex)
 	if (name) then
 		local itemString = GetInboxItemLink(index, attachIndex)
 		local _, itemLink = GetItemInfo(itemString)
-		return public.TooltipCall(GameTooltip, name, itemLink, quality, count)
+		return private.TooltipCall(true, GameTooltip, name, itemLink, quality, count)
+	end
+end
+
+function private.GtHookSetSendMailItem(funcArgs, retVal, frame, index, attachIndex)
+	debugPrint("Enter","GtHookSetSendMailItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithMail") and not private.IsForceKeyPressed()) then return end	
+	local name, _, count, quality = GetSendMailItem(index, attachIndex)
+	if (name) then
+		local itemString = GetSendMailItemLink(index, attachIndex)
+		local _, itemLink = GetItemInfo(itemString)
+		return private.TooltipCall(true, GameTooltip, name, itemLink, quality, count)
 	end
 end
 
 function private.GtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
+	debugPrint("Slot: "..tostring(slot),"GtHookSetInventoryItem","Debug")
+	if (slot >= 0 and slot<= 19) then
+		if (not EnhTooltip.Settings.GetSetting("showWithCharacterInventory") and not private.IsForceKeyPressed()) then return end	
+	end
+	
+	if (slot >= 20 and slot<= 23) then
+		if (not EnhTooltip.Settings.GetSetting("showWithBagBar") and not private.IsForceKeyPressed()) then return end	
+	end
+
+	if (slot >= 40 and slot<= 67) then
+		if (not EnhTooltip.Settings.GetSetting("showWithBank") and not private.IsForceKeyPressed()) then return end	
+	end
+
+	if (slot >= 68 and slot<= 74) then
+		if (not EnhTooltip.Settings.GetSetting("showWithBagBar") and not private.IsForceKeyPressed()) then return end	
+	end
+
+	if (slot >= 87 and slot<= 118) then
+		if (not EnhTooltip.Settings.GetSetting("showWithBagsAndKeyRing") and not private.IsForceKeyPressed()) then return end	
+	end
+
+	--if true then return end
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
 		local name = public.NameFromLink(link)
@@ -1423,61 +1507,69 @@ function private.GtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 		local quality = GetInventoryItemQuality(unit, slot)
 		quality = quality or public.QualityFromLink(link)
 
-		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 	end
 end
 
 function private.GtHookSetMerchantItem(funcArgs, retVal, frame, slot)
+	debugPrint("Enter","GtHookSetMerchantItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithMerchants") and not private.IsForceKeyPressed()) then return end	
 	local link = GetMerchantItemLink(slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot)
 		local quality = public.QualityFromLink(link)
-		return public.TooltipCall(GameTooltip, name, link, quality, quantity, price)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, quantity, price)
 	end
 end
 
 function private.GtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
+	debugPrint("Enter","GtHookSetCraftItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
 	local link
 	if (slot) then
 		link = GetCraftReagentItemLink(skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot)
 			local quality = public.QualityFromLink(link)
-			return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+			return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetCraftItemLink(skill)
 		if (link) then
 			local name = public.NameFromLink(link)
 			local quality = public.QualityFromLink(link)
-			return public.TooltipCall(GameTooltip, name, link, quality)
+			return private.TooltipCall(true, GameTooltip, name, link, quality)
 		end
 	end
 end
 
 function private.GtHookSetCraftSpell(funcArgs, retVal, frame, slot)
+	debugPrint("Enter","GtHookSetCraftSpell","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
 	local name = GetCraftInfo(slot)
 	local link = GetCraftItemLink(slot)
 	if name and link then
-		return public.TooltipCall(GameTooltip, name, link)
+		return private.TooltipCall(true, GameTooltip, name, link)
 	end
 end
 
 function private.GtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
+	debugPrint("Enter","GtHookSetTradeSkillItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
 	local link
 	if (slot) then
 		link = GetTradeSkillReagentItemLink(skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot)
 			local quality = public.QualityFromLink(link)
-			return public.TooltipCall(GameTooltip, name, link, quality, quantity)
+			return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetTradeSkillItemLink(skill)
 		if (link) then
 			local name = public.NameFromLink(link)
 			local quality = public.QualityFromLink(link)
-			return public.TooltipCall(GameTooltip, name, link, quality)
+			return private.TooltipCall(true, GameTooltip, name, link, quality)
 		end
 	end
 end
@@ -1500,53 +1592,98 @@ function public.FindItemInBags(findName)
 end
 
 function private.GtHookSetAuctionSellItem(funcArgs, retVal, frame)
+	debugPrint("Enter","GtHookSetAuctionSellItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithAuction") and not private.IsForceKeyPressed()) then return end	
 	local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name) then
 		local bag, slot = public.FindItemInBags(name)
 		if (bag) then
 			local link = GetContainerItemLink(bag, slot)
 			if (link) then
-				return public.TooltipCall(GameTooltip, name, link, quality, quantity, price)
+				return private.TooltipCall(true, GameTooltip, name, link, quality, quantity, price)
 			end
 		end
 	end
 end
 
 function private.GtHookSetTradePlayerItem(funcArgs, retVal, frame, index)
+	debugPrint("Enter","GtHookSetTradePlayerItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithTrade") and not private.IsForceKeyPressed()) then return end	
 	local link = GetTradePlayerItemLink(index)
 	local name, texture, itemCount, quality = GetTradePlayerItemInfo(index)
 	
 	if (name) then
-		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
 	end
 end
 
 function private.GtHookSetTradeTargetItem(funcArgs, retVal, frame, index)
+	debugPrint("Enter","GtHookSetTradeTargetItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithTrade") and not private.IsForceKeyPressed()) then return end	
 	local link = GetTradeTargetItemLink(index)
 	local name, texture, itemCount, quality = GetTradeTargetItemInfo(index)
 	
 	if (name) then
-		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
 	end
 end
 
 function private.GtHookSetGuildBankItem(funcArgs, retVal, frame, tab, slot)
+	debugPrint("Enter","GtHookSetGuildBankItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithGuildBank") and not private.IsForceKeyPressed()) then return end	
 	local link = GetGuildBankItemLink(tab, slot)
 	local name = public.NameFromLink(link)
 
 	if (name) then
 		local texture, itemCount, locked = GetGuildBankItemInfo(tab, slot)
 		local quality = public.QualityFromLink(link)
-		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
 	end
 end
 
 function private.GtHookSetHyperlink(funcArgs, retVal, frame, link)
+	debugPrint("Enter","GtHookSetHyperlink","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithOther") and not private.IsForceKeyPressed()) then return end	
+	debugPrint("Enter2","GtHookSetHyperlink","Debug")
 	if (link) then
 		local name, link, quality = GetItemInfo(link)
 		if (name) then
-			return public.TooltipCall(GameTooltip, name, link, quality)
+			return private.TooltipCall(true, GameTooltip, name, link, quality)
 		end
+	end
+end
+
+function private.GtSetTrainerService(funcArgs, retVal, frame, index)
+	debugPrint("Enter","GtSetTrainerService","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
+	local link = GetTrainerServiceItemLink(index)
+	debugPrint(tostring(link),"GtSetTrainerService","Debug")
+	if (link) then
+		local name, link, quality = GetItemInfo(link)
+		if (name) then
+			return private.TooltipCall(true, GameTooltip, name, link, quality)
+		end
+	end
+end
+
+function private.GtSetLootRollItem(funcArgs, retVal, frame, id)
+	debugPrint("Enter","GtSetLootRollItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithLootAndLootRoll") and not private.IsForceKeyPressed()) then return end	
+	local link = GetLootRollItemLink(id)
+	local texture, name, itemCount, quality = GetLootRollItemInfo(id);
+	if (name) then
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
+	end
+end
+
+function private.GtSetBuybackItem(funcArgs, retVal, frame, slot)
+	debugPrint("Enter","GtSetBuybackItem","Debug")
+	if (not EnhTooltip.Settings.GetSetting("showWithMerchants") and not private.IsForceKeyPressed()) then return end	
+	local link = GetBuybackItemLink(slot)
+	local name, texture, price, itemCount = GetBuybackItemInfo(slot);
+	local quality = public.QualityFromLink(link)
+	if (name) then
+		return private.TooltipCall(true, GameTooltip, name, link, quality, itemCount)
 	end
 end
 
@@ -1648,28 +1785,17 @@ function public.SetPopupKey(key)
 	return private.forcePopupKey
 end
 
-
-function public.SetSuppressEnhancedTooltip(suppress)
-	if suppress ~= nil then
-		private.suppressEnhancedTooltip = suppress
-	end
-	return private.suppressEnhancedTooltip
-end
-
-function public.SetForceTooltipKey(key)
-	private.forceSuppresedTooltipKey = key or private.forceSuppresedTooltipKey
-	return private.forceSuppresedTooltipKey
-end
-
-local DebugLib = LibStub("DebugLib")
+local DebugLib
 local debug, assert
-if DebugLib then
-	debug, assert = DebugLib(addonName)
-else
-	function debug() end
-	assert = debug
-end
-
+if LibStub then
+	DebugLib = LibStub("DebugLib")
+	if DebugLib then
+		debug, assert = DebugLib(addonName)
+	else
+		function debug() end
+		assert = debug
+	end
+end  
 
 
 ------------------------
@@ -1770,6 +1896,12 @@ function private.TtInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradePlayerItem", 200, private.GtHookSetTradePlayerItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeTargetItem", 200, private.GtHookSetTradeTargetItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetHyperlink", 200, private.GtHookSetHyperlink)
+	
+	Stubby.RegisterFunctionHook("GameTooltip.SetSendMailItem", 200, private.GtHookSetSendMailItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetTrainerService", 200, private.GtSetTrainerService)
+	Stubby.RegisterFunctionHook("GameTooltip.SetLootRollItem", 200, private.GtSetLootRollItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetBuybackItem", 200, private.GtSetBuybackItem)
+
 	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, private.GtHookSetText)
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, private.GtHookAppendText)
 	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, private.GtHookShow)
@@ -1781,6 +1913,7 @@ function private.TtInitialize()
 	Stubby.RegisterAddOnHook("LootLink", "EnhTooltip", private.HookLootLink)
 	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "EnhTooltip", private.HookTradeskill)
 	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", private.HookCraft)
+	Stubby.RegisterAddOnHook("EnhTooltip", "EnhTooltip", private.onVariablesLoaded)
 
 	-- Register event notification
 	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", private.MerchantScanner)
@@ -1798,7 +1931,10 @@ end
 
 function public.OnLoad()
 	EnhancedTooltip:SetBackdropColor(0,0,0)
-	public.ClearTooltip()
+	private.ClearTooltip(true)
 	private.TtInitialize()
-	Stubby.RegisterAddOnHook("Auc-Advanced","EnhTooltip", EnhTooltip.WireUpConfigurator)
+end
+
+function private.onVariablesLoaded()
+	EnhTooltip.SideIcon.Update()
 end
