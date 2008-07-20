@@ -312,8 +312,8 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
 				local stack, postBid, postSeller = tonumber(tbl[1]), tonumber(tbl[2]), tbl[3]
 				--if seller ==  postSeller and postBid == bid then --Seller is mostly useless thanks to blizzards item name cahce chamges. Can often be nil  esp after a getall
 				if postBid == bid then
-					--table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
-					private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
+					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
 					debugPrint("posted Bid removed as Won", itemString, index, tbl[7])
 					return tbl[7] --return the reason code provided for why we bid/bought item
 				end
@@ -405,7 +405,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex);
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
 			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
-			if (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) then
+			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) then
 				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
 					if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
 						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
