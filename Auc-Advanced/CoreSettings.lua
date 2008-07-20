@@ -439,7 +439,7 @@ function lib.MakeGuiConfig()
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
-	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.getFrameNames("config"), "printwindow")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
 	gui:AddTip(id, "This allows you to select which Chat Window Auctioneer Advanced prints its output to.")	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",

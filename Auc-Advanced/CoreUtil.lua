@@ -38,33 +38,36 @@ local private = {}
 function lib.getFrameNames(option)
 	local frames = {}
 	local frameName = ""
-	local configFrames = {}
 --This iterates through the first 10 ChatWindows, getting the name associated with it.
 	for i=1, 10 do
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i)
-		--If the name isn't blank, then we build a couple of tables, one where the Chat Frame names are the keys, and indexes the values, another which is the reverse.
+		--If the name isn't blank, then we build tables where the Chat Frame names are the keys, and indexes the values.
 		if (name ~= "") then
 			frames[name] = i
-			table.insert(configFrames, {i, name})
 		end
 	end
 	--Next, if a number was passed as an option, we simply retrieve the frame name and assign it to frameName
 	if (type(option) == "number") then
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(option);
 		frameName = name
-	end
-	--If no option was specified, we return the Name=>Index table
-	if (not option) then
-		return frames
-	--If the option was a number, we return frameName
-	elseif (type(option) == "number") then
 		return frameName
-	--If the option was the word "config" we return the Index=>Name table
-	elseif (option == "config") then
-		return configFrames
+	--If no option was specified, we return the Name=>Index table
+	elseif (not option) then
+		return frames
 	end
 end
 
+--This function will be called by our configuration screen to build the appropriate list.
+function lib.configFramesList()
+	local configFrames = {}
+	for i=1, 10 do
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i)
+		if (name ~= "") and (docked or shown) then
+			table.insert(configFrames, {i, name})
+		end
+	end
+	return configFrames
+end
 --This function will retrieve the index we've got stored for the user
 function lib.getFrameIndex()
 	--Check to make sure AucAdvanced.Settings exists, if not initialize it
