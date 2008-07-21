@@ -74,7 +74,8 @@ local tremove = table.remove;
 local tinsert = table.insert;
 local abs = math.abs;
 local floor = math.floor;
-local ERROR = 0.02;
+local ERROR = 0.05;
+local GetSetting = AucAdvanced.Settings.GetSetting;
 -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
 --[[
 	This function acquires the current market value of the mentioned item using
@@ -88,6 +89,7 @@ local ERROR = 0.02;
 	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
 ]]
 function lib.GetMarketValue(itemLink, serverKey)
+    ERROR = GetSetting("marketvalue.accuracy");
     local _;
     if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
     if not itemLink then return; end

@@ -116,6 +116,7 @@ local settingDefaults = {
 	['scancommit.progressbar'] = true,
 	['alwaysHomeFaction'] = false,
 	['printwindow'] = 1,
+    ['marketvalue.accuracy'] = .05
 }
 
 local function getDefault(setting)
@@ -424,6 +425,10 @@ function lib.MakeGuiConfig()
 	
 	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, "Processing priority: %d")
 	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
+    
+    gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
+    gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving framerate while calculating) at the cost of some accuracy.");
+    
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
@@ -440,6 +445,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
+    
+    
 	gui:AddTip(id, "This allows you to select which Chat Window Auctioneer Advanced prints its output to.")	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
@@ -465,6 +472,11 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is preferred output frame",
 		"What is Preferred Output Frame?",
 		"The Preferred Output Frame allows you to designate which of your Chat Windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the dropdown menu and Auctioneer Advanced will print all subsequent output to that window.")
+        
+    gui:AddHelp(id, "what is accuracy",
+        "What is Market Pricing error?",
+        "Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers).");
+        
 	
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
