@@ -976,7 +976,7 @@ function private.CreateFrames()
 				if curBuy > 0 and curBuy <= sellValue then
 			    	warnvendor = "buyout"
 				elseif curBid > 0 and curBid <= sellValue then
-                	warnvdendor = "bid"
+                	warnvendor = "bid"
                	end
 			end
 		end
