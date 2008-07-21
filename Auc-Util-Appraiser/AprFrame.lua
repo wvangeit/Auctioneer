@@ -628,8 +628,6 @@ function private.CreateFrames()
 			frame.salebox.bid:Hide()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
-			frame.salebox.warn:SetText("")
-			frame.salebox.note:SetText("")
 			frame.manifest.lines:Clear()
 			frame.manifest:Hide()
 			frame.toggleManifest:Disable()
@@ -639,6 +637,7 @@ function private.CreateFrames()
 			frame.salebox.totalbid:SetText("")
 			frame.salebox.totalbuyout:SetText("")
 			frame.salebox.ignore:Hide()
+    		frame.salebox.warn:SetText("")
 			frame.salebox.bulk:Hide()
 			return
 		end
@@ -967,17 +966,18 @@ function private.CreateFrames()
 		
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
-		frame.salebox.note:SetText("")
+		frame.salebox.warn:SetText("")
+		local warnvendor
 		if GetSellValue then
 			local sellValue = GetSellValue(frame.salebox.link)
 			if (sellValue and sellValue > 0) then
 				sellValue = sellValue + 1 -- the curBuy/curBid have been rounded up earlier, and they MAY be based on vendor values!
 				sellValue = math.ceil(sellValue / (1 - (AucAdvanced.cutRate or 0.05)))
 				if curBuy > 0 and curBuy <= sellValue then
-					frame.salebox.note:SetText("|cffff8010".."Note: Buyout <= Vendor")
+			    	warnvendor = "buyout"
 				elseif curBid > 0 and curBid <= sellValue then
-					frame.salebox.note:SetText("Note: Min Bid <= Vendor")
-				end
+                	warnvdendor = "bid"
+               	end
 			end
 		end
 		
@@ -988,6 +988,10 @@ function private.CreateFrames()
 		elseif (curBuy > 0 and curBid > curBuy) then
 			frame.salebox.warn:SetText("Buy price must be > bid")
 			canAuction = false
+		elseif warnvendor == "buyout" then 
+            frame.salebox.warn:SetText("|cffff8010Note: Buyout <= Vendor") 
+        elseif warnvendor == "bid" then 
+            frame.salebox.warn:SetText("|cffeec900Note: Min Bid <= Vendor") 
 		else
 			frame.salebox.warn:SetText("")
 		end
@@ -1107,10 +1111,10 @@ function private.CreateFrames()
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
 			frame.salebox.numberonly:Hide()
-			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
+			frame.switchUI:SetText("Full View")
+			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -35)
 			frame.salebox.bid:ClearAllPoints()
-			frame.salebox.bid:SetPoint("TOP", frame.salebox.model, "BOTTOM", 0, -35)
-			frame.salebox.bid:SetPoint("LEFT", frame.salebox, "LEFT", 25, 0)
+			frame.salebox.bid:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, -30)
 			frame.salebox.bid.label:ClearAllPoints()
 			frame.salebox.bid.label:SetPoint("BOTTOMLEFT", frame.salebox.bid, "TOPLEFT", 0, 2)
 			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0, -20)
@@ -1118,7 +1122,7 @@ function private.CreateFrames()
 			frame.salebox.buy.label:SetPoint("BOTTOMLEFT", frame.salebox.buy, "TOPLEFT", 0, 2)
 			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.buy, "BOTTOMLEFT", -10, -10)
 			frame.gobatch:Hide()
-			frame.go:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -20, 15)
+			frame.go:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -20, 25)
 			frame.salebox.info:ClearAllPoints()
 			frame.salebox.info:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, 8)
 			--set scrollframe to match clasic ratio
@@ -1144,10 +1148,8 @@ function private.CreateFrames()
 				frame.salebox.totalbuyout:Show()
 			end
 			frame.salebox.name:SetHeight(36)
-			frame.salebox.warn:SetJustifyH("LEFT")
-			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -25)
-			frame.salebox.oldnote = frame.salebox.note
-			frame.salebox.note = frame.salebox.warn
+			frame.salebox.warn:ClearAllPoints()
+			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox, "BOTTOMLEFT", 10, 10)
 			frame.salebox.ignore:Hide()
 			frame.salebox.bulk:Hide()
 		else
@@ -1159,6 +1161,7 @@ function private.CreateFrames()
 			frame.salebox.totalsize:Hide()
 			frame.salebox.numberentry:Hide()
 			frame.salebox.numberonly:Hide()
+			frame.switchUI:SetText("Simple View")
 			frame.salebox.depositcost:Hide()
 			frame.salebox.totalbid:Hide()
 			frame.salebox.totalbuyout:Hide()
@@ -1179,18 +1182,16 @@ function private.CreateFrames()
 			end
 			frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
 			frame.salebox.bid:ClearAllPoints()
-			frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
-			frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
+			frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
 			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
-			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,0)
-			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0,-16)
-	        frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number, "BOTTOMRIGHT", 250, 0)
+			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-33)
+			
+			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
+			frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
 			frame.salebox.bid.label:ClearAllPoints()
-			frame.salebox.bid.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
 			frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
 			frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
 			frame.salebox.buy.label:ClearAllPoints()
-			frame.salebox.buy.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
 			frame.salebox.buy.label:SetPoint("TOPRIGHT", frame.salebox.buy, "TOPLEFT", -5,0)
 			frame.salebox.buy.label:SetPoint("BOTTOMRIGHT", frame.salebox.buy, "BOTTOMLEFT", -5,0)
 			frame.gobatch:Show()
@@ -1204,10 +1205,8 @@ function private.CreateFrames()
 			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 			
 			frame.salebox.name:SetHeight(20)
-			frame.salebox.warn:SetJustifyH("RIGHT")
-			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 0)
-			frame.salebox.note = frame.salebox.oldnote or frame.salebox.note
-			frame.salebox.oldnote = nil
+			frame.salebox.warn:ClearAllPoints()
+			frame.salebox.warn:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -10, 10)
 		end
 		
 		frame.UpdateControls()
@@ -1229,7 +1228,8 @@ function private.CreateFrames()
 				end
 			end
 		end
-		frame.DirectSelect(link)
+--		frame.DirectSelect(link)
+        frame.SelectItem(nil,nil,link)
 	end
 	
 	function frame.IconClicked()
@@ -1662,8 +1662,8 @@ function private.CreateFrames()
 	
 	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.switchUI:SetPoint("TOPRIGHT", frame.config, "TOPLEFT", 2, 0)
-	frame.switchUI:SetText("Switch UI")
-	frame.switchUI:SetWidth(80)
+	frame.switchUI:SetText("Simple View")
+	frame.switchUI:SetWidth(100)
 	frame.switchUI:SetScript("OnClick", function()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
@@ -1872,22 +1872,12 @@ function private.CreateFrames()
 	frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 
 	frame.salebox.warn = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5,0)
-	frame.salebox.warn:SetPoint("RIGHT", frame.salebox, "RIGHT", -10,0)
+	frame.salebox.warn:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -10,10)
 	frame.salebox.warn:SetHeight(12)
 	frame.salebox.warn:SetTextColor(1, 0.3, 0.06)
 	frame.salebox.warn:SetText("")
 	frame.salebox.warn:SetJustifyH("RIGHT")
 	frame.salebox.warn:SetJustifyV("BOTTOM")
-
-	frame.salebox.note = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.note:SetPoint("BOTTOMLEFT", frame.salebox, "BOTTOMLEFT", 0,10)
-	frame.salebox.note:SetPoint("RIGHT", frame.salebox, "RIGHT", -10,0)
-	frame.salebox.note:SetHeight(12)
-	frame.salebox.note:SetTextColor(1, 0.8, 0.1)
-	frame.salebox.note:SetText("")
-	frame.salebox.note:SetJustifyH("RIGHT")
-	frame.salebox.note:SetJustifyV("BOTTOM")
 
 	frame.salebox.stack = CreateFrame("Slider", "AppraiserSaleboxStack", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.stack:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -5)
@@ -1909,12 +1899,12 @@ function private.CreateFrames()
 	AppraiserSaleboxStackHigh:SetText("")
 
 	frame.salebox.stack.label = frame.salebox.stack:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.stack.label:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 33,2)
+	frame.salebox.stack.label:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0,0)
 	frame.salebox.stack.label:SetJustifyH("LEFT")
 	frame.salebox.stack.label:SetJustifyV("CENTER")
 	
 	frame.salebox.number = CreateFrame("Slider", "AppraiserSaleboxNumber", frame.salebox, "OptionsSliderTemplate")
-	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0,0)
+	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0, -15)
 	frame.salebox.number:SetHitRectInsets(0,0,0,0)
 	frame.salebox.number:SetMinMaxValues(1,1)
 	frame.salebox.number:SetValueStep(1)
@@ -1925,20 +1915,6 @@ function private.CreateFrames()
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
-
-   	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "UICheckButtonTemplate")
-    -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
-	frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number, "BOTTOMRIGHT", 250, 0)
-	frame.salebox.numberonly:SetHeight(20)
-	frame.salebox.numberonly:SetWidth(20)
-	frame.salebox.numberonly:SetChecked(false)
-	frame.salebox.numberonly:SetScript("OnClick", frame.ChangeControls)
-	-- This is not the way to make a tooltip! Leaving there to fix when I know how. - Kinesia
-    --	frame.salebox.numberonly:SetTip("Take existing auctions into account and only post what is needed to maintain this total number.")
-	frame.salebox.numberonly.label = frame.salebox.numberonly:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.numberonly.label:SetPoint("BOTTOMLEFT", frame.salebox.numberonly, "BOTTOMRIGHT", 0, 6)
-	frame.salebox.numberonly.label:SetText("Only")
-    frame.salebox.numberonly:Hide()   
 
 	function frame.salebox.number:GetAdjustedValue()
 		local maxStax = self.maxStax or 0
@@ -1978,12 +1954,26 @@ function private.CreateFrames()
 	end)
 	
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.number.label:SetPoint("LEFT", frame.salebox.number, "RIGHT", 33,2)
+	frame.salebox.number.label:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-4)
 	frame.salebox.number.label:SetJustifyH("LEFT")
 	frame.salebox.number.label:SetJustifyV("CENTER")
 
+   	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "UICheckButtonTemplate")
+    -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
+	frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
+	frame.salebox.numberonly:SetHeight(20)
+	frame.salebox.numberonly:SetWidth(20)
+	frame.salebox.numberonly:SetChecked(false)
+	frame.salebox.numberonly:SetScript("OnClick", frame.ChangeControls)
+	-- This is not the way to make a tooltip! Leaving there to fix when I know how. - Kinesia
+    --	frame.salebox.numberonly:SetTip("Take existing auctions into account and only post what is needed to maintain this total number.")
+	frame.salebox.numberonly.label = frame.salebox.numberonly:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.numberonly.label:SetPoint("BOTTOMLEFT", frame.salebox.numberonly, "BOTTOMRIGHT", 0, 4)
+	frame.salebox.numberonly.label:SetText("Only")
+    frame.salebox.numberonly:Hide()   
+
 	frame.salebox.duration = CreateFrame("Slider", "AppraiserSaleboxDuration", frame.salebox, "OptionsSliderTemplate")
-	frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,0)
+	frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-25)
 	frame.salebox.duration:SetHitRectInsets(0,0,0,0)
 	frame.salebox.duration:SetMinMaxValues(1,3)
 	frame.salebox.duration:SetValueStep(1)
@@ -2009,16 +1999,16 @@ function private.CreateFrames()
 		return private.GetExtraPriceModels(frame.salebox.link)
 	end
 	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, frame.GetLinkPriceModels, "default")
-	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0,-16)
+	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
 	frame.salebox.model.element = "model"
 	frame.salebox.model:Hide()
 
 	frame.salebox.model.label = frame.salebox.model:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 0,0)
+	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 30,0)
 	frame.salebox.model.label:SetText("Pricing model to use:")
 	
 	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "UICheckButtonTemplate")
-	frame.salebox.matcher:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 22, 7)
+	frame.salebox.matcher:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, 5)
 	frame.salebox.matcher:SetHeight(20)
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
@@ -2026,7 +2016,7 @@ function private.CreateFrames()
 	frame.salebox.matcher:Hide()
 	
 	frame.salebox.matcher.label = frame.salebox.matcher:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 6)
+	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 5)
 	frame.salebox.matcher.label:SetText("Enable price matching")
 
 	frame.salebox.ignore = CreateFrame("CheckButton", "AppraiserSaleboxIgnore", frame.salebox, "UICheckButtonTemplate")
@@ -2054,8 +2044,7 @@ function private.CreateFrames()
 	frame.salebox.bulk.label:SetText("Enable batch posting")
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
-	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
-	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
+	frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, function()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
@@ -2085,10 +2074,9 @@ function private.CreateFrames()
 	AppraiserSaleboxBidCopper:SetBackdropColor(0,0,0, 0)
 
 	frame.salebox.bid.label = frame.salebox.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.bid.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
 	frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
 	frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
-	frame.salebox.bid.label:SetText("Bid price/item:")
+	frame.salebox.bid.label:SetText("Bid per item:")
 	frame.salebox.bid.label:SetJustifyH("RIGHT")
 
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
@@ -2127,10 +2115,9 @@ function private.CreateFrames()
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.buy, AppraiserSaleboxBidCopper)
 
 	frame.salebox.buy.label = frame.salebox.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.buy.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
 	frame.salebox.buy.label:SetPoint("TOPRIGHT", frame.salebox.buy, "TOPLEFT", -5,0)
 	frame.salebox.buy.label:SetPoint("BOTTOMRIGHT", frame.salebox.buy, "BOTTOMLEFT", -5,0)
-	frame.salebox.buy.label:SetText("Buy price/item:")
+	frame.salebox.buy.label:SetText("Buy per item:")
 	frame.salebox.buy.label:SetJustifyH("RIGHT")
 
 	frame.go = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
