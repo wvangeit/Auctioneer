@@ -7,6 +7,7 @@
 <Script file="BeanCounterConfig.lua"/>
 <Script file="BeanCounterUpdate.lua"/>
 <Script file="BeanCounterMail.lua"/>
+<Script file="BeanCounterSearch.lua"/>
 <Script file="BeancounterVendor.lua"/>
 <Script file="PostMonitor.lua"/>
 <Script file="BidMonitor.lua"/>

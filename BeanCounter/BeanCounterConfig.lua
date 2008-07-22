@@ -101,6 +101,7 @@ private.settingDefaults = {
 	["util.beancounter.debugUpdate"] = true,
 	["util.beancounter.debugFrames"] = true,
 	["util.beancounter.debugAPI"] = true,
+	["util.beancounter.debugSearch"] = true,
 	
 	["util.beacounter.invoicetime"] = 5,
 	["util.beancounter.mailrecolor"] = "both",
@@ -448,5 +449,6 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugUpdate", "Update")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugFrames", "Frames")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugAPI", "API")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugSearch", "Search")
 
 end
