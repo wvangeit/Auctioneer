@@ -184,6 +184,14 @@ function lib.vendorAction()
 							runstop = 1
 						end 
 					end
+					--check searchUI reason codes if not in BTMScan	
+					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
+						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
+						if reason:lower() == "vendor" then
+							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":SearchUI-vendor"
+							runstop = 1
+						end
+					end
 				end
 			end
 		end
@@ -207,7 +215,7 @@ function lib.disenchantAction()
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
 					if(aimethod == "Disenchant") then 
 						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")		
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")	
 						end
 						UseContainerItem(bag, slot) 
 						runstop = 1
@@ -221,11 +229,22 @@ function lib.disenchantAction()
 						bids = bidlist[sig..":"..seed.."x"..itemCount]
 						if(bids and bids[1] and bids[1] == "disenchant") then 
 							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")	
+								print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")
 							end
 							UseContainerItem(bag, slot) 
 							runstop = 1
 						end 
+					end
+					--check searchUI reason codes if not in BTMScan	
+					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
+						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
+						if reason:lower() == "disenchant" then
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to SearchUI Rule(Disenchant)")
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end
 					end
 				end
 			end
@@ -263,11 +282,22 @@ function lib.prospectAction()
 						bids = bidlist[sig..":"..seed.."x"..itemCount]
 						if(bids and bids[1] and bids[1] == "prospect") then 
 							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")	
+								print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")
 							end
 							UseContainerItem(bag, slot) 
 							runstop = 1
 						end 
+					end
+					--check searchUI reason codes if not in BTMScan	
+					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
+						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
+						if reason:lower() == "prospect" then
+							if (get("util.automagic.chatspam")) then 
+								print("AutoMagic has loaded", itemName, " due to SearchUI Rule(Prospect)")
+							end
+							UseContainerItem(bag, slot) 
+							runstop = 1
+						end
 					end
 				end
 			end
