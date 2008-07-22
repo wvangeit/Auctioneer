@@ -598,7 +598,7 @@ function lib.GetSigFromLink(link)
 			sig = tostring(id)
 		end
 	else
-		print("Link is not item")
+		lib.Print("Link is not item")
 	end
 	return sig
 end
