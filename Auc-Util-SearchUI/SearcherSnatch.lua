@@ -62,7 +62,7 @@ function lib.Search(item)
     local itemConfigTable = btmget("itemconfig.list")
     local itemConfig = {}
     local value = 0
-    local stacksize = 1
+    local stackSize = 1
 	for sig, itemConfigString in pairs(itemConfigTable) do
 		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
 		if itemConfig.buyBelow and itemConfig.buyBelow>0 then
