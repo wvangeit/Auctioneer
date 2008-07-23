@@ -144,10 +144,11 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_11A()
 	elseif private.playerData["version"] < 2.00 then --very new DB format
 		private.update._2_00A()
-	elseif private.playerData["version"] < 2.01 then --very new DB format
+	elseif private.playerData["version"] < 2.01 then --
 		private.update._2_01()
-	end	
-	
+	elseif private.playerData["version"] < 2.02 then --runs validate to correct ;Used won, Used Failed messages and prevent postDB function errors.
+		private.update._2_02()
+	end
 	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
 	if not private.getOption("util.beancounter.integrityCheckComplete") then 
 		private.integrityCheck(true) 
@@ -491,6 +492,7 @@ local integrityClean, integrityCount = true, 0
 		integrityClean = true
 		private.integrityCheck(complete)
 	else
+		print("BeanCounter Integrity Check Completed after:",integrityCount, "passes")
 		integrityClean, integrityCount = true, 0
 		private.setOption("util.beancounter.integrityCheckComplete", true)
 		private.setOption("util.beancounter.integrityCheck", true)
@@ -601,4 +603,10 @@ function private.update._2_01()
 	end
 	
 	private.integrityCheck(true)
+	private.update._2_02()
+end
+--runs validate to correct ;Used won, Used Failed messages and prevent postDB function errors.
+function private.update._2_02()
+	private.integrityCheck(true)
+	private.playerData["version"] = 2.02
 end
