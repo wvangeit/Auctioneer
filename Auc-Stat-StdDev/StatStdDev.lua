@@ -240,7 +240,7 @@ end
 AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", true)
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
 	
 	gui:AddHelp(id, "what stddev stats",
