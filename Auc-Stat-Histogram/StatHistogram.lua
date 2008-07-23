@@ -280,7 +280,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 end
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	
 	gui:AddHelp(id, "what histogram stats",
 		"What are Histogram stats?",
