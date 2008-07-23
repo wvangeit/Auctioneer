@@ -5,7 +5,8 @@
 	<Script file="SearcherResale.lua"/>
 	<Script file="SearcherDisenchant.lua"/>
 	<Script file="SearcherConverter.lua"/>
-	<Script file="SearcherVendor.lua"/>
+	<Script file="SearcherSnatch.lua"/>
+    <Script file="SearcherVendor.lua"/>
 	<Script file="SearchRealTime.lua"/>
 	<script file="FilterTimeLeft.lua"/>
 	<script file="FilterItemQuality.lua"/>
