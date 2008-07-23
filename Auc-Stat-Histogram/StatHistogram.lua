@@ -440,16 +440,17 @@ function private.refactor(pmax, precision)
 	newstats["min"] = math.ceil(conversion*private.stattable["min"])
 	newstats["max"] = math.ceil(conversion*private.stattable["max"])
 	local count = 0
-	if newstats["max"] > precision then
+	if newstats["max"] > 750 then
 		--we need to crop off the top end
-		newstats["max"] = precision
-		private.stattable["max"] = math.floor(precision/conversion)
+		newstats["max"] = 750
+		private.stattable["max"] = math.floor(750/conversion)
 	end
 	for i = newstats["min"], newstats["max"] do
 		newstats[i] = 0
 	end
 	for i = private.stattable["min"], private.stattable["max"] do
 		local j = math.ceil(conversion*i)
+		if not newstats[j] then newstats[j] = 0 end
 		newstats[j]= newstats[j] + private.stattable[i]
 		count = count + private.stattable[i]
 	end
