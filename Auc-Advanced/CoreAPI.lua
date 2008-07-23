@@ -156,6 +156,11 @@ function lib.GetMarketValue(itemLink, serverKey)
         total = total * delta;
         
         if total ~= total or total == 0 then
+            if nLog and total ~= total then
+                nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+            elseif nLog then
+                nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+            end
             return;                 -- Cannot calculate: NaN
         end
         
@@ -185,8 +190,13 @@ function lib.GetMarketValue(itemLink, serverKey)
         delta = delta * 0.8;
         
         if midpoint ~= midpoint or midpoint == 0 then
+            if nLog and midpoint ~= midpoint then
+                nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+            elseif nLog then
+                nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+            end
             return;                 -- Cannot calculate: NaN
-        end
+        end        
         
     until abs(midpoint - lastMidpoint)/midpoint < ERROR;
     
@@ -205,6 +215,9 @@ function lib.GetMarketValue(itemLink, serverKey)
         
         return midpoint, seen, #pdfList;
     else
+        if nLog then
+            nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "No midpoint was detected for item "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+        end
 		return;
 	end 
 
