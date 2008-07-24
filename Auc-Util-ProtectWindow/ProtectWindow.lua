@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Example.lua 3054 2008-04-27 23:07:17Z MentalPower $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced module that does something nifty.
@@ -258,4 +258,4 @@ myFrame:SetScript("OnEvent", function(name, event, addon)
 	end
 end)
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/Modules/Auc-Util-Example/Example.lua $", "$Rev: 3054 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
