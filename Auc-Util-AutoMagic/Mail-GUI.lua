@@ -222,23 +222,16 @@ function lib.disenchantAction()
 						if (get("util.automagic.chatspam")) then 
 							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")		
 						end
-						UseContainerItem(bag, slot) 
+						UseContainerItem(bag, slot)
 						runstop = 1
 					end 
-				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					if (bidlist) then
-						local reason, bids
-						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						if(bids and bids[1] and bids[1] == "disenchant") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")	
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
-						end 
+				else --look for btmScan or SearchUI reason codes if above fails
+					local reason, text = lib.getReason(itemLink, itemName, itemCount, "disenchant")
+					if reason and text then
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Disenchant)")	
+						end
+						UseContainerItem(bag, slot)
 					end
 				end
 			end
@@ -266,21 +259,14 @@ function lib.prospectAction()
 						end
 						UseContainerItem(bag, slot) 
 						runstop = 1
-					end 
-				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					if (bidlist) then
-						local reason, bids
-						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						if(bids and bids[1] and bids[1] == "prospect") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")	
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
-						end 
+					end
+				else --look for btmScan or SearchUI reason codes if above fails
+					local reason, text = lib.getReason(itemLink, itemName, itemCount, "prospect")
+					if reason and text then
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")	
+						end
+						UseContainerItem(bag, slot)
 					end
 				end
 			end

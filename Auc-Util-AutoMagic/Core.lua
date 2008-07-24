@@ -163,7 +163,7 @@ function lib.vendorAction()
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
-				runstop = 0
+				runstop = 0  --Teslek, not sure why you are using this with elseif statements only one branch will be run anyways? 
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
 				if autoSellList[ itemID ] then 
@@ -172,25 +172,10 @@ function lib.vendorAction()
 				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
 					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Grey"
 					runstop = 1
-				elseif (BtmScan and runstop == 0) then
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					if (bidlist) then
-						local reason, bids
-						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						if(bids and bids[1] and bids[1] == "vendor") then 
-							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":BTM-vendor"
-							runstop = 1
-						end 
-					end
-					--check searchUI reason codes if not in BTMScan	
-					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
-						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
-						if reason:lower() == "vendor" then
-							lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":SearchUI-vendor"
-							runstop = 1
-						end
+				else --look for btmScan or SearchUI reason codes if above fails
+					local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
+					if reason and text then
+						lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":"..text.."-vendor"
 					end
 				end
 			end
@@ -220,31 +205,13 @@ function lib.disenchantAction()
 						UseContainerItem(bag, slot) 
 						runstop = 1
 					end 
-				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					if (bidlist) then
-						local reason, bids
-						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						if(bids and bids[1] and bids[1] == "disenchant") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Disenchant)")
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
-						end 
-					end
-					--check searchUI reason codes if not in BTMScan	
-					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
-						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
-						if reason:lower() == "disenchant" then
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to SearchUI Rule(Disenchant)")
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
+				else --look for btmScan or SearchUI reason codes if above fails
+					local reason, text = lib.getReason(itemLink, itemName, itemCount, "disenchant")
+					if reason and text then
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to ",text ,"Rule(Disenchant)")
 						end
+						UseContainerItem(bag, slot)
 					end
 				end
 			end
@@ -272,32 +239,14 @@ function lib.prospectAction()
 						end
 						UseContainerItem(bag, slot) 
 						runstop = 1
-					end 
-				elseif (BtmScan and get("util.automagic.overidebtmmail") == false and runstop == 0) then
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-					if (bidlist) then
-						local reason, bids
-						local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-						local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-						bids = bidlist[sig..":"..seed.."x"..itemCount]
-						if(bids and bids[1] and bids[1] == "prospect") then 
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to BTM Rule(Prospect)")
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
-						end 
 					end
-					--check searchUI reason codes if not in BTMScan	
-					if (BeanCounter and BeanCounter.API.isLoaded and runstop == 0) then 
-						local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
-						if reason:lower() == "prospect" then
-							if (get("util.automagic.chatspam")) then 
-								print("AutoMagic has loaded", itemName, " due to SearchUI Rule(Prospect)")
-							end
-							UseContainerItem(bag, slot) 
-							runstop = 1
+				else --look for btmScan or SearchUI reason codes if above fails
+					local reason, text = lib.getReason(itemLink, itemName, itemCount, "prospect")
+					if reason and text then
+						if (get("util.automagic.chatspam")) then 
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")	
 						end
+						UseContainerItem(bag, slot)
 					end
 				end
 			end
@@ -348,4 +297,31 @@ function lib.dematAction()
 		end
 	end
 end
+
+--Searches for reason and returns values if found nil other wise.
+--Consolidates code into one function instead of 5-6 places that need editing/maintaining
+function lib.getReason(itemLink, itemName, itemCount, text)
+	if (BtmScan) then
+		local bidlist = BtmScan.Settings.GetSetting("bid.list")
+		if (bidlist) then
+			local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+			local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+			local bids = bidlist[sig..":"..seed.."x"..itemCount]
+
+			if(bids and bids[1] and bids[1] == text) then
+				return bids[1], "BTM"
+			end 
+		end
+	end
+
+	if (BeanCounter and BeanCounter.API.isLoaded) then
+		local reason = BeanCounter.API.getBidReason(itemLink, itemCount) or ""
+		if reason:lower() == text then
+			return reason, "SearchUI"
+		end
+	end
+	
+	return
+end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
