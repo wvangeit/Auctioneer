@@ -101,9 +101,10 @@ BtmScan.OnLoad = function ()
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
 	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.PostCanSendAuctionQuery)
-
-	Stubby.RegisterFunctionHook("BeanCounter.Private.databaseAdd", 600, BtmScan.BeanCounterStored)
-		
+	
+	if BeanCounter then
+		Stubby.RegisterFunctionHook("BeanCounter.Private.databaseAdd", 600, BtmScan.BeanCounterStored)
+	end
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("BtmScan", "CommandHandler", [[
 		local function cmdHandler(msg)
