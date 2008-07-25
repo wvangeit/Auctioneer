@@ -494,7 +494,7 @@ function protectAuctionFrame(enable)
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
 		-- Handle enabling of protection
-		if (enable and not ahFrameProtected and AuctionFrame:IsShown()) then
+		if (enable and not ahFrameProtected and AuctionFrame:IsVisible()) then
 			--Remember that we are now protecting the frame
 			ahFrameProtected = true
 			--Protect the frame.
@@ -530,10 +530,12 @@ function protectAuctionFrame(enable)
 		elseif (not enable and ahFrameProtected) then
 			--Handle disabling of protection
 			ahFrameProtected = nil;
-			AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
-			AuctionFrame.IsShown = function() end
-			ShowUIPanel(AuctionFrame, 1)
-			AuctionFrame.IsShown = nil
+			if AuctionFrame:IsVisible() then
+				AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+				AuctionFrame.IsShown = function() end
+				ShowUIPanel(AuctionFrame, 1)
+				AuctionFrame.IsShown = nil
+			end
 			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
 
 			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList.AuctionFrame ) then

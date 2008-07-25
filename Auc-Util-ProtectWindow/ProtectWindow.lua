@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer Advanced - Window Protection Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -55,14 +55,26 @@ end
 function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
 		--Called when you should build your Configator tab.
+		if debug == "debug_on" then
+			print "Callback: Config"
+		end
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
 		--Called when your config options (if Configator) have been changed.
+		if debug == "debug_on" then
+			print "Callback: configchanged"
+		end
 	elseif (callbackType == "scanprogress") then
 		--Called from scan start to scan end.
+		if debug == "debug_on" then
+			print "Callback: scanprogress"
+		end
 		private.CheckScanProt(...)
 	elseif (callbackType == "scanstats") then
 		--Called when the scan has finished and stats are ready.
+		if debug == "debug_on" then
+			print "Callback: scanstats"
+		end
 		private.ScanEnd(...)
 	end
 end
@@ -70,8 +82,9 @@ end
 function lib.OnLoad()
 	--This function is called when your variables have been loaded.
 	--You should also set your Configator defaults here
-
---	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	if debug == "debug_on" then
+		print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	end
 	AucAdvanced.Settings.SetDefault("util.protectwindow.protectwindow", 1)
 	AucAdvanced.Settings.SetDefault("util.protectwindow.processprotect", 0)
 end
@@ -80,6 +93,9 @@ end
 local ScanProtected = nil
 local ProcessProtect = nil
 function private.CheckScanProt(state, totalAuctions, scannedAuctions, elapsedTime)
+	if debug == "debug_on" then
+		print "CheckScanProt was called"
+	end
 	if get("util.protectwindow.protectwindow") == 3 then 
 		if debug == "debug_on" then 
 			print("State:", state)
@@ -98,10 +114,12 @@ function private.CheckScanProt(state, totalAuctions, scannedAuctions, elapsedTim
 			elseif state == nil and ScanProtected then
 				if debug == "debug_on" then print("AuctionFrame already protected while scanning") end
 			elseif state == false and ScanProtected and not get("util.protectwindow.processprotect") then
-				if debug == "debug_on" then print("Unprotecting AuctionFrame after scanning") end
-				AuctionFrame.IsShown = function () end
-				ShowUIPanel(AuctionFrame, 1)
-				AuctionFrame.IsShown = nil
+				if debug == "debug_on" then print("Unprotecting AuctionFrame because we're not scanning") end
+				if AuctionFrame:IsVisible() then
+					AuctionFrame.IsShown = function () end
+					ShowUIPanel(AuctionFrame, 1)
+					AuctionFrame.IsShown = nil
+				end
 				ScanProtected = nil
 			end
 		end
@@ -116,9 +134,11 @@ function private.ScanEnd()
 		end
 		if get("util.protectwindow.protectwindow") == 3 then
 			if debug=="debug_on" then print("Unprotecting AuctionFrame after processing") end
-			AuctionFrame.IsShown = function () end
-			ShowUIPanel(AuctionFrame, 1)
-			AuctionFrame.IsShown = nil
+			if AuctionFrame:IsVisible() then
+				AuctionFrame.IsShown = function () end
+				ShowUIPanel(AuctionFrame, 1)
+				AuctionFrame.IsShown = nil
+			end
 			ScanProtected = nil
 		end
 	else
@@ -145,7 +165,7 @@ function private.SetupConfigGui(gui)
 		{2, "Always"},
 		{3, "When Scanning"}
 	}, lib.windowProtect, "Prevent other windows from closing the Auction House window.")
-	gui:AddTip(id, "This will allow prevent other windows from closing the Auction House Window when you open them.")
+	gui:AddTip(id, "This will prevent other windows from closing the Auction House Window when you open them, according to your settings.")
 	gui:AddControl(id, "Checkbox", 0, 1, "util.protectwindow.processprotect", "Check this to protect the window until processing is done.")
 	gui:AddTip(id, "This option allows you to extend protection from the end of the scan until processing is done.")
 	gui:AddHelp(id, "What is ProtectWindow",
@@ -157,8 +177,11 @@ end
 --startup. We want this frame to be the major point of execution for the
 --code.
 local myFrame = CreateFrame("Frame")
+if debug == "debug_on" then print "myFrame created" end
 lib.protFrame = myFrame
+if debug == "debug_on" then print "Accessible reference made." end
 myFrame:Hide()
+if debug == "debug_on" then print "myFrame hidden" end
 
 --This function sets up Protect-Window functionality.
 --We had to modify the getter and setter in CoreSettings,
@@ -168,19 +191,31 @@ function lib.windowProtect(action, setvalue)
 	--of "getsetting"  So we get the setting and return it for
 	--CoreSettings.lua
 	if (action == "getsetting") then
+		if debug == "debug_on" then
+			print "windowProtect called by getter"
+		end
 		return get("util.protectwindow.protectwindow")
 	--If this was called by the getDefault, we'll receive an argument
 	--of "getdefault"
 	elseif (action == "getdefault") then
+		if debug == "debug_on" then
+			print "windowProtect called by getDefault"
+		end
 		return AucAdvanced.Settings.getDefault("util.protectwindow.protectwindow")
 	--If it was called by the setter, we'll receive and argument of
 	--"set".  This is where we do most of our work.
 	elseif (action == "set") then
+		if debug == "debug_on" then
+			print "windowProtect called by setter"
+		end
 		--Set our config value
 		local retvalue = set("util.protectwindow.protectwindow", setvalue)
 		--Unhide the frame that will run the script to protect
 		--the window
 		if UIPanelWindows["AuctionFrame"] then
+			if debug == "debug_on" then
+				print "Unhiding myFrame"
+			end
 			myFrame:Show()
 		end
 		return retvalue
@@ -204,7 +239,7 @@ function lib.AdjustProtection ()
 			print ("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		end
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
-		if AuctionFrame:IsShown() then 
+		if AuctionFrame:IsVisible() then 
 			AuctionFrame.IsShown = function() end 
 			ShowUIPanel(AuctionFrame, 1) 
 			AuctionFrame.IsShown = nil 
@@ -214,7 +249,7 @@ function lib.AdjustProtection ()
 			print ("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		end
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
-		if AuctionFrame:IsShown() then 
+		if AuctionFrame:IsVisible() then 
 			AuctionFrame.IsShown = function() end 
 			ShowUIPanel(AuctionFrame, 1) 
 			AuctionFrame.IsShown = nil 
@@ -223,7 +258,7 @@ function lib.AdjustProtection ()
 		if debug == "debug_on" then
 			print ("Disabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		end
-		if AuctionFrame:IsShown() then
+		if AuctionFrame:IsVisible() then
 			AuctionFrame.Hide = function() end 
 			HideUIPanel(AuctionFrame) 
 			AuctionFrame.Hide = nil 
@@ -251,9 +286,15 @@ myFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
 --our code will fire.
 myFrame:SetScript("OnEvent", function(name, event, addon)
 	if addon=="Blizzard_AuctionUI" and event=="ADDON_LOADED" then
+		if debug == "debug_on" then
+			print "Blizz AuctionUI loaded"
+		end
 		myFrame:Show()
 --		AuctionFrame:HookScript("OnShow", function () return myFrame:Show() end)
 	elseif event=="AUCTION_HOUSE_SHOW" then
+		if debug == "debug_on" then
+			print "Auction House was shown"
+		end
 		myFrame:Show()
 	end
 end)
