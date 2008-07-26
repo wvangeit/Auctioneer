@@ -49,6 +49,12 @@ function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Searches")
 
+	if not (Enchantrix and Enchantrix.Storage) then
+		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
+		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with Disenchant")
+		return
+	end
+
 	gui:AddControl(id, "Header",     0,      "Disenchant search criteria")
 
 	local last = gui:GetLast(id)
