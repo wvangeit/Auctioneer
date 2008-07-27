@@ -60,6 +60,10 @@ end
 
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	
+	-- EasyBuyout Addon 
+	AucAdvanced.Settings.SetDefault("util.EasyBuyoutAddon.active", true)
+	
 	-- EasyBuyout Default Settings
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", false)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.modifier.active", true)
@@ -103,9 +107,13 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
-
+	
+	
+	--Entire Addon
+	gui:AddControl(id, "Checkbox", 0,1,"util.EasyBuyoutAddon.active", "Enable Addon")	 	
+	
 	-- EasyBuyout
-	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Header",     0,    "EasyBuyout options")
 	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box!")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.active", "Enable EasyBuyout")
     gui:AddTip(id, "Ticking this box will enable or disable EasyBuyout")
@@ -153,6 +161,9 @@ function private.SetupConfigGui(gui)
 end
 
 function private.BrowseButton_OnClick(...)
+	if not get("util.EasyBuyoutAddon.active") then
+		return orig_AB_OC(...)
+	end
     -- check for EB enabled
     if not get("util.EasyBuyout.active") then
         return orig_AB_OC(...)
@@ -196,6 +207,10 @@ function private.BrowseButton_OnClick(...)
 end
 
 function private.EasyBuyout()
+	if not get("util.EasyBuyoutAddon.active") then
+		return
+	end
+
     if not AuctionFrame then return end
     
     if get("util.EasyBuyout.shift.active") then
@@ -204,7 +219,7 @@ function private.EasyBuyout()
         addShift = false;
     end
     
-    if get("util.EasyBuyout.active") then
+    --if get("util.EasyBuyout.active") then
        for i=1,50 do
             local button = _G["BrowseButton"..i]
             if not button then break end
@@ -212,10 +227,10 @@ function private.EasyBuyout()
             _G["BrowseButton"..i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			button:SetScript("ondoubleclick", private.NewOnDoubleClick)
         end
-    else
+    --else
     
-        return;
-    end
+       -- return;
+    --end
 end
 
 
@@ -260,6 +275,10 @@ local function NewOnClick(self, button)
 end
 
 function private.EasyCancelMain()
+	if not get("util.EasyBuyoutAddon.active") then
+		return
+	end
+
 	for i=1,199 do
 		local button = _G["AuctionsButton"..i]
 		if not button then break end
@@ -270,6 +289,9 @@ function private.EasyCancelMain()
 end
 
 function private.EasyCancel(self, button)
+	if not get("util.EasyBuyoutAddon.active") then
+		return
+	end
 	local link = GetAuctionItemLink("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
 	if link then
 		local _,_,count = GetAuctionItemInfo("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
@@ -288,6 +310,10 @@ end
 
 
 function private.NewOnDoubleClick(self, button)
+
+	if not get("util.EasyBuyoutAddon.active") then
+		return
+	end
 	-- check for EBid enabled
     if not get("util.EasyBuyout.EBid.active") then
         return
