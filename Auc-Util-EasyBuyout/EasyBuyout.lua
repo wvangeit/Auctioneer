@@ -73,6 +73,13 @@ function lib.OnLoad()
 	
 	-- EasyBid Default Settings
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EBid.active", false)
+	
+	-- EasyGoldLimit Default Settings
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.active", false)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.limit", 100000)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.active", false)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.limit", 50000)
+	
 	--This settting will be used to turn off the module for current users until THEY choose to activate it
 	--this will give us a new user friendly default state for builds past AuctioneerAdvancedSuite-5.0.PRE.3164
 	--Remove this function once on or two builds have been released.
@@ -120,6 +127,7 @@ function private.SetupConfigGui(gui)
     gui:AddTip(id, "Select your key modifier for EasyBuyout")
 	
  	-- EasyCancel
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Header",		0,		"EasyCancel options")
 	gui:AddControl(id, "Subhead",		   0,   "Simply right-click an auction to cancel it out with no confirmation box!")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.active", "Enable EasyCancel")
@@ -134,10 +142,23 @@ function private.SetupConfigGui(gui)
     gui:AddTip(id, "Select your key modifier for EasyCancel")
 	
 	-- EasyBid
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Header",		0,		"EasyBid options")
 	gui:AddControl(id, "Subhead",		   0,   "Simply double-click an auction to bid minimum on it!")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EBid.active", "Enable EasyBid")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyBid")
+	
+	-- EasyGoldLimit
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Header", 0, "EasyGoldLimit options")
+	gui:AddControl(id, "Subhead", 0, "Places a limit on EasyBid and EasyBuyout to prevent accidental purchases of expensive auctions")
+	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBuy.active", "Enable EasyGoldLimit for EasyBuyout")
+	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBuyout")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBuy.limit", 0, 999999999, "Set EasyBuyout Limit")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBid.active", "Enable EasyGoldLimit for EasyBid")
+	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBid")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBid.limit", 0, 999999999, "Set EasyBid Limit")
 	
 	-- help sections
     gui:AddHelp(id, "What is EasyBuyout?",
@@ -151,6 +172,10 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "What is EasyBid?",
 		"What is EasyBid?",
 		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers because of the use of \"left-click\". It conflicts with other parts of auctioneer.")
+		
+	gui:AddHelp(id, "What is EasyGoldLimit?",
+		"What is EasyGoldLimit",
+		"This does exactly what the name implies, it places a limit on the amount of gold that will be allowed to be used when bidding or buying an auction. Helps prevent spending more than intended on an auction")
 end
 
 function private.BrowseButton_OnClick(...)
@@ -223,6 +248,15 @@ end
 function private.EasyBuyoutAuction()
     local EasyBuyoutIndex = GetSelectedAuctionItem("list");
     local EasyBuyoutPrice = select(9, GetAuctionItemInfo("list", EasyBuyoutIndex))
+	
+	-- Easy Gold Limit for EasyBuyout
+	if get("util.EasyBuyout.EGL.EBuy.active") then
+		if EasyBuyoutPrice > get("util.EasyBuyout.EGL.EBuy.limit") then
+			ChatFrame1:AddMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBuyout!")
+			return;
+		end
+	end
+	
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
 end
@@ -291,7 +325,6 @@ end
 
 
 function private.NewOnDoubleClick(self, button)
-
 	-- check for EBid enabled
     if not get("util.EasyBuyout.EBid.active") then
         return
@@ -323,11 +356,20 @@ function private.NewOnDoubleClick(self, button)
 end
 
 function private.EasyBidAuction(getID)
-    local EasyBuyoutPrice = select(10, GetAuctionItemInfo("list", getID)) + select(8, GetAuctionItemInfo("list", getID))
-	if EasyBuyoutPrice == 0 then
-		EasyBuyoutPrice = EasyBuyoutPrice + select(7, GetAuctionItemInfo("list", getID))
+    local EasyBidPrice = select(10, GetAuctionItemInfo("list", getID)) + select(8, GetAuctionItemInfo("list", getID))
+	if EasyBidPrice == 0 then
+		EasyBidPrice = EasyBidPrice + select(7, GetAuctionItemInfo("list", getID))
 	end
-	PlaceAuctionBid("list", getID, EasyBuyoutPrice)
+	
+	-- Easy Gold Limit for EasyBid
+	if get("util.EasyBuyout.EGL.EBid.active") then
+		if EasyBidPrice > get("util.EasyBuyout.EGL.EBid.limit") then
+			ChatFrame1:AddMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBid!")
+			return;
+		end
+	end
+	
+	PlaceAuctionBid("list", getID, EasyBidPrice)
     CloseAuctionStaticPopups();
 end
 
