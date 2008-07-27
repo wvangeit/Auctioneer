@@ -35,11 +35,22 @@
 local libType, libName = "Stat", "Histogram"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
+local print,decode,recycle,acquire,clone,_,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
+
+--scrub(mytable)
+--clears out all keys in mytable
+--doesn't go into multi-level scrubbing, because we don't need to scrub multi-level tables in this module
+local function scrub(mytable)
+	for i in pairs(mytable) do
+		mytable[i] = nil
+	end
+end
 
 local data
-private.stattable = {} --this table will get reused
-private.PDcurve = {}
+local stattable = {}
+local PDcurve = {}
+local newstats = {}
+local array = {}
 
 function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
@@ -68,37 +79,37 @@ function lib.Processor(callbackType, ...)
 end
 
 function private.GetPriceData()
-	if not private.stattable["count"] then
+	if not stattable["count"] then
 		debugPrint("GetPriceData: No stattable", libType.."-"..libName)
 		return
 	end
 	local median = 0
 	local Qone = 0
 	local Qthree = 0
-	local count = private.stattable["count"]
-	debugPrint("getPricedata: "..tostring(private.stattable["count"]), libType.."-"..libName)
+	local count = stattable["count"]
+	debugPrint("getPricedata: "..tostring(stattable["count"]), libType.."-"..libName)
 	local recount = 0
 	--now find the Q1, median, and Q3 values
-	for i = private.stattable["min"], private.stattable["max"] do
-		recount = recount + (private.stattable[i] or 0)
+	for i = stattable["min"], stattable["max"] do
+		recount = recount + (stattable[i] or 0)
 		if Qone == 0 and count > 4 then --Q1 is meaningless with very little data
 			if recount >= count/4 then
-				Qone = i*private.stattable["step"]
+				Qone = i*stattable["step"]
 			end
 		elseif median == 0 then
 			if recount >= count/2 then
-				median = i*private.stattable["step"]
+				median = i*stattable["step"]
 			end
 		elseif Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
 			if recount >= count * 3/4 then
-				Qthree = i*private.stattable["step"]
+				Qthree = i*stattable["step"]
 				break
 			end
 		else
 			break
 		end
 	end
-	local step = private.stattable["step"]
+	local step = stattable["step"]
 	local refactored = false
 	if count > 30 then --we've seen enough to get a fairly decent price to base the precision on
 		if (step > (median/150)) and (step > 1) then
@@ -113,7 +124,7 @@ function private.GetPriceData()
 end
 
 function lib.GetPrice(link, faction)
-	scrub(private.stattable)
+	scrub(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -132,7 +143,7 @@ function lib.GetPrice(link, faction)
 		median, Qone, Qthree, step, count = private.GetPriceData()
 	end
 	--we're done with the data, so clear the table
-	scrub(private.stattable)
+	scrub(stattable)
 	return median, Qone, Qthree, step, count
 end
 
@@ -141,12 +152,9 @@ function lib.GetPriceColumns()
 	return "Median", "Q1", "Q3", "step", "Seen"
 end
 
-local array = {}
 function lib.GetPriceArray(link, faction)
-	--check that array is empty
-	if #array > 0 then
-		scrub(array)
-	end
+	--make sure that array is empty
+	scrub(array)
 	local median, Qone, Qthree, step, count = lib.GetPrice(link, faction)
 	--these are the two values that GetMarketPrice cares about
 	array.price = median
@@ -162,17 +170,17 @@ function lib.GetPriceArray(link, faction)
 end
 
 function private.ItemPDF(price)
-	if not private.PDcurve["step"] then return 0 end
-	local index = math.floor(price/private.PDcurve["step"])
-	if (index >= private.PDcurve["min"]) and (index <= private.PDcurve["max"]) then
-		return private.PDcurve[index]
+	if not PDcurve["step"] then return 0 end
+	local index = math.floor(price/PDcurve["step"])
+	if (index >= PDcurve["min"]) and (index <= PDcurve["max"]) then
+		return PDcurve[index]
 	else
 		return 0
 	end
 end
 
 function lib.GetItemPDF(link, faction)
-	scrub(private.PDcurve)
+	scrub(PDcurve)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -196,24 +204,24 @@ function lib.GetItemPDF(link, faction)
 	local area = 0
 	local targetarea = math.min(1, count/30) --if count is less than thirty, we're not very sure about the price
 	
-	private.PDcurve["step"] = step
-	private.PDcurve["min"] = private.stattable["min"]
-	private.PDcurve["max"] = private.stattable["max"]
+	PDcurve["step"] = step
+	PDcurve["min"] = stattable["min"]
+	PDcurve["max"] = stattable["max"]
 	
-	for i = private.stattable["min"], private.stattable["max"] do
-		curcount = curcount + private.stattable[i]
-		private.PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
-		area = area + step*private.PDcurve[i]
+	for i = stattable["min"], stattable["max"] do
+		curcount = curcount + stattable[i]
+		PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+		area = area + step*PDcurve[i]
 	end
 	
 	local areamultiplier = 1
 	if area > 0 then
 		areamultiplier = targetarea/area
 	end
-	for i = private.PDcurve["min"], private.PDcurve["max"] do
-		private.PDcurve[i]= private.PDcurve[i] * areamultiplier
+	for i = PDcurve["min"], PDcurve["max"] do
+		PDcurve[i]= PDcurve[i] * areamultiplier
 	end
-	return private.ItemPDF, private.PDcurve["min"], private.PDcurve["max"]
+	return private.ItemPDF, PDcurve["min"], PDcurve["max"]
 end
 
 lib.ScanProcessors = {}
@@ -238,45 +246,45 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	scrub(private.stattable)
+	scrub(stattable)
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
 	if not data[faction][itemId] then data[faction][itemId] = {} end
 	if data[faction][itemId][property] then
 		private.UnpackStats(data[faction][itemId][property])
 	end
-	if not private.stattable["count"] then
+	if not stattable["count"] then
 		--start out with first 20 prices pushing max to 100.  This should help prevent losing data due to the first price being way too low
 		--also keeps data small initially, as we don't need extremely accurate prices with that little data
-		private.stattable["step"] = math.ceil(buyout / 100)
-		private.stattable["count"] = 0
+		stattable["step"] = math.ceil(buyout / 100)
+		stattable["count"] = 0
 	end
-	priceindex = math.ceil(buyout / private.stattable["step"])
-	if priceindex <= 750 or private.stattable["count"] <= 20 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
-		private.stattable["count"] = private.stattable["count"] + 1
-		if not private.stattable["min"] then --first time we've seen this
-			private.stattable["min"] = priceindex
-			private.stattable["max"] = priceindex
-			private.stattable[priceindex] = 0
-		elseif private.stattable["min"] > priceindex then
-			for i = priceindex, (private.stattable["min"]-1) do
-				private.stattable[i] = 0
+	priceindex = math.ceil(buyout / stattable["step"])
+	if priceindex <= 750 or stattable["count"] <= 20 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
+		stattable["count"] = stattable["count"] + 1
+		if not stattable["min"] then --first time we've seen this
+			stattable["min"] = priceindex
+			stattable["max"] = priceindex
+			stattable[priceindex] = 0
+		elseif stattable["min"] > priceindex then
+			for i = priceindex, (stattable["min"]-1) do
+				stattable[i] = 0
 			end
-			private.stattable["min"] = priceindex
-		elseif private.stattable["max"] < priceindex then
-			for i = (private.stattable["max"]+1),priceindex do
-				private.stattable[i] = 0
+			stattable["min"] = priceindex
+		elseif stattable["max"] < priceindex then
+			for i = (stattable["max"]+1),priceindex do
+				stattable[i] = 0
 			end
-			private.stattable["max"] = priceindex
+			stattable["max"] = priceindex
 		end
-		if not private.stattable[priceindex] then private.stattable[priceindex] = 0 end
-		private.stattable[priceindex] = private.stattable[priceindex] + 1
-		if private.stattable["count"] <= 20 and private.stattable["max"] > 100 then
+		if not stattable[priceindex] then stattable[priceindex] = 0 end
+		stattable[priceindex] = stattable[priceindex] + 1
+		if stattable["count"] <= 20 and stattable["max"] > 100 then
 			private.refactor(buyout, 100)--we're still on initial data collection, so shrink it back down
 		end
 		data[faction][itemId][property] = private.PackStats()
 	end
-	scrub(private.stattable)
+	scrub(stattable)
 end
 
 function private.SetupConfigGui(gui)
@@ -385,23 +393,23 @@ function private.makeData()
 end
 
 function private.UnpackStats(dataItem)
-	scrub(private.stattable)
+	scrub(stattable)
 	if dataItem then
 		local firstvalue, maxvalue, step, count, newdataItem = strsplit(";",dataItem)
 		if not newdataItem then
 			debugPrint("Unpack: dataItem only 4 long", libType.."-"..libName)
 			return
 		end
-		private.stattable["min"] = tonumber(firstvalue)
-		private.stattable["max"] = tonumber(maxvalue)
-		private.stattable["step"] = tonumber(step)
-		private.stattable["count"] = tonumber(count)
-		local index = private.stattable["min"]
+		stattable["min"] = tonumber(firstvalue)
+		stattable["max"] = tonumber(maxvalue)
+		stattable["step"] = tonumber(step)
+		stattable["count"] = tonumber(count)
+		local index = stattable["min"]
 		if not index then
 			print(dataItem)
 		end
 		for n in newdataItem:gmatch("[0-9]+") do
-			private.stattable[index] = tonumber(n)
+			stattable[index] = tonumber(n)
 			index = index + 1
 		end
 	else
@@ -412,11 +420,11 @@ end
 function private.PackStats()
 	local tempstr = ""
 	local datastr = ""
-	local imin = private.stattable["min"]
-	tempstr = strjoin(";",imin,private.stattable["max"], private.stattable["step"], private.stattable["count"])
-		datastr = tostring(private.stattable[imin] or 0)--this gets rid of the string starting as ",1,0,0..."
-	for i = imin+1,private.stattable["max"] do
-		datastr = datastr..","..tostring(private.stattable[i] or 0)
+	local imin = stattable["min"]
+	tempstr = strjoin(";",imin,stattable["max"], stattable["step"], stattable["count"])
+		datastr = tostring(stattable[imin] or 0)--this gets rid of the string starting as ",1,0,0..."
+	for i = imin+1,stattable["max"] do
+		datastr = datastr..","..tostring(stattable[i] or 0)
 	end
 	tempstr = tempstr..";"..datastr
 	return tempstr
@@ -431,35 +439,34 @@ end
 --called by the GetPrice function when price is detected as being too far off an index of 250
 --Also called when adding new data early on that would push the max up.
 function private.refactor(pmax, precision)
-	if type(private.stattable) ~= "table" or type(pmax)~="number" or pmax == 0 then
+	if type(stattable) ~= "table" or type(pmax)~="number" or pmax == 0 then
 		return
 	end
-	local newstats = {}
+	scrub(newstats)
 	newstats["step"] = math.ceil(pmax/precision)
-	local conversion = private.stattable["step"]/newstats["step"]
-	newstats["min"] = math.ceil(conversion*private.stattable["min"])
-	newstats["max"] = math.ceil(conversion*private.stattable["max"])
+	local conversion = stattable["step"]/newstats["step"]
+	newstats["min"] = math.ceil(conversion*stattable["min"])
+	newstats["max"] = math.ceil(conversion*stattable["max"])
 	local count = 0
 	if newstats["max"] > 750 then
 		--we need to crop off the top end
 		newstats["max"] = 750
-		private.stattable["max"] = math.floor(750/conversion)
+		stattable["max"] = math.floor(750/conversion)
 	end
 	for i = newstats["min"], newstats["max"] do
 		newstats[i] = 0
 	end
-	for i = private.stattable["min"], private.stattable["max"] do
+	for i = stattable["min"], stattable["max"] do
 		local j = math.ceil(conversion*i)
 		if not newstats[j] then newstats[j] = 0 end
-		newstats[j]= newstats[j] + private.stattable[i]
-		count = count + private.stattable[i]
+		newstats[j]= newstats[j] + stattable[i]
+		count = count + stattable[i]
 	end
-	scrub(private.stattable)
+	scrub(stattable)
 	for i,j in pairs(newstats) do
-		private.stattable[i] = j
+		stattable[i] = j
 	end
-	private.stattable["count"] = count
-	recycle(newstats)
+	stattable["count"] = count
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
