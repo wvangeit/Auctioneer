@@ -66,166 +66,197 @@ local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdva
 	more complete specification.
 ]]
 
-local cache = {};
-local pdfList = {};
-local warned  = {};
-local tremove = table.remove;
-local tinsert = table.insert;
-local abs = math.abs;
-local floor = math.floor;
-local ERROR = 0.05;
-local GetSetting = AucAdvanced.Settings.GetSetting;
--- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
---[[
-	This function acquires the current market value of the mentioned item using
-	a configurable algorithm to process the data used by the other installed
-	algorithms.
-    
-    The returned value is the most probable value that the item is worth
-    using the algorithms in each of the STAT modules as specified
-    by the GetItemPDF() function.
+do
+    local cache = {};
+    local pdfList = {};
+    local engines = {};
+    local tremove = table.remove;
+    local tinsert = table.insert;
+    local abs = math.abs;
+    local floor = math.floor;
+    local ERROR = 0.05;
+    local GetSetting = AucAdvanced.Settings.GetSetting;
+    local GetItemInfo = GetItemInfo;
+    local type = type;
+    local pairs, ipairs = pairs, ipairs;
+    local GetCVar = GetCVar;
+    local assert = assert;
+    -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
+    --[[
+        This function acquires the current market value of the mentioned item using
+        a configurable algorithm to process the data used by the other installed
+        algorithms.
+        
+        The returned value is the most probable value that the item is worth
+        using the algorithms in each of the STAT modules as specified
+        by the GetItemPDF() function.
 
-	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
-]]
-function lib.GetMarketValue(itemLink, serverKey)
-    ERROR = GetSetting("marketvalue.accuracy");
-    local _;
-    if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
-    if not itemLink then return; end
-    
-    -- Look up in the cache if it's recent enough
-    local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
-    if cacheTable then
-        return cacheTable.value, cacheTable.seen, cacheTable.stats;
-    end
-    
-	-- Clear out the PDF list
-    while tremove(pdfList) do end           -- remove all items from table
-    
-    local upperLimit, lowerLimit, seen = 0, 1e11, 0;
-    
-    -- Run through all of the stat modules and get the PDFs 
-    for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-        local fn = engineLib.GetItemPDF;
-        if fn then
-            local i, min, max = fn(itemLink, serverKey);
-            local priceArray = engineLib.GetPriceArray(itemLink, serverKey);
+        AucAdvanced.API.GetMarketValue(itemLink, serverKey)
+    ]]
+    function lib.GetMarketValue(itemLink, serverKey)
+        ERROR = GetSetting("marketvalue.accuracy");
+        local _;
+        if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
+        if not itemLink then return; end
+        
+        -- Look up in the cache if it's recent enough
+        local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
+        if cacheTable then
+            return cacheTable.value, cacheTable.seen, cacheTable.stats;
+        end
+        
+            
+        local upperLimit, lowerLimit, seen = 0, 1e11, 0;
+        
+        -- Rebuild the engine cache
+        if #engines == 0 then
+            for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+                local fn = engineLib.GetItemPDF;
+                if fn then
+                    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
+                elseif nLog then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engine.."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+                end
+            end
+        end
+        
+        -- Run through all of the stat modules and get the PDFs 
+        local c, oldPdfMax = 0, #pdfList;
+        for _, engine in ipairs(engines) do
+            local i, min, max = engine.pdf(itemLink, serverKey);
+            local priceArray = engine.array(itemLink, serverKey);
             
             if priceArray and (priceArray.seen or 0) > seen then
                 seen = priceArray.seen;
             end
             
-            if i then
-                tinsert(pdfList, i);
+            if i then   -- pdfList[++c] = i;
+                c = c + 1;
+                pdfList[c] =  i;
                 if min < lowerLimit then lowerLimit = min; end
                 if max > upperLimit then upperLimit = max; end
             end
-        elseif not warned[engine] and nLog then
-            warned[engine] = true;
-            nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engine.."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
-        end
-    end
-    
-    assert(lowerLimit > -1/0 and upperLimit < 1/0);
-    
-   
-    
-    -- Ok, integrate from -10G to 10000G through all functions
-    local total, lastTotal = 0, 0;
-    local delta = (upperLimit - lowerLimit) * .01;
-    
-    
-    if #pdfList == 0 or delta < 0.000001 then
-        return;                 -- No PDFs available for this item
-    end
-    
-    repeat
-    
-        lastTotal = total;
-        total = 0;
-        delta = delta * 0.75;
-               
-        for i = 1, #pdfList do
-            local thisCall = pdfList[i];
-            for x = lowerLimit, upperLimit, delta do
-                total = total + thisCall(x);
-            end
         end
         
-        total = total * delta;
-        
-        if total ~= total or total == 0 then
-            if nLog and total ~= total then
-                nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-            elseif nLog then
-                nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-            end
-            return;                 -- Cannot calculate: NaN
+        -- Clean out extras if needed
+        for i = c+1, oldPdfMax do
+            pdfList[i] = nil;
         end
         
-    until abs(total-lastTotal)/total < ERROR;
-    
-    local limit = total/2;
-    local midpoint, lastMidpoint = 0, 0;
-    
-    -- Now find the 50% point
-    total = 0;
-
-    repeat
-        lastMidpoint = midpoint;
-        total = 0;
-    
-        for x = lowerLimit, upperLimit, delta do
+        
+        assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..GetItemInfo(itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
+        
+       
+        
+        -- Ok, integrate from -10G to 10000G through all functions
+        local total, lastTotal = 0, 0;
+        local delta = (upperLimit - lowerLimit) * .01;
+        
+        
+        if #pdfList == 0 or delta < 0.000001 then
+            return;                 -- No PDFs available for this item
+        end
+        
+        repeat
+        
+            lastTotal = total;
+            total = 0;
+            delta = delta * 0.75;
+            
+            assert(delta > 0, "Infinite loop detected on pass 1 of market pricing for "..GetItemInfo(itemLink));
+                   
             for i = 1, #pdfList do
-                total = total + pdfList[i](x) * delta;
+                local thisCall = pdfList[i];
+                for x = lowerLimit, upperLimit, delta do
+                    total = total + thisCall(x);
+                end
             end
             
-            if total > limit then
-                midpoint = x;
-                break;
+            total = total * delta;
+            
+            if total ~= total or total == 0 then
+                if nLog and total ~= total then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                elseif nLog then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                end
+                return;                 -- Cannot calculate: NaN
             end
-        end
+            
+        until abs(total-lastTotal)/total < ERROR;
         
-        delta = delta * 0.8;
+        local limit = total/2;
+        local midpoint, lastMidpoint = 0, 0;
         
-        if midpoint ~= midpoint or midpoint == 0 then
-            if nLog and midpoint ~= midpoint then
-                nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-            elseif nLog then
-                nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+        -- Now find the 50% point
+        total = 0;
+
+        repeat
+            lastMidpoint = midpoint;
+            total = 0;
+            
+            assert(delta > 0, "Infinite loop detected on pass 2 of market pricing for "..GetItemInfo(itemLink));
+        
+            for x = lowerLimit, upperLimit, delta do
+                for i = 1, #pdfList do
+                    total = total + pdfList[i](x) * delta;
+                end
+                
+                if total > limit then
+                    midpoint = x;
+                    break;
+                end
             end
-            return;                 -- Cannot calculate: NaN
-        end        
+            
+            delta = delta * 0.8;
+            
+            if midpoint ~= midpoint or midpoint == 0 then
+                if nLog and midpoint ~= midpoint then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                elseif nLog then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                end
+                return;                 -- Cannot calculate: NaN
+            end        
+            
+        until abs(midpoint - lastMidpoint)/midpoint < ERROR;
         
-    until abs(midpoint - lastMidpoint)/midpoint < ERROR;
+        
+        if midpoint and midpoint > 0 then
+            midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
+            
+            -- Cache before finishing up
+            local cacheTable = {}
+            cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
+            cacheTable.time = GetTime();
+            cacheTable.value = midpoint;
+            cacheTable.seen = seen;
+            cacheTable.stats = #pdfList;
+            
+            
+            return midpoint, seen, #pdfList;
+        else
+            if nLog then
+                nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "No midpoint was detected for item "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+            end
+            return;
+        end 
+
+    end
     
-    
-	if midpoint and midpoint > 0 then
-        midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
-        
-        -- Cache before finishing up
-        local cacheTable = {}
-        cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
-        cacheTable.time = GetTime();
-        cacheTable.value = midpoint;
-        cacheTable.seen = seen;
-        cacheTable.stats = #pdfList;
-        
-        
-        return midpoint, seen, #pdfList;
-    else
-        if nLog then
-            nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "No midpoint was detected for item "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+    -- Now hook NewModule so that we clear the engine cache when a new module comes into play
+    local oldNewModule = AucAdvanced.NewModule;
+    AucAdvanced.NewModule = function(...)
+        engines = {};               -- Clear the engine list
+        return oldNewModule(...);   -- Tailcall original function
+    end
+
+
+    -- Clears the cache for AucAdvanced.API.GetMarketValue()
+    function lib.ClearMarketCache()
+        for x = 1, #cache do
+            cache[x] = nil;
         end
-		return;
-	end 
-
-end
-
--- Clears the cache for AucAdvanced.API.GetMarketValue()
-function lib.ClearMarketCache()
-    for x = 1, #cache do
-        cache[x] = nil;
     end
 end
 
