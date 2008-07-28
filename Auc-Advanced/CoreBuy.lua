@@ -101,7 +101,7 @@ function lib.PushSearch()
 	if (private.CurAuction["buyout"] > 0) and (private.CurAuction["price"] > private.CurAuction["buyout"]) then
 		private.CurAuction["price"] = private.CurAuction["buyout"]
 	end
-	private.CurAuction["reason"] = private.BuyRequests[1][7]
+	private.CurAuction["reason"] = private.BuyRequests[1][7] or ""
 	table.remove(private.BuyRequests, 1)
 	local canbuy, reason = lib.CanBuy(private.CurAuction["price"], private.CurAuction["sellername"])
 	if not canbuy then
@@ -167,6 +167,7 @@ function private.PromptPurchase()
 	end
 	private.Prompt.Value:SetText(private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
+	private.Prompt.Reason:SetText(private.CurAuction["reason"])
 	local width = private.Prompt.Value:GetStringWidth() or 0
 	private.Prompt:SetWidth(math.max((width + 70), 400))
 end
@@ -184,7 +185,7 @@ function lib.ScanPage()
 				print("Unable to bid on "..link..". Already highest bidder")
 				private.CurAuction = {}
 			end
-			if ((not owner) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"])) 
+			if ((not owner) or (not private.CurAuction["sellername"]) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"])) 
 			and (not ishigh)
 			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"]) 
 			and (buyout == private.CurAuction["buyout"]) then --found the auction we were looking for
@@ -219,6 +220,7 @@ function private.PerformPurchase()
 
 	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
 	
+	private.CurAuction["reason"] = private.Prompt.Reason:GetText()
 	--Add bid to list of bids we're watching for
 	local pendingBid = clone(private.CurAuction)
 	table.insert(private.PendingBids, pendingBid)
@@ -358,7 +360,7 @@ private.Prompt = CreateFrame("frame", "AucAdvancedBuyPrompt", UIParent)
 private.Prompt:Hide()
 private.Prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
 private.Prompt:SetFrameStrata("DIALOG")
-private.Prompt:SetHeight(100)
+private.Prompt:SetHeight(120)
 private.Prompt:SetWidth(400)
 private.Prompt:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -388,6 +390,22 @@ private.Prompt.Text:SetJustifyH("CENTER")
 
 private.Prompt.Value = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 private.Prompt.Value:SetPoint("TOP", private.Prompt.Text, "BOTTOM", -3)
+
+private.Prompt.Reason = CreateFrame("EditBox", "AucAdvancedBuyPromptReason", private.Prompt, "InputBoxTemplate")
+private.Prompt.Reason:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 150, -55)
+private.Prompt.Reason:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -30, -55)
+private.Prompt.Reason:SetHeight(20)
+private.Prompt.Reason:SetAutoFocus(false)
+private.Prompt.Reason:SetScript("OnEnterPressed", function()
+	private.Prompt.Reason:ClearFocus()
+	end)
+private.Prompt.Reason:SetText("")
+
+private.Prompt.Reason.Label = private.Prompt.Reason:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+private.Prompt.Reason.Label:SetPoint("TOPRIGHT", private.Prompt.Reason, "TOPLEFT", 0, 0)
+private.Prompt.Reason.Label:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 52, -55)
+private.Prompt.Reason.Label:SetText("Reason:")
+private.Prompt.Reason.Label:SetHeight(15)
 
 private.Prompt.Yes = CreateFrame("Button", "AucAdvancedBuyPromptYes", private.Prompt, "OptionsButtonTemplate")
 private.Prompt.Yes:SetText("Yes")
