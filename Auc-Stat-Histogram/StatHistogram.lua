@@ -313,6 +313,7 @@ function private.SetupConfigGui(gui)
 
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    "Histogram options")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.tooltip", "Show Histogram stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Histogram module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.median", "Display Median")
@@ -321,6 +322,9 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of 'IQR' calculation in tooltips on or off.  See help for further explanation.")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.precision", "Display Precision")
 	gui:AddTip(id, "Toggle display of 'precision' calculation in tooltips on or off")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.quantmul", "Multiply by Stack Size")
+	gui:AddTip(id, "Multiplies by current Stack Size if on")
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
@@ -332,18 +336,27 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 		return
 	end
 	
-	if not quantity or quantity < 1 then quantity = 1 end
+	local quantmul = get("stat.histogram.quantmul")
+	if (not quantmul) or (not quantity) or (quantity < 1) then quantity = 1 end
 	local median, Qone, Qthree, step, count = lib.GetPrice(hyperlink)
 	if not count then
 		count = 0
 	end
 	if median then
-		EnhTooltip.AddLine(libName.." prices: (seen "..tostring(count)..")")
+		if quantity == 1 then
+			EnhTooltip.AddLine(libName.." prices: (seen "..tostring(count)..")")
+		else
+			EnhTooltip.AddLine(libName.." prices x"..tostring(quantity)..": (seen "..tostring(count)..")")
+		end
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		local iqr = Qthree-Qone
 		if get("stat.histogram.median") then
 			EnhTooltip.AddLine("  median:", median*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			if quantity > 1 then
+				EnhTooltip.AddLine("   (or individually):", median)
+				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			end
 		end
 		if (iqr > 0) and (get("stat.histogram.iqr")) then
 			EnhTooltip.AddLine("  IQR:", iqr*quantity)
@@ -364,6 +377,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.histogram.median", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.iqr", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.precision", true)
+	AucAdvanced.Settings.SetDefault("stat.histogram.quantmul", true)
 end
 
 function lib.ClearItem(hyperlink, faction)
