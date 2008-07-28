@@ -924,7 +924,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		local reserve = lib.GetSetting("reserve") or 1
 		local balance = GetMoney()
 		
-		if (cost <= maxprice) and (balance > reserve) then
+		if (cost <= maxprice) and ((balance-cost) > reserve) then
 			--Check to see whether the item already exists in the results table
 			local isdupe = false
 			if not nodupes then
