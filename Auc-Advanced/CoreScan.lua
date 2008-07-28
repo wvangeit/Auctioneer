@@ -646,7 +646,7 @@ Commitfunction = function()
 					sameRecoveredCount = sameRecoveredCount + 1
 				end
 			end
-			scandata.image[itemPos] = {data}
+			scandata.image[itemPos] = replicate(data)
 		else
 			if (processStats("create", data)) then
 				data[Const.ID] = private.GetNextID(idList)
