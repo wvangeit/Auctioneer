@@ -880,7 +880,7 @@ function public.AddLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(private.embedLines, private.reuse(text))
+		table.insert(private.embedLines, {text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -933,7 +933,7 @@ function public.AddHeaderLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(private.embedLines, curHeader, private.reuse(text))
+		table.insert(private.embedLines, curHeader, {text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -978,7 +978,7 @@ end
 function public.AddSeparator(embed)
 	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
-		table.insert(private.embedLines, private.reuse(" "))
+		table.insert(private.embedLines, {" "})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -1099,7 +1099,7 @@ function private.DoHyperlink(reference, link, button)
 			local callRes = private.TooltipCall(true, ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #private.embedLines > 0
-				private.oldChatItem = private.reuse(reference, link, button, hasEmbed)
+				private.oldChatItem = {reference, link, button, hasEmbed}
 			elseif (callRes == false) then
 				return false
 			end
@@ -1335,7 +1335,7 @@ function private.AfHookOnEnter(funcArgs, retVal, type, index)
 			if (aiBidAmount>0) then aiNextBid = aiBidAmount + aiMinIncrement end
 
 			if not private.priceTable then
-				private.priceTable = private.reuse()
+				private.priceTable = {}
 			end
 			private.priceTable[0] = "AuctionPrices"
 			private.priceTable[1] = aiBuyoutPrice
