@@ -260,7 +260,7 @@ function lib.API.getBidReason(itemLink, quantity)
 	
 	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
 		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
-			quan, bid, Time, reason = v:match("^(.-);.*;(.-);.-;(.-);(%w*)")
+			quan, bid, Time, reason = v:match("^(.-);.*;(.-);.-;(.-);(.+)")
 						
 			if tonumber(quan) == tonumber(quantity) and reason and Time then
 				return reason, Time, tonumber(bid)
