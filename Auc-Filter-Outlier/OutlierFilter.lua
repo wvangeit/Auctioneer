@@ -35,7 +35,7 @@
 local libType, libName = "Filter", "Outlier"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local data
 
@@ -57,10 +57,8 @@ function lib.AuctionFilter(operation, itemData)
 			model = "market"
 		end
 		minseen = get("filter.outlier.minseen")
-		AucAdvanced.Recycle(cache)
-		AucAdvanced.Recycle(levels)
-		cache = AucAdvanced.Acquire()
-		levels = AucAdvanced.Acquire()
+		cache = {}
+		levels = {}
 		if get("filter.outlier.poor.enabled") then levels[0] = get("filter.outlier.poor.level")/100 end
 		if get("filter.outlier.common.enabled") then levels[1] = get("filter.outlier.common.level")/100 end
 		if get("filter.outlier.uncommon.enabled") then levels[2] = get("filter.outlier.uncommon.level")/100 end

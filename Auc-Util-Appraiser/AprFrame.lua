@@ -32,11 +32,8 @@
 
 local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
-local print = AucAdvanced.Print
 local Const = AucAdvanced.Const
-local recycle = AucAdvanced.Recycle
-local acquire = AucAdvanced.Acquire
-local clone = AucAdvanced.Clone
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local frame
 
@@ -330,8 +327,8 @@ function private.CreateFrames()
 		})
 		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 		
-		local data = acquire()
-		local style = acquire()
+		local data = {}
+		local style = {}
 		for i = 1, #results do
 			local result = results[i]
 			local tLeft = result[Const.TLEFT]
@@ -341,7 +338,7 @@ function private.CreateFrames()
 			elseif (tLeft == 4) then tLeft = "48h"
 			end
 			local count = result[Const.COUNT]
-			data[i] = acquire (
+			data[i] = {
 				result[Const.NAME],
 				result[Const.SELLER],
 				tLeft,
@@ -353,23 +350,21 @@ function private.CreateFrames()
 				result[Const.CURBID],
 				result[Const.BUYOUT],
 				result[Const.LINK]
-			)
+			}
 			local curbid = result[Const.CURBID]
 			if curbid == 0 then
 				curbid = result[Const.MINBID]
 			end
 			local r,g,b = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
 			if r then
-				style[i] = acquire()
-				style[i][1] = acquire()
-				style[i][1].textColor = acquire(r,g,b)
+				style[i] = {}
+				style[i][1] = {}
+				style[i][1].textColor = {r,g,b}
 			end
 		end
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
-		recycle(data)
-		recycle(style)
 		--reset scroll position if new items list is too short to show
 		if  not frame.imageview.sheet.rows[1][1]:IsShown() then
 			frame.imageview.sheet.panel:ScrollToCoords(0,0)
@@ -1346,7 +1341,7 @@ function private.CreateFrames()
 			end
 			
 			local bg = false
-			local obj = acquire()
+			local obj = {}
 			for i = 1, #(frame.list) do
 				local item = frame.list[i]
 				if item then

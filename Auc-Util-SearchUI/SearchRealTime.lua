@@ -33,9 +33,10 @@
 
 local lib, parent, private = AucSearchUI.NewSearcher("RealTime")
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "realtime"
+
 local Const = AucAdvanced.Const
 --default assumption is that we're not embedded.  This is checked later.
 local embedded = false

@@ -193,7 +193,6 @@ local private = {
 	showIgnore = false,
 	moneySpacing = 4,
 	embedLines = {},   -- list of all embeded lines in/for the current tooltip
-	recycleBin = {},
 	eventTimer = 0,
 	hideTime = 0,
 	currentGametip = nil, -- tooltip frame, for which our enhanced tooltip frame
@@ -356,57 +355,9 @@ function private.GetLine(line)
 	return ret
 end
 
-function private.recycle(...)
-	-- Get the passed parameter/s
-	local n = select("#", ...)
-	local tbl, key, item
-	if n == 1 then
-		item = ...
-	else
-		tbl, key = ...
-		item = tbl[key]
-	end
-
-	-- We can only clean tables
+function private.Empty(item)
 	if type(item) ~= 'table' then return end
-
-	-- Clean out any values from this table
-	for k,v in pairs(item) do
-		if type(v) == 'table' then
-			-- Recycle this table too
-			private.recycle(item, k)
-		else
-			item[k] = nil
-		end
-	end
-
-	-- If we are to clean the input value
-	if tbl and key then
-		-- Place the husk of a table in the recycle bin
-		table.insert(private.recycleBin, item)
-
-		-- Clean out the original table entry too
-		tbl[key] = nil
-	end
-end
-
-function private.reuse(...)
-	-- Get a recycled table or create a new one.
-	local item
-	if #private.recycleBin > 0 then
-		item = table.remove(private.recycleBin)
-	end
-	if not item then
-		item = {}
-	end
-
-	-- And populate it if there's any args
-	local n = select("#", ...)
-	for i = 1, n do
-		local v = select(i, ...)
-		item[i] = v
-	end
-	return item
+	for k,v in pairs(item) do item[k] = nil end
 end
 
 function private.ClearTooltip(pvt)
@@ -453,7 +404,7 @@ function private.ClearTooltip(pvt)
 
 	-- clear the embedLines table, using ipairs instead of = {} to allow
 	-- reusing old tables, which should be quite common for this table
-	private.recycle(private.embedLines)
+	private.Empty(private.embedLines)
 	debugPrint("End","ClearTooltip","Debug")
 end
 
@@ -1163,7 +1114,7 @@ function private.CheckHide()
 		private.HideTooltip(true)
 		if (HideObj and HideObj == "ItemRefTooltip") then
 			-- closing chatreferenceTT?
-			private.recycle(private.oldChatItem)
+			private.oldChatItem = nil
 		elseif private.oldChatItem then
 			-- closing another tooltip
 			-- redisplay old chatlinkdata, if it was not embeded

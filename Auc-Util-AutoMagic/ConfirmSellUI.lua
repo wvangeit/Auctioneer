@@ -28,7 +28,7 @@
 --]] 
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 
 local _, selected, selecteditem, selectedvendor, selectedappraiser, selectedwhy, selectedignored

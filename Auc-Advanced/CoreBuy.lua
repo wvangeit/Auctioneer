@@ -46,13 +46,10 @@ local lib = AucAdvanced.Buy
 local private = {}
 lib.Private = private
 
-lib.Print = AucAdvanced.Print
-local print = AucAdvanced.Print
-local recycle = AucAdvanced.Recycle
-local acquire = AucAdvanced.Acquire
-local clone = AucAdvanced.Clone
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = AucAdvanced.Const
 local _
+lib.Print = print
 
 private.BuyRequests = {}
 private.CurAuction = {}
@@ -222,7 +219,7 @@ function private.PerformPurchase()
 	
 	private.CurAuction["reason"] = private.Prompt.Reason:GetText()
 	--Add bid to list of bids we're watching for
-	local pendingBid = clone(private.CurAuction)
+	local pendingBid = replicate(private.CurAuction)
 	table.insert(private.PendingBids, pendingBid)
 	--register for the Response events if this is the first pending bid
 	if (#private.PendingBids == 1) then

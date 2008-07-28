@@ -35,16 +35,7 @@
 local libType, libName = "Stat", "Histogram"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,_,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
-
---scrub(mytable)
---clears out all keys in mytable
---doesn't go into multi-level scrubbing, because we don't need to scrub multi-level tables in this module
-local function scrub(mytable)
-	for i in pairs(mytable) do
-		mytable[i] = nil
-	end
-end
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local data
 local stattable = {}
@@ -124,7 +115,7 @@ function private.GetPriceData()
 end
 
 function lib.GetPrice(link, faction)
-	scrub(stattable)
+	empty(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -143,7 +134,7 @@ function lib.GetPrice(link, faction)
 		median, Qone, Qthree, step, count = private.GetPriceData()
 	end
 	--we're done with the data, so clear the table
-	scrub(stattable)
+	empty(stattable)
 	return median, Qone, Qthree, step, count
 end
 
@@ -154,7 +145,7 @@ end
 
 function lib.GetPriceArray(link, faction)
 	--make sure that array is empty
-	scrub(array)
+	empty(array)
 	local median, Qone, Qthree, step, count = lib.GetPrice(link, faction)
 	--these are the two values that GetMarketPrice cares about
 	array.price = median
@@ -180,7 +171,7 @@ function private.ItemPDF(price)
 end
 
 function lib.GetItemPDF(link, faction)
-	scrub(PDcurve)
+	empty(PDcurve)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -246,7 +237,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	scrub(stattable)
+	empty(stattable)
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
 	if not data[faction][itemId] then data[faction][itemId] = {} end
@@ -284,7 +275,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		end
 		data[faction][itemId][property] = private.PackStats()
 	end
-	scrub(stattable)
+	empty(stattable)
 end
 
 function private.SetupConfigGui(gui)
@@ -407,7 +398,7 @@ function private.makeData()
 end
 
 function private.UnpackStats(dataItem)
-	scrub(stattable)
+	empty(stattable)
 	if dataItem then
 		local firstvalue, maxvalue, step, count, newdataItem = strsplit(";",dataItem)
 		if not newdataItem then
@@ -456,7 +447,7 @@ function private.refactor(pmax, precision)
 	if type(stattable) ~= "table" or type(pmax)~="number" or pmax == 0 then
 		return
 	end
-	scrub(newstats)
+	empty(newstats)
 	newstats["step"] = math.ceil(pmax/precision)
 	local conversion = stattable["step"]/newstats["step"]
 	newstats["min"] = math.ceil(conversion*stattable["min"])
@@ -476,7 +467,7 @@ function private.refactor(pmax, precision)
 		newstats[j]= newstats[j] + stattable[i]
 		count = count + stattable[i]
 	end
-	scrub(stattable)
+	empty(stattable)
 	for i,j in pairs(newstats) do
 		stattable[i] = j
 	end

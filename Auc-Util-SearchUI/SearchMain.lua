@@ -34,7 +34,7 @@
 local libType, libName = "Util", "SearchUI"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local Const = AucAdvanced.Const
@@ -1000,7 +1000,7 @@ end
 local PerformSearch = function()
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
-	local scandata = clone(AucAdvanced.Scan.GetScanData())
+	local scandata = replicate((AucAdvanced.Scan.GetScanData()))
 	local speed = lib.GetSetting("searchspeed")
 	if not speed then speed = 1000 end
 	local searcher, searcherName = private.FindSearcher()
@@ -1026,7 +1026,6 @@ local PerformSearch = function()
 		end
 		lib.SearchItem(searcher.name, data, true)
 	end
-	recycle(scandata)
 	gui.frame.progressbar:Hide()
 end
 

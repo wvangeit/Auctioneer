@@ -35,7 +35,7 @@
 local libType, libName = "Stat", "Purchased"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local data
 
@@ -150,7 +150,7 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
 	
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 
-    local dataset = acquire();
+    local dataset = {}
     local count = 0
     if dayAverage then
         tinsert(dataset, dayAverage);

@@ -33,7 +33,7 @@
 local libType, libName = "Util", "ScanButton"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "scanprogress") then
@@ -102,7 +102,11 @@ function private.HookAH()
 end
 
 function private.UpdateScanProgress()
-	local scanning, paused = AucAdvanced.Scan.IsScanning(), AucAdvanced.Scan.IsPaused()
+	local scanning, paused = false, false
+	if AucAdvanced and AucAdvanced.Scan then
+		scanning, paused = AucAdvanced.Scan.IsScanning(), AucAdvanced.Scan.IsPaused()
+	end
+
 	private.ConfigChanged()
 
 	if scanning or paused then

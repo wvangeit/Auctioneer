@@ -28,7 +28,7 @@
 --]] 
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
 ---------------------------------------------------------

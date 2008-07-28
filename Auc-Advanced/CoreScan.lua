@@ -46,13 +46,9 @@ local lib = AucAdvanced.Scan
 local private = {}
 lib.Private = private
 
-lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
-local print = lib.Print
-local recycle = AucAdvanced.Recycle
-local acquire = AucAdvanced.Acquire
-local clone = AucAdvanced.Clone
-local scrub = AucAdvanced.Scrub
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+lib.Print = print
 
 private.isScanning = false
 private.curPage = 0
@@ -104,8 +100,8 @@ function lib.GetImage()
 end
 
 function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
-	if not private.scanStack then private.scanStack = acquire() end
-	local query = acquire()
+	if not private.scanStack then private.scanStack = {} end
+	local query = {}
 	name = name or ""
 	minUseLevel = tonumber(minUseLevel) or 0
 	maxUseLevel = tonumber(maxUseLevel) or 0
@@ -128,14 +124,14 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	query.page = 0
 	query.isUsable = isUsable
 	local now = GetTime()
-	table.insert(private.scanStack, acquire(now, false, 0, query, acquire(), acquire(), now, 0, now))
+	table.insert(private.scanStack, {now, false, 0, query, {}, {}, now, 0, now})
 end
 
 function lib.PushScan()
 	if private.isScanning then
 		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
-		if not private.scanStack then private.scanStack = acquire() end
-		table.insert(private.scanStack, acquire(
+		if not private.scanStack then private.scanStack = {} end
+		table.insert(private.scanStack, {
 			private.scanStartTime,
 			private.sentQuery,
 			private.curPage,
@@ -145,7 +141,7 @@ function lib.PushScan()
 			private.scanStarted,
 			private.totalPaused,
 			GetTime()
-		))
+		})
 		private.scanStartTime = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
@@ -278,9 +274,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		secleft = 60 - secleft
 		if not GetAll then
 			if not CanQuery then
-				private.queueScan = acquire(
+				private.queueScan = {
 					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
-				)
+				}
 				return
 			end
 		else
@@ -327,7 +323,7 @@ function lib.IsPaused()
 end
 
 function private.Unpack(item, storage)
-	if not storage then storage = acquire() end
+	if not storage then storage = {} end
 	storage.id = item[Const.ID]
 	storage.link = item[Const.LINK]
 	storage.useLevel = item[Const.ULEVEL]
@@ -547,8 +543,8 @@ Commitfunction = function()
 	CommitRunning = true
 	local origscandata, origidList = lib.GetScanData()
 	--create clones of the scandata so that we have a constant, local table during the process (ie can't be messed with)
-	local scandata = clone(origscandata)
-	local idList = clone(origidList)
+	local scandata = replicate(origscandata)
+	local idList = replicate(origidList)
 
 	--grab the first item in the commit queue, and bump everything else down
 	local wasIncomplete = private.CommitQueue[1]["wasIncomplete"]
@@ -565,8 +561,7 @@ Commitfunction = function()
 		if private.CommitQueue[i+1] then
 			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
 		else
-			recycle(private.CommitQueue, i)
-			--private.CommitQueue[i] = nil
+			private.CommitQueue[i] = nil
 		end
 	end
 	local now = time()
@@ -580,7 +575,7 @@ Commitfunction = function()
 	local totali = 2*(#scandata.image) + #TempcurScan
 
 	local list, link, flag
-	local lut = acquire()
+	local lut = {}
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	local dirtyCount = 0
@@ -605,7 +600,7 @@ Commitfunction = function()
 					lut[link] = pos
 				else
 					if (type(list) == "number") then
-						lut[link] = acquire()
+						lut[link] = {}
 						table.insert(lut[link], list)
 					end
 					table.insert(lut[link], pos)
@@ -651,11 +646,11 @@ Commitfunction = function()
 					sameRecoveredCount = sameRecoveredCount + 1
 				end
 			end
-			scandata.image[itemPos] = clone(data)
+			scandata.image[itemPos] = {data}
 		else
 			if (processStats("create", data)) then
 				data[Const.ID] = private.GetNextID(idList)
-				table.insert(scandata.image, clone(data))
+				table.insert(scandata.image, replicate(data))
 				newCount = newCount + 1
 			end
 		end
@@ -663,7 +658,6 @@ Commitfunction = function()
 -- end of debugging code
 
 	end
-	recycle(lut)
 
 	local data, flag
 	local numempty = 0
@@ -717,16 +711,14 @@ Commitfunction = function()
 	processStats("complete")
 
 	--now that we're done, set the scandata to the new updated scandata
-	scrub(origscandata)
+	empty(origscandata)
 	for i,j in pairs(scandata) do
-		origscandata[i] = clone(j)
+		origscandata[i] = replicate(j)
 	end
-	scrub(origidList)
+	empty(origidList)
 	for i,j in pairs(idList) do
-		origidList[i] = clone(j)
+		origidList[i] = replicate(j)
 	end
-	recycle(scandata)
-	recycle(idList)
 	
 	local filterCount = private.filteredCount
 
@@ -788,13 +780,13 @@ Commitfunction = function()
 		lib.Print(scanTime)
 	end
 
-	if (not origscandata.scanstats) then origscandata.scanstats = acquire() end
+	if (not origscandata.scanstats) then origscandata.scanstats = {} end
 	if (origscandata.scanstats[1]) then
 		origscandata.scanstats[2] = origscandata.scanstats[1]
 		origscandata.scanstats[1] = nil
 	end
 	if (origscandata.scanstats[0]) then origscandata.scanstats[1] = origscandata.scanstats[0] end
-	origscandata.scanstats[0] = acquire()
+	origscandata.scanstats[0] = {}
 	origscandata.scanstats[0].oldCount = oldCount
 	origscandata.scanstats[0].sameCount = sameCount
 	origscandata.scanstats[0].newCount = newCount
@@ -811,13 +803,11 @@ Commitfunction = function()
 	origscandata.scanstats[0].paused = totalPaused
 	origscandata.scanstats[0].ended = GetTime()
 	origscandata.scanstats[0].elapsed = GetTime() - scanStarted - totalPaused
-	origscandata.scanstats[0].query = clone(TempcurQuery)
+	origscandata.scanstats[0].query = replicate(TempcurQuery)
 	origscandata.time = now
 	if wasGetAll then origscandata.LastFullScan = now end
 
 	private.filteredCount = 0
-	recycle(TempcurScan)
-	recycle(TempcurQuery)
 
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -862,8 +852,8 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private.CommitQueue[Queuelength + 1]["scanStarted"] = private.scanStarted
 	private.CommitQueue[Queuelength + 1]["scanStartTime"] = private.scanStartTime
 	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
-	recycle(private, "curQuery")
-	recycle(private, "curScan")
+	private["curQuery"] = nil
+	private["curScan"] = nil
     
     AucAdvanced.API.ClearMarketCache();
 
@@ -940,7 +930,7 @@ function private.HasAllData()
 		-- Check to see if we have all the page data
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 		if not private.NoOwnerList then
-			private.NoOwnerList = acquire()
+			private.NoOwnerList = {}
 			for i = 1, numBatchAuctions do
 				private.NoOwnerList[i] = i
 			end
@@ -960,7 +950,6 @@ function private.HasAllData()
 			private.nextCheck = now + 0.25
 			return false
 		end
-		recycle(private.NoOwnerList)
 		private.NoOwnerList = nil
 		return true
 	end
@@ -1008,7 +997,7 @@ StorePageFunction = function()
 		coroutine.yield()
 	end
 	if not private.curScan then
-		private.curScan = acquire()
+		private.curScan = {}
 	end
 
 
@@ -1063,12 +1052,12 @@ StorePageFunction = function()
 			else highbidder = true end
 			if not owner then owner = "" end
 
-			local itemData = acquire(
+			local itemData = {
 				itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
 				timeLeft, curTime, name, texture, count, quality, canUse, level,
 				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
 				0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
-			)
+			}
 
 			local legacyScanning = private.legacyScanning
 			if legacyScanning == nil then
@@ -1106,7 +1095,7 @@ StorePageFunction = function()
 			end
 		end
 		this = oldThis
-		EventFramesRegistered=nil  -- do NOT attempt to recycle, subkeys are global tables!
+		EventFramesRegistered=nil
 	end
 
 	--Send a Processor event to modules letting them know we are done with the page
@@ -1142,7 +1131,7 @@ StorePageFunction = function()
 			lib.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
 		if not private.curPages then
-			private.curPages = acquire()
+			private.curPages = {}
 		end
 		private.curPages[pageNumber] = true
 		local incomplete = 0
@@ -1217,7 +1206,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 
 	local isSame = true
-	local query = acquire()
+	local query = {}
 	name = name or ""
 	minLevel = tonumber(minLevel) or 0
 	maxLevel = tonumber(maxLevel) or 0
@@ -1263,7 +1252,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		end
 		private.curPage = startPage
 
-		recycle(private.curQuery)
 		private.curQuery = query
 
 		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
@@ -1276,7 +1264,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			query.invType or ""
 		)
 	else
-		recycle(query)
 		query = private.curQuery
 		query.page = page
 	end
@@ -1338,7 +1325,6 @@ function private.OnUpdate(me, dur)
 				return
 			end
 		end
-		recycle(private.NoOwnerList)
 		private.NoOwnerList = nil
 		private.scanDelay = nil
 	end
@@ -1406,8 +1392,8 @@ end
 
 function private.ResetAll()
 	if CommitRunning then
-		recycle(private, "curQuery")
-		recycle(private, "curScan")
+		private.curQuery = nil
+		private.curScan = nil
 
 		private.curPage = 0
 		private.isPaused = nil
@@ -1422,10 +1408,10 @@ function private.ResetAll()
 	private.totalPaused = nil
 	private.curQuerySig = nil
 
-	recycle(private, "curQuery")
-	recycle(private, "curScan")
-	recycle(private, "curPages")
-	recycle(private, "scanStack")
+	private.curQuery = nil
+	private.curScan = nil
+	private.curPages = nil
+	private.scanStack = nil
 
 	private.curPage = 0
 	private.isPaused = nil

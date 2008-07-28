@@ -40,7 +40,7 @@ local libType = "Util"
 local libType, libName = "Util", "AskPrice"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 --[[
 The following functions are part of the module's exposed methods:

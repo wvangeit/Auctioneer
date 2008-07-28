@@ -284,13 +284,43 @@ function lib.AddTab(tabButton, tabFrame)
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end
 
-local LibRecycle = LibStub("LibRecycle")
+-- Table management functions:
+local function replicate(source, depth, history)
+	if type(source) ~= "table" then return source end
+	assert(depth==nil or tonumber(depth), "Unknown depth: " .. tostring(depth))
+	if not depth then depth = 0 history = {} end
+	assert(history, "Have depth but without history")
+	assert(depth < 100, "Structure is too deep")
+	local dest = {} history[source] = dest
+	for k, v in pairs(source) do
+		if type(v) == "table" then
+			if history[v] then dest[k] = history[v]
+			else dest[k] = replicate(v, depth+1, history) end
+		else dest[k] = v end
+	end
+	return dest
+end
+local function empty(item)
+	if type(item) ~= 'table' then return end
+	for k,v in pairs(item) do item[k] = nil end
+end
+local function fill(item, ...)
+	if type(item) ~= 'table' then return end
+	if (#item > 0) then empty(item) end
+	local n = select('#', ...)
+	for i = 1,n do item[i] = select(i, ...) end
+end
+-- End table management functions
 
-lib.Recycle = LibRecycle.Recycle
-lib.Acquire = LibRecycle.Acquire
-lib.Clone = LibRecycle.Clone
-lib.Scrub = LibRecycle.Scrub
-
+-- Old functions (compatability)
+lib.Recycle = function() end
+lib.Acquire = function(...) return {...} end
+lib.Clone = replicate
+lib.Scrub = empty
+-- New functions
+lib.Replicate = replicate
+lib.Empty = empty
+lib.Fill = fill
 
 --[[
 Functions for establishing a new copy of the library.
@@ -299,7 +329,7 @@ Recommended method:
   local libType, libName = "myType", "myName"
   local lib,parent,private = AucAdvanced.NewModule(libType, libName)
   if not lib then return end
-  local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 --]]
 
@@ -346,14 +376,14 @@ end
 --[[
 
 Usage:
-  local print,decode,recycle,acquire,clone,scrub,get,set,default, debugPrint = AucAdvanced.GetModuleLocals()
+  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 -- ]]
 function lib.GetModuleLocals()
 	return lib.Print, lib.DecodeLink,
-	lib.Recycle, lib.Acquire, lib.Clone, lib.Scrub,
+	lib.Recycle, lib.Acquire, lib.Replicate, lib.Empty,
 	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault,
-	lib.Debug.DebugPrint
+	lib.Debug.DebugPrint, lib.Fill
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

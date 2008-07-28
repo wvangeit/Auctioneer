@@ -38,9 +38,8 @@ local private = {}
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
-local recycle = AucAdvanced.Recycle
-local acquire = AucAdvanced.Acquire
-local clone = AucAdvanced.Clone
+
+local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdvanced.Fill
 
 --[[
 	The following functions are defined for modules's exposed methods:
@@ -205,7 +204,7 @@ function lib.GetMarketValue(itemLink, serverKey)
         midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
         
         -- Cache before finishing up
-        local cacheTable = acquire();
+        local cacheTable = {}
         cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
         cacheTable.time = GetTime();
         cacheTable.value = midpoint;
@@ -226,7 +225,6 @@ end
 -- Clears the cache for AucAdvanced.API.GetMarketValue()
 function lib.ClearMarketCache()
     for x = 1, #cache do
-        recycle(cache[x]);
         cache[x] = nil;
     end
 end
@@ -240,7 +238,7 @@ function lib.ClearItem(itemLink, serverKey)
 end
 
 function lib.GetAlgorithms(itemLink)
-	local engines = acquire()
+	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engineLib.GetPrice or engineLib.GetPriceArray then
@@ -255,7 +253,7 @@ function lib.GetAlgorithms(itemLink)
 end
 
 function lib.IsValidAlgorithm(algorithm, itemLink)
-	local engines = acquire()
+	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -269,7 +267,7 @@ function lib.IsValidAlgorithm(algorithm, itemLink)
 	return false
 end
 
-private.algorithmstack = acquire()
+private.algorithmstack = {}
 function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
 		error("No pricing algorithm supplied")
@@ -331,7 +329,7 @@ end
 
 private.queryTime = 0
 private.prevQuery = { empty = true }
-private.curResults = acquire()
+private.curResults = {}
 function lib.QueryImage(query, faction, realm, ...)
 	local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
 
@@ -512,7 +510,7 @@ end
 
 function lib.GetMatchers(itemLink)
 	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
-	local engines = acquire()
+	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engineLib.GetMatchArray then
@@ -547,7 +545,7 @@ function lib.GetMatchers(itemLink)
 end
 
 function lib.IsValidMatcher(matcher, itemLink)
-	local engines = acquire()
+	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == matcher and engineLib.GetMatchArray then

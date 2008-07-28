@@ -40,8 +40,6 @@ Enchantrix.AucUtil = lib
 AucAdvanced.Modules.Util.Enchantrix = lib
 
 local print = AucAdvanced.Print
-local acquire = AucAdvanced.Acquire
-local recycle = AucAdvanced.Recycle
 
 local get = Enchantrix.Settings.GetSetting
 
@@ -67,8 +65,7 @@ local array
 function lib.GetPriceArray(link)
 	local usable, itemId = lib.IsValidAlgorithm(link)
     if not usable then return end
-	if array then recycle(array) end
-	array = acquire()
+	array = {}
 
 	if not priceTableAge or priceTableAge < GetTime() - 15 then
 		priceTable = Enchantrix.Util.CreateReagentPricingTable(priceTable)

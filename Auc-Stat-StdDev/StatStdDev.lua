@@ -35,7 +35,7 @@
 local libType, libName = "Stat", "StdDev"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local data
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
@@ -50,7 +50,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then
 		print("Clearing "..libName.." stats for {{", myFaction, "}}")
-		recycle(data, myFaction)
+		data[myFaction] = nil
 	end
 end
 
@@ -96,7 +96,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	end
 	table.insert(stats[property], buyout)
 	data[faction][itemId] = private.PackStats(stats)
-	recycle(stats)
 end
 
 local BellCurve = AucAdvanced.API.GenerateBellCurve();
@@ -199,7 +198,6 @@ function lib.GetPrice(hyperlink, faction)
 	end
 
 	local confidence = .01
-	recycle(stats)
 	local average
 	if (number > 0) then
 		average = total / number
@@ -375,7 +373,7 @@ function private.UnpackStatIter(data, ...)
 		local property, info = strsplit(":", v)
 		property = tonumber(property) or property
 		if (property and info) then
-			data[property] = acquire( strsplit(";", info) )
+			data[property] = {strsplit(";", info)}
 			local item
 			for i=1, #data[property] do
 				item = data[property][i]
@@ -385,7 +383,7 @@ function private.UnpackStatIter(data, ...)
 	end
 end
 function private.UnpackStats(dataItem)
-	local data = acquire()
+	local data = {}
 	if (dataItem) then
 		private.UnpackStatIter(data, strsplit(",", dataItem))
 	end

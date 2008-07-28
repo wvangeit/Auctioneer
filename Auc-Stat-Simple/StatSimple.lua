@@ -35,7 +35,7 @@
 local libType, libName = "Stat", "Simple"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 -- Eliminate some global lookups
 local data
@@ -102,7 +102,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	stats[property][2] = stats[property][2] + itemData.stackSize
 	if stats[property][3] > buyoutper then stats[property][3] = buyoutper end
 	data.daily[itemId] = private.PackStats(stats)
-	recycle(stats)
 end
 
 function lib.GetPrice(hyperlink, faction, realm)
@@ -120,7 +119,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 	local seenDays, seenCount, avg3, avg7, avg14, avgmins = 0,0,0,0,0,0
     -- Stddev calculations for market price
     local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
-    local dataset = acquire()    
+    local dataset = {}
     
 	if data.daily and data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
@@ -132,7 +131,6 @@ function lib.GetPrice(hyperlink, faction, realm)
     		tinsert(dataset,dayAverage)
     		daysUsed = 1
 		end
-		recycle(stats)
 	end
 	if data.means and data.means[itemId] then
 		local stats = private.UnpackStats(data.means[itemId])
@@ -159,7 +157,6 @@ function lib.GetPrice(hyperlink, faction, realm)
                 daysUsed = 14
             end
         end    
-		recycle(stats)
 	end
 	
     local mean = private.sum(unpack(dataset))/#dataset;
@@ -172,7 +169,6 @@ function lib.GetPrice(hyperlink, faction, realm)
     else
         variance = variance/(#dataset-1)
     end
-    recycle(dataset)
 	
 	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, sqrt(variance)
 end
@@ -432,7 +428,7 @@ function private.PushStats(faction, realm)
 	if not data.daily then return end
 	if not data.means then data.means = {} end
 
-	local pdata, temp
+	local pdata, fdata, temp
 	for itemId, stats in pairs(data.daily) do
 		if (itemId ~= "created") then
 			pdata = private.UnpackStats(stats)
@@ -441,14 +437,14 @@ function private.PushStats(faction, realm)
 				dailyAvg = info[1] / info[2]
 				if not info[3] then info[3] = 0 end
 				if not fdata[property] then
-					fdata[property] = acquire(
+					fdata[property] = {
 						1,
 						info[2],
 						("%0.01f"):format(dailyAvg),
 						("%0.01f"):format(dailyAvg),
 						("%0.01f"):format(dailyAvg),
 						("%0.01f"):format(info[3])
-					)
+					}
 				else
 					fdata[property][1] = fdata[property][1] + 1
 					fdata[property][2] = fdata[property][2] + info[2]
@@ -479,12 +475,9 @@ function private.PushStats(faction, realm)
 				end
 			end
 			data.means[itemId] = private.PackStats(fdata)
-			recycle(pdata)
-			recycle(fdata)
 		end
 	end
-	recycle(data.daily)
-	data.daily = acquire()
+	data.daily = {}
 	data.daily.created = time()
 end
 
@@ -496,7 +489,7 @@ function private.UnpackStatIter(data, ...)
 		local property, info = strsplit(":", v)
 		property = tonumber(property) or property
 		if (property and info) then
-			data[property] = AucAdvanced.Acquire(strsplit(";", info))
+			data[property] = {strsplit(";", info)}
 			local item
 			for i=1, #data[property] do
 				item = data[property][i]
@@ -507,7 +500,7 @@ function private.UnpackStatIter(data, ...)
 end
 
 function private.UnpackStats(dataItem)
-	local data = AucAdvanced.Acquire() 
+	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
 	return data
 end
@@ -528,7 +521,7 @@ function private.UpgradeDb()
 	if (not AucAdvancedStatSimpleData.Version) then
 		local newData = {Version = "1.0", RealmData = {}}
 		for x, y in pairs(AucAdvancedStatSimpleData) do
-			local t = acquire(strsplit(x, "-"))
+			local t = {strsplit(x, "-")}
 			local realm, faction
 			for _, z in ipairs(t) do
 				if (faction) then
@@ -538,10 +531,9 @@ function private.UpgradeDb()
 				faction = z
 			end
 			if (not newData.RealmData[realm]) then
-				newData.RealmData[realm] = acquire()
+				newData.RealmData[realm] = {}
 			end
 			newData.RealmData[realm][faction] = y
-			recycle(t)
 		end
 		AucAdvancedStatSimpleData = newData
 	end

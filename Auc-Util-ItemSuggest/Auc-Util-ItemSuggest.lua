@@ -35,7 +35,7 @@
 local libType, libName = "Util", "ItemSuggest"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _
 
