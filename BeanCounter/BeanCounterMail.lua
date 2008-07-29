@@ -194,6 +194,7 @@ function private.mailSort()
 end
 --retrieves the itemID from the DB
 function private.matchDB(text)
+	text = text:gsub("%((.+)%)", "%%(%1%%)") -- Excapes () if they are in the itemName So they are not treated as a capture. ie Cat Carrier (Siamese) becomes Cat Carrier %(Siamese%)
 	local itemID
 	for i, itemLink in pairs(BeanCounterDB.ItemIDArray) do
 		if itemLink:match("%[("..text..")%]") then 
@@ -402,7 +403,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		button:Show()
 			
 		local itemindex = ((InboxFrame.pageNum * 7) - 7 + i) --this gives us the actual itemindex as oposed to teh 1-7 button index
-		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex);
+		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
 			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
 			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) then
