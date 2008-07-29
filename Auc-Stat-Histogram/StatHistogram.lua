@@ -81,23 +81,27 @@ function private.GetPriceData()
 	debugPrint("getPricedata: "..tostring(stattable["count"]), libType.."-"..libName)
 	local recount = 0
 	--now find the Q1, median, and Q3 values
-	for i = stattable["min"], stattable["max"] do
-		recount = recount + (stattable[i] or 0)
-		if Qone == 0 and count > 4 then --Q1 is meaningless with very little data
-			if recount >= count/4 then
-				Qone = i*stattable["step"]
-			end
-		elseif median == 0 then
-			if recount >= count/2 then
-				median = i*stattable["step"]
-			end
-		elseif Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
-			if recount >= count * 3/4 then
-				Qthree = i*stattable["step"]
+	if stattable["min"] == stattable["max"] then
+		median = stattable["min"]*stattable["step"]
+	else
+		for i = stattable["min"], stattable["max"] do
+			recount = recount + (stattable[i] or 0)
+			if Qone == 0 and count > 4 then --Q1 is meaningless with very little data
+				if recount >= count/4 then
+					Qone = i*stattable["step"]
+				end
+			elseif median == 0 then
+				if recount >= count/2 then
+					median = i*stattable["step"]
+				end
+			elseif Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
+				if recount >= count * 3/4 then
+					Qthree = i*stattable["step"]
+					break
+				end
+			else
 				break
 			end
-		else
-			break
 		end
 	end
 	local step = stattable["step"]
@@ -251,7 +255,28 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		stattable["count"] = 0
 	end
 	priceindex = math.ceil(buyout / stattable["step"])
-	if priceindex <= 750 or stattable["count"] <= 20 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
+	if stattable["count"] <= 20 then
+		stattable["count"] = stattable["count"] + 1
+		--get the refactoring out of the way first, because we're not capping the price yet
+		--failure to do this now can cause major trouble in the form of massive tables
+		if priceindex > 100 then
+			private.refactor(buyout, 100)
+			priceindex = 100
+		end
+		if not stattable["min"] then
+			stattable["min"] = priceindex
+			stattable["max"] = priceindex
+			stattable[priceindex] = 0
+		elseif stattable["min"] > priceindex then
+			for i = priceindex, (stattable["min"]-1) do
+				stattable[i] = 0
+			end
+			stattable["min"] = priceindex
+		end
+		if not stattable[priceindex] then stattable[priceindex] = 0 end
+		stattable[priceindex] = stattable[priceindex] + 1
+		data[faction][itemId][property] = private.PackStats()
+	elseif priceindex <= 750 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
 		stattable["count"] = stattable["count"] + 1
 		if not stattable["min"] then --first time we've seen this
 			stattable["min"] = priceindex
@@ -270,9 +295,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		end
 		if not stattable[priceindex] then stattable[priceindex] = 0 end
 		stattable[priceindex] = stattable[priceindex] + 1
-		if stattable["count"] <= 20 and stattable["max"] > 100 then
-			private.refactor(buyout, 100)--we're still on initial data collection, so shrink it back down
-		end
 		data[faction][itemId][property] = private.PackStats()
 	end
 	empty(stattable)
