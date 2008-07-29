@@ -144,7 +144,7 @@ do
         end
         
         
-        assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..GetItemInfo(itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
+        assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
         
        
         
@@ -163,7 +163,7 @@ do
             total = 0;
             delta = delta * 0.75;
             
-            assert(delta > 0, "Infinite loop detected on pass 1 of market pricing for "..GetItemInfo(itemLink));
+            assert(delta > 0, "Infinite loop detected on pass 1 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
                    
             for i = 1, #pdfList do
                 local thisCall = pdfList[i];
@@ -195,7 +195,7 @@ do
             lastMidpoint = midpoint;
             total = 0;
             
-            assert(delta > 0, "Infinite loop detected on pass 2 of market pricing for "..GetItemInfo(itemLink));
+            assert(delta > 0, "Infinite loop detected on pass 2 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
         
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
