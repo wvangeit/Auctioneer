@@ -395,11 +395,6 @@ function private.IsSameItem(focus, compare, onlyDirt)
 	if (focus[Const.MINBID] ~= compare[Const.MINBID]) then return false end
 	if (focus[Const.BUYOUT] ~= compare[Const.BUYOUT]) then return false end
 	if (focus[Const.CURBID] > compare[Const.CURBID]) then return false end
-	local focusOwner = focus[Const.SELLER]
-	local compareOwner = compare[Const.SELLER]
-	if (focusOwner ~= "" and compareOwner ~= "" and focusOwner ~= compareOwner) then
-		return false
-	end
 	return true
 end
 
