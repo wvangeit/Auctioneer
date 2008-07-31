@@ -261,7 +261,7 @@ local function setter(setting, value)
 			-- Clean it's profile container of values
 			EnhTooltipConfig["profile."..value] = {}
 
-			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatResetProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage("Reset all settings for: "..value)
 
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -270,7 +270,7 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			EnhTooltipConfig[getUserSig()] = value
 
-			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatUsingProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage("Now using profile: "..value)
 
 		end
 
