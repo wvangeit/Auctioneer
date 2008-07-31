@@ -216,6 +216,19 @@ EnhTooltip.Private = private
 local public = EnhTooltip
 local debugPrint
 
+--Private print does not need to concatenate strings, simply use commas to seperate arguments. Also handles printing functions, nils, and tables without throwing errors
+private.Print = function(...)
+	local output, part
+	for i=1, select("#", ...) do
+		part = select(i, ...)
+		part = tostring(part):gsub("{{", "|cffddeeff"):gsub("}}", "|r")
+		if (output) then output = output .. " " .. part
+		else output = part end
+	end
+	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
+end
+
+
 ------------------------
 --  Hookable functions
 ------------------------

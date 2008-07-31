@@ -29,18 +29,9 @@
 
 EnhTooltip.Config = {}
 local lib = EnhTooltip.Config
-local private = {}
-
-private.Print = function(...)
-	local output, part
-	for i=1, select("#", ...) do
-		part = select(i, ...)
-		part = tostring(part):gsub("{{", "|cffddeeff"):gsub("}}", "|r")
-		if (output) then output = output .. " " .. part
-		else output = part end
-	end
-	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
-end
+--Allows EhTT sub lua's sccess to functions and settings in other EhTT files. This also makes private.Print accessable from all EhTT luas
+--Private print does not need to concatenate strings, simply use commas to seperate arguments. Also handles printing functions, nils, and tables without throwing errors
+local private = EnhTooltip.Private
 
 function private.CommandHandler(command, subcommand, subcommand2, ...)
 	command = command:lower()
@@ -61,7 +52,7 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 	elseif command == "force" then
 		EnhTooltip.SetSetting("forceSuppresedTooltipKey", subcommand)
 		if (subcommand == "shift") or (subcommand == "alt") or (subcommand == "ctrl") then
-			private.Print("Enhanced tooltips are forced with ".. subcommand.." key")
+			private.Print("Enhanced tooltips are forced with ", subcommand, " key")
 		else
 			private.Print("Enhanced tooltips are not forced")
 		end
@@ -108,7 +99,7 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 		elseif subcommand == "other" then
 			optionName = "showWithOther"
 		else
-			private.Print("Unknown option for show argument: "..subcommand)
+			private.Print("Unknown option for show argument: ", subcommand)
 		end
 		
 		local state
@@ -117,12 +108,12 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 		elseif subcommand2 == "off" then
 			state = false
 		else
-			private.Print("Unknown state for show argument: "..subcommand2)
+			private.Print("Unknown state for show argument: ", subcommand2)
 		end
 				
 		if optionName or (state ~= nil) then	
 			EnhTooltip.Settings.SetSetting(optionName, state)
-			private.Print("Enhanced tooltip for "..subcommand.." is now "..subcommand2)
+			private.Print("Enhanced tooltip for ", subcommand, " is now ",subcommand2)
 		end
 	elseif command == "block" then
 		if subcommand == "on" then
@@ -132,11 +123,11 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 			EnhTooltip.Settings.SetSetting("blockExternalCalls", false)
 			private.Print("External calls are now allowed")
 		else
-			private.Print("Unknown state for block argument: "..subcommand)
+			private.Print("Unknown state for block argument: ", subcommand)
 		end		
 	else	
 		-- No match found
-		private.Print("Unable to find command: "..command)
+		private.Print("Unable to find command: ", command)
 		private.Print("Type {{/ett help}} for help")
 	end
 	if EnhTooltip.Gui then

@@ -64,13 +64,14 @@ Usage:
 -- Remove debug output
 -- Test without configator and without slidebar
 -- Test lootroll
+--Add self reliant locale strings
 
-if not EnhTooltip then 
-	EnhTooltip = {}
-end
+--Allows EhTT sub lua's sccess to functions and settings in other EhTT files. This also makes private.Print accessable from all EhTT luas
+local private = EnhTooltip.Private
 
-local lib = {}
-EnhTooltip.Settings = lib
+EnhTooltip.Settings = {}
+local lib = EnhTooltip.Settings
+
 local gui
 
 local function processSetting(setting, action, value)
@@ -261,7 +262,7 @@ local function setter(setting, value)
 			-- Clean it's profile container of values
 			EnhTooltipConfig["profile."..value] = {}
 
-			DEFAULT_CHAT_FRAME:AddMessage("Reset all settings for: "..value)
+			private.Print("Reset all settings for: ", value)
 
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -270,7 +271,7 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			EnhTooltipConfig[getUserSig()] = value
 
-			DEFAULT_CHAT_FRAME:AddMessage("Now using profile: "..value)
+			private.Print("Now using profile: ", value)
 
 		end
 

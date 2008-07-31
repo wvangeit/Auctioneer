@@ -14,7 +14,7 @@
 Libs\Load.xml
 TinyMoneyFrame.lua
 TinyMoneyFrame.xml
-ConfigUI.lua
 Tooltip.lua
 Tooltip.xml
 Command.lua
+ConfigUI.lua
