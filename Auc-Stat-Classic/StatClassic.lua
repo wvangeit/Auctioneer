@@ -70,6 +70,135 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+do
+    -- Inverse Z table
+    local inverseZ = {
+        [1] = 0,
+        [.4960*2] = .01*2,
+        [.4920*2] = .02*2,
+        [.4880*2] = .03*2,
+        [.4840*2] = .04*2,
+        [.4801*2] = .05*2,
+        [.4761*2] = .06*2,
+        [.4721*2] = .07*2,
+        [.4681*2] = .08*2,
+        [.4641*2] = .09*2,
+        [.4602*2] = .10*2,
+        [.4562*2] = .11*2,
+        [.4522*2] = .12*2,
+        [.4483*2] = .13*2,
+        [.4443*2] = .14*2,
+        [.4404*2] = .15*2,
+        [.4364*2] = .16*2,
+        [.4325*2] = .17*2,
+        [.4286*2] = .18*2,
+        [.4247*2] = .19*2,
+        [.4207*2] = .20*2,
+        [.4168*2] = .21*2,
+        [.4129*2] = .22*2,
+        [.4090*2] = .23*2,
+        [.4052*2] = .24*2,
+        [.4013*2] = .25*2,
+        [.3974*2] = .26*2,
+        [.3936*2] = .27*2,
+        [.3897*2] = .28*2,
+        [.3859*2] = .29*2,
+        [.3821*2] = .30*2,
+        [.3783*2] = .31*2,
+        [.3745*2] = .32*2,
+        [.3707*2] = .33*2,
+        [.3669*2] = .34*2,
+        [.3632*2] = .35*2,
+        [.3594*2] = .36*2,
+        [.3557*2] = .37*2,
+        [.3620*2] = .38*2,
+        [.3483*2] = .39*2,
+        [.3446*2] = .40*2,
+        [.3409*2] = .41*2,
+        [.3372*2] = .42*2,
+        [.3336*2] = .43*2,
+        [.3300*2] = .44*2,
+        [.3264*2] = .45*2,
+        [.3228*2] = .46*2,
+        [.3192*2] = .47*2,
+        [.3156*2] = .48*2,
+        [.3121*2] = .49*2,
+        [.3085*2] = .50*2,
+        [.3050*2] = .51*2,
+        [.3015*2] = .52*2,
+        [.2981*2] = .53*2,
+        [.2946*2] = .54*2,
+        [.2912*2] = .55*2,
+        [.2877*2] = .56*2,
+        [.2843*2] = .57*2,
+        [.2810*2] = .58*2,
+        [.2776*2] = .59*2,
+        [.2743*2] = .60*2,
+        [.2709*2] = .61*2,
+        [.2676*2] = .62*2,
+        [.2643*2] = .63*2,
+        [.2611*2] = .64*2,
+        [.2578*2] = .65*2,
+        [.2546*2] = .66*2,
+        [.2514*2] = .67*2,
+        [.2483*2] = .68*2,
+        [.2420*2] = .70*2,
+        [.2266*2] = .75*2,
+        [.2119*2] = .80*2,
+        [.1977*2] = .85*2,
+        [.1841*2] = .90*2,
+        [.1711*2] = 1.0*2,
+        [.1357*2] = 1.1*2,
+        [.1151*2] = 1.2*2,
+        [.0968*2] = 1.3*2,
+        [.0808*2] = 1.4*2,
+        [.0668*2] = 1.5*2,
+        [.0548*2] = 1.6*2,
+        [.0446*2] = 1.7*2,
+        [.0359*2] = 1.8*2,
+        [.0287*2] = 1.9*2,
+        [.0228*2] = 2.0*2,
+        [.0179*2] = 2.1*2,
+        [.0139*2] = 2.2*2,
+        [.0107*2] = 2.3*2,
+        [.0082*2] = 2.4*2,
+        [.0062*2] = 2.5*2,
+        [.0047*2] = 2.6*2,
+        [.0035*2] = 2.7*2,
+        [.0026*2] = 2.8*2,
+        [.0019*2] = 2.9*2,
+        [.0013*2] = 3.0*2        
+    };
+    
+    -- Build the keys list (so we can use ipairs)
+    local inverseZKeys = {};
+    for k,v in pairs(inverseZ) do
+        table.insert(inverseZKeys, k);
+    end
+    table.sort(inverseZKeys);
+    
+    local ipairs = ipairs;
+    local sqrt = math.sqrt;
+    local curve = AucAdvanced.API.GenerateBellCurve();
+
+    function lib.GetItemPDF(link, key)
+        -- First, obtain price lookup
+        local median, seen, confidence = lib.GetPrice(link, key);
+        if not median or median == 0 or confidence == 0 then return; end
+        -- Go through the inverse Z table and look for the nearest value that is less than the confidence
+        local nearest = inverseZ[inverseZKeys[1]];
+        for _, k in ipairs(inverseZKeys) do
+            if inverseZ[k] > confidence then break; end
+            nearest = inverseZ[k];
+        end
+        
+        local stddev = median * nearest / sqrt(seen);   -- unbiased population estimate from inverse Z lookup
+        curve:SetParameters(median, stddev);
+        return curve, median - stddev * 3, median + stddev * 3;
+    end
+end
+    
+
 function lib.GetPrice(hyperlink, ahKey)
 	if (not data) then private.makeData() end
 	local linkType,itemId,property,factor,enchant = AucAdvanced.DecodeLink(hyperlink)
