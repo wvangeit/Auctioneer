@@ -91,7 +91,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchNatureRes"), key = "factor_stat.natureRes", print = _BARKLOC("NatureRes") },
 	{ search = _BARKLOC("EnchSearchResShadow"), key = "factor_stat.shadowRes", print = _BARKLOC("ShadowRes") },
 	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
-	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortSpellsurge") },		-- INCORRECTLY matches mana?
+	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortSpellSurge") },		-- INCORRECTLY matches mana?
 	{ search = _BARKLOC("EnchSearchVitality"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortVitality") },			-- INCORRECTLY matches health and mana?
 	{ search = _BARKLOC("EnchSearchManaPerFive"), key = "factor_stat.other", print = _BARKLOC("ShortManaPerFive") },						-- INCORRECTLY matches mana
 	{ search = _BARKLOC("EnchSearchMana"), key = "factor_stat.mana", print = _BARKLOC("ShortMana") },
@@ -1256,12 +1256,19 @@ function Enchantrix_GetShortDescriptor( index )
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute.search ) ~= nil ) then
 			--Barker.Util.DebugPrintQuick("Matched attribute: ", attribute.print, " in: ", long_str);
+			
+			local print_string = attribute.print;
+			if (print_string == nil) then
+				Barker.Util.DebugPrintQuick("Failed print lookup for: ", long_str);		-- should not fail
+				print_string = "unknown";
+			end
+			
 			if (not attribute.ignoreValues) then
 				statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
 				statvalue = statvalue:sub(statvalue:find('[0-9]+'));
-				return "+"..statvalue..' '..attribute.print;
+				return "+"..statvalue..' '..print_string;
 			else
-				return attribute.print;
+				return print_string;
 			end
 		end
 	end
@@ -1269,7 +1276,13 @@ function Enchantrix_GetShortDescriptor( index )
 
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
 
+	-- this happens for any enchant we don't have a special case for, which is relatively often
 	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfo(index),  long_str,  enchant  );
+	
+	if (enchant == nil) then
+		Barker.Util.DebugPrintQuick("Failed enchant split for: ", long_str);		-- should not fail
+		return "unknown";
+	end
 
 	return enchant[#enchant];
 end
