@@ -38,7 +38,11 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 local data
+local totaldata
+local sessionseen = {}
 local stattable = {}
+local totalstattable = {}
+			for i = 1, 750 do totalstattable[i] = 0 end
 local PDcurve = {}
 local newstats = {}
 local array = {}
@@ -107,10 +111,10 @@ function private.GetPriceData()
 	local step = stattable["step"]
 	local refactored = false
 	if count > 30 then --we've seen enough to get a fairly decent price to base the precision on
-		if (step > (median/150)) and (step > 1) then
+		if (step > (median/225)) and (step > 1) then
 			private.refactor(median*3, 750)
 			refactored = true
-		elseif step < (median/350) then
+		elseif step < (median/275) then
 			private.refactor(median*3, 750)
 			refactored = true
 		end
@@ -186,6 +190,22 @@ function lib.GetItemPDF(link, faction)
 	if not data[faction][itemId][property] then return end
 	private.UnpackStats(data[faction][itemId][property])
 	local median, Qone, Qthree, step, count, refactored = private.GetPriceData()
+	if median and (median/step > 225) and (median/step < 275) and (not sessionseen[tostring(itemId).."-"..tostring(property)]) then
+		--print(median/step.."      "..step)
+		sessionseen[tostring(itemId).."-"..tostring(property)] = true
+		local index = 1
+		for n in AucAdvancedStatHistogramTotalData:gmatch("[0-9]+") do
+			totalstattable[index] = tonumber(n)
+			index = index + 1
+		end
+		for i = stattable["min"], stattable["max"] do
+			totalstattable[i] = totalstattable[i] + (stattable[i]/stattable["count"])
+		end
+		AucAdvancedStatHistogramTotalData = tostring(totalstattable[1])
+		for i = 2, 750 do
+			AucAdvancedStatHistogramTotalData = AucAdvancedStatHistogramTotalData..","..tostring(totalstattable[i] or 0)
+		end
+	end
 	if refactored then
 		--data has been refactored, so we need to repack it
 		data[faction][itemId][property] = private.PackStats()
@@ -216,7 +236,7 @@ function lib.GetItemPDF(link, faction)
 	for i = PDcurve["min"], PDcurve["max"] do
 		PDcurve[i]= PDcurve[i] * areamultiplier
 	end
-	return private.ItemPDF, PDcurve["min"], PDcurve["max"]
+	return private.ItemPDF, PDcurve["min"]*PDcurve["step"], PDcurve["max"]*PDcurve["step"]
 end
 
 lib.ScanProcessors = {}
@@ -386,6 +406,7 @@ end
 
 function lib.OnLoad(addon)
 	private.makeData()
+	private.makeTotalData()
 	AucAdvanced.Settings.SetDefault("stat.histogram.tooltip", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.median", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.iqr", true)
@@ -416,6 +437,12 @@ function private.makeData()
 	if data then return end
 	if (not AucAdvancedStatHistogramData) then AucAdvancedStatHistogramData = {} end
 	data = AucAdvancedStatHistogramData
+	private.DataLoaded()
+end
+function private.makeTotalData()
+	if totaldata then return end
+	AucAdvancedStatHistogramTotalData = ""
+	totaldata = AucAdvancedStatHistogramTotalData
 	private.DataLoaded()
 end
 
