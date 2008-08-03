@@ -269,9 +269,6 @@ end
 
 function private.HideTooltip(pvt)
 	debugPrint(debugstack(2,20,20),"HideTooltip","Debug")
-	--if (not pvt) and (EnhTooltip.Settings.GetSetting("blockExternalCalls")) then
-	--	return
-	--end
 	EnhancedTooltip:Hide()
 	private.currentItem = nil
 	private.hideTime = 0	
@@ -1877,7 +1874,6 @@ function private.TtInitialize()
 	Stubby.RegisterAddOnHook("LootLink", "EnhTooltip", private.HookLootLink)
 	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "EnhTooltip", private.HookTradeskill)
 	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", private.HookCraft)
-	Stubby.RegisterAddOnHook("EnhTooltip", "EnhTooltip", private.onVariablesLoaded)
 
 	-- Register event notification
 	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", private.MerchantScanner)
@@ -1888,6 +1884,7 @@ function private.TtInitialize()
 	Stubby.RegisterEventHook("BANKFRAME_OPENED", "EnhTooltip", private.CallBankHook)
 	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "EnhTooltip", private.CallBankHook)
 	Stubby.RegisterEventHook("BAG_UPDATE", "EnhTooltip", private.CallBagHook)
+	Stubby.RegisterEventHook("VARIABLES_LOADED", "EnhTooltip", private.onVariablesLoaded)
 end
 
 

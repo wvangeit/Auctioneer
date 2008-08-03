@@ -62,9 +62,7 @@ Usage:
 
 -- TODO
 -- Remove debug output
--- Test without configator and without slidebar
--- Test lootroll
---Add self reliant locale strings
+-- Add self reliant locale strings
 
 --Allows EhTT sub lua's sccess to functions and settings in other EhTT files. This also makes private.Print accessable from all EhTT luas
 local private = EnhTooltip.Private
