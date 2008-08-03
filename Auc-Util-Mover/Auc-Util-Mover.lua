@@ -71,7 +71,8 @@ function lib.OnLoad(addon)
 	default("util.mover.anchors", {})
 	default("util.protectwindow.protectwindow", 1)
 	default("util.protectwindow.processprotect", 0)
-	default("util.ah-windowcontrol.auctionscale", 1)
+	default("util.ah-windowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
+	default("util.ah-windowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
 end
 
 --after Auction House Loads Hook the Window Display event
@@ -116,7 +117,10 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header", 0, "") --Spacer for options
 	gui:AddControl(id, "Header", 0,	"Window Size Options")
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ah-windowcontrol.auctionscale",    0.1, 3, 0.1, "Auction House Scale")
-	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House Window.")	
+	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House Window. Default is 1")
+	
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ah-windowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
+	gui:AddTip(id, "This option allows you to adjust the Text size of the CompactUI on the Browse tab. Default is 0")
 end
 
 		
@@ -148,6 +152,21 @@ function private.MoveFrame()
 	if get("util.ah-windowcontrol.auctionscale") then
 		AuctionFrame:SetScale(get("util.ah-windowcontrol.auctionscale"))
 	end
+	if get("util.compactui.activated") then
+		for i = 1,14 do
+			local button = _G["BrowseButton"..i]
+			local increase = get('util.ah-windowcontrol.compactuiscale') or 0
+			if not button.Count then return end -- we get called before compactUI has built teh frame
+			button.Count:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+			button.Name:SetFont(STANDARD_TEXT_FONT, 10 + increase)
+			button.rLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+			button.iLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+			button.tLeft:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+			button.Owner:SetFont(STANDARD_TEXT_FONT, 10 + increase)
+			button.Value:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+		end
+	end
+	
 end
 
 --Restore previous sessions Window position
