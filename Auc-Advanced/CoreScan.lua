@@ -188,25 +188,13 @@ function lib.PopScan()
 	end
 end
 
-local BaseProgressBar =  CreateFrame("Frame", nil, UIParent)
-BaseProgressBar:SetWidth(320)
-BaseProgressBar:SetHeight(50)
-BaseProgressBar:Hide()
-BaseProgressBar:SetFrameStrata("MEDIUM")
-BaseProgressBar:SetBackdrop({
-        bgFile = "Interface/Tooltips/ChatBubble-Background",
-	edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
-        tile = 1, tileSize = 12, edgeSize = 32,
-        insets = { left = 5, right = 5, top = 5, bottom = 5 }
-})
-
-local CommitProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar", BaseProgressBar, "TextStatusBar")
+local CommitProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
 CommitProgressBar:SetWidth(300)
-CommitProgressBar:SetHeight(25)
-CommitProgressBar:SetPoint("CENTER", BaseProgressBar, "CENTER", 0,5)
+CommitProgressBar:SetHeight(18)
+CommitProgressBar:SetPoint("CENTER", UIParent, "CENTER", -5,5)
 CommitProgressBar:SetBackdrop({
   bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
-  --edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
   tile=1, tileSize=10, edgeSize=10,
   insets={left=1, right=1, top=1, bottom=1}
 })
@@ -224,13 +212,13 @@ CommitProgressBar.text:SetJustifyV("CENTER")
 CommitProgressBar.text:SetText("AucAdv: Processing")
 CommitProgressBar.text:SetTextColor(1,1,1)
 
-local GetAllProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar", BaseProgressBar, "TextStatusBar")
+local GetAllProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
 GetAllProgressBar:SetWidth(300)
-GetAllProgressBar:SetHeight(25)
-GetAllProgressBar:SetPoint("CENTER", BaseProgressBar, "CENTER", 0,5)
+GetAllProgressBar:SetHeight(18)
+GetAllProgressBar:SetPoint("CENTER", UIParent, "CENTER", -5,5)
 GetAllProgressBar:SetBackdrop({
   bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
-  --edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
   tile=1, tileSize=10, edgeSize=10,
   insets={left=1, right=1, top=1, bottom=1}
 })
@@ -287,8 +275,13 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			end
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			BaseProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", 0, 20) --set our point to the auctionframe
-			BaseProgressBar:Show()
+			--setup Getall progress bar. Display above processing bar if present
+			GetAllProgressBar:SetParent(AuctionFrame) --set parent to auctionframe so we obey its scale
+			if CommitProgressBar:IsShown() then
+				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 23) --set our point to the auctionframe
+			else
+				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
+			end
 			GetAllProgressBar:Show()
 			GetAllProgressBar:SetValue(0)
 			GetAllProgressBar.text:SetText("AucAdv: Scanning")
@@ -561,8 +554,8 @@ Commitfunction = function()
 	end
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
-		BaseProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", 0, 20) --set our point to the auctionframe
-		BaseProgressBar:Show()
+		CommitProgressBar:SetParent(AuctionFrame)
+		CommitProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
 		CommitProgressBar:Show()
 		CommitProgressBar.text:SetText("AucAdv: Processing")
 		CommitProgressBar:SetValue(0)
@@ -815,7 +808,6 @@ Commitfunction = function()
 	AucAdvanced.Buy.FinishedSearch(origscandata.scanstats[0].query)
 
 	--Hide the progress indicator
-	BaseProgressBar:Hide()
 	CommitProgressBar:Hide()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
@@ -1020,6 +1012,11 @@ StorePageFunction = function()
 	local storecount = 0
 	for i = 1, numBatchAuctions do
 		if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+			if CommitProgressBar:IsShown() then
+				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 23) --set our point to the auctionframe above progress bar
+			else
+				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
+			end
 			GetAllProgressBar:SetValue(100*i/numBatchAuctions)
 			coroutine.yield()
 		end
@@ -1078,7 +1075,6 @@ StorePageFunction = function()
 		end
 	end
 	if isGetAll then
-		BaseProgressBar:Hide()
 		GetAllProgressBar:Hide()
 		local oldThis = this
 		for _, frame in pairs(EventFramesRegistered) do
