@@ -1107,6 +1107,7 @@ function private.CreateFrames()
 			frame.salebox.number:Hide()
 			frame.salebox.numberonly:Hide()
 			frame.switchUI:SetText("Full View")
+			frame.switchUI.TooltipText = "Switch to a more advanced layout"
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -35)
 			frame.salebox.bid:ClearAllPoints()
 			frame.salebox.bid:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, -30)
@@ -1157,6 +1158,7 @@ function private.CreateFrames()
 			frame.salebox.numberentry:Hide()
 			frame.salebox.numberonly:Hide()
 			frame.switchUI:SetText("Simple View")
+			frame.switchUI.TooltipText = "Switch to a Simple layout"
 			frame.salebox.depositcost:Hide()
 			frame.salebox.totalbid:Hide()
 			frame.salebox.totalbuyout:Hide()
@@ -1602,6 +1604,13 @@ function private.CreateFrames()
 		end
 	end
 
+	frame.SetButtonTooltip = function(text)
+		if text and get("util.appraiser.buttontips") then
+			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetText(text)
+		end
+	end
+	
 	frame.DoTooltip = function ()
 		if not this.id then this = this:GetParent() end
 		if this.id then --we're mousing over the itemlist
@@ -1657,6 +1666,8 @@ function private.CreateFrames()
 			frame.manifest:Show()
 		end
 	end)
+	frame.toggleManifest:SetScript("OnEnter", function() return frame.SetButtonTooltip("Open/Close sidebar with additional price info") end)
+	frame.toggleManifest:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.toggleManifest:SetWidth(120)
 	frame.toggleManifest:SetText("Close Sidebar")
 	frame.toggleManifest:Disable()
@@ -1678,6 +1689,9 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
+	frame.switchUI.TooltipText = "Switch to a Simple layout"
+	frame.switchUI:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
+	frame.switchUI:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchUI:Enable()
 
 	frame.itembox = CreateFrame("Frame", nil, frame)
@@ -1694,7 +1708,8 @@ function private.CreateFrames()
 
 	-- "Show Auctions" checkbox
 	frame.itembox.showAuctions = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowAuctions", frame.itembox, "OptionsCheckButtonTemplate")
-	frame.itembox.showAuctions.tooltipText = "Include own auctions in the item listing"
+	frame.itembox.showAuctions:SetScript("OnEnter", function() return frame.SetButtonTooltip("Include own auctions\nin the item listing") end)
+	frame.itembox.showAuctions:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.itembox.showAuctions:SetWidth(24)
 	frame.itembox.showAuctions:SetHeight(24)
 	Auc_Util_Appraiser_ShowAuctionsText:SetText("Auctions ")
@@ -1708,7 +1723,8 @@ function private.CreateFrames()
 	
 	-- "Show Hidden" checkbox
 	frame.itembox.showHidden = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowHidden", frame.itembox, "OptionsCheckButtonTemplate")
-	frame.itembox.showHidden.tooltipText = "Include items tagged as 'hidden' in the item listing"
+	frame.itembox.showHidden:SetScript("OnEnter", function() return frame.SetButtonTooltip("Include items tagged as \n'hidden' in the item listing") end)
+	frame.itembox.showHidden:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.itembox.showHidden:SetWidth(24)
 	frame.itembox.showHidden:SetHeight(24)
 	Auc_Util_Appraiser_ShowHiddenText:SetText("Hidden ")
@@ -1728,8 +1744,6 @@ function private.CreateFrames()
 	frame.itembox.showText.text:SetText("Show: ")
 	frame.itembox.showText:SetWidth(frame.itembox.showText.text:GetWidth())
 	frame.itembox.showText:SetHeight(frame.itembox.showAuctions:GetHeight())
-	
-	
 
 	frame.items = {}
 	for i=1, NUM_ITEMS do
@@ -1899,6 +1913,8 @@ function private.CreateFrames()
 	frame.salebox.stack:SetValue(20)
 	frame.salebox.stack:SetWidth(255)
 	frame.salebox.stack:SetScript("OnValueChanged", frame.UpdateControls)
+	frame.salebox.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the number of items per posted stack") end)
+	frame.salebox.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
 	
@@ -1923,6 +1939,8 @@ function private.CreateFrames()
 	frame.salebox.number:SetValue(1)
 	frame.salebox.number:SetWidth(255)
 	frame.salebox.number:SetScript("OnValueChanged", frame.UpdateControls)
+	frame.salebox.number:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the number of stacks to be posted") end)
+	frame.salebox.number:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.number.element = "number"
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
@@ -1970,8 +1988,10 @@ function private.CreateFrames()
 	frame.salebox.number.label:SetJustifyH("LEFT")
 	frame.salebox.number.label:SetJustifyV("CENTER")
 
-   	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "UICheckButtonTemplate")
-    -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
+   	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "OptionsCheckButtonTemplate")
+ 	frame.salebox.numberonly:SetScript("OnEnter", function() return frame.SetButtonTooltip("Restrict active auctions to the 'number' value") end)
+	frame.salebox.numberonly:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+   -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
 	frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
 	frame.salebox.numberonly:SetHeight(20)
 	frame.salebox.numberonly:SetWidth(20)
@@ -1992,6 +2012,8 @@ function private.CreateFrames()
 	frame.salebox.duration:SetValue(3)
 	frame.salebox.duration:SetWidth(80)
 	frame.salebox.duration:SetScript("OnValueChanged", frame.UpdateControls)
+	frame.salebox.duration:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the time to post this item for") end)
+	frame.salebox.duration:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.duration.element = "duration"
 	frame.salebox.duration:Hide()
 	AppraiserSaleboxDurationLow:SetText("")
@@ -2011,6 +2033,8 @@ function private.CreateFrames()
 		return private.GetExtraPriceModels(frame.salebox.link)
 	end
 	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, frame.GetLinkPriceModels, "default")
+	frame.salebox.model.button:SetScript("OnEnter", function() return frame.SetButtonTooltip("Select the pricing\nmodel to use") end)
+	frame.salebox.model.button:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
 	frame.salebox.model.element = "model"
 	frame.salebox.model:Hide()
@@ -2019,7 +2043,9 @@ function private.CreateFrames()
 	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 30,0)
 	frame.salebox.model.label:SetText("Pricing model to use:")
 	
-	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "UICheckButtonTemplate")
+	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "OptionsCheckButtonTemplate")
+ 	frame.salebox.matcher:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enables the use of matchers\n(eg Undercut) when calculating prices") end)
+	frame.salebox.matcher:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.matcher:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, 5)
 	frame.salebox.matcher:SetHeight(20)
 	frame.salebox.matcher:SetWidth(20)
@@ -2031,7 +2057,9 @@ function private.CreateFrames()
 	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 5)
 	frame.salebox.matcher.label:SetText("Enable price matching")
 
-	frame.salebox.ignore = CreateFrame("CheckButton", "AppraiserSaleboxIgnore", frame.salebox, "UICheckButtonTemplate")
+	frame.salebox.ignore = CreateFrame("CheckButton", "AppraiserSaleboxIgnore", frame.salebox, "OptionsCheckButtonTemplate")
+	frame.salebox.ignore:SetScript("OnEnter", function() return frame.SetButtonTooltip("Removes this item\nfrom the item listing") end)
+	frame.salebox.ignore:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.ignore:SetPoint("TOPRIGHT", frame.salebox, "TOPRIGHT", -10, -3)
 	frame.salebox.ignore:SetHeight(20)
 	frame.salebox.ignore:SetWidth(20)
@@ -2043,7 +2071,9 @@ function private.CreateFrames()
 	frame.salebox.ignore.label:SetPoint("BOTTOMRIGHT", frame.salebox.ignore, "BOTTOMLEFT", -5, 6)
 	frame.salebox.ignore.label:SetText("Hide this item")
 
-	frame.salebox.bulk = CreateFrame("CheckButton", "AppraiserSaleboxBulk", frame.salebox, "UICheckButtonTemplate")
+	frame.salebox.bulk = CreateFrame("CheckButton", "AppraiserSaleboxBulk", frame.salebox, "OptionsCheckButtonTemplate")
+	frame.salebox.bulk:SetScript("OnEnter", function() return frame.SetButtonTooltip("Flags this item to be \nincluded in Batch Posting") end)
+	frame.salebox.bulk:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.bulk:SetPoint("TOPRIGHT", frame.salebox.ignore, "BOTTOMRIGHT", 0, 3)
 	frame.salebox.bulk:SetHeight(20)
 	frame.salebox.bulk:SetWidth(20)
@@ -2057,6 +2087,8 @@ function private.CreateFrames()
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
+	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enter new bid amount to set a Fixed Price") end)
+	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, function()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
@@ -2093,6 +2125,8 @@ function private.CreateFrames()
 
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
+	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enter new buyout amount to set a Fixed Price") end)
+	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, function()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
@@ -2137,6 +2171,8 @@ function private.CreateFrames()
 	frame.go:SetText("Post items")
 	frame.go:SetWidth(80)
 	frame.go:SetScript("OnClick", frame.PostAuctions)
+	frame.go:SetScript("OnEnter", function() return frame.SetButtonTooltip("Posts current item") end)
+	frame.go:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.go.postType = "single"
 	frame.go:Disable()
 
@@ -2145,6 +2181,11 @@ function private.CreateFrames()
 	frame.gobatch:SetText("Batch post")
 	frame.gobatch:SetWidth(80)
 	frame.gobatch:SetScript("OnClick", frame.PostAuctions)
+	frame.gobatch:SetScript("OnEnter", function() return frame.SetButtonTooltip(
+		"Alt: Refreshes batch post items\n"
+		.."Shift: Lists current batch post items\n"
+		.."Ctrl+Alt+Shift: Posts batch post items") end)
+	frame.gobatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.gobatch.postType = "batch"
 	frame.gobatch:Enable()
 
@@ -2153,6 +2194,8 @@ function private.CreateFrames()
 	frame.refresh:SetText("Refresh")
 	frame.refresh:SetWidth(80)
 	frame.refresh:SetScript("OnClick", frame.SmartRefresh)
+	frame.refresh:SetScript("OnEnter", function() return frame.SetButtonTooltip("Normal: Refreshes current item\nAlt: Refreshes whole item list") end)
+	frame.refresh:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	frame.age = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.age:SetPoint("RIGHT", frame.refresh, "LEFT", -10, 0)
@@ -2169,6 +2212,8 @@ function private.CreateFrames()
 	frame.cancel:SetScript("OnClick", function()
 		AucAdvanced.Post.Private.postRequests = {}
 	end)
+	frame.cancel:SetScript("OnEnter", function() return frame.SetButtonTooltip("Clears post queue") end)
+	frame.cancel:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.cancel:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
 	frame.cancel:SetScript("OnUpdate", function()
 		local postnum = #AucAdvanced.Post.Private.postRequests
@@ -2423,6 +2468,8 @@ function private.CreateFrames()
 	frame.imageview.purchase.buy:SetWidth(30)
 	frame.imageview.purchase.buy:SetText("Buy")
 	frame.imageview.purchase.buy:SetScript("OnClick", private.BuyAuction)
+ 	frame.imageview.purchase.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip("Buyout the selected\ncompeting auction") end)
+	frame.imageview.purchase.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.buy:Disable()
 	
 	frame.imageview.purchase.buy.price = frame.imageview.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2435,6 +2482,8 @@ function private.CreateFrames()
 	frame.imageview.purchase.bid:SetWidth(30)
 	frame.imageview.purchase.bid:SetText("Bid")
 	frame.imageview.purchase.bid:SetScript("OnClick", private.BidAuction)
+ 	frame.imageview.purchase.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Place a bid on the\nselected competing auction") end)
+	frame.imageview.purchase.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.bid:Disable()
 	
 	frame.imageview.purchase.bid.price = frame.imageview.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2525,6 +2574,8 @@ function private.CreateFrames()
 	frame.salebox.numberentry:SetWidth(30)
 	frame.salebox.numberentry:SetNumber(0)
 	frame.salebox.numberentry:SetAutoFocus(false)
+	frame.salebox.numberentry:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the number of stacks to be posted") end)
+	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
 		local text = frame.salebox.numberentry:GetText()
 		if (text:lower() == "full") then
@@ -2589,6 +2640,8 @@ function private.CreateFrames()
 	frame.salebox.stackentry:SetHeight(16)
 	frame.salebox.stackentry:SetWidth(30)
 	frame.salebox.stackentry:SetAutoFocus(false)
+	frame.salebox.stackentry:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the number of items per posted stack") end)
+	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
 		frame.salebox.stack:SetValue(frame.salebox.stackentry:GetNumber())
 		frame.salebox.stackentry:ClearFocus()
