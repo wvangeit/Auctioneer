@@ -1604,20 +1604,35 @@ function private.CreateFrames()
 
 	frame.DoTooltip = function ()
 		if not this.id then this = this:GetParent() end
-		local id = this.id
-		local pos = math.floor(frame.scroller:GetValue())
-		local item = frame.list[pos + id]
-		if item then
-			local name = item[2]
-			local link = item[7]
-			local count = item[6]
-			GameTooltip:SetOwner(frame.itembox, "ANCHOR_NONE")
-			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, count)
+		if this.id then --we're mousing over the itemlist
+			local id = this.id
+			local pos = math.floor(frame.scroller:GetValue())
+			local item = frame.list[pos + id]
+			if item then
+				local name = item[2]
+				local link = item[7]
+				local count = item[6]
+				GameTooltip:SetOwner(frame.itembox, "ANCHOR_NONE")
+				GameTooltip:SetHyperlink(link)
+				if (EnhTooltip) then
+					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, count)
+				end
+				GameTooltip:ClearAllPoints()
+				GameTooltip:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0)
 			end
-			GameTooltip:ClearAllPoints()
-			GameTooltip:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0)
+		else --we're mousing over the itemslot
+			if frame.salebox.sig then
+				local link = frame.salebox.link
+				local count = frame.salebox.count
+				local _,name = strsplit("[",(strsplit("]",frame.salebox.name:GetText()))) --isolates the text between the []
+				GameTooltip:SetOwner(frame.salebox.icon, "ANCHOR_NONE")
+				GameTooltip:SetHyperlink(link)
+				if (EnhTooltip) then
+					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, count)
+				end
+				GameTooltip:ClearAllPoints()
+				GameTooltip:SetPoint("TOPRIGHT", frame.salebox.icon, "TOPLEFT", -10, 0)
+			end
 		end
 	end
 	frame.UndoTooltip = function ()
@@ -1848,6 +1863,8 @@ function private.CreateFrames()
 	frame.salebox.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
 	frame.salebox.icon:SetScript("OnReceiveDrag", frame.IconClicked)
+	frame.salebox.icon:SetScript("OnEnter", frame.DoTooltip)
+	frame.salebox.icon:SetScript("OnLeave", frame.UndoTooltip)
 	
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
