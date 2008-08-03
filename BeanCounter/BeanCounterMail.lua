@@ -194,10 +194,9 @@ function private.mailSort()
 end
 --retrieves the itemID from the DB
 function private.matchDB(text)
-	text = text:gsub("%((.+)%)", "%%(%1%%)") -- Excapes () if they are in the itemName So they are not treated as a capture. ie Cat Carrier (Siamese) becomes Cat Carrier %(Siamese%)
 	local itemID
 	for i, itemLink in pairs(BeanCounterDB.ItemIDArray) do
-		if itemLink:match("%[("..text..")%]") then 
+		if itemLink:find("["..text.."]", 1, true) then 
 			itemID = string.split(":", i)
 			--debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
 			return itemID, itemLink
