@@ -28,6 +28,8 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+
+if not BtmScan then return end --Stopgap measure for problem with Btmscan not found in embedded version
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Snatch")
 if not lib then return end
@@ -78,27 +80,28 @@ function lib.Search(item)
 		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
 		if itemConfig.buyBelow and itemConfig.buyBelow>0 then
 			local snatchitemID, _, _ = strsplit(':', sig)
-		itemid = tonumber(itemid)
-		snatchitemID = tonumber(snatchitemID)
-		if itemid == snatchitemID then 
-			value = itemConfig.buyBelow
-			if value == nil then
-				value = 0
-			end
-			stackSize = item[Const.COUNT]
-			value = value * stackSize
-			if --get("snatch.allow.buy") and 
-			item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value then
-				return "buy", value
-			elseif --get("snatch.allow.bid") and 
-			item[Const.PRICE] <= value then
-					return "bid", value
+			itemid = tonumber(itemid)
+			snatchitemID = tonumber(snatchitemID)
+			if itemid == snatchitemID then 
+				value = itemConfig.buyBelow
+				if value == nil then
+					value = 0
 				end
-			else
-				return false, "Not in snatch list"
+				stackSize = item[Const.COUNT]
+				value = value * stackSize
+				if --get("snatch.allow.buy") and 
+							item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value then
+					return "buy", value
+				elseif --get("snatch.allow.bid") and 
+										item[Const.PRICE] <= value then
+					return "bid", value
+				else
+					return false, "Price not low enough"
+				end
 			end
 		end
 	end
+	return false, "Not in snatch list"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
