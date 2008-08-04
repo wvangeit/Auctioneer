@@ -524,15 +524,13 @@ private.CommitQueuewasGetAll = {}
 
 local CommitRunning = false
 Commitfunction = function()
+
 	local ProcessSpeed = AucAdvanced.Settings.GetSetting("scancommit.speed")
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
 	--	if not private.curQuery then CommitRunning = false return end
 	CommitRunning = true
-	local origscandata, origidList = lib.GetScanData()
-	--create clones of the scandata so that we have a constant, local table during the process (ie can't be messed with)
-	local scandata = replicate(origscandata)
-	local idList = replicate(origidList)
+	local scandata, idList = lib.GetScanData()
 
 	--grab the first item in the commit queue, and bump everything else down
 	local wasIncomplete = private.CommitQueue[1]["wasIncomplete"]
@@ -698,19 +696,9 @@ Commitfunction = function()
 	CommitProgressBar:SetValue(100)
 	processStats("complete")
 
-	--now that we're done, set the scandata to the new updated scandata
-	empty(origscandata)
-	for i,j in pairs(scandata) do
-		origscandata[i] = replicate(j)
-	end
-	empty(origidList)
-	for i,j in pairs(idList) do
-		origidList[i] = replicate(j)
-	end
-	
 	local filterCount = private.filteredCount
 
-	local currentCount = #origscandata.image
+	local currentCount = #scandata.image
 	if (updateCount + sameCount + newCount + filterCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterCount, scanCount))
 	end
@@ -768,32 +756,32 @@ Commitfunction = function()
 		lib.Print(scanTime)
 	end
 
-	if (not origscandata.scanstats) then origscandata.scanstats = {} end
-	if (origscandata.scanstats[1]) then
-		origscandata.scanstats[2] = origscandata.scanstats[1]
-		origscandata.scanstats[1] = nil
+	if (not scandata.scanstats) then scandata.scanstats = {} end
+	if (scandata.scanstats[1]) then
+		scandata.scanstats[2] = scandata.scanstats[1]
+		scandata.scanstats[1] = nil
 	end
-	if (origscandata.scanstats[0]) then origscandata.scanstats[1] = origscandata.scanstats[0] end
-	origscandata.scanstats[0] = {}
-	origscandata.scanstats[0].oldCount = oldCount
-	origscandata.scanstats[0].sameCount = sameCount
-	origscandata.scanstats[0].newCount = newCount
-	origscandata.scanstats[0].updateCount = updateCount
-	origscandata.scanstats[0].earlyDeleteCount = earlyDeleteCount
-	origscandata.scanstats[0].expiredDeleteCount = expiredDeleteCount
-	origscandata.scanstats[0].currentCount = currentCount
-	origscandata.scanstats[0].missedCount = missedCount
-	origscandata.scanstats[0].filteredCount = filterCount
-	origscandata.scanstats[0].wasIncomplete = wasIncomplete or false
-	origscandata.scanstats[0].startTime = scanStartTime
-	origscandata.scanstats[0].endTime = now
-	origscandata.scanstats[0].started = scanStarted
-	origscandata.scanstats[0].paused = totalPaused
-	origscandata.scanstats[0].ended = GetTime()
-	origscandata.scanstats[0].elapsed = GetTime() - scanStarted - totalPaused
-	origscandata.scanstats[0].query = replicate(TempcurQuery)
-	origscandata.time = now
-	if wasGetAll then origscandata.LastFullScan = now end
+	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
+	scandata.scanstats[0] = {}
+	scandata.scanstats[0].oldCount = oldCount
+	scandata.scanstats[0].sameCount = sameCount
+	scandata.scanstats[0].newCount = newCount
+	scandata.scanstats[0].updateCount = updateCount
+	scandata.scanstats[0].earlyDeleteCount = earlyDeleteCount
+	scandata.scanstats[0].expiredDeleteCount = expiredDeleteCount
+	scandata.scanstats[0].currentCount = currentCount
+	scandata.scanstats[0].missedCount = missedCount
+	scandata.scanstats[0].filteredCount = filterCount
+	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
+	scandata.scanstats[0].startTime = scanStartTime
+	scandata.scanstats[0].endTime = now
+	scandata.scanstats[0].started = scanStarted
+	scandata.scanstats[0].paused = totalPaused
+	scandata.scanstats[0].ended = GetTime()
+	scandata.scanstats[0].elapsed = GetTime() - scanStarted - totalPaused
+	scandata.scanstats[0].query = replicate(TempcurQuery)
+	scandata.time = now
+	if wasGetAll then scandata.LastFullScan = now end
 
 	private.filteredCount = 0
 
@@ -801,11 +789,11 @@ Commitfunction = function()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engineLib.Processor then
-				engineLib.Processor("scanstats", origscandata.scanstats[0])
+				engineLib.Processor("scanstats", scandata.scanstats[0])
 			end
 		end
 	end
-	AucAdvanced.Buy.FinishedSearch(origscandata.scanstats[0].query)
+	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
 
 	--Hide the progress indicator
 	CommitProgressBar:Hide()

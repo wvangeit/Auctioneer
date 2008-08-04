@@ -69,6 +69,7 @@ function private.CreateFrames()
 	frame.cache = {}
 	
 	function frame.GenerateList(repos)
+		if not (frame.salebox and frame.salebox:IsVisible()) then return end --If we don't have Appraiser open, we don't need to run this. It will run when we go to Appraiser
 		local n = #(frame.list)
 		for i=1, n do
 			frame.list[i] = nil
