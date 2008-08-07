@@ -55,13 +55,16 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 	if not private.compressed then private.refreshItemIDArray() private.sortArrayByDate() private.compactDB() private.prunePostedDB()  private.compressed = true end
 	
 	if not itemName then return end
+	if not settings then settings = private.frame.getCheckboxSettings() end
+	
 	tbl = {}
 	for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
 		if itemLink:lower():find(itemName:lower(), 1, true)  then
 			if settings.exact and private.frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
 				local name = itemLink:match("^|c%x+|H.+|h%[(.+)%].*") or "failed name"
 				if itemName:lower() == name:lower() then
-					local itemID = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+					local itemID, suffix = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+					settings.suffix = suffix -- Store Suffix used to later filter unwated results from the itemID search
 					tbl[itemID] = itemID --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
 					break
 				end
@@ -112,7 +115,6 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	--debugPrint(id, settings, queryReturn, count, itemTexture)
 	
 	--Retrives all matching results
-	local link
 	for i in pairs(private.serverData) do
 		if settings.selectbox[2] == "alliance" and private.serverData[i]["faction"] and private.serverData[i]["faction"]:lower() ~= settings.selectbox[2] then
 			--If looking for alliance and player is not alliance fall into this null
@@ -183,8 +185,8 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	for i,v in pairs(data.temp.completedAuctions) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.itemKey then
-			if v[3]:match(".*:("..settings.itemKey.."):.-") then
+		if settings.exact and settings.suffix then
+			if v[3]:match(".*:("..settings.suffix.."):.-") then
 				-- do nothing and add item to data table
 			else
 				match = false --we want exact matches and this is not one
@@ -204,8 +206,8 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	for i,v in pairs(data.temp.failedAuctions) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.itemKey then
-			if v[3]:match(".*:("..settings.itemKey.."):.-") then
+		if settings.exact and settings.suffix then
+			if v[3]:match(".*:("..settings.suffix.."):.-") then
 				-- do nothing and add item to data table
 			else
 				match = false --we want exact matches and this is not one
@@ -225,8 +227,8 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	for i,v in pairs(data.temp["completedBids/Buyouts"]) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.itemKey then
-			if v[3]:match(".*:("..settings.itemKey.."):.-") then
+		if settings.exact and settings.suffix then
+			if v[3]:match(".*:("..settings.suffix.."):.-") then
 				-- do nothing and add item to data table
 			else
 				match = false --we want exact matches and this is not one
@@ -246,8 +248,8 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	for i,v in pairs(data.temp.failedBids) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.itemKey then
-			if v[3]:match(".*:("..settings.itemKey.."):.-") then
+		if settings.exact and settings.suffix then
+			if v[3]:match(".*:("..settings.suffix.."):.-") then
 				-- do nothing and add item to data table
 			else
 				match = false --we want exact matches and this is not one

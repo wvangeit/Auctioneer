@@ -70,8 +70,8 @@ function lib.API.search(name, settings, queryReturn, count)
 		--search data
 		if itemLink then
 			--itemKey is used to filter results if exact is used. We need the key to remove of the XXX style items from returns
-			settings.itemKey = itemLink:match("item:.+:(.-):.-%[.-%]")
-			if settings.itemKey == 0 then settings.itemKey = nil end
+			settings.suffix = itemLink:match("item:.+:(.-):.-%[.-%]")
+			if settings.suffix == 0 then settings.suffix = nil end
 			SearchRequest[1] = private.searchByItemID(itemName, settings, queryReturn, count)
 		else
 			SearchRequest[1] = private.startSearch(itemName, settings, queryReturn, count)
