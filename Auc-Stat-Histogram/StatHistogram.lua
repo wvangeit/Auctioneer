@@ -42,7 +42,7 @@ local totaldata
 local sessionseen = {}
 local stattable = {}
 local totalstattable = {}
-			for i = 1, 750 do totalstattable[i] = 0 end
+			for i = 1, 300 do totalstattable[i] = 0 end
 local PDcurve = {}
 local newstats = {}
 local array = {}
@@ -110,12 +110,12 @@ function private.GetPriceData()
 	end
 	local step = stattable["step"]
 	local refactored = false
-	if count > 30 then --we've seen enough to get a fairly decent price to base the precision on
-		if (step > (median/225)) and (step > 1) then
-			private.refactor(median*3, 750)
+	if count > 20 then --we've seen enough to get a fairly decent price to base the precision on
+		if (step > (median/85)) and (step > 1) then
+			private.refactor(median*3, 300)
 			refactored = true
-		elseif step < (median/275) then
-			private.refactor(median*3, 750)
+		elseif step < (median/115) then
+			private.refactor(median*3, 300)
 			refactored = true
 		end
 	end
@@ -190,7 +190,7 @@ function lib.GetItemPDF(link, faction)
 	if not data[faction][itemId][property] then return end
 	private.UnpackStats(data[faction][itemId][property])
 	local median, Qone, Qthree, step, count, refactored = private.GetPriceData()
-	if median and (median/step > 225) and (median/step < 275) and (not sessionseen[tostring(itemId).."-"..tostring(property)]) then
+	--[[if median and (median/step > 85) and (median/step < 115) and (not sessionseen[tostring(itemId).."-"..tostring(property)]) then
 		--print(median/step.."      "..step)
 		sessionseen[tostring(itemId).."-"..tostring(property)] = true
 		local index = 1
@@ -199,13 +199,13 @@ function lib.GetItemPDF(link, faction)
 			index = index + 1
 		end
 		for i = stattable["min"], stattable["max"] do
-			totalstattable[i] = totalstattable[i] + (stattable[i]/stattable["count"])
+			totalstattable[i] = totalstattable[i] + math.floor(1000*stattable[i]/stattable["count"])
 		end
 		AucAdvancedStatHistogramTotalData = tostring(totalstattable[1])
-		for i = 2, 750 do
+		for i = 2, 300 do
 			AucAdvancedStatHistogramTotalData = AucAdvancedStatHistogramTotalData..","..tostring(totalstattable[i] or 0)
 		end
-	end
+	end]]
 	if refactored then
 		--data has been refactored, so we need to repack it
 		data[faction][itemId][property] = private.PackStats()
@@ -296,7 +296,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		if not stattable[priceindex] then stattable[priceindex] = 0 end
 		stattable[priceindex] = stattable[priceindex] + 1
 		data[faction][itemId][property] = private.PackStats()
-	elseif priceindex <= 750 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
+	elseif priceindex <= 300 then --we don't want prices too high: they'll bloat the data.  If range needs to go higher, we'll refactor later
 		stattable["count"] = stattable["count"] + 1
 		if not stattable["min"] then --first time we've seen this
 			stattable["min"] = priceindex
@@ -430,7 +430,42 @@ end
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-
+	--Forces all data to be refactored if the database hasn't been updated yet
+	local VERSION = 2
+	if (data["version"]) and (data["version"] >= VERSION) then return end
+	local function findallprices()
+		print("Auc-Stat-Histogram: Updating database.  Please be patient")
+		local i = 1
+		for faction, itemlist in pairs(data) do
+			if type(itemlist) == "table" then
+				for itemId, proplist in pairs(itemlist) do
+					for prop, datastring in pairs(proplist) do
+						i = i+1
+						empty(stattable)
+						private.UnpackStats(datastring)
+						local _,_,_,_,_,refactored = private.GetPriceData()
+						if refactored then
+							data[faction][itemId][prop] = private.PackStats()
+						end
+						if i%5000 == 0 then
+							coroutine.yield()
+						end
+					end
+				end
+			end
+		end
+		print("Auc-Stat-Histogram: Database is updated.  Thank You for your patience")
+		data["version"] = VERSION
+	end
+	local co = coroutine.create(findallprices)
+	coroutine.resume(co)
+	local function onupdate()
+		if coroutine.status(co) ~= "dead" then
+			coroutine.resume(co)
+		end
+	end
+	local onupdateframe = CreateFrame("Frame")
+	onupdateframe:SetScript("OnUpdate", onupdate)
 end
 
 function private.makeData()
@@ -443,7 +478,7 @@ function private.makeTotalData()
 	if totaldata then return end
 	AucAdvancedStatHistogramTotalData = ""
 	totaldata = AucAdvancedStatHistogramTotalData
-	private.DataLoaded()
+	--private.DataLoaded()
 end
 
 function private.UnpackStats(dataItem)
@@ -502,10 +537,10 @@ function private.refactor(pmax, precision)
 	newstats["min"] = math.ceil(conversion*stattable["min"])
 	newstats["max"] = math.ceil(conversion*stattable["max"])
 	local count = 0
-	if newstats["max"] > 750 then
+	if newstats["max"] > 300 then
 		--we need to crop off the top end
-		newstats["max"] = 750
-		stattable["max"] = math.floor(750/conversion)
+		newstats["max"] = 300
+		stattable["max"] = math.floor(300/conversion)
 	end
 	for i = newstats["min"], newstats["max"] do
 		newstats[i] = 0
