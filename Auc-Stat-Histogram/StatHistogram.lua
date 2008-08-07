@@ -123,6 +123,7 @@ function private.GetPriceData()
 end
 
 function lib.GetPrice(link, faction)
+	if not get("stat.histogram.enable") then return end
 	empty(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
@@ -152,6 +153,7 @@ function lib.GetPriceColumns()
 end
 
 function lib.GetPriceArray(link, faction)
+	if not get("stat.histogram.enable") then return end
 	--make sure that array is empty
 	empty(array)
 	local median, Qone, Qthree, step, count = lib.GetPrice(link, faction)
@@ -179,6 +181,7 @@ function private.ItemPDF(price)
 end
 
 function lib.GetItemPDF(link, faction)
+	if not get("stat.histogram.enable") then return end
 	empty(PDcurve)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
@@ -241,6 +244,7 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
+	if not get("stat.histogram.enable") then return end
 	if (not data) then private.makeData() end
 
 	-- This function is responsible for processing and storing the stats after each scan
@@ -347,6 +351,9 @@ function private.SetupConfigGui(gui)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    "Histogram options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.enable", "Enable Histogram Stats")
+	gui:AddTip(id, "Allow Histogram to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.tooltip", "Show Histogram stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Histogram module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.median", "Display Median")
@@ -412,6 +419,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.histogram.iqr", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.precision", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.quantmul", true)
+	AucAdvanced.Settings.SetDefault("stat.histogram.enable", true)
 end
 
 function lib.ClearItem(hyperlink, faction)
