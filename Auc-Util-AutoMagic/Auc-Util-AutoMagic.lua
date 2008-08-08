@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
-	Version: <%version%> (<%codename%>)
+	Version: 5.0.PRE.3312 (BillyGoat)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
@@ -219,27 +219,27 @@ function lib.slidebar()
 			function lib.sideIconEnter()
 				local SlideBar = LibStub:GetLibrary("SlideBar", true)
 				if embedded then
-					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIcon")
 				else
-					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
+					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
 				end
 			end
 			function lib.sideIconLeave()
 				local SlideBar = LibStub:GetLibrary("SlideBar", true)
 				if embedded then
-					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 				else
-					sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 				end
 			end
 			if embedded then
-				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\AucAdvanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
+				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 			else
 				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
 			end
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-			sideIcon:SetScript("OnEnter", lib.sideIconEnter)
-			sideIcon:SetScript("OnLeave", lib.sideIconLeave)
+			sideIcon.OnEnter = lib.sideIconEnter
+			sideIcon.OnLeave = lib.sideIconLeave
 			sideIcon:SetScript("OnClick", lib.autosellslidebar)
 			sideIcon.tip = {
 				"AutoMagic: Auto Sell Config",
