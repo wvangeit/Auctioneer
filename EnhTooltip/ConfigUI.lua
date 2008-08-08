@@ -511,10 +511,11 @@ if LibStub then
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", click)
 		sideIcon.tip = {
-			"EnhTooltip/Informant",
+			--"EnhTooltip/Informant",
+			"EnhTooltip",
 			"Description.",
 			"{{Click}} to open the Enhanced Tooltip configuration.",
-			"{{Right-Click}} to open Informant configuration.",
+			--"{{Right-Click}} to open Informant configuration.",
 		}
 	end
 end
