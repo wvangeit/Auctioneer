@@ -1,8 +1,12 @@
 ## Title: Auc:Util:ItemSuggest
 ## Interface: 20400
 ## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan
+## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
-## SavedVariables: 
-Auc-Util-ItemSuggest.lua
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+## SavedVariables: Auc-Util-ItemSuggest.lua
+
 Embed.xml
