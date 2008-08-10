@@ -151,7 +151,7 @@ function lib.CanSupplyMarket()
 	return false
 end
 
-function lib.GetPrice(link, _, match)
+function lib.GetPrice(link, serverKey, match)
 	local sig = lib.GetSigFromLink(link)
 	local curModel, curModelText
 	
@@ -175,16 +175,16 @@ function lib.GetPrice(link, _, match)
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
 		curModelText = curModelText.."("..curModel..")"
 		if curModel == "market" then
-			newBuy, seen = AucAdvanced.API.GetMarketValue(link)
+			newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
 		else
-			newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+			newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
 		end
 		if (not newBuy) or (newBuy == 0) then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
 			if curModel == "market" then
-				newBuy, seen = AucAdvanced.API.GetMarketValue(link)
+				newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
 			else
-				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
 			end
 		end
 	elseif curModel == "fixed" then
@@ -192,20 +192,20 @@ function lib.GetPrice(link, _, match)
 		newBid = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.bid")
 		seen = 99
 	elseif curModel == "market" then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(link)
+		newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
 	else
-		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
 	end
 	if match then
 		local biddown
 		if curModel == "fixed" then
 			if newBuy and newBuy > 0 then
 				biddown = newBid/newBuy
-				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy, serverKey)
 				newBid = newBuy * biddown
 			end
 		else
-			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy)
+			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy, serverKey)
 		end
 	end
 	if curModel ~= "fixed" then
