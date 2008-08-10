@@ -86,7 +86,11 @@ function private.GetPriceData()
 	local recount = 0
 	--now find the Q1, median, and Q3 values
 	if stattable["min"] == stattable["max"] then
+		--no need to do fancy median calculations
 		median = stattable["min"]*stattable["step"]
+		--count = value at the only index we have
+		count = stattable[stattable["min"]]
+		stattable["count"] = count
 	else
 		for i = stattable["min"], stattable["max"] do
 			recount = recount + (stattable[i] or 0)
@@ -101,12 +105,11 @@ function private.GetPriceData()
 			elseif Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
 				if recount >= count * 3/4 then
 					Qthree = i*stattable["step"]
-					break
 				end
-			else
-				break
 			end
 		end
+		count = recount --We've just rechecked the count, so save the correct value
+		stattable["count"] = count
 	end
 	local step = stattable["step"]
 	local refactored = false
