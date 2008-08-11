@@ -1371,7 +1371,7 @@ function private.CreateFrames()
 
 	function frame.PostBySig(sig, dryRun)
 		local generallink, itemName = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
-		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(generallink, _, true)
+		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(generallink, nil, true)
 		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
 		local numberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".numberonly")
 
