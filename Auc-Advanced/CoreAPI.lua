@@ -676,6 +676,9 @@ local bellCurveMeta = {
             elseif (stddev ~= stddev) then
                 error("Standard deviation must be a real number");
             end
+			if stddev < .1 then --need to prevent obsurdly small stddevs like 1e-11, as they cause freeze-ups
+				stddev = .1
+			end
             self.mean = mean;
             self.stddev = stddev;
             self.param1 = 1/(stddev*sq2pi);     -- Make __call a little faster where we can
