@@ -162,7 +162,7 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName] = {}
 		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
 		
-		BeanCounterDB[private.realmName][private.playerName]["faction"] = "unkown" --faction is recorded when we get the login event
+		BeanCounterDB[private.realmName][private.playerName]["faction"] = "unknown" --faction is recorded when we get the login event
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
 		
 		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
