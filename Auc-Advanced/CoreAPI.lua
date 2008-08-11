@@ -314,9 +314,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
         
         serverKey = reserved.."-"..serverKey;
     end
-    
-	local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
-	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
+    serverKey = serverKey or AucAdvanced.GetFaction()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -324,7 +322,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 				and not engineLib.IsValidAlgorithm(itemLink) then
 					return
 				end
-				local algosig = strjoin(":", algorithm, itemLink, faction, realm)
+				local algosig = strjoin(":", algorithm, itemLink, serverKey)
 				for pos, history in ipairs(private.algorithmstack) do
 					if (history == algosig) then
 						-- We are looping
@@ -340,13 +338,13 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 				local price, seen, array
 				table.insert(private.algorithmstack, algosig)
 				if (engineLib.GetPriceArray) then
-					array = engineLib.GetPriceArray(itemLink, faction, realm)
+					array = engineLib.GetPriceArray(itemLink, serverKey)
 					if (array) then
 						price = array.price
 						seen = array.seen
 					end
 				else
-					price = engineLib.GetPrice(itemLink, faction, realm)
+					price = engineLib.GetPrice(itemLink, serverKey)
 				end
 				table.remove(private.algorithmstack, -1)
 				return price, seen, array
