@@ -130,6 +130,7 @@ function lib.Search(item)
 			if UnitFactionGroup("player") == "Horde" then faction = "-Alliance" end
 			if UnitFactionGroup("player") == "Alliance" then faction = "-Horde" end
 			comparefaction = GetRealmName()..faction --If you're at home, compare to cross-faction
+			faction = nil
 		else
 			comparefaction = GetRealmName().."-"..UnitFactionGroup("player") --if you're at neutral, compare to home
 		end
