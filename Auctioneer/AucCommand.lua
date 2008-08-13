@@ -1931,8 +1931,8 @@ function protectWindow(param, khaosCommand)
 	if (param == 'never' or param == 'off' or param == _AUCT('CmdProtectWindow0') or param == _AUCT('CmdOff') or tonumber(param) == 0) then
 		--If AucAdvanced is Loaded, defer to it
 		if AucAdvanced then 
-			if AucAdvanced.Modules.Util.ProtectWindow then
-				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 1)
+			if AucAdvanced.Modules.Util.AHWindowControl then
+				AucAdvanced.Settings.SetSetting("util.protectwindow.protectwindow", 1)
 				mode = 0;
 			end
 		--Otherwise, behave as normal	
@@ -1945,8 +1945,8 @@ function protectWindow(param, khaosCommand)
 		mode = 1;
 		--If AucAdvanced is loaded, defer to it.
 		if AucAdvanced then
-			if AucAdvanced.Modules.Util.ProtectWindow then
-				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 3)
+			if AucAdvanced.Modules.Util.AHWindowControl then
+				AucAdvanced.Settings.SetSetting("util.protectwindow.protectwindow", 3)
 			end
 		--Otherwise, behave as normal.
 		else
@@ -1961,8 +1961,8 @@ function protectWindow(param, khaosCommand)
 		mode = 2;
 		--If AucAdvanced is loaded, defer to it.
 		if AucAdvanced then
-			if AucAdvanced.Modules.Util.ProtectWindow then
-				AucAdvanced.Modules.Util.ProtectWindow.windowProtect("set", 2)
+			if AucAdvanced.Modules.Util.AHWindowControl then
+				AucAdvanced.Settings.SetSetting("util.protectwindow.protectwindow", 2)
 			end
 		--Otherwise, behave as normal.
 		else
