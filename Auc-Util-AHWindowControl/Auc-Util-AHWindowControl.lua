@@ -44,7 +44,7 @@ function lib.GetName()
 	return libName
 end
 
-local debug = true
+local debug = false
 local function debugPrint(...)
 	if debug  then
 		print(...)
