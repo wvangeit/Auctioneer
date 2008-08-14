@@ -91,7 +91,7 @@ if daterange then
 					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
 					
-					if matchstacksize then
+					if matchstacksize and AucAdvAppraiserFrame then
 						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
@@ -109,7 +109,7 @@ if daterange then
 					local stack, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
 					
-					if matchstacksize then
+					if matchstacksize and AucAdvAppraiserFrame then
 						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
 							tempnum = tempnum + 1
 						end
