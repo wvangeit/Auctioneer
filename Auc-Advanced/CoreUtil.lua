@@ -171,7 +171,6 @@ end
 
 function lib.GetFaction()
 	local realmName = GetRealmName()
-	local currentZone = GetMinimapZoneText()
 	local factionGroup = lib.GetFactionGroup()
 	if not factionGroup then return end
 
