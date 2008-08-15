@@ -177,7 +177,7 @@ local convertToID = 0
 local newBid = 0
 local newBuy = 0
 local curModelText = "Unknown"
-local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.id, _,get(lcName..".matching.check"))
+local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.id, nil ,get(lcName..".matching.check"))
 local reagentPrice = 0		
 
 if newBuy == nil then newBuy = newBid end
