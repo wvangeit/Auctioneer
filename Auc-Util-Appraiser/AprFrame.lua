@@ -540,6 +540,7 @@ function private.CreateFrames()
 			defStack = tonumber(defStack)
 		end
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
+		frame.salebox.number:SetAdjustedRange(curNumber, -2, -1)--make sure the slider can handle the setting before we set it
 		frame.salebox.number:SetAdjustedValue(curNumber)
 		
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
