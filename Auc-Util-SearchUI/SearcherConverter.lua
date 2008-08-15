@@ -189,7 +189,7 @@ function lib.Search(item)
 	local newBid = 0
 	local newBuy = 0
 	local curModelText = "Unknown"
-	local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.ITEMID], _,get("conveter.matching.check"))
+	local newBid, newBuy,_, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.ITEMID], nil,get("conveter.matching.check"))
 	local evalPrice = 0		
 
 	if newBuy == nil then newBuy = newBid end
@@ -238,7 +238,7 @@ function lib.Search(item)
 				local newBid = 0
 				local newBuy = 0
 				local curModelText = "Unknown"
-				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, nil, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then
@@ -284,7 +284,7 @@ function lib.Search(item)
 				newBid = 0
 				newBuy = 0
 				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, nil, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then
@@ -333,7 +333,7 @@ function lib.Search(item)
 				local newBid = 0
 				local newBuy = 0
 				local curModelText = "Unknown"
-				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				local newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, nil, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then
@@ -388,7 +388,7 @@ function lib.Search(item)
 				newBid = 0
 				newBuy = 0
 				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, _, get("converter.matching.check"))
+				newBid, newBuy, _, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(convertToID, nil, get("converter.matching.check"))
 				
 				if newBuy == nil then newBuy = newBid end
 				if newBuy == nil then
