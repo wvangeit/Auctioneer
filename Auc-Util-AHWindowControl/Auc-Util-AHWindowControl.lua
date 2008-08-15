@@ -191,7 +191,7 @@ function private.AdjustProtection ()
 	if not UIPanelWindows["AuctionFrame"] then
 		debugPrint("AuctionFrame doesn't exist yet.")
 		return
-	elseif (get("util.protectwindow.protectwindow") == 1) then
+	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
 		debugPrint("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
 		if AuctionFrame:IsVisible() then 
@@ -199,7 +199,7 @@ function private.AdjustProtection ()
 			ShowUIPanel(AuctionFrame, 1) 
 			AuctionFrame.IsShown = nil 
 		end
-	elseif (get("util.protectwindow.protectwindow") == 3) then
+	elseif (get("util.protectwindow.protectwindow") == 3) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
 		debugPrint("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
 		if AuctionFrame:IsVisible() then 
@@ -207,7 +207,7 @@ function private.AdjustProtection ()
 			ShowUIPanel(AuctionFrame, 1) 
 			AuctionFrame.IsShown = nil 
 		end
-	elseif get("util.protectwindow.protectwindow") == 2 then
+	elseif get("util.protectwindow.protectwindow") == 2 and AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
 		debugPrint("Disabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		if AuctionFrame:IsVisible() then
 			AuctionFrame.Hide = function() end 
