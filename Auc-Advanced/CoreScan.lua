@@ -785,6 +785,7 @@ Commitfunction = function()
 
 	private.filteredCount = 0
 
+	AucAdvanced.API.ClearMarketCache();
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
@@ -830,8 +831,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private["curQuery"] = nil
 	private["curScan"] = nil
     
-    AucAdvanced.API.ClearMarketCache();
-
 	if coroutine.status(CoCommit) ~= "dead" then
 		CoroutineResume(CoCommit)
 	else

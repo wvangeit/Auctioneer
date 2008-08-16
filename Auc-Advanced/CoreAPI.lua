@@ -254,7 +254,7 @@ do
 
     -- Clears the cache for AucAdvanced.API.GetMarketValue()
     function lib.ClearMarketCache()
-        for x = 1, #cache do
+        for x, _ in pairs(cache) do
             cache[x] = nil;
         end
     end
