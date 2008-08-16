@@ -371,6 +371,7 @@ private.Prompt:SetBackdrop({
 })
 private.Prompt:SetBackdropColor(0,0,0,0.8)
 private.Prompt:SetMovable(true)
+private.Prompt:SetClampedToScreen(true)
 
 private.Prompt.Item = CreateFrame("Button", "AucAdvancedBuyPromptItem", private.Prompt)
 private.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
@@ -418,5 +419,20 @@ private.Prompt.No:SetText("Cancel")
 private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -20, 0)
 private.Prompt.No:SetScript("OnClick", private.CancelPurchase)
 
+private.Prompt.DragTop = CreateFrame("Button", nil, private.Prompt)
+private.Prompt.DragTop:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 10, -5)
+private.Prompt.DragTop:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -10, -5)
+private.Prompt.DragTop:SetHeight(6)
+private.Prompt.DragTop:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+private.Prompt.DragTop:SetScript("OnMouseDown", function() private.Prompt:StartMoving() end)
+private.Prompt.DragTop:SetScript("OnMouseUp", function() private.Prompt:StopMovingOrSizing() end)
+
+private.Prompt.DragBottom = CreateFrame("Button", nil, private.Prompt)
+private.Prompt.DragBottom:SetPoint("BOTTOMLEFT", private.Prompt, "BOTTOMLEFT", 10, 5)
+private.Prompt.DragBottom:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -10, 5)
+private.Prompt.DragBottom:SetHeight(6)
+private.Prompt.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+private.Prompt.DragBottom:SetScript("OnMouseDown", function() private.Prompt:StartMoving() end)
+private.Prompt.DragBottom:SetScript("OnMouseUp", function() private.Prompt:StopMovingOrSizing() end)
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
