@@ -75,7 +75,6 @@ local print_order = {
  -- TODO: check for mistakes and mis-classifications/exceptions, need high level enchanters to check output!
 local attributes = {
 
-	{ search = _BARKLOC("EnchSearchHealing"), key = "factor_stat.other", print = _BARKLOC("ShortHealing") },		-- INCORRECTLY matches spell power after Blizzard changed the strings
 	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("Crusader") },	-- incorrectly matched strength
 	{ search = _BARKLOC("EnchSearchIntellect"), key = 'factor_stat.intellect', print = _BARKLOC("INT") },
 	{ search = _BARKLOC("EnchSearchBoarSpeed"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortBoarSpeed") },		-- INCORRECTLY matches stamina?
@@ -103,6 +102,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchSpellPower1"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "spell power"
 	{ search = _BARKLOC("EnchSearchSpellPower2"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "major spell power"
 	{ search = _BARKLOC("EnchSearchSpellPower3"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		bracer, ring, gloves "spell power"
+	{ search = _BARKLOC("EnchSearchHealing"), key = "factor_stat.other", print = _BARKLOC("ShortHealing") },								-- INCORRECTLY matches spell power after Blizzard changed the strings
 	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "factor_stat.damageAbsorb", print = _BARKLOC("DMGAbsorb") },			-- must come before armor and damage
 	{ search = _BARKLOC("EnchSearchDamage1"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
 	{ search = _BARKLOC("EnchSearchDamage2"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
