@@ -177,10 +177,14 @@ function lib.ScanPage()
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		if link == private.CurAuction["link"] then
+			local price = private.CurAuction["price"]
+			local buy = private.CurAuction["buyout"]
 			local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", i)
-			if ishigh then
+			if ishigh and ((not buy) or (buy <= 0) or (price < buy)) then
 				print("Unable to bid on "..link..". Already highest bidder")
 				private.CurAuction = {}
+			else
+				ishigh = false --we're buying, not bidding, so being high bidder doesn't matter
 			end
 			if ((not owner) or (not private.CurAuction["sellername"]) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"])) 
 			and (not ishigh)
