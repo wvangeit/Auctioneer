@@ -159,8 +159,8 @@ local function findItemInBags(findLink)
 			local _, count = GetContainerItemInfo(bag, slot)
 	    	local link = GetContainerItemLink(bag, slot)
 			if link and (not findLink or link == findLink) then
-				if not findLink and prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellname')
-				   and link == prompt.link and bag == prompt.bag and slot == prompt.slot then
+				if not findLink and link == prompt.link and bag == prompt.bag
+					and slot == prompt.slot and count == prompt.count then
 					-- items sometimes linger after they've been disenchanted and looted
 					debugSpam("Skipping zombie item " .. link)
 				else
@@ -349,8 +349,10 @@ end
 
 function showPrompt(link, bag, slot, value, spell)
 	debugSpam(link ..",".. bag ..",".. slot ..",".. value ..",".. spell)
-
-	prompt.link, prompt.bag, prompt.slot = link, bag, slot
+	
+	local _, count = GetContainerItemInfo(bag, slot)
+	
+	prompt.link, prompt.bag, prompt.slot, prompt.count = link, bag, slot, count
 
 	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(prompt.link)
 	prompt.Item:SetNormalTexture(texture)
@@ -376,7 +378,7 @@ end
 
 function clearPrompt()
 	hidePrompt()
-	prompt.link, prompt.bag, prompt.slot = nil, nil, nil, nil
+	prompt.link, prompt.bag, prompt.slot, prompt.count = nil, nil, nil, nil, nil
 end
 
 local function promptNo()
