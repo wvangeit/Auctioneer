@@ -1971,6 +1971,7 @@ function private.CreateFrames()
 	end
 	frame.salebox.number.extra = {}
 	function frame.salebox.number:SetAdjustedRange(maxStax, ...)
+		maxStax = math.max(1,maxStax)
 		local curVal = self:GetAdjustedValue()
 		self.maxStax = maxStax
 		local n = select("#", ...)
