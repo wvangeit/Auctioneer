@@ -1034,7 +1034,7 @@ function lib.PerformSearch(searcher)
 		coSearch = coroutine.create(PerformSearch)
 		local status, result = coroutine.resume(coSearch, searcher)
 		if not status and result then
-			error("Error in search coroutine: " .. result)
+            error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
 		end
 	else
 		print("coroutine already running: "..coroutine.status(coSearch))
@@ -1048,7 +1048,7 @@ function private.OnUpdate()
 		if flip then
 			local status, result = coroutine.resume(coSearch)
 			if not status and result then
-				error("Error in search coroutine: " .. result)
+				error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
 			end
 		end
 	end
