@@ -6,7 +6,7 @@
 
 	This is an addon for World of Warcraft that adds the abilty to drag and reposition the Auction House Frame. 
 	Protect the Auction Frame from being closed or moved by Escape or Blizzard frames.
-	Limited Font and Frame Scaling og teh Auction House/CompactUI
+	Limited Font and Frame Scaling og the Auction House/CompactUI
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -72,11 +72,11 @@ end
 function lib.OnLoad(addon)
 	default("util.mover.activated", false)
 	default("util.mover.rememberlastpos", false)
-	default("util.mover.anchors", {})
+	default("util.mover.anchors", {"TOPLEFT", UIParent, "TOPLEFT", 0, -104})
 	default("util.protectwindow.protectwindow", 1)
-	default("util.protectwindow.processprotect", 0)
-	default("util.ah-windowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
-	default("util.ah-windowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
+	default("util.protectwindow.processprotect", false)
+	default("util.ahwindowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
+	default("util.ahwindowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
 end
 
 --after Auction House Loads Hook the Window Display event
@@ -93,9 +93,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    "Window Movement Options")
 	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated", "Allow the Auction frame to be movable?")
 	gui:AddTip(id, "Ticking this box will enable the ability to reloacate the Auction frame")
-	gui:AddHelp(id, "what is mover",
+	gui:AddHelp(id, "what is AHWindowControl",
 		"What is this Utility?",
-		"This Utility allows you to drag and relocate the Auction Frame for this play session. Just click and move where you desire.")
+		"This Utility allows you to drag and relocate the Auction Frame for this play session. Just click and move where you desire. It also alows you to protect the Auction House from closing when opening certain blizzard windows.")
 	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.rememberlastpos", "Remember last known window position?")
 	gui:AddTip(id, "If this box is checked, the Auction frame will reopen in the last location it was moved to.")
 	gui:AddHelp(id, "what is remeberpos",
@@ -120,12 +120,12 @@ function private.SetupConfigGui(gui)
 	--AuctionFrame Scale
 	gui:AddControl(id, "Header", 0, "") --Spacer for options
 	gui:AddControl(id, "Header", 0,	"Window Size Options")
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ah-windowcontrol.auctionscale",    0.1, 3, 0.1, "Auction House Scale")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.auctionscale",    0.5, 2, 0.1, "Auction House Scale")
 	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House Window. Default is 1")
 	gui:AddHelp(id, "what is Auction House Scale",
 			"Auction House Scale?", 
-			"The Auction House scale slider adjusts the overall size of teh Entire Auction House Window. The Defauls Size is 1")
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ah-windowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
+			"The Auction House scale slider adjusts the overall size of the Entire Auction House Window. The Defauls Size is 1")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
 	gui:AddTip(id, "This option allows you to adjust the Text size of the CompactUI on the Browse tab. Default is 0")
 	gui:AddHelp(id, "what is CompactUI Font Scale",
 			"CompactUI Font Scale?", 
@@ -157,14 +157,14 @@ function private.MoveFrame()
 		AuctionFrame:SetScript("OnMouseDown", function() end)
 		AuctionFrame:SetScript("OnMouseUp", function() end)
 	end
-	if get("util.ah-windowcontrol.auctionscale") then
-		AuctionFrame:SetScale(get("util.ah-windowcontrol.auctionscale"))
+	if get("util.ahwindowcontrol.auctionscale") then
+		AuctionFrame:SetScale(get("util.ahwindowcontrol.auctionscale"))
 	end
 	if get("util.compactui.activated") then
 		for i = 1,14 do
 			local button = _G["BrowseButton"..i]
-			local increase = get('util.ah-windowcontrol.compactuiscale') or 0
-			if not button.Count then return end -- we get called before compactUI has built teh frame
+			local increase = get('util.ahwindowcontrol.compactuiscale') or 0
+			if not button.Count then return end -- we get called before compactUI has built the frame
 			button.Count:SetFont(STANDARD_TEXT_FONT, 11 + increase)
 			button.Name:SetFont(STANDARD_TEXT_FONT, 10 + increase)
 			button.rLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
@@ -179,7 +179,8 @@ end
 --Restore previous sessions Window position
 function private.recallLastPos()
 	if get("util.mover.rememberlastpos") then
-		local anchors = get("util.mover.anchors")
+		local anchors = get("util.mover.anchors") 
+		if #anchors ~= 5 then anchors = {"TOPLEFT", UIParent, "TOPLEFT", 0, -104} end
 		AuctionFrame:ClearAllPoints()
 		AuctionFrame:SetPoint(anchors[1], anchors[2], anchors[3], anchors[4], anchors[5])
 	end
