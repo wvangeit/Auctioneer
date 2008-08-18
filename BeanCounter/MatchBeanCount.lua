@@ -72,7 +72,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local maxincrease = AucAdvanced.Settings.GetSetting("match.beancount.maxup")
 	local maxdecrease = AucAdvanced.Settings.GetSetting("match.beancount.maxdown")
 	local daterange = AucAdvanced.Settings.GetSetting("match.beancount.daterange")
-	local matchstacksize = AucAdvanced.Settings.GetSetting("match.beancount.matchstacksize")
+	--local matchstacksize = AucAdvanced.Settings.GetSetting("match.beancount.matchstacksize") --REMOVED for now, the posible issues arising from buying at last appraiser stack price needs to be resolved
 	local numdays = AucAdvanced.Settings.GetSetting("match.beancount.numdays")
 	numdays = numdays * 86400
 	increase = (increase / 100) + 1
@@ -91,11 +91,7 @@ if daterange then
 					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
 					
-					if matchstacksize and AucAdvAppraiserFrame then
-						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
-							tempnum = tempnum + 1
-						end
-					elseif (now - auctime) < (numdays) then
+					if (now - auctime) < (numdays) then
 						tempnum = tempnum + 1
 					end
 				end
@@ -109,11 +105,7 @@ if daterange then
 					local stack, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
 					
-					if matchstacksize and AucAdvAppraiserFrame then
-						if (stack == AucAdvAppraiserFrame.salebox.stack:GetValue() ) and (now - auctime) < (numdays) then
-							tempnum = tempnum + 1
-						end
-					elseif (now - auctime) < (numdays) then
+					if (now - auctime) < (numdays) then
 						tempnum = tempnum + 1
 					end
 				end
@@ -177,7 +169,7 @@ end
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.beancount.enable", false)
 	AucAdvanced.Settings.SetDefault("match.beancount.daterange", false)
-	AucAdvanced.Settings.SetDefault("match.beancount.matchstacksize", false)
+	--AucAdvanced.Settings.SetDefault("match.beancount.matchstacksize", false)
 	AucAdvanced.Settings.SetDefault("match.beancount.numdays", 30)
 	AucAdvanced.Settings.SetDefault("match.beancount.failed", -0.1)
 	AucAdvanced.Settings.SetDefault("match.beancount.success", 0.1)
@@ -225,8 +217,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "WideSlider", 0, 2, "match.beancount.numdays", 1, 300, 1, "Use data from last %g days")
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.matchstacksize", "Seprerate data by stack size. Only available if Use recent data is set")
-	gui:AddTip(id, "Only use data for the current stack size.")
+	--gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.matchstacksize", "Seprerate data by stack size. Only available if Use recent data is set")
+	--gui:AddTip(id, "Only use data for the current stack size.")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
