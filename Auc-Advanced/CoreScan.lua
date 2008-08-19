@@ -236,6 +236,37 @@ GetAllProgressBar.text:SetJustifyV("CENTER")
 GetAllProgressBar.text:SetText("AucAdv: Scanning")
 GetAllProgressBar.text:SetTextColor(1,1,1)
 
+--controls the display, anchor, and text of our progress bars
+function lib.ProgressBars(self, value, show, text)
+	--setup parent so we can display even if AH is closed
+	if AuctionFrame:IsShown() then
+		self:SetParent(AuctionFrame)
+		self:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5)
+	else
+		self:SetParent(UIParent)
+	end
+	--turn bar on/off
+	if show then
+		self:Show()
+	else
+		self:Hide()
+	end
+	--prevent overlap
+	if CommitProgressBar:IsShown() then
+		GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 23) --set our point above commitbar
+	else
+		GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
+	end
+	--update progress
+	if value then
+		self:SetValue(value)
+	end
+	--change bars text if desired
+	if text then 
+		self.text:SetText(text)
+	end
+end
+
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
 	if AuctionFrame and AuctionFrame:IsVisible() then
 		if private.isPaused then
@@ -275,16 +306,8 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			end
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			--setup Getall progress bar. Display above processing bar if present
-			GetAllProgressBar:SetParent(AuctionFrame) --set parent to auctionframe so we obey its scale
-			if CommitProgressBar:IsShown() then
-				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 23) --set our point to the auctionframe
-			else
-				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
-			end
-			GetAllProgressBar:Show()
-			GetAllProgressBar:SetValue(0)
-			GetAllProgressBar.text:SetText("AucAdv: Scanning")
+			
+			lib.ProgressBars(GetAllProgressBar, 0, true)
 		end
 
 		if private.curQuery then
@@ -552,11 +575,7 @@ Commitfunction = function()
 	end
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
-		CommitProgressBar:SetParent(AuctionFrame)
-		CommitProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
-		CommitProgressBar:Show()
-		CommitProgressBar.text:SetText("AucAdv: Processing")
-		CommitProgressBar:SetValue(0)
+		lib.ProgressBars(CommitProgressBar, 0, true)
 	end
 	local totali = 2*(#scandata.image) + #TempcurScan
 
@@ -570,7 +589,7 @@ Commitfunction = function()
 		link = data[Const.LINK]
 		i = i + 1
 		if i % (ProcessSpeed*100) == 0 then
-			CommitProgressBar:SetValue(100*i/totali)
+			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 1")
 			coroutine.yield()
 		end
 		if link then
@@ -607,7 +626,8 @@ Commitfunction = function()
 	for index, data in ipairs(TempcurScan) do
 		i = i + 1
 		if i % (ProcessSpeed*10) == 0 then
-			CommitProgressBar:SetValue(100*i/totali)
+			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 2")
+			--CommitProgressBar:SetValue(100*i/totali)
 			coroutine.yield()
 		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
@@ -651,7 +671,7 @@ Commitfunction = function()
 		data = scandata.image[pos]
 		i = i + 1
 		if i % (ProcessSpeed*100) == 0 then
-			CommitProgressBar:SetValue(100*i/totali)
+			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 3")
 			coroutine.yield()
 		end
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
@@ -693,7 +713,7 @@ Commitfunction = function()
 			numempty = numempty + 1
 		end
 	end
-	CommitProgressBar:SetValue(100)
+	lib.ProgressBars(CommitProgressBar, 100, true, "AucAdv: Processing Finished")
 	processStats("complete")
 
 	local filterCount = private.filteredCount
@@ -797,7 +817,7 @@ Commitfunction = function()
 	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
 
 	--Hide the progress indicator
-	CommitProgressBar:Hide()
+	lib.ProgressBars(CommitProgressBar, nil, false)
 	private.UpdateScanProgress(false)
 	lib.PopScan()
 	CommitRunning = false
@@ -999,12 +1019,7 @@ StorePageFunction = function()
 	local storecount = 0
 	for i = 1, numBatchAuctions do
 		if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
-			if CommitProgressBar:IsShown() then
-				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 23) --set our point to the auctionframe above progress bar
-			else
-				GetAllProgressBar:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5) --set our point to the auctionframe
-			end
-			GetAllProgressBar:SetValue(100*i/numBatchAuctions)
+			lib.ProgressBars(GetAllProgressBar, 100*i/numBatchAuctions, true)
 			coroutine.yield()
 		end
 		local itemLink = GetAuctionItemLink("list", i)
@@ -1062,7 +1077,7 @@ StorePageFunction = function()
 		end
 	end
 	if isGetAll then
-		GetAllProgressBar:Hide()
+		lib.ProgressBars(GetAllProgressBar, 100, false)
 		local oldThis = this
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
