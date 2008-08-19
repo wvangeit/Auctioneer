@@ -351,13 +351,17 @@ end
 -- using the Craft APIs
 local function getReagentsFromCraftFrame(craftIndex)
 	local reagentList = {}
+	
+	local getReagentsFunc = GetCraftNumReagents or GetTradeSkillNumReagents;	-- ccox - WoW 3.0
+	local getReagentLinkFunc = GetCraftReagentItemLink or GetTradeSkillReagentItemLink;	 -- ccox - WoW 3.0
+	local getReagentInfoFunc = GetCraftReagentInfo or GetTradeSkillReagentInfo;	-- ccox - WoW 3.0
 
-	local numReagents = GetCraftNumReagents(craftIndex)
+	local numReagents = getReagentsFunc(craftIndex)
 	for i = 1, numReagents do
-		local link = GetCraftReagentItemLink(craftIndex, i)
+		local link = getReagentLinkFunc(craftIndex, i)
 		if link then
 			local hlink = EnhTooltip.HyperlinkFromLink(link)
-			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(craftIndex, i)
+			local reagentName, reagentTexture, reagentCount, playerReagentCount = getReagentInfoFunc(craftIndex, i)
 			table.insert(reagentList, {hlink, reagentCount})
 		end
 	end
@@ -465,13 +469,15 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		name = name:gsub("^%s*", "")	-- remove leading spaces
 		--Enchantrix.Util.DebugPrintQuick("cleaned name is ", name )
 
-		-- first try craft APIs
-		for i = 1, GetNumCrafts() do
-			local craftName = GetCraftInfo(i)
-			--Enchantrix.Util.DebugPrintQuick("testing craft ", name, " equal to ", craftName )
-			if name == craftName then
-				craftIndex = i
-				break
+		if select(4, GetBuildInfo()) < 30000 then		-- ccox - WoW 3.0 gets rid of GetCraft APIs
+			-- first try craft APIs
+			for i = 1, GetNumCrafts() do
+				local craftName = GetCraftInfo(i)
+				--Enchantrix.Util.DebugPrintQuick("testing craft ", name, " equal to ", craftName )
+				if name == craftName then
+					craftIndex = i
+					break
+				end
 			end
 		end
 
@@ -539,7 +545,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	if not embed and not isItem then
 		local icon
 		if craftIndex then
-			icon = GetCraftIcon(craftIndex)
+			icon = GetCraftIcon(craftIndex)		-- ccox - WoW 3.0 - API is gone, but can't be hit because craftIndex won't be set
 		elseif tradeIndex then
 			icon = GetTradeSkillIcon(tradeIndex)
 		else
@@ -634,6 +640,10 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 			enchantTooltip(funcVars, retVal, frame, name, link, true)
 		end
 	elseif ltype == "enchant" or ltype == "spell" then
+-- ccox - debugging Wow 3.0 -- Enchantrix.Util.DebugPrintQuick("tooltip inputs", funcVars, retVal, frame, name, link, quality, count )
+		
+		name = name or ""	-- tooltip hook gives a nil name in 3.0!  Filed as a bug with Blizzard
+		
 		enchantTooltip(funcVars, retVal, frame, name, link, false)
 	end
 end
