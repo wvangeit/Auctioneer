@@ -68,7 +68,7 @@ local HideMailGUI
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE)) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE)) or sender:find("Blackwater Auction House",1,true) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local itemLink = GetInboxItemLink(n, 1)
@@ -92,7 +92,7 @@ function private.updateInboxStart()
 end
 
 function private.getInvoice(n, sender, subject)
-	if sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE) then
+	if sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE) or sender:find("Blackwater Auction House",1,true) then
 		if subject:match(successLocale) or subject:match(wonLocale) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
 			if  playerName and playerName ~= "" then
@@ -161,7 +161,7 @@ function private.mailSort()
 		local messageAgeInSeconds = math.floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
 		
-		if private.reconcilePending[i]["sender"]:match(FACTION_ALLIANCE) or private.reconcilePending[i]["sender"]:match(FACTION_HORDE) then
+		if private.reconcilePending[i]["sender"]:match(FACTION_ALLIANCE) or private.reconcilePending[i]["sender"]:match(FACTION_HORDE) or private.reconcilePending[i]["sender"]:find("Blackwater Auction House",1,true) then
 			if private.reconcilePending[i].subject:match(successLocale) and (private.reconcilePending[i].retrieved == "yes" or private.reconcilePending[i].retrieved == "failed") then
 				private.sortCompletedAuctions( i )
 				
@@ -405,7 +405,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
 			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
-			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) then
+			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) or sender:find("Blackwater Auction House",1,true) then
 				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
 					if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
 						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
