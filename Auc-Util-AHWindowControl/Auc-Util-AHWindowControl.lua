@@ -55,7 +55,6 @@ function lib.Processor(callbackType, ...)
 	if callbackType == "auctionui" then
 		private.auctionHook() ---When AuctionHouse loads hook the auction function we need
 		private.MoveFrame() --Set position back to previous session if options set
-		private.AdjustProtection() --Set protection
 	elseif callbackType == "configchanged" then
 		private.MoveFrame()	
 		private.AdjustProtection()
@@ -137,8 +136,13 @@ end
 
 --Hooks AH show function. This is fired after all Auction Frame methods have been set by Blizzard
 --We can now override with our settings
+local runonce=true
 function private.setupWindowFunctions()
 	private.recallLastPos()
+	if runonce then
+		private.AdjustProtection()
+		runonce=nil
+	end
 end
 
 --Enable or Disable the move scripts
@@ -208,7 +212,7 @@ function private.AdjustProtection ()
 			ShowUIPanel(AuctionFrame, 1) 
 			AuctionFrame.IsShown = nil 
 		end
-	elseif get("util.protectwindow.protectwindow") == 2 and AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
+	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-enabled") == true then
 		debugPrint("Disabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		if AuctionFrame:IsVisible() then
 			AuctionFrame.Hide = function() end 
@@ -218,6 +222,8 @@ function private.AdjustProtection ()
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", nil)
 	else
 		debugPrint("No case matched")
+		debugPrint("util.protectwindow.protectwindow="..get("util.protectwindow.protectwindow"))
+		debugPrint("UIPanelLayout-enabled="..tostring(AuctionFrame:GetAttribute("UIPanelLayout-enabled")))
 	end
 end
 
