@@ -1003,7 +1003,7 @@ function Enchantrix_CreateBarker()
 				local cost = 0;
 				for j=1,GetCraftNumReagentsFunc(index),1 do
 					local reagentName,_,countRequired = GetCraftReagentInfoFunc(index,j);
-					reagent = GetCraftReagentItemLinkFunc(index,j);
+					local reagent = GetCraftReagentItemLinkFunc(index,j);
 					cost = cost + (Enchantrix_GetReagentHSP(reagent)*countRequired);
 				end
 
