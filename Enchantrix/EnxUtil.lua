@@ -761,9 +761,10 @@ end
 function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	local maxLevel;
 	
-	if (skill >= 300) then
-		-- NOTE - ccox - this is higher than any item level available in WoW 2.2, but may need to be changed later
-		maxLevel = 200;
+	if (skill >= 325) then
+		maxLevel = 200;		-- ccox - BOGUS - fake for WOTLK
+	elseif (skill >= 300) then
+		maxLevel = 129;		-- max level for WoW 2.2/BC ??
 	elseif (skill >= 125) then
 		-- skill 125 to 299
 		maxLevel = 19 + (5 * math.floor(skill / 25));
@@ -780,8 +781,12 @@ end
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
 
+	if (level >= 130) then
+		-- new math for WOTLK
+		return 325;		-- ccox - BOGUS - fake for WOTLK
+	
+	elseif (level > 65) then
 	-- someone changed their math with the Burning Crusade
-	if (level > 65) then
 
 		-- epics are a little different
 		if (quality == 4) then

@@ -45,6 +45,8 @@ local getItemDisenchantFromTableForOneMaterial	-- Enchantrix.Storage.GetItemDise
 local saveDisenchant				-- Enchantrix.Storage.SaveDisenchant()
 local addonLoaded					-- Enchantrix.Storage.AddonLoaded()
 local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
+
+local saveProspect					-- Enchantrix.Storage.SaveProspect()
 local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
 
 -- Local functions
