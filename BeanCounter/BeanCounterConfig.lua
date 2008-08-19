@@ -82,15 +82,16 @@ local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)") --We
 private.settingDefaults = {
 	["util.beancounter.ButtonExactCheck"] = false,
 	["util.beancounter.ButtonClassicCheck"] = false,
-	["util.beancounter.ButtonBidCheck"] = false,
-	["util.beancounter.ButtonBidFailedCheck"] = false,
-	["util.beancounter.ButtonAuctionCheck"] = false,
-	["util.beancounter.ButtonAuctionFailedCheck"] = false,	
+	["util.beancounter.ButtonBidCheck"] = true,
+	["util.beancounter.ButtonBidFailedCheck"] = true,
+	["util.beancounter.ButtonAuctionCheck"] = true,
+	["util.beancounter.ButtonAuctionFailedCheck"] = true,	
 
 	["util.beancounter.activated"] = true,
 	["util.beancounter.integrityCheckComplete"] = false,
 	["util.beancounter.integrityCheck"] = true,
 	
+	--Debug settings
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
 	["util.beancounter.debugCore"] = true,
