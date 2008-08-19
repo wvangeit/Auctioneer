@@ -405,7 +405,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
 			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
-			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE)) or sender:find("Blackwater Auction House",1,true) then
+			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE) or sender:find("Blackwater Auction House",1,true)) then
 				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
 					if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
 						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
