@@ -575,7 +575,8 @@ end
 
 function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
-
+	if not private.getOption("util.beancounter.displayReasonCodeTooltip") then return end
+	
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	
 	if not reason then return end

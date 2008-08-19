@@ -91,6 +91,8 @@ private.settingDefaults = {
 	["util.beancounter.integrityCheckComplete"] = false,
 	["util.beancounter.integrityCheck"] = true,
 	
+	--Tootip Settings
+	["util.beancounter.displayReasonCodeTooltip"] = true,
 	--Debug settings
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
@@ -394,6 +396,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
 	
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('Show reason for purchase in the games Tooltips'))
+	gui:AddTip(id, _BC('Turns on the SearchUI reason an item was purchased for in the Tooltip'))
+		
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
 	
@@ -406,9 +411,14 @@ function lib.MakeGuiConfig()
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
 		_BC('A_MailInvoiceTimeout') --"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
 		)
+	
 	gui:AddHelp(id, "what is recolor",
 		_BC('Q_MailRecolor'), --"What is Mail Re-Color Method?",
 		_BC('A_MailRecolor') --"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
+		)
+	gui:AddHelp(id, "what is tooltip",
+		_BC('What is BeanCounters Tooltip'), 
+		_BC('BeanCounter will store the SearchUI reason an item was purchased and display it in the Tooltip')
 		)
 	gui:AddHelp(id, "what is external",
 		_BC('Q_ExtenalSearch'), --"Allow External Addons to use BeanCounter?",
