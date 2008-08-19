@@ -78,16 +78,19 @@ InformantConfig = {}
 -- LOCAL DEFINES
 
 CLASS_TO_CATEGORY_MAP = {
-	[2]  = 1,
-	[4]  = 2,
-	[1]  = 3,
-	[0]  = 4,
-	[7]  = 5,
-	[6]  = 6,
-	[11] = 7,
-	[9]  = 8,
-	[5]  = 9,
-	[15] = 11,
+	[2]  = 1, --Weapon
+	[4]  = 2, --Armor
+	[1]  = 3, --Container
+	[0]  = 4, --Consumable
+	[7]  = 5, --Trade Goods
+	[6]  = 6, --Projectile
+	[11] = 7, --Quiver
+	[9]  = 8, --Recipe
+	[3]  = 9, --Gem
+	[15] = 10, --Miscellaneous
+	[13] = 10, --Miscellaneous
+	[5] = 10, --Miscellaneous
+	[12] = 11, --Quest
 }
 
 local filterDefaults = {

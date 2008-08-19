@@ -149,6 +149,8 @@ function commandHandler(command, source)
 		cmd == "show-name"
 	) then
 		genVarSet(cmd, param, chatprint)
+	elseif (cmd == "about") then
+		chatPrint(_INFM('about'))
 	else
 		if (chatprint) then
 			chatPrint(_INFM('FrmtActUnknown'):format(cmd))
