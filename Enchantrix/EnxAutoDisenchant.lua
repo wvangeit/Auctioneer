@@ -43,15 +43,24 @@ local clearPrompt
 --------------------------------------------------------------------------------
 -- Debug stuff
 
-local function debugSpam(message, r, g, b)
---	if not b then
---		r, g, b = 0, 0.75, 1
---	end
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib("Enchantrix")
+else
+	function debug() end
+	assert = debug
+end
+
+local function debugSpam(...)
+--	local message = debug:Dump(...)
+--	local r, g, b = 0, 0.75, 1
 --	getglobal("ChatFrame1"):AddMessage("AutoDe: " .. message, r, g, b)
 end
 
-local function eventSpam(message)
-	debugSpam("Event: " .. message, 0, 1, 0.75)
+local function eventSpam(...)
+--	local message = debug:Dump(...)
+--	debugSpam("Event: " .. message)
 end
 
 --------------------------------------------------------------------------------
@@ -153,8 +162,9 @@ local function getDisenchantOrProspectValue(link, count)
 	end
 end
 
-local function findItemInBags(findLink)
-	for bag = 0, 4 do
+
+-- check one bag (to save time when we know something moved in just this bag)
+local function findItemInOneBag(bag, findLink)
    		for slot = 1, GetContainerNumSlots(bag) do
 			local _, count = GetContainerItemInfo(bag, slot)
 	    	local link = GetContainerItemLink(bag, slot)
@@ -174,15 +184,32 @@ local function findItemInBags(findLink)
 			end
 		end
 	end
+
+
+-- check all bags for disenchantable items
+local function findItemInBags(findLink)
+	debugSpam("scanning bags")
+	for bag = 0, 4 do
+		local link, bag, slot, value, spell = findItemInOneBag(bag, findLink)
+		if (spell) then
+			return link, bag, slot, value, spell
+		end
+	end
 end
 
-function beginScan()
+
+function beginScan(bag)
 	setState("scan")
-	local link, bag, slot, value, spell = findItemInBags()
+	local link, outBag, slot, value, spell
+	if (bag) then
+		link, outBag, slot, value, spell = findItemInOneBag(bag)
+	else
+		link, outBag, slot, value, spell = findItemInBags()
+	end
 	if link then
 		-- prompt for disenchant
 		setState("prompt")
-		showPrompt(link, bag, slot, value, spell)
+		showPrompt(link, outBag, slot, value, spell)
 	end
 end
 
@@ -193,7 +220,7 @@ local function onEvent(...)
 	if event == "LOOT_OPENED" then
 		if isState("loot_wait") then
 			-- loot window opened - grab the spoils
-			eventSpam(event)
+			eventSpam(...)
 			for slot = 1, GetNumLootItems() do
 				LootSlot(slot)
 			end
@@ -202,13 +229,13 @@ local function onEvent(...)
 	elseif event == "LOOT_CLOSED" then
 		if isState("loot") then
 			-- looting done - continue scanning
-			eventSpam(event)
+			eventSpam(...)
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		if isState("prompt") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- disenchant started - wait for completion
-			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3 .." ".. arg4)
+			eventSpam(...)
 			if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
 				if arg2 == _ENCH('ArgSpellProspectingName') then
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
@@ -222,36 +249,34 @@ local function onEvent(...)
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		if isState("cast") and arg1 == "player" then
 			-- interrupted - revert to scanning
-			eventSpam(event .." ".. arg1)
+			eventSpam(...)
 			clearPrompt()
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" then
 		if isState("cast") and arg1 == "player" then
 			-- failed - revert to scanning
-			eventSpam(event .." ".. arg1)
+			eventSpam(...)
 			clearPrompt()
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		if isState("cast") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- completed - wait for loot window to come up
-			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3)
+			eventSpam(...)
 			setState("loot_wait")
 		end
 	elseif event == "BAG_UPDATE" then
-		-- TODO: should also be watching for UNIT_INVENTORY_CHANGED here. splitting/combining stacks
-		-- of ores does NOT trigger BAG_UPDATE
 		if isState("scan") then
 			-- bag contents changed - rescan bags
-			eventSpam(event .." ".. arg1)
+			eventSpam(...)
 			beginScan(arg1)
 		elseif isState("prompt") and arg1 == prompt.bag then
 			-- verify that our item is still there
 		    local link = GetContainerItemLink(prompt.bag, prompt.slot)
 			if link ~= prompt.link then
-				eventSpam(event .." ".. arg1)
-				debugSpam(prompt.link .. " moved/disappeared")
+				eventSpam(...)
+				debugSpam(prompt.link, "moved/disappeared")
 				hidePrompt()
 
 				local bag, slot, value, spell
@@ -494,9 +519,15 @@ local function initUI()
 		dest:SetHighlightTexture(source:GetHighlightTexture())
 		dest:SetPushedTexture(source:GetPushedTexture())
 		dest:SetText(source:GetText())
-		dest:SetFont(source:GetFont())
-		dest:SetTextColor(source:GetTextColor())
-		dest:SetHighlightTextColor(source:GetHighlightTextColor())
+
+		if select(4, GetBuildInfo() ) >= 30000 then
+			dest:SetNormalFontObject(GameFontNormal);		-- ccox - WoW 3.0
+			dest:SetHighlightFontObject(GameFontHighlight);	-- ccox - WOTLK
+		else
+			dest:SetFont(source:GetFont()) 				-- ccox - API gone in WoW 3.0
+			dest:SetTextColor(source:GetTextColor()) 	-- ccox - API gone in WoW 3.0
+			dest:SetHighlightTextColor(source:GetHighlightTextColor()) -- ccox - API gone in WoW 3.0
+		end
 	end
 
 	-- create an invisible "Yes" OptionsButton, then copy its settings
