@@ -189,6 +189,26 @@ function EnchantrixBarker_OnEvent()
 		Enchantrix_BarkerOptions_Frame:Hide();
 	end
 	
+
+	-- ccox - WoW 3.0 - Tradeskill Window no longer has space for the button
+	if select(4, GetBuildInfo() ) >= 30000 then
+		if craftName and craftName == _BARKLOC('Enchanting') then
+			if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
+				if( Barker.Settings.GetSetting('barker') ) then
+					Enchantrix_BarkerOptions_TradeTab:Show();
+					Enchantrix_BarkerOptions_TradeTab.tooltipText = _BARKLOC('OpenBarkerWindow');
+				else
+					Enchantrix_BarkerOptions_TradeTab:Hide();
+					Enchantrix_BarkerOptions_TradeTab:Hide();
+				end
+			end
+		elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
+			-- we are closing, or it's a different craft/trade, hide the button and frame
+			Enchantrix_BarkerOptions_TradeTab:Hide();
+			Enchantrix_BarkerOptions_TradeTab:Hide();
+		end
+	end
+	
 end
 
 function Enchantrix_BarkerOptions_OnShow()
@@ -237,15 +257,27 @@ local function craftUILoaded()
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
 		useFrame = ATSWFrame;
 	end
-
-	Enchantrix_BarkerDisplayButton:SetParent(useFrame);
-
-	if (ATSWFrame ~= nil) then
-		-- this works for ATSW
-		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
+	
+	-- ccox - WoW 3.0 - the tradskill window no longer has room for the barker button
+	if select(4, GetBuildInfo() ) >= 30000 then
+		Enchantrix_BarkerOptions_TradeTab:SetParent(useFrame);
+		if (ATSWFrame ~= nil) then
+			-- this works for ATSW
+			Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 15 );
+		else
+			-- and this works for the WoW 3.0 trade Window
+			Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 75 );
+		end
 	else
-		-- and this works for the WoW 2.1 trade Window
-		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -68 );
+		Enchantrix_BarkerDisplayButton:SetParent(useFrame);
+	
+		if (ATSWFrame ~= nil) then
+			-- this works for ATSW
+			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
+		else
+			-- and this works for the WoW 2.1 trade Window
+			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -68 );
+		end
 	end
 
 	-- skillet has an API to add buttons

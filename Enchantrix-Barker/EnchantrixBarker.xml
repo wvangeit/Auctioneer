@@ -44,6 +44,13 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Scripts>
 	</Button>
 
+	<Button name="Enchantrix_BarkerOptions_TradeTab" inherits="CharacterFrameTabButtonTemplate" id="1" text="Trade Barker">
+		<Scripts>
+			<OnClick>
+				Enchantrix_BarkerOptions_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
 
 	<Slider name="EnchantrixBarker_OptionsSliderTemplate" inherits="OptionsSliderTemplate" virtual="true" minValue="0" maxValue="100" defaultValue="50" valueStep="2">
 		<Size>
@@ -59,7 +66,15 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Button name="Enchantrix_BarkerOptions_FrameTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
 		<Scripts>
 			<OnClick>
-				PanelTemplates_Tab_OnClick(Enchantrix_BarkerOptions_Frame);
+				PlaySound("igCharacterInfoTab");
+				
+				if select(4, GetBuildInfo() ) >= 30000 then
+					local frame = self:GetParent()
+					PanelTemplates_SetTab(frame, this:GetID());
+				else
+					PanelTemplates_Tab_OnClick(Enchantrix_BarkerOptions_Frame);
+				end
+				
 				Enchantrix_BarkerOptions_Tab_OnClick();
 			</OnClick>
 		</Scripts>
