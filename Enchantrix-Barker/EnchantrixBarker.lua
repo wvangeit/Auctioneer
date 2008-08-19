@@ -32,6 +32,9 @@
 ]]
 EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
+-- ccox - WoW 3.0 API change
+local GetCraftInfoFunc = GetCraftInfo or GetTradeSkillInfo;
+
 local priorityList = {};
 
 	-- this is used to search the trade categories
@@ -166,11 +169,12 @@ local addonName = "Enchantrix Barker"
 
 function EnchantrixBarker_OnEvent()
 
-	--Returns "Enchanting" for enchantwindow and nil for Beast Training
-	local craftName, rank, maxRank = GetCraftDisplaySkillLine()
+	--Returns "Enchanting" for enchantwindow
+	local GetTradeLineFunc = GetCraftDisplaySkillLine or GetTradeSkillLine	-- ccox - WoW 3.0 - GetCraft routines are gone
+	local craftName, _rank, _maxRank = GetTradeLineFunc();
 
-	if craftName then
-		if( event == "CRAFT_SHOW" ) then
+	if craftName and craftName == _BARKLOC('Enchanting') then
+		if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
 			if( Barker.Settings.GetSetting('barker') ) then
 				Enchantrix_BarkerDisplayButton:Show();
 				Enchantrix_BarkerDisplayButton.tooltipText = _BARKLOC('OpenBarkerWindow');
@@ -224,7 +228,10 @@ end
 local function craftUILoaded()
 
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
-	local useFrame = CraftFrame;
+	Stubby.UnregisterAddOnHook("Blizzard_TradeSkillUI", "Enchantrix")
+	
+	-- ccox - CraftFrame pre LK / 3.0, TradeSkillFrame after (where CraftFrame is nil)
+	local useFrame = CraftFrame or TradeSkillFrame;
 
 	if (ATSWFrame ~= nil) then
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
@@ -257,7 +264,8 @@ function EnchantrixBarker_OnLoad()
 	if (ATSWFrame ~= nil) then
 		Stubby.RegisterAddOnHook("ATSWFrame", "Enchantrix", craftUILoaded)
 	end
-	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "Enchantrix", craftUILoaded)
+	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "Enchantrix", craftUILoaded)			-- pre 3.0
+	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "Enchantrix", craftUILoaded)		-- post 3.0
 end
 
 function Enchantrix_BarkerGetConfig( key )
@@ -269,8 +277,6 @@ function Enchantrix_BarkerSetConfig( key, value )
 end
 
 function Enchantrix_BarkerOptions_SetDefaults()
-	--Barker.Util.ChatPrint("Enchantrix: Setting Barker to defaults"); -- TODO: Localize
-	
 	-- currently, we have no settings other than what's in the dialog
 	-- resetting the WHOLE profile will reset everything
 	
@@ -942,8 +948,13 @@ function Enchantrix_CreateBarker()
 		-- not in a recognized trade zone
 		return nil;
 	end
-
-	local temp = GetCraftSkillLine(1);
+	
+	local temp
+	if select(4, GetBuildInfo() ) >= 30000 then
+		temp = GetTradeSkillLine();
+	else
+		temp = GetCraftSkillLine(1);
+	end
 
 	if (not temp) then
 		-- trade skill window isn't open (how did this happen?)
@@ -960,21 +971,39 @@ function Enchantrix_CreateBarker()
 	local highestProfit = Enchantrix_BarkerGetConfig("highest_profit");
 	local profitMargin = Enchantrix_BarkerGetConfig("profit_margin");
 
-	for index=1, GetNumCrafts() do
-		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
+	-- ccox - WoW 3.0 - API change
+	local GetNumCraftsFunc = GetNumCrafts or GetNumTradeSkills
+	local GetCraftItemLinkFunc = GetCraftItemLink or GetTradeSkillItemLink
+	local GetCraftNumReagentsFunc = GetCraftNumReagents or GetTradeSkillNumReagents
+	local GetCraftReagentInfoFunc = GetCraftReagentInfo or GetTradeSkillReagentInfo
+	local GetCraftReagentItemLinkFunc = GetCraftReagentItemLink or GetTradeSkillReagentItemLink
+
+	local craftCount = GetNumCraftsFunc()
+	
+	for index=1, craftCount do
+	
+		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded;
+		
+		-- ccox - WoW 3.0 - API change, and return value change
+		if select(4, GetBuildInfo() ) >= 30000 then
+			craftName, craftType, numEnchantsAvailable, isExpanded = GetTradeSkillInfo(index);
+		else
+			craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
+		end
+		
 		if ( numEnchantsAvailable > 0 ) then -- user has reagents
 
 			-- does this skill produce an enchant, or a trade good?
-			local itemLink = GetCraftItemLink(index);
+			local itemLink = GetCraftItemLinkFunc(index);
 			local itemName, newItemLink = GetItemInfo(itemLink);
 
 			-- item name and link are nil for enchants, and valid for produced items (which we want to ignore)
 			if (not itemName and not newItemLink) then
 
 				local cost = 0;
-				for j=1,GetCraftNumReagents(index),1 do
-					local reagentName,_,countRequired = GetCraftReagentInfo(index,j);
-					reagent = GetCraftReagentItemLink(index,j);
+				for j=1,GetCraftNumReagentsFunc(index),1 do
+					local reagentName,_,countRequired = GetCraftReagentInfoFunc(index,j);
+					reagent = GetCraftReagentItemLinkFunc(index,j);
 					cost = cost + (Enchantrix_GetReagentHSP(reagent)*countRequired);
 				end
 
@@ -1214,7 +1243,7 @@ end
 
 function EnchantrixBarker_GetItemCategoryString( index )
 
-	local enchant = GetCraftInfo( index );
+	local enchant = GetCraftInfoFunc( index );
 
 	for key,category in pairs(categories) do
 		--Barker.Util.DebugPrintQuick( "cat key: ", key);
@@ -1231,7 +1260,7 @@ end
 
 function EnchantrixBarker_GetItemCategoryKey( index )
 
-	local enchant = GetCraftInfo( index );
+	local enchant = GetCraftInfoFunc( index );
 
 	for key,category in pairs(categories) do
 		--Barker.Util.DebugPrintQuick( "cat key: ", key, ", name: ", category );
@@ -1247,7 +1276,13 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 end
 
 function EnchantrixBarker_GetCraftDescription( index )
-	return GetCraftDescription(index) or "";
+
+	-- ccox - WoW 3.0 - API change
+	if select(4, GetBuildInfo() ) >= 30000 then
+		return GetTradeSkillDescription(index) or "";
+	else
+		return GetCraftDescription(index) or "";
+	end
 end
 
 function Enchantrix_GetShortDescriptor( index )
@@ -1274,10 +1309,10 @@ function Enchantrix_GetShortDescriptor( index )
 	end
 
 
-	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
+	local enchant = Barker.Util.Split(GetCraftInfoFunc(index), "-");
 
 	-- this happens for any enchant we don't have a special case for, which is relatively often
-	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfo(index),  long_str,  enchant  );
+	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfoFunc(index),  long_str,  enchant  );
 	
 	if (enchant == nil) then
 		Barker.Util.DebugPrintQuick("Failed enchant split for: ", long_str);		-- should not fail
@@ -1302,7 +1337,7 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 		end
 	end
 
-	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
+	local enchant = Barker.Util.Split(GetCraftInfoFunc(index), "-");
 
 	return enchant[#enchant];
 end

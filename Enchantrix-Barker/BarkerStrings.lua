@@ -410,6 +410,7 @@ EnchantrixBarkerLocalizations = {
 		["Chest"]	= "Chest";
 		["Cloak"]	= "Cloak";
 		["Darnassus"]	= "Darnassus";
+		["Enchanting"]	= "Enchanting";
 		["EnchSearchAgility"]	= "agility";
 		["EnchSearchAllResistance1"]	= "resistance to all schools of magic";
 		["EnchSearchAllResistance2"]	= "resistance to all magic schools";
