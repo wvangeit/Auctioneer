@@ -68,7 +68,7 @@ local HideMailGUI
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE)) or sender:find("Blackwater Auction House",1,true) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE) or sender:find("Blackwater Auction House",1,true)) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local itemLink = GetInboxItemLink(n, 1)
