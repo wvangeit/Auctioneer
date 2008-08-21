@@ -64,6 +64,8 @@ function lib.AuctionFilter(operation, itemData)
 		if get("filter.outlier.uncommon.enabled") then levels[2] = get("filter.outlier.uncommon.level")/100 end
 		if get("filter.outlier.rare.enabled") then levels[3] = get("filter.outlier.rare.level")/100 end
 		if get("filter.outlier.epic.enabled") then levels[4] = get("filter.outlier.epic.level")/100 end
+		if get("filter.outlier.legendary.enabled") then levels[5] = get("filter.outlier.legendary.level")/100 end
+		if get("filter.outlier.artifact.enabled") then levels[6] = get("filter.outlier.artifact.level")/100 end
 		reset = false
 	end
 
@@ -127,11 +129,15 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.outlier.uncommon.enabled", true)
 	AucAdvanced.Settings.SetDefault("filter.outlier.rare.enabled", false)
 	AucAdvanced.Settings.SetDefault("filter.outlier.epic.enabled", false)
+	AucAdvanced.Settings.SetDefault("filter.outlier.legendary.enabled", true)
+	AucAdvanced.Settings.SetDefault("filter.outlier.artifact.enabled", true)
 	AucAdvanced.Settings.SetDefault("filter.outlier.poor.level", 300)
 	AucAdvanced.Settings.SetDefault("filter.outlier.common.level", 500)
 	AucAdvanced.Settings.SetDefault("filter.outlier.uncommon.level", 600)
 	AucAdvanced.Settings.SetDefault("filter.outlier.rare.level", 800)
 	AucAdvanced.Settings.SetDefault("filter.outlier.epic.level", 1200)
+	AucAdvanced.Settings.SetDefault("filter.outlier.legendary.level", 300)
+	AucAdvanced.Settings.SetDefault("filter.outlier.artifact.level", 300)
 end
 
 function private.GetPriceModels()
@@ -203,6 +209,18 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.epic.enabled", "Enable filtering "..hex.."epic|r quality items")
 	gui:AddTip(id, "Ticking this box will enable outlier filtering on epic quality items")
 	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.epic.level", 100, 5000, 25, "Cap growth to: %d%%")
+	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+
+	local _,_,_, hex = GetItemQualityColor(5)
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.legendary.enabled", "Enable filtering "..hex.."legendary|r quality items")
+	gui:AddTip(id, "Ticking this box will enable outlier filtering on legendary quality items")
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.legendary.level", 100, 5000, 25, "Cap growth to: %d%%")
+	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+
+	local _,_,_, hex = GetItemQualityColor(6)
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.artifact.enabled", "Enable filtering "..hex.."artifact|r quality items")
+	gui:AddTip(id, "Ticking this box will enable outlier filtering on artifact quality items")
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.artifact.level", 100, 5000, 25, "Cap growth to: %d%%")
 	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
 
 end
