@@ -93,6 +93,8 @@ private.settingDefaults = {
 	
 	--Tootip Settings
 	["util.beancounter.displayReasonCodeTooltip"] = true,
+	["util.beancounter.displaybeginerTooltips"] = true,
+	
 	--Debug settings
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
@@ -389,19 +391,23 @@ function lib.MakeGuiConfig()
 	id = gui:AddTab(_BC('C_BeanCounterConfig')) --"BeanCounter Config")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
-	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
 	
-	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
-	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
-	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('Show beginner tooltips on mouseover'))
+	gui:AddTip(id, _BC('Turns on the beginner tooltips that display on mouseover'))
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('Show reason for purchase in the games Tooltips'))
 	gui:AddTip(id, _BC('Turns on the SearchUI reason an item was purchased for in the Tooltip'))
 		
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
-	
+		
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
+	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
+		
+	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
+	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
+	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
+		
 	gui:AddControl(id, "Text",       0, 1, "dateString", _BC('C_DateString')) --"|CCFFFCC00Date format to use:")
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
 	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", _BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
