@@ -390,7 +390,7 @@ function snatchui.OnDragToIcon()
 end
 
 function snatchui.ClickLinkHook(_, link, button)
-	if link then
+	if link and snatchui.frame and snatchui.frame:IsShown() then
 		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
 			snatchui.SetWorkingItem(link)
 		end
