@@ -102,7 +102,7 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 	end
 end
 
-function private.ClickLinkHook(_, _, item, link, button)
+function private.ClickLinkHook(item, link, button)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
 	
@@ -141,7 +141,7 @@ function private.OnLoad(addon)
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
 		Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, private.ClickBagHook)
-		Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -200, private.ClickLinkHook)
+		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
