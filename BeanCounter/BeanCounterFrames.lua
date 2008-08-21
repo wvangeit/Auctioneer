@@ -298,8 +298,8 @@ function private.CreateFrames()
 	end	
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)	
 	
-	function private.ClickLinkHook(_, _, _, link, button)
-		if (frame.searchBox and frame.searchBox:IsVisible()) then
+	function private.ClickLinkHook(itemString, link, button)
+			if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
 				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
 				local itemTexture = select(2, private.getItemInfo(link, "name")) 
@@ -311,7 +311,8 @@ function private.CreateFrames()
 			end
 		end
 	end
-	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, private.ClickLinkHook)
+	--Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, private.ClickLinkHook)
+	hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 	
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
