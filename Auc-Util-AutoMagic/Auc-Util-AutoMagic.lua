@@ -190,14 +190,13 @@ end
 
 function lib.autoSellGUI() 
 	if (autosellframe:IsVisible()) then autosellframe:Hide() end
-	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
+	hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 	autosellframe:Show()		
 	lib.populateDataSheet()
 end
 
 function lib.closeAutoSellGUI()
 	autosellframe:Hide()
-	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 end
 
 --Slidebar 
@@ -305,7 +304,7 @@ function lib.autoSellIconDrag()
 end
 
 
-function lib.ClickLinkHook(_, _, _, link, button)
+function lib.ClickLinkHook(_, link, button)
 	if link then
 		if (button == "LeftButton") then 
 		lib.setWorkingItem(link)
