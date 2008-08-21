@@ -47,14 +47,23 @@ local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
 local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
 local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("(.+)%%s", "%1") 
 
+local registeredAltaholicHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
-		private.updateInboxStart() 
-	elseif (event == "MAIL_SHOW") then 
+		private.updateInboxStart()
+	
+	elseif (event == "MAIL_SHOW") then
+		--Since Altoholic has an option to read mail this is a workaround for it. We call our read function before
+		if Altoholic and not registeredAltaholicHook then
+			registeredAltaholicHook = true
+			Stubby.RegisterFunctionHook("Altoholic.UpdatePlayerMail", -10, private.updateInboxStart)
+		end
+		
 		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
 		hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
 		hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
+	
 	elseif (event == "MAIL_CLOSED") then
 		InboxCloseButton:Show()
 		InboxFrame:Show()
@@ -66,6 +75,7 @@ end
 --Mailbox Snapshots
 local HideMailGUI
 function private.updateInboxStart()
+	print("called")
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
 		if sender and (sender:match(FACTION_ALLIANCE) or sender:match(FACTION_HORDE) or sender:find("Blackwater Auction House",1,true)) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
@@ -81,7 +91,6 @@ function private.updateInboxStart()
 			GetInboxText(n) --read message
 		end
 	end
-	
 	if HideMailGUI == true then
 		InboxCloseButton:Hide()
 		InboxFrame:Hide()
