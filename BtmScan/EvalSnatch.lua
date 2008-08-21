@@ -389,7 +389,7 @@ function snatchui.OnDragToIcon()
 	end
 end
 
-function snatchui.ClickLinkHook(_, _, _, link, button)
+function snatchui.ClickLinkHook(_, link, button)
 	if link then
 		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
 			snatchui.SetWorkingItem(link)
@@ -663,7 +663,7 @@ function lib.snatchGUI()
 		lib.closeSnatchGUI()
 	end
 	
-	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, snatchui.ClickLinkHook)
+	hooksecurefunc("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
 	
 	snatchui.frame:Show()
 	snatchui.PopulateBagSheet()
@@ -674,7 +674,6 @@ end
 function lib.closeSnatchGUI()
 	snatchui.ClearWorkingItem()
 	snatchui.frame:Hide()
-	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
 end
 
 
