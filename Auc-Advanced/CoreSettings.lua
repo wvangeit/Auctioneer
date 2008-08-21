@@ -433,7 +433,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
 	
-	gui:AddControl(id, "Checkbox",		0, 2, 	"alwaysHomeFaction", "See home faction data everywhere unless at neutral ah.")
+	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", "See home faction data everywhere unless at neutral ah.")
 	gui:AddTip(id, "This allows the ability to see home data everywhere, however it disables itself while a neutral ah is open to allow you to see neutral ah data.")
 	
 	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
