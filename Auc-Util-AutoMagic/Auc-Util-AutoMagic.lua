@@ -304,7 +304,7 @@ end
 
 
 function lib.ClickLinkHook(_, link, button)
-	if link then
+	if link and autosellframe:IsShown() and link:find("Hitem:") then
 		if (button == "LeftButton") then 
 		lib.setWorkingItem(link)
 		end
