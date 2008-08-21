@@ -740,28 +740,6 @@ Commitfunction = function()
 	scanTimeMins = mod(scanTimeMins, 60)
 	--Hides the end of scan summary if user is not interested
 	if private.getOption("scandata.summary") then
-		if (wasIncomplete) then
-			lib.Print("Auctioneer Advanced scanned {{"..scanCount.."}} auctions before interruption:")
-		else
-
-			lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
-		end
-		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query)")
-		if (sameRecoveredCount > 0) then
-			lib.Print("  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)")
-		else
-			lib.Print("  {{"..sameCount.."}} unchanged items")
-		end
-		lib.Print("  {{"..newCount.."}} new items")
-		if (updateRecoveredCount > 0) then
-			lib.Print("  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)")
-		else
-			lib.Print("  {{"..updateCount.."}} updated items")
-		end
-		lib.Print("  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed")
-		lib.Print("  {{"..filterCount.."}} filtered items")
-		lib.Print("  {{"..missedCount.."}} missed items")
-		lib.Print("  {{"..currentCount.."}} items in DB at end")
 		local scanTime = "  "
 		if (scanTimeHours and scanTimeHours ~= 0) then
 			scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
@@ -772,8 +750,39 @@ Commitfunction = function()
 		if (scanTimeSecs and scanTimeSecs ~= 0) then
 			scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
 		end
-		scanTime = scanTime.."Spent Scanning Auction House"
-		lib.Print(scanTime)
+		if (wasIncomplete) then
+			lib.Print("AucAdv scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before interruption:")
+		else
+
+			lib.Print("AucAdv finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:")
+		end
+		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end")
+		if (sameCount > 0) then
+			if (sameRecoveredCount > 0) then
+				lib.Print("  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)")
+			else
+				lib.Print("  {{"..sameCount.."}} unchanged items")
+			end
+		end
+		if (updateCount > 0) then
+			if (updateRecoveredCount > 0) then
+				lib.Print("  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)")
+			else
+				lib.Print("  {{"..updateCount.."}} updated items")
+			end
+		end
+		if (newCount > 0) then
+			lib.Print("  {{"..newCount.."}} new items")
+		end
+		if (earlyDeleteCount+expiredDeleteCount > 0) then
+			lib.Print("  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed")
+		end
+		if (filterCount > 0) then
+			lib.Print("  {{"..filterCount.."}} filtered items")
+		end
+		if (missedCount > 0) then
+			lib.Print("  {{"..missedCount.."}} missed items")
+		end
 	end
 
 	if (not scandata.scanstats) then scandata.scanstats = {} end
