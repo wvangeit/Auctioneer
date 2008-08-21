@@ -190,7 +190,6 @@ end
 
 function lib.autoSellGUI() 
 	if (autosellframe:IsVisible()) then autosellframe:Hide() end
-	hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 	autosellframe:Show()		
 	lib.populateDataSheet()
 end
@@ -311,6 +310,7 @@ function lib.ClickLinkHook(_, link, button)
 		end
 	end
 end
+hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 
 
 local autoselldata = {}; local bagcontents = {}; local bagcontentsnodups = {}	
