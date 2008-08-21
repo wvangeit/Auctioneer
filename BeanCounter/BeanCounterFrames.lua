@@ -103,18 +103,13 @@ end
 function private.GUI(_, button)
 	if (button == "LeftButton") then
 		if private.frame:GetParent() == AuctionFrame then 
-			--BeanCounterBaseFrame:SetWidth(800)
-			--BeanCounterBaseFrame:SetHeight(450)
-			
 			private.frame:SetParent("BeanCounterBaseFrame")
 			private.frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
-			--BeanCounterBaseFrame:SetPoint("TOPLEFT", lib.Gui, "TOPLEFT")
-			--private.frame:SetPoint("BOTTOMRIGHT", lib.Gui, "BOTTOMRIGHT", 0,0)
 		end
 		if not BeanCounterBaseFrame:IsVisible() then
 			if AuctionFrame then AuctionFrame:Hide() end
 			BeanCounterBaseFrame:Show()
-			private.frame:SetFrameStrata("FULLSCREEN")
+			--private.frame:SetFrameStrata("FULLSCREEN")
 			private.frame:Show()
 		else
 			BeanCounterBaseFrame:Hide()
@@ -148,9 +143,11 @@ function private.CreateFrames()
 	base:SetWidth(834.5)
 	base:SetHeight(450)
 	
-	--base:SetToplevel(true)
+	
 	base:SetMovable(true)
 	base:EnableMouse(true)
+	base:SetToplevel(true)
+	
 	base.Drag = CreateFrame("Button", nil, base)
 	base.Drag:SetPoint("TOPLEFT", base, "TOPLEFT", 10,-5)
 	base.Drag:SetPoint("TOPRIGHT", base, "TOPRIGHT", -10,-5)
@@ -311,7 +308,7 @@ function private.CreateFrames()
 			end
 		end
 	end
-	--Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, private.ClickLinkHook)
+	
 	hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 	
 	--Check boxes to narrow our search
@@ -573,13 +570,13 @@ function private.relevelFrames(myLevel, ...)
 		private.relevelFrame(child)
 	end
 end
-
+--Created SearchUI reason code data into tooltips
 function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
 	if not private.getOption("util.beancounter.displayReasonCodeTooltip") then return end
 	
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
-	
+	debugPrint("Add to Tooltip", itemLink, reason)
 	if not reason then return end
 	if reason == "" then reason = "Unknown" end
 	Time = SecondsToTime((time() - Time))

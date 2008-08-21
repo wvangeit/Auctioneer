@@ -85,6 +85,6 @@ function private.merchantBuy(id, amount) --Hooked function
 	
 	local value = private.packString(link, price, quantity, time())
 	
-	private.databaseAdd("vendorbuy", itemID, value)
+	--private.databaseAdd("vendorbuy", itemID, value)
 	debugPrint("Vendor buy added..",itemID, value)
 end
