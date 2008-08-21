@@ -396,6 +396,7 @@ function snatchui.ClickLinkHook(_, link, button)
 		end
 	end
 end
+hooksecurefunc("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
 
 function snatchui.PopulateBagSheet()
 	
@@ -662,9 +663,7 @@ function lib.snatchGUI()
 	elseif (snatchui.frame:IsVisible()) then 
 		lib.closeSnatchGUI()
 	end
-	
-	hooksecurefunc("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
-	
+
 	snatchui.frame:Show()
 	snatchui.PopulateBagSheet()
 	snatchui.PopulateSnatchSheet()
