@@ -100,6 +100,7 @@ function buildCommandMap()
 		[_ENCH('ShowGuessBaseline')] = 'valuate-baseline',
 
 		[_ENCH('ShowUI')] = 'show',
+		[_ENCH('ConfigUI')] = 'config',
 		[_ENCH('ShowDELevels')] = 'levels',
 		[_ENCH('ShowDEMaterials')] = 'materials',
 	}

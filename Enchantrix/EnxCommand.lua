@@ -183,7 +183,7 @@ function handleCommand(command, source)
 			end
 		end
 
-	elseif (cmd == 'show') then
+	elseif (cmd == 'show' or cmd == 'config') then
 		-- show or hide our settings UI
 		Enchantrix.Settings.MakeGuiConfig()
 		local gui = Enchantrix.Settings.Gui
@@ -244,7 +244,7 @@ function chatPrintHelp()
 
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix.Locale.GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
-	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('ShowUI').."|r - " .. _ENCH('HelpShowUI'));
+	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('ConfigUI').."|r - " .. _ENCH('HelpShowUI'));
 
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));

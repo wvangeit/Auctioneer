@@ -575,6 +575,7 @@ EnchantrixLocalizations = {
 		["CmdOn"]	= "on";
 		["CmdPrintin"]	= "print-in";
 		["CmdToggle"]	= "toggle";
+		["ConfigUI"]	= "config";
 		["ShowDELevels"]	= "levels";
 		["ShowDEMaterials"]	= "materials";
 		["ShowEmbed"]	= "embed";
