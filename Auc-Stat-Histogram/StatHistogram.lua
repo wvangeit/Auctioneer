@@ -57,7 +57,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then
 		print("Clearing "..libName.." stats for {{", myFaction, "}}")
-		
+		data[myFaction] = nil
 	end
 end
 
@@ -426,7 +426,7 @@ function lib.OnLoad(addon)
 end
 
 function lib.ClearItem(hyperlink, faction)
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 	
@@ -434,6 +434,7 @@ function lib.ClearItem(hyperlink, faction)
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
 	data[faction][itemId][property] = nil
+	print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
 end
 
 --[[ Local functions ]]--
