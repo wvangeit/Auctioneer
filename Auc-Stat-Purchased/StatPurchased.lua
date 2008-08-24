@@ -562,6 +562,26 @@ function private.ClearData(faction, realmName)
 	end
 end
 
+function lib.ClearItem(hyperlink, faction)
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then return end
+	if (factor and factor ~= 0) then property = property.."x"..factor end
+	local realm
+	if faction then
+		realm, faction = strsplit("-", faction)
+	else
+		realm = GetRealmName()
+		faction = AucAdvanced.GetFactionGroup()
+	end
+	if (not AAStatPurchasedData) then private.LoadData() end
+	if (AAStatPurchasedData.RealmData[realm] and AAStatPurchasedData.RealmData[realm][faction]) then
+		if AAStatPurchasedData.RealmData[realm][faction]["stats"] and AAStatPurchasedData.RealmData[realm][faction]["stats"]["means"] then
+			AAStatPurchasedData.RealmData[realm][faction]["stats"]["means"][itemId] = nil
+			print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
+		end
+	end
+end
+
 function private.GetAuctionData(faction, realm)
 	if (not AAStatPurchasedData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFactionGroup()
