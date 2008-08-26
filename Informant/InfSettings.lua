@@ -337,37 +337,98 @@ function lib.MakeGuiConfig()
 	gui = Configator:Create(setter, getter)
 	lib.Gui = gui
 
-  	gui:AddCat("Informant")
+  	gui:AddCat("Informant")	-- TODO - localize me!
 
 	id = gui:AddTab(_INFM("GuiTabGeneral"))
 	gui:AddControl(id, "Header",     0,    _INFM("GuiGeneralOptions"))
-	gui:AddControl(id, "Checkbox",   0, 1, "all", _INFM('HelpOnoff') )					-- _INFM('GuiMainEnable')
-	gui:AddControl(id, "Checkbox",   0, 1, "embed", _INFM('HelpEmbed') )				-- _INFM('GuiEmbed')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-name", _INFM('HelpName'))				-- _INFM('GuiInfoName')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _INFM('HelpVendor'))			-- _INFM('GuiVendor')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-buy", _INFM('HelpVendorBuy'))	-- _INFM('GuiVendorBuy')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-sell", _INFM('HelpVendorSell'))	-- _INFM('GuiVendorSell')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-usage", _INFM('HelpUsage'))			-- _INFM('GuiInfoUsage')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-stack", _INFM('HelpStack'))			-- _INFM('GuiInfoStack')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _INFM('HelpMerchant'))		-- _INFM('GuiInfoMerchant')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('HelpZeroMerchants'))	-- _INFM('GuiInfoMerchant')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _INFM('HelpQuest'))			-- _INFM('GuiInfoQuest')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-icon", _INFM('HelpIcon'))				-- _INFM('GuiInfoIcon')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-ilevel", _INFM('HelpILevel'))			-- _INFM('GuiInfoILevel')
-	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _INFM('HelpLink'))				-- _INFM('GuiInfoLink')
-
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "all", _INFM('GuiMainEnable') )
+	gui:AddTip(id, _INFM('HelpOnoff'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "embed", _INFM('GuiEmbed') )
+	gui:AddTip(id, _INFM('HelpEmbed'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-name", _INFM('GuiInfoName'))
+	gui:AddTip(id, _INFM('HelpName'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _INFM('GuiVendor'))
+	gui:AddTip(id, _INFM('HelpVendor'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-buy", _INFM('GuiVendorBuy'))
+	gui:AddTip(id, _INFM('HelpVendorBuy'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-sell", _INFM('GuiVendorSell'))
+	gui:AddTip(id, _INFM('HelpVendorSell'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-usage", _INFM('GuiInfoUsage'))
+	gui:AddTip(id, _INFM('HelpUsage'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-stack", _INFM('GuiInfoStack'))
+	gui:AddTip(id, _INFM('HelpStack'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _INFM('GuiInfoMerchant'))
+	gui:AddTip(id, _INFM('HelpMerchant'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('GuiInfoMerchant'))
+	gui:AddTip(id, _INFM('HelpZeroMerchants'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _INFM('GuiInfoQuest'))
+	gui:AddTip(id, _INFM('HelpQuest'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-icon", _INFM('GuiInfoIcon'))
+	gui:AddTip(id, _INFM('HelpIcon'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-ilevel", _INFM('GuiInfoILevel'))
+	gui:AddTip(id, _INFM('HelpILevel'))
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _INFM('GuiInfoLink'))
+	gui:AddTip(id, _INFM('HelpLink'))
+	
+	gui:AddHelp(id, "what is",
+		"What is Informant?",
+		"Informant provides extra information about items in tooltips."
+	)
+	
 
 	id = gui:AddTab(_INFM("GuiTabProfiles"))
 	gui:AddControl(id, "Header",     0,    _INFM("GuiConfigProfiles"))
 
 	gui:AddControl(id, "Subhead",    0,    _INFM("GuiActivateProfile"))
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
+	gui:AddTip(id, "Select the profile that you wish to use for this character")	-- TODO - localize me!
+	
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", _INFM("GuiDeleteProfileButton"))
+	gui:AddTip(id, "Deletes the currently selected profile")	-- TODO - localize me!
+	
 	gui:AddControl(id, "Button",     0, 1, "profile.default", _INFM("GuiResetProfileButton"))
 
 	gui:AddControl(id, "Subhead",    0,    _INFM("GuiCreateReplaceProfile"))
+	gui:AddTip(id, "Reset all settings for the current profile")	-- TODO - localize me!
+	
 	gui:AddControl(id, "Text",       0, 1, "profile.name", _INFM("GuiNewProfileName"))
+	gui:AddTip(id, "Enter the name of the profile that you wish to create")	-- TODO - localize me!
+	
 	gui:AddControl(id, "Button",     0, 1, "profile.save", _INFM("GuiSaveProfileButton"))
+	gui:AddTip(id, "Click this button to create or overwrite the specified profile name")	-- TODO - localize me!
+
+	-- TODO - localize me!
+	-- these are stolen from EnhTT
+	gui:AddHelp(id, "what is",
+		"What is a profile?",
+		"A profile is used to contain a group of settings, you can use different profiles for different characters, or switch between profiles for the same character when doing different tasks."
+	)
+	gui:AddHelp(id, "how to create",
+		"How do I create a new profile?",
+		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+	)
+	gui:AddHelp(id, "how to delete",
+		"How do I delete a profile?",
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button"
+	)
+	gui:AddHelp(id, "why delete",
+		"Why would I want to delete a profile?",
+		"You can delete a profile when you don't want to use it anymore, or you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
+	)
 
 end
 
