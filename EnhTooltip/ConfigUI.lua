@@ -150,6 +150,12 @@ local settingDefaults = {
 	}
 
 local function getDefault(setting)
+	local a,b,c = strsplit(".", setting)
+
+	-- basic settings
+	if (a == "show") then return true end
+	if (b == "enable") then return true end
+	
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
 	return result
@@ -498,6 +504,17 @@ local function click(obj, button)
 			end		
 		end
 	elseif (button == "RightButton") then
+		if (Informant and Informant.Settings) then
+			Informant.Settings.MakeGuiConfig()
+			local gui = Informant.Settings.Gui
+			if (gui) then
+				if (gui:IsVisible()) then
+					gui:Hide()
+				else
+					gui:Show()
+				end
+			end
+		end
 	end
 end
 
@@ -510,12 +527,12 @@ if LibStub then
 		sideIcon = SlideBar.AddButton("EnhTooltip", "Interface\\AddOns\\EnhTooltip\\Skin\\EnhOrb")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", click)
+-- TODO - localize these strings!
 		sideIcon.tip = {
-			--"EnhTooltip/Informant",
-			"EnhTooltip",
+			"EnhTooltip/Informant",
 			"Description.",
 			"{{Click}} to open the Enhanced Tooltip configuration.",
-			--"{{Right-Click}} to open Informant configuration.",
+			"{{Right-Click}} to open Informant configuration.",
 		}
 	end
 end
