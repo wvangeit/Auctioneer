@@ -23,6 +23,7 @@ Data\InfPrices.lua
 Data\InfQuests.lua
 
 InfCommand.lua
+InfSettings.lua
 InfTooltip.lua
 InfData.lua
 

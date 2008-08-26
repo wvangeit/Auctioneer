@@ -27,7 +27,7 @@ Informant_RegisterRevision("$URL$", "$Rev$")
 
 local nilSafeString			-- nilSafeString(String)
 local whitespace			-- whitespace(length)
-local getFilter = Informant.GetFilter
+local getFilter = Informant.Settings.GetSetting
 local debugPrint
 
 function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)

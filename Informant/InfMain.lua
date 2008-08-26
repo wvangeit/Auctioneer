@@ -41,8 +41,6 @@ local debugPrint            -- debugPrint(message, title, errorCode, level)
 local frameActive			-- frameActive(isActive)
 local frameLoaded			-- frameLoaded()
 local getCatName			-- getCatName(catID)
-local getFilter				-- getFilter(filter)
-local getFilterVal			-- getFilterVal(type)
 local getItem				-- getItem(itemID)
 local getRowCount			-- getRowCount()
 local infDebugPrint         -- debugPrint(message, category, title, errorCode, level)
@@ -52,15 +50,12 @@ local onVariablesLoaded		-- onVariablesLoaded()
 local onQuit				-- onQuit()
 local scrollUpdate			-- scrollUpdate(offset)
 local setDatabase			-- setDatabase(database)
-local setFilter				-- setFilter(key, value)
-local setFilterDefaults		-- setFilterDefaults()
 local setRequirements		-- setRequirements(requirements)
 local setSkills				-- setSkills(skills)
 local setVendors			-- setVendors(vendors)
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
--- local getKeyBindProfile			-- getKeyBindProfile()
 
 -- LOCAL VARIABLES
 
@@ -92,24 +87,6 @@ CLASS_TO_CATEGORY_MAP = {
 	[5] = 10, --Miscellaneous
 	[12] = 11, --Quest
 }
-
-local filterDefaults = {
-	['all'] = 'on',
-	['embed'] = 'off',
-	['locale'] = 'default',
-	['show-name'] = 'on',
-	['show-vendor'] = 'on',
-	['show-vendor-buy'] = 'on',
-	['show-vendor-sell'] = 'on',
-	['show-usage'] = 'on',
-	['show-stack'] = 'on',
-	['show-merchant'] = 'on',
-	['show-zero-merchants'] = 'on',
-	['show-quest'] = 'on',
-	['show-icon'] = 'on',
-	['show-ilevel'] = 'on',
-	['show-link'] = 'off',
-};
 
 -- FUNCTION DEFINITIONS
 
@@ -385,37 +362,6 @@ function setQuestNames(list)
 	Informant.SetQuestNames = nil -- Set only once
 end
 
-function setFilter(key, value)
-	if (not InformantConfig.filters) then
-		InformantConfig.filters = {};
-		setFilterDefaults()
-	end
-	if (type(value) == "boolean") then
-		if (value) then
-			InformantConfig.filters[key] = 'on';
-		else
-			InformantConfig.filters[key] = 'off';
-		end
-	else
-		InformantConfig.filters[key] = value;
-	end
-end
-
-function getFilterVal(type)
-	if (not InformantConfig.filters) then
-		InformantConfig.filters = {}
-		setFilterDefaults()
-	end
-	return InformantConfig.filters[type]
-end
-
-function getFilter(filter)
-	value = getFilterVal(filter)
-	if ((value == _INFM('CmdOn')) or (value == "on")) then return true
-	elseif ((value == _INFM('CmdOff')) or (value == "off")) then return false end
-	return true
-end
-
 function getLocale()
 	local locale = Informant.GetFilterVal('locale');
 	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
@@ -638,7 +584,6 @@ function onVariablesLoaded()
 	if (not InformantConfig) then
 		InformantConfig = {}
 	end
-	setFilterDefaults()
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
@@ -652,22 +597,7 @@ function onVariablesLoaded()
 		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
---[[
-	-- This code should no longer be needed
-	-- Restore key bindings
-	-- This workaround is required for LoadOnDemand addons since their saved
-	-- bindings are deleted upon login.
-	local profile = getKeyBindProfile();
-	if (InformantConfig and InformantConfig.bindings) then
-		if (not	InformantConfig.bindings[profile]) then profile = 'global'; end
-		if (InformantConfig.bindings[profile]) then
-			for _,key in ipairs(InformantConfig.bindings[profile]) do
-				SetBinding(key, 'INFORMANT_POPUPDOWN')
-			end
-		end
-	end
-	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
---]]
+
 	Informant.InitCommands()
 end
 
@@ -675,19 +605,6 @@ function onEvent(event, addon)
 	if (event == "ADDON_LOADED" and addon:lower() == "informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
-	--[[
-	-- This code should no longer be needed
-	elseif (event == "UPDATE_BINDINGS") then
-		-- Store key bindings for Informant
-		local key1, key2 = GetBindingKey('INFORMANT_POPUPDOWN');
-		local profile = getKeyBindProfile();
-
-		if (not InformantConfig.bindings) then InformantConfig.bindings = {}; end
-		if (not InformantConfig.bindings[profile]) then InformantConfig.bindings[profile] = {}; end
-
-		InformantConfig.bindings[profile][1] = key1;
-		InformantConfig.bindings[profile][2] = key2;
-	--]]
 	end
 end
 
@@ -791,26 +708,16 @@ function clear()
 	scrollUpdate()
 end
 
-function setFilterDefaults()
-	if (not InformantConfig.filters) then InformantConfig.filters = {}; end
-	for k,v in pairs(filterDefaults) do
-		if (InformantConfig.filters[k] == nil) then
-			InformantConfig.filters[k] = v;
-		end
-	end
-end
---[[
---This code should no longer be needed
--- Key binding helper functions
-
-function getKeyBindProfile()
-	if (IsAddOnLoaded("PerCharBinding")) then
-		return GetRealmName() .. ":" .. UnitName("player")
-	end
-	return 'global'
-end
---]]
 -- GLOBAL OBJECT
+
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib("Informant")
+else
+	function debug() end
+	assert = debug
+end
 
 -------------------------------------------------------------------------------
 -- Prints the specified message to nLog.
@@ -838,7 +745,7 @@ end
 --                nil, otherwise
 -------------------------------------------------------------------------------
 function infDebugPrint(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+	return debug(addonName, message, category, title, errorCode, level)
 end
 
 -------------------------------------------------------------------------------
@@ -890,13 +797,9 @@ Informant = {
 	FrameActive = frameActive,
 	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,
-	GetFilter = getFilter,
-	GetFilterVal = getFilterVal,
 	GetLocale = getLocale,
 	GetQuestName = getQuestName,
 	OnEvent = onEvent,
-	SetFilter = setFilter,
-	SetFilterDefaults = setFilterDefaults,
 	DebugPrint = infDebugPrint
 }
 

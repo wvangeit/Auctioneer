@@ -105,6 +105,16 @@ function commandHandler(command, source)
 		cmdHelp()
 		return
 
+	elseif (cmd == 'show' or cmd == 'config') then
+		-- show or hide our settings UI
+		Informant.Settings.MakeGuiConfig()
+		local gui = Informant.Settings.Gui
+		if (gui:IsVisible()) then
+			gui:Hide()
+		else
+			gui:Show()
+		end
+
 	elseif (cmd == "on" or cmd == "off" or cmd == "toggle") then
 		onOff(cmd, chatprint)
 	elseif (cmd == "disable") then
@@ -166,6 +176,8 @@ function cmdHelp()
 	lineFormat = "  |cffffffff/informant %s %s|r - %s"
 	chatPrint(lineFormat:format(_INFM('CmdDefault'), "", _INFM('HelpDefault')))
 end
+
+
 --[[
 	The onOff(state, chatprint) function handles the state of the Informant AddOn (whether it is currently on or off)
 	If "on" or "off" is specified in the first argument then Informant's state is changed to that value,
@@ -193,15 +205,15 @@ function onOff(state, chatprint)
 	end
 
 	if (state == 'on' or state == 'off') then
-		Informant.SetFilter('all', state)
+		Informant.Settings.SetSetting('all', state)
 
 	elseif (state == 'toggle') then
-		Informant.SetFilter('all', not Informant.GetFilter('all'))
+		Informant.Settings.SetSetting('all', not Informant.Settings.GetSetting('all'))
 	end
 
 	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint) then
-		state = Informant.GetFilter('all')
+		state = Informant.Settings.GetSetting('all')
 
 		if (state) then
 			chatPrint(_INFM('StatOn'))
@@ -218,15 +230,12 @@ function restoreDefault(param, chatprint)
 		return
 	elseif ((param == _INFM('CmdClearAll')) or (param == "all")) then
 		param = "all"
-		InformantConfig.filters = {}
+		Informant.Settings.RestoreDefaults()
 	else
 		paramLocalized = param
 		param = delocalizeCommand(param)
-		Informant.SetFilter(param, nil)
+		Informant.Settings.SetSetting(param, nil)
 	end
-
-	-- Apply defaults for settings that went missing
-	Informant.SetFilterDefaults()
 
 	if (chatprint) then
 		if (param == "all") then
@@ -243,13 +252,13 @@ function genVarSet(variable, param, chatprint)
 	end
 
 	if (param == "on" or param == "off" or type(param) == "boolean") then
-		Informant.SetFilter(variable, param)
+		Informant.Settings.SetSetting(variable, param)
 	elseif (param == "toggle" or param == nil or param == "") then
-		param = Informant.SetFilter(variable, not Informant.GetFilter(variable))
+		param = Informant.Settings.SetSetting(variable, not Informant.Settings.GetSetting(variable))
 	end
 
 	if (chatprint) then
-		if (Informant.GetFilter(variable)) then
+		if (Informant.Settings.GetSetting(variable)) then
 			chatPrint(_INFM('FrmtActEnable'):format(localizeCommand(variable)))
 		else
 			chatPrint(_INFM('FrmtActDisable'):format(localizeCommand(variable)))
@@ -346,7 +355,7 @@ function localizeFilterVal(value)
 end
 
 function getLocalizedFilterVal(key)
-	return localizeFilterVal(Informant.GetFilterVal(key))
+	return localizeFilterVal(Informant.Settings.GetSetting(key))
 end
 
 -- Turns a localized slash command into the generic English version of the command
@@ -396,3 +405,6 @@ end
 
 -- Globally accessible functions
 Informant.SetLocale = setLocale
+
+
+

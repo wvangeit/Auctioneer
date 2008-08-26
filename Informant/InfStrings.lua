@@ -625,6 +625,18 @@ InformantLocalizations = {
 		["SkillTailoring"]	= "Tailoring";
 		["SkillWarlock"]	= "Warlock spells";
 
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Activate a current profile";
+		["GuiConfigProfiles"]	= "Setup, configure and edit profiles";
+		["GuiCreateReplaceProfile"]	= "Create or replace a profile";
+		["GuiDeleteProfileButton"]	= "Delete";
+		["GuiGeneralOptions"]	= "General Informant options";
+		["GuiNewProfileName"]	= "New profile name:";
+		["GuiResetProfileButton"]	= "Reset";
+		["GuiSaveProfileButton"]	= "Save";
+		["GuiTabGeneral"]	= "General";
+		["GuiTabProfiles"]	= "Profiles";
+
 	};
 
 	esES = {
@@ -1493,7 +1505,7 @@ InformantLocalizations = {
 		-- Section: Help Text
 		["GuiDefaultAll"]	= "Сбросить все настройки Информанта";
 		["GuiDefaultAllButton"]	= "Сбросить всё";
-		["GuiDefaultAllHelp"]	= "Щелкните тут для того чтобы установить все настройки Информанта к их значениям по умолчанию. ВНИМАНИЕ: Это действие нельзя отменить, если Вы передумаете.";
+		["GuiDefaultAllHelp"]	= "Щелкните для сброса всех настроек Информанта в исходное состояние. ВНИМАНИЕ: Это действие нельзя отменить.";
 		["GuiDefaultOption"]	= "Сбросить это настройку";
 		["GuiEmbed"]	= "Вставлять информацию в стандартную всплывающую подсказку";
 		["GuiEmbedHeader"]	= "Вставлять";
@@ -1552,7 +1564,7 @@ InformantLocalizations = {
 		["FrmtActEnable"]	= "%s не показывается";
 		["FrmtActEnabledOn"]	= "Отоброжение предметов %s в %s\n";
 		["FrmtActSet"]	= "%s установлено в '%s'";
-		["FrmtActUnknown"]	= "Незвестная комманда: '%s'  ";
+		["FrmtActUnknown"]	= "Неизвестная комманда: '%s'  ";
 		["FrmtInfoBuy"]	= "Купить у торговца";
 		["FrmtInfoBuymult"]	= "Купить %d (%s каждое)\n";
 		["FrmtInfoClass"]	= "Класс: %s";
