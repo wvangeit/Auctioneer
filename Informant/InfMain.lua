@@ -578,7 +578,6 @@ function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
---	Informant.InitTrades();
 end
 
 local function frameLoaded()
