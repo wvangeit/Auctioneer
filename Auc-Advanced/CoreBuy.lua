@@ -140,7 +140,17 @@ function lib.FinishedSearch(query)
 		if (rarity == query.quality) and (minlevel == query.minUseLevel) and (equiploc == query.invType)
 		and (private.CurAuction["itemname"] == query.name) then
 			print("AucAdv: Auction for "..private.CurAuction["link"].." no longer exists")
-			private.CurAuction = {}
+			empty(private.CurAuction)
+		else --The search was for the wrong item, so put the request back into the queue
+			table.insert(private.BuyRequests, 1, {
+				private.CurAuction["link"], 
+				private.CurAuction["sellername"],
+				private.CurAuction["count"],
+				private.CurAuction["minbid"],
+				private.CurAuction["buyout"],
+				private.CurAuction["price"]
+			})
+			empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
 		end
 	end
 end
@@ -326,6 +336,7 @@ function private.OnUpdate()
 			private.CurAuction["buyout"],
 			private.CurAuction["price"]
 		})
+		empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
 	end
 end
 
