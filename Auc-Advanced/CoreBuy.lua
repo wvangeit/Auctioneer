@@ -324,7 +324,9 @@ end
 
 function private.OnUpdate()
 	if AuctionFrame and AuctionFrame:IsVisible() then
-		if (not private.CurAuction["link"]) and (#private.BuyRequests > 0) then
+		if (not private.CurAuction["link"])
+				and (not AucAdvanced.Scan.IsPaused())
+				and (#private.BuyRequests > 0) then
 			lib.PushSearch()
 		end
 	elseif private.CurAuction["link"] then --AH was closed, so reinsert current request back into the queue
