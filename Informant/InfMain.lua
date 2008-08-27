@@ -138,11 +138,6 @@ function getItem(itemID, static)
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
-	local vbuy = self.vendbuy[itemID]
-	local vsell = self.vendsell[itemID]
-	if (vbuy) then buy = vbuy end
-	if (vsell) then sell = vsell end
-
 	local dataItem = (static and staticDataItem or {})
 	dataItem.buy = buy
 	dataItem.sell = sell
@@ -271,6 +266,8 @@ function getItem(itemID, static)
 	return dataItem
 end
 
+--[[
+-- ccox - this appears to be unused
 function getItemBasic(itemID)
 	if (not itemID) then return end
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
@@ -283,12 +280,14 @@ function getItemBasic(itemID)
 			texture = itemTexture,
 			reqLevel = itemUseLevel,
 			itemLevel = itemLevel,
-			buy = self.vendbuy[itemID],
-			sell = self.vendsell[itemID],
+--			buy = self.vendbuy[itemID],
+--			sell = self.vendsell[itemID],
 			fullData = false,
 		}
 	end
 end
+]]
+
 
 --Implementation of GetSellValue API proposed by Tekkub at http://www.wowwiki.com/API_GetSellValue
 local origGetSellValue = GetSellValue
@@ -306,7 +305,18 @@ function GetSellValue(item)
 	-- Return out if we didn't find an id
 	if not id then return end
 
-	local sellval = self.vendsell[id] -- Retrieve the price here...
+	local itemInfo = Informant.GetItem(id)
+	local sellval
+	
+-- ccox - TODO - is this correct for items sold in stacks?
+-- see Informant.TooltipHandler
+
+	if (itemInfo) then
+		sellval = itemInfo.buy
+		if (sellval) then
+			sellval = tonumber(sellval)
+		end
+	end
 
 	if sellval then
 		return sellval
@@ -320,31 +330,18 @@ function setSkills(skills)
 	self.skills = skills
 	Informant.SetSkills = nil -- Set only once
 end
-
 function setRequirements(requirements)
 	self.requirements = requirements
 	Informant.SetRequirements = nil -- Set only once
 end
-
 function setVendors(vendors)
 	self.vendors = vendors
 	Informant.SetVendors = nil -- Set only once
 end
-
 function setDatabase(database)
 	self.database = database
 	Informant.SetDatabase = nil -- Set only once
 end
-
-function setVendorBuy(vendorlist)
-	self.vendbuy = vendorlist
-	Informant.SetVendorBuy = nil -- Set only once
-end
-function setVendorSell(vendorlist)
-	self.vendsell = vendorlist
-	Informant.SetVendorSell = nil -- Set only once
-end
-
 function setQuestStarts(list)
 	self.questStarts = list
 	Informant.SetQuestStarts = nil -- Set only once
@@ -788,8 +785,6 @@ Informant = {
 	SetRequirements = setRequirements,
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
-	SetVendorBuy = setVendorBuy,
-	SetVendorSell = setVendorSell,
 	SetQuestStarts = setQuestStarts,
 	SetQuestRewards = setQuestRewards,
 	SetQuestRequires = setQuestRequires,

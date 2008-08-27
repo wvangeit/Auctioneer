@@ -19,7 +19,6 @@ InfLocale.lua
 
 InfMain.lua
 
-Data\InfPrices.lua
 Data\InfQuests.lua
 
 InfCommand.lua
