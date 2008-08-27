@@ -279,7 +279,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	gui:MakeScrollable(id)
 
 	gui:AddHelp(id, "what appraiser",
