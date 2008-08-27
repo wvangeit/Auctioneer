@@ -401,9 +401,9 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Deletes the currently selected profile")	-- TODO - localize me!
 	
 	gui:AddControl(id, "Button",     0, 1, "profile.default", _INFM("GuiResetProfileButton"))
+	gui:AddTip(id, "Reset all settings for the current profile")	-- TODO - localize me!
 
 	gui:AddControl(id, "Subhead",    0,    _INFM("GuiCreateReplaceProfile"))
-	gui:AddTip(id, "Reset all settings for the current profile")	-- TODO - localize me!
 	
 	gui:AddControl(id, "Text",       0, 1, "profile.name", _INFM("GuiNewProfileName"))
 	gui:AddTip(id, "Enter the name of the profile that you wish to create")	-- TODO - localize me!
