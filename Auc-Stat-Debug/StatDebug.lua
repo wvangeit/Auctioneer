@@ -145,7 +145,7 @@ end
 AucAdvanced.Settings.SetDefault("stat.debug.tooltip", true)
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
 	
 	gui:AddHelp(id, "what debug stats",
