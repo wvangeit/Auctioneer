@@ -65,6 +65,7 @@ function lib.OnLoad()
 	end
 	hooksecurefunc("QueryAuctionItems", private.CopyQuery)
 	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
+	AucAdvanced.Settings.SetDefault("util.compactui.tooltiphelp", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
 	AucAdvanced.Settings.SetDefault("util.browseoverride.activated", false)
@@ -85,14 +86,31 @@ function private.QueryCurrent(SortTable, SortColumn, reverse)
 	end
 end
 
+--Beginner Tooltips script display for all UI elements 
+function private.buttonTooltips(self, text)
+	if get("util.compactui.tooltiphelp") and text and self then
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+		GameTooltip:SetText(text)
+	end
+end
+
 function private.HookAH()
 	lib.inUse = true
+	--private.switchUI:ClearAllPoints()
+	if get("util.compactui.activated") then
+		private.switchUI:SetText("Normal") 
+	else
+		private.switchUI:SetText("CompactUI")
+	end
+	private.switchUI:SetParent(AuctionFrameBrowse)
+	private.switchUI:SetPoint("TOPRIGHT", AuctionFrameBrowse, "TOPRIGHT", -157, -13)
 
+	
 	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
 		private.MyAuctionFrameUpdate = function() end
 		return
 	end
-
+		
 	AuctionFrameBrowse_Update = private.MyAuctionFrameUpdate
 	local button, lastButton, origButton
 	local line
@@ -102,7 +120,7 @@ function private.HookAH()
 	BrowseDurationSort:Hide()
 	BrowseHighBidderSort:Hide()
 	BrowseCurrentBidSort:Hide()
-
+	
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
 		if (i <= NUM_BROWSE_TO_DISPLAY) then
@@ -746,6 +764,26 @@ function private.MyAuctionFrameUpdate()
 	AucAdvanced.API.ListUpdate()
 end
 
+--create switch UI button
+private.switchUI = CreateFrame("Button", nil, UIParent, "OptionsButtonTemplate")
+private.switchUI:SetWidth(100)
+
+private.switchUI:SetScript("OnClick", function()
+      if get("util.compactui.activated") then
+         set("util.compactui.activated", false)
+         private.switchUI:SetText("CompactUI")   
+	print("Compact UI has been disabled, you will need to restart WoW for this to take effect")
+      else
+         set("util.compactui.activated", true)
+         private.switchUI:SetText("Normal")
+	print("Compact UI has been enabled, you will need to restart WoW for this to take effect")	 
+      end
+end)
+private.switchUI.TooltipText = "Switch to a Simple layout"
+private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Toggles the Compact UI display on and off.\nThis requires a WoW restart or /console reloadui.") end)
+private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui:AddTab(libName, libType.." Modules")
@@ -760,6 +798,8 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload")
 	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house\naddons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the\nabovebox and reloading your interface.")
 
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.tooltiphelp", "Displays the pop up help tooltips")
+	gui:AddTip(id, "This option will display popup help tooltips on the Compact UI display")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when zero")
 	gui:AddTip(id, "This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show required bid instead of current bid value")
@@ -767,6 +807,10 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning")
 	gui:AddTip(id, "Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning")
 
+	gui:AddHelp(id, "what is popup",
+		"What does enabling the popup help do?",
+		"Displays little popup tooltips over various parts of the compactUI")
+	
 	gui:AddHelp(id, "what is collapse",
 		"What does removing smaller denomination coins do?",
 		"Removing smaller denomination coins removes coins from the lowest order when the coins are zero and their removal would not affect the accuracy of the price display.\n"..
