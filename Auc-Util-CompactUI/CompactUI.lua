@@ -96,14 +96,8 @@ end
 
 function private.HookAH()
 	lib.inUse = true
-	--private.switchUI:ClearAllPoints()
-	if get("util.compactui.activated") then
-		private.switchUI:SetText("Normal") 
-	else
-		private.switchUI:SetText("CompactUI")
-	end
 	private.switchUI:SetParent(AuctionFrameBrowse)
-	private.switchUI:SetPoint("TOPRIGHT", AuctionFrameBrowse, "TOPRIGHT", -157, -13)
+	private.switchUI:SetPoint("TOPRIGHT", AuctionFrameBrowse, "TOPRIGHT", -157, -17)
 
 	
 	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
@@ -767,27 +761,22 @@ end
 --create switch UI button
 private.switchUI = CreateFrame("Button", nil, UIParent, "OptionsButtonTemplate")
 private.switchUI:SetWidth(100)
-
+private.switchUI:SetHeight(15)
+private.switchUI:SetText("Configure")
 private.switchUI:SetScript("OnClick", function()
-      if get("util.compactui.activated") then
-         set("util.compactui.activated", false)
-         private.switchUI:SetText("CompactUI")   
-	print("Compact UI has been disabled, you will need to restart WoW for this to take effect")
-      else
-         set("util.compactui.activated", true)
-         private.switchUI:SetText("Normal")
-	print("Compact UI has been enabled, you will need to restart WoW for this to take effect")	 
-      end
+	AucAdvanced.Settings.Show()
+	private.gui:ActivateTab(private.guiID)
 end)
-private.switchUI.TooltipText = "Switch to a Simple layout"
-private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Toggles the Compact UI display on and off.\nThis requires a WoW restart or /console reloadui.") end)
+private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the compact UI window.") end)
 private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName, libType.." Modules")
-
+	local id = gui:AddTab(libName, libType.." Modules")
+	private.gui = gui --stores our ID id we use this to open the config button to correct frame
+	private.guiID = id 
+	
 	gui:AddHelp(id, "what compactui",
 		"What is CompactUI?",
 		"CompactUI is a space optimized browse interface to replace the default Blizzard auction browse interface.\n"..
