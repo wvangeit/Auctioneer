@@ -451,7 +451,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName, libType.." Modules")
+	local id = gui:AddTab(libName, libType.." Modules")
 	gui:MakeScrollable(id)
 
 	gui:AddHelp(id, "what askprice",
