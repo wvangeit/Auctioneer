@@ -358,7 +358,7 @@ AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", true)
 AucAdvanced.Settings.SetDefault("stat.purchased.reportsafe", false)
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
 	
 	gui:AddHelp(id, "what purchased stats",
