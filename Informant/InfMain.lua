@@ -312,7 +312,7 @@ function GetSellValue(item)
 -- see Informant.TooltipHandler
 
 	if (itemInfo) then
-		sellval = itemInfo.buy
+		sellval = itemInfo.sell
 		if (sellval) then
 			sellval = tonumber(sellval)
 		end
