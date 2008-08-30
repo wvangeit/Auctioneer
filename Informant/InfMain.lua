@@ -58,6 +58,7 @@ local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
 local Dump
 local idFromLink
+local OnTooltipAddMoney
 
 -- LOCAL VARIABLES
 
@@ -107,6 +108,12 @@ function split(str, at)
 	else
 		return {strsplit(at, str)};
 	end
+end
+
+-- utility, so we don't have to maintain multiple copies of this
+function idFromLink( itemLink )
+	local _, _, itemid = string.find(itemLink, "item:(%d+)")
+	return tonumber(itemid)
 end
 
 function skillToName(userSkill)
@@ -532,12 +539,6 @@ end
 
 
 
--- utility, so we don't have to maintain multiple copies of this
-function idFromLink( itemLink )
-	local _, _, itemid = string.find(itemLink, "item:(%d+)")
-	return tonumber(itemid)
-end
-
 
 
 function OnTooltipAddMoney(self, money)
@@ -545,7 +546,7 @@ function OnTooltipAddMoney(self, money)
 end
 
 
-function TooltipScanBagItem(bag, slot)
+local function TooltipScanBagItem(bag, slot)
 	Informant_ScanTooltip.scanningMoneyFound = false
 	Informant_ScanTooltip:ClearLines()
 	local _, count = GetContainerItemInfo(bag, slot)
@@ -562,7 +563,7 @@ function TooltipScanBagItem(bag, slot)
 end
 
 
-function updateSellPricesFromMerchant()
+local function updateSellPricesFromMerchant()
 	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
@@ -597,7 +598,7 @@ function updateSellPricesFromMerchant()
 end
 
 
-function updateBuyPricesFromMerchant()
+local function updateBuyPricesFromMerchant()
 	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
 	for index = 1, GetMerchantNumItems() do
 		local link = GetMerchantItemLink(index)
@@ -635,7 +636,7 @@ function updateBuyPricesFromMerchant()
 end
 
 
-function doUpdateMerchant()
+local function doUpdateMerchant()
 
 	if (not InformantLocalUpdates) then InformantLocalUpdates = {} end
 	
