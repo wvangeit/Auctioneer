@@ -31,6 +31,14 @@
 	<Script>
 		Informant_RegisterRevision("$URL$", "$Rev$")
 	</Script>
+	
+	<GameTooltip name="Informant_ScanTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
+		<Scripts>
+			<Onload>
+				this:SetOwner( UIParent, "ANCHOR_NONE" )
+			</Onload>
+		</Scripts>
+	</GameTooltip>
 
 	<Frame name="InformantFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true" moveable="true">
 		<Size>

@@ -56,6 +56,8 @@ local setVendors			-- setVendors(vendors)
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
+local Dump
+local idFromLink
 
 -- LOCAL VARIABLES
 
@@ -131,6 +133,25 @@ function getItem(itemID, static)
 		buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
 		buy = tonumber(buy)
 		sell = tonumber(sell)
+	end
+	
+	-- if we have a local correction for this item, merge in the corrected data
+	if (InformantLocalUpdates and InformantLocalUpdates.items) then
+		local updateData = InformantLocalUpdates.items[ itemID ]
+		if (updateData) then
+			if (updateData.buy) then
+				buy = tonumber(updateData.buy)
+			end
+			if (updateData.sell) then
+				sell = tonumber(updateData.sell)
+			end
+			if (updateData.stack) then
+				stack = tonumber(updateData.stack)
+			end
+			if (updateData.quantity) then
+				quantity = tonumber(updateData.quantity)
+			end
+		end
 	end
 
 	class = tonumber(class)
@@ -298,8 +319,7 @@ function GetSellValue(item)
 	elseif type(item) == "string" then
 		-- Find the itemid
 		local _, link = GetItemInfo(item)
-		local _, _, itemid = string.find(link or item, "item:(%d+)")
-		id = tonumber(itemid)
+		local itemid = idFromLink( link or item )
 	end
 
 	-- Return out if we didn't find an id
@@ -510,6 +530,146 @@ function showHideInfo(iType, iId)
 	end
 end
 
+
+
+-- utility, so we don't have to maintain multiple copies of this
+function idFromLink( itemLink )
+	local _, _, itemid = string.find(itemLink, "item:(%d+)")
+	return tonumber(itemid)
+end
+
+
+
+function OnTooltipAddMoney(self, money)
+	Informant_ScanTooltip.scanningMoneyFound = money
+end
+
+
+function TooltipScanBagItem(bag, slot)
+	Informant_ScanTooltip.scanningMoneyFound = false
+	Informant_ScanTooltip:ClearLines()
+	local _, count = GetContainerItemInfo(bag, slot)
+	if (not count or count < 1) then return end
+	Informant_ScanTooltip.scanningStack = count
+	
+	-- magic happens here as OnTooltipAddMoney gets called
+	local _, repairCost = Informant_ScanTooltip:SetBagItem(bag, slot)
+	if (type(repairCost) == "number" and repairCost > 0) then
+		-- don't count price for items that need repair
+		Informant_ScanTooltip.scanningMoneyFound = false
+		return
+	end
+end
+
+
+function updateSellPricesFromMerchant()
+	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
+	for bag = 0, NUM_BAG_FRAMES do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local scanningLink = GetContainerItemLink(bag, slot)
+			if (scanningLink) then
+				TooltipScanBagItem(bag, slot)
+				if (Informant_ScanTooltip.scanningMoneyFound) then
+					local itemid = idFromLink(scanningLink)
+					local informantItemInfo = getItem( itemid )
+					if (informantItemInfo) then
+						
+						local sellPrice = Informant_ScanTooltip.scanningMoneyFound / Informant_ScanTooltip.scanningStack
+						
+						if (informantItemInfo.sell ~= sellPrice) then
+							-- is this item sell price correct in our database? or missing from our database?
+							local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(scanningLink)
+
+							local newItemInfo = InformantLocalUpdates.items[ itemid ]
+							if (not newItemInfo) then newItemInfo = {} end
+							newItemInfo.sell = sellPrice
+							newItemInfo.stack = itemStackSize
+							newItemInfo.quantity = itemStackSize
+							InformantLocalUpdates.items[ itemid ] = newItemInfo
+							
+						end
+					
+					end
+				end	-- if money found
+			end	-- if link
+		end	-- for slot
+	end	-- for bag
+end
+
+
+function updateBuyPricesFromMerchant()
+	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
+	for index = 1, GetMerchantNumItems() do
+		local link = GetMerchantItemLink(index)
+		if (link) then
+			local itemid = idFromLink( link )
+			local name, texture, price, quantity, numAvailable, isUsableFlag, extendedCostFlag = GetMerchantItemInfo(index)
+			if (extendedCostFlag) then
+				--local honorPoints, arenaPoints, itemCount = GetMerchantItemCostInfo(index);
+				-- NOTE - currently not using this information
+			end
+
+			local informantItemInfo = getItem( itemid )
+			if (informantItemInfo) then
+				
+				if (price ~= informantItemInfo.buy) then
+					-- is this item buy price correct in our database? or missing from our database?
+			
+					local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(link)
+
+-- ccox - currently this will hit often, because we don't take reputation discounts into account for buy pricing
+-- should we try to get rep discounts, or just update the price as seen?  Then they'll be wrong for alts!
+-- could we account for the rep discounts and calculate a baseline?
+				
+					local newItemInfo = InformantLocalUpdates.items[ itemid ]
+					if (not newItemInfo) then newItemInfo = {} end
+					newItemInfo.buy = price
+					newItemInfo.stack = itemStackSize
+					newItemInfo.quantity = itemStackSize
+					InformantLocalUpdates.items[ itemid ] = newItemInfo
+		
+				end
+			end	-- if info
+		end	-- if link
+	end	--	for GetMerchantNumItems
+end
+
+
+function doUpdateMerchant()
+
+	if (not InformantLocalUpdates) then InformantLocalUpdates = {} end
+	
+	if((not MerchantFrame:IsVisible()) or InRepairMode()) then return end
+	
+	if (not Informant.Settings.GetSetting('auto-update')) then return end
+
+	
+	-- update vendor name/info
+	if (not InformantLocalUpdates.vendor) then InformantLocalUpdates.vendor = {} end
+	
+	local vendorName = UnitName("NPC")
+	local vendorFaction = UnitFactionGroup("NPC")
+	if (vendorFaction ~= UnitFactionGroup("player")) then
+		vendorFaction = "Neutral"
+	end
+	local vendorGUID = UnitGUID("NPC")
+	local vendorID = tonumber(string.sub(vendorGUID,6,12),16)
+
+	-- ccox - debugging
+	--local vendMessage = Dump( "Found vendor: ", vendorName, "Faction: ", vendorFaction, "id: ", vendorID )
+	--chatPrint(vendMessage)
+
+	-- ccox - TODO - how can we add new vendors to our database?
+	-- is there any kind of in-game vendor id? 			YES
+	-- BUT our current database doesn't use the NPC ids!
+
+
+	updateBuyPricesFromMerchant()
+	updateSellPricesFromMerchant()
+
+end
+
+
 function onQuit()
 	if (not InformantConfig.position) then
 		InformantConfig.position = { }
@@ -517,8 +677,14 @@ function onQuit()
 	InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
 end
 
+
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
+	
+	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
+	
+	this:RegisterEvent("MERCHANT_SHOW");
+	this:RegisterEvent("MERCHANT_UPDATE");
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 end
@@ -599,10 +765,16 @@ function onVariablesLoaded()
 end
 
 function onEvent(event, addon)
+
 	if (event == "ADDON_LOADED" and addon:lower() == "informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
 	end
+	
+	if( event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE" ) then
+		doUpdateMerchant();
+	end
+	
 end
 
 function frameActive(isActive)
@@ -770,6 +942,10 @@ end
 -------------------------------------------------------------------------------
 function debugPrint(message, title, errorCode, level)
 	return Informant.DebugPrint(message, "InfMain", title, errorCode, level)
+end
+
+function Dump(...)
+	return debug:Dump(...)
 end
 
 Informant = {

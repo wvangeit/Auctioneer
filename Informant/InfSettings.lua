@@ -130,6 +130,7 @@ local settingDefaults = {
 	['show-icon'] = true,
 	['show-ilevel'] = true,
 	['show-link'] = false,
+	['auto-update'] = false,
 }
 
 local function getDefault(setting)
@@ -384,9 +385,14 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _INFM('GuiInfoLink'))
 	gui:AddTip(id, _INFM('HelpLink'))
 	
+	-- TODO - localize me!
+	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", "Automatically update item information at merchants")
+	gui:AddTip(id, "Allow Informant to scan your bags and merchant inventory for updates")
+	
+	-- TODO - localize me!
 	gui:AddHelp(id, "what is",
 		"What is Informant?",
-		"Informant provides extra information about items in tooltips."
+		"Informant provides extra information about items in tooltips and to other addons."
 	)
 	
 

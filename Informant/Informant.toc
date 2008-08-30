@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar
-## SavedVariables: InformantConfig
+## SavedVariables: InformantConfig, InformantLocalUpdates
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
