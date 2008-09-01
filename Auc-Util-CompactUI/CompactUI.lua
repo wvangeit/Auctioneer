@@ -763,10 +763,13 @@ private.switchUI = CreateFrame("Button", nil, UIParent, "OptionsButtonTemplate")
 private.switchUI:SetWidth(100)
 private.switchUI:SetHeight(15)
 private.switchUI:SetText("Configure")
-private.switchUI:SetScript("OnClick", function()
-	AucAdvanced.Settings.Show()
-	private.gui:ActivateTab(private.guiID)
-end)
+if private.gui:IsShown() then
+          AucAdvanced.Settings.Hide()
+      else
+         AucAdvanced.Settings.Show()
+         private.gui:ActivateTab(private.guiID)
+	end
+end
 private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the compact UI window.") end)
 private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
