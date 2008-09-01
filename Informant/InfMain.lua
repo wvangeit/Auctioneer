@@ -344,7 +344,7 @@ function GetSellValue(item)
 	elseif type(item) == "string" then
 		-- Find the itemid
 		local _, link = GetItemInfo(item)
-		local itemid = idFromLink( link or item )
+		id = idFromLink( link or item )
 	end
 
 	-- Return out if we didn't find an id
