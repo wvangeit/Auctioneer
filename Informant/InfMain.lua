@@ -143,20 +143,21 @@ function getItem(itemID, static)
 	end
 	
 	-- if we have a local correction for this item, merge in the corrected data
+	local itemUpdateData
 	if (InformantLocalUpdates and InformantLocalUpdates.items) then
-		local updateData = InformantLocalUpdates.items[ itemID ]
-		if (updateData) then
-			if (updateData.buy) then
-				buy = tonumber(updateData.buy)
+		itemUpdateData = InformantLocalUpdates.items[ itemID ]
+		if (itemUpdateData) then
+			if (itemUpdateData.buy) then
+				buy = tonumber(itemUpdateData.buy)
 			end
-			if (updateData.sell) then
-				sell = tonumber(updateData.sell)
+			if (itemUpdateData.sell) then
+				sell = tonumber(itemUpdateData.sell)
 			end
-			if (updateData.stack) then
-				stack = tonumber(updateData.stack)
+			if (itemUpdateData.stack) then
+				stack = tonumber(itemUpdateData.stack)
 			end
-			if (updateData.quantity) then
-				quantity = tonumber(updateData.quantity)
+			if (itemUpdateData.quantity) then
+				quantity = tonumber(itemUpdateData.quantity)
 			end
 		end
 	end
@@ -236,18 +237,35 @@ function getItem(itemID, static)
 
 	if (merchantlist ~= '') then
 		local merchList = split(merchantlist, ",")
-		local vendName
+		if (itemUpdateData and itemUpdateData.merchants) then
+			-- check update list for additional merchants
+			local moreMerch = split(itemUpdateData.merchants, ",")
+			if (#moreMerch > 0 and not merchList) then merchList = {} end
+			for pos, merchID in pairs(moreMerch) do
+				table.insert(merchList, merchID)
+			end
+		end
 		local vendList = {}
 		if (merchList) then
 			for pos, merchID in pairs(merchList) do
-				vendName = self.vendors[tonumber(merchID)]
+				merchID = tonumber(merchID)
+				local vendName = self.vendors[ merchID ]
+				if (not vendName and InformantLocalUpdates and InformantLocalUpdates.vendor) then
+					-- can't find it, try the update list
+					local vendorInfo = InformantLocalUpdates.vendor[ merchID ]
+					if (vendorInfo) then
+						vendName = vendorInfo.name
+					end
+				end
 				if (vendName) then
 					table.insert(vendList, vendName)
 				end
 			end
 		end
+		dataItem.merchantList = merchList
 		dataItem.vendors = vendList
 	else
+		dataItem.merchantList = nil
 		dataItem.vendors = nil
 	end
 
@@ -598,7 +616,7 @@ local function updateSellPricesFromMerchant()
 end
 
 
-local function updateBuyPricesFromMerchant()
+local function updateBuyPricesFromMerchant( vendorID )
 	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
 	for index = 1, GetMerchantNumItems() do
 		local link = GetMerchantItemLink(index)
@@ -611,7 +629,7 @@ local function updateBuyPricesFromMerchant()
 			end
 
 			local informantItemInfo = getItem( itemid )
-			if (informantItemInfo) then
+			if (informantItemInfo) then		-- this should always be true
 				
 				if (price ~= informantItemInfo.buy) then
 					-- is this item buy price correct in our database? or missing from our database?
@@ -626,26 +644,46 @@ local function updateBuyPricesFromMerchant()
 					if (not newItemInfo) then newItemInfo = {} end
 					newItemInfo.buy = price
 					newItemInfo.stack = itemStackSize
-					newItemInfo.quantity = itemStackSize
+					newItemInfo.quantity = quantity
 					InformantLocalUpdates.items[ itemid ] = newItemInfo
 		
 				end
+				
+				local foundMerchant = false
+				if (informantItemInfo.merchantList) then
+					-- some vendors are known for this item, check the list and see if this vendor is on it
+					for pos, merchID in pairs(informantItemInfo.merchantList) do
+						merchID = tonumber(merchID)
+						if (merchID == vendorID) then
+							foundMerchant = true
+							break
+						end
+					end
+				end
+				
+				-- if no vendor are known, or this vendor isn't on the list, add this vendor
+				if (not foundMerchant) then
+					local newItemInfo = InformantLocalUpdates.items[ itemid ]
+					if (not newItemInfo) then newItemInfo = {} end
+					local oldList = newItemInfo.merchants
+					
+					if (oldList) then
+						newItemInfo.merchants = oldList..","..tostring( vendorID )
+					else
+						newItemInfo.merchants = tostring( vendorID )
+					end
+					
+					InformantLocalUpdates.items[ itemid ] = newItemInfo
+				end
+				
 			end	-- if info
 		end	-- if link
 	end	--	for GetMerchantNumItems
 end
 
 
-local function doUpdateMerchant()
+local function updateMerchantName()
 
-	if (not InformantLocalUpdates) then InformantLocalUpdates = {} end
-	
-	if((not MerchantFrame:IsVisible()) or InRepairMode()) then return end
-	
-	if (not Informant.Settings.GetSetting('auto-update')) then return end
-
-	
-	-- update vendor name/info
 	if (not InformantLocalUpdates.vendor) then InformantLocalUpdates.vendor = {} end
 	
 	local vendorName = UnitName("NPC")
@@ -653,19 +691,33 @@ local function doUpdateMerchant()
 	if (vendorFaction ~= UnitFactionGroup("player")) then
 		vendorFaction = "Neutral"
 	end
+	-- TODO - we are not currently using the faction information for vendors
+	
 	local vendorGUID = UnitGUID("NPC")
 	local vendorID = tonumber(string.sub(vendorGUID,6,12),16)
+	
+	if (not self.vendors[ vendorID ] and not InformantLocalUpdates.vendor[ vendorID ]) then
+		-- add the new vendor name to our update list
+		local vendorInfo = {}
+		vendorInfo.name = vendorName;
+		vendorInfo.faction = vendorFaction;
+		InformantLocalUpdates.vendor[ vendorID ] = vendorInfo
+	end
+	
+	return vendorID
+end
 
-	-- ccox - debugging
-	--local vendMessage = Dump( "Found vendor: ", vendorName, "Faction: ", vendorFaction, "id: ", vendorID )
-	--chatPrint(vendMessage)
 
-	-- ccox - TODO - how can we add new vendors to our database?
-	-- is there any kind of in-game vendor id? 			YES
-	-- BUT our current database doesn't use the NPC ids!
+local function doUpdateMerchant()
 
+	if (not InformantLocalUpdates) then InformantLocalUpdates = {} end
+	
+	if ((not MerchantFrame:IsVisible()) or InRepairMode()) then return end
+	
+	if (not Informant.Settings.GetSetting('auto-update')) then return end
 
-	updateBuyPricesFromMerchant()
+	local vendorID = updateMerchantName()
+	updateBuyPricesFromMerchant( vendorID )
 	updateSellPricesFromMerchant()
 
 end
