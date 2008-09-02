@@ -113,7 +113,7 @@ end
 
 local settings = nil
 function lib.GetPrice(hyperlink, faction, realm)
-    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
+    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return false end
     if not settings then
         -- faction seems to be nil when passed in
         faction = UnitFactionGroup("player"):lower() 
@@ -227,13 +227,13 @@ function lib.GetPrice(hyperlink, faction, realm)
 end
 
 function lib.GetPriceColumns()
-    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
+    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
 	return "Average", "Mean","Std Deviation", "Variance", "Confidence", "Bought Price", "Sold Price", "Bought Quantity", "Sold Quantity", "Bought Times", "Sold Times", "3day Bought Price", "3day Sold Price", "3day Bought Quantity", "3day Sold Quantity", "7day Bought Price", "7day Sold Price", "7day Bought Quantity", "7day Sold Quantity"
 end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
-	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
+	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
     -- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
@@ -299,7 +299,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 	
-	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
+	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
 	
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
