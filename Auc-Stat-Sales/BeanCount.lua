@@ -52,6 +52,7 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
 function lib.GetItemPDF(hyperlink, faction, realm)
+	if not get("stat.sales.enable") then return end
     -- Get the data
 	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, faction, realm)
    
@@ -113,6 +114,7 @@ end
 
 local settings = nil
 function lib.GetPrice(hyperlink, faction, realm)
+	if not get("stat.sales.enable") then return end
     if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return false end
     if not settings then
         -- faction seems to be nil when passed in
@@ -233,6 +235,7 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
+	if not get("stat.sales.enable") then return end
 	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
     -- Clean out the old array
 	while (#array > 0) do table.remove(array) end
@@ -281,6 +284,7 @@ function lib.OnLoad(addon)
     AucAdvanced.Settings.SetDefault("stat.sales.normal", true)
     AucAdvanced.Settings.SetDefault("stat.sales.stddev", false)
     AucAdvanced.Settings.SetDefault("stat.sales.confidence", false)
+   	AucAdvanced.Settings.SetDefault("stat.sales.enable", true)
 end
 
 function lib.Processor(callbackType, ...)
@@ -373,6 +377,10 @@ function private.SetupConfigGui(gui)
 		"BeanCounter database. It averages all of the prices for items that you have sold")
 	
 	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", "Enable Sales Stats")
+	gui:AddTip(id, "Allow Sales to contribute to Market Price.")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.tooltip", "Show sales stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Sales module on or off")
