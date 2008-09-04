@@ -1157,10 +1157,11 @@ StorePageFunction = function()
 	end
 end
 
-CoStore = coroutine.create(StorePageFunction)
+--CoStore = coroutine.create(StorePageFunction)
 
 function lib.StorePage()
-	if coroutine.status(CoStore) ~= "dead" then
+
+	if CoStore and coroutine.status(CoStore) ~= "dead" then
 		CoroutineResume(CoStore)
 	else
 		CoStore = coroutine.create(StorePageFunction)
@@ -1330,7 +1331,7 @@ function private.OnUpdate(me, dur)
 		private.NoOwnerList = nil
 		private.scanDelay = nil
 	end
-	if coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
+	if CoStore and coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
 		flipb = not flipb
 		if flipb then
 			flopb = not flopb
