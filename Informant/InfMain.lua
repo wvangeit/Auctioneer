@@ -518,7 +518,7 @@ local function showItem(itemInfo)
 					addLine("  ".._INFM('InfoQuestLineMult'):format(quest[2], getQuestName(quest[1])), "80ee80")
 				end
 			end
-			addLine(_INFM('InfoQuestSource'):format().." WoWWatcher.com");
+			addLine(_INFM('InfoQuestSource'):format().." WoWHead.com");
 		end
 
 		if (itemInfo.vendors) then
