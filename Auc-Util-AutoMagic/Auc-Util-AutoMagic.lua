@@ -41,7 +41,8 @@ local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellf
 local autoselldata = {}
 local autosell = {}
 local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-autoSellList ={}
+lib.autoSellList = get("util.automagic.autoSellList") or {} --get sell list or create new
+
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
@@ -265,9 +266,10 @@ end
 
 function autosellframe.removeitemfromlist()
 	for k, n in pairs(myworkingtable) do
-		autoSellList[k] = nil
+		lib.autoSellList[k] = nil
 		myworkingtable[k] = nil
 	end
+	set("util.automagic.autoSellList", lib.autoSellList)--Store the changed sell list across sessions 
 	myworkingtable = {}
 	lib.populateDataSheet()
 	autosellframe.ClearIcon()
@@ -275,9 +277,10 @@ end
 
 function autosellframe.additemtolist()
 	for k, n in pairs(myworkingtable) do
-		autoSellList[k] = n
+		lib.autoSellList[k] = n
 		myworkingtable[k] = nil
 	end
+	set("util.automagic.autoSellList", lib.autoSellList)--Store the changed sell list across sessions 
 	myworkingtable = {}
 	lib.populateDataSheet()
 	autosellframe.ClearIcon()
@@ -317,7 +320,7 @@ local autoselldata = {}; local bagcontents = {}; local bagcontentsnodups = {}
 function lib.populateDataSheet()
 	for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 		
-	for id, column2 in pairs(autoSellList) do
+	for id, column2 in pairs(lib.autoSellList) do
 		if (id == nil) then return end
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
 		local abid,abuy = GetPrice(itemLink, nil, true)

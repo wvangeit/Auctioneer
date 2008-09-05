@@ -31,6 +31,7 @@ local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
+
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats
 local VOID = 22450
@@ -166,7 +167,7 @@ function lib.vendorAction()
 				runstop = 0  --Teslek, not sure why you are using this with elseif statements only one branch will be run anyways? 
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
-				if autoSellList[ itemID ] then 
+				if lib.autoSellList[ itemID ] then 
 					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Custom Add"
 					runstop = 1
 				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
