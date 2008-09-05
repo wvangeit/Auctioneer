@@ -158,6 +158,7 @@ local isDEMats =
 
 lib.vendorlist = {}
 function lib.vendorAction()
+	lib.vendorlist = {} --this needs to be cleared and recalcuated on EVERY vendor open. Not just when we confirm a sell
 	for bag=0,4 do 
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
