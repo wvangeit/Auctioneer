@@ -120,6 +120,11 @@ end
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
+	--stores our ID id we use this to open the config button to correct frame
+	private.gui = gui 
+	private.guiID = id 
+	
+	
 		gui:AddHelp(id, "what is AutoMagic?",
 			"What is AutoMagic?",
 			"AutoMagic is a work-in-progress. Its goal is to automate tasks that auctioneers run into that can be a pain to do, as long as it is within the bounds set by blizzard.\n\n"..
@@ -215,7 +220,7 @@ function lib.mailGUI() --Function is called from lib.mailShow()
 end
 
 function lib.autoSellGUI() 
-	if (autosellframe:IsVisible()) then autosellframe:Hide() end
+	if (autosellframe:IsVisible()) then autosellframe:Hide() return end
 	autosellframe:Show()		
 	lib.populateDataSheet()
 end
@@ -225,8 +230,18 @@ function lib.closeAutoSellGUI()
 end
 
 --Slidebar 
-function lib.autosellslidebar()
-		lib.autoSellGUI() 
+function lib.autosellslidebar(_, button)
+	if (button == "LeftButton") then
+		lib.autoSellGUI()
+	else 
+	--if we rightclick open the configuration window for the whole addon
+		if private.gui and private.gui:IsShown() then
+			AucAdvanced.Settings.Hide()
+		else
+			AucAdvanced.Settings.Show()
+			private.gui:ActivateTab(private.guiID)
+		end
+	end
 end
 
 local sideIcon
@@ -268,8 +283,8 @@ function lib.slidebar()
 			sideIcon.tip = {
 				"AutoMagic: Auto Sell Config",
 				"",
-				"{{Click}} ~Configure your Auto Sell items~",
-				
+				"{{Left-Click}} to open the 'Auto Sell' list.",
+				"{{Right-Click}} to edit the configuration.",				
 			}
 		end
 	end
