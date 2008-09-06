@@ -176,6 +176,8 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 	lib.confirmsellui.Drag:SetScript("OnMouseDown", function() lib.confirmsellui:StartMoving() end)
 	lib.confirmsellui.Drag:SetScript("OnMouseUp", function() lib.confirmsellui:StopMovingOrSizing() end)
+	lib.confirmsellui.Drag:SetScript("OnEnter", function() lib.buttonTooltips( lib.confirmsellui.Drag, "Click and drag to reposition window") end)
+	lib.confirmsellui.Drag:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	-- Text Header
 	lib.confirmsellheader = lib.confirmsellui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
@@ -189,7 +191,7 @@ function lib.makeconfirmsellui()
 	    
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	
-		--Create the autosell list results frame
+	--Create the autosell list results frame
 	lib.confirmsellui.resultlist = CreateFrame("Frame", nil, lib.confirmsellui)
 	lib.confirmsellui.resultlist:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -218,8 +220,10 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.continueButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui, "BOTTOMRIGHT", -18, 10)
 	lib.confirmsellui.continueButton:SetText(("Continue"))
 	lib.confirmsellui.continueButton:SetScript("OnClick",  lib.ASCConfirmContinue)
+	lib.confirmsellui.continueButton:SetScript("OnEnter", function() lib.buttonTooltips( lib.confirmsellui.continueButton, "Click to sell all listed items to vendor.") end)
+	lib.confirmsellui.continueButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	    
-	-- Remove item from sales button
+	--[[ Remove item from sales button
 	lib.confirmsellui.removeButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.removeButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.continueButton, "BOTTOMLEFT", -18, 0)
 	lib.confirmsellui.removeButton:SetText(("Remove Item"))
@@ -238,7 +242,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.unignoreButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.ignoreButton, "BOTTOMLEFT", -18, 0)
 	lib.confirmsellui.unignoreButton:SetText(("Un-Ignore Item"))
 	lib.confirmsellui.unignoreButton:SetScript("OnClick",  lib.ASCUnIgnoreItem)
-	lib.confirmsellui.unignoreButton:Disable()
+	lib.confirmsellui.unignoreButton:Disable()]]
 end
     
 lib.makeconfirmsellui()
