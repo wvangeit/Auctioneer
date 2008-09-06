@@ -57,6 +57,7 @@ local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
 local Dump
+local debugPrintQuick
 local idFromLink
 local OnTooltipAddMoney
 
@@ -429,7 +430,12 @@ local function getQuestName(questID)
 	else
 		questName = _INFM('InfoUntransQuest'):format(questID)
 	end
-	return "|HinfQuest:"..questID.."|h|cff5599ff["..questName.."]|r|h"
+	-- format as just text, looks better
+	return "|cff5599ff"..questName
+
+-- try to format as a link, but we don't make it clickable anywhere
+-- if we want a linkable quest, we'll have to redo this
+--	return "|HinfQuest:"..questID.."|h|cff5599ff["..questName.."]|r|h"
 end
 
 local function showItem(itemInfo)
@@ -933,12 +939,13 @@ end
 -- GLOBAL OBJECT
 
 local DebugLib = LibStub("DebugLib")
-local debug, assert
+local debug, assert, printquick
 if DebugLib then
-	debug, assert = DebugLib("Informant")
+	debug, assert, printquick = DebugLib("Informant")
 else
 	function debug() end
 	assert = debug
+	printquick = debug
 end
 
 -------------------------------------------------------------------------------
@@ -999,6 +1006,10 @@ end
 
 function Dump(...)
 	return debug:Dump(...)
+end
+
+function debugPrintQuick(...)
+	return printquick(...)
 end
 
 Informant = {

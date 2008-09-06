@@ -615,11 +615,16 @@ InformantLocalizations = {
 		["SkillEnchanting"]	= "Enchanting";
 		["SkillEngineering"]	= "Engineering";
 		["SkillFirstAid"]	= "First Aid";
+		["SkillFishing"]	= "Fishing";
+		["SkillHerbalism"]	= "Herbalism";
+		["SkillInscription"]	= "Inscription";
+		["SkillJewelcrafting"]	= "Jewelcrafting";
 		["SkillLeatherworking"]	= "Leatherworking";
 		["SkillMage"]	= "Mage spells";
 		["SkillMining"]	= "Mining";
 		["SkillPaladin"]	= "Paladin spells";
 		["SkillPriest"]	= "Priest spells";
+		["SkillRiding"]	= "Riding";
 		["SkillRogue"]	= "Rogue skills";
 		["SkillShaman"]	= "Shaman spells";
 		["SkillTailoring"]	= "Tailoring";
@@ -1473,6 +1478,7 @@ InformantLocalizations = {
 	ruRU = {
 
 		-- Section: Commands
+		["about"]	= "База данный получена из Оружейной и при содействии команды http://www.wowhead.com";
 		["CmdClearAll"]	= "all";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -1485,7 +1491,7 @@ InformantLocalizations = {
 		["OptLocale"]	= "<locale> ";
 		["ShowIcon"]	= "show-icon";
 		["ShowILevel"]	= "show-ilevel";
-		["ShowLink"]	= "show-link";
+		["ShowLink"]	= "показать ссылку";
 		["ShowMerchant"]	= "show-merchant\n";
 		["ShowName"]	= "show-name";
 		["ShowQuest"]	= "show-quest";
@@ -1623,6 +1629,17 @@ InformantLocalizations = {
 		["SkillTailoring"]	= "Шитьё";
 		["SkillWarlock"]	= "Заклинания Колдуна(Warlock)";
 
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Активировать текущий профиль";
+		["GuiConfigProfiles"]	= "Настройка и изменение профиля";
+		["GuiCreateReplaceProfile"]	= "Создание или перемещение профиля";
+		["GuiDeleteProfileButton"]	= "Удалить";
+		["GuiNewProfileName"]	= "Новое имя для профиля";
+		["GuiResetProfileButton"]	= "Восстановить";
+		["GuiSaveProfileButton"]	= "Сохранить";
+		["GuiTabGeneral"]	= "Основной";
+		["GuiTabProfiles"]	= "Провили";
+
 	};
 
 	trTR = {
@@ -1712,6 +1729,7 @@ InformantLocalizations = {
 		["GuiInfoQuest"]	= "显示任务信息。";
 		["GuiInfoStack"]	= "显示堆叠数量。";
 		["GuiInfoUsage"]	= "显示用途信息。";
+		["GuiInfoZeroMerchants"]	= "无已知商人时也显示";
 		["GuiLocale"]	= "设置地域代码为";
 		["GuiMainEnable"]	= "启用Informant。";
 		["GuiMainHelp"]	= "包含插件 - Informant的设置。它用于显示详细物品信息。";
@@ -1742,6 +1760,7 @@ InformantLocalizations = {
 		["HelpVendor"]	= "选择是否显示商贩价格。";
 		["HelpVendorBuy"]	= "选择是否显示商贩收购价格(需要show-vendor=on)。";
 		["HelpVendorSell"]	= "选择是否显示商贩销售价格(需要show-vendor=on)。";
+		["HelpZeroMerchants"]	= "选择是否在无已知商人提供此物品时显示";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "物品助手";
@@ -1774,14 +1793,14 @@ InformantLocalizations = {
 		["InfoNoItem"]	= "必须先移到一个物品上，然后按激活键。";
 		["InfoPlayerMade"]	= "由等级%d的%s制作。";
 		["InfoQuestHeader"]	= "在%d个任务中使用：";
-		["InfoQuestLine"]	= "请求: %s";
+		["InfoQuestLine"]	= "任务: %s";
 		["InfoQuestLineMult"]	= "%d 需要: %s";
 		["InfoQuestName"]	= "%d为\"%s\"(等级%d)";
-		["InfoQuestRequiresHeader"]	= "需要向 %d 请求:";
-		["InfoQuestRewardsHeader"]	= "从反馈 %d 请求:";
+		["InfoQuestRequiresHeader"]	= "%d 任务需要:";
+		["InfoQuestRewardsHeader"]	= "由 %d 任务奖励:";
 		["InfoQuestSource"]	= "任务数据提供者是";
-		["InfoQuestStartsHeader"]	= "开始请求:";
-		["InfoUntransQuest"]	= "未知请求: ID #%d";
+		["InfoQuestStartsHeader"]	= "开始一个任务:";
+		["InfoUntransQuest"]	= "未知任务: ID #%d";
 		["InfoVendorHeader"]	= "%d个货商出售：";
 		["InfoVendorName"]	= "%s";
 
@@ -1813,6 +1832,18 @@ InformantLocalizations = {
 		["SkillShaman"]	= "萨满祭司技能";
 		["SkillTailoring"]	= "裁缝";
 		["SkillWarlock"]	= "术士技能";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "激活当前配置文件";
+		["GuiConfigProfiles"]	= "建立,配置和编辑配置文件";
+		["GuiCreateReplaceProfile"]	= "创建或替换一个配置文件";
+		["GuiDeleteProfileButton"]	= "删除";
+		["GuiGeneralOptions"]	= "Informant常规设置";
+		["GuiNewProfileName"]	= "新配置文件名:";
+		["GuiResetProfileButton"]	= "重置";
+		["GuiSaveProfileButton"]	= "保存";
+		["GuiTabGeneral"]	= "常规";
+		["GuiTabProfiles"]	= "配置文件";
 
 	};
 

@@ -37,7 +37,7 @@ Informant.SetSkills({
 	[185]="Cooking",
 	[333]="Enchanting",
 	[202]="Engineering",
-	[129]="First Aid",
+	[129]="FirstAid",
 	[356]="Fishing",
 	[182]="Herbalism",
 	[755]="Jewelcrafting",
