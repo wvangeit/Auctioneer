@@ -347,7 +347,7 @@ function lib.MakeGuiConfig()
 	id = gui:AddTab("Profiles")
 	gui:AddControl(id, "Header",           0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",          0,    "Activate a current profile")
-	gui:AddControl(id, "Selectbox",        0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui:AddControl(id, "Selectbox",        0, 1, "profile.profiles", "profile", "Switch to a given profile")
 	gui:AddControl(id, "Button",           0, 1, "profile.delete", "Delete")
 	gui:AddControl(id, "Subhead",          0,    "Create or replace a profile")
 	gui:AddControl(id, "Text",             0, 1, "profile.name", "New profile name:")
@@ -402,7 +402,7 @@ if LibStub then
 		sideIcon:SetScript("OnClick", lib.Toggle)
 		sideIcon.tip = {
 			"Bottom Scanner",
-			"Bottom Scanner allows you to continually scan the auction house's new auctions for bargains. When it finds a good deal, it will ask you if you wish to purchase it.",
+			"Bottom Scanner allows you to continually scan the Auction House's new auctions for bargains. When it finds a good deal, it will ask you if you wish to purchase it.",
 			"{{Click}} to edit the configuration options.",
 		}
 	end

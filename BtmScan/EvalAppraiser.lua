@@ -225,13 +225,13 @@ function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddHelp(id, "what appraiser evaluator",
-		"What is the appraiser evaluator?",
-	"If you are using Auctioneer Advanced and Appraiser this Evaluator uses your Appraiser settings to value items."..
-	"\nOtherwise it will use the standard pricing schemes that you do have installed."..
-	"\nFor most items it will use whatever your default Pricing model is, falling back to your alternate model when the default has no value."..
+		"What is the Appraiser evaluator?",
+	"If you are using Auctioneer Advanced and Appraiser this evaluator uses your Appraiser settings to value items."..
+	"\nOtherwise it will use the standard pricing schemes that you have installed."..
+	"\nFor most items it will use whatever your default pricing model is, falling back to your alternate model when the default has no value."..
 	"\nIf you have fixed values for some items or another pricing model selected for an item then it will use those instead."..
-	"\nIt takes the markdown percentage you have set into account as well and values things at your Bid price."..
-    "\nYou can take the item you've bought out of the mailbox and post it in the AuctionHouse using Appraiser without changing any settings."..
+	"\nIt takes the markdown percentage you have set into account as well and values things at your bid price."..
+    "\nYou can take the item you've bought out of the mailbox and post it in the Auction House using Appraiser without changing any settings."..
     "\nThis should simplify your handling of large numbers of auctions.")
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)

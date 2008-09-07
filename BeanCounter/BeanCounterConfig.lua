@@ -396,7 +396,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('Turns on the beginner tooltips that display on mouseover'))
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('Show reason for purchase in the games Tooltips'))
-	gui:AddTip(id, _BC('Turns on the SearchUI reason an item was purchased for in the Tooltip'))
+	gui:AddTip(id, _BC('Turns on the SearchUI reason an item was purchased for in the tooltip'))
 		
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
@@ -424,7 +424,7 @@ function lib.MakeGuiConfig()
 		)
 	gui:AddHelp(id, "what is tooltip",
 		_BC('What is BeanCounters Tooltip'), 
-		_BC('BeanCounter will store the SearchUI reason an item was purchased and display it in the Tooltip')
+		_BC('BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip')
 		)
 	gui:AddHelp(id, "what is external",
 		_BC('Q_ExtenalSearch'), --"Allow External Addons to use BeanCounter?",
