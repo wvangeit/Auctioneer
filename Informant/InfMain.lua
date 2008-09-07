@@ -221,20 +221,20 @@ function getItem(itemID, static)
 		dataItem.usageText = nil
 	end
 
-	local reqSkill = 0
-	local reqLevel = 0
-	local skillName = ""
+	local tradeSkillCode = 0
+	local tradeSkillLevel = 0
+	local tradeSkillName = ""
 
 	local skillsRequired = self.requirements[itemID]
 	if (skillsRequired) then
-		reqSkill, reqLevel = strsplit(":", skillsRequired)
-		skillName = skillToName(reqSkill)
+		tradeSkillCode, tradeSkillLevel = strsplit(":", skillsRequired)
+		tradeSkillName = skillToName(tradeSkillCode)
 	end
 
-	dataItem.isPlayerMade = (reqSkill ~= 0)
-	dataItem.reqSkill = reqSkill
-	dataItem.reqSkillName = skillName
-	dataItem.reqLevel = itemUseLevel or reqLevel
+	dataItem.isPlayerMade = (tradeSkillCode ~= 0)
+	dataItem.tradeSkillLevel = tradeSkillLevel
+	dataItem.tradeSkillCode = tradeSkillCode
+	dataItem.tradeSkillName = tradeSkillName
 
 	if (merchantlist ~= '') then
 		local merchList = split(merchantlist, ",")
@@ -312,28 +312,6 @@ function getItem(itemID, static)
 	end
 	return dataItem
 end
-
---[[
--- ccox - this appears to be unused
-function getItemBasic(itemID)
-	if (not itemID) then return end
-	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
-
-	if (itemName) then
-		return {
-			classText = itemType,
-			quality = itemQuality,
-			stack = itemStackSize,
-			texture = itemTexture,
-			reqLevel = itemUseLevel,
-			itemLevel = itemLevel,
---			buy = self.vendbuy[itemID],
---			sell = self.vendsell[itemID],
-			fullData = false,
-		}
-	end
-end
-]]
 
 
 --Implementation of GetSellValue API proposed by Tekkub at http://www.wowwiki.com/API_GetSellValue
@@ -484,15 +462,16 @@ local function showItem(itemInfo)
 			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
+		
 		if (itemInfo.usageText and itemInfo.usageText ~= "") then
 			reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.isPlayerMade) then
-			addLine(_INFM('InfoPlayerMade'):format(itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
+			addLine(_INFM('InfoPlayerMade'):format(itemInfo.tradeSkillLevel, itemInfo.tradeSkillName), "5060ff")
 		end
-
+		
 		local numReq = 0
 		local numRew = 0
 		local numSta = 0
