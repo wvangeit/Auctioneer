@@ -153,12 +153,15 @@ nSIdeBar related bits
 ]]
 
 local sideIcon
+local SlideBar
+
 if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar", true)
+	SlideBar = LibStub:GetLibrary("SlideBar", true)
 	if SlideBar then
 		sideIcon = SlideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", click)
+-- TODO - localize these strings!
 		sideIcon.tip = {
 			"Enchantrix",
 			"Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer Advanced to allow pricing and purchasing decisions to be made.",
@@ -172,9 +175,9 @@ end
 if sideIcon then
 	function sideIcon.Update()
 		if (settings.GetSetting("sideIcon.enable")) then
-			sideIcon:Enable();
+			SlideBar.AddButton("Enchantrix")
 		else
-			sideIcon:Disable();
+			SlideBar.RemoveButton("Enchantrix")
 		end
 	end
 else
