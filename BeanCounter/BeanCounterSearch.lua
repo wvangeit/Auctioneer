@@ -80,7 +80,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 	else
 		--get the itemTexture for display in the drop box
 		for i, itemLink in pairs(BeanCounterDB.ItemIDArray) do
-			if itemLink:lower():match("%[("..itemName:lower()..")%]")then
+			if itemLink:lower():find("["..itemName:lower().."]", 1, true) then
 				itemTexture = select(2, private.getItemInfo(itemLink, "name"))
 				break
 			end
@@ -272,6 +272,11 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		data, style = private.classicSearch(data, style, classic, settings, dateString)
 	end
 	if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
+		if itemTexture then 
+			private.frame.icon:SetNormalTexture(itemTexture)
+		else
+			private.frame.icon:SetNormalTexture(nil)
+		end		
 		private.frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
 		private.frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 		private.frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest

@@ -109,7 +109,7 @@ private.settingDefaults = {
 	["util.beancounter.debugSearch"] = true,
 	
 	["util.beacounter.invoicetime"] = 5,
-	["util.beancounter.mailrecolor"] = "both",
+	["util.beancounter.mailrecolor"] = "off",
 	["util.beancounter.externalSearch"] = true,
 	
 	["util.beancounter.hasUnreadMail"] = false,
