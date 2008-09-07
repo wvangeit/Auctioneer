@@ -370,7 +370,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _INFM('GuiInfoMerchant'))
 	gui:AddTip(id, _INFM('HelpMerchant'))
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('GuiInfoMerchant'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('GuiInfoNoMerchants'))
 	gui:AddTip(id, _INFM('HelpZeroMerchants'))
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _INFM('GuiInfoQuest'))
@@ -392,7 +392,12 @@ function lib.MakeGuiConfig()
 	-- TODO - localize me!
 	gui:AddHelp(id, "what is",
 		"What is Informant?",
-		"Informant provides extra information about items in tooltips and to other addons."
+		"Informant provides extra information about items in tooltips, in an information window, and to other addons."
+	)
+	
+	gui:AddHelp(id, "how to use information window",
+		"How do I use the Information Window?",
+		"You can bind a key to toggle the Informant information window to get more detailed information about items.  To do this, you need to open game options, select \"Key Bindings\" and look for Informant: Toggle Information Window."
 	)
 	
 
