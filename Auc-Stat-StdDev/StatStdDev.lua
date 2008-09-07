@@ -266,7 +266,7 @@ function private.SetupConfigGui(gui)
 		"strength of the calculations (higher the better).")
 
 	gui:AddHelp(id, "why multiply stack size stddev",
-		"Why have the option to multiply stack size?",
+		"Why have the option to multiply by stack size?",
 		"The original Stat-StdDev multiplied by the stack size of the item, "..
 		"but some like dealing on a per-item basis.")
 
@@ -284,7 +284,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of 'Confidence' calculation in tooltips on or off")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.stddev.quantmul", "Multiply by Stack Size")
-	gui:AddTip(id, "Multiplies by current Stack Size if on")
+	gui:AddTip(id, "Multiplies by current stack size if on")
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)

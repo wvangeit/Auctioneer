@@ -321,8 +321,8 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "average minimum buyout",
 		"What's the point in an average minimum buyout?",
 		"This way you know how good a market is dealing.  If the MBO (minimum buyout) "..
-		"is bigger than the Average MBO, then it's usually a good time to sell, and "..
-		"if the Average MBO is greater than the MBO, then it's a good time to buy.")
+		"is bigger than the average MBO, then it's usually a good time to sell, and "..
+		"if the average MBO is greater than the MBO, then it's a good time to buy.")
 	
 	gui:AddHelp(id, "average minimum buyout variance",
 		"What's the '10% variance' mentioned earlier for?",
@@ -347,18 +347,18 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.tooltip", "Show simple stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
-	gui:AddTip(id, "Toggle display of 3-Day Average from the Simple module on or off")
+	gui:AddTip(id, "Toggle display of 3-Day average from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg7", "Display Moving 7 Day Average")
-	gui:AddTip(id, "Toggle display of 7-Day Average from the Simple module on or off")
+	gui:AddTip(id, "Toggle display of 7-Day average from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg14", "Display Moving 14 Day Average")
-	gui:AddTip(id, "Toggle display of 14-Day Average from the Simple module on or off")
+	gui:AddTip(id, "Toggle display of 14-Day average from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.minbuyout", "Display Daily Minimum Buyout")
 	gui:AddTip(id, "Toggle display of Minimum Buyout from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avgmins", "Display Average of Daily Minimum Buyouts")
-	gui:AddTip(id, "Toggle display of Minimum Buyout Average from the Simple module on or off")
+	gui:AddTip(id, "Toggle display of Minimum Buyout average from the Simple module on or off")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.quantmul", "Multiply by Stack Size")
-	gui:AddTip(id, "Multiplies by current Stack Size if on")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.quantmul", "Multiply by stack size")
+	gui:AddTip(id, "Multiplies by current stack size if on")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.reportsafe", "Report safer prices for low volume items")
 	gui:AddTip(id, "Returns longer averages (7-day, or even 14-day) for low-volume items")
 end

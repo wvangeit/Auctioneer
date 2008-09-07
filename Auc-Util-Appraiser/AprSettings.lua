@@ -285,13 +285,13 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what appraiser",
 		"What is Appraiser?",
 		"Appraiser is a tool to allow you to rapidly post auctions, and remembers your last posting prices automatically.\n"..
-		"The Appraiser interface attatches to your auctionhouse window as an extra tab at the bottom of the window.\n"..
+		"The Appraiser interface attaches to your Auction House window as an extra tab at the bottom of the window.\n"..
 		"When you first select the Appraiser window, it will display all your auctionable items on the left side of your window. When you select an item from the left, you will see the control window at the top and the current auctions list at the bottom.\n"..
 		"The control window allows you to specify the posting stack size, for posting stack-splitted auctions, and the number of stacks to post by sliding the two sliders left and right.")
 
 	gui:AddControl(id, "Header",     0,    lib.libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
-	gui:AddTip(id, "This option will cause the current appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
+	gui:AddTip(id, "This option will cause the current Appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.ownauctions", "Show own Auctions in the tooltips?")
 	gui:AddTip(id, "This option will cause your current auctions to be displayed in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", "Color Appraiser items by their PriceLevel data")
@@ -300,27 +300,27 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the per-stack prices of your bid and buyout lines in the right-side pop-out manifest frame")
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.tint.color", "Tint bid and buy input boxes by their PriceLevel data")
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the bid and buyout input boxes")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.clickhook", "Allow alt-clicking inventory items to load them into appraiser")
-	gui:AddTip(id, "This option will enable the use of alt-clicking inventory items to select and post (in addition to being able to drag them into the appraiser window).\nAlt-shift-click automatically posts the (stack of) item(s) clicked.\nOnly active while the appraiser tab is open.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.clickhookany", "Allow alt-clicking item links / icons to change appraiser settings for any item")
-	gui:AddTip(id, "This option will enable the use of alt-clicking item links (e.g. from chat) or icons (e.g. in bottomscanner) to bring up the appraiser settings for the item so that they can be adjusted.\nOnly active while the appraiser tab is open.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.clickhook", "Allow alt-clicking inventory items to load them into Appraiser")
+	gui:AddTip(id, "This option will enable the use of alt-clicking inventory items to select and post (in addition to being able to drag them into the Appraiser window).\nAlt-shift-click automatically posts the (stack of) item(s) clicked.\nOnly active while the Appraiser tab is open.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.clickhookany", "Allow alt-clicking item links / icons to change Appraiser settings for any item")
+	gui:AddTip(id, "This option will enable the use of alt-clicking item links (e.g. from chat) or icons (e.g. in BottomScanner) to bring up the Appraiser settings for the item so that they can be adjusted.\nOnly active while the Appraiser tab is open.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.reselect", "Select next item after posting")
-	gui:AddTip(id, "This option will enable Appraiser to select the next item from the list when you post")
+	gui:AddTip(id, "This option will enable Appraiser to select the next item from the list when you post.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.buttontips", "Show tooltip help over controls")
-	gui:AddTip(id, "This option will enable help tooltips for the Appraiser controls")
+	gui:AddTip(id, "This option will enable help tooltips for the Appraiser controls.")
 	
 	gui:AddControl(id, "Subhead",    0,    "Default pricing model")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
-	gui:AddTip(id, "You may select a default and alternate pricing model for items that do no have a specific model set")
+	gui:AddTip(id, "You may select a default and alternate pricing model for items that do not have a specific model set.")
 	gui:AddControl(id, "Subhead",    0,    "Alternate pricing model")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.altModel", "Alternate pricing model to use for appraisals")
-	gui:AddTip(id, "You may select a default and alternate pricing model for items that do no have a specific model set")
+	gui:AddTip(id, "You may select a default and alternate pricing model for items that do not have a specific model set.")
 	gui:AddControl(id, "Subhead",    0,    "Use Matching by Default")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.match", "Use Matching by Default")
-	gui:AddTip(id, "This option determines whether to default to checking or unchecking the match competition checkbox")
+	gui:AddTip(id, "This option determines whether to default to checking or unchecking the match competition checkbox.")
 	gui:AddControl(id, "Subhead",    0,    "Default Listing Time")
 	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", "Default listing duration")
-	gui:AddTip(id, "You may set a default auction listing duration for items that do not have a specific duration set")
+	gui:AddTip(id, "You may set a default auction listing duration for items that do not have a specific duration set.")
 	gui:AddControl(id, "Subhead",    0,    "Default Stack Size")
 	gui:AddControl(id, "Text",       0, 1, "util.appraiser.stack")
 	gui:AddTip(id, [[Input number or "max" to set the default size for stacks]])
@@ -330,32 +330,32 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddHelp(id, "what is clickhook",
 		"What are the click-hooks?",
-		"The click-hooks let you select an item by Alt-clicking on it, or post it by Alt-Shift-clicking on it.")
+		"The click-hooks let you select an item by alt-clicking on it, or post it by alt-shift-clicking on it.")
 	gui:AddHelp(id, "what is model",
 		"What is the default pricing model used for?",
 		"When Appraiser calculates the price to list an item for, it will use either a market price, which is an average of certain other pricing models, or a price returned by a specific AuctioneerAdvanced statistics module. You may select the model that is used for items that have not had a particular model selected.")
 
 	gui:AddControl(id, "Subhead",    0,    "Starting bid calculation")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
-	gui:AddTip(id, "The markdown amount is a percentage amount that an item's calculated value will be reduced by to produce the bid value")
+	gui:AddTip(id, "The markdown amount is a percentage amount that an item's calculated value will be reduced by to produce the bid value.")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
-	gui:AddTip(id, "The subtract amount is a fixed amount that an item's calculated value will have subtracted to produce the bid value")
+	gui:AddTip(id, "The subtract amount is a fixed amount that an item's calculated value will have subtracted to produce the bid value.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
-	gui:AddTip(id, "This option will cause the item's calculated value to be reduced by the value of the deposit rate to produce the bid value")
+	gui:AddTip(id, "This option will cause the item's calculated value to be reduced by the value of the deposit rate to produce the bid value.")
 	gui:AddControl(id, "Checkbox", 0, 1, "util.appraiser.bid.vendor", "Vendor price as minimum")
-	gui:AddTip(id, "This option will cause the item's bid to never fall below the vendor price of the item, taking into account the auction house's cut")
+	gui:AddTip(id, "This option will cause the item's bid to never fall below the vendor price of the item, taking into account the Auction House's cut.")
 
 	gui:AddHelp(id, "what is bid",
 		"What is the starting bid?",
 		"The starting bid is also known as the minimum bid. It is the price that the first bidder must match or exceed in order to place the bid. From there, the next bids must go up in bid increments based off the current bid.")
 
 	gui:AddHelp(id, "how bid calculated?",
-		"How does the bid price get calculated",
-		"Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (|cffffff00Buyout|r - |cffffff00Markdown|r - |cffffff00Deposit|r)")
+		"How does the bid price get calculated?",
+		"Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (|cffffff00Buyout|r - |cffffff00Markdown|r - |cffffff00Deposit|r).")
 
 	gui:AddHelp(id, "how markdown calculated",
 		"How is the markdown percentage calculated?",
-		"The amount is calculated by multiplying the calculated value by the percentage amount which is specified in the options. This amount is then subtracted from the calculated value (along with the fixed subtract amount and/or the deposit amount if specified) to produce the starting bid price")
+		"The amount is calculated by multiplying the calculated value by the percentage amount which is specified in the options. This amount is then subtracted from the calculated value (along with the fixed subtract amount and/or the deposit amount if specified) to produce the starting bid price.")
 
 	gui:AddControl(id, "Subhead",    0,    "Value rounding")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.bid", "Round starting bid")
@@ -363,11 +363,11 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.buy", "Round buyout value")
 	gui:AddTip(id, "This option causes the buyout amount for any stacks posted to be rounded according to the following rules")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"unit","Stop value"},{"div","Divisions"}}, "util.appraiser.round.method", "Rounding method to use")
-	gui:AddTip(id, "You select the rounding algorithm to use for rounding the selected stack prices")
+	gui:AddTip(id, "You select the rounding algorithm to use for rounding the selected stack prices.")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, "Rounding at: %0.02f")
 	gui:AddTip(id, "This slider allows you to select the position that the rounding algorithm will use to round at")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 0, 100, 1, "Step magnitude at: %d")
-	gui:AddTip(id, "This slider allows you to select the point at which the rounding will step up to the next unit place |cffffff00(copper->silver->gold)")
+	gui:AddTip(id, "This slider allows you to select the point at which the rounding will step up to the next unit place |cffffff00(copper->silver->gold).")
 
 	gui:AddHelp(id, "what is rounding",
 		"What is value rounding?",
@@ -382,7 +382,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is position",
 		"What is the rounding position?",
-		"The rounding position (\"Rounding at\" value in the settings) used by the rounding methods to determine the point at which they are going to round to. Perhaps the easiest way to see how this works is to open up the auctionhouse and select an item, then play with the sliders, and watch what happens to the stack prices that are listed on the right side of the auction window.")
+		"The rounding position (\"Rounding at\" value in the settings) used by the rounding methods to determine the point at which they are going to round to. Perhaps the easiest way to see how this works is to open up the Auction House and select an item, then play with the sliders, and watch what happens to the stack prices that are listed on the right side of the auction window.")
 
 	gui:AddHelp(id, "what is magnitude",
 		"What is the step magnitude?",
@@ -392,7 +392,7 @@ function private.SetupConfigGui(gui)
 "If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
 "The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..
 "You set the rounding position by setting the slider to the value you want the number to be rounded to.\n"..
-"Finally, set the magnitude step position to the place where you want the rounding to step-up to the next place (eg if this is set to 5, then 4g 72s 15c will round at the copper position, but 5g 72s 15c will round at the silver position)"
+"Finally, set the magnitude step position to the place where you want the rounding to step-up to the next place (eg. if this is set to 5, then 4g 72s 15c will round at the copper position, but 5g 72s 15c will round at the silver position)."
 	)
 
 	--[[

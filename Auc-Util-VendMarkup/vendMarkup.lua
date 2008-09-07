@@ -88,9 +88,8 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddHelp(id, "what vendmarkup",
 		"What is the Vendor Markup module?",
-		"This module will give you the price to vendor an item multiplied by a percentage of that vendor price to give you the vendor markup price.\n"..
-		"This vendor markup is most often used when posting items for auction, which do not have any data, you can tell Appraiser to use the vendor markup\n"..
-		"for the buyout price, and that will give you a good starting point for what the item might sell for.\n")
+		"This module will give you the price to vendor an item multiplied by a percentage of that vendor's price to give you the vendor markup price.\n"..
+		"This vendor markup is most often used when posting items for auction which do not have any data, you can tell Appraiser to use the vendor markup for the buyout price, and that will give you a good starting point for what the item might sell for.\n")
 
 	gui:AddControl(id, "Header",     0, libName.." options")
 

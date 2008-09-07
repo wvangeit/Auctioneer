@@ -171,11 +171,11 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "What is EasyBid?",
 		"What is EasyBid?",
-		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers because of the use of \"left-click\". It conflicts with other parts of auctioneer.")
+		"This part of the EasyBuyout utility does what the name implies, it allows you to double click (or 'modifier'+double-click) to bid minimal on an auction! !!NOTE!! EasyBid can not use key modifiers because of the use of \"left-click\". It conflicts with other parts of Auctioneer.")
 		
 	gui:AddHelp(id, "What is EasyGoldLimit?",
 		"What is EasyGoldLimit",
-		"This does exactly what the name implies, it places a limit on the amount of gold that will be allowed to be used when bidding or buying an auction. Helps prevent spending more than intended on an auction")
+		"This does exactly what the name implies, it places a limit on the amount of gold that will be allowed to be used when bidding or buying an auction. It helps prevent spending more than intended on an auction.")
 end
 
 function private.BrowseButton_OnClick(...)

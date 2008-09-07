@@ -169,8 +169,8 @@ function private.SetupConfigGui(gui)
 		"The complex answer? Well, you see there's this bowl of soup...")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.activated", "Enable use of the Outlier Filter")
-	gui:AddTip(id, "Ticking this box will enable the Outlier filter to perform filtering your auction scans")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.activated", "Enable use of the outlier filter")
+	gui:AddTip(id, "Ticking this box will enable the outlier filter to perform filtering of your auction scans")
 
 	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "filter.outlier.model", "Pricing model to use for the valuation")

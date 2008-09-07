@@ -378,7 +378,7 @@ function lib.MakeGuiConfig()
 	
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
-	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
 	gui:AddTip(id, "Select the profile that you wish to use for this character")
 
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
@@ -397,15 +397,15 @@ function lib.MakeGuiConfig()
 	)
 	gui:AddHelp(id, "how create",
 		"How do I create a new profile?",
-		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+		"You enter the name of the new profile that you wish to create into the text box labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
 	)
 	gui:AddHelp(id, "how delete",
 		"How do I delete a profile?",
-		"To delete a profile, simply select the profile you wish to delete with the drop-down selecteion box and then click the Delete button"
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button"
 	)
 	gui:AddHelp(id, "why delete",
 		"Why would I want to delete a profile?",
-		"You can delete a profile when you don't want to use it anymore, or you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
+		"You can delete a profile when you don't want to use it anymore, or when you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
 	)
 
 	id = gui:AddTab("General")
@@ -413,12 +413,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
 	gui:AddTip(id, "Enable the display of how many items in the current scan image match this item")
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
-	gui:AddTip(id, "Makes the scan data to only display exact matches unless the shift key is held down")
+	gui:AddTip(id, "Makes the scan data only display exact matches unless the shift key is held down")
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
-	gui:AddTip(id, "Forces the scan data to load when AuctioneerAdvanced is first loaded rather than on demand when first needed")
+	gui:AddTip(id, "Forces the scan data to load when Auctioneer Advanced is first loaded rather than on demand when first needed")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
-	gui:AddTip(id, "Display the summation of a Auction House scan")
+	gui:AddTip(id, "Display the summation of an Auction House scan")
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", "Enable searching click-hooks")
 	gui:AddTip(id, "Enables the click-hooks for searching")
@@ -427,14 +427,14 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
     
     gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
-    gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving framerate while calculating) at the cost of some accuracy.");
+    gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.");
     
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
+	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progress bar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
 	
-	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", "See home faction data everywhere unless at neutral ah.")
-	gui:AddTip(id, "This allows the ability to see home data everywhere, however it disables itself while a neutral ah is open to allow you to see neutral ah data.")
+	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", "See home faction data everywhere unless at a neutral ah.")
+	gui:AddTip(id, "This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data.")
 	
 	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
 	last = gui:GetLast(id)
@@ -447,31 +447,31 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
     
     
-	gui:AddTip(id, "This allows you to select which Chat Window Auctioneer Advanced prints its output to.")	
+	gui:AddTip(id, "This allows you to select which chat window Auctioneer Advanced prints its output to.")	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
-		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auctionhouse image.")
+		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image.")
 	gui:AddHelp(id, "what is image",
-		"What is an auctionhouse image?",
-		"As you scan the auctionhouse, AuctioneerAdvanced builds up an image of what is at auction. This is the image. It represents AuctioneerAdvanced's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not, then it will not.")
+		"What is an auction house image?",
+		"As you scan the auction house, Auctioneer Advanced builds up an image of what is at the auction. This is the image. It represents Auctioneer Advanced's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not a recent scan, then the info will not.")
 	gui:AddHelp(id, "what is exact",
 		"What is an exact match?",
-		"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same.")
+		"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same.")
 	gui:AddHelp(id, "why force load",
 		"Why would you want to force load the scan data?",
 		"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded.")
 	gui:AddHelp(id, "why show summation",
 		"What is the post scan summary?",
-		"If you want to know the number on new, updated, or unchanged auctions gathered from a scan of the auction house.")
+		"It displays the number of new, updated, or unchanged auctions gathered from a scan of the auction house.")
 	gui:AddHelp(id, "what is clickhook",
 		"What are the click-hooks?",
-		"The click-hooks let you perform a search for an item either by Alt-rightclicking the item in your bags, or by Alt-clicking an itemlink in the chat pane.")
+		"The click-hooks let you perform a search for an item either by Alt-right-clicking the item in your bags, or by Alt-clicking an item link in the chat pane.")
 	gui:AddHelp(id, "what is priority",
 		"What is the Processing Priority?",
 		"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete.")
 	gui:AddHelp(id, "what is preferred output frame",
-		"What is Preferred Output Frame?",
-		"The Preferred Output Frame allows you to designate which of your Chat Windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the dropdown menu and Auctioneer Advanced will print all subsequent output to that window.")
+		"What is the Preferred Output Frame?",
+		"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer Advanced will print all subsequent output to that window.")
         
     gui:AddHelp(id, "what is accuracy",
         "What is Market Pricing error?",

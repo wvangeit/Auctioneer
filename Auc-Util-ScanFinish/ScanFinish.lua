@@ -82,7 +82,7 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.shutdown", false)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.logout", false)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.message", "So many auctions...so little time")
+	AucAdvanced.Settings.SetDefault("util.scanfinish.message", "So many auctions... so little time")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.messagechannel", "none")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.emote", "none")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.debug", false)
@@ -100,7 +100,7 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		if blnDebug then print("  Debug:ScanFinish Switching State=false (ScanFinish is deactivated)") end
 		state = false
 	elseif AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
-		if blnDebug then print("  Debug:ScanFinish Switching State=false (browseroverride is activated)") end
+		if blnDebug then print("  Debug:ScanFinish Switching State=false (Browser override is activated)") end
 		state = false
 	end
 
@@ -271,7 +271,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is scanfinish",
 		"What is ScanFinish?",
-		" ScanFinish is an AuctioneerAdvanced module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\n ScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or BottomScanner activities. Unfortunately, this also means the functionality will not be enabled in auction houses with under "..intScanMinThreshold.." items."
+		"ScanFinish is an AuctioneerAdvanced module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\nScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or BottomScanner activities. Unfortunately, this also means the functionality will not be enabled in auction houses with under "..intScanMinThreshold.." items."
 		)
 
 	gui:AddControl(id, "Header",	 0,	libName.." options")
@@ -284,9 +284,9 @@ function private.SetupConfigGui(gui)
 		{"AuctioneerClassic", "Auctioneer Classic"},
 		{"QUESTCOMPLETED","Quest Completed"},
 		{"LEVELUP","Level Up"},
-		{"AuctionWindowOpen","AuctionHouse Open"},
-		{"AuctionWindowClose","AuctionHouse Close"},
-		{"ReadyCheck","Raid ReadyCheck"},
+		{"AuctionWindowOpen","Auction House Open"},
+		{"AuctionWindowClose","Auction House Close"},
+		{"ReadyCheck","Raid Ready Check"},
 		{"RaidWarning","Raid Warning"},
 		{"LOOTWINDOWCOINSOUND","Coin"},
 	}, "util.scanfinish.soundpath", "Pick the sound to play")
@@ -324,7 +324,7 @@ function private.SetupConfigGui(gui)
 		{"EMOTE","Emote (/em)"},
 		{"GENERAL","General"},
 	}, "util.scanfinish.messagechannel", "Pick the channel to send your message to")
-	gui:AddTip(id, "Selecting one of these channels will cause your character say the message text into the selected channel once Auctioneer has completed a scan successfully. \n\nBy choosing Emote, your character will use the text above as a custom emote. \n\nBy selecting None, no message will be sent.")
+	gui:AddTip(id, "Selecting one of these channels will cause your character to say the message text into the selected channel once Auctioneer has completed a scan successfully. \n\nBy choosing Emote, your character will use the text above as a custom emote. \n\nBy selecting None, no message will be sent.")
 
 
 	gui:AddControl(id, "Subhead",	0,	"Shutdown or Log Out")

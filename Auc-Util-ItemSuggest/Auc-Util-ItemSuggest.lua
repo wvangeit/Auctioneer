@@ -84,7 +84,7 @@ function lib.SetupConfigGui(gui)
 	gui:MakeScrollable(id)
 		
 	gui:AddControl(id, "Header",     0,    "ItemSuggest")
-	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display Item Suggest Tooltips")	
+	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest Tooltips")	
 	
 	gui:AddControl(id, "Header",     0,    "Set skill usage limits if desired")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
@@ -96,11 +96,11 @@ function lib.SetupConfigGui(gui)
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
 	
-	gui:AddControl(id, "Header",     0,    "Deposit cost influence?")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include Deposit Costs?")
+	gui:AddControl(id, "Header",     0,    "Deposit cost influence")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs?")
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
 	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttiimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH Brokerage Costs?")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs?")
 end
 
 function lib.itemsuggest(hyperlink, quantity)

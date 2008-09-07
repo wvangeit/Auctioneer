@@ -178,15 +178,15 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what scanbutton",
 		"What are the scan buttons?",
-		"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the AuctionHouse frame.\n"..
-		"These scan buttons are the scan buttons for Auctioneer Advanced. If you are also using Auctioneer Classic, "..
+		"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the Auction House frame.\n"..
+		"These are the scan buttons for Auctioneer Advanced. If you are also using Auctioneer Classic, "..
 		"you may want to disable these buttons, until you are ready to switch, so as to avoid confusion.")
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the AuctionHouse")
-	gui:AddTip(id, "If enabled, shows the Stop/Play/Pause scan buttons in the title bar of the AuctionHouse")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the Auction House")
+	gui:AddTip(id, "If enabled, this shows the Stop/Play/Pause scan buttons in the title bar of the Auction House.")
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections has been queued?")
-	gui:AddTip(id, "If enabled, shows the Starting search of filter...messages when using the ctr+click to selecting specific categorys of the AH to scan")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections have been queued")
+	gui:AddTip(id, "If enabled, this shows the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan.")
 end
 
 function private.ConfigChanged()

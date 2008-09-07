@@ -706,8 +706,8 @@ function lib.MakeGuiConfig()
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",           0,    "Setup General Options")
-	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search Process Priority: %s")
+	gui:AddControl(id, "Header",           0,    "Setup general options")
+	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search process priority: %s")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "reserve", 1, 99999999, "Reserve Amount")
 	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
@@ -839,7 +839,7 @@ if SlideBar then
 	sideIcon:SetScript("OnClick", lib.Toggle)
 	sideIcon.tip = {
 		"Auction SearchUI",
-		"Allows you to perform searches on the AuctioneerAdvanced auction cache, even when away from the AuctionHouse",
+		"Allows you to perform searches on the AuctioneerAdvanced auction cache, even when away from the Auction House",
 		"{{Click}} to open the Search UI.",
 	}
 end
@@ -1005,7 +1005,7 @@ local PerformSearch = function()
 	if not speed then speed = 1000 end
 	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
-		print("No valid Searcher selected")
+		print("No valid Searches selected")
 		return
 	end
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)

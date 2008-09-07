@@ -90,27 +90,27 @@ function private.SetupConfigGui(gui)
 	id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    "Window Movement Options")
-	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated", "Allow the Auction frame to be movable?")
-	gui:AddTip(id, "Ticking this box will enable the ability to reloacate the Auction frame")
+	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated", "Allow the auction frame to be movable?")
+	gui:AddTip(id, "Ticking this box will enable the ability to relocate the auction frame")
 	gui:AddHelp(id, "what is AHWindowControl",
-		"What is this Utility?",
-		"This Utility allows you to drag and relocate the Auction Frame for this play session. Just click and move where you desire. It also alows you to protect the Auction House from closing when opening certain blizzard windows.")
+		"What is this utility?",
+		"This utility allows you to drag and relocate the auction frame for this play session. Just click and move where you desire. It also alows you to protect the Auction House from closing when opening certain Blizzard windows.")
 	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.rememberlastpos", "Remember last known window position?")
-	gui:AddTip(id, "If this box is checked, the Auction frame will reopen in the last location it was moved to.")
+	gui:AddTip(id, "If this box is checked, the auction frame will reopen in the last location it was moved to.")
 	gui:AddHelp(id, "what is remeberpos",
 		"Remember last known window position?",
-		"This will remember the Auction Frame's last position and re-apply it each session.")
+		"This will remember the auction frame's last position and re-apply it each session.")
 	
 	--Window Protection
 	gui:AddControl(id, "Header", 0,	"Window Protection Options")
-	gui:AddControl(id, "Subhead", 0, "Protect the Auction Window when?")
+	gui:AddControl(id, "Subhead", 0, "Protect the Auction House window:")
 	--Note the function reference in the place of the setting name.  See changes in getter, setter, and getDefault to accomodate this.
 	gui:AddControl(id, "Selectbox", 0, 1, {
 		{1, "Never"},
 		{2, "Always"},
 		{3, "When Scanning"}
 	}, "util.protectwindow.protectwindow", "Prevent other windows from closing the Auction House window.")
-	gui:AddTip(id, "This will prevent other windows from closing the Auction House Window when you open them, according to your settings.")
+	gui:AddTip(id, "This will prevent other windows from closing the Auction House window when you open them, according to your settings.")
 	gui:AddControl(id, "Checkbox", 0, 1, "util.protectwindow.processprotect", "Check this to protect the window until processing is done.")
 	gui:AddTip(id, "This option allows you to extend protection from the end of the scan until processing is done.")
 	gui:AddHelp(id, "What is ProtectWindow",
@@ -120,15 +120,15 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header", 0, "") --Spacer for options
 	gui:AddControl(id, "Header", 0,	"Window Size Options")
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.auctionscale",    0.5, 2, 0.1, "Auction House Scale")
-	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House Window. Default is 1")
+	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House window. Default is 1.")
 	gui:AddHelp(id, "what is Auction House Scale",
 			"Auction House Scale?", 
-			"The Auction House scale slider adjusts the overall size of the Entire Auction House Window. The Defauls Size is 1")
+			"The Auction House scale slider adjusts the overall size of the entire Auction House window. The default size is 1.")
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
-	gui:AddTip(id, "This option allows you to adjust the Text size of the CompactUI on the Browse tab. Default is 0")
+	gui:AddTip(id, "This option allows you to adjust the text size of the CompactUI on the Browse tab. The default size is 0.")
 	gui:AddHelp(id, "what is CompactUI Font Scale",
 			"CompactUI Font Scale?", 
-			"The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The Defauls Size is 0")
+			"The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.")
 end
 
 		
@@ -197,7 +197,7 @@ function private.AdjustProtection ()
 		debugPrint("AuctionFrame doesn't exist yet.")
 		return
 	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
-		debugPrint("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
+		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
 		if AuctionFrame:IsVisible() then 
 			AuctionFrame.IsShown = function() end 
@@ -205,7 +205,7 @@ function private.AdjustProtection ()
 			AuctionFrame.IsShown = nil 
 		end
 	elseif (get("util.protectwindow.protectwindow") == 3) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
-		debugPrint("Enabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
+		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
 		if AuctionFrame:IsVisible() then 
 			AuctionFrame.IsShown = function() end 
@@ -213,7 +213,7 @@ function private.AdjustProtection ()
 			AuctionFrame.IsShown = nil 
 		end
 	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-enabled") == true then
-		debugPrint("Disabling Standard Frame Handler for AuctionFrame because protectwindow ="..get("util.protectwindow.protectwindow"))
+		debugPrint("Disabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		if AuctionFrame:IsVisible() then
 			AuctionFrame.Hide = function() end 
 			HideUIPanel(AuctionFrame) 
@@ -238,7 +238,7 @@ function private.CheckScanProt(state, totalAuctions, scannedAuctions, elapsedTim
 			debugPrint("elapsedTime", elapsedTime)
 			debugPrint("IsScanning reports:", AucAdvanced.Scan.IsScanning())
 		if state == true and not ScanProtected then
-			debugPrint("Protecting AuctionFrame while scanning (CheckScanProt)")
+			debugPrint("Protecting Auction Frame while scanning (CheckScanProt)")
 			AuctionFrame.Hide = function() end
 			HideUIPanel(AuctionFrame)
 			AuctionFrame.Hide = nil
@@ -247,7 +247,7 @@ function private.CheckScanProt(state, totalAuctions, scannedAuctions, elapsedTim
 		elseif state == nil and ScanProtected then
 			debugPrint("AuctionFrame already protected while scanning")
 		elseif state == false and ScanProtected and not get("util.protectwindow.processprotect") then
-			debugPrint("Unprotecting AuctionFrame because we're not scanning (CheckScanProt)")
+			debugPrint("Unprotecting Auction Frame because we're not scanning (CheckScanProt)")
 			if AuctionFrame:IsVisible() then
 				AuctionFrame.IsShown = function() end
 				ShowUIPanel(AuctionFrame, 1)
@@ -264,7 +264,7 @@ function private.ScanEnd()
 		debugPrint("Scan Data received, we're done scanning.")
 		debugPrint("IsScanning() reports", AucAdvanced.Scan.IsScanning())
 		if get("util.protectwindow.protectwindow") == 3 and ScanProtected then
-			debugPrint("Unprotecting AuctionFrame after processing (from ScanEnd)")
+			debugPrint("Unprotecting Auction Frame after processing (from ScanEnd)")
 			if AuctionFrame:IsVisible() then
 				AuctionFrame.IsShown = function() end
 				ShowUIPanel(AuctionFrame, 1)

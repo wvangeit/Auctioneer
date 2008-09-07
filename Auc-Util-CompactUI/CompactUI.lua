@@ -771,7 +771,7 @@ private.switchUI:SetScript("OnClick", function()
 		private.gui:ActivateTab(private.guiID)
 	end
 end)
-private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the compact UI window.") end)
+private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the CompactUI window.") end)
 private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
@@ -787,22 +787,22 @@ function private.SetupConfigGui(gui)
 		"Due to the fact that it heavily modifies your auction frames, it may cause it to be incompatible with other addons that also modify the auction frames. If this is the case you will have to make a choice between CompactUI and the other addons. You may disable CompactUI easily by unticking the \"Enable use of CompactUI (requires logout)\" option in the settings window.")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
-	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload")
-	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house\naddons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the\nabovebox and reloading your interface.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout).")
+	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload.")
+	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading your interface.")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.tooltiphelp", "Displays the pop up help tooltips")
-	gui:AddTip(id, "This option will display popup help tooltips on the Compact UI display")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when zero")
-	gui:AddTip(id, "This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show required bid instead of current bid value")
+	gui:AddTip(id, "This option will display popup help tooltips on the CompactUI display")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when it's zero.")
+	gui:AddTip(id, "This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show the required bid instead of the current bid value.")
 	gui:AddTip(id, "The default interface shows you the current bid, ticking this option changes CompactUI's behaviour to instead show the required bid")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning")
-	gui:AddTip(id, "Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning.")
+	gui:AddTip(id, "Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning.")
 
 	gui:AddHelp(id, "what is popup",
 		"What does enabling the popup help do?",
-		"Displays little popup tooltips over various parts of the compactUI")
+		"Displays a little popup tooltip over various parts of the CompactUI")
 	
 	gui:AddHelp(id, "what is collapse",
 		"What does removing smaller denomination coins do?",
@@ -811,11 +811,11 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is required",
 		"What is the required bid?",
-		"The stock standard interface shows you the current bid. In the case where the current bid is not the minimum (or starting) bid, your actual spend when you bid on this item will be the current bid, plus the minimum increment. Therefore what you pay will be more than what is displayed in the window when you are not the first bidder. By ticking this option, you change CompactUI's behaviour to instead show the required bid that you will need to bid, so that no matter if there is a bid or not, what you see is what you will pay.")
+		"The stock standard interface shows you the current bid. In the case where the current bid is not the minimum (or starting) bid, your actual amount when you bid on this item will be the current bid, plus the minimum increment. Therefore what you pay will be more than what is displayed in the window when you are not the first bidder. By ticking this option, you change CompactUI's behaviour to instead show the required bid that you will need to bid, so that no matter if there is a bid or not, what you see is what you will pay.")
 
 	gui:AddHelp(id, "what is browseoverride",
-		"Why do I want to prevent other modules from changing the browse window?",
-		"If you have a module such as ScanProgress installed, and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead.")
+		"Why do I want to prevent other modules from changing the Browse window?",
+		"If you have a module such as ScanProgress installed and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead.")
 
 end
 

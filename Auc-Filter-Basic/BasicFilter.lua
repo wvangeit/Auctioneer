@@ -89,16 +89,16 @@ function private.SetupConfigGui(gui)
 
 	id = gui:AddTab(libName, libType.." Modules")
 	gui:AddHelp(id, "what basic filter",
-		"What is this Basic Filter?",
-		"This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the Minimum Item level, and the Minimum Quality (Junk, Common, Uncommon, Rare, etc)\n"..
-		"It also allows you to specify that items from a certain seller not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items\n")
+		"What is the Basic Filter?",
+		"This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the minimum item level, and the minimum quality (Junk, Common, Uncommon, Rare, etc)\n"..
+		"It also allows you to specify items from a certain seller to not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items\n")
 
 	gui:AddControl(id, "Header",	0,	libName.." "..libType.." options")
 	last = gui:GetLast(id)
 	
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.activated", "Enable use of the Basic filter")
-	gui:AddTip(id, "Ticking this box will enable the Basic filter to perform filtering your auction scans")
+	gui:AddTip(id, "Ticking this box will enable the basic filter to perform filtering of your auction scans")
 	
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.ignoreself", "Ignore own auctions")
@@ -106,7 +106,7 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Subhead",	0, "Filter by Quality")
 	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, "Minimum Quality: %d")
-	gui:AddTip(id, "Use this slider to choose the minimum quality to go into the storage.\n"..
+	gui:AddTip(id, "Use this slider to choose the minimum quality to go into storage.\n"..
 		"\n"..
 		"0 = Junk (|cff9d9d9d Grey|r),\n"..
 		"1 = Common (|cffffffff White|r),\n"..
@@ -116,7 +116,7 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Subhead",	0, "Filter by Item Level")
 	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, "Minimum item level")
-	gui:AddTip(id, "Enter the minimum item level to go into the storage.")
+	gui:AddTip(id, "Enter the minimum item level to go into storage.")
 	
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Subhead",	0.55,    "Ignore List")
