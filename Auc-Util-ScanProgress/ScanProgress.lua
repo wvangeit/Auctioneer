@@ -165,7 +165,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what scanprogress",
 		"What is the Scan Progress indicator?",
-		"The Scan Progress indicator is the text that appears while scanning the Auction House. It displays:  the speed of the scan, current auctions and total number of auctions scanned, aswell as the current number of pages and total pages scanned."
+		"The Scan Progress indicator is the text that appears while scanning the Auction House. It displays:  the speed of the scan, current auctions and total number of auctions scanned, aswell as the current number of pages and total pages scanned.")
 
 --	Old answer, incase the new one is too short and/or vague.
 --		"The Scan Progress indicator is the text that appears while scanning the Auction House, indicating "..
