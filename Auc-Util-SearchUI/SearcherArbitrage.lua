@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Search UI - Searcher Arbitrage
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: SearcherResale.lua 3277 2008-07-28 12:04:47Z Norganna $
+	Revision: $Id: SearcherArbitrage.lua 3277 2008-07-28 12:04:47Z Norganna $
 	URL: http://auctioneeraddon.com/
 
 	This is a plugin module for the SearchUI that assists in searching by refined paramaters
@@ -53,15 +53,23 @@ end
 
 function private.getRealmList()
 	local found = false
-	local allrealms = get("arbitrage.search.allrealms")
+	local allrealms = {}
 	local _,current,_ = AucAdvanced.GetFaction()
-	for num,realm in pairs(allrealms) do
-		if realm == current then found = true end
+	for realm,_ in pairs(AucAdvancedData["UtilSearchUI"]) do
+		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
+			realm = strsub(realm, 1, (strlen(realm)-9))
+		end
+		if strsub(realm, (strlen(realm)-6)) == "Neutral" then
+			realm = strsub(realm, 1, (strlen(realm)-8))
+		end
+		if strsub(realm, (strlen(realm)-4)) == "Horde" then
+			realm = strsub(realm, 1, (strlen(realm)-6))
+		end
+		if current ~= realm then
+			table.insert(allrealms, realm)
+		end
 	end
-	if not found then
-		table.insert(allrealms, current)
-		set("arbitrage.search.allrealms", allrealms)
-	end
+	return allrealms
 end
 
 -- Set our defaults
@@ -75,8 +83,8 @@ default("arbitrage.adjust.listings", 3)
 default("arbitrage.allow.bid", true)
 default("arbitrage.allow.buy", true)
 default("arbitrage.allow.buy", true)
-default("arbitrage.search.crossrealmrealm", false) --I'm not sure what this should be for default
-default("arbitrage.search.crossrealmfaction", false) --I'm not sure what this should be for default
+default("arbitrage.search.crossrealmrealm", false)
+default("arbitrage.search.crossrealmfaction", false)
 default("arbitrage.search.allrealms", {})
 default("arbitrage.search.style", "Neutral")
 
@@ -85,7 +93,6 @@ function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Searches")
 	gui:MakeScrollable(id)
-	private.getRealmList()
 
 	gui:AddControl(id, "Header",     0,      "Arbitrage search criteria")
 
@@ -99,7 +106,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",           0,      "Search against")
 	gui:AddControl(id, "Selectbox",         0.01, 1, private.getStyles(), "arbitrage.search.style", "Search against")
 	gui:AddControl(id, "Subhead",           0.01,      "Cross-Realm:")
-	gui:AddControl(id, "Selectbox",         0.02, 1, "arbitrage.search.allrealms", "arbitrage.search.crossrealmrealm", "Realm")
+	gui:AddControl(id, "Selectbox",         0.02, 1, private.getRealmList(), "arbitrage.search.crossrealmrealm", "Realm")
 	gui:AddControl(id, "Selectbox",         0.02, 1, private.getFactions(), "arbitrage.search.crossrealmfaction", "Faction")
 	
 	gui:SetLast(id, last)
@@ -115,7 +122,6 @@ end
 
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
-	private.getRealmList()
 
 	-- Get correct faction to compare against
 	local comparefaction,_,factionGroup = AucAdvanced.GetFaction()
@@ -192,5 +198,4 @@ function lib.Search(item)
 	return false, "Not enough profit"
 end
 
-private.getRealmList()
 AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherArbitrage.lua $", "$Rev: 3229 $")
