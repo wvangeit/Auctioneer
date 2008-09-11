@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 data layout:
@@ -470,7 +470,7 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("blockExternalCalls"), "Block External Calls")
-	gui:AddTip(id, "Block other addons from manupulating Enhanced Tooltip. See help for more details.")
+	gui:AddTip(id, "Block other addons from manipulating Enhanced Tooltip. See help for more details.")
 
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the slidebar button")
@@ -481,13 +481,13 @@ function lib.MakeGuiConfig()
 	)
 	
 	gui:AddHelp(id, "how hiding works",
-		"How do the options controlling whether Ehnanced tooltip is shown work?",
-		"The main option \"Hide Enhanced Tooltip\" controls whether Ehnanced tooltip shown. It overrides individual frames options. The alt button option works both for the main and individul frame options and allow to show the hiddent tooltip when the Alt button is pressed. Note, that in order to work 100% of the time the Alt button should be pressed *before* you mouse over an item. Some frames do support activating tooltip when Alt button is pressed when mouse is already over an item and some frames do not."
+		"How do the options controlling whether Enhanced tooltip is shown work?",
+		"The main option \"Hide Enhanced Tooltip\" controls whether Enhanced tooltip shown. It overrides individual frames options. The alt button option works both for the main and individul frame options and allow to show the hiddent tooltip when the Alt button is pressed. Note, that in order to work 100% of the time the Alt button should be pressed *before* you mouse over an item. Some frames do support activating tooltip when Alt button is pressed when mouse is already over an item and some frames do not."
 	)
 
 	gui:AddHelp(id, "what does block external calls option do",
 		"What does Block External Calls option do?",
-		"EnhTooltip addon is written the way, that in most cases when another addon displays an item tooltip it doesn't need to do anything special - Enhanced Tooltip will be provided automatically. The \"Other\" option allows controlling this type of tooltips. However this automatic way of supplying Enhanced Tooltip has some limitation. To get around them many addons choose to display the Enhanced Tooltip explicitly. For those addons the \"Other\" option will have no effect - the Enhanced Tooltip will be shown non the less. One solution here is to disable Enhanced Tooltip globally, with \"Hide Enhanced Tooltip\" option. However it means that Ehnanced tooltip won't be displayed at all. If you configured all the places where you want Enhanced Tooltip to be displayed and where you want it to be hidden, and the tooltip still appears in some place where you don't want it to be try enabling this option. It will prevent other addons from using Enhanced Tooltip API, thus disabling Enhanced Tooltip for them. You also may play with the \"Other\" option and see which combination yeilds the most preferable result for you."
+		"The EnhTooltip addon is sometimes used by other 3rd party addons to display custom tooltip information.  In most cases, enabling or disabling the \"Other\" category of tooltips will enable or disable those 3rd party addon tooltips.  However, there are some limitations.  For example, if a 3rd party addon bypasses this control and explicitly calls the EnhTooltip functions for it's own purposes, it's own tooltips may be displayed regardless of EnhTooltip configuration settings.  If \"Block External Calls\" is set, 3rd party addons are prevented from using EnhTooltip to display custom tooltip information.  It may be useful to set this option if you see tooltips being displayed even though you've otherwise set the configuration option to hide certain types of tooltips."
 	)
 end
 
