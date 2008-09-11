@@ -414,7 +414,7 @@ function private.CreateFrames()
 	
 	--Scripts that are executed when we mouse over a TOOLTIP frame	
 	function private.scrollSheetOnEnter(button, row, index)
-		local link, name
+		local link, name, _
 		link = frame.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
 		if link:match("^(|c%x+|H.+|h%[.+%])") then
 			_, name = lib.API.getItemString(link)
