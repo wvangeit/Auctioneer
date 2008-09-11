@@ -149,6 +149,14 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 2.02 then --runs validate to correct ;Used won, Used Failed messages and prevent postDB function errors.
 		private.update._2_02()
 	end
+	--WOW 3.0 HACK
+	if private.serverVersion >= 30000 then
+		private.version = 2.03 --change private version so bean Does not freak that DB is one higher than Expected after the upgarde.
+		
+		if private.playerData["version"] < 2.03 then--if not upgraded yet then upgrade
+			private.update._2_03()
+		end
+	end
 	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
 	if not private.getOption("util.beancounter.integrityCheckComplete") then 
 		private.integrityCheck(true) 
@@ -609,4 +617,45 @@ end
 function private.update._2_02()
 	private.integrityCheck(true)
 	private.playerData["version"] = 2.02
+end
+
+
+
+--Updates all keys and itemLinks due to extension in WotLK expansion
+--NOT IMPLEMENTED UNTIL CLIENT VERSION IS 30000
+function private.update._2_03()
+	if private.serverVersion >= 30000 then  --WOW 3.0 HACK
+		private.integrityCheck(true)
+		print("WOW version 30000 detected begining Update")
+		for player, v in pairs(private.serverData)do
+			for DB, data in pairs(private.serverData[player]) do
+				if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
+					for itemID, value in pairs(data) do
+						local temp = {}
+						for itemString, index in pairs(value) do
+							itemString = itemString..":80"
+							temp[itemString] = index
+						end
+						private.serverData[player][DB][itemID] = temp
+					end
+				end
+			end
+			private.serverData[player]["version"] = 2.03
+		end
+	end
+		
+	--Upgrade the itemID array's itemLinks only needs to run once
+	if not private.getOption("util.beancounter.ItemLinkArray.upgradedtoWotLK") then
+		print("WOW version 30000 ItemLink Array upgrade started")
+		local temp = {}
+		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
+			v = v:gsub("(.*item:.-)|(.*)", "%1:80|%2" )
+			temp[i] = v
+		end
+		BeanCounterDB["ItemIDArray"] = temp
+		private.setOption("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
+		print("WOW version 30000 ItemLink Array upgrade finished")
+	end
+	
+	print("WOW version 30000 Update finished")
 end

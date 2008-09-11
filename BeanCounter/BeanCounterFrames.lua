@@ -211,10 +211,11 @@ function private.CreateFrames()
 		local objtype, _, link = GetCursorInfo()
 		ClearCursor()
 		if objtype == "item" then
-			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+			local itemID = lib.API.decodeLink(link)
+			local _, itemName =  lib.API.getItemString(link)
 			local itemTexture = select(2, private.getItemInfo(link, "name")) 
 			frame.searchBox:SetText(itemName)
-			private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName)
+			private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 		end
 	end 
 	
@@ -270,7 +271,7 @@ function private.CreateFrames()
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
 	frame.searchBox:SetScript("OnEnterPressed", function()
-		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
+		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
 	end)
 	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, "Enter search query's here or leave blank to search all") end)
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -281,7 +282,7 @@ function private.CreateFrames()
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
 	frame.searchButton:SetText(_BC('UiSearch'))
 	frame.searchButton:SetScript("OnClick", function()
-		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
+		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
 	function private.ClickBagHook(_,_,button)
@@ -290,12 +291,13 @@ function private.CreateFrames()
 			local slot = this:GetID()
 			local link = GetContainerItemLink(bag, slot)
 			if link then
-				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-				local itemTexture = select(2, private.getItemInfo(link, "name")) 
+				local itemID = lib.API.decodeLink(link)
+				local _, itemName = lib.API.getItemString(link)
+				local _, itemTexture = private.getItemInfo(link, "name")
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
+					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
 			end
 		end
@@ -305,12 +307,13 @@ function private.CreateFrames()
 	function private.ClickLinkHook(itemString, link, button)
 			if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
-				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-				local itemTexture = select(2, private.getItemInfo(link, "name")) 
+				local itemID = lib.API.decodeLink(link)
+				local _, itemName = lib.API.getItemString(link)				
+				local _, itemTexture = private.getItemInfo(link, "name")
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
+					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
 			end
 		end
@@ -414,7 +417,7 @@ function private.CreateFrames()
 		local link, name
 		link = frame.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
 		if link:match("^(|c%x+|H.+|h%[.+%])") then
-			name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
+			_, name = lib.API.getItemString(link)
 		end
 		GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 		if frame.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
@@ -468,7 +471,7 @@ function private.CreateFrames()
 
 		
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
-	function frame.getCheckboxSettings()
+	function private.getCheckboxSettings()
 		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), 
 			["bid"] = frame.bidCheck:GetChecked(), ["failedbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked(),
 			["failedauction"] = frame.auctionFailedCheck:GetChecked() 

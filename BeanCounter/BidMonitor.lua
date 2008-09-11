@@ -129,7 +129,7 @@ function private.onBidAccepted()
 	local bid = private.removePendingBid()
 	if (bid) then
 	
-	local itemID = bid.itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
+	local itemID = lib.API.decodeLink(bid.itemLink)
 	local text = private.packString(bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), "")
 		debugPrint(bid.isBuyout, bid.isHighBidder)		
 		--we use the bid/buy data for storing "BTM/SearchUI reasons" and outbid data

@@ -234,7 +234,13 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 	
 	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
 	--ItemLink will be used minus its unique ID
-	local itemString = itemLink:match("^.*(item:.+):.-") -- ignore Unique ID
+	local itemString --WOW 3.0 HACK
+	if private.serverVersion >= 30000 then
+		itemString = itemLink:match("^.*(item:.+):.-:.-")-- ignore Unique ID
+		debugPrint("3.0 Hack find stacksize", itemString, itemlink)
+	else
+		itemString = itemLink:match("^.*(item:.+):.-") -- ignore Unique ID
+	end
 	
 	for i,v in pairs (private.playerData[key][itemID]) do
 		if i:match(itemString) or i == itemString then
@@ -260,7 +266,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 end
 
 function private.sortFailedAuctions( i )
-	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
+	local itemID =  lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
 	if itemID then
 		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then 
@@ -274,7 +280,7 @@ end
 --find stack, bid and buy info for failedauctions
 function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, expiredTime)
 	if not private.playerData[key][itemID] then return end --if no keys present abort
-	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
+	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this 
  	for i,v in pairs (private.playerData[key][itemID]) do
 		if i:match(itemString) or i == itemString then --we still stack check and data range check but match should be assured by now
  			for index, text in pairs(v) do
@@ -297,7 +303,7 @@ end
 
  --No need to reconcile, all needed data has been provided in the invoice We do need to clear entries so outbid has less to wade through
 function private.sortCompletedBidsBuyouts( i )
-	local itemID = private.reconcilePending[i]["itemLink"]:match("^|c%x+|Hitem:(%d+):.-|h%[.+%].-")
+	local itemID = lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
 	local reason = private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
@@ -311,7 +317,7 @@ end
 --Used only to clear postedBid entries so failed bids is less likely to miss
 function private.findCompletedBids(itemID, seller, bid, itemLink)
 	local buy, bid = tonumber(buy),tonumber(bid)
-	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
+	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this 	
 	debugPrint("Starting search to remove posted Bid")
 	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
 		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
@@ -343,8 +349,7 @@ end
 function private.findFailedBids(itemID, itemLink, gold)
 	gold = tonumber(gold)
 	if not itemLink then debugPrint("Failed auction ItemStrig nil", itemID, itemLink) return end
-	local itemString = itemLink:match("^.*(item:.-)|") --use the UniqueID stored to match this 
-	
+	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this 
 	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
 		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
  			if not text:match(".*USED.*") then

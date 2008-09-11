@@ -55,13 +55,13 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 	if not private.compressed then private.refreshItemIDArray() private.sortArrayByDate() private.compactDB() private.prunePostedDB()  private.compressed = true end
 	
 	if not itemName then return end
-	if not settings then settings = private.frame.getCheckboxSettings() end
+	if not settings then settings = private.getCheckboxSettings() end
 	
 	tbl = {}
 	for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
 		if itemLink:lower():find(itemName:lower(), 1, true)  then
 			if settings.exact and private.frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
-				local name = itemLink:match("^|c%x+|H.+|h%[(.+)%].*") or "failed name"
+				local _, name = lib.API.getItemString(itemLink) or nil, "failed name"
 				if itemName:lower() == name:lower() then
 					local itemID, suffix = string.split(":", itemKey)--Create a list of itemIDs that match the search text
 					settings.suffix = suffix -- Store Suffix used to later filter unwated results from the itemID search
@@ -92,7 +92,7 @@ end
 function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic)
 
 	if not id then return end
-	if not settings then settings = private.frame.getCheckboxSettings() end
+	if not settings then settings = private.getCheckboxSettings() end
 	if not count then count = 500 end --count determines how many results we show or display High # ~to display all
 
 	tbl = {}
@@ -308,8 +308,9 @@ end
 			local stack = tonumber(tbl[1]) or 0
 			if stack > 0 then pricePer =  (tbl[2]-tbl[3]+tbl[4])/stack end
 							
-			local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
-			local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+			local itemID, suffix = lib.API.decodeLink(itemKey)
+			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
+			
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			
 			return({
@@ -335,8 +336,9 @@ end
 			tbl = text
 			if type(text) == "string" then tbl = private.unpackString(text) end
 			
-			local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
-			local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+			local itemID, suffix = lib.API.decodeLink(itemKey)
+			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
+
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			
 			return({
@@ -370,8 +372,9 @@ end
 				if stack > 0 then	pricePer = (tbl[4]-tbl[2]+tbl[3])/stack end
 			end
 			
-			local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
-			local itemLink =  BeanCounterDB["ItemIDArray"][key..":"..suffix]
+			local itemID, suffix = lib.API.decodeLink(itemKey)
+			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
+
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			
 			return({
@@ -396,8 +399,9 @@ end
 			tbl = text
 			if type(text) == "string" then tbl= private.unpackString(text) end
 
-			local key, suffix = itemKey:match("^item:(%d-):.+:(.+):.-")
-			local itemLink =  BeanCounterDB["ItemIDArray"][key:lower()..":"..suffix]
+			local itemID, suffix = lib.API.decodeLink(itemKey)
+			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
+
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			return({
 				itemLink, --itemname

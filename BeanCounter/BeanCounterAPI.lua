@@ -70,7 +70,8 @@ function lib.API.search(name, settings, queryReturn, count)
 		--search data
 		if itemLink then
 			--itemKey is used to filter results if exact is used. We need the key to remove of the XXX style items from returns
-			settings.suffix = itemLink:match("item:.+:(.-):.-%[.-%]")
+			local _
+			_, settings.suffix = lib.API.decodeLink(itemLink)
 			if settings.suffix == 0 then settings.suffix = nil end
 			SearchRequest[1] = private.searchByItemID(itemName, settings, queryReturn, count)
 		else
@@ -187,16 +188,74 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	return tbl.sums, low, high
 end
 
+
+
+--**********************************************************************************************************************
+--ITEMLINK AND STRING API'S USE THESE IN PLACE OF LOCAL :MATCH() CALLS
+
 --[[ Retrives the itemLink from the name array when passed an itemKey
 we store itemKeys with a unique ID but our name array does not
 ]]
-function lib.API.getItemLink(itemString)
-	itemID, key = itemString:match("item:(.-):.*:(.-):.-")
-	if BeanCounterDB.ItemIDArray[itemID..":"..key] then 
-		return BeanCounterDB.ItemIDArray[itemID..":"..key]
+function lib.API.getArrayItemLink(itemString)
+	local itemID, suffix = lib.API.decodeLink(itemString)
+	if BeanCounterDB.ItemIDArray[itemID..":"..suffix] then 
+		return BeanCounterDB.ItemIDArray[itemID..":"..suffix]
 	end
-	debugPrint("Searching DB for ItemID..", key, itemID, "Failed Item does not exist")
-	return nil
+	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
+	return
+end
+
+--[[Turns an itemLink into an itemString and extracts the itemName]]
+function lib.API.getItemString(itemLink)
+	if not itemLink or not type(itemLink) == "string" then return end
+	local itemString, itemName = itemLink:match("H(item:.-)|h%[(.-)%]")
+	return itemString, itemName
+end
+
+--[[Returns id, suffix, uniqueID when passed an itemLink or itemString]]
+local function breakHyperlink(match, matchlen, ...)
+	local v
+	local n = select("#", ...)
+	for i = 1, n do
+		v = select(i, ...)
+		if (v:sub(1,matchlen) == match) then
+			return strsplit(":", v) --for item:0:...  style links bean stores
+		elseif(v:sub(2, matchlen+1) == match) then
+			return strsplit(":", v:sub(2))  --for Hitem:0:... normal itemStrings and hyperlinks
+		end
+	end
+end
+function lib.API.decodeLink(link)
+	local vartype = type(link)
+	if (vartype == "string") then
+		local lType, id, enchant, gem1, gem2, gem3, gemBonus, suffix, uniqueID, lichKing = breakHyperlink("item:", 5, strsplit("|", link))
+		if (lType ~= "item") then return end
+			return id, suffix, uniqueID
+		end
+	return
+end
+
+--[[Return REASON codes for tooltip or other use
+This allows a way to get it that wont break if I change the internal DB layout
+Pass a itemlink and stack count   
+Returns :  "Reason, time of purchase, what you payed"  or nil
+NOTE: Reason could possibly be "", decided to return data anyways, calling module can decide if it want to use data or not
+]]
+function lib.API.getBidReason(itemLink, quantity)
+	if not itemLink or not quantity then return end
+	
+	local itemString = lib.API.getItemString(itemLink)
+	local itemID, suffix = lib.API.decodeLink(itemLink)
+	
+	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
+		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
+			local quan, _, _, _, bid, _, Time, reason = string.split(";", v)			
+			if tonumber(quan) == tonumber(quantity) and reason and Time then
+				return reason, Time, tonumber(bid)
+			end
+		end
+	end
+	return --if nothing found return nil
 end
 
 --[[===========================================================================
@@ -244,27 +303,5 @@ do
 		
 	end
 			
-end
-
---[[Return REASON codes for tooltip or other use
-This allows a way to get it that wont break if I change the internal DB layout
-Pass a itemlink and stack count   
-Returns :  "Reason, time of purchase, what you payed"  or nil
-NOTE: Reason could possibly be "", decided to return data anyways, calling module can decide if it want to use data or not
-]]
-function lib.API.getBidReason(itemLink, quantity)
-	if not itemLink or not quantity then return end
-	
-	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
-		
-	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
-		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
-			local quan, _, _, _, bid, _, Time, reason = string.split(";", v)			
-			if tonumber(quan) == tonumber(quantity) and reason and Time then
-				return reason, Time, tonumber(bid)
-			end
-		end
-	end
-	return --if nothing found return nil
 end
 

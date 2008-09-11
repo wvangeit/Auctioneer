@@ -57,6 +57,7 @@ local private = {
 	--BeanCounterMail 
 	reconcilePending = {},
 	inboxStart = {},
+	serverVersion = select(4, GetBuildInfo()),--WOW 3.0 HACK
 	}
 	
 lib.Private = private --allow beancounter's sub lua's access
@@ -87,9 +88,9 @@ if AucAdvanced and AucAdvanced.NewModule then
 	private.AucModule.locals = {["get"] = get, ["set"] = set, ["default"] = default}
 
 	function private.AucModule.Processor(callbackType, ...)
-		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
+		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
 			local item = ...
-			if item.name then BeanCounter.externalSearch(item.name) end
+			if item.name then lib.API.search(item.name) end
 		
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
@@ -256,6 +257,7 @@ end
 --Can be item Name or link or itemID 
 --If itemID or link search will be much faster than a plain text lookup
 function lib.externalSearch(name, settings, queryReturn, count)
+	lib.ShowDeprecationAlert("Depreciated API Call Used", "")
 	--print("|CFFFF3300 WARNING: |CFFFFFFFF A module just called a depreciated  Beancounter API")
 	--print(" |CFFFF3300 BeanCounter.externalSearch() ")
 	--print("Please update the module to use the function |CFFFFFF00 BeanCounter.API.search()  ")
@@ -293,12 +295,19 @@ end
 --Add data to DB
 --~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
 function private.databaseAdd(key, itemID, itemLink, value, compress)
-	if not key or not itemID or not itemLink or not value then print("database add error: Missing required data") print("Database", key, "itemID", itemID, "itemLink", itemLink, "Data", data) return end
+	if not key or not itemID or not itemLink or not value then print("BeanCounter database add error: Missing required data") print("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress) return end
 	
-	local itemString, suffix = itemLink:match("^|c%x+|H(item:%d+.+:(.-):.+)|h%[.+%].-")
+	local _, suffix = lib.API.decodeLink(itemLink)
+	local itemString = lib.API.getItemString(itemLink)
 	--if this will be a compressed entry replace uniqueID with 0
 	if compress then 
-		itemString  = itemString:gsub("^(item:%d+:.+:.-):.*", "%1:0")
+		if private.serverVersion >= 30000 then
+			debugPrint("WOW 3.0 HACK Database Add before", itemString)
+			itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")--WOW 3.0 HACK
+			debugPrint("WOW 3.0 HACK Database Add after", itemString)
+		else		
+			itemString  = itemString:gsub("^(item:%d+:.+:.-):.*", "%1:0")
+		end
 	end	
 	
 	if private.playerData[key][itemID] then --if ltemID exsists
@@ -319,7 +328,8 @@ end
 --remove item (for pending bids only atm)
 function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 	if key == "postedBids" then
-	local itemString, suffix = itemLink:match("^|c%x+|H(item:%d+.+:(.-):.+)|h%[.+%].-")
+	local itemString = lib.API.getItemString(itemLink)
+	local _, suffix = lib.API.decodeLink(itemLink)
 		if private.playerData[key][itemID] and private.playerData[key][itemID][itemString] then
 			for i, v in pairs(private.playerData[key][itemID][itemString]) do
 				local tbl = private.unpackString(v)
@@ -342,8 +352,9 @@ function private.storeReasonForBid(CallBack)
 	if not CallBack then return end
 	
 	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
-	 
-	local itemString, itemID, suffix = itemLink:match("^|c%x+|H(item:(%d+):.+:(.-):.+)|h%[.+%].-")
+	local itemString = lib.API.getItemString(itemLink)
+	local itemID, suffix = lib.API.decodeLink(itemLink)
+	
 	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
 		for i, v in pairs(private.playerData.postedBids[itemID][itemString]) do
 			local tbl = private.unpackString(v)
@@ -361,14 +372,14 @@ function private.storeReasonForBid(CallBack)
 end
 
 --Get item Info or a specific subset. accepts itemID or "itemString" or "itemName ONLY IF THE ITEM IS IN PLAYERS BAG" or "itemLink"
-function private.getItemInfo(link, cmd) 
---debugPrint(link, cmd)
+function private.getItemInfo(link, cmd)
+	--debugPrint(link, cmd)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
 	if not cmd and itemLink then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
 	
 	elseif itemLink and (cmd == "itemid") then
-		local itemID = itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
+		local itemID = lib.API.decodeLink(itemLink)
 		return itemID, itemLink
 	
 	elseif itemName and itemTexture  and (cmd == "name") then
@@ -382,13 +393,13 @@ end
 --[[ DATABASE MAINTIANACE FUNCTIONS
 ]]
 --Recreate/refresh ItemIName to ItemID array
-function private.refreshItemIDArray()
+function private.refreshItemIDArray(announce)
 	for player, v in pairs(private.serverData)do
 		for DB,data in pairs(private.serverData[player]) do
 			if DB ~= "mailbox" and type(data) == "table" then
 				for itemID, value in pairs(data) do
 					for itemString, text in pairs(value) do
-						local key, suffix = itemString:match("^item:(%d-):.+:(.+):.-")
+						local key, suffix = lib.API.decodeLink(itemString)
 						if not BeanCounterDB["ItemIDArray"][key..":"..suffix] then
 							local _, itemLink = private.getItemInfo(itemString, "itemid")
 							if itemLink then
@@ -401,20 +412,22 @@ function private.refreshItemIDArray()
 			end
 		end
 	end
+	if announce then print("Finished refresing ItemName Array") end
 end
---Moves entrys older than 31 days into compressed( non uniqueID) Storage
+--Moves entrys older than 40 days into compressed( non uniqueID) Storage
 --Array refresh needs to run before this function
-function private.compactDB()
+function private.compactDB(announce)
 	debugPrint("Compressing database entries older than 40 days")
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
 		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
-					if "0" ~= itemString:match(".*:(.-)$") then --ignore the already compacted keys 
-						local itemLink = lib.API.getItemLink(itemString)
+					local _, _, uniqueID = lib.API.decodeLink(itemString)
+					if uniqueID ~= "0" then --ignore the already compacted keys 
+						local itemLink = lib.API.getArrayItemLink(itemString)
 						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
 							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 40 days old process
-								debugPrint("Compressed", itemLink, index[1])
+								debugPrint("Compressed", "|H"..itemString, index[1] )
 								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
 								table.remove(index, 1)
 							end
@@ -426,6 +439,7 @@ function private.compactDB()
 			end
 		end
 	end
+	if announce then print("Finished compressing Databases") end
 end
 --Sort all array entries by Date oldest to newest
 --Helps make compact more efficent needs to run once per week or so
@@ -446,7 +460,7 @@ function private.sortArrayByDate(announce)
 end
 --Prune Old keys from postedXXXX tables
 --First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
-function private.prunePostedDB()
+function private.prunePostedDB(announce)
 	--Used to clean up post DB
 	debugPrint("Cleaning posted Databases")
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
@@ -479,6 +493,7 @@ function private.prunePostedDB()
 			end		
 		end
 	end
+	if announce then print("Finished pruning Posted Databases") end
 end
 
 function private.debugPrint(...)
