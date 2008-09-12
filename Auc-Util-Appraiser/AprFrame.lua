@@ -356,11 +356,18 @@ function private.CreateFrames()
 			if curbid == 0 then
 				curbid = result[Const.MINBID]
 			end
+			--price level color item
 			local r,g,b = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
 			if r then
 				style[i] = {}
 				style[i][1] = {}
 				style[i][1].textColor = {r,g,b}
+			end
+			--color ignored sellers
+			if AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
+				if not style[i] then style[i] = {} end
+				style[i][2] = {}
+				style[i][2].textColor = {1,0,0}
 			end
 		end
 		frame.refresh:Enable()
@@ -2442,6 +2449,68 @@ function private.CreateFrames()
 		end
 	end
 	
+	function private.onClick(button, row, index)
+		if (IsAltKeyDown()) and frame.imageview.sheet.labels[index]:GetText() == "Seller" then
+			local seller = frame.imageview.sheet.rows[row][index]:GetText()
+			if not seller or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
+			
+			frame.sellerIgnore:SetParent(frame.imageview.sheet.panel)
+			frame.sellerIgnore:SetFrameStrata("TOOLTIP")
+			frame.sellerIgnore:ClearAllPoints()
+			frame.sellerIgnore:SetPoint("TOPLEFT", button, "BOTTOM")
+			frame.sellerIgnore:Show()
+			--if toon not ignored the ignore
+			if not AucAdvanced.Modules.Filter.Basic.IgnoreList[seller] then
+				frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) frame.sellerIgnore:Hide() end)
+				frame.sellerIgnore.help:SetText("Add player to ignore list\n\n|CFFFFFFFF"..(seller))
+			else
+				frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) frame.sellerIgnore:Hide() end)
+				frame.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
+			end
+		end
+	end
+	--ignore/unignore seller GUI
+	frame.sellerIgnore = CreateFrame("Frame", nil, UiParent)
+	frame.sellerIgnore:Hide()
+	frame.sellerIgnore:SetBackdrop({
+	      bgFile = "Interface/Tooltips/ChatBubble-Background",
+	      edgeFile = "Interface/Minimap/TooltipBackdrop",
+	      tile = true, tileSize = 32, edgeSize = 10,
+	      insets = { left = 2, right = 2, top = 2, bottom = 2 }
+	})
+	frame.sellerIgnore:SetBackdropColor(0,0,0, 1)
+	frame.sellerIgnore:SetWidth(100)
+	frame.sellerIgnore:SetHeight(70)
+	frame.sellerIgnore:SetPoint("CENTER", UIParent, "CENTER")
+	frame.sellerIgnore:SetFrameStrata("TOOLTIP")
+	
+	frame.sellerIgnore.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
+	frame.sellerIgnore.help:SetParent(frame.sellerIgnore)
+	frame.sellerIgnore.help:SetPoint("CENTER", frame.sellerIgnore, "TOP", 0, -25)
+	frame.sellerIgnore.help:SetWidth(100)
+
+	frame.sellerIgnore.yes = CreateFrame("Button", nil, frame.sellerIgnore, "GameMenuButtonTemplate")
+	frame.sellerIgnore.yes:SetTextFontObject("GameFontNormalSmall")
+	frame.sellerIgnore.yes:SetPoint("BOTTOMLEFT", frame.sellerIgnore, "BOTTOMLEFT", 5, 10)
+	frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( name ) end)
+	frame.sellerIgnore.yes:SetText("Yes")
+	frame.sellerIgnore.yes:SetWidth(30)
+	frame.sellerIgnore.yes:SetHeight(10)
+	local font = frame.sellerIgnore.yes:GetFontString()
+	font:SetFontObject("GameFontNormalSmall" )
+	font:SetTextHeight(10)
+	
+	frame.sellerIgnore.no = CreateFrame("Button", nil, frame.sellerIgnore, "GameMenuButtonTemplate")
+	frame.sellerIgnore.no:SetTextFontObject("GameFontNormalSmall")
+	frame.sellerIgnore.no:SetPoint("BOTTOMRIGHT", frame.sellerIgnore, "BOTTOMRIGHT", -5, 10)
+	frame.sellerIgnore.no:SetScript("OnClick", function()  frame.sellerIgnore:Hide() end)
+	frame.sellerIgnore.no:SetText("No")
+	frame.sellerIgnore.no:SetWidth(30)
+	frame.sellerIgnore.no:SetHeight(10)
+	local font = frame.sellerIgnore.no:GetFontString()
+	font:SetFontObject("GameFontNormalSmall" )
+	font:SetTextHeight(10)
+	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
 		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
@@ -2454,7 +2523,7 @@ function private.CreateFrames()
 		{ "CurBid", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.CurBid"), { DESCENDING=true } }, --85
 		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
 		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
-	}, nil, nil, nil, private.onResize, private.onSelect)
+	}, nil, nil, private.onClick, private.onResize, private.onSelect)
 	
 	frame.imageview.sheet:EnableSelect(true)
 	
