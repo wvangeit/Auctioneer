@@ -112,6 +112,9 @@ function lib.Search(item)
 		return false, "Item not Prospectable"
 	end
 	
+	--adjust for stack size
+	market = market * item[Const.COUNT]
+	
 	--adjust for brokerage costs
 	local brokerage = get("prospect.adjust.brokerage")
 	
@@ -132,4 +135,4 @@ function lib.Search(item)
 	return false, "Not enough profit"
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherDisenchant.lua $", "$Rev: 3277 $")
+AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherProspect.lua $", "$Rev: 3277 $")
