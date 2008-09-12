@@ -430,11 +430,11 @@ function lib.MakeGuiConfig()
 	)
 	gui:AddHelp(id, "how to create",
 		"How do I create a new profile?",
-		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+		"You enter the name of the new profile that you wish to create into the text box labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
 	)
 	gui:AddHelp(id, "how to delete",
 		"How do I delete a profile?",
-		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button"
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button."
 	)
 	gui:AddHelp(id, "why delete",
 		"Why would I want to delete a profile?",

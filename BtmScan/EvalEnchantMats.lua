@@ -359,7 +359,7 @@ function lib:setup(gui)
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")
 	
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
-	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
+	gui:AddControl(id, "Subhead",          0,    "Reagent Price Modification")
 
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..GPLANAR, 0, 200, 1, "Greater Planar Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..GETERNAL, 0, 200, 1, "Greater Eternal Essence %s%%")

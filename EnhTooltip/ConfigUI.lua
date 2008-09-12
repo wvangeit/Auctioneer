@@ -402,11 +402,11 @@ function lib.MakeGuiConfig()
 	)
 	gui:AddHelp(id, "how create",
 		"How do I create a new profile?",
-		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+		"You enter the name of the new profile that you wish to create into the text box labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
 	)
 	gui:AddHelp(id, "how delete",
 		"How do I delete a profile?",
-		"To delete a profile, simply select the profile you wish to delete with the drop-down selecteion box and then click the Delete button"
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button."
 	)
 	gui:AddHelp(id, "why delete",
 		"Why would I want to delete a profile?",
@@ -429,8 +429,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithAuction"), "Auction")
 	gui:AddTip(id, "Show Enhanced Tooltip in Auction House")
 	
-	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBagsAndKeyRing"), "Bags and KeyRing")
-	gui:AddTip(id, "Show Enhanced Tooltip in Bags, including Bank Bags and in the KeyRing")
+	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBagsAndKeyRing"), "Bags and Keyring")
+	gui:AddTip(id, "Show Enhanced Tooltip in Bags, including Bank Bags and in the Keyring")
 	
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBagBar"), "Bag Bar")
 	gui:AddTip(id, "Show Enhanced Tooltip in the Bag Bar (the bar displaying your four bags) and in the Bank Bag bar")
@@ -448,7 +448,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Show Enhanced Tooltip in Guild Bank")
 	
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithLootAndLootRoll"), "Loot and Loot Roll")
-	gui:AddTip(id, "Show Enhanced Tooltip in the loot window, and on the popup that appears when you are rolling for loot.")
+	gui:AddTip(id, "Show Enhanced Tooltip in the loot window, and on the pop-up that appears when you are rolling for loot.")
 	
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithMail"), "Mail")
 	gui:AddTip(id, "Show Enhanced Tooltip in Mail interface")
@@ -473,16 +473,16 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Block other addons from manipulating Enhanced Tooltip. See help for more details.")
 
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the slidebar button")
+	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the SlideBar button")
 
 	gui:AddHelp(id, "what is",
 		"What is Enhanced Tooltip?",
-		"Enhanced Tooltip is an additional tooltip that appears next to the main tooltip when you mouse over on an item. This tooltip displays various extra information about the item supplied by other Addons such as AucAdvanced, Enchantrix, Informant and others. Which pieces of infomration are displayed and which are not is configured within each respective addon."
+		"Enhanced Tooltip is an additional tooltip that appears next to the main tooltip when you mouse over an item. This tooltip displays various extra information about the item supplied by other addons, such as AucAdvanced, Enchantrix, Informant and others. Which pieces of information are displayed and which are not is configured within each respective addon."
 	)
 	
 	gui:AddHelp(id, "how hiding works",
-		"How do the options controlling whether Enhanced tooltip is shown work?",
-		"The main option \"Hide Enhanced Tooltip\" controls whether Enhanced tooltip shown. It overrides individual frames options. The alt button option works both for the main and individul frame options and allow to show the hiddent tooltip when the Alt button is pressed. Note, that in order to work 100% of the time the Alt button should be pressed *before* you mouse over an item. Some frames do support activating tooltip when Alt button is pressed when mouse is already over an item and some frames do not."
+		"How do the options controlling whether Enhanced Tooltip is shown work?",
+		"The main option \"Hide Enhanced Tooltip\" controls whether Enhanced Tooltip is shown. It overrides individual frame options. The alt button option works both for the main and individual frame options and shows the hidden tooltip when the Alt button is pressed. Note, that in order to work 100% of the time the Alt button should be pressed *before* you mouse over an item. Some frames do support activating tooltip when Alt button is pressed when mouse is already over an item and some frames do not."
 	)
 
 	gui:AddHelp(id, "what does block external calls option do",

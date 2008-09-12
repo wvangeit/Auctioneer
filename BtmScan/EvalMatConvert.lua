@@ -555,7 +555,7 @@ function lib:setup(gui)
 	gui:AddHelp(id, "what is EMC",
 		"What is EMC?",
 		"This evaluator allows you to purchase items that can be changed to another item that is worth more (based on your settings here) by simply right clicking the item to convert it.\n\n"..
-		"An example of a convertable item would be 1x greater essence into 3x lesser essence or visa versa.\n\n"..
+		"An example of a convertible item would be 1x greater essence into 3x lesser essence or visa versa.\n\n"..
 	"\n")
 	
 	gui:AddHelp(id, "EMC: General settings",
@@ -572,36 +572,36 @@ function lib:setup(gui)
 	
 	gui:AddHelp(id, "EMC: Custom profit settings",
 		"EMC: Custom profit settings",
-		"This section allows you to set your minimum profit requirements for an item to be considered a deal. both minimum profit and discount % must be met for an item to be considered."..
+		"This section allows you to set your minimum profit requirements for an item to be considered a deal. Both minimum profit and discount % must be met for an item to be considered."..
 		""..
-		"Please note, this evaluator uses your last used fixed price or last used pricing module from appraiser tab, if you haven't posted a mat from appraiser tab it will use whatever pricing module you set as your default for appraiser.\n\n"..
+		"Please note, this evaluator uses your last used fixed price or last used pricing module from the Appraiser tab, if you haven't posted a mat from the Appraiser tab it will use whatever pricing module you set as your default for Appraiser.\n\n"..
 		""..
 	"\n")
 	
-	gui:AddControl(id, "Subhead",		0,	"Custom profit settings")
+	gui:AddControl(id, "Subhead",		0,	"Custom Profit Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",		0, 1, 	lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
-	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "We get a prices from Appraiser Tab. Check to use market matching (if enabled on the item)")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "We get prices from the Appraiser tab. Check to use market matching (if enabled on the item).")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".buyout.check", "Use Buyout Price instead of Bid Price:")	
 	
 	gui:AddHelp(id, "EMC: Fees adjustment",
-		"EMC: Fees adjustment",
-		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) figured in when valuating an item for conversion. \n\n"..
+		"EMC: Fee Adjustment",
+		"Fee Adjustments: This section allows you to select if you want brokerage (AH cut) figured in when valuating an item for conversion. \n\n"..
 		""..
 	"\n")
 	
-	gui:AddControl(id, "Subhead",		0,    	"Fees adjustment")
-	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fees basis")
-	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from convert profit")
+	gui:AddControl(id, "Subhead",		0,    	"Fee Adjustments")
+	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fee basis")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from the converted profit")
 		
 	gui:AddHelp(id, "EMC: Enable or disable by category",
 		"EMC: Enable or disable by category",
-		"This is pretty self explanatory. Either allow the evaluator to look at the specific categorys or not. \n\n"..
+		"This is pretty self explanatory. Either allow the evaluator to look at the specific categories or not. \n\n"..
 		""..
 	"\n")
 		
 	gui:AddControl(id, "Subhead",		0,    	"Enable or disable by category")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableEssence", "Enable essence conversions")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableMote", "Enable mote to primal conversions")
-	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted conversions (Warning: if you dont know about depleted items leave off!)") 
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted conversions (Warning: if you don't know about depleted items leave off!)") 
 end

@@ -192,16 +192,16 @@ function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	
 		gui:AddHelp(id, "what is the disenchant evaluator",
-		"What is the disenchant evaluator?",
+		"What is the Disenchant evaluator?",
 		"This evaluator allows you to purchase items that can be disenchanted (via the enchanting skill) into items that sell for more than the item you are buying based on your settings.\n\n"..
 		""..
 		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout an item for disenchanting.\n\n"..
 		""..
 		"Custom Skill & Profit Settings: This section allows you to set your enchanting skill in order to avoid buying items that you cannot process due to being outside of your desired enchanting skill range. Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
 		""..
-		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) when valuating an item to disenchant.\n\n"..
+		"Fee Adjustments: This section allows you to select if you want brokerage (AH cut) when valuating an item to disenchant.\n\n"..
 		""..
-		"*** Note: To refine how values are defined for enchanting mats please see enchantrix settings if available.\n\n"..
+		"*** Note: To refine how values are defined for enchanting mats please see Enchantrix settings if available.\n\n"..
 		""..
 		"\n")
 	
@@ -217,7 +217,7 @@ function lib:setup(gui)
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 	
-	gui:AddControl(id, "Subhead",          0,    "Fees adjustment")
+	gui:AddControl(id, "Subhead",          0,    "Fee Adjustments")
 	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Auction fees basis")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
 end

@@ -99,7 +99,7 @@ function lib:setup(gui)
 		"know an item is worth.  Rather than ignore the item completely, "..
 		"you can instead just ignore the item in the future when it is "..
 		"at or above the currently listed price.  \n\n"..
-		"Note that price ignoring is global across all appraisers, "..
+		"Note that price ignoring is global across all Appraisers, "..
 		"so you should be a little careful when using this option.  "..
 		"If needed, you can always disable IgnoreItemPrice for specific "..
 		"evaluators here in these options.")

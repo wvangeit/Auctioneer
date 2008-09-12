@@ -199,14 +199,14 @@ function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	
 	gui:AddHelp(id, "what is the prospect evaluator",
-		"What is the prospect evaluator?",
-		"This evaluator allows you to purchase items that can be prospected (via the jewel crafting skill) into items that sell for more than the ore you are buying based on your settings.\n\n"..
+		"What is the Prospect evaluator?",
+		"This evaluator allows you to purchase items that can be prospected (via the Jewel Crafting skill) into items that sell for more than the ore you are buying based on your settings.\n\n"..
 		""..
-		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout ore for prospecting.\n\n"..
+		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled, if you only want to allow it to bid or buyout ore for prospecting.\n\n"..
 		""..
-		"Custom Skill & Profit Settings: This section allows you to set your prospecting skill in order to avoid buying ores that you cannot process due to being outside of your desired prospecting skill range. Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
+		"Custom Skill & Profit Settings: This section allows you to set your prospecting skill in order to avoid buying ores that you cannot prospect due to being outside of your desired prospecting skill range. Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
 		""..
-		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) and/or deposit costs figured in when valuating an item to prospect. You may also select how many times you project having to relist the mats before they will sell.\n\n"..
+		"Fee Adjustments: This section allows you to select if you want brokerage (AH cut) and/or deposit costs figured in when valuating an item to prospect. You may also select how many times you project having to re-list the mats before they will sell.\n\n"..
 		""..
 		"\n")
 		
@@ -226,5 +226,5 @@ function lib:setup(gui)
 	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
-	gui:AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average relistings: %0.1fx")
+	gui:AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average re-listings: %0.1fx")
 end

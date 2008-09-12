@@ -113,10 +113,10 @@ function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	
 	gui:AddHelp(id, "what is the vendor evaluator",
-		"What is the vendor evaluator?",
+		"What is the Vendor evaluator?",
 		"This evaluator allows you to purchase items that can be sold to a vendor for more than you pay for it based on your settings here.\n\n"..
 		""..
-		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout an item for selling to a vendor.\n\n"..
+		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled, if you only want to allow it to bid or buyout an item for selling to a vendor.\n\n"..
 		""..
 		"Profit Settings: Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
 		""..

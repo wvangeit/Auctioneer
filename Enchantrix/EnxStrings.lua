@@ -607,7 +607,7 @@ EnchantrixLocalizations = {
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "  (go to http://enchantrix.org/ to share your data)";
 		["FrmtWelcome"]	= "Enchantrix v%s loaded";
-		["MesgAuctVersion"]	= "Enchantrix requires Auctioneer version 3.4 or higher. Some features will be unavailable until you update your Auctioneer installation.";
+		["MesgAuctVersion"]	= "Enchantrix requires Auctioneer version 4.0 or higher. Some features will be unavailable until you update your Auctioneer installation.";
 
 		-- Section: Help Text
 		["GuiClearall"]	= "Clear All Enchantrix Data";
@@ -629,11 +629,11 @@ EnchantrixLocalizations = {
 		["GuiPrintin"]	= "Select the desired message frame";
 		["GuiPrintYieldsInChat"]	= "Show item yields in chat";
 		["GuiTerse"]	= "Enable terse mode";
-		["GuiValuateAverages"]	= "Valuate with Auctioneer Averages";
+		["GuiValuateAverages"]	= "Valuate with Auctioneer averages";
 		["GuiValuateBaseline"]	= "Valuate with Built-in Data";
 		["GuiValuateEnable"]	= "Enable Valuation";
 		["GuiValuateHeader"]	= "Valuation";
-		["GuiValuateMedian"]	= "Valuate with Auctioneer Medians";
+		["GuiValuateMedian"]	= "Valuate with Auctioneer medians";
 		["HelpClear"]	= "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 		["HelpDefault"]	= "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values.";
 		["HelpDisable"]	= "Stops enchantrix from automatically loading next time you log in";
@@ -716,7 +716,7 @@ EnchantrixLocalizations = {
 		["TooltipShowDisenchantLevel"]	= "Disenchanting requires skill %d";
 
 		-- Section: User Interface
-		["ExportPriceAucAdv"]	= "Export Enchantrix prices to AuctioneerAdvanced";
+		["ExportPriceAucAdv"]	= "Export Enchantrix prices to Auctioneer Advanced";
 		["GuiActivateProfile"]	= "Activate a current profile";
 		["GuiAutoDeEnable"]	= "Watch bags for disenchantable items - USE WITH CARE\n";
 		["GuiAutoDeOptions"]	= "Automation\n";
@@ -727,7 +727,7 @@ EnchantrixLocalizations = {
 		["GuiConfigProfiles"]	= "Setup, configure and edit profiles";
 		["GuiCreateReplaceProfile"]	= "Create or replace a profile";
 		["GuiDefaultBBProfitPercent"]	= "Default bidbroker profit Percentage: %d";
-		["GuiDefaultLessHSP"]	= "Default Percentage less than HSP: %d";
+		["GuiDefaultLessHSP"]	= "Default percentage less than HSP: %d";
 		["GuiDefaultProfitMargin"]	= "Default Profit Margin:";
 		["GuiDeleteProfileButton"]	= "Delete";
 		["GuiFixedSettings"]	= "Fixed reagent prices";

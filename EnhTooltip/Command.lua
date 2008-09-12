@@ -29,8 +29,8 @@
 
 EnhTooltip.Config = {}
 local lib = EnhTooltip.Config
---Allows EhTT sub lua's sccess to functions and settings in other EhTT files. This also makes private.Print accessable from all EhTT luas
---Private print does not need to concatenate strings, simply use commas to seperate arguments. Also handles printing functions, nils, and tables without throwing errors
+--Allows EhTT sub lua's access to functions and settings in other EhTT files. This also makes private.Print accessible from all EhTT luas
+--Private print does not need to concatenate strings, simply use commas to separate arguments. Also handles printing functions, nils, and tables without throwing errors
 local private = EnhTooltip.Private
 
 function private.CommandHandler(command, subcommand, subcommand2, ...)
@@ -41,7 +41,7 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 		private.Print("  {{/ett on||off}} - Show or hide enhanced tooltip globally")
 		private.Print("  {{/ett force alt||shift||ctrl||off}} - Force showing enhanced tooltip, when a key pressed")
 		private.Print("  {{/ett config}} - Open configuration interface")
-		private.Print("  {{/ett show auction||bags||bagbar||bank||chat||inventory||guildbank||loot||mail||merchants||professions||quests||trade||other on||off}} - shows or hide enhanced tooltip for a paticular frame")
+		private.Print("  {{/ett show auction||bags||bagbar||bank||chat||inventory||guildbank||loot||mail||merchants||professions||quests||trade||other on||off}} - shows or hide enhanced tooltip for a particular frame.")
 		private.Print("  {{/ett block on||off}} - blocks / allows external addons from using Enhanced Tooltip tooltip manipulation API")
 	elseif command == "on" then
 		EnhTooltip.Settings.SetSetting("suppressEnhancedTooltip", false)
