@@ -212,6 +212,7 @@ function BF_IgnoreList_Load()
 
 	--Get the ignore list for the current realm and faction
 	IgnoreList = AucAdvancedFilterBasic_IgnoreList[realm][faction]
+	lib.IgnoreList = IgnoreList --make current ignore list global for other addons
 
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
