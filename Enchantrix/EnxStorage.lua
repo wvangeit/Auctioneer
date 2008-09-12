@@ -48,6 +48,7 @@ local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
 
 local saveProspect					-- Enchantrix.Storage.SaveProspect()
 local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
+local getItemProspectTotals			-- Enchantrix.Storage.GetItemProspectTotals()
 
 -- Local functions
 local unserialize
@@ -249,6 +250,33 @@ function getItemDisenchants(link)
 		return nil
 	end
 	return data
+end
+
+
+
+-- NOTE - Rabbitbunny - copied from getItemDisenchantTotals directly below
+-- NOTE - ccox - calculation copied from itemTooltip, I couldn't easily reuse the code
+-- TODO - REVISIT - ccox - share the code with itemTooltip
+function getItemProspectTotals(link)
+	local data = Enchantrix.Storage.GetItemProspects(link)
+	if not data then
+		-- error message would have been printed inside GetItemProspects
+		return
+	end
+
+	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
+
+	for result, resProb in pairs(data) do
+		local style, extra = Enchantrix.Util.GetPricingModel()
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result,extra)
+		local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
+		totalHSP = totalHSP + resHSP
+		totalMed = totalMed + resMed
+		totalMkt = totalMkt + resMkt
+		totalFive = totalFive + resFive
+	end
+
+	return totalHSP, totalMed, totalMkt, totalFive
 end
 
 
@@ -565,6 +593,7 @@ Enchantrix.Storage = {
 
 	SaveProspect = saveProspect,
 	GetItemProspects = getItemProspects,
+	GetItemProspectTotals = getItemProspectTotals,
 }
 
 -- Make all globals local to this file
