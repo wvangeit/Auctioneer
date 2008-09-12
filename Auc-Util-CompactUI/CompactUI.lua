@@ -423,6 +423,20 @@ function private.ButtonClick(me, mouseButton)
 		DressUpItemLink(GetAuctionItemLink("list", me.id))
 	elseif ( IsShiftKeyDown() ) then
 		ChatEdit_InsertLink(GetAuctionItemLink("list", me.id))
+	--Display the ignore player UI
+	elseif (IsAltKeyDown() ) and me.Owner:GetText() then
+		if not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
+		
+		private.sellerIgnore:ClearAllPoints()	private.sellerIgnore:SetPoint("TOPLEFT", me.Owner,"TOPRIGHT") private.sellerIgnore:Show()
+		--if toon not ignored the ignore
+		local seller = me.Owner:GetText()
+		if not AucAdvanced.Modules.Filter.Basic.IgnoreList[seller] then
+			private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) private.sellerIgnore:Hide() end)
+			private.sellerIgnore.help:SetText("Add player to ignore list\n\n|CFFFFFFFF"..(seller))
+		else
+			private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) private.sellerIgnore:Hide() end)
+			private.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
+		end
 	else
 		if ( AUCTION_DISPLAY_ON_CHARACTER == "1" ) then
 			DressUpItemLink(GetAuctionItemLink("list", me.id))
@@ -648,7 +662,13 @@ function private.SetAuction(button, pos)
 			end
 		end
 	end
-
+	--if player is ignored then color name red otherwise set normal
+	if owner and AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[owner] then
+		button.Owner:SetTextColor(1,0,0) 
+	else
+		button.Owner:SetTextColor(1,1,1) 
+	end
+	
 	local perUnit = 1
 	if (private.PerItem:GetChecked()) then
 		perUnit = count
@@ -758,7 +778,7 @@ function private.MyAuctionFrameUpdate()
 	AucAdvanced.API.ListUpdate()
 end
 
---create the switch UI button.
+--create the configure UI button.
 private.switchUI = CreateFrame("Button", nil, UIParent, "OptionsButtonTemplate")
 private.switchUI:SetWidth(100)
 private.switchUI:SetHeight(15)
@@ -774,7 +794,49 @@ end)
 private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the CompactUI window.") end)
 private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
+--ignore/unignore seller GUI
+private.sellerIgnore = CreateFrame("Frame", nil, UiParent)
+private.sellerIgnore:Hide()
+private.sellerIgnore:SetBackdrop({
+      bgFile = "Interface/Tooltips/ChatBubble-Background",
+      edgeFile = "Interface/Minimap/TooltipBackdrop",
+      tile = true, tileSize = 32, edgeSize = 10,
+      insets = { left = 2, right = 2, top = 2, bottom = 2 }
+})
+private.sellerIgnore:SetBackdropColor(0,0,0, 1)
+private.sellerIgnore:SetWidth(100)
+private.sellerIgnore:SetHeight(70)
+private.sellerIgnore:SetPoint("CENTER", UIParent, "CENTER")
+private.sellerIgnore:SetFrameStrata("TOOLTIP")
+private.sellerIgnore:SetScale(0.7)
 
+private.sellerIgnore.help = private.sellerIgnore:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
+private.sellerIgnore.help:SetParent(private.sellerIgnore)
+private.sellerIgnore.help:SetPoint("CENTER", private.sellerIgnore, "TOP", 0, -25)
+private.sellerIgnore.help:SetWidth(100)
+
+private.sellerIgnore.yes = CreateFrame("Button", nil, private.sellerIgnore, "GameMenuButtonTemplate")
+private.sellerIgnore.yes:SetTextFontObject("GameFontNormalSmall")
+private.sellerIgnore.yes:SetPoint("BOTTOMLEFT", private.sellerIgnore, "BOTTOMLEFT", 5, 10)
+private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( name ) end)
+private.sellerIgnore.yes:SetText("Yes")
+private.sellerIgnore.yes:SetWidth(30)
+private.sellerIgnore.yes:SetHeight(10)
+local font = private.sellerIgnore.yes:GetFontString()
+font:SetFontObject("GameFontNormalSmall" )
+font:SetTextHeight(10)
+
+private.sellerIgnore.no = CreateFrame("Button", nil, private.sellerIgnore, "GameMenuButtonTemplate")
+private.sellerIgnore.no:SetTextFontObject("GameFontNormalSmall")
+private.sellerIgnore.no:SetPoint("BOTTOMRIGHT", private.sellerIgnore, "BOTTOMRIGHT", -5, 10)
+private.sellerIgnore.no:SetScript("OnClick", function()  private.sellerIgnore:Hide() end)
+private.sellerIgnore.no:SetText("No")
+private.sellerIgnore.no:SetWidth(30)
+private.sellerIgnore.no:SetHeight(10)
+local font = private.sellerIgnore.no:GetFontString()
+font:SetFontObject("GameFontNormalSmall" )
+font:SetTextHeight(10)
+	
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
