@@ -5,6 +5,7 @@
 	<Script file="SearcherGeneral.lua"/>
 	<Script file="SearcherResale.lua"/>
 	<Script file="SearcherDisenchant.lua"/>
+	<Script file="SearcherEnchantMats.lua"/>
 	<Script file="SearcherProspect.lua"/>
 	<Script file="SearcherConverter.lua"/>
 	<Script file="SearcherSnatch.lua"/>
