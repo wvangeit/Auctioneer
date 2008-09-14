@@ -103,13 +103,6 @@ local validReagents =
 	}
 
 -- Set our defaults
-default("enchantmats.profit.min", 1)
-default("enchantmats.profit.pct", 50)
-default("enchantmats.seen.check", false)
-default("enchantmats.seen.min", 10)
-default("enchantmats.adjust.brokerage", true)
-default("enchantmats.adjust.deposit", true)
-default("enchantmats.adjust.listings", 3)
 default("enchantmats.level.custom", false)
 default("enchantmats.level.min", 0)
 default("enchantmats.level.max", 375)
@@ -158,20 +151,9 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 	
-	gui:AddControl(id, "MoneyFramePinned",  0, 1, "enchantmats.profit.min", 1, 99999999, "Minimum Profit")
-	gui:AddControl(id, "Slider",            0, 1, "enchantmats.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
-	gui:AddControl(id, "Checkbox",          0, 1, "enchantmats.seen.check", "Check Seen count")
-	gui:AddControl(id, "Slider",            0, 2, "enchantmats.seen.min", 1, 100, 1, "Min seen count: %s")
-	
-	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "enchantmats.allow.buy", "Allow Buyouts")
-
-	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
-	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.adjust.brokerage", "Subtract auction fees")
-	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Slider",            0.42, 1, "enchantmats.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 	
 	gui:AddControl(id, "Checkbox",         0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 375, 25, "Minimum skill: %s")
@@ -238,6 +220,7 @@ function lib.Search(item)
 		market = (market * item[Const.COUNT]) * adjustment / 100
 	end
 	
+	-- it's not a reagent, figure out what it de's into
 	if (not market or market == 0) then
 		
 		-- All disenchantable items are "uncommon" quality or higher
@@ -306,7 +289,6 @@ function lib.Search(item)
 	if( not market or market <= 0) then
 		return false, "No Price Found"
 	end
-
 	
 	if (get("enchantmats.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("enchantmats.seen.min"))) then
@@ -314,36 +296,9 @@ function lib.Search(item)
 		end
 	end
 	
-	--adjust for brokerage/deposit costs
-	local deposit = get("enchantmats.adjust.deposit")
-	local brokerage = get("enchantmats.adjust.brokerage")
-	
-	if brokerage then
-		market = market * 0.95
-	end
-	if deposit then
-		local relistings = get("enchantmats.adjust.listings")
-		local rate = AucAdvanced.depositRate or 0.05
-		local newfaction
-		if rate == .25 then newfaction = "neutral" end
-		local amount = GetDepositCost(item[Const.LINK], 12, newfaction, item[Const.COUNT])
-		if not amount then
-			amount = 0
-		else
-			amount = amount * relistings
-		end
-		market = market - amount
-	end
-	
-	local pct = get("enchantmats.profit.pct")
-	local minprofit = get("enchantmats.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
-	if get("enchantmats.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if get("enchantmats.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= market) then
 		return "buy", market --Ishould say what they're buying it for here
-	elseif get("enchantmats.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif get("enchantmats.allow.bid") and (item[Const.PRICE] <= market) then
 		return "bid", market
 	end
 	return false, "Not enough profit"
