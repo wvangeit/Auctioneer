@@ -209,7 +209,6 @@ BeanCounterLocalizations = {
 	enUS = {
 
 		-- Section: Config Text
-		[""C_ShowReasonPurchase""]	= "Show reason for purchase in the games Tooltips.";
 		["C_BeanCounterConfig"]	= "BeanCounter Config";
 		["C_BeanCounterDatabaseMaintenance"]	= "BeanCounter Database Maintenance";
 		["C_BeanCounterOptions"]	= "BeanCounter options";
