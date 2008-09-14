@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit license to use this AddOn with these facilities
+		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -113,8 +113,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "BeanCounter Konfig.";
 		["C_BeanCounterOptions"]	= "BeanCounter Optionen";
-		["C_DateString"]	= "|CCFFFCC00 Zu verwendendes Datumsformat:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Beispieldatum:";
+		["C_DateString"]	= "Zu verwendendes Datumsformat:";
+		["C_DateStringExample"]	= "Beispieldatum:";
 		["C_ExtenalSearch"]	= "Externen AddOns die BeanCounter Suche erlauben";
 		["C_MailInvoiceTimeout"]	= "Mail-Zeitüberschreitung = %d Sekunden";
 		["C_MailRecolor"]	= "Mail einfärben";
@@ -209,13 +209,22 @@ BeanCounterLocalizations = {
 	enUS = {
 
 		-- Section: Config Text
+		[""C_ShowReasonPurchase""]	= "Show reason for purchase in the games Tooltips.";
 		["C_BeanCounterConfig"]	= "BeanCounter Config";
+		["C_BeanCounterDatabaseMaintenance"]	= "BeanCounter Database Maintenance";
 		["C_BeanCounterOptions"]	= "BeanCounter options";
-		["C_DateString"]	= "|CCFFFCC00 Date format to use:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Example Date:";
+		["C_DataMaintenance"]	= "Data Maintenance";
+		["C_DateString"]	= "Date format to use:";
+		["C_DateStringExample"]	= "Example Date:";
 		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search?";
 		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
 		["C_MailRecolor"]	= "Mail Re-Color Method";
+		["C_Resortascendingtime"]	= "Resort all entries by ascending time";
+		["C_ResortDatabase"]	= "Resort Database";
+		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using.";
+		["C_ShowBeginnerTooltips"]	= "Show beginner tooltips on mouse over.";
+		["C_ShowReasonPurchase"]	= "Show reason for purchase in the games Tooltips.";
+		["C_ValidateDatabase"]	= "Validate Database";
 
 		-- Section: Generic Strings
 		["NoRe-Color"]	= "No Re-Color";
@@ -226,12 +235,14 @@ BeanCounterLocalizations = {
 		["Re-ColorText"]	= "Re-Color Text";
 
 		-- Section: Help Text
+		["A_BeanCountersTooltip"]	= "BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip.";
 		["A_DateString"]	= "This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21";
 		["A_DateStringCommands"]	= "Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)";
 		["A_ExtenalSearch"]	= "Other addons can have BeanCounter search for an item to be displayed in BeanCounter's GUI. For example this allows BeanCounter to show what items you are looking at in Appraiser";
 		["A_MailInvoiceTimeout"]	= "The length of time BeanCounter will wait on the server to respond to an invoice request. An invoice is the \"who\", \"what\", and \"how\" of an Auction House mail.";
 		["A_MailRecolor"]	= "BeanCounter reads all mail from the Auction House. This option tells BeanCounter how the user wants to re-color the messages to make them look unread.";
 		["HelpGuiItemBox"]	= "Drop item into box to search.";
+		["Q_BeanCountersTooltip"]	= "What is BeanCounter's Tooltip";
 		["Q_DateString"]	= "Date Format to use?";
 		["Q_DateStringCommands"]	= "Acceptable Date Commands?";
 		["Q_ExtenalSearch"]	= "Allow External Addons to use BeanCounter?";
@@ -255,6 +266,10 @@ BeanCounterLocalizations = {
 		["TTExtenalSearch"]	= "When entering a search in another addon, BeanCounter will also display a search for that item.";
 		["TTMailInvoiceTimeout"]	= "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data. Higher == slower, but improves chances of getting data if the Mail server is extremely busy.";
 		["TTMailRecolor"]	= "Choose how mail will appear after BeanCounter has scanned the Mail Box.";
+		["TTResort Database"]	= "This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions.";
+		["TTShowBeginnerTooltips"]	= "Turns on the beginner tooltips that display on mouse over.";
+		["TTShowReasonPurchase"]	= "Turns on the SearchUI reason an item was purchased for in the tooltip.";
+		["TTValidateDatabase"]	= "This will scan Beancounter's Data and attempt to correct any errors it may find. Use if you are getting errors on search.";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auction History Database";
@@ -341,8 +356,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "BeanCounter Configuration";
 		["C_BeanCounterOptions"]	= "BeanCounter Options";
-		["C_DateString"]	= "|CCFFFCC00 Format date à utiliser:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Exemple Date:";
+		["C_DateString"]	= "Format date à utiliser:";
+		["C_DateStringExample"]	= "Exemple Date:";
 		["C_ExtenalSearch"]	= "Autorise les Addons Externes à utiliser la recherche BeanCounter?";
 		["C_MailInvoiceTimeout"]	= "Mail de dépassement du temps des encheres = %d secondes";
 		["C_MailRecolor"]	= "Méthode de changement de couleur de mail";
@@ -456,8 +471,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "콩순이 설정";
 		["C_BeanCounterOptions"]	= "콩순이 옵션";
-		["C_DateString"]	= "|CCFFFCC00 사용할 날짜 형식: ";
-		["C_DateStringExample"]	= "|CCFFFCC00 날짜 예제: ";
+		["C_DateString"]	= "사용할 날짜 형식: ";
+		["C_DateStringExample"]	= "날짜 예제: ";
 		["C_ExtenalSearch"]	= "외부 애드온이 콩순이 검색을 사용하도록 허락합니까?";
 		["C_MailInvoiceTimeout"]	= "우편 송장 타임아웃 = %d 초";
 		["C_MailRecolor"]	= "우편에 다시 색입히는 방법";
@@ -623,8 +638,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "Параметры BeanCounter";
 		["C_BeanCounterOptions"]	= "Опции BeanCounter";
-		["C_DateString"]	= "|CCFFFCC00 Используемый формат даты:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Пример даты:";
+		["C_DateString"]	= "Используемый формат даты:";
+		["C_DateStringExample"]	= "Пример даты:";
 		["C_ExtenalSearch"]	= "Позволить сторонним аддонам использовать поиск BeanCounter'а?";
 		["C_MailInvoiceTimeout"]	= "Перерыв Почтовой Накладной";
 		["C_MailRecolor"]	= "способ определения цвета почты";
@@ -715,8 +730,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "BeanCounter 设置";
 		["C_BeanCounterOptions"]	= "BeanCounter 选项";
-		["C_DateString"]	= "|CCFFFCC00 使用的日期格式:";
-		["C_DateStringExample"]	= "|CCFFFCC00 示例日期:";
+		["C_DateString"]	= "使用的日期格式:";
+		["C_DateStringExample"]	= "示例日期:";
 		["C_ExtenalSearch"]	= "允许外部插件使用BeanCounter的搜索?";
 		["C_MailInvoiceTimeout"]	= "邮箱通知延迟=%d秒";
 		["C_MailRecolor"]	= "邮箱上色方法";
@@ -807,8 +822,8 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "拍賣記錄器設定";
 		["C_BeanCounterOptions"]	= "拍賣記錄器選項";
-		["C_DateString"]	= "|CCFFFCC00 資料格式使用";
-		["C_DateStringExample"]	= "|CCFFFCC00 範例資料";
+		["C_DateString"]	= "資料格式使用";
+		["C_DateStringExample"]	= "範例資料";
 		["C_ExtenalSearch"]	= "允許其他addons使用拍賣記錄器的搜尋？";
 		["C_MailInvoiceTimeout"]	= "郵件通知到期 = %d 秒";
 		["C_MailRecolor"]	= "信件重新上色方法";
