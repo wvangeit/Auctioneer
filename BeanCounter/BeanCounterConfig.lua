@@ -392,39 +392,38 @@ function lib.MakeGuiConfig()
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('Show beginner tooltips on mouseover'))
-	gui:AddTip(id, _BC('Turns on the beginner tooltips that display on mouseover'))
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('C_ShowBeginnerTooltips'))--"Show beginner tooltips on mouse over" 
+	gui:AddTip(id, _BC('TTShowBeginnerTooltips')) --Turns on the beginner tooltips that display on mouse eover
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('Show reason for purchase in the games Tooltips'))
-	gui:AddTip(id, _BC('Turns on the SearchUI reason an item was purchased for in the tooltip'))
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('C_ShowReasonPurchase'))--Show reason for purchase in the games Tooltips
+	gui:AddTip(id, _BC('TTShowReasonPurchase'))--Turns on the SearchUI reason an item was purchased for in the tooltip
 		
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
 		
-	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 20, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
 		
 	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
 		
-    gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00 ".._BC('C_DateString')) --"|CCFFFCC00Date format to use:")
+	gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00".._BC('C_DateString')) --"|CCFFFCC00Date format to use:")
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
-    gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00 ".._BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
+	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00".._BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
 	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
 		_BC('A_MailInvoiceTimeout') --"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
 		)
-	
 	gui:AddHelp(id, "what is recolor",
 		_BC('Q_MailRecolor'), --"What is Mail Re-Color Method?",
 		_BC('A_MailRecolor') --"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
 		)
 	gui:AddHelp(id, "what is tooltip",
-		_BC('What is BeanCounters Tooltip'), 
-		_BC('BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip')
+		_BC('Q_BeanCountersTooltip'),--What is BeanCounters Tooltip 
+		_BC('A_BeanCountersTooltip')--BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip
 		)
 	gui:AddHelp(id, "what is external",
 		_BC('Q_ExtenalSearch'), --"Allow External Addons to use BeanCounter?",
@@ -435,21 +434,21 @@ function lib.MakeGuiConfig()
 		_BC('A_DateString') --"This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21"
 		)
 	gui:AddHelp(id, "what is date command",
-			_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
-			_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
-			)			
+		_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
+		_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
+		)			
 	
-	id = gui:AddTab("Data Maintenance")
+	id = gui:AddTab(_BC('C_DataMaintenance')) --"Data Maintenance"
 	lib.Id = id
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    "BeanCounter Database Maintenance")
-	gui:AddControl(id, "Subhead",    0,    "Resort all entries by ascending time")
-	gui:AddControl(id, "Button",     0, 1, "database.sort", "Resort Database")
-	gui:AddTip(id, "This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions")
+	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterDatabaseMaintenance')) --"BeanCounter Database Maintenance"
+	gui:AddControl(id, "Subhead",    0,    _BC('C_Resortascendingtime')) --"Resort all entries by ascending time"
+	gui:AddControl(id, "Button",     0, 1, "database.sort", _BC('C_Resort Database')) --"Resort Database"
+	gui:AddTip(id, _BC('TTResort Database'))--"This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions"
 	
-	gui:AddControl(id, "Subhead",    0,    "Scan Database for errors: Use if you have errors when searching BeanCounter \n Backup BeanCounter's saved variables before using.")
-	gui:AddControl(id, "Button",     0, 1, "database.validate", "Validate Database")
-	gui:AddTip(id, "This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search")
+	gui:AddControl(id, "Subhead",    0,    _BC('C_ScanDatabase')) --"Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using."
+	gui:AddControl(id, "Button",     0, 1, "database.validate", _BC('C_ValidateDatabase')) --"Validate Database"
+	gui:AddTip(id, _BC('TTValidateDatabase')) --"This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search"
 		
 	
 	id = gui:AddTab("BeanCounter Debug")
