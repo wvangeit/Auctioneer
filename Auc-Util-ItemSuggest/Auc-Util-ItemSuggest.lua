@@ -82,26 +82,90 @@ default("util.itemsuggest.deplength", "24")
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
+	
+	gui:AddHelp(id, "what itemsuggest",
+        "What is the ItemSuggest module?",
+		"ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant or prospect that item.")
+
 		
 	gui:AddControl(id, "Header",     0,    "ItemSuggest")
-	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest Tooltips")	
+	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest Tooltips")
+    gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
 	
 	gui:AddControl(id, "Header",     0,    "Set skill usage limits if desired")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
+
 	
-	gui:AddControl(id, "Header",     0,    "Bias (weights) adjusts your preference up or down by % of value in Item Suggest")
+	gui:AddControl(id, "Header",     0,    "ItemSuggest Recommendation Bias")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
+	gui:AddTip(id, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
+	gui:AddTip(id, "Weight ItemSuggest recommendations for auction resale higher or lower.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
+	gui:AddTip(id, "Weight ItemSuggest recommendations for Disenchantment higher or lower.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
+   	gui:AddTip(id, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
 	
 	gui:AddControl(id, "Header",     0,    "Deposit cost influence")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs?")
+	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
+	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
 	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
+	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs?")
+	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
+	
 end
+
+
+
+--Original start
+--Config UI functions
+--function private.SetupConfigGui(gui)
+--	-- The defaults for the following settings are set in the lib.OnLoad function
+--		
+--	local id = gui:AddTab(libName, libType.." Modules")
+--	gui:AddControl(id, "Header",     0,    libName.." options")
+--
+--	gui:AddHelp(id, "what itemsuggest",
+--		"What is the ItemSuggest module?",
+--		"TODO Write a descriptive - and helpful - block of text targeting end-users of the ItemSuggest module.")
+--
+--    gui:AddControl(id, "Checkbox",  0,  "util.itemsuggest.enablett",    "Display ItemSuggest Tooltips")
+--  gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
+--
+--  gui:AddControl(id, "Header",     0,    "Skill Usage Limits")
+--	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
+--	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
+--	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
+--	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
+--	
+--	gui:AddControl(id, "Header",     0,    "Bias Recommendations: Apply Weighting for different ItemSuggest catagories")
+--	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
+--	gui:AddTip(id, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
+--	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
+--	gui:AddTip(id, "Weight ItemSuggest recommendations for auction resale higher or lower.")
+--	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
+--	gui:AddTip(id, "Weight ItemSuggest recommendations for Disenchantment higher or lower.")
+--  gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
+--  gui:AddTip(id, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
+--
+--	gui:AddControl(id, "Header",     0,    "Deposit Cost Influence")
+--	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs?")
+--	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
+--	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
+--	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
+--	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
+--	gui:AddTip(id, "Set the average number of re-listed auctions per auction.")
+--	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs?")
+--	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
+--
+--end
+--Original end
 
 function lib.itemsuggest(hyperlink, quantity)
 	-- Determine Base Values
