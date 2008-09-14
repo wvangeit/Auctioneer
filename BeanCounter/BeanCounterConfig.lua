@@ -408,9 +408,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
 		
-	gui:AddControl(id, "Text",       0, 1, "dateString", _BC('C_DateString')) --"|CCFFFCC00Date format to use:")
+    gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00 ".._BC('C_DateString')) --"|CCFFFCC00Date format to use:")
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
-	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", _BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
+    gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00 ".._BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
 	
 	gui:AddHelp(id, "what is invoice",
