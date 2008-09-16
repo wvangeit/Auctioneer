@@ -35,6 +35,7 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 function lib.GetPrice(hyperlink, faction, realm)
+	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not (Wowecon and Wowecon.API) then return end
 	local price,seen,specific = Wowecon.API.GetAuctionPrice_ByLink(hyperlink)
 	return price, false, seen, specific
@@ -47,6 +48,7 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
+	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not (Wowecon and Wowecon.API) then return end
 
 	-- Get our statistics
@@ -116,12 +118,16 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", "Enable WoWEcon Stats")
+	gui:AddTip(id, "Allow WoWEcon to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", "Always use global price, not server price")
 	gui:AddTip(id, "Toggle use of server specific Wowecon price stats, if they exist")
 end
 
 function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.useglobal", true)
+	AucAdvanced.Settings.SetDefault("stat.wowecon.enable", true)
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
