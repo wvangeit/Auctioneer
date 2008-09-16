@@ -213,6 +213,7 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- as the mean plus 5 standard deviations)
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
+    if not get("stat.purchased.enable") then return end --disable purchased if desired
     
     -- Calculate the SE estimated standard deviation & mean
     local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, faction, realm);
@@ -241,6 +242,8 @@ function lib.GetItemPDF(hyperlink, faction, realm)
 end
 
 function lib.GetPrice(hyperlink, faction, realm)
+	if not get("stat.purchased.enable") then return end --disable purchased if desired
+	
 	if (not faction) or (faction == AucAdvanced.GetFaction()) then
 		faction = AucAdvanced.GetFactionGroup()
 	end
@@ -283,6 +286,8 @@ local cacheMeta = {__mode="kv"}	-- weak-everything
 local tmpReturn={} -- used to return stuff in
 
 function lib.GetPriceArray(hyperlink, faction, realm)
+	if not get("stat.purchased.enable") then return end --disable purchased if desired
+	
 	if (not faction) or (faction == AucAdvanced.GetFaction()) then
 		faction = AucAdvanced.GetFactionGroup()
 	end
@@ -352,6 +357,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.purchased.avg7", true)
 	AucAdvanced.Settings.SetDefault("stat.purchased.avg14", true)
 	AucAdvanced.Settings.SetDefault("stat.purchased.quantmul", true)
+	AucAdvanced.Settings.SetDefault("stat.purchased.enable", true)
 end
 
 AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", true)
@@ -396,9 +402,12 @@ function private.SetupConfigGui(gui)
 		
 		
 	gui:AddControl(id, "Header",     0,    libName.." options")
-
+	
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.enable", "Enable Purchased Stats")
+	gui:AddTip(id, "Allow Stat Purchased to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.tooltip", "Show purchased stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Purchased module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
