@@ -68,6 +68,7 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
+	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	if (not data) then private.makeData() end
 
 	-- This function is responsible for processing and storing the stats after each scan
@@ -103,20 +104,21 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
 function lib.GetItemPDF(hyperlink, faction, realm)
-    -- Get the data
-    local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm);
-    -- DEFAULT_CHAT_FRAME:AddMessage("-----");
-    -- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
-    
-    if not (mean and stddev) or mean == 0 or stddev == 0 then
-        return nil;                 -- No data, cannot determine pricing
-    end
-    
-    local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
-    
-    -- Build the PDF based on standard deviation & mean
-    BellCurve:SetParameters(mean, stddev);
-    return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
+	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
+	-- Get the data
+	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm);
+	-- DEFAULT_CHAT_FRAME:AddMessage("-----");
+	-- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
+	
+	if not (mean and stddev) or mean == 0 or stddev == 0 then
+		return nil;                 -- No data, cannot determine pricing
+	end
+	
+	local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
+	
+	-- Build the PDF based on standard deviation & mean
+	BellCurve:SetParameters(mean, stddev);
+	return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
 end
 
 -----------------------------------------------------------------------------------
@@ -142,6 +144,8 @@ function private.GetCfromZ(Z)
 end
 
 function lib.GetPrice(hyperlink, faction)
+	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
+	
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -214,6 +218,7 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
+	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
@@ -272,6 +277,10 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.stddev.enable", "Enable StdDev Stats")
+	gui:AddTip(id, "Allow StdDev to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.stddev.tooltip", "Show stddev stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the StdDev module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.stddev.mean", "Display Mean")
@@ -340,6 +349,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.stddev.stdev", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.confid", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.quantmul", true)
+	AucAdvanced.Settings.SetDefault("stat.stddev.enable", true)
 end
 
 function lib.ClearItem(hyperlink, faction, realm)
