@@ -182,6 +182,8 @@ do
     local curve = AucAdvanced.API.GenerateBellCurve();
 
     function lib.GetItemPDF(link, key)
+    	if not get("stat.classic.enable") then return end --disable classic if desired
+	
         -- First, obtain price lookup
         local median, seen, confidence = lib.GetPrice(link, key);
         if not median or median == 0 or confidence == 0 then return; end
@@ -200,6 +202,8 @@ end
     
 
 function lib.GetPrice(hyperlink, ahKey)
+	if not get("stat.classic.enable") then return end --disable classic if desired
+	
 	if (not data) then private.makeData() end
 	local linkType,itemId,property,factor,enchant = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -240,6 +244,8 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, ahKey, realm)
+	if not get("stat.classic.enable") then return end --disable classic if desired
+
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
@@ -257,6 +263,7 @@ function lib.GetPriceArray(hyperlink, ahKey, realm)
 end
 
 AucAdvanced.Settings.SetDefault("stat.classic.tooltip", true)
+AucAdvanced.Settings.SetDefault("stat.classic.enable", true)
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
@@ -264,9 +271,13 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddHelp(id, "what classic stats",
 		"What are Classic stats?",
-		"Classic stats are imported from the AucClassic data")
-
+		"This module provides access to the older Classic stats. It is provided as a method to support an upgrade path. With both Auctioneer Classic and AucAdv enabled type\n |CFFFF0000/aadv stat classic import|r \nto import the statistics to AucAdv. This will import all of your old statistics and provide them in-game. Once this has been done, you can then turn off Classic Auctioneer, while still having access to your stats.")
+	
 	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.classic.enable", "Enable Classic Stats")
+	gui:AddTip(id, "Allow Stats from Auctioneer Classic to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.classic.tooltip", "Show classic stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the classic module on or off")
 	
