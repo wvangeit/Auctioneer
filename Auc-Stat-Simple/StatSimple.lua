@@ -77,6 +77,7 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
+	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -105,6 +106,8 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 end
 
 function lib.GetPrice(hyperlink, faction, realm)
+	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+	
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
@@ -179,6 +182,7 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
+	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
@@ -234,6 +238,7 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
     
+    if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
     -- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
     
@@ -260,6 +265,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.simple.minbuyout", true)
 	AucAdvanced.Settings.SetDefault("stat.simple.avgmins", true)
 	AucAdvanced.Settings.SetDefault("stat.simple.quantmul", true)
+	AucAdvanced.Settings.SetDefault("stat.simple.enable", true)
 end
 
 local AAStatSimpleData
@@ -344,6 +350,10 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.enable", "Enable Simple Stats")
+	gui:AddTip(id, "Allow Simple Stats to gather and return price data")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.tooltip", "Show simple stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
