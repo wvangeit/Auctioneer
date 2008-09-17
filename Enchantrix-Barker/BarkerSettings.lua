@@ -68,8 +68,6 @@ local lib = {}
 Barker.Settings = lib
 local gui
 
-local tooltip = LibStub("nTipHelper:1")
-
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
 	return userSig
@@ -399,7 +397,7 @@ function lib.GetSetting(setting, default)
 end
 
 local function gsc(value)
-	return tooltip:Coins(value)
+	return EnhTooltip.GetTextGSC(value, true)
 end
 
 function lib.MakeGuiConfig()
@@ -479,5 +477,4 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.defense", 0, 100, 1, "Defense priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.other", 0, 100, 1, "Other priority: %d%%")
 end
-
 

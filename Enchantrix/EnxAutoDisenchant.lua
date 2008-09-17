@@ -40,8 +40,6 @@ local showPrompt
 local hidePrompt
 local clearPrompt
 
-local tooltip = LibStub("nTipHelper:1")
-
 --------------------------------------------------------------------------------
 -- Debug stuff
 
@@ -425,15 +423,21 @@ end
 
 local function showTooltip()
 	GameTooltip:SetOwner(prompt, "ANCHOR_NONE")
-
-	local count = 1
-	if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
-		count = 5
-	end
-	tooltip:ShowItemLink(GameTooltip, prompt.link, count)
+	GameTooltip:SetHyperlink(prompt.link)
 
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("TOPRIGHT", "AutoDisenchantPromptItem", "TOPLEFT", -10, -20)
+
+	if (EnhTooltip) then
+		local name = GetItemInfo(prompt.link)
+		local count = 1
+		if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
+			count = 5
+		end
+		EnhTooltip.TooltipCall(GameTooltip, name, prompt.link, -1, count, 0)
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint("TOPRIGHT", "AutoDisenchantPromptItem", "TOPLEFT", -10, -20)
+	end
 
 	GameTooltip:Show()
 end

@@ -56,8 +56,6 @@ local confidenceInterval
 
 local createProfiler
 
-local tooltip = LibStub("nTipHelper:1")
-
 ------------------------
 --   Item functions   --
 ------------------------
@@ -428,15 +426,13 @@ function getItemIdFromSig(sig)
 end
 
 function getItemIdFromLink(link)
-	local itemType, itemId = tooltip:BreakHyperlink(link)
-	if (itemType == "item") then
-		return itemId
-	end
+	return (EnhTooltip.BreakLink(link))
 end
 
 function getIType(link)
 	assert(type(link) == "string")
-	local iId = getItemIdFromLink(link)
+	local _, _, iId = link:find("item:(%d+):")
+
 	local iName,iLink,iQual,iLevel,iMin,iType,iSub,iStack,iEquip,iTex=GetItemInfo(link)
 	if (iQual < 2) then
 		--Enchantrix.DebugPrint("GetIType", ENX_INFO, "Quality too low", "The quality for " .. link .. " is too low (" .. iQual .. "< 2)")
@@ -1077,7 +1073,6 @@ end
 function Enchantrix.Util.DebugPrintQuick(...)
 	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
 end
-
 
 
 

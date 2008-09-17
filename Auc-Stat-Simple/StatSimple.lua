@@ -375,7 +375,7 @@ end
 
 --[[ Local functions ]]--
 
-function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -393,29 +393,37 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then
-		tooltip:AddLine(libName.." prices:")
+		EnhTooltip.AddLine(libName.." prices:")
+		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
-			tooltip:AddLine("  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
+			EnhTooltip.AddLine("  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (seenDays > 6) and dispAvg14 then
-			tooltip:AddLine("  14 day average", avg14*quantity)
+			EnhTooltip.AddLine("  14 day average", avg14*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (seenDays > 2) and dispAvg7 then
-			tooltip:AddLine("  7 day average", avg7*quantity)
+			EnhTooltip.AddLine("  7 day average", avg7*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (seenDays > 0) and dispAvg3 then
-			tooltip:AddLine("  3 day average", avg3*quantity)
+			EnhTooltip.AddLine("  3 day average", avg3*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (seenDays > 0) and (avgmins > 0) and dispAvgMBO then
-			tooltip:AddLine("  Average MBO", avgmins*quantity)
+			EnhTooltip.AddLine("  Average MBO", avgmins*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (dayCount > 0) then
-			tooltip:AddLine("  Seen |cffddeeff"..dayCount.."|r today", dayAverage*quantity)
+			EnhTooltip.AddLine("  Seen |cffddeeff"..dayCount.."|r today", dayAverage*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
-			tooltip:AddLine(" Today's Min BO", minBuyout*quantity)
+			EnhTooltip.AddLine(" Today's Min BO", minBuyout*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	end
 end

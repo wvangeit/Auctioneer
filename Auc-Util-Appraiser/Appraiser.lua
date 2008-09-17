@@ -75,7 +75,7 @@ lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
 lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;
 
 
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
+function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
 
@@ -99,7 +99,8 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 		end
 
 		if value then
-			tooltip:AddLine("Appraiser |cffddeeff("..curModel..")|r x|cffddeeff"..quantity.."|r", value * quantity)
+			EnhTooltip.AddLine("Appraiser |cffddeeff("..curModel..")|r x|cffddeeff"..quantity.."|r", value * quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
@@ -135,8 +136,9 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 			end
 			r,g,b = r or 1,g or 1, b or 1
 			
-            tooltip:AddLine(format("  Posted %2d at avg/ea", countBO or countBid)..
-				(avgBO and "" or " (bid)"), avgBO or avgBid, r,g,b)    
+            EnhTooltip.AddLine(format("  Posted %2d at avg/ea", countBO or countBid)..
+				(avgBO and "" or " (bid)"), avgBO or avgBid)
+            EnhTooltip.LineColor(r,g,b)    
 		end
     end
 end

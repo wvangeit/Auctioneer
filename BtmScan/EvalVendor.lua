@@ -51,7 +51,6 @@ BtmScan.evaluators[lcName] = lib
 
 function lib:valuate(item, tooltip)
 	local price = 0
-	local count = tonumber(item.count) or 1
 
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
@@ -62,7 +61,7 @@ function lib:valuate(item, tooltip)
 	local vendor = GetSellValue and GetSellValue(item.id) or 0
 	-- If there's no price, then we obviously can't sell it, ignore!
 	if not vendor or vendor == 0 then return end
-	vendor = vendor * count
+	vendor = vendor * item.count
 	item:info("Vendor price", vendor)
 
 	-- Mark it down

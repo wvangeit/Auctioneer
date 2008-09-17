@@ -1554,8 +1554,7 @@ local ItemUsableCached = {
 			this:RegisterChatString(ERR_SKILL_UP_SI)
 		end
 
-		local itemType, id = AucAdvanced.DecodeLink(link)
-		if not itemType or itemType ~= "item" then return end
+		local id = EnhTooltip.BreakLink(link)
 
 		-- check cache first. failing that, do a tooltip scan
 		if this.cache[id] == nil then

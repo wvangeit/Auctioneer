@@ -51,11 +51,10 @@ local get = BtmScan.Settings.GetSetting
 local set = BtmScan.Settings.SetSetting
 local translate = BtmScan.Locales.Translate
 
-local tooltip = LibStub("nTipHelper:1")
 
 BtmScan.evaluators[lcName] = lib
 
-function lib:valuate(item, doTooltip, tooltip)
+function lib:valuate(item, tooltip)
 	local price = 0
 
 	-- If we're not enabled, scadaddle!
@@ -327,7 +326,10 @@ function snatchui.OnEnterSnatchSheet(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			tooltip:ShowItemLink(GameTooltip, link, 1)
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
 		end
 	end		
 end
@@ -338,7 +340,10 @@ function snatchui.OnEnterBagSheet(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			tooltip:ShowItemLink(GameTooltip, link, 1)
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then 
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			end
 		end
 	end		
 end
@@ -346,6 +351,7 @@ end
 function snatchui.OnLeaveSheet(button, row, index)
 	GameTooltip:Hide()
 end
+
 
 function snatchui.OnClickSnatchSheet(button, row, index)
 	local link = snatchui.frame.snatchlist.sheet.rows[row][1]:GetText()
@@ -668,6 +674,5 @@ function lib.closeSnatchGUI()
 	snatchui.ClearWorkingItem()
 	snatchui.frame:Hide()
 end
-
 
 

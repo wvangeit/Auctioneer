@@ -189,21 +189,18 @@ function private.HookAH()
 		button.Owner:SetHeight(19)
 		button.Owner:SetJustifyH("LEFT")
 		button.Owner:SetFont(STANDARD_TEXT_FONT, 10)
-		button.Bid = AucAdvanced.CreateMoney(10,110)
-		button.Bid:SetParent(button)
+		button.Bid = CreateFrame("Frame", "AucAdvancedUtilCompactUIMoneyBid"..i, button, "EnhancedTooltipMoneyTemplate")
 		button.Bid.SetMoney = private.SetMoney
-		button.Bid:SetPoint("TOPRIGHT", button.Owner, "TOPRIGHT", 112, 0)
-	--	button.Bid:SetFrameStrata("PARENT")
-		button.Bid:SetDrawLayer("OVERLAY")
-		button.Buy = AucAdvanced.CreateMoney(10,110)
-		button.Buy:SetParent(button)
+		button.Bid:SetPoint("TOPRIGHT", button.Owner, "TOPRIGHT", 122, 0)
+		button.Bid:SetWidth(120)
+		button.Bid:SetFrameStrata("MEDIUM")
+		button.Buy = CreateFrame("Frame", "AucAdvancedUtilCompactUIMoneyBuy"..i, button, "EnhancedTooltipMoneyTemplate")
 		button.Buy.SetMoney = private.SetMoney
-		button.Buy:SetColor(1,0.82,0)
 		button.Buy:SetPoint("TOPRIGHT", button.Bid, "BOTTOMRIGHT", 0, 1)
-	--	button.Buy:SetFrameStrata("PARENT")
-		button.Buy:SetDrawLayer("OVERLAY")
+		button.Buy:SetWidth(120)
+		button.Buy:SetFrameStrata("MEDIUM")
 		button.Value = button:CreateFontString(nil,nil,"GameFontHighlight")
-		button.Value:SetPoint("TOPLEFT", button.Bid, "TOPRIGHT", 2, 0)
+		button.Value:SetPoint("TOPLEFT", button.Bid, "TOPRIGHT", -10, 0)
 		button.Value:SetWidth(45)
 		button.Value:SetHeight(19)
 		button.Value:SetJustifyH("RIGHT")
@@ -335,7 +332,7 @@ function private.HookAH()
 	createHeader(4, -1, "iLvl", bOne.iLevel)
 	createHeader(5, 1, "Left", bOne.tLeft)
 	createHeader(6, 1, "Owner", bOne.Owner)
-	createHeader(7, -1, "Price", bOne.Value, bOne.Bid, -110, 0, {"Buy total", "Bid total", "Buy each", "Bid each"})
+	createHeader(7, -1, "Price", bOne.Value, bOne.Bid, -110, -13, {"Buy total", "Bid total", "Buy each", "Bid each"})
 	createHeader(8, 1, "Pct", bOne.Value, nil, 0, -2)
 
 	local tex
@@ -401,11 +398,23 @@ end
 function private.SetMoney(me, value, hasBid, highBidder)
 	value = math.floor(tonumber(value) or 0)
 	if (value == 0) then me:Hide() return end
+	me.small = true
+	if (AucAdvanced.Settings.GetSetting("util.compactui.collapse")) then
+		me.info.showSmallerCoins = false
+	else
+		me.info.showSmallerCoins = true
+	end
+	TinyMoneyFrame_Update(me, value)
 	local r,g,b
 	if (hasBid == true) then r,g,b = 1,1,1
 	elseif (hasBid == false) then r,g,b = 0.7,0.7,0.7 end
 	if (highBidder) then r,g,b = 0.4,1,0.2 end
-	me:SetValue(value, r,g,b)
+	if (r and g and b) then
+		local myName = me:GetName()
+		getglobal(myName.."GoldButtonText"):SetTextColor(r,g,b)
+		getglobal(myName.."SilverButtonText"):SetTextColor(r,g,b)
+		getglobal(myName.."CopperButtonText"):SetTextColor(r,g,b)
+	end
 	me:Show()
 end
 

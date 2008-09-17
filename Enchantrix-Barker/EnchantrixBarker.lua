@@ -167,14 +167,6 @@ local addonName = "Enchantrix Barker"
 
 -- UI code
 
-local function getGSC(money)
-	money = math.floor(tonumber(money) or 0)
-	local g = math.floor(money / 10000)
-	local s = math.floor(money % 10000 / 100)
-	local c = money % 100
-	return g,s,c
-end
-
 function EnchantrixBarker_OnEvent()
 
 	--Returns "Enchanting" for enchantwindow
@@ -780,7 +772,7 @@ function EnchantrixBarker_OptionsSlider_GetTextFromValue( value, units )
 	if units == 'percentage' then
 		valuestr = value..'%'
 	elseif units == 'money' then
-		local p_gold,p_silver,p_copper = getGSC(value);
+		local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(value);
 
 		if( p_gold > 0 ) then
 			valuestr = p_gold.."g";
@@ -1065,8 +1057,8 @@ function Enchantrix_CreateBarker()
 				};
 				availableEnchants[ numAvailable] = enchant;
 
-				local p_gold,p_silver,p_copper = getGSC(enchant.price);
-				local pr_gold,pr_silver,pr_copper = getGSC(enchant.profit);
+				local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+				local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
 
 				EnchantrixBarker_AddEnchantToPriorityList( enchant )
 				numAvailable = numAvailable + 1;
@@ -1268,7 +1260,7 @@ function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
 end
 
 function EnchantrixBarker_GetBarkerEnchantString( enchant )
-	local p_gold,p_silver,p_copper = getGSC(enchant.price);
+	local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
 
 	enchant_barker = Enchantrix_GetShortDescriptor(enchant.index).." - ";
 	if( p_gold > 0 ) then

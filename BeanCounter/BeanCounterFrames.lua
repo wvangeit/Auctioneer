@@ -233,10 +233,7 @@ function private.CreateFrames()
 	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.icon:SetScript("OnClick", frame.IconClicked)
 	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
-
-	frame.icon:SetScript("OnEnter", function()
-		private.buttonTooltips(frame.icon, "Drop an item here to start a search for it.\nDisplays current search's icon if possible")
-	end)
+	frame.icon:SetScript("OnEnter", function() private.buttonTooltips( frame.icon, "Drop an item here to start a search for it.\nDisplays current search's icon if possible") end)
 	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	--help text
@@ -426,7 +423,7 @@ function private.CreateFrames()
 		if frame.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 			if link and name then
 				GameTooltip:SetHyperlink(link)
-				private.tooltip:ShowItemLink(GameTooltip, link, 1)
+				if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
 			else
 				GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
 			end
@@ -603,24 +600,19 @@ function private.relevelFrames(myLevel, ...)
 	end
 end
 --Created SearchUI reason code data into tooltips
-function private.processTooltip(tip, itemLink, quantity)
+function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
 	if not private.getOption("util.beancounter.displayReasonCodeTooltip") then return end
 	
-	private.tooltip:SetFrame(tip)
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	debugPrint("Add to Tooltip", itemLink, reason)
-	if reason then
-		if reason == "" then reason = "Unknown" end
-		Time = SecondsToTime((time() - Time))
-		
-		local text = ("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}"):format(reason, Time)
-		local cost = tonumber(bid)
-		private.tooltip:AddLine(text, cost, 0.9,0.6,0.2)
-	end
-	private.tooltip:ClearFrame(tip)
+	if not reason then return end
+	if reason == "" then reason = "Unknown" end
+	Time = SecondsToTime((time() - Time))
+	
+	EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, Time ), tonumber(bid))
+	EnhTooltip.LineColor(0.9,0.6,0.2)
 end
-
 
 
 

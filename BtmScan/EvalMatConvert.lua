@@ -55,7 +55,7 @@ local set = BtmScan.Settings.SetSetting
 
 BtmScan.evaluators[lcName] = lib
 
-function lib:valuate(item, doTooltip, tooltip)
+function lib:valuate(item, tooltip)
 	local	emcBuyFor = "EMC: Error.Debug"
 	
 	-- If we're not enabled, scadaddle!	
@@ -469,7 +469,7 @@ end
 	
 	if value > evalPrice then
 		if (not get(lcName..".disabletooltip")) then
-			tooltip:AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")					
+			EnhTooltip.AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")					
 		end	
 
 		emcBuyFor = "EMC: Convert 2 sell"
@@ -479,20 +479,20 @@ end
 	
 	if emcAdjustedValue > evalPrice then
 		if (not get(lcName..".disabletooltip")) then
-			tooltip:AddLine("|cff00FF00 EMC: Convert me to sell! |r")			
+			EnhTooltip.AddLine("|cff00FF00 EMC: Convert me to sell! |r")			
 		end	
 		emcBuyFor = "EMC: Convert 2 sell"	
 		emcTrueSellValue = emcAdjustedValue
 	else
 		if (not get(lcName..".disabletooltip")) then
-			tooltip:AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
+			EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
 		end	
 		emcBuyFor = "EMC: Just sell me"
 		emcTrueSellValue = evalPrice
 	end
 		
 	-- Check for tooltip evaluation
-	if (doTooltip) then
+	if (tooltip) then
 		item.what = self.name
 		item.valuation = value
 		if (item.bid == 0) then

@@ -3,8 +3,8 @@
 ##
 ## Interface: 20400
 ## LoadOnDemand: 1
-## Dependencies: Stubby
-## OptionalDeps: !nLog, DebugLib, Configator, SlideBar, Auctioneer, Auc-Util-Appraiser, BeanCounter, LibTooltip
+## Dependencies: EnhTooltip, Stubby
+## OptionalDeps: !nLog, DebugLib, Configator, SlideBar, Auctioneer, Auc-Util-Appraiser, BeanCounter
 ## SavedVariables: BtmScanData
 ##
 ## Version: <%version%> (<%codename%>)

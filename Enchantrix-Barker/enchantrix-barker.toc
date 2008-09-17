@@ -2,8 +2,8 @@
 ## Notes: Print Enchant price lists to chat [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
 ## Interface: 20400
-## Dependencies: Stubby
-## OptionalDeps: Khaos, Enchantrix, !nLog, DebugLib, Babylonian, LibTooltip
+## Dependencies: EnhTooltip, Stubby
+## OptionalDeps: Khaos, Enchantrix, !nLog, DebugLib, Babylonian
 ## SavedVariables: EnchantrixBarkerConfig
 ##
 ## Version: <%version%> (<%codename%>)
