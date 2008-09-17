@@ -148,7 +148,7 @@ end
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function cmdHelp()
 
-	local onOffToggle = " (".._INFM('CmdOn').."|".._INFM('CmdOff').."|".._INFM('CmdToggle')..")"
+	local onOffToggle = " (".._INFM('CmdOn').."/".._INFM('CmdOff').."/".._INFM('CmdToggle')..")"
 	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
 	chatPrint(_INFM('TextUsage'))
@@ -194,17 +194,11 @@ function onOff(state, chatprint)
 	if (type(state) == "string") then
 		state = delocalizeFilterVal(state)
 
-	elseif (state == true) then
-		state = 'on'
-
-	elseif (state == false) then
-		state = 'off'
-
 	elseif (state == nil) then
 		state = 'toggle'
 	end
 
-	if (state == 'on' or state == 'off') then
+	if (state == 'on' or state == 'off' or type(param) == "boolean") then
 		Informant.Settings.SetSetting('all', state)
 
 	elseif (state == 'toggle') then
@@ -319,10 +313,10 @@ end
 
 function delocalizeFilterVal(value)
 	if (value == _INFM('CmdOn')) then
-		return 'on'
+		return true
 
 	elseif (value == _INFM('CmdOff')) then
-		return 'off'
+		return false
 
 	elseif (value == _INFM('CmdDefault')) then
 		return 'default'
@@ -338,10 +332,10 @@ end
 function localizeFilterVal(value)
 	local result
 
-	if (value == 'on') then
+	if (value == 'on' or (type(value) == "boolean" and value == true)) then
 		result = _INFM('CmdOn')
 
-	elseif (value == 'off') then
+	elseif (value == 'off' or (type(value) == "boolean" and value == false)) then
 		result = _INFM('CmdOff')
 
 	elseif (value == 'default') then
