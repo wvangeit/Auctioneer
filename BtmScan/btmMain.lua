@@ -1228,7 +1228,7 @@ local tooltipItem = {}
 BtmScan.TooltipHook = function (tip, link, count, name, hyperlink, quality)
 	tooltip:SetFrame(tip)
 	local extra = tooltip:GetExtra()
-	price = extra.price
+
 	--If the tooltip option is disabled, then disable the tooltip
 	if (not BtmScan.Settings.GetSetting("show.tooltip")) then return end
 

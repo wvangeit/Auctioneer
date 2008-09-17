@@ -211,7 +211,7 @@ function private.HookAH()
 
 		button.SetAuction = private.SetAuction
 		button:SetScript("OnClick", private.ButtonClick)
-testbutton = button
+
 		lastButton = button
 	end
 	NUM_BROWSE_TO_DISPLAY = NEW_NUM_BROWSE
