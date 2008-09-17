@@ -370,14 +370,12 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Multiplies by current Stack Size if on")
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 	
-	if not get("stat.histogram.tooltip") then
-		return
-	end
+	if not get("stat.histogram.tooltip") then return end
 	
 	local quantmul = get("stat.histogram.quantmul")
 	if (not quantmul) or (not quantity) or (quantity < 1) then quantity = 1 end
@@ -387,30 +385,23 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	end
 	if median then
 		if quantity == 1 then
-			EnhTooltip.AddLine(libName.." prices: (seen "..tostring(count)..")")
+			tooltip:AddLine(libName.." prices: (seen "..tostring(count)..")")
 		else
-			EnhTooltip.AddLine(libName.." prices x"..tostring(quantity)..": (seen "..tostring(count)..")")
+			tooltip:AddLine(libName.." prices x"..tostring(quantity)..": (seen "..tostring(count)..")")
 		end
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		local iqr = Qthree-Qone
 		if get("stat.histogram.median") then
-			EnhTooltip.AddLine("  median:", median*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  median:", median*quantity)
 			if quantity > 1 then
-				EnhTooltip.AddLine("   (or individually):", median)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine("   (or individually):", median)
 			end
 		end
 		if (iqr > 0) and (get("stat.histogram.iqr")) then
-			EnhTooltip.AddLine("  IQR:", iqr*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  IQR:", iqr*quantity)
 		end
 		if get("stat.histogram.precision") then
-		EnhTooltip.AddLine("  precision:", step*quantity)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("  precision:", step*quantity)
 		end
-		--EnhTooltip.AddLine("  index: "..tostring(math.floor(median/step)))
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	end
 end
 

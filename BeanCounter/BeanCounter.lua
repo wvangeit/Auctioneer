@@ -60,6 +60,11 @@ local private = {
 	serverVersion = select(4, GetBuildInfo()),--WOW 3.0 HACK
 	}
 	
+}
+
+local tooltip = LibStub("nTipHelper:1")
+private.tooltip = tooltip
+
 lib.Private = private --allow beancounter's sub lua's access
 --Taken from AucAdvCore
 function BeanCounter.Print(...)
@@ -142,8 +147,8 @@ function lib.OnLoad(addon)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 	
-	--ToolTip Hooks here rather than Aunctioneer's Callback so we can choose Placement @ bottom of frame 
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 700, private.processTooltip)
+	tooltip:Activate()
+	tooltip:AddCallback(private.processTooltip, 700)
 	
 	lib.API.isLoaded = true
 end

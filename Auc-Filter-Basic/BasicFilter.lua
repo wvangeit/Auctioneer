@@ -53,8 +53,7 @@ function lib.AuctionFilter(operation, itemData)
 	if not active or active ~= true then return end
 	local retval = false
 	-- Get the signature of this item and find it's stats.
-	--local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
-	local quality = EnhTooltip.QualityFromLink(itemData.link)
+	local quality = AucAdvanced.GetLinkQuality(itemData.link)
 	local level = tonumber(itemData.itemLevel) or 0
 	--This needs to have the case conversions done because the data is stored in the SV the same way, and LUA is case-sensitive
 	local seller = itemData.sellerName:sub(1,1):upper()..itemData.sellerName:sub(2):lower()

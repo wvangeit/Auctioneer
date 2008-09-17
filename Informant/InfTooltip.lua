@@ -30,20 +30,24 @@ local whitespace			-- whitespace(length)
 local getFilter = Informant.Settings.GetSetting
 local debugPrint
 
-function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
+local tooltip = LibStub("nTipHelper:1")
+
+function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	-- nothing to do, if informant is disabled
 	if (not getFilter('all')) then
 		return;
 	end;
 
-	if EnhTooltip.LinkType(link) ~= "item" then return end
+	tooltip:SetFrame(frame)
+
+	local extra = tooltip:GetExtra()
+	local itemType,itemID,suffix,factor,enchant,seed,gem1,gem2,gem3,gemBonus = tooltip:DecodeLink(link)
+	if itemType ~= "item" then return end
 
 	local quant = 0
 	local sell = 0
 	local buy = 0
 	local stacks = 1
-
-	local itemID, randomProp, enchant, uniqID, _, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus = EnhTooltip.BreakLink(link)
 
 	local itemInfo
 	if (itemID and itemID > 0) then
@@ -85,126 +89,106 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 
 	local embedded = getFilter('embed')
 
-	if (getFilter('show-icon')) then
-		if (itemInfo.texture) then
-			EnhTooltip.SetIcon(itemInfo.texture)
-		end
-	end
-
-	if (not embedded and getFilter('show-name')) then
-		EnhTooltip.AddHeaderLine(itemInfo.itemName, nil, embedded)
-		EnhTooltip.HeaderQuality(itemInfo.itemQuality)
-		EnhTooltip.HeaderSize(12)
-	end
-
+	tooltip:SetColor(1,1,1)
 	if (getFilter('show-ilevel')) then
 		if (itemInfo.itemLevel) then
-			EnhTooltip.AddHeaderLine(_INFM('FrmtInfoItemLevel'):format(itemInfo.itemLevel), nil, embedded)
-			EnhTooltip.HeaderQuality(itemInfo.itemQuality)
+			tooltip:AddLine(_INFM('FrmtInfoItemLevel'):format(itemInfo.itemLevel), nil, embedded)
 		end
 	end
 
 	if (getFilter('show-link')) then
-		EnhTooltip.AddHeaderLine(_INFM('FrmtInfoItemLink'):format((":"):join(itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus, randomProp, uniqID), nil, embedded))
-		EnhTooltip.HeaderQuality(itemInfo.itemQuality)
+		tooltip:AddLine(_INFM('FrmtInfoItemLink'):format((":"):join(itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus, randomProp, uniqID), nil, embedded))
 	end
 
 	--DEFAULT_CHAT_FRAME:AddMessage("Got vendor: "..(buy or 0).."/"..(sell or 0))
 	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy, true)
-			local sgsc = EnhTooltip.GetTextGSC(sell, true)
+			local bgsc = tooltip:Coins(buy)
+			local sgsc = tooltip:Coins(sell)
 
+			tooltip:SetColor(0.8, 0.5, 0.1)
 			if (count and (count > 1)) then
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoBuymult'):format(count, bgsc), buy*count, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
+					tooltip:AddLine(_INFM('FrmtInfoBuymult'):format(count, bgsc), buy*count, embedded)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoSellmult'):format(count, sgsc), sell*count, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
+					tooltip:AddLine(_INFM('FrmtInfoSellmult'):format(count, sgsc), sell*count, embedded)
 				end
 			else
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoBuy'):format(), buy, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
+					tooltip:AddLine(_INFM('FrmtInfoBuy'):format(), buy, embedded)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoSell'):format(), sell, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
+					tooltip:AddLine(_INFM('FrmtInfoSell'):format(), sell, embedded)
 				end
 			end
 		end
 	end
 
+	tooltip:SetColor(1,1,1)
 	if (getFilter('show-stack')) then
 		if (stacks > 1) then
-			EnhTooltip.AddLine(_INFM('FrmtInfoStx'):format(stacks), nil, embedded)
+			tooltip:AddLine(_INFM('FrmtInfoStx'):format(stacks), nil, embedded)
 		end
 	end
 	if (getFilter('show-merchant')) then
 		if (itemInfo.vendors) then
 			local merchantCount = #itemInfo.vendors
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(_INFM('FrmtInfoMerchants'):format(merchantCount), nil, embedded)
-				EnhTooltip.LineColor(0.5, 0.8, 0.5)
+				tooltip:AddLine(_INFM('FrmtInfoMerchants'):format(merchantCount), 0.5, 0.8, 0.5, embedded)
 			else
 				-- NOTE - there are 2 cases for "no known":  nil list, and zero length list
 				if (getFilter('show-zero-merchants')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoNoKnownMerchants'), nil, embedded)
-					EnhTooltip.LineColor(0.8, 0.2, 0.2)
+					tooltip:AddLine(_INFM('FrmtInfoNoKnownMerchants'), 0.8, 0.2, 0.2, embedded)
 				end
 			end
 		else
 			-- NOTE - there are 2 cases for "no known":  nil list, and zero length list
 			if (getFilter('show-zero-merchants')) then
-				EnhTooltip.AddLine(_INFM('FrmtInfoNoKnownMerchants'), nil, embedded)
-				EnhTooltip.LineColor(0.8, 0.2, 0.2)
+				tooltip:AddLine(_INFM('FrmtInfoNoKnownMerchants'), 0.8, 0.2, 0.2, embedded)
 			end
 		end
 	end
 	if (getFilter('show-usage')) then
+		tooltip:SetColor(0.6, 0.4, 0.8)
 		local reagentInfo = ""
 		if (itemInfo.classText) then
 			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
-			EnhTooltip.AddLine(reagentInfo, nil, embedded)
-			EnhTooltip.LineColor(0.6, 0.4, 0.8)
+			tooltip:AddLine(reagentInfo, embedded)
 		end
 		if (itemInfo.usedList and itemInfo.usageText) then
 			if (#itemInfo.usedList > 2) then
 
 				local currentUseLine = nilSafeString(itemInfo.usedList[1])..", "..nilSafeString(itemInfo.usedList[2])..","
 				reagentInfo = _INFM('FrmtInfoUse'):format(currentUseLine)
-				EnhTooltip.AddLine(reagentInfo, nil, embedded)
-				EnhTooltip.LineColor(0.6, 0.4, 0.8)
+				tooltip:AddLine(reagentInfo, embedded)
 
 				for index = 3, #itemInfo.usedList, 2 do
 					if (itemInfo.usedList[index+1]) then
 						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])..", "..nilSafeString(itemInfo.usedList[index+1])..","
-						EnhTooltip.AddLine(reagentInfo, nil, embedded)
-						EnhTooltip.LineColor(0.6, 0.4, 0.8)
+						tooltip:AddLine(reagentInfo, embedded)
 					else
 						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])
-						EnhTooltip.AddLine(reagentInfo, nil, embedded)
-						EnhTooltip.LineColor(0.6, 0.4, 0.8)
+						tooltip:AddLine(reagentInfo, embedded)
 					end
 				end
 			else
 				reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
-				EnhTooltip.AddLine(reagentInfo, nil, embedded)
-				EnhTooltip.LineColor(0.6, 0.4, 0.8)
+				tooltip:AddLine(reagentInfo, nil, embedded)
 			end
 		end
 	end
 	if (getFilter('show-quest')) then
+		tooltip:SetColor(0.5, 0.5, 0.8)
 		if (itemInfo.quests) then
 			local questCount = itemInfo.questCount
 			if (questCount > 0) then
-				EnhTooltip.AddLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embedded)
-				EnhTooltip.LineColor(0.5, 0.5, 0.8)
+				tooltip:AddLine(_INFM('FrmtInfoQuest'):format(questCount), embedded)
 			end
 		end
 	end
+
+	tooltip:ClearFrame(frame)
 end
 
 function nilSafeString(str)

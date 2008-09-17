@@ -431,7 +431,7 @@ end
 
 
 --[[ Local functions ]]--
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine what you should
 	-- display in the tooltip.
@@ -446,29 +446,23 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	local dispAvg14 = AucAdvanced.Settings.GetSetting("stat.purchased.avg14")
 
 	if (seenDays + dayCount > 0) then
-		EnhTooltip.AddLine(libName.." prices:")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine(libName.." prices:")
 
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
-			EnhTooltip.AddLine("  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
 		end
 		if (seenDays > 6) and dispAvg14 then
-			EnhTooltip.AddLine("  14 day average", avg14*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  14 day average", avg14*quantity)
 		end
 		if (seenDays > 2) and dispAvg7 then
-			EnhTooltip.AddLine("  7 day average", avg7*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  7 day average", avg7*quantity)
 		end
 		if (seenDays > 0) and dispAvg3 then
-			EnhTooltip.AddLine("  3 day average", avg3*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  3 day average", avg3*quantity)
 		end
 		if (dayCount > 0) then
-			EnhTooltip.AddLine("  Seen |cffddeeff"..dayCount.."|r today", dayAverage*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  Seen |cffddeeff"..dayCount.."|r today", dayAverage*quantity)
 		end
 	end
 end

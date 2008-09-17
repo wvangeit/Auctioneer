@@ -57,17 +57,17 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not (get("util.automagic.depositTT")) then 
 		if hyperlink then
 			local ttdepcost = GetDepositCost(hyperlink, get("util.automagic.deplength"), nil, quantity) 
 			
 			if (ttdepcost == nil) then 	
-				EnhTooltip.AddLine("|cff336699 Unknown deposit cost |r")
+				tooltip:AddLine("|cff336699 Unknown deposit cost |r")
 			elseif (ttdepcost == 0) then 	
-				EnhTooltip.AddLine("|cff336699 No deposit cost |r")				
+				tooltip:AddLine("|cff336699 No deposit cost |r")				
 			else 
-				EnhTooltip.AddLine("|cffCCFF99"..get("util.automagic.deplength").."hr Deposit : |r" , ttdepcost)
+				tooltip:AddLine("|cffCCFF99"..get("util.automagic.deplength").."hr Deposit : |r" , ttdepcost)
 			end
 		end
 	end
@@ -420,10 +420,7 @@ function autosell.OnBagListEnter(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
-			end
+			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, 1)
 		end		
 	end
 end
@@ -435,10 +432,7 @@ function autosell.OnEnter(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
-			end
+			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, 1)
 		end		
 	end
 end

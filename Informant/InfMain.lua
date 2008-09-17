@@ -67,6 +67,8 @@ local self = {}
 local lines = {}
 local addonName = "Informant"
 
+local tooltip = LibStub("nTipHelper:1")
+
 -- GLOBAL VARIABLES
 
 BINDING_HEADER_INFORMANT_HEADER = _INFM('BindingHeader')
@@ -439,12 +441,12 @@ local function showItem(itemInfo)
 		local count = itemInfo.itemCount or 1
 
 		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy, true)
-			local sgsc = EnhTooltip.GetTextGSC(sell, true)
+			local bgsc = tooltip:Coins(buy)
+			local sgsc = tooltip:Coins(sell)
 
 			if (count and (count > 1)) then
-				local bqgsc = EnhTooltip.GetTextGSC(buy*count, true)
-				local sqgsc = EnhTooltip.GetTextGSC(sell*count, true)
+				local bqgsc = tooltip:Coins(buy*count)
+				local sqgsc = tooltip:Coins(sell*count)
 				addLine(_INFM('FrmtInfoBuymult'):format(count, bgsc)..": "..bqgsc, "ee8822")
 				addLine(_INFM('FrmtInfoSellmult'):format(count, sgsc)..": "..sqgsc, "ee8822")
 			else
@@ -729,7 +731,9 @@ end
 
 local function frameLoaded()
 	Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, Informant.TooltipHandler)
+
+	tooltip:Activate()
+	tooltip:AddCallback(Informant.TooltipHandler, 300)
 
 	onLoad()
 
@@ -1016,4 +1020,5 @@ Informant = {
 	OnEvent = onEvent,
 	DebugPrint = infDebugPrint
 }
+
 

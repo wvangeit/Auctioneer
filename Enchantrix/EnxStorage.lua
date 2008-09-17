@@ -57,6 +57,8 @@ local normalizeDisenchant
 local mergeDisenchant
 local mergeDisenchantLists
 
+local tooltip = LibStub("nTipHelper:1")
+
 -- Database
 
 local N_DISENCHANTS = 1
@@ -203,7 +205,9 @@ end
 
 -- this will return nil for anything that is not prospectable
 function getItemProspects(link)
-	local itemID = EnhTooltip.BreakLink(link);
+	local itemType, itemID = tooltip:DecodeLink(link)
+	if (itemType ~= "item") then return end
+
 	return Enchantrix.Constants.ProspectableItems[ itemID ];
 end
 

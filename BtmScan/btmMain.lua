@@ -67,6 +67,8 @@ local TopScanActive = false
 --warn once per session if purchase would cause you to fall below reserve
 local reserveWarning = true
 
+local tooltip = LibStub("nTipHelper:1")
+
 BTMSCAN_VERSION = "<%version%>"
 if (BTMSCAN_VERSION == "<\037version%>") then
 	BTMSCAN_VERSION = "4.1.0-DEV"
@@ -98,7 +100,9 @@ BtmScan.OnLoad = function ()
 	if (not BtmScanData.config) then BtmScanData.config = {} end
 	if (not BtmScanData.factions) then BtmScanData.factions = {} end
 
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
+	tooltip:Activate()
+	tooltip:AddCallback(BtmScan.TooltipHook, 620)
+
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
 	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.PostCanSendAuctionQuery)
 	
@@ -167,8 +171,7 @@ BtmScan.OnLoad = function ()
 end
 
 local function tt(tip, price)
-	EnhTooltip.AddLine(tip, price)
-	EnhTooltip.LineColor(0.9,0.6,0.2)
+	tooltip:AddLine(tip, price, 0.9,0.6,0.2)
 end
 
 -- Event handler
@@ -574,7 +577,7 @@ function BtmScan.CrossEvaluateItem(evaluatorName, item, doTooltip)
 
 	local pushEnabled = BtmScan.Settings.GetSetting(evaluatorName .. ".enable")
 	BtmScan.Settings.SetSetting(evaluatorName .. ".enable", true)
-	evaluator:valuate(item, doTooltip)
+	evaluator:valuate(item, doTooltip, tooltip)
 	BtmScan.Settings.SetSetting(evaluatorName .. ".enable", pushEnabled)
 end
 
@@ -611,7 +614,7 @@ function BtmScan.EvaluateItem(item, doTooltip)
 
 		if (valuator and valuator.valuate) then
 			item:clear()
-			valuator:valuate(item, doTooltip)
+			valuator:valuate(item, doTooltip, tooltip)
 			if (doTooltip) then
 				local header = false
 				if (item.valuation > 0) then
@@ -1222,7 +1225,10 @@ BtmScan.GetZoneConfig = function (whence)
 end
 
 local tooltipItem = {}
-BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count, price,force,hyperlink, additional)
+BtmScan.TooltipHook = function (tip, link, count, name, hyperlink, quality)
+	tooltip:SetFrame(tip)
+	local extra = tooltip:GetExtra()
+	price = extra.price
 	--If the tooltip option is disabled, then disable the tooltip
 	if (not BtmScan.Settings.GetSetting("show.tooltip")) then return end
 
@@ -1237,7 +1243,6 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 
 	local item = tooltipItem
 	item.link = link
-
 
 	-- If this item exists
 	if (item.link) then
@@ -1275,7 +1280,6 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			itemconfig = {}
 		end
 		item.itemconfig=itemconfig
-
 
 		-- Check that we're not ignoring this item
 		if itemconfig.isIgnore then
@@ -1370,6 +1374,7 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			end
 		end
 	end
+	tooltip:ClearFrame(tip)
 end
 
 BtmScan.DoTooltip = function ()
@@ -1382,12 +1387,9 @@ BtmScan.DoTooltip = function ()
 	if (itemID and itemID > 0) then
 		--GameTooltip:SetOwner(BtmScan.LogFrame, "ANCHOR_NONE")
 		GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
-		GameTooltip:SetHyperlink(wholeLink)
+		tooltip:ShowItemLink(GameTooltip, wholeLink, count, { price = cost })
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPLEFT", "AuctionFrame", "TOPRIGHT", 10, -20)
-		if (EnhTooltip) then
-			EnhTooltip.TooltipCall(GameTooltip, itemName, wholeLink, -1, count, cost)
-		end
 	end
 end
 BtmScan.PurchaseTooltip = function()
@@ -1395,12 +1397,7 @@ BtmScan.PurchaseTooltip = function()
 	if (item.link) then
 		if (item.id and item.id > 0) then
 			GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
-			GameTooltip:SetHyperlink(item.link)
-			GameTooltip:ClearAllPoints()
-			GameTooltip:SetPoint("TOPRIGHT", "BtmScanPromptItem", "TOPLEFT", -10, -20)
-			if (EnhTooltip) then
-				EnhTooltip.TooltipCall(GameTooltip, item.name, item.link, -1, item.count, item.purchase)
-			end
+			tooltip:ShowItemLink(GameTooltip, item.link, item.count, { price = item.purchase })
 			GameTooltip:ClearAllPoints()
 			GameTooltip:SetPoint("TOPRIGHT", "BtmScanPromptItem", "TOPLEFT", -10, -20)
 		end

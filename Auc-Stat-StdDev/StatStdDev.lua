@@ -296,7 +296,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Multiplies by current stack size if on")
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -308,34 +308,27 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
 
 	if (mean and mean > 0) then
-		EnhTooltip.AddLine(libName.." prices ("..count.." points):")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine(libName.." prices ("..count.." points):")
 
 		if AucAdvanced.Settings.GetSetting("stat.stddev.mean") then
-			EnhTooltip.AddLine("  Mean price", mean*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  Mean price", mean*quantity)
 		end
 		if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.stddev.normal") then
-				EnhTooltip.AddLine("  Normalized", average*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine("  Normalized", average*quantity)
 				if (quantity > 1) then
-					EnhTooltip.AddLine("  (or individually)", average)
-					EnhTooltip.LineColor(0.3, 0.9, 0.8)
+					tooltip:AddLine("  (or individually)", average)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.stdev") then
-				EnhTooltip.AddLine("  Std Deviation", stdev*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine("  Std Deviation", stdev*quantity)
                 if (quantity > 1) then
-                    EnhTooltip.AddLine("  (or individually)", stdev)
-                    EnhTooltip.LineColor(0.3, 0.9, 0.8);
+                    tooltip:AddLine("  (or individually)", stdev)
                 end
                     
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.confid") then
-				EnhTooltip.AddLine("  Confidence: "..(floor(confidence*1000))/1000)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine("  Confidence: "..(floor(confidence*1000))/1000)
 			end
 		end
 	end
