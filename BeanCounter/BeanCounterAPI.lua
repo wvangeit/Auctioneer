@@ -212,7 +212,9 @@ function lib.API.getItemString(itemLink)
 	return itemString, itemName
 end
 
---[[Returns id, suffix, uniqueID when passed an itemLink or itemString]]
+--[[Returns id, suffix, uniqueID when passed an itemLink or itemString, this a mildly tweaked version of the one found in AucAdv.
+Handles Hitem:string,  item:string, or full itemlinks
+]]
 local function breakHyperlink(match, matchlen, ...)
 	local v
 	local n = select("#", ...)
@@ -263,7 +265,7 @@ end
 --||=========================================================================]]
  --Ths function was created by Shirik all thanks and blame go to him :P
 do
-	local SOURCE_PATTERN = "([^\\/:]+:%d+): in function `([^\"']+)[\"']";
+	local SOURCE_PATTERN = "([^\\/:]+:%d+): in function ([^\"']+)[\"']";
 	local seenCalls = {};
 	local uid = 0;
 	-------------------------------------------------------------------------------
@@ -278,6 +280,7 @@ do
 		debugstack(3):match(SOURCE_PATTERN),        -- Keep in mind this will be truncated to only the first in the tuple
 		debugstack(2):match(SOURCE_PATTERN);        -- This will give us both the source and the function name
 		
+		caller, source, functionName = caller or "Unknown.lua:000", source or "Unknown.lua:000", functionName or "Unknown" --Stop nil errors if data is missing
 		functionName = functionName .. "()";
 			
 		-- Check for this source & caller combination
@@ -293,7 +296,7 @@ do
 				(comments or "")
 				);
 				geterrorhandler()(
-				"Deprecated function call occurred in AuctioneerAdvanced API:\n     {{{Deprecated Function:}}} "..functionName..
+				"Deprecated function call occurred in BeanCounter API:\n     {{{Deprecated Function:}}} "..functionName..
 				"\n     {{{Source Module:}}} "..source:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
 				"\n     {{{Calling Module:}}} "..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
 				"\n     {{{Available Replacement:}}} "..replacementName..
