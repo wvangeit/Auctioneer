@@ -322,11 +322,11 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Add the last sale price if BeanCounter is loaded.and one exists
-				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch and BeanCounter.API.isLoaded) then
+				if (IsAddOnLoaded("BeanCounter") and BeanCounter.API and BeanCounter.API.isLoaded and BeanCounter.API.search) then
 					local settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = false, 
 						["bid"] = false, ["outbid"] = false, ["auction"] = true, ["failedauction"] = false
 						}
-					local lastSale = BeanCounter.externalSearch(id, settings, true, 1) or {} --returns a table containing last sold
+					local lastSale = BeanCounter.API.search(id, settings, true, 1) or {} --returns a table containing last sold
 					if (lastSale and lastSale[1] and lastSale[1][6] and lastSale[1][3] and lastSale[1][4]) then
 						local lastPrice  = {}
 						lastPrice.text   = _AUCT('UiPriceModelLastSold')
@@ -751,8 +751,8 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 
 		-- Update the Transactions tab if BeanCounter is loaded. Allows searchs made here to show in BC
-		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch and BeanCounter.API.isLoaded then
-			BeanCounter.externalSearch(itemId) --will accept itemid, string, itemkey, or itemlink
+		if IsAddOnLoaded("BeanCounter") and BeanCounter.API and BeanCounter.API.isLoaded and BeanCounter.API.search then
+			BeanCounter.API.search(itemId) --will accept itemid, string, itemkey, or itemlink
 		end
 		
 	else
