@@ -122,11 +122,13 @@ function lib.GetPrice(hyperlink, faction, realm)
         settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true, ["exact"] = true}
     end
     local sig = lib.GetSigFromLink(hyperlink)
-    if cache[sig] then
-        if cache[sig]==false then return end
-        return unpack(cache[sig])
-    end
-	local tbl = BeanCounter.API.search(hyperlink, settings, true)
+  	if cache[sig] == false then
+		return
+	end
+	if cache[sig] then
+		return unpack(cache[sig])
+	end
+		local tbl = BeanCounter.API.search(hyperlink, settings, true)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
     local i,v, reason, qty, priceper, thistime
     if tbl then
