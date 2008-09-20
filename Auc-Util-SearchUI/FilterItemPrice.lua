@@ -45,9 +45,11 @@ end
 private.tempignorelist = {}
 private.sheetdata = {}
 for item, cost in pairs(ignorelist) do
-	table.insert(private.sheetdata, {
-	AucAdvanced.API.GetLinkFromSig(item),
-	cost})
+	local link = AucAdvanced.API.GetLinkFromSig(item)
+	if not link then
+		link = item
+	end
+	table.insert(private.sheetdata, {link, cost})
 end
 
 function private.OnEnterSheet(button, row, index)
@@ -83,9 +85,11 @@ function lib.AddIgnore(sig, price, temp)
 		set("ignoreitemprice.ignorelist", ignorelist)
 		AucSearchUI.CleanTable(private.sheetdata)
 		for item, cost in pairs(ignorelist) do
-			table.insert(private.sheetdata, {
-			AucAdvanced.API.GetLinkFromSig(item),
-			cost})
+			local link = AucAdvanced.API.GetLinkFromSig(item)
+			if not link then
+				link = item
+			end
+			table.insert(private.sheetdata, {link, cost})
 		end
 		if private.ignorelistGUI and private.ignorelistGUI.sheet then
 			private.ignorelistGUI.sheet:SetData(private.sheetdata)
@@ -97,8 +101,14 @@ end
 --removes the selected item from the ignore list
 function private.remove()
 	local data = private.ignorelistGUI.sheet:GetSelection()
-	local sig = AucAdvanced.API.GetSigFromLink(data[1])
-	lib.AddIgnore(sig)
+	if string.find(data[1], "item:") then
+		local sig = AucAdvanced.API.GetSigFromLink(data[1])
+		if sig then
+			lib.AddIgnore(sig) --second var is nil, removing item from list
+		end
+	else
+		lib.AddIgnore(data[1])
+	end
 end
 
 -- This function is automatically called when we need to create our search parameters
