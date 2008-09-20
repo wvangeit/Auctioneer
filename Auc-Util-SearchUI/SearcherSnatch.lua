@@ -380,7 +380,7 @@ function lib.finishedItem()
 	frame.slot.help:SetText(("Drop item into box"))
 	frame.icon:SetNormalTexture(nil)
 	--reset current working item
-	workingItemLink = nil
+	private.workingItemLink = nil
 	--refresh displays
 	lib.refreshData()
 end
