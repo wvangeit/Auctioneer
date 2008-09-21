@@ -51,22 +51,14 @@ function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Searches")
 	gui:MakeScrollable(id)	
-	
-	--[[local last = gui:GetLast(id)
-	gui:AddControl(id, "Header",     0,      "Snatch search criteria")
+	--we add a single invisible element to set the normal gui
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
-	gui:AddControl(id, "Checkbox",          0, 1, "snatch.allow.bid", "Allow Bids")
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Checkbox",          0, 11,  "snatch.allow.buy", "Allow Buyouts")
-	]]
 
+	
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-	
-	
 	--Add Drag slot / Item icon
-	frame = AucSearchUI.Private.gui.tabs[id].content
+	frame = gui.tabs[id].content
 	private.frame = frame
 	
 	--Create the snatch list results frame
@@ -79,15 +71,12 @@ function lib:MakeGuiConfig(gui)
 	})
 	
 	frame.snatchlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	--frame.snatchlist:SetPoint("TOPLEFT", frame, "TOPLEFT", 187, -160)
-	--frame.snatchlist:SetPoint("BOTTOM", frame, "TOP", 0, -240)
 	frame.snatchlist:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, 2)
 	frame.snatchlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 110)
 	frame.snatchlist:SetWidth(360)
 
 	frame.slot = frame:CreateTexture(nil, "BORDER")
 	frame.slot:SetDrawLayer("Artwork") -- or the border shades it
-	--frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 23, -75)
 	frame.slot:SetPoint("BOTTOM", frame.snatchlist, "BOTTOM", 0, -100)
 	frame.slot:SetWidth(45)
 	frame.slot:SetHeight(45)
@@ -113,19 +102,19 @@ function lib:MakeGuiConfig(gui)
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
 	frame.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
-	frame.slot.help:SetWidth(80)
+	frame.slot.help:SetWidth(100)
 		
 	
 	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
-		{ "Snatching", "TOOLTIP", 150 }, 
-		{ "Buy at", "COIN", 70 }, 
+		{ "Snatching", "TOOLTIP", 176 }, 
+		{ "Buy each", "COIN", 70 }, 
 		}, private.OnEnterScratch, private.OnLeave, private.OnClickSnatch, private.OnResize)
 	else
 		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
-		{ "Snatching", "TOOLTIP", 150 }, 
-		{ "Buy at", "COIN", 70}, 
-		{ "Appraiser", "COIN", 70 }, 
+		{ "Snatching", "TOOLTIP", 176 }, 
+		{ "Buy each", "COIN", 70}, 
+		{ "App. value", "COIN", 70 }, 
 		}, private.OnEnterScratch, private.OnLeave, private.OnClickSnatch, private.OnResize)
 	end
 	
@@ -152,14 +141,13 @@ function lib:MakeGuiConfig(gui)
 	
 	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		frame.baglist.sheet = ScrollSheet:Create(frame.baglist, {
-			{ "Bag Contents", "TOOLTIP", 150 }, 
+			{ "Bag Contents", "TOOLTIP", 208 }, 
 			{ "BTM Rule", "TEXT", 70 }, 
 			}, private.OnEnterBag, private.OnLeave, private.OnClickBag, private.OnResize)
 	else
 		frame.baglist.sheet = ScrollSheet:Create(frame.baglist, {
-			{ "Bag Contents", "TOOLTIP", 150 }, 
+			{ "Bag Contents", "TOOLTIP", 208 }, 
 			{ "Appraiser", "COIN", 70 }, 
-			{ "BTM Rule", "TEXT", 70 }, 
 			}, private.OnEnterBag, private.OnLeave, private.OnClickBag, private.OnResize)
 	end
 
@@ -187,7 +175,6 @@ function lib:MakeGuiConfig(gui)
 	
 		
 	frame.gold = CreateFrame("EditBox", "snatchgold", frame, "InputBoxTemplate")
-	--frame.gold:SetPoint("BOTTOMLEFT", frame.additem, "TOPLEFT", 10, 10)
 	frame.gold:SetPoint("LEFT", frame.slot, "RIGHT", 10, -20)
 	frame.gold:SetAutoFocus(false)
 	frame.gold:SetHeight(15)
@@ -216,7 +203,6 @@ function lib:MakeGuiConfig(gui)
 	
 	--Add Item to list button	
 	frame.additem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	--frame.additem:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -210)
 	frame.additem:SetPoint("LEFT", frame.gold, "RIGHT", 70, 0)
 	frame.additem:SetText(('Add Item'))
 	frame.additem:SetScript("OnClick", function() 	
@@ -228,7 +214,6 @@ function lib:MakeGuiConfig(gui)
 	
 	--Remove Item from list button	
 	frame.removeitem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	--frame.removeitem:SetPoint("TOPLEFT", frame.additem, "BOTTOMLEFT", 0, -20)
 	frame.removeitem:SetPoint("LEFT", frame.additem, "RIGHT", 10, 0)
 	frame.removeitem:SetText(('Remove Item'))
 	frame.removeitem:SetScript("OnClick", function() lib.RemoveSnatch(private.workingItemLink) end)
@@ -248,6 +233,20 @@ function lib:MakeGuiConfig(gui)
 							end)
 	
 	private.snatchList =  get("snatch.itemsList")
+	
+	--Set our "last" frame anchor point this will be the "top" area for normal config GUI elements
+	local last = gui:GetLast(id)
+	local  locationA, Frame, locationB, x, y = last:GetPoint()
+		last:SetPoint(locationA, Frame, locationB, x, -270)
+	gui:SetLast(id, last)
+	
+	gui:AddControl(id, "Subhead",0, "Snatch search settings:")
+	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
+	last = gui:GetLast(id)	
+	gui:AddControl(id, "Checkbox", 0, 1, "snatch.allow.bid", "Allow Bids")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox", 0, 11,  "snatch.allow.buy", "Allow Buyouts")
+	
 	
 	lib.refreshData()
 	lib.PopulateBagSheet()
@@ -289,7 +288,8 @@ function private.OnClickSnatch(button, row, index)
 	local link = frame.snatchlist.sheet.rows[row][1]:GetText()
 	lib.SetWorkingItem(link)
 end
-function private.OnResize()
+function private.OnResize(...)
+	--print(...)
 end
 
 
@@ -324,17 +324,17 @@ function lib.Search(item)
 	local itemsig = (":"):join(item[Const.ITEMID], item[Const.SUFFIX] , item[Const.ENCHANT])
 	
 	local value = 0
-	local stackSize = 1
+	local stackSize = item[Const.COUNT] or 1
 		
 	if private.snatchList[itemsig] then
-		value = private.snatchList[itemsig].price
+		value =  stackSize * private.snatchList[itemsig].price
 		
-		if item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value then
+		if item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value and get("snatch.allow.buy") then
 			return "buy", value
-		elseif item[Const.PRICE] <= value then
+		elseif item[Const.PRICE] <= value and get("snatch.allow.bid") then
 			return "bid", value
 		else
-			return false, "Price not low enough"
+			return false, "Price not low enough or bid/buy not checked."
 			
 		end
 	end
@@ -359,8 +359,14 @@ function lib.AddSnatch(itemlink, price, count)	-- give price=(0 or nil) to stop 
 	if count and count<=0 then
 		count=nil
 	end
+	--get appraiser price if possible
+	local abid, abuy, appraiser 
+	if AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
+		abid, abuy = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemlink, nil, true)
+		appraiser = tonumber(abuy) or tonumber(abid)
+	end
 	--add item to snatch list
-	private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count}
+	private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count, ["appraiser"] = appraiser}
 	set("snatch.itemsList", private.snatchList)
 	lib.finishedItem()
 end
@@ -393,7 +399,7 @@ function lib.SetWorkingItem(link)
 	if not name or not texture then return end
 	--set edit box texture and name
 	frame.icon:SetNormalTexture(texture)
-	frame.slot.help:SetText(name)
+	frame.slot.help:SetText(link)
 	
 	--set current working item
 	private.workingItemLink = link
@@ -412,7 +418,7 @@ hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 function lib.refreshData()
 	local Data, Style = {}, {}
 	for item, v in pairs(private.snatchList) do
-		table.insert(Data, {v.link, v.price, 0})
+		table.insert(Data, {v.link, v.price, v.appraiser})
 	end
 	frame.snatchlist.sheet:SetData(Data, Style)
 end
@@ -444,8 +450,7 @@ function lib.PopulateBagSheet()
 						local abid,abuy = appraiser.GetPrice(itemLink, nil, true)
 						tinsert(bagcontents, {
 							itemLink,
-							tonumber(abuy) or tonumber(abid),
-							0
+							tonumber(abuy) or tonumber(abid)
 						})
 					end
 				end
