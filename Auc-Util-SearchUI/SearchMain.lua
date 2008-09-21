@@ -679,7 +679,7 @@ function lib.MakeGuiConfig()
 
 	gui.sheet:EnableSelect(true)
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
-	gui.Search:SetPoint("BOTTOMRIGHT", gui.frame, "TOPRIGHT", -10, 15)
+	gui.Search:SetPoint("BOTTOMRIGHT", gui, "BOTTOMRIGHT", -10, 35)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 	gui.Search:SetFrameLevel(11)
