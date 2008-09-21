@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Auctioneer Advanced - Search UI - Searcher Arbitrage
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -177,7 +177,11 @@ function lib.Search(item)
 	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
 	
 	if brokerage then
-		market = market * .095
+		if string.find(comparefaction, "Neutral") then
+			market = market * .85
+		else
+			market = market * .95
+		end
 	end
 	if deposit then
 		local relistings = get("arbitrage.adjust.listings")
