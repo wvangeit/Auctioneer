@@ -35,25 +35,30 @@ local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetMo
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Arbitrage"
 
-function private.getStyles()
-	return {
-			{0, "Neutral"},
-			{1, "Cross-Faction"},
-			{2, "Cross-Realm"},
+private.Styles = {
+			"Neutral",
+			"Cross-Faction",
+			"Cross-Realm",
 		}
+private.Factions = {
+			"Neutral",
+			"Alliance",
+			"Horde",
+		}
+function private.getStyles()
+	return private.Styles
 end
 
 function private.getFactions()
-	return {
-			{0, "Neutral"},
-			{1, "Alliance"},
-			{2, "Horde"},
-		}
+	return private.Factions
 end
 
 function private.getRealmList()
+	if private.realmlist then
+		return private.realmlist
+	end
 	local found = false
-	local allrealms = {}
+	private.realmlist = {}
 	local _,current,_ = AucAdvanced.GetFaction()
 	for realm,_ in pairs(AucAdvancedData["UtilSearchUI"]) do
 		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
@@ -66,10 +71,10 @@ function private.getRealmList()
 			realm = strsub(realm, 1, (strlen(realm)-6))
 		end
 		if current ~= realm then
-			table.insert(allrealms, realm)
+			table.insert(private.realmlist, realm)
 		end
 	end
-	return allrealms
+	return private.realmlist
 end
 
 -- Set our defaults
@@ -82,10 +87,9 @@ default("arbitrage.adjust.deposit", true)
 default("arbitrage.adjust.listings", 3)
 default("arbitrage.allow.bid", true)
 default("arbitrage.allow.buy", true)
-default("arbitrage.search.crossrealmrealm", false)
-default("arbitrage.search.crossrealmfaction", false)
+default("arbitrage.search.crossrealmfaction", "Alliance")
 default("arbitrage.search.allrealms", {})
-default("arbitrage.search.style", "Neutral")
+default("arbitrage.search.style", "Cross-Faction")
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -124,23 +128,31 @@ function lib.Search(item)
 
 	-- Get correct faction to compare against
 	local comparefaction,_,factionGroup = AucAdvanced.GetFaction()
-	if get("arbitrage.search.style") == "Neutral" then
-		if (factionGroup == UnitFactionGroup("player")) then
+	local searchstyle = get("arbitrage.search.style")
+	if searchstyle == "Neutral" then
+		local unitfaction = UnitFactionGroup("player")
+		if (factionGroup == unitfaction) then
 			comparefaction = GetRealmName().."-Neutral" --If you're at home, compare to neutral
 		else
-			comparefaction = GetRealmName().."-"..UnitFactionGroup("player") --if you're at neutral, compare to home
+			comparefaction = GetRealmName().."-"..unitfaction --if you're at neutral, compare to home
 		end
-	elseif get("arbitrage.search.style") == "Cross-Faction" then
-		if (factionGroup == UnitFactionGroup("player")) then
-			if UnitFactionGroup("player") == "Horde" then faction = "-Alliance" end
-			if UnitFactionGroup("player") == "Alliance" then faction = "-Horde" end
+	elseif searchstyle == "Cross-Faction" then
+		local unitfaction = UnitFactionGroup("player")
+		if (factionGroup == unitfaction) then
+			local faction = "-Alliance"
+			if unitfaction == "Alliance" then faction = "-Horde" end --no need to check against both.  If it isn't one, then it must be the other
 			comparefaction = GetRealmName()..faction --If you're at home, compare to cross-faction
-			faction = nil
 		else
-			comparefaction = GetRealmName().."-"..UnitFactionGroup("player") --if you're at neutral, compare to home
+			comparefaction = GetRealmName().."-"..unitfaction --if you're at neutral, compare to home
 		end
-	elseif get("arbitrage.search.style") == "Cross-Realm" then
-		comparefaction = get("arbitrage.search.crossrealmrealm").."-"..get("arbitrage.search.crossrealmfaction")
+	elseif searchstyle == "Cross-Realm" then
+		local crossrealmrealm = get("arbitrage.search.crossrealmrealm")
+		if crossrealmrealm then
+			local crossrealmfaction = get("arbitrage.search.crossrealmfaction")
+			comparefaction = crossrealmrealm.."-"..crossrealmfaction
+		else
+			comparefaction = AucAdvanced.GetFaction()
+		end
 	else
 		comparefaction = AucAdvanced.GetFaction()
 	end
@@ -194,7 +206,7 @@ function lib.Search(item)
 	elseif get("arbitrage.allow.bid") and (item[Const.PRICE] <= value) then
 		return "bid", market
 	end
-	return false, "Not enough profit"
+	return false, "Not enough profit"--..":"..tostring(comparefaction)..":"..tostring(market)
 end
 
 AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherArbitrage.lua $", "$Rev: 3229 $")
