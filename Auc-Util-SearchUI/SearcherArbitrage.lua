@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Search UI - Searcher Arbitrage
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: SearcherArbitrage.lua 3277 2008-07-28 12:04:47Z Norganna $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is a plugin module for the SearchUI that assists in searching by refined paramaters
@@ -209,4 +209,4 @@ function lib.Search(item)
 	return false, "Not enough profit"--..":"..tostring(comparefaction)..":"..tostring(market)
 end
 
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/SearcherArbitrage.lua $", "$Rev: 3229 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
