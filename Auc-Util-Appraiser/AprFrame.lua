@@ -1286,7 +1286,7 @@ function private.CreateFrames()
 			end
 		end
 		if equipLoc == "" then equipLoc = nil end
-
+		equipLoc = Const.InvTypes[equipLoc]
 		print(("Refreshing view of {{%s}}"):format(name))
 		if background and type(background) == 'boolean' then
 			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
