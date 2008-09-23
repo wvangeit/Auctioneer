@@ -173,7 +173,6 @@ function lib.GetPrice(link, serverKey, match)
 	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-		curModelText = curModelText.."("..curModel..")"
 		if curModel == "market" then
 			newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
 		else
@@ -187,6 +186,7 @@ function lib.GetPrice(link, serverKey, match)
 				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
 			end
 		end
+		curModelText = curModelText.."("..curModel..")"
 	elseif curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.bid")
