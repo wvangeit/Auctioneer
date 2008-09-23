@@ -79,17 +79,7 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.limit", 100000)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.active", false)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.limit", 50000)
-	
-	--This settting will be used to turn off the module for current users until THEY choose to activate it
-	--this will give us a new user friendly default state for builds past AuctioneerAdvancedSuite-5.0.PRE.3164
-	--Remove this function once on or two builds have been released.
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EB.Deactivate", false)
-	if not get("util.EasyBuyout.EB.Deactivate") then
-		set("util.EasyBuyout.active", false)
-		set("util.EasyBuyout.EC.active", false)
-		set("util.EasyBuyout.EBid.active", false)
-		set("util.EasyBuyout.EB.Deactivate", true)
-	end
+
 end
 
 --[[ Local functions ]]--
