@@ -29,7 +29,6 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
---if not BtmScan then return end --Stopgap measure for problem with Btmscan not found in embedded version
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Snatch")
 if not lib then return end
@@ -343,10 +342,7 @@ function lib.Search(item)
 end
 
 --[[Snatch GUI functinality code]]
-
-
-function lib.AddSnatch(itemlink, price, count)	-- give price=(0 or nil) to stop snatching
-	
+function lib.AddSnatch(itemlink, price, count)	
 	local _, itemid, itemsuffix, itemenchant, itemseed = AucAdvanced.DecodeLink(itemlink)
 	
 	if not itemid then return end 
@@ -359,14 +355,8 @@ function lib.AddSnatch(itemlink, price, count)	-- give price=(0 or nil) to stop 
 	if count and count<=0 then
 		count=nil
 	end
-	--get appraiser price if possible
-	local abid, abuy, appraiser 
-	if AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
-		abid, abuy = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemlink, nil, true)
-		appraiser = tonumber(abuy) or tonumber(abid)
-	end
 	--add item to snatch list
-	private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count, ["appraiser"] = appraiser}
+	private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count}
 	set("snatch.itemsList", private.snatchList)
 	lib.finishedItem()
 end
@@ -416,9 +406,17 @@ hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 
 
 function lib.refreshData()
+	--get appraiser price if possible
 	local Data, Style = {}, {}
 	for item, v in pairs(private.snatchList) do
-		table.insert(Data, {v.link, v.price, v.appraiser})
+		--look up the current appraiser valuation to add to display
+		local abid, abuy, appraiser
+		if AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
+			abid, abuy = AucAdvanced.Modules.Util.Appraiser.GetPrice(v.link, nil, true)
+			appraiser = tonumber(abuy) or tonumber(abid)
+		end
+	
+		table.insert(Data, {v.link, v.price, appraiser or 0})
 	end
 	frame.snatchlist.sheet:SetData(Data, Style)
 end
