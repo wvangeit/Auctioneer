@@ -103,7 +103,6 @@ function lib:MakeGuiConfig(gui)
 	frame.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
 	frame.slot.help:SetWidth(100)
 		
-	
 	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
 		{ "Snatching", "TOOLTIP", 176 }, 
@@ -152,60 +151,17 @@ function lib:MakeGuiConfig(gui)
 			}, private.OnEnterBag, private.OnLeave, private.OnClickBag, private.OnResize)
 	end
 	
-	--Add coin boxes
-	local function goldtosilver()
-		frame.silver:SetFocus()
-	end
-	
-	local function silvertocopper()
-		frame.copper:SetFocus()
-	end
-	
-	local function copper()
-		frame.copper:ClearFocus()
-	end
-			
-	frame.gold = CreateFrame("EditBox", "snatchgold", frame, "InputBoxTemplate")
-	frame.gold:SetPoint("LEFT", frame.slot, "RIGHT", 10, -20)
-	frame.gold:SetAutoFocus(false)
-	frame.gold:SetHeight(15)
-	frame.gold:SetWidth(40)
-	frame.gold:SetScript("OnEnterPressed", goldtosilver)
-	frame.gold:SetScript("OnTabPressed", goldtosilver)
-	frame.gold:SetScript("OnEnter", function() lib.buttonTooltips( frame.gold, "Gold amount") end)
-	frame.gold:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	frame.silver = CreateFrame("EditBox", "snatchsilver", frame, "InputBoxTemplate")
-	frame.silver:SetPoint("TOPLEFT", frame.gold, "TOPRIGHT", 10, 0)
-	frame.silver:SetAutoFocus(false)
-	frame.silver:SetHeight(15)
-	frame.silver:SetWidth(20)
-	frame.silver:SetMaxLetters(2)
-	frame.silver:SetScript("OnEnterPressed", silvertocopper)
-	frame.silver:SetScript("OnTabPressed", silvertocopper)
-	frame.silver:SetScript("OnEnter", function() lib.buttonTooltips( frame.silver, "Silver amount") end)
-	frame.silver:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	frame.copper = CreateFrame("EditBox", "snatchcopper", frame, "InputBoxTemplate")
-	frame.copper:SetPoint("TOPLEFT", frame.silver, "TOPRIGHT", 10, 0)
-	frame.copper:SetAutoFocus(false)
-	frame.copper:SetHeight(15)
-	frame.copper:SetWidth(20)
-	frame.copper:SetMaxLetters(2)
-	frame.copper:SetScript("OnEnterPressed", copper)
-	frame.copper:SetScript("OnTabPressed", copper)
-	frame.copper:SetScript("OnEnter", function() lib.buttonTooltips( frame.copper, "Copper amount") end)
-	frame.copper:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+	frame.money = CreateFrame("Frame", "TEST", frame, "MoneyInputFrameTemplate")
+	frame.money.isMoneyFrame = true
+	frame.money:SetPoint("LEFT", frame.slot, "RIGHT", 10,-20)
+		
 	--Add Item to list button	
 	frame.additem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	frame.additem:SetPoint("LEFT", frame.gold, "RIGHT", 70, 0)
+	frame.additem:SetPoint("LEFT", frame.money, "RIGHT", 0, 0)
 	frame.additem:SetText(('Add Item'))
-	frame.additem:SetScript("OnClick", function() 	
-								local g = tonumber(frame.gold:GetText()) or 0
-								local s = tonumber(frame.silver:GetText()) or 0
-								local c = tonumber(frame.copper:GetText()) or 0
-								lib.AddSnatch(private.workingItemLink, g*10000 + s*100 + c)
+	frame.additem:SetScript("OnClick", function() 
+								local copper = MoneyInputFrame_GetCopper(frame.money)
+								lib.AddSnatch(private.workingItemLink, copper)
 							end)
 	frame.additem:SetScript("OnEnter", function() lib.buttonTooltips( frame.additem, "Click to add current selection to the snatch list") end)
 	frame.additem:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -280,9 +236,6 @@ function private.OnEnterBag(button, row, index)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
---~ 			if (EnhTooltip) then 
---~ 				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
---~ 			end
 		end
 	end		
 end
@@ -375,6 +328,7 @@ function lib.AddSnatch(itemlink, price, count)
 	set("snatch.itemsList", private.snatchList)
 	lib.finishedItem()
 end
+
 function lib.RemoveSnatch(itemlink)
 	local _, itemid, itemsuffix, itemenchant, itemseed = AucAdvanced.DecodeLink(itemlink)
 	if not itemid then return end 
@@ -391,6 +345,7 @@ function lib.finishedItem()
 	frame.slot.help:SetText(("Drop item into box"))
 	frame.icon:SetNormalTexture(nil)
 	frame.icon:SetScript("OnEnter", function() end)
+	MoneyInputFrame_ResetMoney(frame.money)
 	--reset current working item
 	private.workingItemLink = nil
 	--refresh displays
