@@ -257,13 +257,13 @@ end
 -- NOTE - Rabbitbunny - copied from getItemDisenchantTotals directly below
 -- NOTE - ccox - calculation copied from itemTooltip, I couldn't easily reuse the code
 -- TODO - REVISIT - ccox - share the code with itemTooltip
+-- NOTE - RockSlice - this function now returns value for one ore
 function getItemProspectTotals(link)
 	local data = Enchantrix.Storage.GetItemProspects(link)
 	if not data then
 		-- error message would have been printed inside GetItemProspects
 		return
 	end
-
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 
 	for result, resProb in pairs(data) do
@@ -275,7 +275,8 @@ function getItemProspectTotals(link)
 		totalMkt = totalMkt + resMkt
 		totalFive = totalFive + resFive
 	end
-
+	--so far, we've been calculating per prospect.  We need price per unit
+	totalHSP, totalMed, totalMkt, totalFive = totalHSP/5, totalMed/5, totalMkt/5, totalFive/5
 	return totalHSP, totalMed, totalMkt, totalFive
 end
 
