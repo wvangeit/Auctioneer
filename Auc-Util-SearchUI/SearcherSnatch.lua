@@ -39,11 +39,11 @@ lib.Private = private
 
 default("snatch.allow.bid", true)
 default("snatch.allow.buy", true)
+default("snatch.allow.beginerTooltips", true)
 if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
 
 private.workingItemLink = nil
 local frame 
-
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -137,6 +137,8 @@ function lib:MakeGuiConfig(gui)
 	frame.bagscan:SetText(("Refresh Bag Data"))
 	frame.bagscan:SetWidth(130)
 	frame.bagscan:SetScript("OnClick", lib.PopulateBagSheet)
+	frame.bagscan:SetScript("OnEnter", function() lib.buttonTooltips( frame.bagscan, "Click to rescan all items currently in your inventory.") end)
+	frame.bagscan:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 		frame.baglist.sheet = ScrollSheet:Create(frame.baglist, {
@@ -149,15 +151,6 @@ function lib:MakeGuiConfig(gui)
 			{ "Appraiser", "COIN", 70 }, 
 			}, private.OnEnterBag, private.OnLeave, private.OnClickBag, private.OnResize)
 	end
-
-	
-	
-	--[[
-	frame.additem.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.additem.help:SetPoint("TOPLEFT", frame.additem, "TOPRIGHT", 1, 1)
-	frame.additem.help:SetText(("(to Snatch list)")) 
-	frame.additem.help:SetWidth(90)
-	]]
 	
 	--Add coin boxes
 	local function goldtosilver()
@@ -171,8 +164,7 @@ function lib:MakeGuiConfig(gui)
 	local function copper()
 		frame.copper:ClearFocus()
 	end
-	
-		
+			
 	frame.gold = CreateFrame("EditBox", "snatchgold", frame, "InputBoxTemplate")
 	frame.gold:SetPoint("LEFT", frame.slot, "RIGHT", 10, -20)
 	frame.gold:SetAutoFocus(false)
@@ -180,6 +172,8 @@ function lib:MakeGuiConfig(gui)
 	frame.gold:SetWidth(40)
 	frame.gold:SetScript("OnEnterPressed", goldtosilver)
 	frame.gold:SetScript("OnTabPressed", goldtosilver)
+	frame.gold:SetScript("OnEnter", function() lib.buttonTooltips( frame.gold, "Gold amount") end)
+	frame.gold:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	frame.silver = CreateFrame("EditBox", "snatchsilver", frame, "InputBoxTemplate")
 	frame.silver:SetPoint("TOPLEFT", frame.gold, "TOPRIGHT", 10, 0)
@@ -189,6 +183,8 @@ function lib:MakeGuiConfig(gui)
 	frame.silver:SetMaxLetters(2)
 	frame.silver:SetScript("OnEnterPressed", silvertocopper)
 	frame.silver:SetScript("OnTabPressed", silvertocopper)
+	frame.silver:SetScript("OnEnter", function() lib.buttonTooltips( frame.silver, "Silver amount") end)
+	frame.silver:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	frame.copper = CreateFrame("EditBox", "snatchcopper", frame, "InputBoxTemplate")
 	frame.copper:SetPoint("TOPLEFT", frame.silver, "TOPRIGHT", 10, 0)
@@ -198,7 +194,8 @@ function lib:MakeGuiConfig(gui)
 	frame.copper:SetMaxLetters(2)
 	frame.copper:SetScript("OnEnterPressed", copper)
 	frame.copper:SetScript("OnTabPressed", copper)
-	
+	frame.copper:SetScript("OnEnter", function() lib.buttonTooltips( frame.copper, "Copper amount") end)
+	frame.copper:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	--Add Item to list button	
 	frame.additem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -210,13 +207,17 @@ function lib:MakeGuiConfig(gui)
 								local c = tonumber(frame.copper:GetText()) or 0
 								lib.AddSnatch(private.workingItemLink, g*10000 + s*100 + c)
 							end)
+	frame.additem:SetScript("OnEnter", function() lib.buttonTooltips( frame.additem, "Click to add current selection to the snatch list") end)
+	frame.additem:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	--Remove Item from list button	
 	frame.removeitem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.removeitem:SetPoint("LEFT", frame.additem, "RIGHT", 10, 0)
 	frame.removeitem:SetText(('Remove Item'))
 	frame.removeitem:SetScript("OnClick", function() lib.RemoveSnatch(private.workingItemLink) end)
-		
+	frame.removeitem:SetScript("OnEnter", function() lib.buttonTooltips( frame.removeitem, "Click to remove current selection from the snatch list") end)
+	frame.removeitem:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	
 	--Reset snatch list
 	frame.resetList = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.resetList:SetPoint("TOP", frame.snatchlist, "BOTTOM", 0, -15)
@@ -230,9 +231,10 @@ function lib:MakeGuiConfig(gui)
 									print("This will clear the snatch list permanently. To use hold ALT+CTR+SHIFT while clicking this button") 
 								end 
 							end)
+	frame.resetList:SetScript("OnEnter", function() lib.buttonTooltips( frame.resetList, "Shift+ALT+CTR Click to remove all items from the snatch list") end)
+	frame.resetList:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	private.snatchList =  get("snatch.itemsList")
-	
 	--Set our "last" frame anchor point this will be the "top" area for normal config GUI elements
 	local last = gui:GetLast(id)
 	local  locationA, Frame, locationB, x, y = last:GetPoint()
@@ -243,13 +245,20 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	last = gui:GetLast(id)	
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.allow.bid", "Allow Bids")
+	gui:AddTip(id, "Allow Snatch searcher to sugest bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox", 0, 11,  "snatch.allow.buy", "Allow Buyouts")
+	gui:AddTip(id, "Allow Snatch searcher to sugest buyouts")
+	
+	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox", 0, 1,  "snatch.allow.beginerTooltips", "Display beginner popup help.")
+	gui:AddTip(id, "Display beginner tooltips.")
 	
 	
 	lib.refreshData()
 	lib.PopulateBagSheet()
 end
+
 function private.OnEnterScratch(button, row, index)
 	if frame.snatchlist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.snatchlist.sheet.rows[row][index]:GetText()
@@ -263,6 +272,7 @@ function private.OnEnterScratch(button, row, index)
 		end
 	end		
 end
+
 function private.OnEnterBag(button, row, index)
 	if frame.baglist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.baglist.sheet.rows[row][index]:GetText()
@@ -270,29 +280,37 @@ function private.OnEnterBag(button, row, index)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
-			end
+--~ 			if (EnhTooltip) then 
+--~ 				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+--~ 			end
 		end
 	end		
 end
+
 function private.OnLeave()
 	GameTooltip:Hide()
 end
+
 function private.OnClickBag(button, row, index)
 	local link = frame.baglist.sheet.rows[row][1]:GetText()
 	lib.SetWorkingItem(link)
 end
+
 function private.OnClickSnatch(button, row, index)
 	local link = frame.snatchlist.sheet.rows[row][1]:GetText()
 	lib.SetWorkingItem(link)
 end
+
 function private.OnResize(...)
 	--print(...)
 end
-
-
-
+--Beginner Tooltips script display for all UI elements 
+function lib.buttonTooltips(self, text)
+	if get("snatch.allow.beginerTooltips") and text and self then
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+		GameTooltip:SetText(text)
+	end
+end
 --[[
 ItemTable[Const.LINK]    = hyperlink
 	ItemTable[Const.ILEVEL]  = iLevel
@@ -318,10 +336,9 @@ ItemTable[Const.LINK]    = hyperlink
 	ItemTable[Const.ENCHANT]  = enchant
 	ItemTable[Const.SEED]  = seed
 ]]
+--returns if a item meets snatch criteria
 function lib.Search(item)
-	
 	local itemsig = (":"):join(item[Const.ITEMID], item[Const.SUFFIX] , item[Const.ENCHANT])
-	
 	local value = 0
 	local stackSize = item[Const.COUNT] or 1
 		
@@ -334,15 +351,13 @@ function lib.Search(item)
 			return "bid", value
 		else
 			return false, "Price not low enough or bid/buy not checked."
-			
 		end
-	end
-	
+	end	
 	return false, "Not in snatch list"
 end
 
 --[[Snatch GUI functinality code]]
-function lib.AddSnatch(itemlink, price, count)	
+function lib.AddSnatch(itemlink, price, count)
 	local _, itemid, itemsuffix, itemenchant, itemseed = AucAdvanced.DecodeLink(itemlink)
 	
 	if not itemid then return end 
@@ -375,26 +390,32 @@ function lib.finishedItem()
 	--reset UI
 	frame.slot.help:SetText(("Drop item into box"))
 	frame.icon:SetNormalTexture(nil)
+	frame.icon:SetScript("OnEnter", function() end)
 	--reset current working item
 	private.workingItemLink = nil
 	--refresh displays
 	lib.refreshData()
 end
---get teh current item we may want to add or remove
+--get the current item we may want to add or remove
 function lib.SetWorkingItem(link)
 	if type(link)~="string" then return end
 	
 	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
-	
 	if not name or not texture then return end
-	--set edit box texture and name
-	frame.icon:SetNormalTexture(texture)
-	frame.slot.help:SetText(link)
 	
+	--set edit box texture and name
+	frame.icon:SetNormalTexture(texture) --set icon texture
+	frame.icon:SetScript("OnEnter", function() --set mouseover tooltip
+			GameTooltip:SetOwner(frame.icon, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetHyperlink(link)
+		end)
+	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	frame.slot.help:SetText(link)
+
 	--set current working item
 	private.workingItemLink = link
-
 end
+
 function lib.ClickLinkHook(_, link, button)
 	if link and private.frame and private.frame:IsShown() then
 		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
@@ -403,7 +424,6 @@ function lib.ClickLinkHook(_, link, button)
 	end
 end
 hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
-
 
 function lib.refreshData()
 	--get appraiser price if possible
@@ -422,8 +442,7 @@ function lib.refreshData()
 end
 
 function lib.PopulateBagSheet()
-	
-	local unique={}
+	local unique = {}
 	local bagcontents = {}
 	local appraiser = AucAdvanced and AucAdvanced.Modules.Util.Appraiser
 	
@@ -437,8 +456,6 @@ function lib.PopulateBagSheet()
 					unique[sig]=true
 					local _,itemCount = GetContainerItemInfo(bag,slot)
 					local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
-										
-								
 					if not appraiser then
 						tinsert(bagcontents, {
 							itemLink,
@@ -455,7 +472,6 @@ function lib.PopulateBagSheet()
 			end
 		end
 	end
-	
 	frame.baglist.sheet:SetData(bagcontents) --Set the GUI scrollsheet
 end
 
