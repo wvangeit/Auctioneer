@@ -437,7 +437,7 @@ function private.ProcessPosts()
 			private.updateFrame.timer = -0.1
 
 			-- Send out a message that the post has been successful
-			private.SendProcessor("postresult", true, request[0], request)
+			AucAdvanced.SendProcessorMessage("postresult", true, request[0], request)
 		elseif GetTime() > expire then
 			local tries = (request[6] or 0) + 1
 			request[6] = tries
@@ -449,7 +449,7 @@ function private.ProcessPosts()
 				private.updateFrame.timer = -5
 
 				-- Send out a message that the post has failed
-				private.SendProcessor("postresult", false, request[0], request, ERROR_FAILRETRY)
+				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
 				private.updateFrame.timer = -1
 				-- Wait for another "lag" interval
@@ -476,7 +476,7 @@ function private.ProcessPosts()
 			private.updateFrame.timer = -0.1
 
 			-- Send out a message that the post has failed
-			private.SendProcessor("postresult", false, request[0], request, err)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, err)
 		else
 			print("Delaying post request: {{", bag, "}}")
 			private.updateFrame.timer = -1
@@ -505,7 +505,7 @@ function private.ProcessPosts()
 				private.updateFrame.timer = -5
 
 				-- Send out a message that the post has failed
-				private.SendProcessor("postresult", false, request[0], request, ERROR_FAILRETRY)
+				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
 				private.updateFrame.timer = -1
 			end
@@ -518,21 +518,6 @@ function private.ProcessPosts()
 		private.updateFrame.timer = -1
 	end
 end
-
---[[
-    PRIVATE: SendProcessor
-	Sends out processor callback messages to all registered modules
-]]
-function private.SendProcessor(...)
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor(...)
-			end
-		end
-	end
-end
-
 
 --[[
 

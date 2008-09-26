@@ -50,12 +50,11 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
 		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
 		private.Print("  {{/auc about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
-		for system, systemMods in pairs(AucAdvanced.Modules) do
-			for engine, engineLib in pairs(systemMods) do
-				if (engineLib.CommandHandler) then
-					private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
-				end
-			end
+
+		local modules = AucAdvanced.GetAllModules("CommandHandler")
+		for pos, engineLib in ipairs(modules) do
+			local engine = engineLib:GetName()
+			private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
 		end
 	elseif command == "begin" or command == "scan" then
 		lib.ScanCommand(subcommand, ...)
@@ -82,18 +81,10 @@ function private.CommandHandler(command, subcommand, ...)
 		AucAdvanced.Scan.StartScan(nil, nil, nil, nil, nil, nil, nil, nil, true)
 	else
 		if command and subcommand then
-			subcommand = subcommand:lower()
-			for system, systemMods in pairs(AucAdvanced.Modules) do
-				if command == system:lower() then
-					for engine, engineLib in pairs(systemMods) do
-						if subcommand == engine:lower() then
-							if engineLib.CommandHandler then
-								engineLib.CommandHandler(...)
-								return
-							end
-						end
-					end
-				end
+			local engineLib = AucAdvanced.GetAllModules("CommandHandler", command, subcommand)
+			if engineLib then
+				engineLib.CommandHandler()
+				retun
 			end
 		end
 

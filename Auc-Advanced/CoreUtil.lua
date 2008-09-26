@@ -385,4 +385,61 @@ function lib.GetModuleLocals()
 	lib.Debug.DebugPrint, lib.Fill
 end
 
+private.checkedModules = {}
+function private.CheckModule(name, module)
+	if private.checkedModules[module] then return end
+
+	local fix
+	if not module.GetName or type(module.GetName) ~= "function" then
+		-- Sometimes we find engines that don't have a "GetName()" function.
+		-- All engines should have this function!
+		nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module without GetName()", "No GetName() function was found for module indexed as \""..name.."\". Please fix this!")
+		fix = true
+	else
+		local reportedName = module.GetName()
+		if reportedName ~= name then
+			nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module GetName() mismatch", "The GetName() function was found for module indexed as \""..name.."\", but actually returns \""..reportedName.."\". Please fix this!")
+			fix = true
+		end
+	end
+
+	if fix then
+		module.GetName = function()
+			return name
+		end
+	end
+
+	private.checkedModules[module] = true
+end
+
+function lib.GetAllModules(having, findSystem, findEngine)
+	local modules
+	if findSystem then findSystem = findSystem:lower() end
+	if findEngine then findEngine = findEngine:lower() end
+	if not findEngine then modules = {} end
+
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		if not findSystem or system:lower() == findSystem then
+			for engine, engineLib in pairs(systemMods) do
+				private.CheckModule(engine, engineLib)
+				if not having or engineLib[having] then
+					if not findEngine then
+						table.insert(modules, engineLib)
+					elseif engine:lower() == findEngine then
+						return engineLib, system, engine
+					end
+				end
+			end
+		end
+	end
+	return modules
+end
+
+function lib.SendProcessorMessage(...)
+	local modules = AucAdvanced.GetAllModules("Processor")
+	for pos, engineLib in ipairs(modules) do
+		engineLib.Processor(...)
+	end
+end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

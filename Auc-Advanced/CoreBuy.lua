@@ -255,20 +255,6 @@ function private.CancelPurchase()
 	AucAdvanced.Scan.SetPaused(false)
 end
 
---[[
-    PRIVATE: SendProcessor
-	Sends out processor callback messages to all registered modules
-]]
-function private.SendProcessor(...)
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor(...)
-			end
-		end
-	end
-end
-
 function private.onEventHookBid(_, event, arg1)
 	if (event == "CHAT_MSG_SYSTEM" and arg1) then
 		if (arg1 == ERR_AUCTION_BID_PLACED) then
@@ -289,7 +275,7 @@ function private.onBidAccepted()
 	--"itemlink;seller;count;buyout;price;reason"
 	local bid = private.PendingBids[1]
 	local CallBackString = string.join(";", tostring(bid["link"]), tostring(bid["sellername"]), tostring(bid["count"]), tostring(bid["buyout"]), tostring(bid["price"]), tostring(bid["reason"]))
-	private.SendProcessor("bidplaced", CallBackString)
+	AucAdvanced.SendProcessorMessage("bidplaced", CallBackString)
 	private.removePendingBid()
 end
 

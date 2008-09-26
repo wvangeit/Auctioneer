@@ -70,11 +70,7 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 		AucAdvanced.Scan.GetImage()
 	end
 
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then engineLib.Processor("tooltip", frame, name, hyperlink, quality, quantity, cost, additional) end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("tooltip", frame, name, hyperlink, quality, quantity, cost, additional)
 end
 
 function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
@@ -124,13 +120,7 @@ end
 
 function private.HookAH()
 	hooksecurefunc("AuctionFrameBrowse_Update", AucAdvanced.API.ListUpdate)
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("auctionui")
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("auctionui")
 end
 
 function private.OnLoad(addon)
@@ -151,39 +141,32 @@ function private.OnLoad(addon)
 	-- Notify the actual module if it exists
 	local auc, sys, eng = strsplit("-", addon)
 	if (auc == "auc" and sys and eng) then
-		for system, systemMods in pairs(AucAdvanced.Modules) do
-			if (sys == system:lower()) then
-				for engine, engineLib in pairs(systemMods) do
-					if (eng == engine:lower() and engineLib.OnLoad) then
-						engineLib.OnLoad(addon)
-					end
-				end
-			end
+		local engineLib = AucAdvanced.GetAllModules("OnLoad", sys, eng)
+		if engineLib then
+			engineLib.OnLoad(addon)
 		end
 	end
 
 	-- Check all modules' load triggers and pass event to processors
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.LoadTriggers and engineLib.LoadTriggers[addon]) then
-				if (engineLib.OnLoad) then
-					engineLib.OnLoad(addon)
-				end
-			end
-			if (engineLib.Processor and auc == "auc" and sys and eng) then
-				engineLib.Processor("load", addon)
+	local modules = AucAdvanced.GetAllModules("LoadTriggers")
+	for pos, engineLib in ipairs(modules) do
+		if engineLib.LoadTriggers[addon] then
+			if (engineLib.OnLoad) then
+				engineLib.OnLoad(addon)
 			end
 		end
+	end
+
+	-- Notify all processors that an auctioneer addon has loaded
+	if auc == "auc" and sys and eng then
+		AucAdvanced.SendProcessorMessage("load", addon)
 	end
 end
 
 function private.OnUnload()
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.OnUnload) then
-				engineLib.OnUnload()
-			end
-		end
+	local modules = AucAdvanced.GetAllModules("OnUnload")
+	for pos, engineLib in ipairs(modules) do
+		engineLib.OnUnload()
 	end
 end
 
@@ -220,13 +203,7 @@ function private.OnUpdate(...)
 	local now = GetTime()
 	for event, time in pairs(private.Schedule) do
 		if time > now then
-			for system, systemMods in pairs(AucAdvanced.Modules) do
-				for engine, engineLib in pairs(systemMods) do
-					if engineLib.Processor then
-						engineLib.Processor(event, time)
-					end
-				end
-			end
+			AucAdvanced.SendProcessorMessage(event, time)
 		end
 		private.Schedule[event] = nil
 	end

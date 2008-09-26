@@ -283,13 +283,7 @@ local function setter(setting, value)
 		db[setting] = value
 	end
 
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("configchanged", setting, value)
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 end
 
 function lib.SetSetting(...)
@@ -485,11 +479,7 @@ function lib.MakeGuiConfig()
 
 	-- Alert all modules that the config screen is being built, so that they
 	-- may place their own configuration should they desire it.
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then engineLib.Processor("config", gui) end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("config", gui)
 end
 
 local sideIcon

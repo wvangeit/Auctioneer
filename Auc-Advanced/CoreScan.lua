@@ -381,13 +381,7 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elaps
 		return
 	end
 
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime)
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime)
 end
 
 function private.IsIdentical(focus, compare)
@@ -448,15 +442,14 @@ local function processStats(operation, curItem, oldItem)
 			Only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
 			(it could think it was sold, for instance)
 		]]
-		for engine, engineLib in pairs(AucAdvanced.Modules.Filter) do
-			if (engineLib.AuctionFilter) then
-				local result=engineLib.AuctionFilter(operation, statItem)
-				if (result) then
-					private.filteredCount = private.filteredCount + 1
-					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
-					operation = "filter"
-					break
-				end
+		local modules = AucAdvanced.GetAllModules("AuctionFilter", "Filter")
+		for pos, engineLib in ipairs(modules) do
+			local result=engineLib.AuctionFilter(operation, statItem)
+			if (result) then
+				private.filteredCount = private.filteredCount + 1
+				curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
+				operation = "filter"
+				break
 			end
 		end
 	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
@@ -464,14 +457,14 @@ local function processStats(operation, curItem, oldItem)
 		operation = "filter"
 		private.filteredCount = private.filteredCount + 1
 	end
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.ScanProcessors and engineLib.ScanProcessors[operation]) then
-				if (oldItem) then
-					engineLib.ScanProcessors[operation](operation, statItem, statItemOld)
-				else
-					engineLib.ScanProcessors[operation](operation, statItem)
-				end
+
+	local modules = AucAdvanced.GetAllModules("ScanProcessors")
+	for pos, engineLib in ipairs(modules) do
+		if engineLib.ScanProcessors[operation] then
+			if (oldItem) then
+				engineLib.ScanProcessors[operation](operation, statItem, statItemOld)
+			else
+				engineLib.ScanProcessors[operation](operation, statItem)
 			end
 		end
 	end
@@ -816,13 +809,7 @@ Commitfunction = function()
 
 	AucAdvanced.API.ClearMarketCache();
 	-- Tell everyone that our stats are updated
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engineLib.Processor then
-				engineLib.Processor("scanstats", scandata.scanstats[0])
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("scanstats", scandata.scanstats[0])
 	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
 
 	--Hide the progress indicator
@@ -876,26 +863,17 @@ end
 
 function private.QuerySent(query, isSearch, isNavigate, ...)
 	-- Tell everyone that our stats are updated
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engineLib.Processor then
-				engineLib.Processor("querysent", query, isSearch, ...)
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("querysent", query, isSearch, ...)
 	return ...
 end
 
 function private.FinishedPage(nextPage)
 	-- Tell everyone that our stats are updated
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engineLib.FinishedPage then
-				local finished = engineLib.FinishedPage(nextPage)
-				if finished and finished == false then
-					return false
-				end
-			end
+	local modules = AucAdvanced.GetAllModules("FinishedPage")
+	for pos, engineLib in ipairs(modules) do
+		local finished = engineLib.FinishedPage(nextPage)
+		if finished and finished == false then
+			return false
 		end
 	end
 	return true
@@ -1101,13 +1079,7 @@ StorePageFunction = function()
 	end
 
 	--Send a Processor event to modules letting them know we are done with the page
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("pagefinished", pageNumber)
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("pagefinished", pageNumber)
 
 	-- Send the next page query or finish scanning
 

@@ -110,12 +110,13 @@ do
         
         -- Rebuild the engine cache
         if #engines == 0 then
-            for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+			local modules = AucAdvanced.GetAllModules(nil, "Stat")
+			for pos, engineLib in ipairs(modules) do
                 local fn = engineLib.GetItemPDF;
                 if fn then
                     tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
                 elseif nLog then
-                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engine.."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
                 end
             end
         end
@@ -261,22 +262,21 @@ do
 end
 
 function lib.ClearItem(itemLink, serverKey)
-	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if engineLib.ClearItem then
-			engineLib.ClearItem(itemLink, serverKey)
-		end
+	local modules = AucAdvanced.GetAllModules("ClearItem")
+	for pos, engineLib in ipairs(modules) do
+		engineLib.ClearItem(itemLink, serverKey)
 	end
 end
 
 function lib.GetAlgorithms(itemLink)
 	local engines = {}
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engineLib.GetPrice or engineLib.GetPriceArray then
-				if not engineLib.IsValidAlgorithm
-				or engineLib.IsValidAlgorithm(itemLink) then
-					table.insert(engines, engine)
-				end
+	local modules = AucAdvanced.GetAllModules()
+	for pos, engineLib in ipairs(modules) do
+		if engineLib.GetPrice or engineLib.GetPriceArray then
+			if not engineLib.IsValidAlgorithm
+			or engineLib.IsValidAlgorithm(itemLink) then
+				local engine = engineLib.GetName()
+				table.insert(engines, engine)
 			end
 		end
 	end
@@ -284,15 +284,13 @@ function lib.GetAlgorithms(itemLink)
 end
 
 function lib.IsValidAlgorithm(algorithm, itemLink)
-	local engines = {}
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
-				if engineLib.IsValidAlgorithm then
-					return engineLib.IsValidAlgorithm(itemLink)
-				end
-				return true
+	local modules = AucAdvanced.GetAllModules()
+	for pos, engineLib in ipairs(modules) do
+		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
+			if engineLib.IsValidAlgorithm then
+				return engineLib.IsValidAlgorithm(itemLink)
 			end
+			return true
 		end
 	end
 	return false
@@ -315,40 +313,41 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
         serverKey = reserved.."-"..serverKey;
     end
     serverKey = serverKey or AucAdvanced.GetFaction()
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
-				if engineLib.IsValidAlgorithm
-				and not engineLib.IsValidAlgorithm(itemLink) then
-					return
-				end
-				local algosig = strjoin(":", algorithm, itemLink, serverKey)
-				for pos, history in ipairs(private.algorithmstack) do
-					if (history == algosig) then
-						-- We are looping
-						local origAlgo = private.algorithmstack[1]
-						local endSize = #(private.algorithmstack)+1
-						while (#(private.algorithmstack)) do
-							table.remove(private.algorithmstack)
-						end
-						error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
-					end
-				end
 
-				local price, seen, array
-				table.insert(private.algorithmstack, algosig)
-				if (engineLib.GetPriceArray) then
-					array = engineLib.GetPriceArray(itemLink, serverKey)
-					if (array) then
-						price = array.price
-						seen = array.seen
-					end
-				else
-					price = engineLib.GetPrice(itemLink, serverKey)
-				end
-				table.remove(private.algorithmstack, -1)
-				return price, seen, array
+	local modules = AucAdvanced.GetAllModules()
+	for pos, engineLib in ipairs(modules) do
+		engine = engineLib.GetName()
+		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
+			if engineLib.IsValidAlgorithm
+			and not engineLib.IsValidAlgorithm(itemLink) then
+				return
 			end
+			local algosig = strjoin(":", algorithm, itemLink, serverKey)
+			for pos, history in ipairs(private.algorithmstack) do
+				if (history == algosig) then
+					-- We are looping
+					local origAlgo = private.algorithmstack[1]
+					local endSize = #(private.algorithmstack)+1
+					while (#(private.algorithmstack)) do
+						table.remove(private.algorithmstack)
+					end
+					error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
+				end
+			end
+
+			local price, seen, array
+			table.insert(private.algorithmstack, algosig)
+			if (engineLib.GetPriceArray) then
+				array = engineLib.GetPriceArray(itemLink, serverKey)
+				if (array) then
+					price = array.price
+					seen = array.seen
+				end
+			else
+				price = engineLib.GetPrice(itemLink, serverKey)
+			end
+			table.remove(private.algorithmstack, -1)
+			return price, seen, array
 		end
 	end
 	--error(("Cannot find pricing algorithm: %s"):format(algorithm))
@@ -433,15 +432,8 @@ end
 
 function lib.ListUpdate()
 	if lib.IsBlocked() then return end
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("listupdate")
-			end
-		end
-	end
+	AucAdvanced.SendProcessorMessage("listupdate")
 end
-
 
 function lib.BlockUpdate(block, propagate)
 	local blocked
@@ -456,13 +448,7 @@ function lib.BlockUpdate(block, propagate)
 	end
 
 	if (propagate) then
-		for system, systemMods in pairs(AucAdvanced.Modules) do
-			for engine, engineLib in pairs(systemMods) do
-				if (engineLib.Processor) then
-					engineLib.Processor("blockupdate", blocked)
-				end
-			end
-		end
+		AucAdvanced.SendProcessorMessage("blockupdate", blocked)
 	end
 end
 
@@ -540,13 +526,13 @@ end
 function lib.GetMatchers(itemLink)
 	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 	local engines = {}
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engineLib.GetMatchArray then
-				if not engineLib.IsValidMatcher
-				or engineLib.IsValidMatcher(itemLink) then
-					table.insert(engines, engine)
-				end
+	local modules = AucAdvanced.GetAllModules()
+	for pos, engineLib in ipairs(modules) do
+		if engineLib.GetMatchArray then
+			if not engineLib.IsValidMatcher
+			or engineLib.IsValidMatcher(itemLink) then
+				local engine = engineLib.GetName()
+				table.insert(engines, engine)
 			end
 		end
 	end
@@ -575,14 +561,14 @@ end
 
 function lib.IsValidMatcher(matcher, itemLink)
 	local engines = {}
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if engine == matcher and engineLib.GetMatchArray then
-				if engineLib.IsValidMatcher then
-					return engineLib.IsValidMatcher(itemLink)
-				end
-				return engineLib
+	local modules = AucAdvanced.GetAllModules()
+	for pos, engineLib in ipairs(modules) do
+		local engine = engineLib.GetName()
+		if engine == matcher and engineLib.GetMatchArray then
+			if engineLib.IsValidMatcher then
+				return engineLib.IsValidMatcher(itemLink)
 			end
+			return engineLib
 		end
 	end
 	return false
