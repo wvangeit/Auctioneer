@@ -984,7 +984,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 					private.sheetData = {}
 				end
 				for j,k in pairs(private.sheetData) do
-					if k[1] == item[Const.LINK] then
+					if (k[1] == item[Const.LINK]) and (k[7] == item["reason"]) then
 						isdupe = true
 					end
 				end
