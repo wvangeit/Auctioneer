@@ -40,6 +40,7 @@ lib.Private = private
 default("snatch.allow.bid", true)
 default("snatch.allow.buy", true)
 default("snatch.allow.beginerTooltips", true)
+default("snatch.itemsList", {})
 if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
 
 private.workingItemLink = nil
