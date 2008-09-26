@@ -4,6 +4,4 @@
 ## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan Auc-Util-ItemSuggest
 ##
 ## Version: <%version%> (<%codename%>)
-
-Auc-Util-AutoMagic.lua
 Embed.xml
