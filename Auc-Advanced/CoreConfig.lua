@@ -84,7 +84,7 @@ function private.CommandHandler(command, subcommand, ...)
 			local engineLib = AucAdvanced.GetAllModules("CommandHandler", command, subcommand)
 			if engineLib then
 				engineLib.CommandHandler()
-				retun
+				return
 			end
 		end
 
