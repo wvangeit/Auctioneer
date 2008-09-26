@@ -933,7 +933,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 	end
 	
 	--buyorbid must be either "bid", "buy", true, false, or nil
-	--if string is returned for buyorbid, value must be returned
+	--if string is returned for buyorbid, value must be number or nil (in which case value will be Marketprice)
 	local buyorbid, value, pct, reason
 	buyorbid, value, pct, reason = searcher.Search(item)
 	if buyorbid then
@@ -961,6 +961,12 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 				cost = item[Const.PRICE]
 			else
 				cost = item[Const.BUYOUT]
+			end
+			if not value then
+				value = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+			end
+			if not value then
+				value = 0
 			end
 			item["profit"] = value - cost
 		else
