@@ -41,7 +41,9 @@ local Const = AucAdvanced.Const
 local gui
 private.data = {}
 private.sheetData = {}
+private.isSearching = false
 local coSearch
+local SettingCache = {}
 
 private.tleft = {
 	"|cff000001|cffe5e5e530m", -- 30m
@@ -385,7 +387,6 @@ function lib.SetSetting(...)
 	end
 end
 
-
 local function getter(setting)
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
 	local realmKey = AucAdvanced.GetFaction()
@@ -432,10 +433,22 @@ local function getter(setting)
 end
 
 function lib.GetSetting(setting, default)
+	--use settings cache during a search
+	if private.isSearching then
+		if SettingCache[setting]~=nil then
+			return SettingCache[setting]
+		end
+	end
 	local option = getter(setting)
 	if ( option ~= nil ) then
+		if private.isSearching then
+			SettingCache[setting] = option
+		end
 		return option
 	else
+		if private.isSearching then
+			SettingCache[setting] = default
+		end
 		return default
 	end
 end
@@ -1067,6 +1080,7 @@ local PerformSearch = function()
 	lib.CleanTable(private.sheetData)
 	gui.sheet:SetData(private.sheetData)
 	
+	private.isSearching = true
 	for i, data in ipairs(scandata.image) do
 		if (i % speed) == 0 then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
@@ -1078,7 +1092,13 @@ local PerformSearch = function()
 		end
 		lib.SearchItem(searcher.name, data, true)
 	end
+	private.isSearching = false
+	empty(SettingCache)
 	gui.frame.progressbar:Hide()
+end
+
+function lib.IsSearching()
+	return private.isSearching
 end
 
 function lib.PerformSearch(searcher)
