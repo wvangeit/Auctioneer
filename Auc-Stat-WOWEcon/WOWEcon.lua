@@ -34,10 +34,34 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
+function private.Sanitize(hyperlink)
+	local lType, id, suffix, factor, enchant, seed = decode(hyperlink)
+	if lType == "item" then
+		local newbit, newlink
+		if AucAdvanced.Settings.GetSetting("stat.wowecon.sanitize") then
+			-- If the settings say to sanitize this item, them remove all the
+			-- specificness from the hyperlink before sending it in.
+			newbit = ("|Hitem:%d:%d:%d:%d:%d:%d:%d:%d|h"):format(id,0,0,0,0,0,suffix,factor)
+			newlink = hyperlink:gsub("|Hitem:[%d%p:]+|h", newbit)
+		else
+			-- Only remove the random seed component from the link, leave the factor
+			newlink = hyperlink:gsub("(|Hitem:[%d%p:]+):[%p%d]+|h", "%1:"..factor.."|h")
+		end
+		assert(newlink, "Link sanitization failed")
+		return newlink
+	end
+	return hyperlink
+end
+
 function lib.GetPrice(hyperlink, faction, realm)
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not (Wowecon and Wowecon.API) then return end
+	hyperlink = private.Sanitize(hyperlink)
+
 	local price,seen,specific = Wowecon.API.GetAuctionPrice_ByLink(hyperlink)
+	if specific and AucAdvanced.Settings.GetSetting("stat.wowecon.useglobal") then
+		price,seen = Wowecon.API.GetAuctionPrice_ByLink(hyperlink, Wowecon.API.GLOBAL_PRICE)
+	end
 	return price, false, seen, specific
 end
 
@@ -51,17 +75,26 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not (Wowecon and Wowecon.API) then return end
 
+	array.hyperlink = hyperlink
+	hyperlink = private.Sanitize(hyperlink)
+	array.sanitized = hyperlink
+
 	-- Get our statistics
-	local price, _, seen, specific = lib.GetPrice(hyperlink, faction, realm)
+	local price,seen,specific = Wowecon.API.GetAuctionPrice_ByLink(hyperlink)
 	array.price = price
-	array.seen = seen
+	array.seen = seen or 0
 	array.specific = specific
 
 	if (specific) then
+		array.s_price = price
+		array.s_seen = seen
 		price,seen = Wowecon.API.GetAuctionPrice_ByLink(hyperlink, Wowecon.API.GLOBAL_PRICE)
+	else
+		array.s_price = nil
+		array.s_seen = 0
 	end
 	array.g_price = price
-	array.g_seen = seen
+	array.g_seen = seen or 0
 	
 	if AucAdvanced.Settings.GetSetting("stat.wowecon.useglobal") then
 		array.price = array.g_price
@@ -88,6 +121,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
+	elseif (callbackType == "tooltip") then
+		lib.ProcessTooltip(...)
 	end
 end
 
@@ -115,19 +150,74 @@ function private.SetupConfigGui(gui)
 		"If you are not using the global price option here, you should "..
 		"check to make sure there isn't a hidden server specific price for your server, "..
 		"with just a small number of seen times.")
+
+	gui:AddHelp(id, "sanitize link",
+		"What does the sanitize link option do?",
+		"Sanitizing the link can improve the price data you receive from WOWEcon by "..
+		"removing the parts of the link that are very specific (such as enchants, "..
+		"item factors, and gem informatio) to just get the price information for the "..
+		"common base item. This will generally only affect items that are slightly "..
+		"different from the normal base item, and have no, or very little price data "..
+		"due to their uniqueness.")
+
+	gui:AddHelp(id, "show price tooltip",
+		"Why would I want to show the WOWEcon price in the tooltip?",
+		"The pricing data that Appraiser uses for the items may be different to the "..
+		"price data that WOWEcon displays by default, since WOWEcon can get very "..
+		"specific with the data that it returns. Enabling this option will let you "..
+		"see the exact price that this module is reporting for the current item.")
 	
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", "Enable WoWEcon Stats")
-	gui:AddTip(id, "Allow WoWEcon to gather and return price data")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", "Enable WOWEcon Stats")
+	gui:AddTip(id, "Allow WOWEcon to gather and return price data")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", "Always use global price, not server price")
 	gui:AddTip(id, "Toggle use of server specific Wowecon price stats, if they exist")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", "Sanitize links before sending to WOWEcon API")
+	gui:AddTip(id, "Removes ultra-specific item data from links before issuing the price request")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", "Show WOWEcon value in tooltip (see note)")
+	gui:AddTip(id, "Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip")
 end
 
 function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.useglobal", true)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.enable", true)
+	AucAdvanced.Settings.SetDefault("stat.wowecon.sanitize", true)
+	AucAdvanced.Settings.SetDefault("stat.wowecon.tooltip", false)
+end
+
+function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+	if not AucAdvanced.Settings.GetSetting("stat.wowecon.tooltip") then return end
+	lib.GetPriceArray(hyperlink)
+
+	if array.seen > 0 then
+		EnhTooltip.AddLine(libName.." prices (seen "..array.seen..")")
+		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+
+		if array.specific then
+			EnhTooltip.AddLine("  Server price:", array.price * quantity)
+		else
+			EnhTooltip.AddLine("  Global price:", array.price * quantity)
+		end
+		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		if (quantity > 1) then
+			EnhTooltip.AddLine("    (or individually)", array.price)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		end
+
+		if IsModifierKeyDown() then
+			if array.specific then
+				EnhTooltip.AddLine("  Global (seen "..array.g_seen.."):", array.g_price * quantity)
+			elseif array.s_seen > 0 then
+				EnhTooltip.AddLine("  Server (seen "..array.s_seen.."):", array.s_price * quantity)
+			else
+				EnhTooltip.AddLine("  Never seen for server")
+			end
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		end
+
+	end
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
