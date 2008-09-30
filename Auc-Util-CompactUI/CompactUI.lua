@@ -879,6 +879,13 @@ function private.SetupConfigGui(gui)
 		"Why do I want to prevent other modules from changing the Browse window?",
 		"If you have a module such as ScanProgress installed and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead.")
 
+	gui:AddHelp(id, "what is playerignore",
+		"How to ignore a seller's auctions?",
+		"ALT click on the seller you wish to ignore and select yes in the pop up window. The seller's name will be marked in red and placed in the BASIC FILTER module's ignored list.")
+	gui:AddHelp(id, "what is playerunignore",
+		"How to un-ignore a seller's auctions?",
+		"ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list.")
+
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
