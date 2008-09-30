@@ -388,6 +388,13 @@ function private.SetupConfigGui(gui)
 		"What is the step magnitude?",
 		"The step magnitude specifies the point at which the algorithm decides to move up to the next unit place |cffffff00(copper->silver->gold)|r. For example, if the step magnitude was set to 5, then an amount of 1g 45s 12c would round at the copper place, but an amount of 5g 45s 12c would round at the silver place.")
 
+	gui:AddHelp(id, "what is playerignore",
+		"How to ignore a seller's auctions?",
+		"ALT click on the seller you wish to ignore and select yes in the pop up window. The seller's name will be marked in red and placed in the BASIC FILTER module's ignored list.")
+	gui:AddHelp(id, "what is playerunignore",
+		"How to un-ignore a seller's auctions?",
+		"ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list.")
+	
 	gui:AddControl(id, "Note",       0, 2, 500, 150,
 "If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
 "The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..
