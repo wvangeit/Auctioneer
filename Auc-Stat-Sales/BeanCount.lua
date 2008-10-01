@@ -345,7 +345,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
         end
         if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.sales.normal") then
-				EnhTooltip.AddLine("  Normalized", average*quantity)
+				EnhTooltip.AddLine("  Normalized (stack)", average*quantity)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
 				if (quantity > 1) then
 					EnhTooltip.AddLine("  (or individually)", average)
