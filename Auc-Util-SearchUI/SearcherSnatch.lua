@@ -40,7 +40,7 @@ lib.Private = private
 default("snatch.allow.bid", true)
 default("snatch.allow.buy", true)
 default("snatch.allow.beginerTooltips", true)
-default("snatch.itemsList", {})
+--defaults do not work for tables,  A123456 is still gonna be table A123456  regardless of if it has data or not
 if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
 
 private.workingItemLink = nil
