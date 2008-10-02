@@ -352,10 +352,10 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", true)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg3", true)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg7", true)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg14", true)
+	AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", false)
+	AucAdvanced.Settings.SetDefault("stat.purchased.avg3", false)
+	AucAdvanced.Settings.SetDefault("stat.purchased.avg7", false)
+	AucAdvanced.Settings.SetDefault("stat.purchased.avg14", false)
 	AucAdvanced.Settings.SetDefault("stat.purchased.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.purchased.enable", true)
 end

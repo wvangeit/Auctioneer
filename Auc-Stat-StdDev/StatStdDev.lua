@@ -343,9 +343,9 @@ end
 
 function lib.OnLoad(addon)
 	private.makeData()
-	AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", true)
-	AucAdvanced.Settings.SetDefault("stat.stddev.mean", true)
-	AucAdvanced.Settings.SetDefault("stat.stddev.normal", true)
+	AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", false)
+	AucAdvanced.Settings.SetDefault("stat.stddev.mean", false)
+	AucAdvanced.Settings.SetDefault("stat.stddev.normal", false)
 	AucAdvanced.Settings.SetDefault("stat.stddev.stdev", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.confid", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.quantmul", true)

@@ -98,11 +98,11 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.showmailgui", false)
 	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
 	default("util.automagic.chatspam", true) --Supposed to default on has to be unchecked if you don't want the chat text.
-	default("util.automagic.depositTT", false) --Used for disabling the deposit costs TT
+	default("util.automagic.depositTT", true) --Used for disabling the deposit costs TT
 	default("util.automagic.ammailguix", 100) --Used for storing mailgui location
 	default("util.automagic.ammailguiy", 100) --Used for storing mailgui location
 	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
-	default("util.automagic.deplength", "24")
+	default("util.automagic.deplength", "48")
 	default("util.automagic.overidebtmmail", false) -- Item AI for mail rule instead of BTM rule.
 	
 	default("util.automagic.displaybeginerTooltips", true)

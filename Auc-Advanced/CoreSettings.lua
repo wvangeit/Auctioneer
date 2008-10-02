@@ -112,11 +112,11 @@ local settingDefaults = {
 	['scandata.force'] = false,
 	['scandata.summary'] = true,
 	['clickhook.enable'] = true,
-	['scancommit.speed'] = 20,
+	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
-	['alwaysHomeFaction'] = false,
+	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
-    ['marketvalue.accuracy'] = .05
+    ['marketvalue.accuracy'] = .08
 }
 
 local function getDefault(setting)

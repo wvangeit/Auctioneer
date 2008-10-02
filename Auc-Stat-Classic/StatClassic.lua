@@ -262,7 +262,7 @@ function lib.GetPriceArray(hyperlink, ahKey, realm)
 	return array
 end
 
-AucAdvanced.Settings.SetDefault("stat.classic.tooltip", true)
+AucAdvanced.Settings.SetDefault("stat.classic.tooltip", false)
 AucAdvanced.Settings.SetDefault("stat.classic.enable", true)
 
 function private.SetupConfigGui(gui)

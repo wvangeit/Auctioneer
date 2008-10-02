@@ -77,7 +77,7 @@ default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
 default("util.itemsuggest.relisttimes", 1)-- Used for item AI
 default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
 default("util.itemsuggest.includedeposit", 1)-- Used for item AI
-default("util.itemsuggest.deplength", "24")
+default("util.itemsuggest.deplength", "48")
 
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)

@@ -157,9 +157,9 @@ function lib.OnLoad()
 
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.undercut.enable", true)
-	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -10)
+	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -20)
 	AucAdvanced.Settings.SetDefault("match.undermarket.overmarket", 10)
-	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 5)
+	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 1)
 end
 
 --[[ Local functions ]]--

@@ -279,7 +279,7 @@ function lib.ClearItem(hyperlink, faction, realm)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("stat.sales.tooltip", true)
+	AucAdvanced.Settings.SetDefault("stat.sales.tooltip", false)
     AucAdvanced.Settings.SetDefault("stat.sales.avg", true)
     AucAdvanced.Settings.SetDefault("stat.sales.avg3", false)
     AucAdvanced.Settings.SetDefault("stat.sales.avg7", false)

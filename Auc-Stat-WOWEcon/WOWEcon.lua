@@ -182,7 +182,7 @@ end
 
 function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.useglobal", true)
-	AucAdvanced.Settings.SetDefault("stat.wowecon.enable", true)
+	AucAdvanced.Settings.SetDefault("stat.wowecon.enable", false)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.sanitize", true)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.tooltip", false)
 end

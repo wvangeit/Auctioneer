@@ -417,10 +417,10 @@ end
 function lib.OnLoad(addon)
 	private.makeData()
 	private.makeTotalData()
-	AucAdvanced.Settings.SetDefault("stat.histogram.tooltip", true)
-	AucAdvanced.Settings.SetDefault("stat.histogram.median", true)
+	AucAdvanced.Settings.SetDefault("stat.histogram.tooltip", false)
+	AucAdvanced.Settings.SetDefault("stat.histogram.median", false)
 	AucAdvanced.Settings.SetDefault("stat.histogram.iqr", true)
-	AucAdvanced.Settings.SetDefault("stat.histogram.precision", true)
+	AucAdvanced.Settings.SetDefault("stat.histogram.precision", false)
 	AucAdvanced.Settings.SetDefault("stat.histogram.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.histogram.enable", true)
 end
