@@ -108,13 +108,13 @@ function lib:MakeGuiConfig(gui)
 		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
 		{ "Snatching", "TOOLTIP", 176 }, 
 		{ "Buy each", "COIN", 70 }, 
-		}, private.OnEnterScratch, private.OnLeave, private.OnClickSnatch, private.OnResize)
+		}, private.OnEnterSnatch, private.OnLeave, private.OnClickSnatch, private.OnResize)
 	else
 		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
 		{ "Snatching", "TOOLTIP", 176 }, 
 		{ "Buy each", "COIN", 70}, 
 		{ "App. value", "COIN", 70 }, 
-		}, private.OnEnterScratch, private.OnLeave, private.OnClickSnatch, private.OnResize)
+		}, private.OnEnterSnatch, private.OnLeave, private.OnClickSnatch, private.OnResize)
 	end
 	
 	-- Bag List
@@ -216,7 +216,7 @@ function lib:MakeGuiConfig(gui)
 	lib.PopulateBagSheet()
 end
 
-function private.OnEnterScratch(button, row, index)
+function private.OnEnterSnatch(button, row, index)
 	if frame.snatchlist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.snatchlist.sheet.rows[row][index]:GetText()
 		local name = GetItemInfo(link)
@@ -312,7 +312,7 @@ end
 
 --[[Snatch GUI functinality code]]
 function lib.AddSnatch(itemlink, price, count)
-	local _, itemid, itemsuffix, itemenchant, itemseed = AucAdvanced.DecodeLink(itemlink)
+	local _, itemid, itemsuffix, itemenchant, _ = AucAdvanced.DecodeLink(itemlink)
 	
 	if not itemid then return end 
 	
@@ -358,6 +358,17 @@ function lib.SetWorkingItem(link)
 	
 	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
 	if not name or not texture then return end
+	
+	--Get the current saved value if already in snatch list
+	local _, itemid, itemsuffix, itemenchant, _ = AucAdvanced.DecodeLink(link)
+	if itemid then	
+		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+		if private.snatchList[itemsig] then
+			MoneyInputFrame_SetCopper(frame.money, private.snatchList[itemsig].price or 0)
+		else
+			MoneyInputFrame_ResetMoney(frame.money)
+		end
+	end
 	
 	--set edit box texture and name
 	frame.icon:SetNormalTexture(texture) --set icon texture
