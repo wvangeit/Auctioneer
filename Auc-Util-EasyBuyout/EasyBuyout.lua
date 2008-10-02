@@ -75,9 +75,9 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EBid.active", false)
 	
 	-- EasyGoldLimit Default Settings
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.active", false)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.active", true)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBuy.limit", 100000)
-	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.active", false)
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.active", true)
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.EGL.EBid.limit", 50000)
 
 end

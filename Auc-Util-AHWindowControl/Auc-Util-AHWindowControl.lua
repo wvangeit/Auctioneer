@@ -69,11 +69,11 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-	default("util.mover.activated", false)
-	default("util.mover.rememberlastpos", false)
+	default("util.mover.activated", true)
+	default("util.mover.rememberlastpos", true)
 	default("util.mover.anchors", {"TOPLEFT", UIParent, "TOPLEFT", 0, -104})
 	default("util.protectwindow.protectwindow", 1)
-	default("util.protectwindow.processprotect", false)
+	default("util.protectwindow.processprotect", true)
 	default("util.ahwindowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
 	default("util.ahwindowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
 end
