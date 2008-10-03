@@ -2417,19 +2417,19 @@ function private.CreateFrames()
 		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
 			frame.imageview.sheet.prevselected = frame.imageview.sheet.selected
 			local selected = frame.imageview.sheet:GetSelection()
-			if (not selected) or (not selected[11]) then
+			if (not selected) or (not selected[10]) then
 				private.buyselection = {}
 				frame.imageview.purchase.buy:Disable()
 				frame.imageview.purchase.buy.price:SetText("")
 				frame.imageview.purchase.bid:Disable()
 				frame.imageview.purchase.bid.price:SetText("")
 			else
-				private.buyselection.link = selected[11]
-				private.buyselection.seller = selected[2]
-				private.buyselection.stack = selected[4]
-				private.buyselection.minbid = selected[8]
-				private.buyselection.curbid = selected[9]
-				private.buyselection.buyout = selected[10]
+				private.buyselection.link = selected[10]
+				private.buyselection.seller = selected[1]
+				private.buyselection.stack = selected[3]
+				private.buyselection.minbid = selected[7]
+				private.buyselection.curbid = selected[8]
+				private.buyselection.buyout = selected[9]
 				--make sure that it's not one of our auctions, then enable based on buy/bid availability
 				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
 					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
