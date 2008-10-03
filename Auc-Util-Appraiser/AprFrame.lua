@@ -340,7 +340,7 @@ function private.CreateFrames()
 			end
 			local count = result[Const.COUNT]
 			data[i] = {
-				result[Const.NAME],
+				--result[Const.NAME],
 				result[Const.SELLER],
 				tLeft,
 				count,
@@ -357,11 +357,11 @@ function private.CreateFrames()
 				curbid = result[Const.MINBID]
 			end
 			--price level color item
-			local r,g,b = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
-			if r then
+			local r, g, b, Alpha1, Alpha2, direction = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
+			if direction and r then
 				style[i] = {}
 				style[i][1] = {}
-				style[i][1].textColor = {r,g,b}
+				style[i][1].rowColor = {r, g, b, Alpha1, Alpha2, direction}
 			end
 			--color ignored sellers
 			if AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
@@ -384,7 +384,19 @@ function private.CreateFrames()
 		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
 			local _, link = GetItemInfo(itemID)
 			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
-			return r,g,b
+				
+			local direction = get("util.appraiser.colordirection")
+			if (direction == "LEFT") then
+				return r,g,b, 0, 0.2, "Horizontal"
+			elseif (direction == "RIGHT") then
+				return r,g,b, 0.2, 0, "Horizontal"
+			elseif (direction == "BOTTOM") then
+				return r,g,b, 0, 0.2, "Vertical"
+			elseif (direction == "TOP") then
+				return r,g,b, 0.2, 0, "Vertical"
+			else
+				return r,g,b
+			end
 		end
 		return rDef,gDef,bDef
 	end
@@ -2512,7 +2524,7 @@ function private.CreateFrames()
 	font:SetTextHeight(10)
 	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
+		--{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
 		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
 		{ "Left",   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Left")}, --40
 		{ "Stk",    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Stk")}, --30

@@ -256,6 +256,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.vendor", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.color", true)
+AucAdvanced.Settings.SetDefault("util.appraiser.colordirection","RIGHT")
 AucAdvanced.Settings.SetDefault("util.appraiser.manifest.color", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.tint.color", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.match", "on")
@@ -265,7 +266,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.clickhook", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.reselect", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.buttontips", true)
 --Default sizes for the scrollframe column widths
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Item", 105)
+--AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Item", 105)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Seller", 75)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Left", 40)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Stk", 30 )
@@ -275,7 +276,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Buy/ea", 85)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.MinBid", 85)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.CurBid", 85)
 AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.Buyout", 85)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0)
+AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0.05)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
@@ -296,6 +297,14 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This option will cause your current auctions to be displayed in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", "Color Appraiser items by their PriceLevel data")
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the current auction valuations by how far above/below the current priceing model's mean in shades from red to blue. ")
+	gui:AddControl(id, "Selectbox",  0, 3, {
+		{"LEFT", "Left"},
+		{"RIGHT", "Right"},
+		{"TOP", "Top"},
+		{"BOTTOM", "Bottom"},
+	}, "util.appraiser.colordirection", "Pick the gradient direction")
+	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the Appraiser Browse window (if enabled).")
+	
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.manifest.color", "Color bid and buy prices in the manifest frame by their PriceLevel data")
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the per-stack prices of your bid and buyout lines in the right-side pop-out manifest frame")
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.tint.color", "Tint bid and buy input boxes by their PriceLevel data")
