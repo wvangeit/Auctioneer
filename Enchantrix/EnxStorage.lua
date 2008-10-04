@@ -48,7 +48,10 @@ local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
 
 local saveProspect					-- Enchantrix.Storage.SaveProspect()
 local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
-local getItemProspectTotals			-- Enchantrix.Storage.GetItemProspectTotals()
+
+local saveMilling					-- Enchantrix.Storage.SaveMilling
+local getItemMilling				-- Enchantrix.Storage.GetItemMilling()
+
 
 -- Local functions
 local unserialize
@@ -198,13 +201,48 @@ function saveProspect(sig, reagentList )
 		end
 		ProspectedLocal[id][reagentID] = ProspectedLocal[id][reagentID] + quantity;
 	end
-
 end
 
 -- this will return nil for anything that is not prospectable
 function getItemProspects(link)
 	local itemID = EnhTooltip.BreakLink(link);
 	return Enchantrix.Constants.ProspectableItems[ itemID ];
+end
+
+
+
+-- for this, we need to pass in a list of reagents
+function saveMilling(sig, reagentList )
+	-- Update tables after a prospect has been detected
+	assert(type(sig) == "string");
+
+	local id = Enchantrix.Util.GetItemIdFromSig(sig)
+	if (not MillingLocal[id]) then
+		MillingLocal[id] = {}
+		MillingLocal[id].total = 0;
+	end
+
+	MillingLocal[id].total = MillingLocal[id].total + 1;
+	for reagentID, quantity in pairs( reagentList ) do
+		if (not MillingLocal[id][reagentID]) then
+			MillingLocal[id][reagentID] = 0;
+		end
+		MillingLocal[id][reagentID] = MillingLocal[id][reagentID] + quantity;
+	end
+end
+
+-- this will return nil for anything that is not millable
+
+--- ccox - WOTLK - this needs to use item level not just item->result
+-- similar code in EnxTooltip.lua / millingTooltip
+
+function getItemMilling(link)
+	local itemID = EnhTooltip.BreakLink(link);
+	local resultGroup = Enchantrix.Constants.MillableItems[ itemID ];
+	if not resultGroup then
+		return nil
+	end
+	return Enchantrix.Constants.MillGroupYields[ resultGroup ];
 end
 
 
@@ -575,6 +613,7 @@ function addonLoaded()
 	if not NonDisenchantables then NonDisenchantables = {} end
 	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
 	if not ProspectedLocal then ProspectedLocal = {} end
+	if not MillingLocal then MillingLocal = {} end
 
 	mergeDisenchantLists()
 end
@@ -594,7 +633,9 @@ Enchantrix.Storage = {
 
 	SaveProspect = saveProspect,
 	GetItemProspects = getItemProspects,
-	GetItemProspectTotals = getItemProspectTotals,
+
+	SaveMilling = saveMilling,
+	GetItemMilling = getItemMilling,
 }
 
 -- Make all globals local to this file

@@ -817,6 +817,15 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 end
 
 
+function Enchantrix.Util.InscriptionSkillRequiredForItem(link)
+	local item = getItemIdFromLink(link);
+	local resultBracket = Enchantrix.Constants.MillableItems[item];
+	if (not resultBracket) then
+		return 0
+	end
+	return Enchantrix.Constants.MillingSkillRequired[resultBracket];
+end
+
 function Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
 	local item = getItemIdFromLink(link);
 	local minLevel = Enchantrix.Constants.ProspectMinLevels[item];
@@ -831,7 +840,7 @@ end
 
 -- NOTE: this is sort of an expensive function, so don't call it often
 -- I've tried to make it friendlier by caching the value and only checking every 5 seconds
--- TODO - can these 2 functions be merged?
+-- TODO - can these 3 functions be merged?
 
 function Enchantrix.Util.GetUserEnchantingSkill()
 	local MyExpandedHeaders = {}
@@ -939,6 +948,58 @@ function Enchantrix.Util.GetUserJewelCraftingSkill()
 	return Enchantrix.JewelCraftingSkill
 end
 
+function Enchantrix.Util.GetUserInscriptionSkill()
+	local MyExpandedHeaders = {}
+	local i, j
+
+	-- the user can't have increased their skill too much in 5 seconds
+	if (Enchantrix.InscriptionSkill
+		and Enchantrix.InscriptionSkillTimeStamp
+		and GetTime() - Enchantrix.InscriptionSkillTimeStamp < 5) then
+		return Enchantrix.InscriptionSkill
+	end
+
+	-- just in case the user doesn't have jewelcrafting
+	Enchantrix.InscriptionSkill = 0;
+
+	-- search the skill tree for all skills
+	for i=0, GetNumSkillLines(), 1 do
+		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
+
+		-- expand the header if necessary
+		if ( header and not isExpanded ) then
+			MyExpandedHeaders[i] = skillName
+		end
+	end
+
+	ExpandSkillHeader(0)
+	for i=1, GetNumSkillLines(), 1 do
+		local skillName, header, _, skillRank = GetSkillLineInfo(i)
+		-- check for the skill name
+		if (skillName and not header) then
+			if (skillName == _ENCH("Inscription")) then
+				-- save this in a global for caching, and the auction filters
+				Enchantrix.InscriptionSkill = skillRank
+				Enchantrix.InscriptionSkillTimeStamp = GetTime()
+				-- no need to look at the rest of the skills
+				break
+			end
+		end
+	end
+
+	-- close headers expanded during search process
+	for i=0, GetNumSkillLines() do
+		local skillName, header, isExpanded = GetSkillLineInfo(i)
+		for j in pairs(MyExpandedHeaders) do
+			if ( header and skillName == MyExpandedHeaders[j] ) then
+				CollapseSkillHeader(i)
+				MyExpandedHeaders[j] = nil
+			end
+		end
+	end
+
+	return Enchantrix.InscriptionSkill
+end
 
 
 -- an attempt to balance the price of essences when doing auction scans

@@ -296,7 +296,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		-- NOTE: we do get the spell name here
 		DisenchantEvent.finished = nil
-		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName')) then
+-- ccox - WOTLK - localize me!
+		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == 'Milling')) then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
 				DisenchantEvent.spellname = spell;
@@ -346,7 +347,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		-- NOTE: we do get the spell name here
-		if spell == _ENCH('ArgSpellname') or spell == _ENCH('ArgSpellProspectingName') then
+-- ccox - WOTLK - localize me!
+		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == 'Milling')) then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.sent = true;
 			end
@@ -357,6 +359,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
 			local isDisenchant = nil
+			local isProspect = nil
+			local isMilling = nil
 			local chatPrintYield = Enchantrix.Settings.GetSetting('chatShowFindings')
 			if (DisenchantEvent.spellname == _ENCH('ArgSpellname')) then
 				if (chatPrintYield) then
@@ -367,7 +371,14 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				if (chatPrintYield) then
 					Enchantrix.Util.ChatPrint( _ENCH("FrmtProspectFound"):format(DisenchantEvent.finished))
 				end
-				isDisenchant = nil;
+				isProspect = true;
+-- ccox - WOTLK - localize me!
+			elseif (DisenchantEvent.spellname == 'Milling') then
+				if (chatPrintYield) then
+					local FrmtMillingFound = "Found that %s mills into:";
+					Enchantrix.Util.ChatPrint( FrmtMillingFound:format(DisenchantEvent.finished))
+				end
+				isMilling = true;
 			end
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
 			local reagentList = {}
@@ -391,8 +402,12 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				end
 			end
 
-			if (not isDisenchant)  then
+			if (isProspect)  then
 				Enchantrix.Storage.SaveProspect(sig, reagentList)
+			end
+			
+			if (isMilling)  then
+				Enchantrix.Storage.SaveMilling(sig, reagentList)
 			end
 		end
 		DisenchantEvent.spellTarget = nil

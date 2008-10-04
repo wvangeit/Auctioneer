@@ -132,6 +132,16 @@ local settingDefaults = {
 	['TooltipProspectShowBaselineValue'] = true,
 	['TooltipProspectShowAuctAdvValue'] = true,
 
+	['TooltipShowMilling'] = true,		-- should the tooltip show any Milling data?
+	['TooltipMillingLevels'] = true,		-- should the tooltip show skill level needed to Milling?
+	['TooltipMillingValues'] = true,		-- should the tooltip show Millinging values
+	['TooltipMillingMats'] = true,			-- should the item tooltip show what it Millings into? (for those who are just greedy)
+	['ToolTipMillingTerseFormat'] = false,
+	['TooltipMillingShowAuctValueHSP'] = true,
+	['TooltipMillingShowAuctValueMedian'] = true,
+	['TooltipMillingShowBaselineValue'] = true,
+	['TooltipMillingShowAuctAdvValue'] = true,
+
 	['ShowAllCraftReagents'] = false,		-- ccox - just an idea I'm testing, doesn't work that well yet
 
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
@@ -542,6 +552,25 @@ function lib.MakeGuiConfig()
 		end
 	end
 	gui:AddControl(id, "Checkbox",   0, 2, "TooltipProspectShowBaselineValue", _ENCH("GuiValueShowBaseline"))
+
+	id = gui:AddTab(_ENCH("GuiTabMilling"))
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiMillingOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowMilling", _ENCH("GuiShowMilling") )
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipMillingLevels", _ENCH("GuiMillingLevels") )
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipMillingMats", _ENCH("GuiMillingMaterials") )
+
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipMillingValues",  _ENCH("GuiMillingingValues"))
+	if (Enchantrix.State.Auctioneer_Loaded) then
+		if (Auctioneer) then
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipMillingShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipMillingShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		end
+		if (AucAdvanced) then
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipMillingShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
+		end
+	end
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipMillingShowBaselineValue", _ENCH("GuiValueShowBaseline"))
 
 
 	id = gui:AddTab(_ENCH("GuiTabAuctions"))

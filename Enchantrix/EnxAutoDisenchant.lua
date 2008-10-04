@@ -119,6 +119,7 @@ end
 local function getDisenchantOrProspectValue(link, count)
 	local _, _, quality, level = GetItemInfo(link)
 	if not (quality and level) then return end
+	
 	if quality >= 2 then
 		local enchSkillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		if enchSkillRequired and Enchantrix.Util.GetUserEnchantingSkill() >= enchSkillRequired then
@@ -137,6 +138,8 @@ local function getDisenchantOrProspectValue(link, count)
 			end
 		end
 	elseif count >= 5 then
+
+-- TODO - ccox - these could share some code
 		local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
 		if jcSkillRequired and Enchantrix.Util.GetUserJewelCraftingSkill() >= jcSkillRequired then
 			local prospect = Enchantrix.Storage.GetItemProspects(link)
@@ -159,6 +162,31 @@ local function getDisenchantOrProspectValue(link, count)
 				return prospectValue, _ENCH('ArgSpellProspectingName')
 			end
 		end
+
+		local inscriptionSkillRequired = Enchantrix.Util.InscriptionSkillRequiredForItem(link)
+		if inscriptionSkillRequired and Enchantrix.Util.GetUserInscriptionSkill() >= inscriptionSkillRequired then
+			local milling = Enchantrix.Storage.GetItemMilling(link)
+			if milling then
+				local millingValue = 0
+				for result, yield in pairs(milling) do
+					local hsp, median, baseline, valFive = Enchantrix.Util.GetReagentPrice(result)
+					if (not hsp) or (hsp == 0) then
+						-- what to do when Auc4 isn't loaded, but Auc5 is
+						-- or when you have no data for mat prices
+						if valFive and valFive > 0 then
+							hsp = valFive
+						else
+							hsp = baseline
+						end
+					end
+					local value = (hsp or 0) * yield
+					millingValue = millingValue + value
+				end
+-- TODO - ccox - localize me!
+				return millingValue, 'Milling'
+			end
+		end
+
 	end
 end
 
@@ -239,8 +267,12 @@ local function onEvent(...)
 			if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
 				if arg2 == _ENCH('ArgSpellProspectingName') then
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
-				else
+				elseif arg2 == _ENCH('ArgSpellname') then
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+-- TODO - ccox - localize me!
+				elseif arg2 == 'Milling' then
+					local tempFormat = "Milling %s"
+					Enchantrix.Util.ChatPrint(tempFormat:format(prompt.link))
 				end
 			end
 			hidePrompt()
@@ -287,9 +319,13 @@ local function onEvent(...)
 					showPrompt(link, bag, slot, value, spell)
 				else
 					-- sold, traded, banked, destroyed, ...
-					if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
+					local spellName = prompt.Yes:GetAttribute("spell")
+					if spellName == _ENCH('ArgSpellProspectingName') then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspectCancelled"))
-					else
+-- TODO - ccox - localize me!
+					elseif spellName == 'Milling'  then
+						Enchantrix.Util.ChatPrint("Milling cancelled: item not found")
+					elseif spellName == _ENCH('ArgSpellname')  then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
 					end
 					clearPrompt()
@@ -314,7 +350,9 @@ local function onUpdate(frame, elapsed)
 	local enabledInOptions = Enchantrix.Settings.GetSetting('AutoDisenchantEnable')
 	if enabledInOptions then
 		if isState("sleep") or isState("init") then
-			if Enchantrix.Util.GetUserEnchantingSkill() >= 1 or Enchantrix.Util.GetUserJewelCraftingSkill() >= 20 then
+			if Enchantrix.Util.GetUserEnchantingSkill() >= 1
+				or Enchantrix.Util.GetUserJewelCraftingSkill() >= 20 
+				or Enchantrix.Util.GetUserInscriptionSkill() >= 1 then
 				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeActive"))
 				beginScan()
 			elseif isState("init") then
@@ -388,7 +426,11 @@ function showPrompt(link, bag, slot, value, spell)
 	if spell == _ENCH('ArgSpellProspectingName') then
 		prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
-	else
+-- TODO - ccox - localize me!
+	elseif spell == 'Milling' then
+		prompt.Lines[1]:SetText("Do you want to mill:\n")
+		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
+	elseif spell == _ENCH('ArgSpellname') then
 		prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link)
 	end
@@ -431,7 +473,10 @@ local function showTooltip()
 	if (EnhTooltip) then
 		local name = GetItemInfo(prompt.link)
 		local count = 1
-		if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
+		local spellName = prompt.Yes:GetAttribute("spell")
+		if spellName == _ENCH('ArgSpellProspectingName')
+-- TODO - ccox - localize me!
+			or spellName == 'Milling' then
 			count = 5
 		end
 		EnhTooltip.TooltipCall(GameTooltip, name, prompt.link, -1, count, 0)
