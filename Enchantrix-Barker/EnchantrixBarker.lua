@@ -157,6 +157,8 @@ local short_location = {
 	[_BARKLOC('Shattrath')] = _BARKLOC('ShortShattrath'),
 	[_BARKLOC('SilvermoonCity')] = _BARKLOC('ShortSilvermoon'),
 	[_BARKLOC('TheExodar')] = _BARKLOC('ShortExodar'),
+-- TODO - ccox - localize me!
+	['Dalaran'] = 'Dalaran',
 };
 
 
