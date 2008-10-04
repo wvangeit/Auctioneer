@@ -10,7 +10,7 @@
 		<ButtonText inherits="GameFontNormal" justifyH="LEFT" setAllPoints="true"/>
 		<Scripts>
 			<OnLoad>
-				this:SetFrameLevel( this:GetFrameLevel() + 4 );
+				self:SetFrameLevel( self:GetFrameLevel() + 4 );
 			</OnLoad>
 			<OnClick>
 				BF_IgnoreList_IgnoreButton_OnClick(self)
@@ -37,7 +37,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetFrameLevel( this:GetFrameLevel() + 3 );
+						self:SetFrameLevel( self:GetFrameLevel() + 3 );
 					</OnLoad>
 					<OnClick>
 						StaticPopup_Show("BASICFILTER_ADD_IGNORE");
@@ -66,7 +66,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetFrameLevel( this:GetFrameLevel() + 3 );
+						self:SetFrameLevel( self:GetFrameLevel() + 3 );
 					</OnLoad>
 					<OnClick>
 						BF_IgnoreList_UnignoreButton_OnClick(self)
@@ -304,8 +304,8 @@
 				</Layers>
 				<Scripts>
 					<OnLoad>
-						this:SetFrameLevel( this:GetFrameLevel() + 3 );
-						ScrollFrame_OnLoad();
+						self:SetFrameLevel( self:GetFrameLevel() + 3 );
+						ScrollFrame_OnLoad(self);
 					</OnLoad>
 					<OnVerticalScroll>
 						FauxScrollFrame_OnVerticalScroll(16, BF_IgnoreList_Update);
