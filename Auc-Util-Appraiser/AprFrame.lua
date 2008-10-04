@@ -2111,7 +2111,7 @@ function private.CreateFrames()
 	frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
 	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enter new bid amount to set a Fixed Price") end)
 	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, function()
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
 		else
@@ -2149,7 +2149,7 @@ function private.CreateFrames()
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
 	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enter new buyout amount to set a Fixed Price") end)
 	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, function()
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function()
 		if not frame.salebox.buyconfig then
 			frame.UpdateControls()
 		else
