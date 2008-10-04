@@ -285,7 +285,7 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											end
 										end
 									else
-										AuctionFrameFilter_OnClick() 
+										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i]) 
 										private.AuctionFrameFilters_ClearSelection()
 									end
 								end)
