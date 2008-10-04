@@ -761,8 +761,12 @@ end
 function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	local maxLevel;
 	
-	if (skill >= 325) then
-		maxLevel = 200;		-- ccox - BOGUS - fake for WOTLK
+	if (skill >= 375) then
+		maxLevel = 220;
+	elseif (skill >= 350) then
+		maxLevel = 200;
+	elseif (skill >= 325) then
+		maxLevel = 151;
 	elseif (skill >= 300) then
 		maxLevel = 129;		-- max level for WoW 2.2/BC ??
 	elseif (skill >= 125) then
@@ -781,9 +785,14 @@ end
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
 
-	if (level >= 130) then
-		-- new math for WOTLK
-		return 325;		-- ccox - BOGUS - fake for WOTLK
+	if (level > 200) then
+		return 375;
+	
+	elseif (level >= 152) then
+		return 350;			-- ccox - rare/blue items are still 325 due to a Blizzard bug, hope it gets fixed soon
+			
+	elseif (level >= 130) then
+		return 325;
 	
 	elseif (level > 65) then
 	-- someone changed their math with the Burning Crusade
@@ -838,28 +847,28 @@ function Enchantrix.Util.DisenchantSkillRequiredForItem(link)
 end
 
 
--- NOTE: this is sort of an expensive function, so don't call it often
--- I've tried to make it friendlier by caching the value and only checking every 5 seconds
--- TODO - can these 3 functions be merged?
+-- NOTE: this is an expensive function
+-- we try to make it friendlier by caching the value and only checking every 5 seconds
 
-function Enchantrix.Util.GetUserEnchantingSkill()
-	local MyExpandedHeaders = {}
-	local i, j
+Enchantrix.Util.SkillCacheRank = {}
+Enchantrix.Util.SkillCacheTimeStamp = {}
 
-	-- the user can't have increased their skill too much in 5 seconds
-	if (Enchantrix.EnchantingSkill
-		and Enchantrix.EnchantingSkillTimeStamp
-		and GetTime() - Enchantrix.EnchantingSkillTimeStamp < 5) then
-		return Enchantrix.EnchantingSkill
+function Enchantrix.Util.GetUserSkillByName( name )
+
+	local cacheRank = Enchantrix.Util.SkillCacheRank[ name ]
+	local cacheTime = Enchantrix.Util.SkillCacheTimeStamp[ name ]
+	if (cacheRank and cacheTime
+		and (GetTime() - cacheTime) < 5) then
+		return cacheRank
 	end
 
-	-- just in case the user doesn't have enchanting
-	Enchantrix.EnchantingSkill = 0;
+	local MyExpandedHeaders = {}
+	local i, j
+	local resultRank = 0
 
 	-- search the skill tree for Mying skills
 	for i=0, GetNumSkillLines(), 1 do
 		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-
 		-- expand the header if necessary
 		if ( header and not isExpanded ) then
 			MyExpandedHeaders[i] = skillName
@@ -871,10 +880,8 @@ function Enchantrix.Util.GetUserEnchantingSkill()
 		local skillName, header, _, skillRank = GetSkillLineInfo(i)
 		-- check for the skill name
 		if (skillName and not header) then
-			if (skillName == _ENCH("Enchanting")) then
-				-- save this in a global for caching, and the auction filters
-				Enchantrix.EnchantingSkill = skillRank
-				Enchantrix.EnchantingSkillTimeStamp = GetTime()
+			if (skillName == name) then
+				resultRank = skillRank
 				-- no need to look at the rest of the skills
 				break
 			end
@@ -891,114 +898,24 @@ function Enchantrix.Util.GetUserEnchantingSkill()
 			end
 		end
 	end
+	
+	Enchantrix.Util.SkillCacheRank[ name ] = resultRank
+	Enchantrix.Util.SkillCacheTimeStamp[ name ] = GetTime()
 
-	return Enchantrix.EnchantingSkill
+	return resultRank
+end
+
+
+function Enchantrix.Util.GetUserEnchantingSkill()
+	return Enchantrix.Util.GetUserSkillByName( _ENCH("Enchanting") )
 end
 
 function Enchantrix.Util.GetUserJewelCraftingSkill()
-	local MyExpandedHeaders = {}
-	local i, j
-
-	-- the user can't have increased their skill too much in 5 seconds
-	if (Enchantrix.JewelCraftingSkill
-		and Enchantrix.JewelCraftingSkillTimeStamp
-		and GetTime() - Enchantrix.JewelCraftingSkillTimeStamp < 5) then
-		return Enchantrix.JewelCraftingSkill
-	end
-
-	-- just in case the user doesn't have jewelcrafting
-	Enchantrix.JewelCraftingSkill = 0;
-
-	-- search the skill tree for Mying skills
-	for i=0, GetNumSkillLines(), 1 do
-		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-
-		-- expand the header if necessary
-		if ( header and not isExpanded ) then
-			MyExpandedHeaders[i] = skillName
-		end
-	end
-
-	ExpandSkillHeader(0)
-	for i=1, GetNumSkillLines(), 1 do
-		local skillName, header, _, skillRank = GetSkillLineInfo(i)
-		-- check for the skill name
-		if (skillName and not header) then
-			if (skillName == _ENCH("Jewelcrafting")) then
-				-- save this in a global for caching, and the auction filters
-				Enchantrix.JewelCraftingSkill = skillRank
-				Enchantrix.JewelCraftingSkillTimeStamp = GetTime()
-				-- no need to look at the rest of the skills
-				break
-			end
-		end
-	end
-
-	-- close headers expanded during search process
-	for i=0, GetNumSkillLines() do
-		local skillName, header, isExpanded = GetSkillLineInfo(i)
-		for j in pairs(MyExpandedHeaders) do
-			if ( header and skillName == MyExpandedHeaders[j] ) then
-				CollapseSkillHeader(i)
-				MyExpandedHeaders[j] = nil
-			end
-		end
-	end
-
-	return Enchantrix.JewelCraftingSkill
+	return Enchantrix.Util.GetUserSkillByName( _ENCH("Jewelcrafting") )
 end
 
 function Enchantrix.Util.GetUserInscriptionSkill()
-	local MyExpandedHeaders = {}
-	local i, j
-
-	-- the user can't have increased their skill too much in 5 seconds
-	if (Enchantrix.InscriptionSkill
-		and Enchantrix.InscriptionSkillTimeStamp
-		and GetTime() - Enchantrix.InscriptionSkillTimeStamp < 5) then
-		return Enchantrix.InscriptionSkill
-	end
-
-	-- just in case the user doesn't have jewelcrafting
-	Enchantrix.InscriptionSkill = 0;
-
-	-- search the skill tree for all skills
-	for i=0, GetNumSkillLines(), 1 do
-		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-
-		-- expand the header if necessary
-		if ( header and not isExpanded ) then
-			MyExpandedHeaders[i] = skillName
-		end
-	end
-
-	ExpandSkillHeader(0)
-	for i=1, GetNumSkillLines(), 1 do
-		local skillName, header, _, skillRank = GetSkillLineInfo(i)
-		-- check for the skill name
-		if (skillName and not header) then
-			if (skillName == _ENCH("Inscription")) then
-				-- save this in a global for caching, and the auction filters
-				Enchantrix.InscriptionSkill = skillRank
-				Enchantrix.InscriptionSkillTimeStamp = GetTime()
-				-- no need to look at the rest of the skills
-				break
-			end
-		end
-	end
-
-	-- close headers expanded during search process
-	for i=0, GetNumSkillLines() do
-		local skillName, header, isExpanded = GetSkillLineInfo(i)
-		for j in pairs(MyExpandedHeaders) do
-			if ( header and skillName == MyExpandedHeaders[j] ) then
-				CollapseSkillHeader(i)
-				MyExpandedHeaders[j] = nil
-			end
-		end
-	end
-
-	return Enchantrix.InscriptionSkill
+	return Enchantrix.Util.GetUserSkillByName( _ENCH("Inscription") )
 end
 
 
@@ -1014,6 +931,7 @@ local function balanceEssencePrices(scanReagentTable, style)
 		[11174] = 11175,  	-- nether
 		[16202] = 16203,  	-- eternal
 		[22447] = 22446,	-- planar
+		[34056] = 34055,	-- cosmic
 	};
 
 	for lesser, greater in pairs(essenceTable) do
@@ -1107,12 +1025,13 @@ function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 end
 
 local DebugLib = LibStub("DebugLib")
-local debug, assert
+local debug, assert, printQuick
 if DebugLib then
-	debug, assert = DebugLib("Enchantrix")
+	debug, assert, printQuick = DebugLib("Enchantrix")
 else
 	function debug() end
 	assert = debug
+	printQuick = debug
 end
 
 ENX_CRITICAL = "Critical"
@@ -1132,7 +1051,7 @@ end
 
 -- when you just want to print a message and don't care about the rest
 function Enchantrix.Util.DebugPrintQuick(...)
-	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
+	printQuick(...)
 end
 
 
