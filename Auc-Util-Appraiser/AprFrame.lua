@@ -2633,7 +2633,7 @@ function private.CreateFrames()
 			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotLeft")
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
-			AuctionFrameMoneyFrame:Hide()
+			AuctionFrameMoneyFrame:Show()
 			if (AuctionDressUpFrame:IsVisible()) then
 				AuctionDressUpFrame:Hide()
 				AuctionDressUpFrame.reshow = true
