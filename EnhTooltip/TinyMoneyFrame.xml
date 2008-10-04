@@ -70,7 +70,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						</Anchor>
 					</Anchors>
 				</ButtonText>
-				<NormalFont inherits="GameFontNormalSmall" justifyH="RIGHT"/>
+				<NormalFont style="SystemFont_Small"/>
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>
@@ -111,7 +111,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						</Anchor>
 					</Anchors>
 				</ButtonText>
-				<NormalFont inherits="GameFontNormalSmall" justifyH="RIGHT"/>
+				<NormalFont style="SystemFont_Small"/>
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>
@@ -148,7 +148,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						<Anchor point="LEFT"/>
 					</Anchors>
 				</ButtonText>
-				<NormalFont inherits="GameFontNormalSmall" justifyH="LEFT"/>
+				<NormalFont style="SystemFont_Small"/>
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>

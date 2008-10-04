@@ -135,7 +135,7 @@ end
 
 function TinyMoneyFrame_UpdateMoney(self)
 	if ( self.info ) then
-		local money = self.info.UpdateFunc();
+		local money = self.info.UpdateFunc(self);
 		TinyMoneyFrame_Update(self, money);
 		if ( self.hasPickup == 1 ) then
 			UpdateCoinPickupFrame(money);

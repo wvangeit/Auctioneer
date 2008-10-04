@@ -1151,7 +1151,7 @@ function public.NameFromLink(link)
 	if (not link) then
 		return
 	end
-	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r")
+	return link:match("|c%x+|Hitem:.+|h%[(.-)%]|h|r")
 end
 
 function public.HyperlinkFromLink(link)
@@ -1165,12 +1165,12 @@ function public.BaselinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h")
+	return link:match("|Hitem:(.+):.-:.-|h")
 end
 
 function public.QualityFromLink(link)
 	if (not link) then return end
-	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
+	local color = link:match("(|c%x+)|Hitem:.+|h%[.-%]|h|r")
 	if (color) then
 		for i = 0, 6 do
 			local _, _, _, hex = GetItemQualityColor(i)
@@ -1204,18 +1204,28 @@ function public.FakeLink(hyperlink, quality, name)
 end
 
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness, name and the four gemSlots.
-function public.BreakLink(link)
-	if (type(link) == number) then return link,0,0,0,"",0,0,0,0,0 end
-	if (type(link) ~= 'string') then return end
-	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemBonus, randomProp, uniqID, name = link:match("|Hitem:(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)|h%[(.-)%]|h")
-	local randomFactor = 0
-	randomProp = tonumber(randomProp) or 0
-	uniqID = tonumber(uniqID) or 0
-	if (randomProp < 0 and uniqID < 0) then
-		randomFactor = bit.band(uniqID, 65535)
+--This is a copy of the Auctioneer Adv version of breakitemlink, does the job very well compared to my code 
+local function breakHyperlink(match, matchlen, ...)
+	local v
+	local n = select("#", ...)
+	for i = 2, n do
+		v = select(i, ...)
+		if (v:sub(1,matchlen) == match) then
+			return strsplit(":", v:sub(2))
+		end
 	end
-
-	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemBonus) or 0, randomFactor
+end
+function public.BreakLink(link)
+	local vartype = type(link)
+	if (vartype == "string") then
+		local lType, itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemBonus, randomProp, uniqID, lichKing = breakHyperlink("Hitem:", 6, strsplit("|", link))
+		if (lType ~= "item") then return end
+		name = link:match("|h%[(.-)%]|h")
+		return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemBonus) or 0, randomFactor, tonumber(lichKing) or 0
+	elseif (vartype == "number") then
+		return link,0,0,0,"",0,0,0,0,0
+	end
+	return
 end
 
 ------------------------
@@ -1326,13 +1336,14 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function private.chatHookOnHyperlinkShow(reference, link, button)
+function private.chatHookOnHyperlinkShow(_, reference, link, button)
 	--debugPrint("Enter","chatHookOnHyperlinkShow","Debug")
 	if (not EnhTooltip.Settings.GetSetting("showWithChatHyperlink") and not private.IsForceKeyPressed()) then return end	
 	private.DoHyperlink(reference, link, button)
 end
 
-function private.AfHookOnEnter(funcArgs, retVal, type, index)
+--For now work around for the nil first value passed by teh AH hook so _,  added
+function private.AfHookOnEnter(_, funcArgs, retVal, type, index)
 	--debugPrint("Enter","AfHookOnEnter","Debug")
 	if (not EnhTooltip.Settings.GetSetting("showWithAuction") and not private.IsForceKeyPressed()) then return end	
 	local link = GetAuctionItemLink(type, index)
@@ -1488,14 +1499,14 @@ function private.GtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
 	local link
 	if (slot) then
-		link = GetCraftReagentItemLink(skill, slot)
+		link = GetTradeSkillReagentItemLink(skill, slot)
 		if (link) then
-			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot)
+			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot)
 			local quality = public.QualityFromLink(link)
 			return private.TooltipCall(true, GameTooltip, name, link, quality, quantity)
 		end
 	else
-		link = GetCraftItemLink(skill)
+		link = GetTradeSkillItemLink(skill)
 		if (link) then
 			local name = public.NameFromLink(link)
 			local quality = public.QualityFromLink(link)
@@ -1507,8 +1518,8 @@ end
 function private.GtHookSetCraftSpell(funcArgs, retVal, frame, slot)
 	--debugPrint("Enter","GtHookSetCraftSpell","Debug")
 	if (not EnhTooltip.Settings.GetSetting("showWithProfessions") and not private.IsForceKeyPressed()) then return end	
-	local name = GetCraftInfo(slot)
-	local link = GetCraftItemLink(slot)
+	local name = GetTradeSkillInfo(slot)
+	local link = GetTradeSkillItemLink(slot)
 	if name and link then
 		return private.TooltipCall(true, GameTooltip, name, link)
 	end
@@ -1628,7 +1639,7 @@ function private.GtSetTrainerService(funcArgs, retVal, frame, index)
 end
 
 function private.GtSetLootRollItem(funcArgs, retVal, frame, id)
-	debugPrint("Enter","GtSetLootRollItem","Debug")
+	--debugPrint("Enter","GtSetLootRollItem","Debug")
 	if (not EnhTooltip.Settings.GetSetting("showWithLootAndLootRoll") and not private.IsForceKeyPressed()) then return end	
 	local link = GetLootRollItemLink(id)
 	local texture, name, itemCount, quality = GetLootRollItemInfo(id);
@@ -1637,7 +1648,7 @@ function private.GtSetLootRollItem(funcArgs, retVal, frame, id)
 	end
 end
 
-function private.GtSetBuybackItem(funcArgs, retVal, frame, slot)
+function private.GtSetBuybackItem(funcArgs, retVal, frame, slot) --Did not need _
 	--debugPrint("Enter","GtSetBuybackItem","Debug")
 	if (not EnhTooltip.Settings.GetSetting("showWithMerchants") and not private.IsForceKeyPressed()) then return end	
 	local link = GetBuybackItemLink(slot)
@@ -1849,8 +1860,11 @@ function private.TtInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, private.GtHookSetInventoryItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, private.GtHookSetBagItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, private.GtHookSetMerchantItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, private.GtHookSetCraftItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, private.GtHookSetCraftSpell)
+
+-- ccox - cannot find any similar functions in GameTooltip 3.0	
+--	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, private.GtHookSetCraftItem)
+-- 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, private.GtHookSetCraftSpell)
+ 	
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, private.GtHookSetTradeSkillItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, private.GtHookSetAuctionSellItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetGuildBankItem", 200, private.GtHookSetGuildBankItem)

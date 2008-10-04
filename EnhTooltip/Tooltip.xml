@@ -31,8 +31,8 @@
 	<Frame name="EnhancedTooltipMoneyTemplate" inherits="TinyMoneyFrameTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
 		<Scripts>
 			<OnLoad>
-				SmallMoneyFrame_OnLoad()
-				MoneyFrame_SetType("STATIC")
+				SmallMoneyFrame_OnLoad(self)
+				MoneyFrame_SetType(self, "STATIC");
 			</OnLoad>
 		</Scripts>
 	</Frame>
