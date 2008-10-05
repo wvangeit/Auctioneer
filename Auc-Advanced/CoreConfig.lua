@@ -51,10 +51,12 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
 		private.Print("  {{/auc about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
 
-		local modules = AucAdvanced.GetAllModules("CommandHandler")
-		for pos, engineLib in ipairs(modules) do
-			local engine = engineLib:GetName()
-			private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
+		for system in pairs(AucAdvanced.Modules) do 
+			local modules = AucAdvanced.GetAllModules("CommandHandler", system)
+			for pos, engineLib in ipairs(modules) do
+				local engine = engineLib:GetName()
+				private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
+			end
 		end
 	elseif command == "begin" or command == "scan" then
 		lib.ScanCommand(subcommand, ...)

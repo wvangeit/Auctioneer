@@ -393,12 +393,16 @@ function private.CheckModule(name, module)
 	if not module.GetName or type(module.GetName) ~= "function" then
 		-- Sometimes we find engines that don't have a "GetName()" function.
 		-- All engines should have this function!
-		nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module without GetName()", "No GetName() function was found for module indexed as \""..name.."\". Please fix this!")
+		if nLog then
+			nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module without GetName()", "No GetName() function was found for module indexed as \""..name.."\". Please fix this!")
+		end
 		fix = true
 	else
 		local reportedName = module.GetName()
 		if reportedName ~= name then
-			nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module GetName() mismatch", "The GetName() function was found for module indexed as \""..name.."\", but actually returns \""..reportedName.."\". Please fix this!")
+			if nLog then
+				nLog.AddMessage("Auctioneer", "CheckModule", N_WARNING, "Module GetName() mismatch", "The GetName() function was found for module indexed as \""..name.."\", but actually returns \""..reportedName.."\". Please fix this!")
+			end
 			fix = true
 		end
 	end

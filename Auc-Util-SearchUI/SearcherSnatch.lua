@@ -192,6 +192,11 @@ function lib:MakeGuiConfig(gui)
 	frame.resetList:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	
 	private.snatchList =  get("snatch.itemsList")
+	--if there was no saved snatchList, create an empty table
+	if not private.snatchList then
+		private.snatchList = {}
+		set("snatch.itemsList", private.snatchList)
+	end
 	--Set our "last" frame anchor point this will be the "top" area for normal config GUI elements
 	local last = gui:GetLast(id)
 	local  locationA, Frame, locationB, x, y = last:GetPoint()
