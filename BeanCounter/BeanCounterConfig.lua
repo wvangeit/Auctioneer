@@ -113,6 +113,10 @@ private.settingDefaults = {
 	--["util.beancounter.dateFormat"] = "%c",
 	["dateString"] = "%c", 
 	
+	--Color gradient
+	["colorizeSearch"] = true,
+	["colorizeSearchopacity"] = 0.2,
+	
 	--GUI column default widths
 	["columnwidth.".._BC('UiNameHeader')] = 120,
 	["columnwidth.".._BC('UiTransactions')] = 100,
@@ -408,6 +412,13 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
 	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00".._BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
+	
+	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "colorizeSearch", "Add a gradient color to each result in the search window")
+	gui:AddTip(id, "This option changes the color of the items lines in the BeanCounter search window.")
+	--gui:AddControl(id, "Slider",     0, 2, "colorizeSearchopacity", 1, 100, 1, "Opacity level: %d%%")
+	gui:AddControl(id, "NumeriSlider", 0, 3, "colorizeSearchopacity",    0, 1, 0.1, "Opacity level")
+	gui:AddTip(id, "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)")
 	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",

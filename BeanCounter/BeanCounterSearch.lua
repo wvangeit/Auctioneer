@@ -193,6 +193,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4], settings))
 			if not queryReturn then --do not create style tables if this data is being returned to an addon
 				style[#data] = {}
+				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {0.3, 0.9, 0.8, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
 				style[#data][12] = {["date"] = dateString}
 				style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
 				style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
@@ -214,6 +215,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
 			if not queryReturn then
 				style[#data] = {}
+				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 0, 0, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
 				style[#data][12] = {["date"] = dateString}
 				style[#data][2] = {["textColor"] = {1,0,0}}
 				style[#data][8] ={["textColor"] = {1,0,0}}
@@ -235,6 +237,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
 			if not queryReturn then
 				style[#data] = {}
+				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 1, 0, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
 				style[#data][12] = {["date"] = dateString}
 				style[#data][2] = {["textColor"] = {1,1,0}}
 				style[#data][8] ={["textColor"] = {1,1,0}}
@@ -256,6 +259,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
 			if not queryReturn then
 				style[#data] = {}
+				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 1, 1, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
 				style[#data][12] = {["date"] = dateString}
 				style[#data][2] = {["textColor"] = {1,1,1}}
 				style[#data][8] ={["textColor"] = {1,1,1}}
