@@ -31,13 +31,11 @@
 
 local lib = BeanCounter
 lib.API = {}
-
 local private = lib.Private
-local print =  BeanCounter.Print
-local _BC = private.localizations
+local private, print, get, set, _BC = lib.getLocals()
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugAPI") then
+    if get("util.beancounter.debugAPI") then
         private.debugPrint("BeanCounterAPI",...)
     end
 end
@@ -47,7 +45,7 @@ If itemID or Link search will be faster than a plain text lookup
 ]]
 local SearchRequest = {}
 function lib.API.search(name, settings, queryReturn, count)
-	if private.getOption("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
+	if get("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
 		--lets create a cache of the last search
 		if SearchRequest[name] then
 			debugPrint("Cached search results returned", name, time())

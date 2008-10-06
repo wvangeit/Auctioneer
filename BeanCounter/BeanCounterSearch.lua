@@ -30,14 +30,10 @@
 ]]
 
 local lib = BeanCounter
-lib.API = {}
-
-local private = lib.Private
-local print =  BeanCounter.Print
-local _BC = private.localizations
+local private, print, get, set, _BC = lib.getLocals()
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugSearch") then
+    if get("util.beancounter.debugSearch") then
         private.debugPrint("BeanCounterSearch",...)
     end
 end
@@ -47,7 +43,7 @@ local data = {}
 local style = {}
 local temp ={}
 local tbl = {}
-print("SearchLOADED")
+
 --This is all handled by ITEMIDS need to remove/rename this to be a utility to convert text searches to itemID searches
 function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 	--Run the compression function once per session, use first search as trigger
@@ -181,7 +177,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		return data.temp
 	end
 	--Format Data for display via scroll private.frame or if requesting addon wants formated data  --SLOW
-	local dateString = private.getOption("dateString") or "%c"
+	local dateString = get("dateString") or "%c"
 	for i,v in pairs(data.temp.completedAuctions) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches

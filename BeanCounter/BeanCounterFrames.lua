@@ -30,12 +30,10 @@
 ]]
 
 local lib = BeanCounter
-local private = lib.Private
-local print =  BeanCounter.Print
-local _BC = private.localizations
+local private, print, get, set, _BC = lib.getLocals()
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugFrames") then
+    if get("util.beancounter.debugFrames") then
         private.debugPrint("BeanCounterFrames",...)
     end
 end
@@ -191,7 +189,7 @@ function private.CreateFrames()
 	
 	--Beginner Tooltips script display for all UI elements 
 	function private.buttonTooltips(self, text)
-		if private.getOption("util.beancounter.displaybeginerTooltips") and text and self then
+		if get("util.beancounter.displaybeginerTooltips") and text and self then
 			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 			GameTooltip:SetText(text)
 		end
@@ -322,9 +320,9 @@ function private.CreateFrames()
 	
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
-	frame.exactCheck:SetChecked(private.getOption("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
+	frame.exactCheck:SetChecked(get("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
-	frame.exactCheck:SetScript("OnClick", function() local set if frame.exactCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonExactCheck", set) end)
+	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) end)
 	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, "Only match the Exact text in the search box") end)
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -332,7 +330,7 @@ function private.CreateFrames()
 	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
 	frame.classicCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
-	frame.classicCheck:SetScript("OnClick", function() local set if frame.classicCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonClassicCheck", set) end)
+	frame.classicCheck:SetScript("OnClick", function() local on if frame.classicCheck:GetChecked() then on = true end set("util.beancounter.ButtonClassicCheck", on) end)
 	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
 	frame.classicCheck:Hide()
@@ -343,14 +341,14 @@ function private.CreateFrames()
 	if BeanCounterAccountDB then
 		if BeanCounterAccountDB[private.realmName] then 
 			frame.classicCheck:Show() --Show id classic has server data
-			frame.classicCheck:SetChecked(private.getOption("util.beancounter.ButtonClassicCheck")) --Recall last checked state
+			frame.classicCheck:SetChecked(get("util.beancounter.ButtonClassicCheck")) --Recall last checked state
 		end
 	end
 	
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
-	frame.bidCheck:SetChecked(private.getOption("util.beancounter.ButtonBidCheck"))
-	frame.bidCheck:SetScript("OnClick", function() local set if frame.bidCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonBidCheck", set) end)
+	frame.bidCheck:SetChecked(get("util.beancounter.ButtonBidCheck"))
+	frame.bidCheck:SetScript("OnClick", function() local on if frame.bidCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidCheck", on) end)
 	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
@@ -359,8 +357,8 @@ function private.CreateFrames()
 	
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
-	frame.bidFailedCheck:SetChecked(private.getOption("util.beancounter.ButtonBidFailedCheck"))
-	frame.bidFailedCheck:SetScript("OnClick", function() local set if frame.bidFailedCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonBidFailedCheck", set) end)
+	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
+	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) end)
 	frame.bidFailedCheck:SetScale(0.85)
 	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
@@ -369,8 +367,8 @@ function private.CreateFrames()
 	
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
-	frame.auctionCheck:SetChecked(private.getOption("util.beancounter.ButtonAuctionCheck"))
-	frame.auctionCheck:SetScript("OnClick", function() local set if frame.auctionCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonAuctionCheck", set) end)
+	frame.auctionCheck:SetChecked(get("util.beancounter.ButtonAuctionCheck"))
+	frame.auctionCheck:SetScript("OnClick", function() local on if frame.auctionCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionCheck", on) end)
 	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
@@ -379,8 +377,8 @@ function private.CreateFrames()
 	
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
-	frame.auctionFailedCheck:SetChecked(private.getOption("util.beancounter.ButtonAuctionFailedCheck"))
-	frame.auctionFailedCheck:SetScript("OnClick", function() local set if frame.auctionFailedCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonAuctionFailedCheck", set) end)
+	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
+	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) end)
 	frame.auctionFailedCheck:SetScale(0.85)
 	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions')) 
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
@@ -436,30 +434,30 @@ function private.CreateFrames()
 	 --store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column,  width)
 		if not width then 
-			private.setOption("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
-			self.labels[column].button:SetWidth(private.getOption("columnwidth."..self.labels[column]:GetText()))
+			set("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(get("columnwidth."..self.labels[column]:GetText()))
 		else
-			private.setOption("columnwidth."..self.labels[column]:GetText(), width)
+			set("columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
 		
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
-		{ _BC('UiNameHeader'), "TOOLTIP",  private.getOption("columnwidth.".._BC('UiNameHeader')) },
-		{ _BC('UiTransactions'), "TEXT", private.getOption("columnwidth.".._BC('UiTransactions')) },
+		{ _BC('UiNameHeader'), "TOOLTIP",  get("columnwidth.".._BC('UiNameHeader')) },
+		{ _BC('UiTransactions'), "TEXT", get("columnwidth.".._BC('UiTransactions')) },
 		
-		{_BC('UiBidTransaction') , "COIN", private.getOption("columnwidth.".._BC('UiBidTransaction')) },
-		{ _BC('UiBuyTransaction') , "COIN", private.getOption("columnwidth.".._BC('UiBuyTransaction')) },
-		{ _BC('UiNetHeader'), "COIN", private.getOption("columnwidth.".._BC('UiNetHeader')) },
-		{ _BC('UiQuantityHeader'), "TEXT", private.getOption("columnwidth.".._BC('UiQuantityHeader')) },
-		{ _BC('UiPriceper'), "COIN", private.getOption("columnwidth.".._BC('UiPriceper')) }, 
+		{_BC('UiBidTransaction') , "COIN", get("columnwidth.".._BC('UiBidTransaction')) },
+		{ _BC('UiBuyTransaction') , "COIN", get("columnwidth.".._BC('UiBuyTransaction')) },
+		{ _BC('UiNetHeader'), "COIN", get("columnwidth.".._BC('UiNetHeader')) },
+		{ _BC('UiQuantityHeader'), "TEXT", get("columnwidth.".._BC('UiQuantityHeader')) },
+		{ _BC('UiPriceper'), "COIN", get("columnwidth.".._BC('UiPriceper')) }, 
 		
-		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", private.getOption("columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer) },
+		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", get("columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer) },
 				
-		{ _BC('UiDepositTransaction'), "COIN", private.getOption("columnwidth.".._BC('UiDepositTransaction')) },
-		{ _BC("UiFee"), "COIN", private.getOption("columnwidth.".._BC("UiFee")) }, 
-		{ _BC('UiReason'), "TEXT", private.getOption("columnwidth.".._BC('UiReason')) }, 
-		{ _BC('UiDateHeader'), "text", private.getOption("columnwidth.".._BC('UiDateHeader')) },
+		{ _BC('UiDepositTransaction'), "COIN", get("columnwidth.".._BC('UiDepositTransaction')) },
+		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) }, 
+		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) }, 
+		{ _BC('UiDateHeader'), "text", get("columnwidth.".._BC('UiDateHeader')) },
 	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
 	--Add tooltip help to the scrollframe headers	
 	for i = 1, #frame.resultlist.sheet.labels do
@@ -602,7 +600,7 @@ end
 --Created SearchUI reason code data into tooltips
 function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
-	if not private.getOption("util.beancounter.displayReasonCodeTooltip") then return end
+	if not get("util.beancounter.displayReasonCodeTooltip") then return end
 	
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	debugPrint("Add to Tooltip", itemLink, reason)

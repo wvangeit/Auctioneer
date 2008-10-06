@@ -32,12 +32,11 @@
 local libName = "BeanCounter"
 local libType = "Util"
 local lib = BeanCounter
-local private = lib.Private
-local print =  BeanCounter.Print
+local private, print, get, set, _BC = lib.getLocals()
 private.update = {}
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugUpdate") then
+    if get("util.beancounter.debugUpdate") then
         private.debugPrint("BeanCounterUpdate",...)
     end
 end
@@ -158,9 +157,9 @@ function private.UpgradeDatabaseVersion()
 		end
 	end
 	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
-	if not private.getOption("util.beancounter.integrityCheckComplete") then 
+	if not get("util.beancounter.integrityCheckComplete") then 
 		private.integrityCheck(true) 
-	elseif not private.getOption("util.beancounter.integrityCheck") then
+	elseif not get("util.beancounter.integrityCheck") then
 		private.integrityCheck()
 	end
 	
@@ -502,8 +501,8 @@ local integrityClean, integrityCount = true, 0
 	else
 		print("BeanCounter Integrity Check Completed after:",integrityCount, "passes")
 		integrityClean, integrityCount = true, 0
-		private.setOption("util.beancounter.integrityCheckComplete", true)
-		private.setOption("util.beancounter.integrityCheck", true)
+		set("util.beancounter.integrityCheckComplete", true)
+		set("util.beancounter.integrityCheck", true)
 	end
 	
 end	
@@ -645,7 +644,7 @@ function private.update._2_03()
 	end
 		
 	--Upgrade the itemID array's itemLinks only needs to run once
-	if not private.getOption("util.beancounter.ItemLinkArray.upgradedtoWotLK") then
+	if not get("util.beancounter.ItemLinkArray.upgradedtoWotLK") then
 		print("WOW version 30000 ItemLink Array upgrade started")
 		local temp = {}
 		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
@@ -653,7 +652,7 @@ function private.update._2_03()
 			temp[i] = v
 		end
 		BeanCounterDB["ItemIDArray"] = temp
-		private.setOption("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
+		set("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
 		print("WOW version 30000 ItemLink Array upgrade finished")
 	end
 	

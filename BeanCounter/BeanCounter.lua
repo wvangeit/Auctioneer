@@ -191,11 +191,9 @@ end
 
 --[[ Configator Section ]]--
 --See BeanCounterConfig.lua
-function private.getOption(option)
-	return lib.GetSetting(option)
-end
-function private.setOption(...)
-	return lib.SetSetting(...)
+--sets sub luas print, get, set, localization and any future locals
+function lib.getLocals()
+	return lib.Private, lib.Print, lib.GetSetting, lib.SetSetting, private.localizations
 end
 
 --[[Sidebar Section]]--

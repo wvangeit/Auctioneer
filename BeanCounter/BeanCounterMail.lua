@@ -30,12 +30,11 @@
 ]]
 
 local lib = BeanCounter
-local private = lib.Private
-local print =  BeanCounter.Print
-local _BC = private.localizations
+local private, print, get, set, _BC = lib.getLocals() --_BC localization function
+
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugMail") then
+    if get("util.beancounter.debugMail") then
         private.debugPrint("BeanCounterMail",...)
     end
 end
@@ -141,7 +140,7 @@ local total = #private.inboxStart
 			private.inboxStart[i] = nil
 			--debugPrint("data.retrieved == yes")
 		
-		elseif  time() - data.startTime > private.getOption("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
+		elseif  time() - data.startTime > get("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
 			debugPrint("time to retrieve invoice exceeded")
 			tbl["retrieved"] = "failed" --time to get invoice exceded
 		else 
@@ -398,7 +397,7 @@ end
 function private.mailFrameUpdate()
 --Change Icon back color if only addon read
 if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
-if private.getOption("util.beancounter.mailrecolor") == "off" then return end
+if get("util.beancounter.mailrecolor") == "off" then return end
 
 	local numItems = GetInboxNumItems()
 	local  index
@@ -420,11 +419,11 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
 			if sender and (sender:match(FACTION_HORDE) or sender:match(FACTION_ALLIANCE) or sender:find("Blackwater Auction House",1,true)) then
 				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
-					if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+					if get("util.beancounter.mailrecolor") == "icon" or get("util.beancounter.mailrecolor") == "both" then 
 						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
 						SetDesaturation(buttonIcon, nil)
 					end
-					if private.getOption("util.beancounter.mailrecolor") == "text" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+					if get("util.beancounter.mailrecolor") == "text" or get("util.beancounter.mailrecolor") == "both" then 
 						senderText = getglobal("MailItem"..i.."Sender");senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 						subjectText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 					end
@@ -503,7 +502,7 @@ end
 
 function private.hasUnreadMail()
 	--[[if HasNewMail() then MiniMapMailFrame:Show() debugPrint("We have real unread mail, mail icon show/hide code bypassed") return end  --no need to process if we have real unread messages waiting
-	if not private.getOption("util.beancounter.mailrecolor") then MiniMapMailFrame:Hide() return end --no need to do this if user isn't using recolor system, and mail icon should not show since HasnewMail() failed
+	if not get("util.beancounter.mailrecolor") then MiniMapMailFrame:Hide() return end --no need to do this if user isn't using recolor system, and mail icon should not show since HasnewMail() failed
 
 	local mailunread = false
 	for i,v in pairs(BeanCounterDB[private.realmName][private.playerName]["mailbox"]) do

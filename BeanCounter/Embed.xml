@@ -3,8 +3,8 @@
 <Script file="BeanCounter.lua"/>
 <Script file="BeanCounterStrings.lua"/>
 <Script file="BeanCounterLocale.lua"/> 
-<Script file="BeanCounterFrames.lua"/>
 <Script file="BeanCounterConfig.lua"/>
+<Script file="BeanCounterFrames.lua"/>
 <Script file="BeanCounterUpdate.lua"/>
 <Script file="BeanCounterMail.lua"/>
 <Script file="BeanCounterSearch.lua"/>

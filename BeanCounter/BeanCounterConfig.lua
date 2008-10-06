@@ -30,15 +30,11 @@
 ]]
 --Most of this code is from enchantrix 
 local lib = BeanCounter
-local private = lib.Private
-local print =  BeanCounter.Print
-
-local gui
-local settings
-local _BC = private.localizations
+local private, print, _, _, _BC = lib.getLocals()
+local gui, settings
 
 local function debugPrint(...)
-    if private.getOption("util.beancounter.debugConfig") then
+    if get("util.beancounter.debugConfig") then
         private.debugPrint("BeanCounterConfig",...)
     end
 end
@@ -371,7 +367,7 @@ function lib.GetSetting(setting, default)
 		return default
 	end
 end
-
+local _, _, get, set, _ = lib.getLocals()--now we can set our get, set locals to the above functions
 private.setter = setter
 private.getter = getter
 function lib.MakeGuiConfig()

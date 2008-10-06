@@ -32,11 +32,10 @@
 local libName = "BeanCounter"
 local libType = "Util"
 local lib = BeanCounter
-local private = lib.Private
-local print =  BeanCounter.Print
+local private, print, get, set, _BC = lib.getLocals()
 
 local function debugPrint(...)
-    if private.getOption("util.beancounter.debugBid") then
+    if get("util.beancounter.debugBid") then
         private.debugPrint("BidMonitor",...)
     end
 end
