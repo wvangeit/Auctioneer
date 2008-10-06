@@ -76,7 +76,7 @@ end
 local print = BeanCounter.Print
 
 local function debugPrint(...) 
-    if private.getOption("util.beancounter.debugCore") then
+    if lib.GetSetting("util.beancounter.debugCore") then
         private.debugPrint("BeanCounterCore",...)
     end
 end
@@ -495,7 +495,7 @@ function private.prunePostedDB(announce)
 end
 
 function private.debugPrint(...)
-	if private.getOption("util.beancounter.debug") then
+	if lib.GetSetting("util.beancounter.debug") then
 		print(...)
 	end
 end
