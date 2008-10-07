@@ -184,8 +184,8 @@ function private.OnEvent(...)
 		AucAdvanced.Scan.Interrupt()
 	elseif (event == "PLAYER_LOGOUT") then
 		AucAdvanced.Scan.Commit(true)
-		private.OnUnload()
 		AucAdvanced.Scan.LogoutCommit()
+		private.OnUnload()
 	elseif event == "UNIT_INVENTORY_CHANGED"
 	or event == "ITEM_LOCK_CHANGED"
 	or event == "CURSOR_UPDATE"
