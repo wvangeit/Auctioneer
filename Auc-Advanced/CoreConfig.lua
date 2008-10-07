@@ -85,7 +85,7 @@ function private.CommandHandler(command, subcommand, ...)
 		if command and subcommand then
 			local engineLib = AucAdvanced.GetAllModules("CommandHandler", command, subcommand)
 			if engineLib then
-				engineLib.CommandHandler()
+				engineLib.CommandHandler(...)
 				return
 			end
 		end
