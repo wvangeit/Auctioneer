@@ -526,13 +526,19 @@ function lib.GetSearchLocals()
 end
 
 function private.removeline()
-	--print("selected: "..tostring(gui.sheet.selected))
-	--DevTools_Dump(private.sheetData)
+	local selected = gui.sheet.selected
+	--find the place in the sort list, so we can select the next one.
+	for i,j in ipairs(gui.sheet.sort) do
+		if j == selected then
+			selected = i
+			break
+		end
+	end
 	table.remove(private.sheetData, gui.sheet.selected)
-	--DevTools_Dump(private.sheetData)
-	gui.sheet.selected = nil
 	gui.frame.remove:Disable()
 	gui.sheet:SetData(private.sheetData)
+	gui.sheet.selected = gui.sheet.sort[selected]
+	gui.sheet:Render() --need to redraw, so the selection looks right
 	lib.UpdateControls()
 end
 
