@@ -209,6 +209,7 @@ local settingDefaults = {
 	["searchspeed"] = 100,
 	["reserve"] = 1,
 	["maxprice"] = 10000000,
+	["tooltiphelp.show"] = true,
 }
 
 local function getDefault(setting)
@@ -525,6 +526,13 @@ function lib.GetSearchLocals()
 	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const
 end
 
+function private.SetButtonTooltip(message)
+	if lib.GetSetting("tooltiphelp.show") then
+		GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
+		GameTooltip:SetText(message)
+	end
+end
+
 function private.removeline()
 	local selected = gui.sheet.selected
 	--find the place in the sort list, so we can select the next one.
@@ -535,7 +543,7 @@ function private.removeline()
 		end
 	end
 	table.remove(private.sheetData, gui.sheet.selected)
-	gui.frame.remove:Disable()
+	--gui.frame.remove:Disable()
 	gui.sheet:SetData(private.sheetData)
 	gui.sheet.selected = gui.sheet.sort[selected]
 	gui.sheet:Render() --need to redraw, so the selection looks right
@@ -585,6 +593,24 @@ function private.buyfirst()
 	private.removeline()
 end
 
+--private.purchase
+--Will buy/bid selected auction based on "reason" column
+function private.purchase()
+	if not gui.sheet.selected then
+		return
+	end
+	if string.match(private.data.reason, ":buy") then
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+	elseif string.match(private.data.reason, ":bid") then
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+	elseif private.data.buyout then
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+	else
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+	end
+	private.removeline()
+end
+
 function private.ignore()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
 	local price
@@ -601,6 +627,13 @@ function private.ignore()
 	price = math.floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price)
 	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
+	private.removeline()
+end
+
+function private.ignoreperm()
+	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
+	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, 1)
+	print("SearchUI now ignoring "..private.data.link.." at any price")
 	private.removeline()
 end
 
@@ -621,6 +654,24 @@ function private.ignoretemp()
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
 	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true).." for the session")
 	private.removeline()
+end
+
+function private.snatch()
+	local link = private.data.link
+	local price
+		if string.match(private.data.reason, ":buy") then
+		price = private.data.buyout
+	elseif string.match(private.data.reason, ":bid") then
+		price = private.data.bid
+	elseif private.data.buyout then
+		price = private.data.buyout
+	else
+		price = private.data.bid
+	end
+	local count = private.data.stack or 1
+	price = math.floor(price/count) + 1 -- +1 so the current item also matches the search
+	lib.Searchers.Snatch.AddSnatch(link,price)
+	print("SearchUI will now snatch "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
 end
 
 function lib.MakeGuiConfig()
@@ -648,13 +699,17 @@ function lib.MakeGuiConfig()
 	
 	function lib.UpdateControls()
 		if gui.sheet.selected then
-			gui.frame.remove:Enable()
+			--gui.frame.remove:Enable()
 			gui.frame.ignore:Enable()
+			gui.frame.ignoreperm:Enable()
 			gui.frame.notnow:Enable()
+			gui.frame.snatch:Enable()
 		else
-			gui.frame.remove:Disable()
+			--gui.frame.remove:Disable()
 			gui.frame.ignore:Disable()
+			gui.frame.ignoreperm:Disable()
 			gui.frame.notnow:Disable()
+			gui.frame.snatch:Disable()
 		end
 		if selected ~= gui.sheet.selected then
 			selected = gui.sheet.selected
@@ -696,6 +751,11 @@ function lib.MakeGuiConfig()
 		if private.data.buyout and (private.data.buyout > 0) and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
 			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
 			gui.frame.bid:Disable()
+		end
+		if (gui.frame.bid:IsEnabled()==1) or (gui.frame.buyout:IsEnabled()==1) then
+			gui.frame.purchase:Enable()
+		else
+			gui.frame.purchase:Disable()
 		end
 	end
 
@@ -744,10 +804,13 @@ function lib.MakeGuiConfig()
 
 	gui.sheet:EnableSelect(true)
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
-	gui.Search:SetPoint("BOTTOMRIGHT", gui, "BOTTOMRIGHT", -10, 35)
+	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 35)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 	gui.Search:SetFrameLevel(11)
+	gui.Search.TooltipText = "Search Snapshot using current Searcher"
+	gui.Search:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.Search:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	
 	gui:AddCat("Searches")
 	gui:AddCat("Filters")
@@ -779,6 +842,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxprice", 1, 99999999, "Maximum Price")
 	
 	gui:AddControl(id, "Subhead",          0,    "Tooltip")
+	gui:AddControl(id, "Checkbox",          0, 1, "tooltiphelp.show", "Show tooltip help over buttons")
 	gui:AddControl(id, "Checkbox",         0, 1, "debug.show", "Show debug line in tooltip for auctions")
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher and searcher.Search then
@@ -789,11 +853,68 @@ function lib.MakeGuiConfig()
 	
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 	
+	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
+	gui.frame.purchase:SetText("Purchase")
+	gui.frame.purchase:SetScript("OnClick", private.purchase)
+	gui.frame.purchase:Disable()
+	gui.frame.purchase.TooltipText = "Bid/BuyOut selected auction\nbased on 'reason' column"
+	gui.frame.purchase:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.purchase:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+
+	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 260, 35)
+	gui.frame.notnow:SetText("Not Now")
+	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
+	gui.frame.notnow:Disable()
+	gui.frame.notnow.TooltipText = "Ignore selected auction for session"
+	gui.frame.notnow:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.notnow:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	
+	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 400, 35)
+	gui.frame.ignore:SetText("Ignore Price")
+	gui.frame.ignore:SetScript("OnClick", private.ignore)
+	gui.frame.ignore:Disable()
+	gui.frame.ignore.TooltipText = "Ignore selected auction at listed price"
+	gui.frame.ignore:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.ignore:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	
+	gui.frame.ignoreperm = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.ignoreperm:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 490, 35)
+	gui.frame.ignoreperm:SetText("Ignore")
+	gui.frame.ignoreperm:SetScript("OnClick", private.ignoreperm)
+	gui.frame.ignoreperm:Disable()
+	gui.frame.ignoreperm.TooltipText = "Ignore selected auction at any price"
+	gui.frame.ignoreperm:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.ignoreperm:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	
+	gui.frame.snatch = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.snatch:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 630, 35)
+	gui.frame.snatch:SetText("Snatch")
+	gui.frame.snatch:SetScript("OnClick", private.snatch)
+	gui.frame.snatch:Disable()
+	gui.frame.snatch.TooltipText = "Add selected auction to snatch list"
+	gui.frame.snatch:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.snatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	
+	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 10)
+	gui.frame.clear:SetText("Clear")
+	gui.frame.clear:SetScript("OnClick", private.removeall)
+	gui.frame.clear:Enable()
+	gui.frame.clear.TooltipText = "Clear results list"
+	gui.frame.clear:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.clear:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.buyout:SetPoint("BOTTOMRIGHT", gui.Done, "BOTTOMLEFT", -30, 25)
+	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
 	gui.frame.buyout:SetText("Buyout")
 	gui.frame.buyout:SetScript("OnClick", private.buyauction)
 	gui.frame.buyout:Disable()
+	gui.frame.buyout.TooltipText = "Buyout selected auction"
+	gui.frame.buyout:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.buyout:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	
 	gui.frame.buyoutbox = gui.frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	gui.frame.buyoutbox:SetPoint("BOTTOMRIGHT", gui.frame.buyout, "BOTTOMLEFT", -4, 4)
@@ -804,40 +925,25 @@ function lib.MakeGuiConfig()
 	gui.frame.bid:SetText("Bid")
 	gui.frame.bid:SetScript("OnClick", private.bidauction)
 	gui.frame.bid:Disable()
+	gui.frame.bid.TooltipText = "Bid on selected auction using custom price"
+	gui.frame.bid:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
+	gui.frame.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	
 	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
 	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
 	MoneyInputFrame_SetOnValueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
 	
-	gui.frame.buyfirst = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.buyfirst:SetPoint("BOTTOMRIGHT", gui.frame.bidbox, "BOTTOMLEFT", -30, -4)
-	gui.frame.buyfirst:SetText("Buy First")
-	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
-	gui.frame.buyfirst:Enable()
+--	gui.frame.buyfirst = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+--	gui.frame.buyfirst:SetPoint("BOTTOMRIGHT", gui.frame.bidbox, "BOTTOMLEFT", -30, -4)
+--	gui.frame.buyfirst:SetText("Buy First")
+--	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
+--	gui.frame.buyfirst:Enable()
 	
-	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.clear:SetPoint("TOPLEFT", gui.frame.buyfirst, "BOTTOMLEFT", 10, -5)
-	gui.frame.clear:SetText("Clear")
-	gui.frame.clear:SetScript("OnClick", private.removeall)
-	gui.frame.clear:Enable()
-	
-	gui.frame.remove = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.remove:SetPoint("BOTTOMLEFT", gui.frame.clear, "BOTTOMRIGHT", 30, 0)
-	gui.frame.remove:SetText("Remove")
-	gui.frame.remove:SetScript("OnClick", private.removeline)
-	gui.frame.remove:Disable()
-	
-	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui.frame.remove, "BOTTOMRIGHT", 120, 0)
-	gui.frame.ignore:SetText("Ignore")
-	gui.frame.ignore:SetScript("OnClick", private.ignore)
-	gui.frame.ignore:Disable()
-	
-	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui.frame.ignore, "BOTTOMRIGHT", 30, 0)
-	gui.frame.notnow:SetText("Not Now")
-	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
-	gui.frame.notnow:Disable()
+--	gui.frame.remove = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+--	gui.frame.remove:SetPoint("BOTTOMLEFT", gui.frame.clear, "BOTTOMRIGHT", 30, 0)
+--	gui.frame.remove:SetText("Remove")
+--	gui.frame.remove:SetScript("OnClick", private.removeline)
+--	gui.frame.remove:Disable()
 	
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
