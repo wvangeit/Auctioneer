@@ -314,6 +314,7 @@ function lib.Unpack(realm)
 				collectgarbage()
 			else
 				print("Error loading scan image: {{", err, "}}")
+				fData.image = nil --clear the image, so we're not left with a string where we expect a table.
 			end
 		end
 	end
