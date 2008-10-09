@@ -346,7 +346,7 @@ function private.SetupConfigGui(gui)
 		"When Appraiser calculates the price to list an item for, it will use either a market price, which is an average of certain other pricing models, or a price returned by a specific AuctioneerAdvanced statistics module. You may select the model that is used for items that have not had a particular model selected.")
 
 	gui:AddControl(id, "Subhead",    0,    "Starting bid calculation")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %0.1f%%")
 	gui:AddTip(id, "The markdown amount is a percentage amount that an item's calculated value will be reduced by to produce the bid value.")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
 	gui:AddTip(id, "The subtract amount is a fixed amount that an item's calculated value will have subtracted to produce the bid value.")
