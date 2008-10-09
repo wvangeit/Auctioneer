@@ -29,6 +29,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+if not AucAdvanced then return end
 
 local libType, libName = "Util", "ScanProgress"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)

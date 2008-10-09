@@ -235,6 +235,7 @@ local function setter(setting, value)
 	end
 	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
 	local SearchUISettings = AucAdvancedData.UtilSearchUI
+	local currentProfile = SearchUISettings[realmKey]["lastProfile"]
 
 	-- turn value into a canonical true or false
 	if value == 'on' then
@@ -249,16 +250,29 @@ local function setter(setting, value)
 		value = nil
 	end
 
+	--[[
+	gui:AddControl(id, "Selectbox",  0, 1, "search.load", "profile", "Load search")
+	gui:AddControl(id, "Button",     0, 1, "search.delete", "Delete search")
+	cont = gui:GetLast(id)
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Subhead",    0.5,    "Save current search")
+	gui:AddControl(id, "Text",       0.5, 1, "search.name", "Name this search")
+	last = gui:GetLast(id)
+	gui:AddControl(id, "Button",     0.7, 1, "search.save", "Save now")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Button",     0.5, 1, "search.new", "New search")
+	]]
 	local a,b,c = strsplit(".", setting)
-	if (a == "profile") then
-		if (setting == "profile.new") then
-			value = gui.elements["profile.name"]:GetText()
+	if (a == "search") then
+		if (setting == "search.new") then
+			value = "Custom"
 
-			-- Create the new profile 
+			-- Create the new search 
 			SearchUISettings["profile."..value] = {}
 
-			-- Set the current profile to the new profile 
+			-- Set the current search to the new profile 
 			SearchUISettings[realmKey]["lastProfile"] = value
+
 			-- Get the new current profile 
 			local newSearch = getProfileParam()
 
@@ -284,11 +298,11 @@ local function setter(setting, value)
 				table.sort(profiles)
 			end
 
-		elseif (setting == "profile.copy") then
-			value = gui.elements["profile.name"]:GetText()
+		elseif (setting == "search.save") then
+			value = gui.elements["search.name"]:GetText()
 
 			-- Create the new profile 
-			SearchUISettings["profile."..value] = getProfileParam() or {}
+			SearchUISettings["profile."..value] = replicate(getProfileParam() or {})
 
 			-- Set the new profile to the current setup 
 			SearchUISettings[realmKey]["lastProfile"] = value
@@ -314,7 +328,7 @@ local function setter(setting, value)
 				table.sort(profiles)
 			end
 
-		elseif (setting == "profile.delete") then
+		elseif (setting == "search.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
 
@@ -343,7 +357,7 @@ local function setter(setting, value)
 				end
 			end
 
-		elseif (setting == "profile.default") then
+		elseif (setting == "search.default") then
 			-- User clicked the reset settings button
 
 			-- Get the current profile from the select box
@@ -366,6 +380,40 @@ local function setter(setting, value)
 		-- Refresh all values to reflect current data
 		gui:Refresh()
 	else
+		-- If the user tries to modify a saved search, we switch to custom profile
+		if currentProfile ~= "Custom" then
+			if SearchUISettings["profile.Custom"] then
+				empty(SearchUISettings["profile.Custom"])
+			else
+				SearchUISettings["profile.Custom"] = {}
+			end
+
+			SearchUISettings["profile.Custom"] = replicate(SearchUISettings["profile."..setting])
+
+			-- Set the last profile to custom
+			currentProfile = "Custom"
+			SearchUISettings[realmKey]["lastProfile"] = currentProfile
+
+			-- Add the new profile to the profiles list
+			local profiles = SearchUISettings["profiles"]
+			if (not profiles) then
+				profiles = { realmKey }
+				SearchUISettings["profiles"] = profiles
+			end
+
+			-- Check to see if it already exists
+			local found = false
+			for pos, name in ipairs(profiles) do
+				if (name == currentProfile) then found = true end
+			end
+
+			-- If not, add it and then sort it
+			if (not found) then
+				table.insert(profiles, currentProfile)
+				table.sort(profiles)
+			end
+		end
+
 		-- Set the value for this setting in the current search 
 		local db = getProfileParam()
 		if db[setting] == value then return end
@@ -816,20 +864,20 @@ function lib.MakeGuiConfig()
 	gui:AddCat("Filters")
 	id = gui:AddTab("General parameters", "Searches") -- Merely a place holder
 
-	id = gui:AddTab("Saved Profiles", "Options")
-	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
+	id = gui:AddTab("Saved Searches", "Options")
+	gui:AddControl(id, "Header",     0,    "Saved Searches")
 	last = gui:GetLast(id)
-	gui:AddControl(id, "Subhead",    0,    "Select a saved profile")
-	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
-	gui:AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
+	gui:AddControl(id, "Subhead",    0,    "Load a saved search")
+	gui:AddControl(id, "Selectbox",  0, 1, "search.load", "profile", "Load search")
+	gui:AddControl(id, "Button",     0, 1, "search.delete", "Delete search")
 	cont = gui:GetLast(id)
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Subhead",    0.5,    "Create or replace a profile")
-	gui:AddControl(id, "Text",       0.5, 1, "profile.name", "New profile name:")
+	gui:AddControl(id, "Subhead",    0.5,    "Save current search")
+	gui:AddControl(id, "Text",       0.5, 1, "search.name", "Name this search")
 	last = gui:GetLast(id)
-	gui:AddControl(id, "Button",     0.5, 1, "profile.new", "Create new")
+	gui:AddControl(id, "Button",     0.7, 1, "search.save", "Save now")
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.7, 1, "profile.copy", "Create copy")
+	gui:AddControl(id, "Button",     0.5, 1, "search.new", "New search")
 	
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")

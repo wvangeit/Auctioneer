@@ -45,8 +45,8 @@
 	Also a zero seedId is special in that it will match all items regardless of seed, but a non-zero
 	seedId will only match an item with exactly the same seedId.
 ]]
+if not AucAdvanced then return end
 
-if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvanced.Post) then AucAdvanced.Post = {} end
 
 local lib = AucAdvanced.Post

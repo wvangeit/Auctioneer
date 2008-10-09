@@ -36,8 +36,8 @@
 --[[
 	See CoreAPI.lua for a description of the modules API
 ]]
+if not AucAdvanced then return end
 
-if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end

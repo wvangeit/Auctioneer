@@ -38,8 +38,8 @@
 	This code helps modules that need to purchase things to do so in an extremely easy and
 	queueable fashion.
 ]]
+if not AucAdvanced then return end
 
-if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvanced.Buy) then AucAdvanced.Buy = {} end
 
 local lib = AucAdvanced.Buy

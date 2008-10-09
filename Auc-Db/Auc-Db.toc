@@ -1,7 +1,7 @@
 ## Title: Auc:Database
 ## Notes: AuctioneerDb.com UI Integration AddOn 
 ##
-## Interface: 20400
+## Interface: 30000
 ## LoadOnDemand: 0
 ## Disabled: 0
 ## Dependencies: Auc-Advanced

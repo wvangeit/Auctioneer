@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Price Level
-## Interface: 20400
+## Interface: 30000
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)

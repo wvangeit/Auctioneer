@@ -31,8 +31,45 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+local _,_,_,tocVersion = GetBuildInfo()
+if (tocVersion < 30000) then
+	local msg = CreateFrame("Frame", nil, UIParent)
+	msg:Hide()
+	msg:SetPoint("CENTER", "UIParent", "CENTER")
+	msg:SetFrameStrata("DIALOG")
+	msg:SetHeight(280)
+	msg:SetWidth(500)
+	msg:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 9, right = 9, top = 9, bottom = 9 }
+	})
+	msg:SetBackdropColor(0,0,0, 1)
 
-if (not AucAdvanced) then AucAdvanced = {} end
+	msg.Done = CreateFrame("Button", "", msg, "OptionsButtonTemplate")
+	msg.Done:SetText("Done")
+	msg.Done:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -10, 10)
+	msg.Done:SetScript("OnClick", function() msg:Hide() end)
+	
+	msg.Text = msg:CreateFontString(nil, "HIGH")
+	msg.Text:SetPoint("TOPLEFT", msg, "TOPLEFT", 20, -20)
+	msg.Text:SetPoint("BOTTOMRIGHT", msg.Done, "TOPRIGHT", -10, 10)
+	msg.Text:SetFont("Fonts\\FRIZQT__.TTF",17)
+	msg.Text:SetJustifyH("LEFT")
+	msg.Text:SetJustifyV("TOP")
+	msg.Text:SetShadowColor(0,0,0)
+	msg.Text:SetShadowOffset(3,-3)
+
+	msg.Text:SetText("|c00ff4400Auctioneer Error:|r\n\nNote: This development build of Auctioneer is only for use with game client versions 3.0 or higher!\n\nYour Auctioneer AddOn will now be disabled.\n\nPlease download a release version and re-enable it from the AddOns window on your character selection screen.\n\nURL:    |c005599ffhttp://auctioneeraddon.com/dl|r")
+
+	msg:Show()
+
+	DisableAddOn("Auc-Advanced")
+	return
+end
+
+AucAdvanced = {}
 local lib = AucAdvanced
 
 lib.revisions = {}

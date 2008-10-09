@@ -1,3 +1,4 @@
+if not AucDB then return end
 
 local lib = AucDB
 

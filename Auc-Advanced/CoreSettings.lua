@@ -62,9 +62,10 @@ Usage:
 	AucAdvanced.Settings.SetSetting('ToolTipShowCounts', true );
 
 ]]
+if not AucAdvanced then return end
 
-local lib = {}
-AucAdvanced.Settings = lib
+AucAdvanced.Settings = {}
+local lib = AucAdvanced.Settings
 local private = {}
 local gui
 local Matcherdropdown

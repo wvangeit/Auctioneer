@@ -38,8 +38,8 @@
 	If you supply a category, that category will be scanned to completion and then the "image" will be updated.
 	If you do not supply a category, then the whole AH will be scanned and then replace the current "image"
 ]]
+if not AucAdvanced then return end
 
-if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvanced.Scan) then AucAdvanced.Scan = {} end
 
 local lib = AucAdvanced.Scan

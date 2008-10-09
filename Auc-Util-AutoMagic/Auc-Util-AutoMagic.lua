@@ -26,6 +26,8 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]] 
+if not AucAdvanced then return end
+
 --Set up our module with AADV
 local libName, libType = "AutoMagic", "Util"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)

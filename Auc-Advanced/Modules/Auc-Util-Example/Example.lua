@@ -1,3 +1,18 @@
+--[[ DELETE v DELETE v DELETE v DELETE v DELETE v DELETE v DELETE v DELETE --
+
+	NOTE:
+	This is an example addon. Use the below code to start your own
+	module should you wish.
+
+	This top section should bel deleted from any derivative code
+	before you distribute it.
+
+]]
+
+return --Comment out this return to see the example module running.
+
+--^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^--
+
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
@@ -28,11 +43,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
-
-
-do
-	return --Comment out this return to see the example module running.
-end
+if not AucAdvanced then return end
 
 local libName = "Example"
 local libType = "Util"
