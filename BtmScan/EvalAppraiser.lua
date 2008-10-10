@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -89,16 +89,16 @@ function lib:valuate(item, tooltip)
 				end
 			end
 		end
-	else 
+	else
 		-- GetAppraiserValue works whether or not Appraiser is installed. In this case it uses Market Value)
 		newBuy, newBid, _, seen, curModelText = AucAdvanced.Modules.Util.Appraiser.GetPrice(item.link, _, get(lcName..".matching.check"))
-		
+
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
 
 		item:info("Estimated Bid: "..item.count.." x",newBid)
 		item:info("Estimated Buy: "..item.count.." x",newBuy)
-		
+
 		if get(lcName..".buyout.check") then
 			market = newBuy
 		else
@@ -106,7 +106,7 @@ function lib:valuate(item, tooltip)
 		end
 	end
 	item:info("Pricing Model:"..curModelText)
-	
+
 	-- If we don't know what it's worth, then there's not much we can do
 	if not market then return end
 	market = market * item.count

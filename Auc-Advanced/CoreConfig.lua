@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -52,7 +52,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
 		private.Print("  {{/auc about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
 
-		for system in pairs(AucAdvanced.Modules) do 
+		for system in pairs(AucAdvanced.Modules) do
 			local modules = AucAdvanced.GetAllModules("CommandHandler", system)
 			for pos, engineLib in ipairs(modules) do
 				local engine = engineLib:GetName()
@@ -137,10 +137,10 @@ end
 function lib.About(all)
 	local rev = AucAdvanced.GetCurrentRevision()
 	private.Print(("Auctioneer Advanced rev.%d loaded"):format(rev))
-	
+
 	if (all) then
 		local revisionsList = AucAdvanced.GetRevisionList()
-		
+
 		for file, revision in pairs(revisionsList) do
 			local shortName = file:match(".-/(%u.*)")
 			private.Print(("    File \"%s\", revision: %d"):format(shortName, revision))

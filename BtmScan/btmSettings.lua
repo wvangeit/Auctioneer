@@ -55,7 +55,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -143,9 +143,9 @@ end
 
 function lib.SetDefault(setting, default)
 	local a,b,c = strsplit(".", setting)
-	if (b == "allow") then 
-		if lib.GetSetting(a..".never."..c) then 
-			default = false 
+	if (b == "allow") then
+		if lib.GetSetting(a..".never."..c) then
+			default = false
 			lib.SetSetting(a..".never."..c, false)
 		end
 	end
@@ -161,7 +161,7 @@ function setter(setting, value)
 	elseif value == 'off' then
 		value = false
 	end
-	
+
 	-- is the setting actually a function ref? if so call it.
 	if type(setting)=="function" then
 		return setting(value)

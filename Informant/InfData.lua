@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 		Many thanks to the folks at http://www.wowhead.com for providing much of this data.
@@ -12339,7 +12339,7 @@ Informant.SetDatabase({
 	[14937]=":19923:4:2:1:::1:0:", -- Heroic Pauldrons
 	[14938]=":11387:4:2:1:::1:0:", -- Heroic Bracers
 	[14939]=":11888:4:2:1:::1:0:", -- Warbringer\'s Chestguard
-	[14940]=":7090:4:2:1:::1:0:", -- Warbringer\'s Sabatons 
+	[14940]=":7090:4:2:1:::1:0:", -- Warbringer\'s Sabatons
 	[14941]=":4427:4:2:1:::1:0:", -- Warbringer\'s Armsplints
 	[14942]=":4443:4:2:1:::1:0:", -- Warbringer\'s Gauntlets
 	[14943]=":4460:4:2:1:::1:0:", -- Warbringer\'s Belt
@@ -24981,7 +24981,7 @@ Informant.SetDatabase({
 	[32621]="::12:1:1:::1:0:", -- Partially Digested Hand
 	[32622]="::15:3:1:::1:0:", -- Elekk Training Collar
 	[32623]="::12:1:1:::1:0:", -- Bossi\'s Spare Parts
-	[32624]=":32200:15:1:1:::1:0:23245", -- Large Iron Metamorphosis Geode 
+	[32624]=":32200:15:1:1:::1:0:23245", -- Large Iron Metamorphosis Geode
 	[32625]=":24150:15:1:1:::1:0:23245", -- Small Iron Metamorphosis Geode
 	[32626]=":32200:15:1:1:::1:0:23245", -- Large Copper Metamorphosis Geode
 	[32627]=":24150:15:1:1:::1:0:23245", -- Small Copper Metamorphosis Geode

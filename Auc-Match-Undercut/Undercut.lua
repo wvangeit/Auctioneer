@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced Matcher module that returns an undercut price 
+	This is an Auctioneer Advanced Matcher module that returns an undercut price
 	based on the current market snapshot
 
 	License:
@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -60,12 +60,12 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
 	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
 	local usevalue = AucAdvanced.Settings.GetSetting("match.undercut.usevalue")
-	local undercut 
+	local undercut
 	if usevalue then
 		undercut = AucAdvanced.Settings.GetSetting("match.undercut.value")
 	else
 		undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
-	end	
+	end
 	local playerName = UnitName("player")
 	local marketdiff = 0
 	local competing = 0
@@ -77,11 +77,11 @@ function lib.GetMatchArray(hyperlink, marketprice)
 		matchprice = floor(marketprice*(1+(overmarket/100)))
 		minprice = ceil(marketprice*(1+(undermarket/100)))
 	end
-	
+
 	itemId = tonumber(itemId)
 	property = tonumber(property) or 0
 	factor = tonumber(factor) or 0
-	
+
 	local data = AucAdvanced.API.QueryImage({
 		itemId = itemId,
 		suffix = property,
@@ -102,7 +102,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 			compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
 			if usevalue then
 				compet.buyoutPrice = compet.buyoutPrice - undercut
-			else		
+			else
 				compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
 			end
 			if compet.buyoutPrice <= 0 then
@@ -176,28 +176,28 @@ function private.SetupConfigGui(gui)
 		"It is recommended to have undercut run after any other matcher modules.")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	
+
 	gui:AddControl(id, "Subhead",    0,    "Competition Matching")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.enable", "Enable Auc-Match-Undercut")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
 	gui:AddTip(id, "This controls how much below the market price you are willing to undercut before giving up.\n"..
 		"If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
 	gui:AddTip(id, "This controls how much above the market price you are willing to mark up.\n"..
 		"If there is no competition, or the competition is marked up higher than this value,\n"..
 		"AucAdvanced will set the price to this value above market.")
-	
+
 	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, "Undercut: %g%%")
 	gui:AddTip(id, "This controls the minimum undercut.  AucAdvanced will try to undercut the competition by this amount")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", "Specify undercut amount by coin value")
 	gui:AddTip(id, "Specify the amount to undercut by a specific amount, instead of by a percentage")
-	
+
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, "Undercut Amount")
-	
+
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -155,7 +155,7 @@ local function getDefault(setting)
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
-	
+
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
 	return result
@@ -288,7 +288,7 @@ local function setter(setting, value)
 		db[setting] = value
 		--setUpdated()
 	end
-	
+
 	if (a == "sideIcon") and EnhTooltip.SideIcon then
 		EnhTooltip.SideIcon.Update()
 	end
@@ -355,13 +355,13 @@ function lib.UpdateGuiConfig()
 	end
 end
 
-local metaProcessor = 
+local metaProcessor =
 {
 	__call = function(tbl, ...) return processSetting(tbl.setting, ...) end
 }
 
 local function getOption(value)
-	local tbl = {setting = value}	
+	local tbl = {setting = value}
 	setmetatable(tbl,metaProcessor)
 	return tbl
 end
@@ -371,16 +371,16 @@ function lib.MakeGuiConfig()
 
 	local id, last, cont
 	local Configator = LibStub:GetLibrary("Configator",true)
-	
+
 	if not Configator then return end
-	
+
 	gui = Configator:Create(setter, getter)
 	lib.Gui = gui
 
   	gui:AddCat("EnhTooltip")
 
 	id = gui:AddTab("Profiles")
-	
+
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
@@ -425,43 +425,43 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Shows Enhanced Tooltip when the Alt button is pressed")
 
 	gui:AddControl(id, "Subhead", 0, "Show Enhanced Tooltip with following frames:")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithAuction"), "Auction")
 	gui:AddTip(id, "Show Enhanced Tooltip in Auction House")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBagsAndKeyRing"), "Bags and Keyring")
 	gui:AddTip(id, "Show Enhanced Tooltip in Bags, including Bank Bags and in the Keyring")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBagBar"), "Bag Bar")
 	gui:AddTip(id, "Show Enhanced Tooltip in the Bag Bar (the bar displaying your four bags) and in the Bank Bag bar")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithBank"), "Bank")
 	gui:AddTip(id, "Show Enhanced Tooltip in your Bank")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithCharacterInventory"), "Character Inventory")
 	gui:AddTip(id, "Show Enhanced Tooltip for equipped items")
 
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithChatHyperlink"), "Chat Hyperlink")
 	gui:AddTip(id, "Show Enhanced Tooltip for Chat Hyperlinks")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithGuildBank"), "Guild Bank")
 	gui:AddTip(id, "Show Enhanced Tooltip in Guild Bank")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithLootAndLootRoll"), "Loot and Loot Roll")
 	gui:AddTip(id, "Show Enhanced Tooltip in the loot window, and on the pop-up that appears when you are rolling for loot.")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithMail"), "Mail")
 	gui:AddTip(id, "Show Enhanced Tooltip in Mail interface")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithMerchants"), "Merchants")
 	gui:AddTip(id, "Show Enhanced Tooltip in Merchant window")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithProfessions"), "Professions")
 	gui:AddTip(id, "Show Enhanced Tooltip for Professions interface")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithQuests"), "Quests")
 	gui:AddTip(id, "Show Enhanced Tooltip for Quests and Quest Log")
-	
+
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("showWithTrade"), "Trade")
 	gui:AddTip(id, "Show Enhanced Tooltip when trading with another player")
 
@@ -472,14 +472,14 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox", 0, 1, getOption("blockExternalCalls"), "Block External Calls")
 	gui:AddTip(id, "Block other addons from manipulating Enhanced Tooltip. See help for more details.")
 
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the SlideBar button")
 
 	gui:AddHelp(id, "what is",
 		"What is Enhanced Tooltip?",
 		"Enhanced Tooltip is an additional tooltip that appears next to the main tooltip when you mouse over an item. This tooltip displays various extra information about the item supplied by other addons, such as AucAdvanced, Enchantrix, Informant and others. Which pieces of information are displayed and which are not is configured within each respective addon."
 	)
-	
+
 	gui:AddHelp(id, "how hiding works",
 		"How do the options controlling whether Enhanced Tooltip is shown work?",
 		"The main option \"Hide Enhanced Tooltip\" controls whether Enhanced Tooltip is shown. It overrides individual frame options. The alt button option works both for the main and individual frame options and shows the hidden tooltip when the Alt button is pressed. Note, that in order to work 100% of the time the Alt button should be pressed *before* you mouse over an item. Some frames do support activating tooltip when Alt button is pressed when mouse is already over an item and some frames do not."
@@ -501,7 +501,7 @@ local function click(obj, button)
 				gui:Hide()
 			else
 				gui:Show()
-			end		
+			end
 		end
 	elseif (button == "RightButton") then
 		if (Informant and Informant.Settings) then

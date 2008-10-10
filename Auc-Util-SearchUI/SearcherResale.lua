@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -53,12 +53,12 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "Resale search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "resale.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "resale.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "resale.seen.check", "Check Seen count")
 	gui:AddControl(id, "Slider",            0, 2, "resale.seen.min", 1, 100, 1, "Min seen count: %s")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
@@ -72,23 +72,23 @@ end
 
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
-	
+
 	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
 	if not market then
 		return false, "No appraiser price"
 	end
 	market = market * item[Const.COUNT]
-	
+
 	if (get("resale.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("resale.seen.min"))) then
 			return false, "Seen count too low"
 		end
 	end
-	
+
 	--adjust for brokerage/deposit costs
 	local deposit = get("resale.adjust.deposit")
 	local brokerage = get("resale.adjust.brokerage")
-	
+
 	if brokerage then
 		market = market * 0.95
 	end
@@ -105,7 +105,7 @@ function lib.Search(item)
 		end
 		market = market - amount
 	end
-	
+
 	local pct = get("resale.profit.pct")
 	local minprofit = get("resale.profit.min")
 	local value = market * (100-pct) / 100

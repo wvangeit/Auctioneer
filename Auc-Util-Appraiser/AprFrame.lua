@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -68,7 +68,7 @@ function private.CreateFrames()
 	local MatchString = ""
 	frame.list = {}
 	frame.cache = {}
-	
+
 	function frame.GenerateList(repos)
 		if not (frame.salebox and frame.salebox:IsVisible()) then return end --If we don't have Appraiser open, we don't need to run this. It will run when we go to Appraiser
 		local n = #(frame.list)
@@ -107,12 +107,12 @@ function private.CreateFrames()
 
 								if frame.showHidden or (not ignore) or isDirect then
 									local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
-									
+
 									table.insert(frame.list, {
 										sig,name,texture,rarity,stack,itemCount,link,
 										ignore=ignore
 									} )
-									
+
 									if AucAdvanced.Modules.Util
 									and AucAdvanced.Modules.Util.ScanData
 									and AucAdvanced.Modules.Util.ScanData.GetDistribution
@@ -146,15 +146,15 @@ function private.CreateFrames()
 							break
 						end
 					end
-					
+
 					if not found then
 						local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
-						
+
 						table.insert(frame.list, {
 							sig,name,texture,rarity,stack,count,link,
 							auction=true
 						} )
-						
+
 						if AucAdvanced.Modules.Util
 						and AucAdvanced.Modules.Util.ScanData
 						and AucAdvanced.Modules.Util.ScanData.GetDistribution
@@ -169,9 +169,9 @@ function private.CreateFrames()
 				end
 			end
 		end
-		
+
 		table.sort(frame.list, private.sortItems)
-		
+
 		local pos = 0
 		n = #frame.list
 		if (n <= NUM_ITEMS) then
@@ -203,7 +203,7 @@ function private.CreateFrames()
 	private.empty = {}
 	function frame.SelectItem(obj, button, rawlink)
 		local item,sig,pos
-		
+
 		if obj then
 			assert(not rawlink)
 			if not obj.id then obj = obj:GetParent() end
@@ -230,7 +230,7 @@ function private.CreateFrames()
 				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
 					itemEquipLoc, itemTexture = GetItemInfo(rawlink)
 				local myCount = GetItemCount(rawlink)
-				item = { 
+				item = {
 					sig, itemName, itemTexture, itemRarity, itemStackCount, myCount, rawlink
 				}
 			end
@@ -261,7 +261,7 @@ function private.CreateFrames()
 			--Also pass this search to BeanCounter's frame
 			if BeanCounter and BeanCounter.API.search and BeanCounter.API.isLoaded then
 				BeanCounter.API.search(item[7], nil, nil, 50)
-			end			
+			end
 		else
 			frame.salebox.name:SetText("No item selected")
 			frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
@@ -328,7 +328,7 @@ function private.CreateFrames()
 			factor = factor,
 		})
 		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
-		
+
 		local data = {}
 		local style = {}
 		for i = 1, #results do
@@ -378,14 +378,14 @@ function private.CreateFrames()
 		if  not frame.imageview.sheet.rows[1][1]:IsShown() then
 			frame.imageview.sheet.panel:ScrollToCoords(0,0)
 		end
-		
+
 	end
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
 		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
 			local _, link = GetItemInfo(itemID)
 			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
-				
+
 			local direction = get("util.appraiser.colordirection")
 			if (direction == "LEFT") then
 				return r,g,b, 0, 0.2, "Horizontal"
@@ -401,7 +401,7 @@ function private.CreateFrames()
 		end
 		return rDef,gDef,bDef
 	end
-		
+
 	function frame.SetPriceFromModel(curModel)
 		if not frame.salebox.sig then return end
 		if not curModel then
@@ -494,11 +494,11 @@ function private.CreateFrames()
 					end
 				end
 			end
-			
+
 			if newBid and (not newBuy or newBid > newBuy) then
 				newBuy = newBid
 			end
-			
+
 		end
 
 		newBid = math.floor((newBid or 0) + 0.5)
@@ -547,7 +547,7 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
-		
+
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
 			defStack = -1
@@ -562,7 +562,7 @@ function private.CreateFrames()
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
 		frame.salebox.number:SetAdjustedRange(curNumber, -2, -1)--make sure the slider can handle the setting before we set it
 		frame.salebox.number:SetAdjustedValue(curNumber)
-		
+
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
 		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
 		if curNumberOnly == "on" then
@@ -572,7 +572,7 @@ function private.CreateFrames()
 		else
 			frame.salebox.numberonly:SetChecked(curNumberOnly)
 		end
-		
+
 		local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
 		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match")
 		if curMatch == nil then
@@ -598,18 +598,18 @@ function private.CreateFrames()
 		frame.UpdateControls()
 		frame.salebox.config = nil
 	end
-	
+
 	function frame.ShowOwnAuctionDetails(itemString)
         local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
 
 		local itemName, itemLink = GetItemInfo(itemString)
-		
+
 		local results = lib.ownResults[itemName]
 		local counts = lib.ownCounts[itemName]
-		
+
 		if counts and #counts>0 then
 			table.sort(counts)
-		
+
 			frame.manifest.lines:Add("")
 			frame.manifest.lines:Add("Own auctions:       |cffffffff(price/each)", nil, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
@@ -617,13 +617,13 @@ function private.CreateFrames()
 				local res = results[count]
 				local avgBid = res.countBid>0 and (res.sumBid / res.countBid) or nil
 				local avgBO =  res.countBO>0 and (res.sumBO / res.countBO) or nil
-				
+
 				local r,g,b,_
 				if colored then
 					_, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(itemLink, 1, avgBid, avgBO)
 				end
 				r,g,b = r or 1,g or 1, b or 1
-				
+
 				frame.manifest.lines:Add(format("  %2d lots of %2dx", res.stackCount, count)..
 					(avgBO and "" or " (bid)"), avgBO or avgBid, r,g,b)
 			end
@@ -695,7 +695,7 @@ function private.CreateFrames()
 		if frame.toggleManifest:GetText() == "Close Sidebar" then
 			frame.manifest:Show()
 		end
-		
+
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 
@@ -714,13 +714,13 @@ function private.CreateFrames()
 		factor = tonumber(factor) or 0
 
 		local itemKey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
-	
+
 		local results = AucAdvanced.API.QueryImage({
 			itemId = itemId,
 			suffix = suffix,
 			factor = factor,
 		})
-		
+
 		if results[1] then
 			local seen = results[1][Const.TIME]
 			if (time() - seen) < 60 then
@@ -753,7 +753,7 @@ function private.CreateFrames()
 		local r,g,b,a
 		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
 		local tinted = AucAdvanced.Settings.GetSetting('util.appraiser.tint.color')
-		
+
 		r,g,b,a=0,0,0,0
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBid, curBid,  r,g,b)
@@ -762,7 +762,7 @@ function private.CreateFrames()
 		AppraiserSaleboxBidGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidCopper:SetBackdropColor(r,g,b, a)
-		
+
 		r,g,b,a=0,0,0,0
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBuy, curBuy,  r,g,b)
@@ -771,7 +771,7 @@ function private.CreateFrames()
 		AppraiserSaleboxBuyGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
-		
+
 		if frame.selectedPostable then
 
 			local depositMult = curDurationMins / 720
@@ -817,7 +817,7 @@ function private.CreateFrames()
 						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 						bidVal = lib.RoundBid(curBid * curSize)
 						buyVal = lib.RoundBuy(curBuy * curSize)
-											
+
 						local rate = AucAdvanced.depositRate or 0.05
 						local newfaction
 						if rate == .25 then newfaction = "neutral" end
@@ -827,7 +827,7 @@ function private.CreateFrames()
 						else
 							depositVal = 0
 						end
-						
+
 						r,g,b=nil,nil,nil
 						if colored then
 							r,g,b = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
@@ -847,7 +847,7 @@ function private.CreateFrames()
 					if (curNumber == -1 and remain > 0) then
 						bidVal = lib.RoundBid(curBid * remain)
 						buyVal = lib.RoundBuy(curBuy * remain)
-						
+
 						local rate = AucAdvanced.depositRate or 0.05
 						local newfaction
 						if rate == .25 then newfaction = "neutral" end
@@ -884,7 +884,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-					
+
 					local rate = AucAdvanced.depositRate or 0.05
 					local newfaction
 					if rate == .25 then newfaction = "neutral" end
@@ -894,7 +894,7 @@ function private.CreateFrames()
 					else
 						depositVal = 0
 					end
-					
+
 					r,g,b=nil,nil,nil
 					if colored then
 						r,g,b = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
@@ -931,18 +931,18 @@ function private.CreateFrames()
 					frame.salebox.totalsize:SetText("("..(curNumber)..")")
 					frame.salebox.numberentry:SetNumber(curNumber)
 				end
-				
+
 				if curNumber > 0 then
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(("%d items"):format(curNumber))
 					bidVal = lib.RoundBid(curBid)
 					buyVal = lib.RoundBuy(curBuy)
-					
+
 					local rate = AucAdvanced.depositRate or 0.05
 					local newfaction
 					if rate == .25 then newfaction = "neutral" end
 					local baseDeposit = GetDepositCost(frame.salebox.link, 12, newfaction) or 0
-					
+
 					depositVal = baseDeposit * depositMult
 					r,g,b=nil,nil,nil
 					if colored then
@@ -974,13 +974,13 @@ function private.CreateFrames()
 					frame.manifest.lines:Add((MatchStringList[i]))
 				end
 			end
-			
+
 			if (totalBid < 1) then
 				frame.manifest.lines:Add(("------------------------------"))
 				frame.manifest.lines:Add(("Note: No auctionable items"))
 			end
 		end -- if frame.selectedPostable then
-		
+
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
 		frame.salebox.warn:SetText("")
@@ -997,7 +997,7 @@ function private.CreateFrames()
                	end
 			end
 		end
-		
+
 		local canAuction = true
 		if curModel == "fixed" and curBid <= 0 then
 			frame.salebox.warn:SetText("Bid price must be > 0")
@@ -1005,10 +1005,10 @@ function private.CreateFrames()
 		elseif (curBuy > 0 and curBid > curBuy) then
 			frame.salebox.warn:SetText("Buy price must be > bid")
 			canAuction = false
-		elseif warnvendor == "buyout" then 
-            frame.salebox.warn:SetText("|cffff8010Note: Buyout <= Vendor") 
-        elseif warnvendor == "bid" then 
-            frame.salebox.warn:SetText("|cffeec900Note: Min Bid <= Vendor") 
+		elseif warnvendor == "buyout" then
+            frame.salebox.warn:SetText("|cffff8010Note: Buyout <= Vendor")
+        elseif warnvendor == "bid" then
+            frame.salebox.warn:SetText("|cffeec900Note: Min Bid <= Vendor")
 		else
 			frame.salebox.warn:SetText("")
 		end
@@ -1016,7 +1016,7 @@ function private.CreateFrames()
 		if totalBid < 1 then
 			canAuction = false
 		end
-		
+
 		if not frame.selectedPostable then
 			canAuction = false
 		end
@@ -1117,7 +1117,7 @@ function private.CreateFrames()
 
 		frame.salebox.config = false
 	end
-	
+
 	function frame.ChangeUI()
 		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
 			--hide unecessary elements
@@ -1148,7 +1148,7 @@ function private.CreateFrames()
 			frame.imageview:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
 			frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
 			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-			
+
 			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0, -5)
 			frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", 0, -5)
 			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
@@ -1204,7 +1204,7 @@ function private.CreateFrames()
 			frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
 			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
 			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-33)
-			
+
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
 			frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
 			frame.salebox.bid.label:ClearAllPoints()
@@ -1222,12 +1222,12 @@ function private.CreateFrames()
 			frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
 			frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-			
+
 			frame.salebox.name:SetHeight(20)
 			frame.salebox.warn:ClearAllPoints()
 			frame.salebox.warn:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -10, 10)
 		end
-		
+
 		frame.UpdateControls()
 	end
 
@@ -1250,7 +1250,7 @@ function private.CreateFrames()
 --		frame.DirectSelect(link)
         frame.SelectItem(nil,nil,link)
 	end
-	
+
 	function frame.IconClicked()
 		local objtype, _, itemlink = GetCursorInfo()
 		ClearCursor()
@@ -1262,7 +1262,7 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+
 	function frame.ToggleDisabled()
 		if not frame.salebox.sig then return end
 		local curDisable = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
@@ -1320,7 +1320,7 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+
 	-- We use this to make sure the correct number of parameters are passed to RefreshView; otherwise, we can end up with e.g. link="LeftButton".
 	function frame.SmartRefresh()
 		frame.refresh:Disable()
@@ -1359,11 +1359,11 @@ function private.CreateFrames()
 				message("Unknown key combination pressed while clicking batch post button.")
 				return
 			end
-			
+
 			if mode == "list" then
 				print "The following items would have be auto-posted:"
 			end
-			
+
 			local bg = false
 			local obj = {}
 			for i = 1, #(frame.list) do
@@ -1386,7 +1386,7 @@ function private.CreateFrames()
 					end
 				end
 			end
-			
+
 		end
 	end
 
@@ -1428,7 +1428,7 @@ function private.CreateFrames()
 			print("Skipping "..link..": Stack size larger than available")
 			return
 		end
-        if numberOnly and number>0 then 
+        if numberOnly and number>0 then
             -- get current number of posted auctions
             local counts = AucAdvanced.Modules.Util.Appraiser.ownCounts[itemName]
             local results = AucAdvanced.Modules.Util.Appraiser.ownResults[itemName]
@@ -1556,7 +1556,7 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+
 	function frame.ClickAnythingHook(link)
 		if not AucAdvanced.Settings.GetSetting("util.appraiser.clickhookany") then return end
 		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
@@ -1564,8 +1564,8 @@ function private.CreateFrames()
 			frame.SelectItem(nil, nil, link)
 		end
 	end
-	
-	
+
+
 	function frame.SetScroll(...)
 		local pos = math.floor(frame.scroller:GetValue())
 		for i = 1, NUM_ITEMS do
@@ -1582,7 +1582,7 @@ function private.CreateFrames()
 				if item.auction then
 					stackX = ""
 				end
-				
+
 				if curIgnore then
 					hex = "|cff444444"
 					stackX = hex..stackX
@@ -1590,13 +1590,13 @@ function private.CreateFrames()
 
 				button.name:SetText(hex.."["..item[2].."]|r")
 				button.size:SetText(stackX..item[6])
-				
+
 				if item.auction then
 					button.size:SetAlpha(0.7)
 				else
 					button.size:SetAlpha(1)
 				end
-				
+
 				local info = ""
 				if frame.cache[item[1]] and not curIgnore then
 					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
@@ -1618,7 +1618,7 @@ function private.CreateFrames()
 				else
 					button.bg:SetAlpha(0.2)
 				end
-				
+
 				button.bg:SetDesaturated(curIgnore)
 			else
 				button:Hide()
@@ -1632,7 +1632,7 @@ function private.CreateFrames()
 			GameTooltip:SetText(text)
 		end
 	end
-	
+
 	frame.DoTooltip = function ()
 		if not this.id then this = this:GetParent() end
 		if this.id then --we're mousing over the itemlist
@@ -1702,7 +1702,7 @@ function private.CreateFrames()
 		AucAdvanced.Settings.Show()
 		private.gui:ActivateTab(private.guiId)
 	end)
-	
+
 	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.switchUI:SetPoint("TOPRIGHT", frame.config, "TOPLEFT", 2, 0)
 	frame.switchUI:SetText("Simple View")
@@ -1742,7 +1742,7 @@ function private.CreateFrames()
 		frame.GenerateList(true)
 		PlaySound(frame.showAuctions and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
 	end)
-	
+
 	-- "Show Hidden" checkbox
 	frame.itembox.showHidden = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowHidden", frame.itembox, "OptionsCheckButtonTemplate")
 	frame.itembox.showHidden:SetScript("OnEnter", function() return frame.SetButtonTooltip("Include items tagged as \n'hidden' in the item listing") end)
@@ -1757,7 +1757,7 @@ function private.CreateFrames()
 		frame.GenerateList(true)
 		PlaySound(frame.showHidden and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
 	end)
-	
+
 	-- "Show:" label
 	frame.itembox.showText = CreateFrame("Frame", nil, frame.itembox)
 	frame.itembox.showText:SetPoint("BOTTOMRIGHT", frame.itembox.showHidden, "BOTTOMLEFT", 0,0)
@@ -1901,7 +1901,7 @@ function private.CreateFrames()
 	frame.salebox.icon:SetScript("OnReceiveDrag", frame.IconClicked)
 	frame.salebox.icon:SetScript("OnEnter", frame.DoTooltip)
 	frame.salebox.icon:SetScript("OnLeave", frame.UndoTooltip)
-	
+
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
 	frame.salebox.name:SetPoint("RIGHT", frame.salebox, "RIGHT", -15)
@@ -1939,12 +1939,12 @@ function private.CreateFrames()
 	frame.salebox.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
-	
+
 	frame.salebox.stack:EnableMouseWheel(1)
 	frame.salebox.stack:SetScript("OnMouseWheel", function()
 		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -arg1)
 	end)
-	
+
 	AppraiserSaleboxStackLow:SetText("")
 	AppraiserSaleboxStackHigh:SetText("")
 
@@ -1952,7 +1952,7 @@ function private.CreateFrames()
 	frame.salebox.stack.label:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0,0)
 	frame.salebox.stack.label:SetJustifyH("LEFT")
 	frame.salebox.stack.label:SetJustifyV("CENTER")
-	
+
 	frame.salebox.number = CreateFrame("Slider", "AppraiserSaleboxNumber", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0, -15)
 	frame.salebox.number:SetHitRectInsets(0,0,0,0)
@@ -2000,12 +2000,12 @@ function private.CreateFrames()
 		self:SetMinMaxValues(1, maxStax+n)
 		self:SetAdjustedValue(math.min(curVal, maxStax))
 	end
-	
+
 	frame.salebox.number:EnableMouseWheel(1)
 	frame.salebox.number:SetScript("OnMouseWheel", function()
 		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -arg1)
 	end)
-	
+
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.number.label:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-4)
 	frame.salebox.number.label:SetJustifyH("LEFT")
@@ -2025,7 +2025,7 @@ function private.CreateFrames()
 	frame.salebox.numberonly.label = frame.salebox.numberonly:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.numberonly.label:SetPoint("BOTTOMLEFT", frame.salebox.numberonly, "BOTTOMRIGHT", 0, 4)
 	frame.salebox.numberonly.label:SetText("Only")
-    frame.salebox.numberonly:Hide()   
+    frame.salebox.numberonly:Hide()
 
 	frame.salebox.duration = CreateFrame("Slider", "AppraiserSaleboxDuration", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-25)
@@ -2046,7 +2046,7 @@ function private.CreateFrames()
 	frame.salebox.duration:SetScript("OnMouseWheel", function()
 		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() + arg1)
 	end)
-	
+
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.duration.label:SetPoint("LEFT", frame.salebox.duration, "RIGHT", 3,2)
 	frame.salebox.duration.label:SetJustifyH("LEFT")
@@ -2065,7 +2065,7 @@ function private.CreateFrames()
 	frame.salebox.model.label = frame.salebox.model:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 30,0)
 	frame.salebox.model.label:SetText("Pricing model to use:")
-	
+
 	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "OptionsCheckButtonTemplate")
  	frame.salebox.matcher:SetScript("OnEnter", function() return frame.SetButtonTooltip("Enables the use of matchers\n(eg Undercut) when calculating prices") end)
 	frame.salebox.matcher:SetScript("OnLeave", function() return GameTooltip:Hide() end)
@@ -2075,7 +2075,7 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetChecked(false)
 	frame.salebox.matcher:SetScript("OnClick", frame.UpdateControls)
 	frame.salebox.matcher:Hide()
-	
+
 	frame.salebox.matcher.label = frame.salebox.matcher:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 5)
 	frame.salebox.matcher.label:SetText("Enable price matching")
@@ -2089,7 +2089,7 @@ function private.CreateFrames()
 	frame.salebox.ignore:SetChecked(false)
 	frame.salebox.ignore:SetScript("OnClick", frame.IconClicked)
 	frame.salebox.ignore:Hide()
-	
+
 	frame.salebox.ignore.label = frame.salebox.ignore:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.ignore.label:SetPoint("BOTTOMRIGHT", frame.salebox.ignore, "BOTTOMLEFT", -5, 6)
 	frame.salebox.ignore.label:SetText("Hide this item")
@@ -2103,7 +2103,7 @@ function private.CreateFrames()
 	frame.salebox.bulk:SetChecked(false)
 	frame.salebox.bulk:SetScript("OnClick", frame.UpdateControls)
 	frame.salebox.bulk:Hide()
-	
+
 	frame.salebox.bulk.label = frame.salebox.bulk:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.bulk.label:SetPoint("BOTTOMRIGHT", frame.salebox.bulk, "BOTTOMLEFT", -5, 6)
 	frame.salebox.bulk.label:SetText("Enable batch posting")
@@ -2226,7 +2226,7 @@ function private.CreateFrames()
 	frame.age:SetText("")
 	frame.age:SetJustifyH("RIGHT")
 	--frame.age:SetJustifyV("BOTTOM")
-	
+
 	frame.cancel = CreateFrame("Button", "AucAdvAppraiserCancelButton", frame, "OptionsButtonTemplate")
 	frame.cancel:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 180, 15)
 	frame.cancel:SetWidth(22)
@@ -2258,7 +2258,7 @@ function private.CreateFrames()
 	frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
 	frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
 	frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
-	
+
 	frame.cancel.label = frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.cancel.label:SetPoint("LEFT", frame.cancel, "RIGHT", 5, 0)
 	frame.cancel.label:SetTextColor(1, 0.8, 0)
@@ -2389,14 +2389,14 @@ function private.CreateFrames()
 	--records the column width changes
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column, width)
-		if not width then 
+		if not width then
 			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
 			self.labels[column].button:SetWidth(AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText()))
 		else
 			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
-	
+
 	function private.BuyAuction()
 		print(private.buyselection.link)
 		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
@@ -2412,7 +2412,7 @@ function private.CreateFrames()
 		frame.imageview.sheet.selected = nil
 		private.onSelect()
 	end
-	
+
 	private.buyselection = {}
 	function private.onSelect()
 		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
@@ -2440,7 +2440,7 @@ function private.CreateFrames()
 						frame.imageview.purchase.buy:Disable()
 						frame.imageview.purchase.buy.price:SetText("")
 					end
-					
+
 					if private.buyselection.minbid then
 						if private.buyselection.curbid and private.buyselection.curbid > 0 then
 							frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
@@ -2461,12 +2461,12 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+
 	function private.onClick(button, row, index)
 		if (IsAltKeyDown()) and frame.imageview.sheet.labels[index]:GetText() == "Seller" then
 			local seller = frame.imageview.sheet.rows[row][index]:GetText()
 			if not seller or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
-			
+
 			frame.sellerIgnore:SetParent(frame.imageview.sheet.panel)
 			frame.sellerIgnore:SetFrameStrata("TOOLTIP")
 			frame.sellerIgnore:ClearAllPoints()
@@ -2496,7 +2496,7 @@ function private.CreateFrames()
 	frame.sellerIgnore:SetHeight(70)
 	frame.sellerIgnore:SetPoint("CENTER", UIParent, "CENTER")
 	frame.sellerIgnore:SetFrameStrata("TOOLTIP")
-	
+
 	frame.sellerIgnore.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
 	frame.sellerIgnore.help:SetParent(frame.sellerIgnore)
 	frame.sellerIgnore.help:SetPoint("CENTER", frame.sellerIgnore, "TOP", 0, -25)
@@ -2512,7 +2512,7 @@ function private.CreateFrames()
 	local font = frame.sellerIgnore.yes:GetFontString()
 	font:SetFontObject("GameFontNormalSmall" )
 	font:SetTextHeight(10)
-	
+
 	frame.sellerIgnore.no = CreateFrame("Button", nil, frame.sellerIgnore, "GameMenuButtonTemplate")
 	frame.sellerIgnore.no:SetNormalFontObject(GameFontNormalSmall)
 	frame.sellerIgnore.no:SetPoint("BOTTOMRIGHT", frame.sellerIgnore, "BOTTOMRIGHT", -5, 10)
@@ -2523,7 +2523,7 @@ function private.CreateFrames()
 	local font = frame.sellerIgnore.no:GetFontString()
 	font:SetFontObject("GameFontNormalSmall" )
 	font:SetTextHeight(10)
-	
+
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		--{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
 		{ "Seller", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Seller")}, --75
@@ -2537,9 +2537,9 @@ function private.CreateFrames()
 		{ "Buyout", "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Buyout"), { DESCENDING=true } }, --85
 		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, private.onClick, private.onResize, private.onSelect)
-	
+
 	frame.imageview.sheet:EnableSelect(true)
-	
+
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
@@ -2556,12 +2556,12 @@ function private.CreateFrames()
  	frame.imageview.purchase.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip("Buyout the selected\ncompeting auction") end)
 	frame.imageview.purchase.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.buy:Disable()
-	
+
 	frame.imageview.purchase.buy.price = frame.imageview.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.imageview.purchase.buy.price:SetPoint("TOPLEFT", frame.imageview.purchase.buy, "TOPRIGHT")
 	frame.imageview.purchase.buy.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.buy, "BOTTOMRIGHT")
 	frame.imageview.purchase.buy.price:SetJustifyV("MIDDLE")
-	
+
 	frame.imageview.purchase.bid = CreateFrame("Button", nil, frame.imageview.purchase, "OptionsButtonTemplate")
 	frame.imageview.purchase.bid:SetPoint("TOPLEFT", frame.imageview.purchase.buy, "TOPLEFT", 120, 0)
 	frame.imageview.purchase.bid:SetWidth(30)
@@ -2570,7 +2570,7 @@ function private.CreateFrames()
  	frame.imageview.purchase.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip("Place a bid on the\nselected competing auction") end)
 	frame.imageview.purchase.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.bid:Disable()
-	
+
 	frame.imageview.purchase.bid.price = frame.imageview.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.imageview.purchase.bid.price:SetPoint("TOPLEFT", frame.imageview.purchase.bid, "TOPRIGHT")
 	frame.imageview.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.bid, "BOTTOMRIGHT")
@@ -2583,14 +2583,14 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5}
 	})
-	
+
 	frame.imageviewclassic:Hide()
 
 	frame.imageviewclassic.purchase = CreateFrame("Frame", nil, frame.imageviewclassic)
 	frame.imageviewclassic.purchase:SetPoint("TOPLEFT", frame.imageviewclassic, "BOTTOMLEFT", 0, 4)
 	frame.imageviewclassic.purchase:SetPoint("BOTTOMRIGHT", frame.imageviewclassic, "BOTTOMRIGHT", 0, -16)
 	frame.imageviewclassic.purchase:SetBackdrop({
-		bgFile = "Interface\\QuestFrame\\UI-QuestTitleHighlight"		
+		bgFile = "Interface\\QuestFrame\\UI-QuestTitleHighlight"
 	})
 	frame.imageviewclassic.purchase:SetBackdropColor(0.5, 0.5, 0.5, 1)
 
@@ -2600,19 +2600,19 @@ function private.CreateFrames()
 	frame.imageviewclassic.purchase.buy:SetText("Buy")
 	frame.imageviewclassic.purchase.buy:SetScript("OnClick", private.BuyAuction)
 	frame.imageviewclassic.purchase.buy:Disable()
-	
+
 	frame.imageviewclassic.purchase.buy.price = frame.imageviewclassic.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.imageviewclassic.purchase.buy.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPRIGHT")
 	frame.imageviewclassic.purchase.buy.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.buy, "BOTTOMRIGHT")
 	frame.imageviewclassic.purchase.buy.price:SetJustifyV("MIDDLE")
-	
+
 	frame.imageviewclassic.purchase.bid = CreateFrame("Button", nil, frame.imageviewclassic.purchase, "OptionsButtonTemplate")
 	frame.imageviewclassic.purchase.bid:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPLEFT", 120, 0)
 	frame.imageviewclassic.purchase.bid:SetWidth(30)
 	frame.imageviewclassic.purchase.bid:SetText("Bid")
 	frame.imageviewclassic.purchase.bid:SetScript("OnClick", private.BidAuction)
 	frame.imageviewclassic.purchase.bid:Disable()
-	
+
 	frame.imageviewclassic.purchase.bid.price = frame.imageviewclassic.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.imageviewclassic.purchase.bid.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.bid, "TOPRIGHT")
 	frame.imageviewclassic.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.bid, "BOTTOMRIGHT")
@@ -2651,7 +2651,7 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
-	
+
 	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
 	frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
 	frame.salebox.numberentry:SetNumeric(false)
@@ -2710,14 +2710,14 @@ function private.CreateFrames()
 		frame.salebox.numberentry:ClearFocus()
 	end)
 	frame.salebox.numberentry:Hide()
-	
+
 	frame.salebox.stacksoflabel = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.stacksoflabel:SetPoint("TOPLEFT", frame.salebox.numberentry, "TOPRIGHT", 5, 0)
 	frame.salebox.stacksoflabel:SetJustifyH("LEFT")
 	frame.salebox.stacksoflabel:SetJustifyV("CENTER")
 	frame.salebox.stacksoflabel:SetText("stacks of")
 	frame.salebox.stacksoflabel:Hide()
-	
+
 	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
 	frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
 	frame.salebox.stackentry:SetNumeric(true)
@@ -2748,14 +2748,14 @@ function private.CreateFrames()
 		frame.salebox.stackentry:ClearFocus()
 	end)
 	frame.salebox.stackentry:Hide()
-	
+
 	frame.salebox.totalsize = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.totalsize:SetPoint("TOPLEFT", frame.salebox.stackentry, "TOPRIGHT", 3, 0)
 	frame.salebox.totalsize:SetJustifyH("LEFT")
 	frame.salebox.totalsize:SetJustifyV("CENTER")
 	frame.salebox.totalsize:SetText("()")
 	frame.salebox.totalsize:Hide()
-	
+
 	frame.salebox.depositcost = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", -15, -5)
 	frame.salebox.depositcost:SetJustifyH("LEFT")
@@ -2771,13 +2771,13 @@ function private.CreateFrames()
 	frame.salebox.totalbuyout:SetJustifyH("LEFT")
 	frame.salebox.totalbuyout:SetJustifyV("CENTER")
 	frame.salebox.totalbuyout:Hide()
-	
+
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
-	
+
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

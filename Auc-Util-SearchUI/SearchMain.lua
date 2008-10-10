@@ -26,7 +26,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -76,7 +76,7 @@ function lib.Processor(callbackType, ...)
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.HookAH()
 		end
-		
+
 		--we need to make sure that the GUI is made by the time the AH opens, as RealTime could be trying to add lines to it.
 		if not gui then
 			lib.MakeGuiConfig()
@@ -105,7 +105,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 		id = button:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame) --without CompactUI
 	end
 	local price = additional[3] --only thing we need from this table, as  minBid and buyout can come from GetAuctionItemInfo
-	
+
 	local name, _, count, _, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
 	local timeleft = GetAuctionItemTimeLeft("list", id)
 	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
@@ -267,13 +267,13 @@ local function setter(setting, value)
 		if (setting == "search.new") then
 			value = "Custom"
 
-			-- Create the new search 
+			-- Create the new search
 			SearchUISettings["profile."..value] = {}
 
-			-- Set the current search to the new profile 
+			-- Set the current search to the new profile
 			SearchUISettings[realmKey]["lastProfile"] = value
 
-			-- Get the new current profile 
+			-- Get the new current profile
 			local newSearch = getProfileParam()
 
 			-- Clean it out and then resave all data
@@ -301,12 +301,12 @@ local function setter(setting, value)
 		elseif (setting == "search.save") then
 			value = gui.elements["search.name"]:GetText()
 
-			-- Create the new profile 
+			-- Create the new profile
 			SearchUISettings["profile."..value] = replicate(getProfileParam() or {})
 
-			-- Set the new profile to the current setup 
+			-- Set the new profile to the current setup
 			SearchUISettings[realmKey]["lastProfile"] = value
-			-- Get the new current profile 
+			-- Get the new current profile
 			local newSearch = getProfileParam()
 
 			-- Add the new profile to the profiles list
@@ -365,7 +365,7 @@ local function setter(setting, value)
 
 			-- Clean it's profile container of values
 			SearchUISettings["profile."..value] = {}
-			-- Set the current profile to the default profile 
+			-- Set the current profile to the default profile
 			SearchUISettings[realmKey]["lastProfile"] = realmKey
 
 		elseif (setting == "profile") then
@@ -414,7 +414,7 @@ local function setter(setting, value)
 			end
 		end
 
-		-- Set the value for this setting in the current search 
+		-- Set the value for this setting in the current search
 		local db = getProfileParam()
 		if db[setting] == value then return end
 		db[setting] = value
@@ -525,7 +525,7 @@ end
 
 private.callbacks = {}
 function lib.AddCallback(name, callback)
-	if (gui) then 
+	if (gui) then
 		callback(gui)
 		return
 	end
@@ -564,7 +564,7 @@ function lib.NewFilter(filterName)
 		for k,v in pairs(filterKit) do
 			filter[k] = v
 		end
-		
+
 		lib.Filters[filterName] = filter
 		return filter, lib, {}
 	end
@@ -734,8 +734,8 @@ function lib.MakeGuiConfig()
 
 	private.gui = gui
 	gui.frame = CreateFrame("Frame", nil, gui)
-	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25) 
-	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0) 
+	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25)
+	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0)
 	gui.frame:SetHeight(275)
 	gui.frame:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
@@ -744,7 +744,7 @@ function lib.MakeGuiConfig()
 		insets = { left = 32, right = 32, top = 32, bottom = 32 }
 	})
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
-	
+
 	function lib.UpdateControls()
 		if gui.sheet.selected then
 			--gui.frame.remove:Enable()
@@ -781,7 +781,7 @@ function lib.MakeGuiConfig()
 				gui.frame.buyout:Disable()
 				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(0, true))
 			end
-		
+
 			if private.data.bid then
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.bid)
 				gui.frame.bid:Enable()
@@ -789,7 +789,7 @@ function lib.MakeGuiConfig()
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, 0)
 				gui.frame.bid:Disable()
 			end
-		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable 
+		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable
 			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < math.ceil(private.data.curbid*1.05) then
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, math.ceil(private.data.curbid*1.05))
 			end
@@ -810,7 +810,7 @@ function lib.MakeGuiConfig()
 	function lib.OnEnterSheet(button, row, index)
 		if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 			local link, name
-			link = gui.sheet.rows[row][index]:GetText() 
+			link = gui.sheet.rows[row][index]:GetText()
 			if not link then
 				return
 			end
@@ -818,8 +818,8 @@ function lib.MakeGuiConfig()
 			if link and name then
 				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 				GameTooltip:SetHyperlink(link)
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
-			end		
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
+			end
 		end
 	end
 
@@ -829,7 +829,7 @@ function lib.MakeGuiConfig()
 
 	function lib.OnClickSheet(button, row, index)
 	--	lib.DoSomethingWithLinkFunctionHere(link)
-	end	
+	end
 
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", 120 },
@@ -847,8 +847,8 @@ function lib.MakeGuiConfig()
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
 		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls) 
-	
+	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls)
+
 
 	gui.sheet:EnableSelect(true)
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
@@ -859,7 +859,7 @@ function lib.MakeGuiConfig()
 	gui.Search.TooltipText = "Search Snapshot using current Searcher"
 	gui.Search:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.Search:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui:AddCat("Searches")
 	gui:AddCat("Filters")
 	id = gui:AddTab("General parameters", "Searches") -- Merely a place holder
@@ -878,7 +878,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.7, 1, "search.save", "Save now")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.5, 1, "search.new", "New search")
-	
+
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")
 	gui:MakeScrollable(id)
@@ -888,7 +888,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "reserve", 1, 99999999, "Reserve Amount")
 	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxprice", 1, 99999999, "Maximum Price")
-	
+
 	gui:AddControl(id, "Subhead",          0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",          0, 1, "tooltiphelp.show", "Show tooltip help over buttons")
 	gui:AddControl(id, "Checkbox",         0, 1, "debug.show", "Show debug line in tooltip for auctions")
@@ -898,9 +898,9 @@ function lib.MakeGuiConfig()
 			gui:AddTip(id, "Show a debug line in the tooltip over auctions for searcher: "..name)
 		end
 	end
-	
+
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
-	
+
 	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
 	gui.frame.purchase:SetText("Purchase")
@@ -918,7 +918,7 @@ function lib.MakeGuiConfig()
 	gui.frame.notnow.TooltipText = "Ignore selected auction for session"
 	gui.frame.notnow:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.notnow:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 400, 35)
 	gui.frame.ignore:SetText("Ignore Price")
@@ -927,7 +927,7 @@ function lib.MakeGuiConfig()
 	gui.frame.ignore.TooltipText = "Ignore selected auction at listed price"
 	gui.frame.ignore:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.ignore:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.ignoreperm = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.ignoreperm:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 490, 35)
 	gui.frame.ignoreperm:SetText("Ignore")
@@ -936,7 +936,7 @@ function lib.MakeGuiConfig()
 	gui.frame.ignoreperm.TooltipText = "Ignore selected auction at any price"
 	gui.frame.ignoreperm:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.ignoreperm:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.snatch = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.snatch:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 630, 35)
 	gui.frame.snatch:SetText("Snatch")
@@ -945,7 +945,7 @@ function lib.MakeGuiConfig()
 	gui.frame.snatch.TooltipText = "Add selected auction to snatch list"
 	gui.frame.snatch:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.snatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 10)
 	gui.frame.clear:SetText("Clear")
@@ -954,7 +954,7 @@ function lib.MakeGuiConfig()
 	gui.frame.clear.TooltipText = "Clear results list"
 	gui.frame.clear:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.clear:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
 	gui.frame.buyout:SetText("Buyout")
@@ -963,7 +963,7 @@ function lib.MakeGuiConfig()
 	gui.frame.buyout.TooltipText = "Buyout selected auction"
 	gui.frame.buyout:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.buyout:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.buyoutbox = gui.frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	gui.frame.buyoutbox:SetPoint("BOTTOMRIGHT", gui.frame.buyout, "BOTTOMLEFT", -4, 4)
 	gui.frame.buyoutbox:SetWidth(100)
@@ -976,31 +976,31 @@ function lib.MakeGuiConfig()
 	gui.frame.bid.TooltipText = "Bid on selected auction using custom price"
 	gui.frame.bid:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
 	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
 	MoneyInputFrame_SetOnValueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
-	
+
 --	gui.frame.buyfirst = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 --	gui.frame.buyfirst:SetPoint("BOTTOMRIGHT", gui.frame.bidbox, "BOTTOMLEFT", -30, -4)
 --	gui.frame.buyfirst:SetText("Buy First")
 --	gui.frame.buyfirst:SetScript("OnClick", private.buyfirst)
 --	gui.frame.buyfirst:Enable()
-	
+
 --	gui.frame.remove = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 --	gui.frame.remove:SetPoint("BOTTOMLEFT", gui.frame.clear, "BOTTOMRIGHT", 30, 0)
 --	gui.frame.remove:SetText("Remove")
 --	gui.frame.remove:SetScript("OnClick", private.removeline)
 --	gui.frame.remove:Disable()
-	
+
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
 	gui.frame.progressbar:SetHeight(30)
 	gui.frame.progressbar:SetPoint("BOTTOM", gui.frame, "BOTTOM", 0, 100)
 	gui.frame.progressbar:SetBackdrop({
-	  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
-	  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
-	  tile=1, tileSize=10, edgeSize=10, 
+	  bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
+	  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+	  tile=1, tileSize=10, edgeSize=10,
 	  insets={left=3, right=3, top=3, bottom=3}
 	})
 	gui.frame.progressbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -1009,18 +1009,18 @@ function lib.MakeGuiConfig()
 	gui.frame.progressbar:SetValue(0)
 	gui.frame.progressbar:SetFrameLevel(10)
 	gui.frame.progressbar:Hide()
-	
+
 	gui.frame.progressbar.text = gui.frame.progressbar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	gui.frame.progressbar.text:SetPoint("CENTER", gui.frame.progressbar, "CENTER")
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching")
 	gui.frame.progressbar.text:SetTextColor(1,1,1)
-	
+
 	gui.frame.progressbar.cancel = CreateFrame("Button", nil, gui.frame.progressbar, "OptionsButtonTemplate")
 	gui.frame.progressbar.cancel:SetPoint("BOTTOMRIGHT", gui.frame.progressbar, "BOTTOMRIGHT", -5, 5)
 	gui.frame.progressbar.cancel:SetPoint("TOPLEFT", gui.frame.progressbar, "TOPRIGHT", -25, -5)
 	gui.frame.progressbar.cancel:SetText("X")
 	gui.frame.progressbar.cancel:SetScript("OnClick", private.cancelSearch)
-	
+
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher.MakeGuiConfig then
@@ -1044,11 +1044,11 @@ local SlideBar = LibStub:GetLibrary("SlideBar", true)
 if SlideBar then
 	--Need to figure out if we're embedded first
 	local embedded = false
-	for _, module in ipairs(AucAdvanced.EmbeddedModules) do 
-		if module == "Auc-Util-SearchUI"  then 
-			embedded = true 
-		end 
-	end 
+	for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+		if module == "Auc-Util-SearchUI"  then
+			embedded = true
+		end
+	end
 	if embedded then
 		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
 	else
@@ -1093,7 +1093,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		return
 	end
 	local debugstring
-	
+
 	--next, pass the item through the filters
 	local isfiltered = false
 	for filtername, filter in pairs(lib.Filters) do
@@ -1104,7 +1104,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			end
 		end
 	end
-	
+
 	--buyorbid must be either "bid", "buy", true, false, or nil
 	--if string is returned for buyorbid, value must be number or nil (in which case value will be Marketprice)
 	local buyorbid, value, pct, reason
@@ -1148,7 +1148,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		local maxprice = lib.GetSetting("maxprice") or 10000000
 		local reserve = lib.GetSetting("reserve") or 1
 		local balance = GetMoney()
-		
+
 		if (cost <= maxprice) and ((balance-cost) > reserve) then
 			--Check to see whether the item already exists in the results table
 			local isdupe = false
@@ -1235,11 +1235,11 @@ local PerformSearch = function()
 	end
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)
 	gui.frame.progressbar:Show()
-	
+
 	--clear the results table
 	lib.CleanTable(private.sheetData)
 	gui.sheet:SetData(private.sheetData)
-	
+
 	private.isSearching = true
 	for i, data in ipairs(scandata.image) do
 		if (i % speed) == 0 then
@@ -1284,7 +1284,7 @@ function private.OnUpdate()
 			end
 		end
 	end
-	if gui and gui:IsShown() then 
+	if gui and gui:IsShown() then
 		if gui.config.selectedCat == "Searches" then
 			if not gui.Search:IsShown() then
 				gui.Search:Show()

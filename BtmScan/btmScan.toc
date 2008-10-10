@@ -1,5 +1,5 @@
 ## Title: Bottom Scanner
-## Notes: Allows you to monitor new auctions for bargains. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
+## Notes: Allows you to monitor new auctions for bargains. [<%version%> (<%codename%>)] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
 ##
 ## Interface: 30000
 ## LoadOnDemand: 1

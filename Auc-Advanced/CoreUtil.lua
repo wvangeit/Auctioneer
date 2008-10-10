@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -219,7 +219,7 @@ function lib.GetFactionGroup()
 	end
 	private.factions[currentZone] = factionGroup
 	if auctionHouseStatus == 0 then
-		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = "Faction" end 
+		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = "Faction" end
 	end
 	if factionGroup == "Faction" then
 		factionGroup = UnitFactionGroup("player")
@@ -368,7 +368,7 @@ Usage:
 --]]
 function lib.GetModule(libType, libName)
 	assert(lib.Modules[libType], "Invalid AucAdvanced libType specified: "..tostring(libType))
-	
+
 	if lib.Modules[libType][libName] then
 		return lib.Modules[libType][libName], lib, private
 	end

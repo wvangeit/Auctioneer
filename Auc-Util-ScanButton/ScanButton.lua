@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -62,7 +62,7 @@ function private.HookAH()
 	private.buttons:SetWidth(22*3 + 4)
 	private.buttons:SetHeight(18)
 	private.buttons:SetScript("OnUpdate", private.OnUpdate)
-	
+
 	private.buttons.stop = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.stop:SetPoint("TOPLEFT", private.buttons, "TOPLEFT", 0,0)
 	private.buttons.stop:SetWidth(22)
@@ -74,7 +74,7 @@ function private.HookAH()
 	private.buttons.stop.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.stop.tex:SetTexCoord(0.25, 0.5, 0, 1)
 	private.buttons.stop.tex:SetVertexColor(1.0, 0.9, 0.1)
-	
+
 	private.buttons.play = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.play:SetPoint("TOPLEFT", private.buttons.stop, "TOPRIGHT", 2,0)
 	private.buttons.play:SetWidth(22)
@@ -86,7 +86,7 @@ function private.HookAH()
 	private.buttons.play.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.play.tex:SetTexCoord(0, 0.25, 0, 1)
 	private.buttons.play.tex:SetVertexColor(1.0, 0.9, 0.1)
-	
+
 	private.buttons.pause = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.pause:SetPoint("TOPLEFT", private.buttons.play, "TOPRIGHT", 2,0)
 	private.buttons.pause:SetWidth(22)
@@ -166,9 +166,9 @@ function private:OnUpdate(delay)
 	--Used to clear the selected filters/highlights AFTER the last queued scan has completed
 	if queueFinished and not AucAdvanced.Scan.IsScanning() and not AucAdvanced.Scan.IsPaused() then
 		queueFinished = false
-		if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("|CFFFFFF00 Last queued Auction Filter completed") end 
-		private.AuctionFrameFilters_ClearSelection() 
-		private.AuctionFrameFilters_ClearHighlight() 
+		if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("|CFFFFFF00 Last queued Auction Filter completed") end
+		private.AuctionFrameFilters_ClearSelection()
+		private.AuctionFrameFilters_ClearHighlight()
 	end
 end
 
@@ -185,7 +185,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the Auction House")
 	gui:AddTip(id, "If enabled, this shows the Stop/Play/Pause scan buttons in the title bar of the Auction House.")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections have been queued")
 	gui:AddTip(id, "If enabled, this shows the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan.")
 end
@@ -248,7 +248,7 @@ end
 --clear any current highlighting from a prev search
 function private.AuctionFrameFilters_ClearHighlight()
 	for i in pairs(CLASS_FILTERS) do
-		_G["AuctionFilterButton"..i]:UnlockHighlight() 
+		_G["AuctionFilterButton"..i]:UnlockHighlight()
 	end
 end
 
@@ -286,7 +286,7 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											end
 										end
 									else
-										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i]) 
+										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i])
 										private.AuctionFrameFilters_ClearSelection()
 									end
 								end)
@@ -314,7 +314,7 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 									end
 								end)
 		end
-	end 
+	end
 	private.AuctionFrameFilters_UpdateClasses() --Changes the frame to match current filter frame, needed for 1 refresh after frame creation.
 end
 
@@ -326,7 +326,7 @@ function private.AuctionFrameFilters_UpdateClasses()
 	index = offset
 	for i=1, NUM_FILTERS_TO_DISPLAY do
 		button = _G["AuctioneerFilterButton"..i]
-			
+
 		if ( getn(OPEN_FILTER_LIST) > NUM_FILTERS_TO_DISPLAY ) then
 			button:SetWidth(136)
 		else
@@ -358,7 +358,7 @@ function private.AuctionFrameFilters_UpdateClasses()
 		else
 			button:Hide()
 		end
-		
+
 	end
 end
 

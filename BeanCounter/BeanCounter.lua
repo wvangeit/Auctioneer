@@ -5,7 +5,7 @@
 
 	BeanCounterCore - BeanCounter: Auction House History
 	URL: http://auctioneeraddon.com/
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -33,7 +33,7 @@
 
 local libName = "BeanCounter"
 local libType = "Util"
-local lib 
+local lib
 BeanCounter={}
 lib = BeanCounter
 lib.API = {}
@@ -46,20 +46,20 @@ local private = {
 	version = 2.02,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
-	
+
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
-		
+
 	--BeanCounter Bids/posts
 	PendingBids = {},
 	PendingPosts = {},
-	
-	--BeanCounterMail 
+
+	--BeanCounterMail
 	reconcilePending = {},
 	inboxStart = {},
 	serverVersion = select(4, GetBuildInfo()),--WOW 3.0 HACK
 	}
-	
+
 lib.Private = private --allow beancounter's sub lua's access
 --Taken from AucAdvCore
 function BeanCounter.Print(...)
@@ -75,7 +75,7 @@ end
 
 local print = BeanCounter.Print
 
-local function debugPrint(...) 
+local function debugPrint(...)
     if lib.GetSetting("util.beancounter.debugCore") then
         private.debugPrint("BeanCounterCore",...)
     end
@@ -91,10 +91,10 @@ if AucAdvanced and AucAdvanced.NewModule then
 		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
 			local item = ...
 			if item.name then lib.API.search(item.name) end
-		
+
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
-		
+
 		end
 	end
 end
@@ -116,7 +116,7 @@ function lib.OnLoad(addon)
 	lib.MakeGuiConfig() --create the configurator GUI frame
 	private.CreateFrames() --create our framework used for AH and GUI
 	private.slidebar() --create slidebar icon
-	
+
 	private.scriptframe:RegisterEvent("PLAYER_MONEY")
 	private.scriptframe:RegisterEvent("PLAYER_ENTERING_WORLD")
 	private.scriptframe:RegisterEvent("MAIL_INBOX_UPDATE")
@@ -124,12 +124,12 @@ function lib.OnLoad(addon)
 	private.scriptframe:RegisterEvent("MAIL_SHOW")
 	private.scriptframe:RegisterEvent("MAIL_CLOSED")
 	private.scriptframe:RegisterEvent("UPDATE_PENDING_MAIL")
-	private.scriptframe:RegisterEvent("MERCHANT_SHOW")	
+	private.scriptframe:RegisterEvent("MERCHANT_SHOW")
 	private.scriptframe:RegisterEvent("MERCHANT_UPDATE")
 	private.scriptframe:RegisterEvent("MERCHANT_CLOSED")
-			
+
 	private.scriptframe:SetScript("OnUpdate", private.onUpdate)
-	
+
 	-- Hook all the methods we need
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
 	--mail
@@ -141,15 +141,15 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-	
-	--ToolTip Hooks here rather than Aunctioneer's Callback so we can choose Placement @ bottom of frame 
+
+	--ToolTip Hooks here rather than Aunctioneer's Callback so we can choose Placement @ bottom of frame
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 700, private.processTooltip)
-	
+
 	lib.API.isLoaded = true
 end
 
 --Create the database
-function private.initializeDB()  
+function private.initializeDB()
 	if not BeanCounterDB  then
 		BeanCounterDB  = {}
 		BeanCounterDB["settings"] = {}
@@ -157,36 +157,36 @@ function private.initializeDB()
 	end
 	if not BeanCounterDB[private.realmName] then
 		BeanCounterDB[private.realmName] = {}
-		
+
 	end
 	if not BeanCounterDB[private.realmName][private.playerName] then
 		BeanCounterDB[private.realmName][private.playerName] = {}
 		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
-		
+
 		BeanCounterDB[private.realmName][private.playerName]["faction"] = "unknown" --faction is recorded when we get the login event
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
-		
+
 		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
 		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
-		
+
 		BeanCounterDB[private.realmName][private.playerName]["postedAuctions"] = {}
 		BeanCounterDB[private.realmName][private.playerName]["completedAuctions"] = {}
 		BeanCounterDB[private.realmName][private.playerName]["failedAuctions"] = {}
-		
+
 		BeanCounterDB[private.realmName][private.playerName]["postedBids"] = {}
 		--BeanCounterDB[private.realmName][private.playerName]["postedBuyouts"] = {} removed as unneccessary
 		BeanCounterDB[private.realmName][private.playerName]["completedBids/Buyouts"]  = {}
 		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
-		
+
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 	end
-	
-	
+
+
 	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
 	private.playerData = BeanCounterDB[private.realmName][private.playerName]
 	private.serverData = BeanCounterDB[private.realmName]
 	private.wealth = private.playerData["wealth"]
-	private.UpgradeDatabaseVersion()  
+	private.UpgradeDatabaseVersion()
 end
 
 --[[ Configator Section ]]--
@@ -224,24 +224,24 @@ function private.onEvent(frame, event, arg, ...)
 	if (event == "PLAYER_MONEY") then
 		private.wealth = GetMoney()
 		private.playerData["wealth"] = private.wealth
-	
-	elseif (event == "PLAYER_ENTERING_WORLD") then --used to record one time info when player loads 
+
+	elseif (event == "PLAYER_ENTERING_WORLD") then --used to record one time info when player loads
 		private.scriptframe:UnregisterEvent("PLAYER_ENTERING_WORLD") --no longer care about this event after we get our current wealth
 		private.wealth = GetMoney()
 		private.playerData["wealth"] = private.wealth
-		
+
 	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event, arg, ...)
-	
+
 	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
 			--private.vendorOnevent(event, arg, ...)
-			
-	elseif (event == "UPDATE_PENDING_MAIL") then 
+
+	elseif (event == "UPDATE_PENDING_MAIL") then
 		private.hasUnreadMail()
 		--we also use this event to get faction data since the faction often returns nil if called after "PLAYER_ENTERING_WORLD"
 		private.faction = UnitFactionGroup(UnitName("player"))
 		private.playerData["faction"] =  private.faction or "unknown"
-		
+
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
 		   lib.OnLoad()
@@ -252,7 +252,7 @@ end
 
 --[[ Utility Functions]]--
 --External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
---Can be item Name or link or itemID 
+--Can be item Name or link or itemID
 --If itemID or link search will be much faster than a plain text lookup
 function lib.externalSearch(name, settings, queryReturn, count)
 	lib.ShowDeprecationAlert("Depreciated API Call Used", "")
@@ -267,8 +267,8 @@ function private.packString(...)
 local String
 	for n = 1, select("#", ...) do
 		local msg = select(n, ...)
-		if msg == nil then 
-			msg = "<nil>" 
+		if msg == nil then
+			msg = "<nil>"
 		elseif msg == true then
 			msg = "boolean true"
 		elseif msg == false then
@@ -294,20 +294,20 @@ end
 --~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
 function private.databaseAdd(key, itemID, itemLink, value, compress)
 	if not key or not itemID or not itemLink or not value then print("BeanCounter database add error: Missing required data") print("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress) return end
-	
+
 	local _, suffix = lib.API.decodeLink(itemLink)
 	local itemString = lib.API.getItemString(itemLink)
 	--if this will be a compressed entry replace uniqueID with 0
-	if compress then 
+	if compress then
 		if private.serverVersion >= 30000 then
 			debugPrint("WOW 3.0 HACK Database Add before", itemString)
 			itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")--WOW 3.0 HACK
 			debugPrint("WOW 3.0 HACK Database Add after", itemString)
-		else		
+		else
 			itemString  = itemString:gsub("^(item:%d+:.+:.-):.*", "%1:0")
 		end
-	end	
-	
+	end
+
 	if private.playerData[key][itemID] then --if ltemID exsists
 		if private.playerData[key][itemID][itemString] then
 			table.insert(private.playerData[key][itemID][itemString], value)
@@ -348,11 +348,11 @@ end
 function private.storeReasonForBid(CallBack)
 	debugPrint("bidplaced", CallBack)
 	if not CallBack then return end
-	
+
 	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
-	
+
 	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
 		for i, v in pairs(private.playerData.postedBids[itemID][itemString]) do
 			local tbl = private.unpackString(v)
@@ -375,14 +375,14 @@ function private.getItemInfo(link, cmd)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
 	if not cmd and itemLink then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
-	
+
 	elseif itemLink and (cmd == "itemid") then
 		local itemID = lib.API.decodeLink(itemLink)
 		return itemID, itemLink
-	
+
 	elseif itemName and itemTexture  and (cmd == "name") then
 		return itemName, itemTexture
-	
+
 	elseif itemStackCount and (cmd == "stack") then
 		return itemStackCount
 	end
@@ -421,7 +421,7 @@ function private.compactDB(announce)
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
 					local _, _, uniqueID = lib.API.decodeLink(itemString)
-					if uniqueID ~= "0" then --ignore the already compacted keys 
+					if uniqueID ~= "0" then --ignore the already compacted keys
 						local itemLink = lib.API.getArrayItemLink(itemString)
 						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
 							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 40 days old process
@@ -432,7 +432,7 @@ function private.compactDB(announce)
 						end
 					end
 				--remove itemStrings that are now empty, all the keys have been moved to compressed format
-				if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end 
+				if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end
 				end
 			end
 		end
@@ -470,25 +470,25 @@ function private.prunePostedDB(announce)
 						--debugPrint("Removed Old posted entry", itemString)
 						table.remove(index, 1)
 					end
-					-- remove empty itemString tables			
-					if #index == 0 then 
+					-- remove empty itemString tables
+					if #index == 0 then
 						--debugPrint("Removed empty itemString table", itemID, itemString)
 						private.playerData[DB][itemID][itemString] = nil
 					end
 				end
 			end
 			--after removing the itemStrings look to see if there are itemID's that need removing
-			local empty = true	
+			local empty = true
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
 					empty = false
 				end
 				if empty then
 					--debugPrint("Removed empty ItemID tables", itemID)
-					private.playerData[DB][itemID] = nil 
+					private.playerData[DB][itemID] = nil
 				end
 				empty = true
-			end		
+			end
 		end
 	end
 	if announce then print("Finished pruning Posted Databases") end

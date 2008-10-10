@@ -3,8 +3,8 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
-	BeanCounterUpdate - Upgrades the Beancounter Database to latest version 
+
+	BeanCounterUpdate - Upgrades the Beancounter Database to latest version
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -35,7 +35,7 @@ local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals()
 private.update = {}
 
-local function debugPrint(...) 
+local function debugPrint(...)
     if get("util.beancounter.debugUpdate") then
         private.debugPrint("BeanCounterUpdate",...)
     end
@@ -57,8 +57,8 @@ local tbl = {}
 							elseif link and  tbl[1] == "0" then
 								private.serverData[player][DB][itemID][index] = text:gsub("(0)", link, 1)
 								print("Corrected",private.serverData[player][DB][itemID][index])
-							else 
-								print("Server could not find itemID, try again later", itemID)    
+							else
+								print("Server could not find itemID, try again later", itemID)
 							end
 						end
 					end
@@ -114,7 +114,7 @@ function private.UpgradeDatabaseVersion()
 	end
 	--Recreate the itemID array if for some reason user lacks it.
 	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} private.refreshItemIDArray() end
-	
+
 	if private.playerData["version"] < 1.015 then
 		private.updateTo1_02A()
 	elseif private.playerData["version"] < 1.02 then
@@ -151,22 +151,22 @@ function private.UpgradeDatabaseVersion()
 	--WOW 3.0 HACK
 	if private.serverVersion >= 30000 then
 		private.version = 2.03 --change private version so bean Does not freak that DB is one higher than Expected after the upgarde.
-		
+
 		if private.playerData["version"] < 2.03 then--if not upgraded yet then upgrade
 			private.update._2_03()
 		end
 	end
 	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
-	if not get("util.beancounter.integrityCheckComplete") then 
-		private.integrityCheck(true) 
+	if not get("util.beancounter.integrityCheckComplete") then
+		private.integrityCheck(true)
 	elseif not get("util.beancounter.integrityCheck") then
 		private.integrityCheck()
 	end
-	
+
 end
 
 --[[This changes the database to use ; and to replace itemNames with itemlink]]--
-function private.updateTo1_02A() 
+function private.updateTo1_02A()
 	--: to ; and itemName to itemlink
 	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
@@ -188,21 +188,21 @@ function private.updateTo1_02A()
 	end
 	private.updateTo1_02B()
 end
-function private.updateTo1_02B() 
+function private.updateTo1_02B()
 	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
 			if type(data) == "table" then
 				for itemID, value in pairs(data) do
 				    for index, text in ipairs(value) do
 					local _, link = private.getItemInfo(itemID, "itemid")
-					    if link then 
+					    if link then
 						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
-						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
+						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink
 					    else
 						local name = text:match("(.-);")
 						link = private.updateCreatelink(itemID, name)
 						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
-						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
+						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink
 					    end
 				    end
 				end
@@ -217,7 +217,7 @@ function private.updateTo1_02B()
 	    end
 	end
 	private.updateTo1_03()
-end 
+end
 function private.updateCreatelink(itemID, name) --If the server query fails make a fake link so we can still view item
     return "|cffffff33|Hitem:"..itemID..":0:0:0:0:0:0:1529248154|h["..name.."]|h|r" --Our fake links are always yellow
 end
@@ -234,7 +234,7 @@ function private.updateTo1_03()
 		end
 	end
 	private.playerData.version = 1.03
-	
+
 	private.updateTo1_04()
 end
 
@@ -245,7 +245,7 @@ function private.updateTo1_04()
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 	end
 	private.playerData.version = 1.04
-	
+
 	private.updateTo1_05()
 end
 
@@ -302,7 +302,7 @@ function private.updateTo1_075()
 	for player,data in pairs(private.serverData) do
 		for itemID ,values in pairs(private.serverData[player]["completedAuctions"]) do
 			for i, text in pairs(values) do
-				text = text:gsub("Auction successful;", "Auction successful;<nil>;", 1) --Add new Stack size field 
+				text = text:gsub("Auction successful;", "Auction successful;<nil>;", 1) --Add new Stack size field
 				private.serverData[player]["completedAuctions"][itemID][i] = text
 			end
 		end
@@ -310,7 +310,7 @@ function private.updateTo1_075()
 	end
 	private.updateTo1_08()
 end
---Compare with postedAuctions add as much stack info as we can. Also add the correct Starting Bid 
+--Compare with postedAuctions add as much stack info as we can. Also add the correct Starting Bid
 function private.updateTo1_08()
 	for player,data in pairs(private.serverData) do
 		for itemID ,values in pairs(private.serverData[player]["completedAuctions"]) do
@@ -319,7 +319,7 @@ function private.updateTo1_08()
 				local tbl = private.unpackString(text)
 				local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(tbl[5]), tonumber(tbl[8]),tonumber(tbl[10]), tonumber(tbl[10]-17300)
 				if not private.serverData[player]["postedAuctions"][itemID] then print("failed", itemID) break end
-				
+
 				for index, v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
 					local tbl2 = private.unpackString(v)
 					local postDeposit, postBuy, postTime = tonumber(tbl2[6]), tonumber(tbl2[4]),tonumber(tbl2[7])
@@ -349,7 +349,7 @@ function private.updateTo1_09()
 				local tbl = private.unpackString(text)
 				local seller, buy, bid = tbl[8], tonumber(tbl[6]),tonumber(tbl[7])
 				local found = false --used to skip checking bids if we found in buys table
-				
+
 				if private.serverData[player]["postedBuyouts"][itemID] then
 					for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
 						local tbl2 = private.unpackString(v)
@@ -426,9 +426,9 @@ function private.updateTo1_11B()
 			for i, text in pairs(values) do
 				local tbl = private.unpackString(text)
 				local stack, arrivedTime = tonumber(tbl[3]), tonumber(tbl[7])
-				
+
 				if not private.serverData[player]["postedAuctions"][itemID] then print("failed", itemID) break end
-				
+
 				for index, v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
 					local tbl2 = private.unpackString(v)
 					local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(tbl[7] - (tbl2[5]*60)) --Time this message should have been posted
@@ -457,7 +457,7 @@ local integrity = {} --table containing teh DB layout
 	integrity["failedAuctions"] = {"number", "number", "number", "number", "number", "string"} --6
 	integrity["postedBids"] = {"number", "number", "string", "string", "number", "number", "string" } --7
 	integrity["postedAuctions"] = {"number", "number", "number", "number", "number" ,"number", "string"} --7
-local integrityClean, integrityCount = true, 0	
+local integrityClean, integrityCount = true, 0
  function private.integrityCheck(complete)
 	local tbl
 	debugPrint(integrityCount)
@@ -467,7 +467,7 @@ local integrityClean, integrityCount = true, 0
 				for itemID, value in pairs(data) do
 					for itemString, data in pairs(value) do
 						--check that the data is a string and table
-						if type(itemString) ~= "string"  or  type(data) ~= "table" then 
+						if type(itemString) ~= "string"  or  type(data) ~= "table" then
 							private.serverData[player][DB][itemID][itemString] = nil
 							debugPrint("Failed: Invalid format", DB, data, "", itemString)
 							integrityClean = false
@@ -475,20 +475,20 @@ local integrityClean, integrityCount = true, 0
 							for index, text in pairs(data) do
 								tbl = {strsplit(";", text)}
 									--check entries for missing data points
-								if #integrity[DB] ~= #tbl then 
-									debugPrint("Failed: Number of entries invalid", player, DB, #tbl) 
+								if #integrity[DB] ~= #tbl then
+									debugPrint("Failed: Number of entries invalid", player, DB, #tbl)
 									table.remove(data, index)
 									integrityClean = false
-								elseif complete and private.IC(tbl, DB) then 
+								elseif complete and private.IC(tbl, DB) then
 									--do a full check type() = check
-									debugPrint("Failed type() check", player, DB) 
+									debugPrint("Failed type() check", player, DB)
 									table.remove(data, index)
 									integrityClean = false
 								end
 							end
 						end
 					end
-				
+
 				end
 			end
 		end
@@ -504,8 +504,8 @@ local integrityClean, integrityCount = true, 0
 		set("util.beancounter.integrityCheckComplete", true)
 		set("util.beancounter.integrityCheck", true)
 	end
-	
-end	
+
+end
 --look at each value and compare to the number, string, number pattern for that specific DB
 function private.IC(tbl, DB, text)
 	for i,v in pairs(tbl) do
@@ -589,7 +589,7 @@ end
 --removes old "Wealth entry to make room for reason codes
 function private.update._2_01()
 	private.integrityCheck()
-	
+
 	for player, v in pairs(private.serverData)do
 		for DB, data in pairs(private.serverData[player]) do
 			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
@@ -608,7 +608,7 @@ function private.update._2_01()
 		end
 		private.serverData[player]["version"] = 2.01
 	end
-	
+
 	private.integrityCheck(true)
 	private.update._2_02()
 end
@@ -642,7 +642,7 @@ function private.update._2_03()
 			private.serverData[player]["version"] = 2.03
 		end
 	end
-		
+
 	--Upgrade the itemID array's itemLinks only needs to run once
 	if not get("util.beancounter.ItemLinkArray.upgradedtoWotLK") then
 		print("WOW version 30000 ItemLink Array upgrade started")
@@ -655,6 +655,6 @@ function private.update._2_03()
 		set("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
 		print("WOW version 30000 ItemLink Array upgrade finished")
 	end
-	
+
 	print("WOW version 30000 Update finished")
 end

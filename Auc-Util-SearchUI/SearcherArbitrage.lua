@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -100,18 +100,18 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "Arbitrage search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "arbitrage.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "arbitrage.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "arbitrage.seen.check", "Check Seen count")
 	gui:AddControl(id, "Slider",            0, 2, "arbitrage.seen.min", 1, 100, 1, "Min seen count: %s")
-	
+
 	gui:AddControl(id, "Subhead",           0,      "Search against")
 	gui:AddControl(id, "Selectbox",         0.01, 1, private.getStyles(), "arbitrage.search.style", "Search against")
 	gui:AddControl(id, "Subhead",           0.01,      "Cross-Realm:")
 	gui:AddControl(id, "Selectbox",         0.02, 1, private.getRealmList(), "arbitrage.search.crossrealmrealm", "Realm")
 	gui:AddControl(id, "Selectbox",         0.02, 1, private.getFactions(), "arbitrage.search.crossrealmfaction", "Faction")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
@@ -156,26 +156,26 @@ function lib.Search(item)
 	else
 		comparefaction = AucAdvanced.GetFaction()
 	end
-	
+
 	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK], comparefaction)
-	
+
 	if not market then
 		return false, "No appraiser price"
 	end
 	market = market * item[Const.COUNT]
-	
+
 	if (get("arbitrage.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("arbitrage.seen.min"))) then
 			return false, "Seen count too low"
 		end
 	end
-	
+
 	--adjust for brokerage/deposit costs
 	local deposit = get("arbitrage.adjust.deposit")
 	local brokerage = get("arbitrage.adjust.brokerage")
 	local sig = AucAdvanced.Modules.Util.Appraiser.GetSigFromLink(item[Const.LINK])
 	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
-	
+
 	if brokerage then
 		if string.find(comparefaction, "Neutral") then
 			market = market * .85
@@ -198,7 +198,7 @@ function lib.Search(item)
 		end
 		market = market - amount
 	end
-	
+
 	local pct = get("arbitrage.profit.pct")
 	local minprofit = get("arbitrage.profit.min")
 	local value = market * (100-pct) / 100

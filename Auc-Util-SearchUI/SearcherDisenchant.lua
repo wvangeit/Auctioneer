@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -58,13 +58,13 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "Disenchant search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "disenchant.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "disenchant.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "disenchant.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.min", 0, 375, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.max", 25, 375, 25, "Maximum skill: %s")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
@@ -72,7 +72,7 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.brokerage", "Subtract auction fees")
-	
+
 	gui:AddControl(id, "Subhead",           0.42,    "Note:")
 	gui:AddControl(id, "Note",              0.42, 1, 290, 30, "The \"Pct\" Column is \% of DE Value")
 end
@@ -104,10 +104,10 @@ function lib.Search(item)
 	if (not market) or (market == 0) then
 		return false, "Item not DEable"
 	end
-	
+
 	--adjust for brokerage costs
 	local brokerage = get("disenchant.adjust.brokerage")
-	
+
 	if brokerage then
 		market = market * 0.95
 	end

@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -84,14 +84,14 @@ define(lcName..'.enable', false)
 
 function lib:setup(gui)
 	id = gui:AddTab(libName)
-	
+
 	gui:AddHelp(id, "what is ignoreitemprice",
 		"What is IgnoreItemPrice?",
 		"The IgnoreItemPrice filter is used by Bottom Scanner to ignore "..
 		"an item at or above a given price.\n\n"..
 		"This option must be enabled for the 'IgnorePrice' button in "..
 		"the Bottom Scanner pop-up dialog to have any effect.")
-	
+
 	gui:AddHelp(id, "when ignoreitemprice",
 		"When would I use IgnoreItemPrice?",
 		"IgnoreItemPrice can be used whenever you get Bottom Scanner "..
@@ -103,7 +103,7 @@ function lib:setup(gui)
 		"so you should be a little careful when using this option.  "..
 		"If needed, you can always disable IgnoreItemPrice for specific "..
 		"evaluators here in these options.")
-	
+
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable price-filtering")
 

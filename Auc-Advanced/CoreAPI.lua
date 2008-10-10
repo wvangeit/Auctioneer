@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -87,7 +87,7 @@ do
         This function acquires the current market value of the mentioned item using
         a configurable algorithm to process the data used by the other installed
         algorithms.
-        
+
         The returned value is the most probable value that the item is worth
         using the algorithms in each of the STAT modules as specified
         by the GetItemPDF() function.
@@ -99,16 +99,16 @@ do
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
         if not itemLink then return; end
-        
+
         -- Look up in the cache if it's recent enough
         local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
         if cacheTable then
             return cacheTable.value, cacheTable.seen, cacheTable.stats;
         end
-        
-            
+
+
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
-        
+
         -- Rebuild the engine cache
         if #engines == 0 then
 			local modules = AucAdvanced.GetAllModules(nil, "Stat")
@@ -121,17 +121,17 @@ do
                 end
             end
         end
-        
-        -- Run through all of the stat modules and get the PDFs 
+
+        -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax = 0, #pdfList;
         for _, engine in ipairs(engines) do
             local i, min, max = engine.pdf(itemLink, serverKey);
             local priceArray = engine.array(itemLink, serverKey);
-            
+
             if priceArray and (priceArray.seen or 0) > seen then
                 seen = priceArray.seen;
             end
-            
+
             if i then   -- pdfList[++c] = i;
                 c = c + 1;
                 pdfList[c] =  i;
@@ -139,43 +139,43 @@ do
                 if max > upperLimit then upperLimit = max; end
             end
         end
-        
+
         -- Clean out extras if needed
         for i = c+1, oldPdfMax do
             pdfList[i] = nil;
         end
-        
-        
+
+
         assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
-        
-       
-        
+
+
+
         -- Ok, integrate from -10G to 10000G through all functions
         local total, lastTotal = 0, 0;
         local delta = (upperLimit - lowerLimit) * .01;
-        
-        
+
+
         if #pdfList == 0 or delta < 0.000001 then
             return;                 -- No PDFs available for this item
         end
-        
+
         repeat
-        
+
             lastTotal = total;
             total = 0;
             delta = delta * 0.75;
-            
+
             assert(delta > 0, "Infinite loop detected on pass 1 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
-                   
+
             for i = 1, #pdfList do
                 local thisCall = pdfList[i];
                 for x = lowerLimit, upperLimit, delta do
                     total = total + thisCall(x);
                 end
             end
-            
+
             total = total * delta;
-            
+
             if total ~= total or total == 0 then
                 if nLog and total ~= total then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
@@ -184,34 +184,34 @@ do
                 end
                 return;                 -- Cannot calculate: NaN
             end
-            
+
         until abs(total-lastTotal)/total < ERROR;
-        
+
         local limit = total/2;
         local midpoint, lastMidpoint = 0, 0;
-        
+
         -- Now find the 50% point
         total = 0;
 
         repeat
             lastMidpoint = midpoint;
             total = 0;
-            
+
             assert(delta > 0, "Infinite loop detected on pass 2 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
-        
+
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
                     total = total + pdfList[i](x) * delta;
                 end
-                
+
                 if total > limit then
                     midpoint = x;
                     break;
                 end
             end
-            
+
             delta = delta * 0.8;
-            
+
             if midpoint ~= midpoint or midpoint == 0 then
                 if nLog and midpoint ~= midpoint then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
@@ -219,14 +219,14 @@ do
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
                 end
                 return;                 -- Cannot calculate: NaN
-            end        
-            
+            end
+
         until abs(midpoint - lastMidpoint)/midpoint < ERROR;
-        
-        
+
+
         if midpoint and midpoint > 0 then
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
-            
+
             -- Cache before finishing up
             local cacheTable = {}
             cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
@@ -234,18 +234,18 @@ do
             cacheTable.value = midpoint;
             cacheTable.seen = seen;
             cacheTable.stats = #pdfList;
-            
-            
+
+
             return midpoint, seen, #pdfList;
         else
             if nLog then
                 nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "No midpoint was detected for item "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
             end
             return;
-        end 
+        end
 
     end
-    
+
     -- Now hook NewModule so that we clear the engine cache when a new module comes into play
     local oldNewModule = AucAdvanced.NewModule;
     AucAdvanced.NewModule = function(...)
@@ -305,12 +305,12 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not itemLink) then
 		error("No itemLink supplied")
 	end
-    
+
     if reserved then
         lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
             "The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
         );
-        
+
         serverKey = reserved.."-"..serverKey;
     end
     serverKey = serverKey or AucAdvanced.GetFaction()
@@ -466,22 +466,22 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
             "The 'realm' and 'faction' parameters have been removed in favor of a single "..
             "variable 'serverKey' which should be used in the future."
         );
-        
+
         serverKey = reserved.."-"..serverKey;
     end
-    
+
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
-    
+
     local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
 	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 
 	local matchers = lib.GetMatchers(itemLink)
 	local total, count, diff, _ = 0, 0, 0
 
-	
+
 	local priceArray = {}
-	
+
 	if algorithm == "market" then
 		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, serverKey)
 	elseif type(algorithm) == "string" then
@@ -489,7 +489,7 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	else
 		priceArray.price = algorithm
 	end
-		
+
 	local InfoString = ""
 	if not priceArray or not priceArray.price then return end
 	for index, matcher in ipairs(matchers) do
@@ -503,7 +503,7 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 			end
 		end
 	end
-	
+
 	if (priceArray.price > 0) then
 		return priceArray.price, total, count, diff/count, InfoString
 	end
@@ -511,8 +511,8 @@ end
 
 function lib.GetMatcherDropdownList()
 	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
-	if not private.matcherlist or #private.matcherlist == 0 then 
-		lib.GetMatchers() 
+	if not private.matcherlist or #private.matcherlist == 0 then
+		lib.GetMatchers()
 	end
 	if not private.matcherlist or #private.matcherlist == 0 then
 		return
@@ -594,17 +594,17 @@ end
 
 -- Allows the return of Appraiser price values to other functions.
 -- If Appraiser is not loaded it uses Market Price
-function lib.GetAppraiserValue(itemLink, useMatching)	
+function lib.GetAppraiserValue(itemLink, useMatching)
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
 	if not AucAdvanced.Modules.Util.Appraiser then
 		newBuy, seen = AucAdvanced.API.GetMarketValue(itemLink)
 		curModelText = "Market"
 		return newBuy, newBuy, seen, curModelText
 	end
-	
+
 	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, 0, useMatching)
 	lib.ShowDeprecationAlert("AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching)");
-    
+
 	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
 end
 
@@ -637,7 +637,7 @@ function lib.GetLinkFromSig(sig)
 	if not suffix then suffix = "0" end
 	if not factor then factor = "0" end
 	if not enchant then enchant = "0" end
-	
+
 	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
 	name, link = GetItemInfo(link)
 	return link, name -- name is ignored by most calls
@@ -656,8 +656,8 @@ local exp = math.exp;
 local bellCurveMeta = {
     __index = {
         SetParameters = function(self, mean, stddev)
-            if (stddev == 0) then 
-                error("Standard deviation cannot be zero"); 
+            if (stddev == 0) then
+                error("Standard deviation cannot be zero");
             elseif (stddev ~= stddev) then
                 error("Standard deviation must be a real number");
             end
@@ -673,21 +673,21 @@ local bellCurveMeta = {
     -- Simple bell curve call
     __call = function(self, x)
         local n = self.param1*exp(-(x-self.mean)^2/self.param2);
-        -- if n ~= n then 
+        -- if n ~= n then
             -- DEFAULT_CHAT_FRAME:AddMessage("-----------------");
             -- DevTools_Dump{param1 = self.param1, param2 = self.param2, x = x, mean = self.mean, stddev = self.stddev, exp = exp(-(x-self.mean)^2/self.param2)};
-            -- error(x.." produced NAN ("..tostring(n)..")"); 
+            -- error(x.." produced NAN ("..tostring(n)..")");
         -- end
         return n;
     end
 }
 -------------------------------------------------------------------------------
 -- Creates a bell curve object that can then be manipulated to pass
--- as a PDF function. This is a recyclable object -- the mean and 
+-- as a PDF function. This is a recyclable object -- the mean and
 -- standard deviation can be updated as necessary so that it does not have
 -- to be regenerated
 --
--- Note: This creates a bell curve with a standard deviation of 1 and 
+-- Note: This creates a bell curve with a standard deviation of 1 and
 -- mean of 0. You will probably want to update it to your own desired
 -- values by calling return:SetParameters(mean, stddev)
 -------------------------------------------------------------------------------
@@ -705,7 +705,7 @@ do
     local uid = 0;
 
     -------------------------------------------------------------------------------
-    -- Shows a deprecation alert. Indicates that a deprecated function has 
+    -- Shows a deprecation alert. Indicates that a deprecated function has
     -- been called and provides a stack trace that can be used to help
     -- find the culprit.
     -- @param replacementName (Optional) The displayable name of the replacement function
@@ -715,15 +715,15 @@ do
         local caller, source, functionName =
             debugstack(3):match(SOURCE_PATTERN),        -- Keep in mind this will be truncated to only the first in the tuple
             debugstack(2):match(SOURCE_PATTERN);        -- This will give us both the source and the function name
-        
+
         functionName = functionName .. "()";
-            
+
         -- Check for this source & caller combination
         seenCalls[source] = seenCalls[source] or {};
         if not seenCalls[source][caller] then
             -- Not warned yet, so warn them!
             seenCalls[source][caller]=true
-            -- Display it            
+            -- Display it
             AucAdvanced.Print(
                 "Auctioneer Advanced: "..
                 functionName .. " has been deprecated and was called by |cFF9999FF"..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:").."|r. "..
@@ -739,10 +739,10 @@ do
 			)
 		end
 
-        
-        
+
+
     end
-    
+
 end
 
 

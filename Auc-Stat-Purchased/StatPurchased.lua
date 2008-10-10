@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -148,7 +148,7 @@ lib.Private = private
 function private.EstimateStandardDeviation(hyperlink, faction, realm)
     local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	assert(linkType=="item", "Standard deviation estimation requires an item link");
-	
+
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 
     local dataset = {}
@@ -169,19 +169,19 @@ function private.EstimateStandardDeviation(hyperlink, faction, realm)
            end
         end
     end
-        
+
     if #dataset == 0 then                               -- No data
          print("Warning: Purchased dataset for "..hyperlink.." is empty.");
         return;
     end
-	
+
     local mean = private.sum(unpack(dataset))/#dataset;
     local variance = 0;
     for k,v in ipairs(dataset) do
         variance = variance + (mean - v)^2;
     end
 
-    return mean, sqrt(variance), count;    
+    return mean, sqrt(variance), count;
 end
 
 -- Simple function to total all of the values in the tuple
@@ -194,7 +194,7 @@ function private.sum(...)
     for x = 1, select('#', ...) do
         total = total + select(x, ...);
     end
-    
+
     return total;
 end
 
@@ -215,14 +215,14 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
     if not get("stat.purchased.enable") then return end --disable purchased if desired
-    
+
     -- Calculate the SE estimated standard deviation & mean
     local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, faction, realm);
-    
+
     if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
     end
-    
+
     if not count or count == 0 then
     print(mean)
     print(stddev)
@@ -233,23 +233,23 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
     if stddev == 0 then stddev = mean / sqrt(count); end
-    
-        
+
+
     -- Calculate the lower and upper bounds as +/- 3 standard deviations
     local lower, upper = mean - 3*stddev, mean + 3*stddev;
-    
+
     bellCurve:SetParameters(mean, stddev);
     return bellCurve, lower, upper;
 end
 
 function lib.GetPrice(hyperlink, faction, realm)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
-	
+
 	if (not faction) or (faction == AucAdvanced.GetFaction()) then
 		faction = AucAdvanced.GetFactionGroup()
 	end
 	realm = realm or GetRealmName()
-	
+
 	local data = private.GetPriceData(faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -288,7 +288,7 @@ local tmpReturn={} -- used to return stuff in
 
 function lib.GetPriceArray(hyperlink, faction, realm)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
-	
+
 	if (not faction) or (faction == AucAdvanced.GetFaction()) then
 		faction = AucAdvanced.GetFactionGroup()
 	end
@@ -301,13 +301,13 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 		cache = setmetatable({}, cacheMeta)
 	end
 	if not cache[hyperlink] then
-	
+
 		local array = {}
 		cache[hyperlink] = array
 
 		-- Get our statistics
 		local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
-		
+
 		-- array.price and array.seen are the ones that most algorithms will look for
 		array.seen = seenCount
 		if not AucAdvanced.Settings.GetSetting("stat.purchased.reportsafe") then
@@ -328,12 +328,12 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 					local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
 					local mix14 = 0.5-mix3
 					local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
-					array.price = a3*mix3 + a7*mix7 + a14*mix14			
+					array.price = a3*mix3 + a7*mix7 + a14*mix14
 					-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
 				end
 			end
 		end
-		
+
 		-- This is additional data
 		array.avgday = dayAverage
 		array.avg3 = avg3
@@ -343,8 +343,8 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 		array.daycount = dayCount
 		array.seendays = seenDays
 	end
-	
-	-- now it'd be wonderful to just be able to return it all out... 
+
+	-- now it'd be wonderful to just be able to return it all out...
 	-- but unfortunately some callers mess with the returned array! Nice going!
 	for k,v in pairs(cache[hyperlink]) do
 		tmpReturn[k]=v
@@ -367,7 +367,7 @@ AucAdvanced.Settings.SetDefault("stat.purchased.reportsafe", false)
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
-	
+
 	gui:AddHelp(id, "what purchased stats",
 		"What are purchased stats?",
 		"Purchased stats are the numbers that are generated by the Purchased module, the "..
@@ -379,7 +379,7 @@ function private.SetupConfigGui(gui)
 		"Moving average means that it places more value on yesterday's moving average "..
 		"than today's average.  The determined amount is then used for "..
 		"tomorrow's moving average calculation.")
-	
+
 	gui:AddHelp(id, "how day average calculated purchased",
 		"How is the moving day averages calculated exactly?",
 		"Todays Moving Average is ((X-1)*YesterdaysMovingAverage + TodaysAverage) / X, "..
@@ -394,21 +394,21 @@ function private.SetupConfigGui(gui)
 		"Why have the option to multiply stack size?",
 		"The original Stat-Purchased multiplied by the stack size of the item, "..
 		"but some like dealing on a per-item basis.")
-	
+
 	gui:AddHelp(id, "report safe safer price prices value low volume item items",
 		"How are the \"safer\" prices computed?",
 		"For anything seen more than 100 times and selling more than 10 items per day (on average), we simply use the 3 day average.\n\n"..
 		"For others, we value the 7-day average at 50%, and the 3- and 14-day averages at between 0--50% and 50--0%, respectively, depending on how many are seen per day (between 1 and 7).\n"
 		)
-		
-		
+
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	
+
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.enable", "Enable Purchased Stats")
 	gui:AddTip(id, "Allow Stat Purchased to gather and return price data")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.tooltip", "Show purchased stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Purchased module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.purchased.avg3", "Display Moving 3 Day Average")
@@ -417,14 +417,14 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of 7-Day average from the Purchased module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.purchased.avg14", "Display Moving 14 Day Average")
 	gui:AddTip(id, "Toggle display of 14-Day average from the Purchased module on or off")
-	
+
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.reportsafe", "Report safer prices for low volume items")
 	gui:AddTip(id, "Returns longer averages (7-day, or even 14-day) for low-volume items")
 
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.quantmul", "Multiply by Stack Size")
 	gui:AddTip(id, "Multiplies by current Stack Size if on")
 
@@ -437,7 +437,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- desire. You are passed a hyperlink, and it's up to you to determine what you should
 	-- display in the tooltip.
 	if not AucAdvanced.Settings.GetSetting("stat.purchased.tooltip") then return end
-	
+
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not AucAdvanced.Settings.GetSetting("stat.purchased.quantmul") then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)

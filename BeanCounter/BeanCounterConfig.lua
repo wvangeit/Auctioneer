@@ -3,7 +3,7 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
+
 	BeanCounterConfig - Controls Configuration data
 
 	License:
@@ -24,11 +24,11 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
---Most of this code is from enchantrix 
+--Most of this code is from enchantrix
 local lib = BeanCounter
 local private, print, _, _, _BC = lib.getLocals()
 local gui, settings
@@ -74,23 +74,23 @@ end
 
 
 -- Default setting values
-local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)") --We have no direct translation so this is a temp workaround	
+local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)") --We have no direct translation so this is a temp workaround
 private.settingDefaults = {
 	["util.beancounter.ButtonExactCheck"] = false,
 	["util.beancounter.ButtonClassicCheck"] = false,
 	["util.beancounter.ButtonBidCheck"] = true,
 	["util.beancounter.ButtonBidFailedCheck"] = true,
 	["util.beancounter.ButtonAuctionCheck"] = true,
-	["util.beancounter.ButtonAuctionFailedCheck"] = true,	
+	["util.beancounter.ButtonAuctionFailedCheck"] = true,
 
 	["util.beancounter.activated"] = true,
 	["util.beancounter.integrityCheckComplete"] = false,
 	["util.beancounter.integrityCheck"] = true,
-	
+
 	--Tootip Settings
 	["util.beancounter.displayReasonCodeTooltip"] = true,
 	["util.beancounter.displaybeginerTooltips"] = true,
-	
+
 	--Debug settings
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
@@ -103,20 +103,20 @@ private.settingDefaults = {
 	["util.beancounter.debugFrames"] = true,
 	["util.beancounter.debugAPI"] = true,
 	["util.beancounter.debugSearch"] = true,
-	
+
 	["util.beacounter.invoicetime"] = 5,
 	["util.beancounter.mailrecolor"] = "off",
 	["util.beancounter.externalSearch"] = true,
-	
+
 	["util.beancounter.hasUnreadMail"] = false,
-	
+
 	--["util.beancounter.dateFormat"] = "%c",
-	["dateString"] = "%c", 
-	
+	["dateString"] = "%c",
+
 	--Color gradient
 	["colorizeSearch"] = true,
 	["colorizeSearchopacity"] = 0.2,
-	
+
 	--GUI column default widths
 	["columnwidth.".._BC('UiNameHeader')] = 120,
 	["columnwidth.".._BC('UiTransactions')] = 100,
@@ -124,14 +124,14 @@ private.settingDefaults = {
 	["columnwidth.".._BC('UiBuyTransaction')] = 60,
 	["columnwidth.".._BC('UiNetHeader')] = 65,
 	["columnwidth.".._BC('UiQuantityHeader')] = 40,
-	["columnwidth.".._BC('UiPriceper')] = 70, 
-		
+	["columnwidth.".._BC('UiPriceper')] = 70,
+
 	["columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer] = 90,
-				
+
 	["columnwidth.".._BC('UiDepositTransaction')] = 58,
-	["columnwidth.".._BC('UiPriceper')] = 50, 
-	["columnwidth.".._BC("UiFee")] = 70, 
-	["columnwidth.".._BC('UiReason')] = 70, 
+	["columnwidth.".._BC('UiPriceper')] = 50,
+	["columnwidth.".._BC("UiFee")] = 70,
+	["columnwidth.".._BC('UiReason')] = 70,
 	["columnwidth.".._BC('UiDateHeader')] = 250,
     }
 
@@ -141,7 +141,7 @@ local function getDefault(setting)
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
-	
+
 	-- lookup the simple settings
 	local result = private.settingDefaults[setting];
 
@@ -167,39 +167,39 @@ local function setter(setting, value)
 		-- Don't save default values
 		value = nil
 	end
-	
+
 	--button to check database integrity pushed
-	if (setting == "database.validate") then 
+	if (setting == "database.validate") then
 		print("Checking")
 		private.integrityCheck(true)
 		value = nil
 	elseif (setting == "database.sort") then
 		private.sortArrayByDate()
 		value = time()
-	end		
-		
+	end
+
 	--This is used to do the DateString
 	local a,b = strsplit(".", setting)
-	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string 
+	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string
 		if not value then value = "%c" end
 		tbl = {}
-		for w in string.gmatch(value, "%%(.)" ) do --look for the date commands prefaced by %  
+		for w in string.gmatch(value, "%%(.)" ) do --look for the date commands prefaced by %
 			tinsert(tbl, w)
 		end
-		
+
 		local valid, invalid = {['a']= 1,['A'] =1,['b'] =1,['B'] =1,['c']=1,['d']=1,['H']=1,['I']=1,['m']=1,['M']=1,['p']=1,['S']=1,['U']=1,['w']=1,['x']=1,['X']=1,['y']=1,['Y']=1} --valid date commands
-		
+
 		for i,v in pairs(tbl) do
 			 if not valid[v] then  invalid = v break end
 		end
 		if invalid then print("Invalid Date Format", "%"..invalid)  return end --Prevent processing if we have an invalid command
-		
+
 		local text = gui.elements.dateString:GetText()
 		gui.elements.dateStringdisplay.textEl:SetText(_BC('C_DateStringExample').." "..date(text, 1196303661))
 	end
-	
+
 	--[[Check for profile changes or store settings ]]
-	
+
 	if (a == "profile") then
 		if (setting == "profile.save") then
 			value = gui.elements["profile.name"]:GetText()
@@ -376,50 +376,50 @@ private.setter = setter
 private.getter = getter
 function lib.MakeGuiConfig()
 
-	
+
 	if gui then return end
-	
+
 	local id
 	local Configator = LibStub:GetLibrary("Configator")
 	gui = Configator:Create(setter, getter)
-		
+
 	local baseGUI
 	lib.Gui = gui
-	
+
   	gui:AddCat("BeanCounter")
-	
+
 	id = gui:AddTab(_BC('C_BeanCounterConfig')) --"BeanCounter Config")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
-	
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('C_ShowBeginnerTooltips'))--"Show beginner tooltips on mouse over" 
+
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('C_ShowBeginnerTooltips'))--"Show beginner tooltips on mouse over"
 	gui:AddTip(id, _BC('TTShowBeginnerTooltips')) --Turns on the beginner tooltips that display on mouse eover
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displayReasonCodeTooltip", _BC('C_ShowReasonPurchase'))--Show reason for purchase in the games Tooltips
 	gui:AddTip(id, _BC('TTShowReasonPurchase'))--Turns on the SearchUI reason an item was purchased for in the tooltip
-		
+
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
-		
+
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 20, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
-		
+
 	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
-		
+
 	gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00".._BC('C_DateString')) --"|CCFFFCC00Date format to use:")
 	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
 	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00".._BC('C_DateStringExample').." 11/28/07 21:34:21") --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
-	
+
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "colorizeSearch", "Add a gradient color to each result in the search window")
 	gui:AddTip(id, "This option changes the color of the items lines in the BeanCounter search window.")
 	--gui:AddControl(id, "Slider",     0, 2, "colorizeSearchopacity", 1, 100, 1, "Opacity level: %d%%")
 	gui:AddControl(id, "NumeriSlider", 0, 3, "colorizeSearchopacity",    0, 1, 0.1, "Opacity level")
 	gui:AddTip(id, "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)")
-	
+
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
 		_BC('A_MailInvoiceTimeout') --"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
@@ -429,7 +429,7 @@ function lib.MakeGuiConfig()
 		_BC('A_MailRecolor') --"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
 		)
 	gui:AddHelp(id, "what is tooltip",
-		_BC('Q_BeanCountersTooltip'),--What is BeanCounters Tooltip 
+		_BC('Q_BeanCountersTooltip'),--What is BeanCounters Tooltip
 		_BC('A_BeanCountersTooltip')--BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip
 		)
 	gui:AddHelp(id, "what is external",
@@ -443,8 +443,8 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is date command",
 		_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
 		_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
-		)			
-	
+		)
+
 	id = gui:AddTab(_BC('C_DataMaintenance')) --"Data Maintenance"
 	lib.Id = id
 	gui:MakeScrollable(id)
@@ -452,12 +452,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    _BC('C_Resortascendingtime')) --"Resort all entries by ascending time"
 	gui:AddControl(id, "Button",     0, 1, "database.sort", _BC('C_Resort Database')) --"Resort Database"
 	gui:AddTip(id, _BC('TTResort Database'))--"This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions"
-	
+
 	gui:AddControl(id, "Subhead",    0,    _BC('C_ScanDatabase')) --"Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using."
 	gui:AddControl(id, "Button",     0, 1, "database.validate", _BC('C_ValidateDatabase')) --"Validate Database"
 	gui:AddTip(id, _BC('TTValidateDatabase')) --"This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search"
-		
-	
+
+
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")

@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -262,7 +262,7 @@ function lib.ProgressBars(self, value, show, text)
 		self:SetValue(value)
 	end
 	--change bars text if desired
-	if text then 
+	if text then
 		self.text:SetText(text)
 	end
 end
@@ -306,7 +306,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			end
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			
+
 			lib.ProgressBars(GetAllProgressBar, 0, true)
 		end
 
@@ -715,7 +715,7 @@ Commitfunction = function()
 	if (updateCount + sameCount + newCount + filterCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterCount, scanCount))
 	end
-	
+
 	if numempty > 0 then
 		lib.Print(("Warning: %d entries in scandata without links"):format(numempty)) --this theoretically should never output, but if it does, we need to track it down.
 	end
@@ -846,7 +846,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
 	private["curQuery"] = nil
 	private["curScan"] = nil
-    
+
 	if coroutine.status(CoCommit) ~= "dead" then
 		CoroutineResume(CoCommit)
 	else

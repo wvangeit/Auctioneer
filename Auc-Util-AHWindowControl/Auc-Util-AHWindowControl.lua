@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds the abilty to drag and reposition the Auction House Frame. 
+	This is an addon for World of Warcraft that adds the abilty to drag and reposition the Auction House Frame.
 	Protect the Auction Frame from being closed or moved by Escape or Blizzard frames.
 	Limited Font and Frame Scaling og the Auction House/CompactUI
 
@@ -26,7 +26,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -57,7 +57,7 @@ function lib.Processor(callbackType, ...)
 		private.auctionHook() ---When AuctionHouse loads hook the auction function we need
 		private.MoveFrame() --Set position back to previous session if options set
 	elseif callbackType == "configchanged" then
-		private.MoveFrame()	
+		private.MoveFrame()
 		private.AdjustProtection()
 	elseif callbackType == "config" then
 		private.SetupConfigGui(...)
@@ -101,7 +101,7 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is remeberpos",
 		"Remember last known window position?",
 		"This will remember the auction frame's last position and re-apply it each session.")
-	
+
 	--Window Protection
 	gui:AddControl(id, "Header", 0,	"Window Protection Options")
 	gui:AddControl(id, "Subhead", 0, "Protect the Auction House window:")
@@ -123,16 +123,16 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.auctionscale",    0.5, 2, 0.1, "Auction House Scale")
 	gui:AddTip(id, "This option allows you to adjust the overall size of the Auction House window. Default is 1.")
 	gui:AddHelp(id, "what is Auction House Scale",
-			"Auction House Scale?", 
+			"Auction House Scale?",
 			"The Auction House scale slider adjusts the overall size of the entire Auction House window. The default size is 1.")
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
 	gui:AddTip(id, "This option allows you to adjust the text size of the CompactUI on the Browse tab. The default size is 0.")
 	gui:AddHelp(id, "what is CompactUI Font Scale",
-			"CompactUI Font Scale?", 
+			"CompactUI Font Scale?",
 			"The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.")
 end
 
-		
+
 --[[ Local functions ]]--
 
 --Hooks AH show function. This is fired after all Auction Frame methods have been set by Blizzard
@@ -149,12 +149,12 @@ end
 --Enable or Disable the move scripts
 function private.MoveFrame()
 	if not AuctionFrame then return end
-	
+
 	if get("util.mover.activated") then
 		AuctionFrame:SetMovable(true)
 		AuctionFrame:SetClampedToScreen(true)
 		AuctionFrame:SetScript("OnMouseDown", function()  AuctionFrame:StartMoving() end)
-		AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing() 
+		AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing()
 						set("util.mover.anchors", {AuctionFrame:GetPoint()}) --store the current anchor points
 					end)
 	else
@@ -184,7 +184,7 @@ end
 --Restore previous sessions Window position
 function private.recallLastPos()
 	if get("util.mover.rememberlastpos") then
-		local anchors = get("util.mover.anchors") 
+		local anchors = get("util.mover.anchors")
 		if #anchors ~= 5 then anchors = {"TOPLEFT", UIParent, "TOPLEFT", 0, -104} end
 		AuctionFrame:ClearAllPoints()
 		AuctionFrame:SetPoint(anchors[1], anchors[2], anchors[3], anchors[4], anchors[5])
@@ -192,34 +192,34 @@ function private.recallLastPos()
 end
 
 --This script will turn the protection of the AuctionFrame on or off,
---as appropriate.   
+--as appropriate.
 function private.AdjustProtection ()
 	if not UIPanelWindows["AuctionFrame"] then
 		debugPrint("AuctionFrame doesn't exist yet.")
 		return
 	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
 		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
-		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
-		if AuctionFrame:IsVisible() then 
-			AuctionFrame.IsShown = function() end 
-			ShowUIPanel(AuctionFrame, 1) 
-			AuctionFrame.IsShown = nil 
+		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+		if AuctionFrame:IsVisible() then
+			AuctionFrame.IsShown = function() end
+			ShowUIPanel(AuctionFrame, 1)
+			AuctionFrame.IsShown = nil
 		end
 	elseif (get("util.protectwindow.protectwindow") == 3) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
 		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
-		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true) 
-		if AuctionFrame:IsVisible() then 
-			AuctionFrame.IsShown = function() end 
-			ShowUIPanel(AuctionFrame, 1) 
-			AuctionFrame.IsShown = nil 
+		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+		if AuctionFrame:IsVisible() then
+			AuctionFrame.IsShown = function() end
+			ShowUIPanel(AuctionFrame, 1)
+			AuctionFrame.IsShown = nil
 		end
 	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-enabled") == true then
 		debugPrint("Disabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		if AuctionFrame:IsVisible() then
-			AuctionFrame.Hide = function() end 
-			HideUIPanel(AuctionFrame) 
-			AuctionFrame.Hide = nil 
-		end 
+			AuctionFrame.Hide = function() end
+			HideUIPanel(AuctionFrame)
+			AuctionFrame.Hide = nil
+		end
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", nil)
 	else
 		debugPrint("No case matched")
@@ -232,7 +232,7 @@ local ScanProtected = nil
 local ProcessProtect = nil
 function private.CheckScanProt(state, totalAuctions, scannedAuctions, elapsedTime)
 	debugPrint "CheckScanProt was called"
-	if get("util.protectwindow.protectwindow") == 3 then 
+	if get("util.protectwindow.protectwindow") == 3 then
 			debugPrint("State:", state)
 			debugPrint("totalAuctions:", totalAuctions)
 			debugPrint("scannedAuctions:", scannedAuctions)

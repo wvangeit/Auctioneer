@@ -3,7 +3,7 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
+
 	BidMonitor - Records bids posted in the Auctionhouse
 
 	License:
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -68,7 +68,7 @@ function private.addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, 
 	pendingBid.itemLink = itemLink
 	table.insert(private.PendingBids, pendingBid)
 	debugPrint("addPendingBid() - Added pending bid")
-	
+
 	-- Register for the response events if this is the first pending bid.
 	if (#private.PendingBids == 1) then
 		debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
@@ -96,7 +96,7 @@ function private.removePendingBid()
 
 		return bid
 	end
-	
+
 	-- No pending bid to remove!
 	return nil
 end
@@ -114,7 +114,7 @@ function private.onEventHookBid(_, event, arg1)
 		if (arg1 == ERR_ITEM_NOT_FOUND or
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
-			arg1 == ERR_AUCTION_HIGHER_BID or 
+			arg1 == ERR_AUCTION_HIGHER_BID or
 			arg1 == ERR_ITEM_MAX_COUNT) then
 			private.onBidFailed()
 		end
@@ -127,10 +127,10 @@ end
 function private.onBidAccepted()
 	local bid = private.removePendingBid()
 	if (bid) then
-	
+
 	local itemID = lib.API.decodeLink(bid.itemLink)
 	local text = private.packString(bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), "")
-		debugPrint(bid.isBuyout, bid.isHighBidder)		
+		debugPrint(bid.isBuyout, bid.isHighBidder)
 		--we use the bid/buy data for storing "BTM/SearchUI reasons" and outbid data
 		if (bid.isBuyout) then
 			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid
@@ -138,7 +138,7 @@ function private.onBidAccepted()
 				private.databaseRemove("postedBids", itemID, bid.itemLink, bid.owner, bid.count) --remove old entry
 			end
 			debugPrint('private.databaseAdd(pendingBids', itemID, text)
-			private.databaseAdd("postedBids", itemID, bid.itemLink, text) --replace with buyout entry.	
+			private.databaseAdd("postedBids", itemID, bid.itemLink, text) --replace with buyout entry.
 		else
 		debugPrint('private.databaseAdd(pendingBids', itemID, text)
 		private.databaseAdd("postedBids", itemID, bid.itemLink, text)

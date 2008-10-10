@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -56,7 +56,7 @@ function lib.GetItemPDF(hyperlink, faction, realm)
 	if not get("stat.sales.enable") then return end
     -- Get the data
 	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, faction, realm)
-   
+
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
  	if stddev == 0 then stddev = mean / sqrt(soldqty); end
@@ -64,9 +64,9 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     if not (mean and stddev) or mean == 0 or stddev == 0 then
         return nil;                 -- No data, cannot determine pricing
     end
-    
+
     local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
-    
+
     -- Build the PDF based on standard deviation & mean
     BellCurve:SetParameters(mean, stddev);
     return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
@@ -119,7 +119,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return false end
     if not settings then
         -- faction seems to be nil when passed in
-        faction = UnitFactionGroup("player"):lower() 
+        faction = UnitFactionGroup("player"):lower()
         settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true, ["exact"] = true}
     end
     local sig = lib.GetSigFromLink(hyperlink)
@@ -174,7 +174,7 @@ function lib.GetPrice(hyperlink, faction, realm)
                     if thistime >= day7time then
                         soldqty7 = soldqty7 + qty
                         sold7 = sold7 + priceper*qty
-                    end 
+                    end
                 end
             end
         end
@@ -191,7 +191,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     -- Calculate Variance
     local variance = 0
     local count = 0
-    
+
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
         if priceper and qty and priceper>0 and qty>0 and reason == "Auc Successful" then
@@ -201,9 +201,9 @@ function lib.GetPrice(hyperlink, faction, realm)
 	end
 	variance = variance / count;
 	local stdev = variance ^ 0.5
-		
+
 	local deviation = 1.5 * stdev
-	
+
 	-- Trim down to those within 1.5 stddev
     local number = 0
     local total = 0
@@ -225,8 +225,8 @@ function lib.GetPrice(hyperlink, faction, realm)
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-    	
-    
+
+
     cache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
     return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
@@ -254,7 +254,7 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	array.mean = mean
 	array.deviation = stdev
 	array.variance = variance
-	
+
     array.boughtseen = boughtseen
     array.soldseen = soldseen
     array.bought = bought
@@ -305,15 +305,15 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	
+
 	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
-	
+
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
     if (boughtseen+soldseen>0) then
 		EnhTooltip.AddLine(libName.." prices:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-    
+
         if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
             if (boughtseen > 0) then
                 EnhTooltip.AddLine("  Total Bought |cffddeeff"..(boughtqty).."|r at avg each", bought)
@@ -323,7 +323,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
                 EnhTooltip.AddLine("  Total Sold |cffddeeff"..(soldqty).."|r at avg each", sold)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
-        end 
+        end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
             if (boughtqty7 > 0) then
                 EnhTooltip.AddLine("  7 Days Bought |cffddeeff"..(boughtqty7).."|r at avg each", bought7)
@@ -360,7 +360,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
                     EnhTooltip.AddLine("  (or individually)", stdev)
                     EnhTooltip.LineColor(0.3, 0.9, 0.8);
                 end
-                    
+
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.confid") then
 				EnhTooltip.AddLine("  Confidence: "..(floor(confidence*1000))/1000)
@@ -378,10 +378,10 @@ function private.SetupConfigGui(gui)
 		"What are sales stats?",
 		"Sales stats are the numbers that are generated by the sales module from the "..
 		"BeanCounter database. It averages all of the prices for items that you have sold")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", "Enable Sales Stats")
 	gui:AddTip(id, "Allow Sales to contribute to Market Price.")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
@@ -401,7 +401,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of 'Confidence' calculation in tooltips on or off")
 
 	end
-    
+
 --[[Bootstrap Code]]
 private.scriptframe = CreateFrame("Frame")
 private.scriptframe:SetScript("OnEvent", private.onEvent)

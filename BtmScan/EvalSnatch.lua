@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -92,17 +92,17 @@ function lib.AddSnatch(itemlink, price, count)	-- give price=(0 or nil) to stop 
 	local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemlink)
 	local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 	local itemconfig = BtmScan.getItemConfig(itemsig)
-	
+
 	if price and price<=0 then
 		price=nil
 	end
 	if count and count<=0 then
 		count=nil
 	end
-	
+
 	itemconfig.buyBelow = price
 	itemconfig.maxCount = count
-	
+
 	if not price then
 		BtmScan.Print(translate("BottomScanner will now %1 %2", translate("not snatch"), itemlink))
 		BtmScan.storeItemConfig(itemconfig, itemsig)
@@ -131,11 +131,11 @@ end
 
 function lib.CommandHandler(msg)
 	-- BtmScan.Print("called snatch-handler: "..msg)
-	if (string.lower(msg) == "snatch") then 
+	if (string.lower(msg) == "snatch") then
 		lib.snatchGUI()
 		return
 	end
-	if (string.lower(msg) == "snatch list") then 
+	if (string.lower(msg) == "snatch list") then
 		lib.PrintList()
 		return
 	end
@@ -187,25 +187,25 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
-	
+
 	gui:AddHelp(id, "what snatch evaluator",
 		"What is the snatch evaluator?",
 		"This evaluator allows you to purchase specific items you want, for a maximum price set by you.\n\n"..
 		"Hint: When configuring the list of items to snatch, you can click any chat link to add a new item to the list."
 		)
-	
+
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
-	
+
 	gui:AddControl(id, "Subhead",          0,    libName.." List")
 	gui:AddControl(id, "Button",           0, 2, lib.snatchGUI, "Edit")
-	
+
 end
 
 --[[ Everything below this point belongs to the snatch ui
- the ui has not modified any of the original snatch code 
+ the ui has not modified any of the original snatch code
  except adding the command handler]]
 
 local snatchui = {
@@ -223,13 +223,13 @@ function snatchui.SetWorkingItem(link)
 	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
 	if not name or not texture then return false end
 	workingItemLink = link
-	
+
 	snatchui.frame.workingname:SetText(link)
 	snatchui.frame.icon.tx:SetTexture(texture)
 	snatchui.frame.icon.tx:Show()
 	snatchui.frame.additem:Show()
-	
-	
+
+
 	BtmScan.getItemConfig(format("%d:%d:%d", BtmScan.BreakLink(link)),  tmpItemConfig)
 	if tmpItemConfig.buyBelow then
 		local g,s,c = BtmScan.GetGSC(tmpItemConfig.buyBelow)
@@ -244,9 +244,9 @@ function snatchui.SetWorkingItem(link)
 		snatchui.frame.copper:SetText("")
 		snatchui.frame.additem:SetText("Add Item")
 		snatchui.frame.removeitem:Hide()
-		
+
 	end
-	
+
 	return true
 end
 
@@ -254,11 +254,11 @@ end
 
 function snatchui.PopulateSnatchSheet()
 	local itemConfigTable = get("itemconfig.list")
-	
+
 	local display = {}
-	
+
 	local appraiser = AucAdvanced and AucAdvanced.Modules.Util.Appraiser
-	
+
 	local itemConfig = {}
 	for sig, itemConfigString in pairs(itemConfigTable) do
 		BtmScan.unpackItemConfiguration(itemConfigString, itemConfig)
@@ -266,25 +266,25 @@ function snatchui.PopulateSnatchSheet()
 			local itemID, itemsuffix, itemenchant = strsplit(':', sig)
 			local itemString = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
 			local _, itemlink = GetItemInfo(itemString)
-			
+
 			if not appraiser then
 				table.insert(display,{
 					itemlink,
 					itemConfig.buyBelow,
-				}) 
+				})
 			else
 				local abid, abuy = appraiser.GetPrice(itemlink, nil, true)
 				table.insert(display,{
 					itemlink,
 					itemConfig.buyBelow,
 					tonumber(abuy) or tonumber(abid) --Appraisers buyout value
-				}) 
+				})
 			end
 		end
 	end
-		
+
 	snatchui.frame.snatchlist.sheet:SetData(display)
-end 
+end
 
 
 function snatchui.OnClickClearAllSnatches()
@@ -314,10 +314,10 @@ function snatchui.OnClickAddSnatch()
 	local g = tonumber(snatchui.frame.gold:GetText()) or 0
 	local s = tonumber(snatchui.frame.silver:GetText()) or 0
 	local c = tonumber(snatchui.frame.copper:GetText()) or 0
-	
+
 	lib.AddSnatch(workingItemLink, g*10000 + s*100 + c)
 	snatchui.ClearWorkingItem()
-	snatchui.PopulateSnatchSheet()	
+	snatchui.PopulateSnatchSheet()
 end
 
 function snatchui.OnEnterSnatchSheet(button, row, index)
@@ -327,11 +327,11 @@ function snatchui.OnEnterSnatchSheet(button, row, index)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			if (EnhTooltip) then
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
 			end
 		end
-	end		
+	end
 end
 
 function snatchui.OnEnterBagSheet(button, row, index)
@@ -341,11 +341,11 @@ function snatchui.OnEnterBagSheet(button, row, index)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then 
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) 
+			if (EnhTooltip) then
+				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
 			end
 		end
-	end		
+	end
 end
 
 function snatchui.OnLeaveSheet(button, row, index)
@@ -356,12 +356,12 @@ end
 function snatchui.OnClickSnatchSheet(button, row, index)
 	local link = snatchui.frame.snatchlist.sheet.rows[row][1]:GetText()
 	snatchui.SetWorkingItem(link)
-end	
+end
 
 function snatchui.OnClickBagSheet(button, row, index)
 	local link = snatchui.frame.baglist.sheet.rows[row][1]:GetText()
 	snatchui.SetWorkingItem(link)
-end	
+end
 
 function snatchui.OnResize()
 	--empty function needed to resize columns. This function can be used later if we want to save columns across sessions
@@ -379,7 +379,7 @@ end
 
 function snatchui.OnClickIcon()
 	snatchui.ClearWorkingItem()
-end 
+end
 
 function snatchui.OnDragToIcon()
 	local objtype, _, itemlink = GetCursorInfo()
@@ -399,11 +399,11 @@ end
 hooksecurefunc("ChatFrame_OnHyperlinkShow", snatchui.ClickLinkHook)
 
 function snatchui.PopulateBagSheet()
-	
+
 	local unique={}
 	local bagcontents = {}
 	local appraiser = AucAdvanced and AucAdvanced.Modules.Util.Appraiser
-	
+
 	for bag=0,NUM_BAG_SLOTS do
 		for slot=1,GetContainerNumSlots(bag) do
 			local itemLink = GetContainerItemLink(bag,slot)
@@ -415,15 +415,15 @@ function snatchui.PopulateBagSheet()
 					local _,itemCount = GetContainerItemInfo(bag,slot)
 					local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
 					local btmRule = ""
-					
+
 					local bidlist = get("bid.list")
 					if (bidlist) then
 						local bids = bidlist[("%d:%d:%d:%dx%d"):format(itemid,suffix,enchant,seed,itemCount)]
-						if(bids and bids[1]) then 
+						if(bids and bids[1]) then
 							btmRule = bids[1]
-						end 
+						end
 					end
-					
+
 					if not appraiser then
 						tinsert(bagcontents, {
 							itemLink,
@@ -441,14 +441,14 @@ function snatchui.PopulateBagSheet()
 			end
 		end
 	end
-	
+
 	snatchui.frame.baglist.sheet:SetData(bagcontents) --Set the GUI scrollsheet
 	snatchui.PopulateSnatchSheet()
 end
 
 
 
-function lib.snatchGUI() 
+function lib.snatchGUI()
 	if not snatchui.frame then
 		snatchui.frame = CreateFrame("Frame", "snatchframe", UIParent)
 
@@ -462,11 +462,11 @@ function lib.snatchGUI()
 		})
 		snatchui.frame:SetBackdropColor(0,0,0, 1)
 		snatchui.frame:Hide()
-		
+
 		snatchui.frame:SetPoint("CENTER", UIParent, "CENTER")
 		snatchui.frame:SetWidth(950)
 		snatchui.frame:SetHeight(450)
-		
+
 		snatchui.frame:SetMovable(true)
 		snatchui.frame:EnableMouse(true)
 		snatchui.frame.Drag = CreateFrame("Button", nil, snatchui.frame)
@@ -477,7 +477,7 @@ function lib.snatchGUI()
 
 		snatchui.frame.Drag:SetScript("OnMouseDown", function() snatchui.frame:StartMoving() end)
 		snatchui.frame.Drag:SetScript("OnMouseUp", function() snatchui.frame:StopMovingOrSizing() end)
-		
+
 		snatchui.frame.DragBottom = CreateFrame("Button",nil, snatchui.frame)
 		snatchui.frame.DragBottom:SetPoint("BOTTOMLEFT", snatchui.frame, "BOTTOMLEFT", 10,5)
 		snatchui.frame.DragBottom:SetPoint("BOTTOMRIGHT", snatchui.frame, "BOTTOMRIGHT", -10,5)
@@ -486,7 +486,7 @@ function lib.snatchGUI()
 
 		snatchui.frame.DragBottom:SetScript("OnMouseDown", function() snatchui.frame:StartMoving() end)
 		snatchui.frame.DragBottom:SetScript("OnMouseUp", function() snatchui.frame:StopMovingOrSizing() end)
-		
+
 		--Add Drag slot / Item icon
 		snatchui.frame.slot = snatchui.frame:CreateTexture(nil, "BORDER")
 		snatchui.frame.slot:SetDrawLayer("Artwork") -- or the border shades it
@@ -504,19 +504,19 @@ function lib.snatchGUI()
 		snatchui.frame.icon:SetScript("OnReceiveDrag", snatchui.OnDragToIcon)
 		snatchui.frame.icon.tx = snatchui.frame.icon:CreateTexture()
 		snatchui.frame.icon.tx:SetAllPoints(snatchui.frame.icon)
-		
-		
+
+
 		snatchui.frame.slot.help = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		snatchui.frame.slot.help:SetPoint("LEFT", snatchui.frame.slot, "RIGHT", 2, 7)
 		snatchui.frame.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
 		snatchui.frame.slot.help:SetWidth(80)
-		
+
 		snatchui.frame.workingname = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		snatchui.frame.workingname:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 15, -135)
 		snatchui.frame.workingname:SetWidth(160)
 		snatchui.frame.workingname:SetJustifyH("LEFT")
-		
-		
+
+
 		--Add Title text
 		local	snatchtitle = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 		snatchtitle:SetText("BTM Snatch Configuration")
@@ -525,8 +525,8 @@ function lib.snatchGUI()
 		snatchtitle:SetHeight(10)
 		snatchtitle:SetPoint("TOPLEFT",  snatchui.frame, "TOPLEFT", 0, -17)
 		snatchui.frame.snatchtitle = snatchtitle
-		
-			
+
+
 		--Create the snatch list results frame
 		snatchui.frame.snatchlist = CreateFrame("Frame", nil, snatchui.frame)
 		snatchui.frame.snatchlist:SetBackdrop({
@@ -535,7 +535,7 @@ function lib.snatchGUI()
 			tile = true, tileSize = 32, edgeSize = 16,
 			insets = { left = 5, right = 5, top = 5, bottom = 5 }
 		})
-		
+
 		snatchui.frame.snatchlist:SetBackdropColor(0, 0, 0.0, 0.5)
 		snatchui.frame.snatchlist:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 187, -40)
 		snatchui.frame.snatchlist:SetPoint("BOTTOM", snatchui.frame, "BOTTOM", 0, 57)
@@ -543,17 +543,17 @@ function lib.snatchGUI()
 
 		if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
-			{ "Snatching", "TOOLTIP", 150 }, 
-			{ "Buy at", "COIN", 70 }, 
+			{ "Snatching", "TOOLTIP", 150 },
+			{ "Buy at", "COIN", 70 },
 			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet, snatchui.OnResize)
 		else
 			snatchui.frame.snatchlist.sheet = ScrollSheet:Create(snatchui.frame.snatchlist, {
-			{ "Snatching", "TOOLTIP", 150 }, 
-			{ "Buy at", "COIN", 70}, 
-			{ "Appraiser", "COIN", 70 }, 
+			{ "Snatching", "TOOLTIP", 150 },
+			{ "Buy at", "COIN", 70},
+			{ "Appraiser", "COIN", 70 },
 			}, snatchui.OnEnterSnatchSheet, snatchui.OnLeaveSheet, snatchui.OnClickSnatchSheet, snatchui.OnResize)
 		end
-		
+
 
 
 		-- Bag List
@@ -564,64 +564,64 @@ function lib.snatchGUI()
 			tile = true, tileSize = 32, edgeSize = 16,
 			insets = { left = 5, right = 5, top = 5, bottom = 5 }
 		})
-		
+
 		snatchui.frame.baglist:SetBackdropColor(0, 0, 0.0, 0.5)
 		snatchui.frame.baglist:SetPoint("TOPLEFT", snatchui.frame.snatchlist, "TOPRIGHT", 20, 0)
 		snatchui.frame.baglist:SetPoint("RIGHT", snatchui.frame, "RIGHT", -30, -0)
 		snatchui.frame.baglist:SetPoint("BOTTOM", snatchui.frame.snatchlist, "BOTTOM", 0, 0)
-		
+
 		snatchui.frame.bagscan = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
 		snatchui.frame.bagscan:SetPoint("TOP", snatchui.frame.baglist, "BOTTOM", 0, -15)
 		snatchui.frame.bagscan:SetText(("Refresh Data"))
 		snatchui.frame.bagscan:SetScript("OnClick", snatchui.PopulateBagSheet)
-		
+
 		if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
 			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
-				{ "Bag Contents", "TOOLTIP", 150 }, 
-				{ "BTM Rule", "TEXT", 70 }, 
+				{ "Bag Contents", "TOOLTIP", 150 },
+				{ "BTM Rule", "TEXT", 70 },
 				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet, snatchui.OnResize)
 		else
 			snatchui.frame.baglist.sheet = ScrollSheet:Create(snatchui.frame.baglist, {
-				{ "Bag Contents", "TOOLTIP", 150 }, 
-				{ "Appraiser", "COIN", 70 }, 
-				{ "BTM Rule", "TEXT", 70 }, 
+				{ "Bag Contents", "TOOLTIP", 150 },
+				{ "Appraiser", "COIN", 70 },
+				{ "BTM Rule", "TEXT", 70 },
 				}, snatchui.OnEnterBagSheet, snatchui.OnLeaveSheet, snatchui.OnClickBagSheet, snatchui.OnResize)
 		end
 
-		
+
 		--Add close button
 		snatchui.frame.closeButton = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
 		snatchui.frame.closeButton:SetPoint("BOTTOMRIGHT", snatchui.frame, "BOTTOMRIGHT", -10, 10)
 		snatchui.frame.closeButton:SetText(("Close"))
 		snatchui.frame.closeButton:SetScript("OnClick",  lib.closeSnatchGUI)
-		
-		--Add Item to list button	
+
+		--Add Item to list button
 		snatchui.frame.additem = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
 		snatchui.frame.additem:SetPoint("TOPLEFT", snatchui.frame, "TOPLEFT", 10, -210)
 		snatchui.frame.additem:SetText(('Add Item'))
 		snatchui.frame.additem:SetScript("OnClick", snatchui.OnClickAddSnatch)
-		
+
 		--[[
 		snatchui.frame.additem.help = snatchui.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		snatchui.frame.additem.help:SetPoint("TOPLEFT", snatchui.frame.additem, "TOPRIGHT", 1, 1)
-		snatchui.frame.additem.help:SetText(("(to Snatch list)")) 
+		snatchui.frame.additem.help:SetText(("(to Snatch list)"))
 		snatchui.frame.additem.help:SetWidth(90)
 		]]
-		
+
 		--Add coin boxes
 		local function goldtosilver()
 			snatchui.frame.silver:SetFocus()
 		end
-		
+
 		local function silvertocopper()
 			snatchui.frame.copper:SetFocus()
 		end
-		
+
 		local function copper()
 			snatchui.frame.copper:ClearFocus()
 		end
 
-			
+
 		snatchui.frame.gold = CreateFrame("EditBox", "snatchgold", snatchui.frame, "InputBoxTemplate")
 		snatchui.frame.gold:SetPoint("BOTTOMLEFT", snatchui.frame.additem, "TOPLEFT", 10, 10)
 		snatchui.frame.gold:SetAutoFocus(false)
@@ -629,7 +629,7 @@ function lib.snatchGUI()
 		snatchui.frame.gold:SetWidth(40)
 		snatchui.frame.gold:SetScript("OnEnterPressed", goldtosilver)
 		snatchui.frame.gold:SetScript("OnTabPressed", goldtosilver)
-		
+
 		snatchui.frame.silver = CreateFrame("EditBox", "snatchsilver", snatchui.frame, "InputBoxTemplate")
 		snatchui.frame.silver:SetPoint("TOPLEFT", snatchui.frame.gold, "TOPRIGHT", 10, 0)
 		snatchui.frame.silver:SetAutoFocus(false)
@@ -638,7 +638,7 @@ function lib.snatchGUI()
 		snatchui.frame.silver:SetMaxLetters(2)
 		snatchui.frame.silver:SetScript("OnEnterPressed", silvertocopper)
 		snatchui.frame.silver:SetScript("OnTabPressed", silvertocopper)
-		
+
 		snatchui.frame.copper = CreateFrame("EditBox", "snatchcopper", snatchui.frame, "InputBoxTemplate")
 		snatchui.frame.copper:SetPoint("TOPLEFT", snatchui.frame.silver, "TOPRIGHT", 10, 0)
 		snatchui.frame.copper:SetAutoFocus(false)
@@ -647,20 +647,20 @@ function lib.snatchGUI()
 		snatchui.frame.copper:SetMaxLetters(2)
 		snatchui.frame.copper:SetScript("OnEnterPressed", copper)
 		snatchui.frame.copper:SetScript("OnTabPressed", copper)
-		
-		--Remove Item from list button	
+
+		--Remove Item from list button
 		snatchui.frame.removeitem = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
 		snatchui.frame.removeitem:SetPoint("TOPLEFT", snatchui.frame.additem, "BOTTOMLEFT", 0, -20)
 		snatchui.frame.removeitem:SetText(('Remove Item'))
 		snatchui.frame.removeitem:SetScript("OnClick", snatchui.OnClickRemoveSnatch)
-		
+
 		--Reset snatch list
 		snatchui.frame.resetList = CreateFrame("Button", nil, snatchui.frame, "OptionsButtonTemplate")
 		snatchui.frame.resetList:SetPoint("TOP", snatchui.frame.snatchlist, "BOTTOM", 0, -15)
 		snatchui.frame.resetList:SetText(("Clear List"))
 		snatchui.frame.resetList:SetScript("OnClick", snatchui.OnClickClearAllSnatches)
-		
-	elseif (snatchui.frame:IsVisible()) then 
+
+	elseif (snatchui.frame:IsVisible()) then
 		lib.closeSnatchGUI()
 	end
 

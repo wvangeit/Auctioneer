@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -96,15 +96,15 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Header",	0,	libName.." "..libType.." options")
 	last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.activated", "Enable use of the Basic filter")
 	gui:AddTip(id, "Ticking this box will enable the basic filter to perform filtering of your auction scans")
-	
+
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.ignoreself", "Ignore own auctions")
 	gui:AddTip(id, "Ticking this box will disable adding auctions that you posted yourself to the snapshot.")
-	
+
 	gui:AddControl(id, "Subhead",	0, "Filter by Quality")
 	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, "Minimum Quality: %d")
 	gui:AddTip(id, "Use this slider to choose the minimum quality to go into storage.\n"..
@@ -114,17 +114,17 @@ function private.SetupConfigGui(gui)
 		"2 = Uncommon (|cff1eff00 Green|r),\n"..
 		"3 = Rare (|cff0070dd Blue|r),\n"..
 		"4 = Epic (|cffa335ee Purple|r)")
-	
+
 	gui:AddControl(id, "Subhead",	0, "Filter by Item Level")
 	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, "Minimum item level")
 	gui:AddTip(id, "Enter the minimum item level to go into storage.")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Subhead",	0.55,    "Ignore List")
 	gui:AddControl(id, "Custom", 	0.55, 0, BasicFilter_IgnoreListFrame); BasicFilter_IgnoreListFrame:SetParent(gui.tabs[id][3])
-	
+
 end
-		
+
 --[[ Local functions ]]--
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
@@ -174,17 +174,17 @@ function BF_IgnoreList_Update()
 		else
 			ignoreButton:UnlockHighlight();
 		end
-		
+
 		if ( ignoreIndex > numIgnores ) then
 			ignoreButton:Hide();
 		else
 			ignoreButton:Show();
 		end
 	end
-	
+
 	-- ScrollFrame stuff
 	FauxScrollFrame_Update(BasicFilter_IgnoreList_ScrollFrame, numIgnores, numIgnoreButtons, 16);
-	
+
 end
 
 function BF_IgnoreList_IgnoreButton_OnClick( button )

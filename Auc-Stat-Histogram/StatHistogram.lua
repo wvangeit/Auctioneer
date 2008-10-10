@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -132,7 +132,7 @@ function lib.GetPrice(link, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
-	
+
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
 		debugPrint("GetPrice: No data", libType.."-"..libName)
@@ -168,7 +168,7 @@ function lib.GetPriceArray(link, faction)
 	array.Qone = Qone
 	array.Qthree = Qthree
 	array.step = step
-	
+
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array
@@ -190,7 +190,7 @@ function lib.GetItemPDF(link, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
-	
+
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
@@ -225,17 +225,17 @@ function lib.GetItemPDF(link, faction)
 	local curcount = 0
 	local area = 0
 	local targetarea = math.min(1, count/30) --if count is less than thirty, we're not very sure about the price
-	
+
 	PDcurve["step"] = step
 	PDcurve["min"] = stattable["min"]
 	PDcurve["max"] = stattable["max"]
-	
+
 	for i = stattable["min"], stattable["max"] do
 		curcount = curcount + stattable[i]
 		PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
 		area = area + step*PDcurve[i]
 	end
-	
+
 	local areamultiplier = 1
 	if area > 0 then
 		areamultiplier = targetarea/area
@@ -263,7 +263,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		buyout = buyout/itemData.stackSize
 	end
 	local priceindex
-	
+
 	-- Get the signature of this item and find it's stats.
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
 	if (linkType ~= "item") then return end
@@ -330,7 +330,7 @@ end
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
-	
+
 	gui:AddHelp(id, "what histogram stats",
 		"What are Histogram stats?",
 		"Histogram stats record a histogram of past prices.")
@@ -375,11 +375,11 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	
+
 	if not get("stat.histogram.tooltip") then
 		return
 	end
-	
+
 	local quantmul = get("stat.histogram.quantmul")
 	if (not quantmul) or (not quantity) or (quantity < 1) then quantity = 1 end
 	local median, Qone, Qthree, step, count = lib.GetPrice(hyperlink)
@@ -430,7 +430,7 @@ function lib.ClearItem(hyperlink, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
-	
+
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end

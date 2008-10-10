@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -119,7 +119,7 @@ end
 local function getDisenchantOrProspectValue(link, count)
 	local _, _, quality, level = GetItemInfo(link)
 	if not (quality and level) then return end
-	
+
 	if quality >= 2 then
 		local enchSkillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		if enchSkillRequired and Enchantrix.Util.GetUserEnchantingSkill() >= enchSkillRequired then
@@ -351,7 +351,7 @@ local function onUpdate(frame, elapsed)
 	if enabledInOptions then
 		if isState("sleep") or isState("init") then
 			if Enchantrix.Util.GetUserEnchantingSkill() >= 1
-				or Enchantrix.Util.GetUserJewelCraftingSkill() >= 20 
+				or Enchantrix.Util.GetUserJewelCraftingSkill() >= 20
 				or Enchantrix.Util.GetUserInscriptionSkill() >= 1 then
 				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeActive"))
 				beginScan()
@@ -412,9 +412,9 @@ end
 
 function showPrompt(link, bag, slot, value, spell)
 	debugSpam(link ..",".. bag ..",".. slot ..",".. value ..",".. spell)
-	
+
 	local _, count = GetContainerItemInfo(bag, slot)
-	
+
 	prompt.link, prompt.bag, prompt.slot, prompt.count = link, bag, slot, count
 
 	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(prompt.link)
@@ -623,5 +623,5 @@ end
 Enchantrix.AutoDisenchant = {
 	AddonLoaded = addonLoaded,
 	NameFromIgnoreListItem = nameFromIgnoreListItem,
-	
+
 }

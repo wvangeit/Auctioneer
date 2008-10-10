@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -305,7 +305,7 @@ function private.SetupConfigGui(gui)
 		{"BOTTOM", "Bottom"},
 	}, "util.appraiser.colordirection", "Pick the gradient direction")
 	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the Appraiser Browse window (if enabled).")
-	
+
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.manifest.color", "Color bid and buy prices in the manifest frame by their PriceLevel data")
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the per-stack prices of your bid and buyout lines in the right-side pop-out manifest frame")
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.tint.color", "Tint bid and buy input boxes by their PriceLevel data")
@@ -318,7 +318,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This option will enable Appraiser to select the next item from the list when you post.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.buttontips", "Show tooltip help over controls")
 	gui:AddTip(id, "This option will enable help tooltips for the Appraiser controls.")
-	
+
 	gui:AddControl(id, "Subhead",    0,    "Default pricing model")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
 	gui:AddTip(id, "You may select a default and alternate pricing model for items that do not have a specific model set.")
@@ -337,7 +337,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",    0,    "Default Number of Stacks")
 	gui:AddControl(id, "Text",       0, 1, "util.appraiser.number")
 	gui:AddTip(id, [[Input number, "maxfull", or "maxplus" to set the default number of stacks.  "maxfull" sets to all full stacks, while "maxplus" sets to all stacks, including any incomplete stack]])
-	
+
 	gui:AddHelp(id, "what is clickhook",
 		"What are the click-hooks?",
 		"The click-hooks let you select an item by alt-clicking on it, or post it by alt-shift-clicking on it.")
@@ -404,7 +404,7 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is playerunignore",
 		"How to un-ignore a seller's auctions?",
 		"ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list.")
-	
+
 	gui:AddControl(id, "Note",       0, 2, 500, 150,
 "If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
 "The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..

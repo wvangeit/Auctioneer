@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -194,9 +194,9 @@ function lib.GetDistribution(hyperlink)
 		end
 	end
     while (#itemWorth>0) do table.remove(itemWorth) end
-    
+
 	local exact, suffix, base = 0,0,0
-    
+
     if (AucAdvanced.Modules.Util and AucAdvanced.Modules.Util.PriceLevel) then
         calcLevel = AucAdvanced.Modules.Util.PriceLevel.CalcLevel
 	else
@@ -330,7 +330,7 @@ function lib.OnUnload()
 	local rope = StringRope:New(-1)
 
 	if not (AucScanData and AucScanData.scans) then return end
-	
+
 	-- Convert all image data to loadstring strings
 	for server, sData in pairs(AucScanData.scans) do
 		for faction, fData in pairs(sData) do

@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -134,7 +134,7 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 	local auctionsToScan = totalAuctions - scannedAuctions
 
 	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)
-	
+
 	local totalPages = totalAuctions / numAuctionsPerPage
 	if (totalPages - math.floor(totalPages) > 0) then
 		totalPages = math.ceil(totalPages)

@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -99,7 +99,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 	hooksecurefunc("SpellTargetItem", spellTargetItemHook)
-	hooksecurefunc("UseItemByName", useItemByNameHook);			-- added in 2.0, used by macro /use 
+	hooksecurefunc("UseItemByName", useItemByNameHook);			-- added in 2.0, used by macro /use
 
 	-- events that we need to catch
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
@@ -405,7 +405,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 			if (isProspect)  then
 				Enchantrix.Storage.SaveProspect(sig, reagentList)
 			end
-			
+
 			if (isMilling)  then
 				Enchantrix.Storage.SaveMilling(sig, reagentList)
 			end

@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -188,7 +188,7 @@ const.StaticPrices = {
 	[43108] = 20000, 	-- EBON_PIGMENT
 	[39343] = 20000, 	-- AZURE_PIGMENT
 	[43109] = 40000, 	-- ICY_PIGMENT
-	
+
 	[43557] = 80000, 	-- POISONOUSIVYBERRIES
 	[43558] = 80000,	-- NIGHTBLOOMLILAC
 	[43559] = 80000,	-- LOCUSTWING
@@ -196,31 +196,31 @@ const.StaticPrices = {
 	[43561] = 80000,	-- IRIDESCENTPOLLEN
 	[43562] = 80000,	-- NIGHTMAREBERRIES
 	[43563] = 80000,	-- FROZENBEETLEHUSK
-	
+
 	[34052] = 250000, 	-- Dream Shard
 	[34053] =  90000, 	-- Small Dream Shard
 	[34054] =  20000, 	-- Infinite Dust
 	[34055] =  80000, 	-- Greater Cosmic Essence
 	[34056] =  25000, 	-- Lesser Cosmic Essence
 	[34057] = 900000, 	-- Abyss Crystal
-	
+
 	[41741] = 800000, 	-- Cobalt Rod
 	[41745] = 800000, 	-- Titanium Rod
-	
+
 	[35622] = 200000, 	-- Eternal Water
 	[35623] = 200000, 	-- Eternal Air
 	[35624] = 200000, 	-- Eternal Earth
 	[35625] = 200000, 	-- Eternal Life
 	[35627] = 200000, 	-- Eternal Shadow
 	[36860] = 200000, 	-- Eternal Fire
-	
+
 	[36923] = 200000, 	-- Chalcedony
 	[36929] = 200000, 	-- Huge Citrine
 	[36917] = 200000, 	-- Bloodstone
 	[36926] = 200000, 	-- Shadow Crystal
 	[36920] = 200000, 	-- Sun Crystal
 	[36932] = 200000, 	-- Dark Jade
-	
+
 	[36933] = 800000, 	-- Forest Emerald
 	[36918] = 800000, 	-- Scarlet Ruby
 	[36927] = 800000, 	-- Twilight Opal
@@ -612,7 +612,7 @@ const.ProspectableItems = {
 			[SHADOWGEM] = 0.375,
 			[LESSERMOONSTONE] = 0.375,
 			[MOSSAGATE] = 0.375,
-			
+
 			[CITRINE] = 0.04,
 			[JADE] = 0.04,
 			[AQUAMARINE] = 0.04,
@@ -622,7 +622,7 @@ const.ProspectableItems = {
 			[CITRINE] = 0.375,
 			[LESSERMOONSTONE] = 0.375,
 			[JADE] = 0.375,
-			
+
 			[AQUAMARINE] = 0.05,
 			[STARRUBY] = 0.05,
 			},
@@ -631,7 +631,7 @@ const.ProspectableItems = {
 			[CITRINE] = 0.375,
 			[STARRUBY] = 0.375,
 			[AQUAMARINE] = 0.375,
-			
+
 			[AZEROTHIANDIAMOND] = 0.03,
 			[BLUESAPPHIRE] = 0.03,
 			[LARGEOPAL] = 0.03,
@@ -644,7 +644,7 @@ const.ProspectableItems = {
 			[BLUESAPPHIRE] = 0.20,
 			[AZEROTHIANDIAMOND] = 0.20,
 			[HUGEEMERALD] = 0.20,
-			
+
 			[BLOODGARNET] = 0.01,
 			[FLAMESPESSARITE] = 0.01,
 			[GOLDENDRAENITE] = 0.01,
@@ -660,7 +660,7 @@ const.ProspectableItems = {
 			[DEEPPERIDOT] = 0.17,
 			[AZUREMOONSTONE] = 0.17,
 			[SHADOWDRAENITE] = 0.17,
-			
+
 			[LIVINGRUBY] = 0.011,
 			[NOBLETOPAZ] = 0.011,
 			[DAWNSTONE] = 0.011,
@@ -677,7 +677,7 @@ const.ProspectableItems = {
 			[DEEPPERIDOT] = 0.19,
 			[AZUREMOONSTONE] = 0.19,
 			[SHADOWDRAENITE] = 0.19,
-			
+
 			[LIVINGRUBY] = 0.03,
 			[NOBLETOPAZ] = 0.03,
 			[DAWNSTONE] = 0.03,
@@ -688,7 +688,7 @@ const.ProspectableItems = {
 
 	-- ccox - WOTLK - new ores!
 	-- data is far from complete
-	
+
 	[COBALT_ORE] = {
 			[CHALCEDONY] = 0.2,
 			[HUGECITRINE] = 0.2,
@@ -696,7 +696,7 @@ const.ProspectableItems = {
 			[SHADOWCRYSTAL] = 0.2,
 			[SUNCRYSTAL] = 0.2,
 			[DARKJADE] = 0.2,
-			
+
 			[TWILIGHTOPAL] = 0.03,
 			[FORESTEMERALD] = 0.03,
 			[SCARLETRUBY] = 0.03,
@@ -712,7 +712,7 @@ const.ProspectableItems = {
 			[HUGECITRINE] = 0.2,
 			[BLOODSTONE] = 0.2,
 			[SUNCRYSTAL] = 0.2,
-			
+
 			[FORESTEMERALD] = 0.03,
 			[SCARLETRUBY] = 0.03,
 			[MONARCHTOPAZ] = 0.03,
@@ -720,7 +720,7 @@ const.ProspectableItems = {
 			[TWILIGHTOPAL] = 0.03,
 			[AUTMNSGLOW] = 0.03,
 			},
-	
+
 }
 
 
@@ -826,7 +826,7 @@ const.MillableItems = {
 	[HERB_SILVERLEAF] = ALABASTER_PIGMENT,
 	[HERB_EARTHROOT] = ALABASTER_PIGMENT,
 --	[HERB_BLOODTHISTLE] = ALABASTER_PIGMENT,		-- removed during beta
-	
+
 	[HERB_MAGEROYAL] = DUSKY_PIGMENT,				-- moved with build 8982 - double check others!
 	[HERB_BRIARTHORN] = DUSKY_PIGMENT,
 	[HERB_SWIFTTHISTLE] = DUSKY_PIGMENT,
@@ -837,12 +837,12 @@ const.MillableItems = {
 	[HERB_GRAVEMOSS] = GOLDEN_PIGMENT,
 	[HERB_KINGSBLOOD] = GOLDEN_PIGMENT,
 	[HERB_LIFEROOT] = GOLDEN_PIGMENT,
-	
+
 	[HERB_FADELEAF] = EMERALD_PIGMENT,
 	[HERB_GOLDTHORN] = EMERALD_PIGMENT,
 	[HERB_WINTERSBITE] = EMERALD_PIGMENT,
 	[HERB_KHADGARSWHISKER] = EMERALD_PIGMENT,
-	
+
 	[HERB_FIREBLOOM] = VIOLET_PIGMENT,
 	[HERB_GHOSTMUSHROOM] = VIOLET_PIGMENT,
 	[HERB_ARTHASTEARS] = VIOLET_PIGMENT,

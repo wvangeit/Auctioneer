@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -89,7 +89,7 @@ function lib:filterItem(item, evaluationModule)
 	local _, _, itemQuality, _, _, itemType  = GetItemInfo(item.id)
 
 	if (not itemType) then return end
-	
+
 	itemQuality = qualname[itemQuality]
 	if (itemType==translate("Armor")) then
 		itemType = "Armor"
@@ -124,7 +124,7 @@ function lib:filterItem(item, evaluationModule)
 	if filterModule then
 		--BtmScan.Print(" filterd "..itemType.." q:"..itemQuality)
 	end
-	
+
 	return filterModule
 end
 
@@ -164,5 +164,5 @@ function lib:setup(gui)
 		end
 		gui:AddControl(id, "Note", 0.49, 1, 200, 20, typename[i])
 	end
-	
+
 end

@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -68,7 +68,7 @@ local SOUL = 11083
 local STRANGE = 10940
 
 -- a table we can check for item ids
-local validReagents = 
+local validReagents =
 	{
 	[VOID] = true,
 	[NEXUS] = true,
@@ -150,15 +150,15 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "EnchantMats search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "enchantmats.allow.buy", "Allow Buyouts")
-	
+
 	gui:AddControl(id, "Checkbox",         0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 375, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.max", 25, 375, 25, "Maximum skill: %s")
-	
+
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
 
@@ -168,45 +168,45 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GMYSTIC, 0, 200, 1, "Greater Mystic Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GASTRAL, 0, 200, 1, "Greater Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GMAGIC, 0, 200, 1, "Greater Magic Essence %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LPLANAR, 0, 200, 1, "Lesser Planar Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LETERNAL, 0, 200, 1, "Lesser Eternal Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LNETHER, 0, 200, 1, "Lesser Nether Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LMYSTIC, 0, 200, 1, "Lesser Mystic Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LASTRAL, 0, 200, 1, "Lesser Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LMAGIC, 0, 200, 1, "Lesser Magic Essence %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..ARCANE, 0, 200, 1, "Arcane Dust %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..ILLUSION, 0, 200, 1, "Illusion Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..DREAM, 0, 200, 1, "Dream Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..VISION, 0, 200, 1, "Vision Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SOUL, 0, 200, 1, "Soul Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..STRANGE, 0, 200, 1, "Strange Dust %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LPRISMATIC, 0, 200, 1, "Large Prismatic Shard %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LBRILLIANT, 0, 200, 1, "Large Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LRADIANT, 0, 200, 1, "Large Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LGLOWING, 0, 200, 1, "Large Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LGLIMMERING, 0, 200, 1, "Large Glimmering Shard %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SPRISMATIC, 0, 200, 1, "Small Prismatic Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SBRILLIANT, 0, 200, 1, "Small Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SRADIANT, 0, 200, 1, "Small Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SGLOWING, 0, 200, 1, "Small Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SGLIMMERING, 0, 200, 1, "Small Glimmering Shard %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..VOID, 0, 200, 1, "Void Crystal %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..NEXUS, 0, 200, 1, "Nexus Crystal %s%%")
 end
 
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
-	
+
 	-- Can't do anything without Enchantrix
 	if not (Enchantrix and Enchantrix.Storage) then
 		return false, "Enchantrix not detected"
 	end
-	
+
 	-- first, is this an enchanting reagent itself?
 	-- if so, just use the value of the reagent
 	if validReagents[ Enchantrix.Util.GetItemIdFromLink(item[Const.LINK]) ] then
@@ -216,13 +216,13 @@ function lib.Search(item)
 		end
 		-- be safe and handle nil results
 		local adjustment = get("enchantmats.PriceAdjust."..Enchantrix.Util.GetItemIdFromLink(item[Const.LINK])) or 0
-		
+
 		market = (market * item[Const.COUNT]) * adjustment / 100
 	end
-	
+
 	-- it's not a reagent, figure out what it de's into
 	if (not market or market == 0) then
-		
+
 		-- All disenchantable items are "uncommon" quality or higher
 		-- so bail on items that are white or gray
 		if (item[Const.QUALITY] <= 1) then
@@ -242,8 +242,8 @@ function lib.Search(item)
 		if (skillneeded < minskill) or (skillneeded > maxskill) then
 			return false, "Skill not high enough to Disenchant"
 		end
-		
-		
+
+
 		-- Give up if it doesn't disenchant to anything
 		local data = Enchantrix.Storage.GetItemDisenchants(item.link)
 		if not data then
@@ -251,51 +251,51 @@ function lib.Search(item)
 		end
 
 		local total = data.total
-		
+
 		if (total and total[1] > 0) then
 			local totalNumber, totalQuantity = unpack(total)
 			for result, resData in pairs(data) do
 				if (result ~= "total") then
 					local resNumber, resQuantity = unpack(resData)
-					
+
 					local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(result);
-					
+
 					-- if no Auc4 price, use Auc5 price
 					if (not reagentPrice) then
 						reagentPrice = five
 					end
-					
+
 					-- still nothing, try the baseline (hard coded)
 					if (not reagentPrice) then
 						reagentPrice = baseline
 					end
-					
+
 					local resYield = resQuantity / totalNumber;
 					local resPrice = (reagentPrice or 0) * resYield;
 					--local percentage = resNumber / totalNumber;
 					--local simpleYield = resQuantity/resNumber;
-					
+
 					-- be safe and handle nil results
 					local adjustment = get("enchantmats.PriceAdjust."..result) or 0;
-					
+
 					market = market + resPrice * adjustment / 100;
 				end
 			end
 		end
 
 	end
-	
+
 	-- If we don't know what it's worth, then there's not much we can do
 	if( not market or market <= 0) then
 		return false, "No Price Found"
 	end
-	
+
 	if (get("enchantmats.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("enchantmats.seen.min"))) then
 			return false, "Seen count too low"
 		end
 	end
-	
+
 	if get("enchantmats.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= market) then
 		return "buy", market --Ishould say what they're buying it for here
 	elseif get("enchantmats.allow.bid") and (item[Const.PRICE] <= market) then

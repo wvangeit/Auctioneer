@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -48,10 +48,10 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "Vendor search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "vendor.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "vendor.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "vendor.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
@@ -60,7 +60,7 @@ end
 
 function lib.Search(item)
 	local market, seen, _, pctstring
-	
+
 	-- Valuate this item
 	local pct = get("vendor.profit.pct")
 	local min = get("vendor.profit.min")
@@ -73,15 +73,15 @@ function lib.Search(item)
 		return false, "No vendor price"
 	end
 	market = market * item[Const.COUNT]
-	
-	
+
+
 	local pct = get("vendor.profit.pct")
 	local minprofit = get("vendor.profit.min")
 	local value = market * (100-pct) / 100
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	
+
 	if get("vendor.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
 		return "buy", market
 	elseif get("vendor.allow.bid") and (item[Const.PRICE] <= value) then

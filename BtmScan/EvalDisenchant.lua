@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -57,7 +57,7 @@ function lib:valuate(item, tooltip)
 
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
-	
+
 	-- Check for bogus/corrupted item links
 	if not (item and item.qual) then return end
 
@@ -190,7 +190,7 @@ define(lcName..'.allow.buy', true)
 
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
-	
+
 		gui:AddHelp(id, "what is the disenchant evaluator",
 		"What is the Disenchant evaluator?",
 		"This evaluator allows you to purchase items that can be disenchanted (via the enchanting skill) into items that sell for more than the item you are buying based on your settings.\n\n"..
@@ -204,7 +204,7 @@ function lib:setup(gui)
 		"*** Note: To refine how values are defined for enchanting mats please see Enchantrix settings if available.\n\n"..
 		""..
 		"\n")
-	
+
 	gui:AddControl(id, "Subhead",          0,    libName.." General Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
@@ -216,7 +216,7 @@ function lib:setup(gui)
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
-	
+
 	gui:AddControl(id, "Subhead",          0,    "Fee Adjustments")
 	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Auction fees basis")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")

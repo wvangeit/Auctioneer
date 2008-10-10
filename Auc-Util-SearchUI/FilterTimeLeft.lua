@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -45,7 +45,7 @@ function lib:MakeGuiConfig(gui)
 	gui:MakeScrollable(id)
 
 	gui:AddControl(id, "Header",     0,      "TimeLeft Filter Criteria")
-	
+
 	local last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoretimeleft.enable", "Enable time-left filtering")
 	gui:AddControl(id, "Checkbox",    0, 2,  "ignoretimeleft.onlyonbids", "Only filter for bids")
@@ -55,7 +55,7 @@ function lib:MakeGuiConfig(gui)
 			{2, "2 hours"},
 			{3, "12 hours"},
 		}, "ignoretimeleft.maxtime", "Max time left")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Subhead",     .5, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do

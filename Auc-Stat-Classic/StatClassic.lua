@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -168,23 +168,23 @@ do
         [.0035*2] = 2.7*2,
         [.0026*2] = 2.8*2,
         [.0019*2] = 2.9*2,
-        [.0013*2] = 3.0*2        
+        [.0013*2] = 3.0*2
     };
-    
+
     -- Build the keys list (so we can use ipairs)
     local inverseZKeys = {};
     for k,v in pairs(inverseZ) do
         table.insert(inverseZKeys, k);
     end
     table.sort(inverseZKeys);
-    
+
     local ipairs = ipairs;
     local sqrt = math.sqrt;
     local curve = AucAdvanced.API.GenerateBellCurve();
 
     function lib.GetItemPDF(link, key)
     	if not get("stat.classic.enable") then return end --disable classic if desired
-	
+
         -- First, obtain price lookup
         local median, seen, confidence = lib.GetPrice(link, key);
         if not median or median == 0 or confidence == 0 then return; end
@@ -194,22 +194,22 @@ do
             if inverseZ[k] > confidence then break; end
             nearest = inverseZ[k];
         end
-        
+
         local stddev = median * nearest / sqrt(seen);   -- unbiased population estimate from inverse Z lookup
         curve:SetParameters(median, stddev);
         return curve, median - stddev * 3, median + stddev * 3;
     end
 end
-    
+
 
 function lib.GetPrice(hyperlink, ahKey)
 	if not get("stat.classic.enable") then return end --disable classic if desired
-	
+
 	if (not data) then private.makeData() end
 	local linkType,itemId,property,factor,enchant = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if not ahKey then
-		ahKey = AucAdvanced.GetFaction() 
+		ahKey = AucAdvanced.GetFaction()
 	end
 	ahKey = ahKey:lower()
 	local median, seen, confidence = 0, 0, 0.1
@@ -269,11 +269,11 @@ AucAdvanced.Settings.SetDefault("stat.classic.enable", true)
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
-	
+
 	gui:AddHelp(id, "what classic stats",
 		"What are Classic stats?",
 		"This module provides access to the older Classic stats. It is provided as a method to support an upgrade path. With both Auctioneer Classic and AucAdv enabled type\n |CFFFF0000/aadv stat classic import|r \nto import the statistics to AucAdv. This will import all of your old statistics and provide them in-game. Once this has been done, you can then turn off Classic Auctioneer, while still having access to your stats.")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.classic.enable", "Enable Classic Stats")
@@ -281,16 +281,16 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.classic.tooltip", "Show classic stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the classic module on or off")
-	
+
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	
+
 	if not AucAdvanced.Settings.GetSetting("stat.classic.tooltip") then return end
-	
+
 	if not quantity or quantity < 1 then quantity = 1 end
 	local median, seen, confidence = lib.GetPrice(hyperlink)
 
@@ -303,7 +303,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		EnhTooltip.AddLine("  Seen Count: |cffddeeff"..seen.."|r")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)	
+		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	end
 end
 
@@ -408,7 +408,7 @@ function private.StoreData(ItemString, median, seen, ahKey)
 	if (not data) then private.makeData() end
 	local now = time()
 	if not ahKey then
-		ahKey = AucAdvanced.GetFaction() 
+		ahKey = AucAdvanced.GetFaction()
 	end
 	ahKey = ahKey:lower()
 	local PriceString = strjoin(",", median, seen, time())

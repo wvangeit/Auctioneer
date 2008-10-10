@@ -1,5 +1,5 @@
 ## Title: EnchantrixBarker
-## Notes: Print Enchant price lists to chat [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
+## Notes: Print Enchant price lists to chat [<%version%>] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
 ##
 ## Interface: 30000
 ## Dependencies: EnhTooltip, Stubby

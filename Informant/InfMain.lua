@@ -23,7 +23,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -142,7 +142,7 @@ function getItem(itemID, static)
 		buy = tonumber(buy)
 		sell = tonumber(sell)
 	end
-	
+
 	-- if we have a local correction for this item, merge in the corrected data
 	local itemUpdateData
 	if (InformantLocalUpdates and InformantLocalUpdates.items) then
@@ -331,7 +331,7 @@ function GetSellValue(item)
 
 	local itemInfo = Informant.GetItem(id)
 	local sellval
-	
+
 -- ccox - TODO - is this correct for items sold in stacks?
 -- see Informant.TooltipHandler
 
@@ -462,7 +462,7 @@ local function showItem(itemInfo)
 			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
-		
+
 		if (itemInfo.usageText and itemInfo.usageText ~= "") then
 			reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
@@ -471,7 +471,7 @@ local function showItem(itemInfo)
 		if (itemInfo.isPlayerMade) then
 			addLine(_INFM('InfoPlayerMade'):format(itemInfo.tradeSkillLevel, itemInfo.tradeSkillName), "5060ff")
 		end
-		
+
 		local numReq = 0
 		local numRew = 0
 		local numSta = 0
@@ -555,7 +555,7 @@ local function TooltipScanBagItem(bag, slot)
 	local _, count = GetContainerItemInfo(bag, slot)
 	if (not count or count < 1) then return end
 	Informant_ScanTooltip.scanningStack = count
-	
+
 	-- magic happens here as OnTooltipAddMoney gets called
 	local _, repairCost = Informant_ScanTooltip:SetBagItem(bag, slot)
 	if (type(repairCost) == "number" and repairCost > 0) then
@@ -577,9 +577,9 @@ local function updateSellPricesFromMerchant()
 					local itemid = idFromLink(scanningLink)
 					local informantItemInfo = getItem( itemid )
 					if (informantItemInfo) then
-						
+
 						local sellPrice = Informant_ScanTooltip.scanningMoneyFound / Informant_ScanTooltip.scanningStack
-						
+
 						if (informantItemInfo.sell ~= sellPrice) then
 							-- is this item sell price correct in our database? or missing from our database?
 							local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(scanningLink)
@@ -590,9 +590,9 @@ local function updateSellPricesFromMerchant()
 							newItemInfo.stack = itemStackSize
 							newItemInfo.quantity = itemStackSize
 							InformantLocalUpdates.items[ itemid ] = newItemInfo
-							
+
 						end
-					
+
 					end
 				end	-- if money found
 			end	-- if link
@@ -615,25 +615,25 @@ local function updateBuyPricesFromMerchant( vendorID )
 
 			local informantItemInfo = getItem( itemid )
 			if (informantItemInfo) then		-- this should always be true
-				
+
 				if (price ~= informantItemInfo.buy) then
 					-- is this item buy price correct in our database? or missing from our database?
-			
+
 					local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(link)
 
 -- ccox - currently this will hit often, because we don't take reputation discounts into account for buy pricing
 -- should we try to get rep discounts, or just update the price as seen?  Then they'll be wrong for alts!
 -- could we account for the rep discounts and calculate a baseline?
-				
+
 					local newItemInfo = InformantLocalUpdates.items[ itemid ]
 					if (not newItemInfo) then newItemInfo = {} end
 					newItemInfo.buy = price
 					newItemInfo.stack = itemStackSize
 					newItemInfo.quantity = quantity
 					InformantLocalUpdates.items[ itemid ] = newItemInfo
-		
+
 				end
-				
+
 				local foundMerchant = false
 				if (informantItemInfo.merchantList) then
 					-- some vendors are known for this item, check the list and see if this vendor is on it
@@ -645,22 +645,22 @@ local function updateBuyPricesFromMerchant( vendorID )
 						end
 					end
 				end
-				
+
 				-- if no vendor are known, or this vendor isn't on the list, add this vendor
 				if (not foundMerchant) then
 					local newItemInfo = InformantLocalUpdates.items[ itemid ]
 					if (not newItemInfo) then newItemInfo = {} end
 					local oldList = newItemInfo.merchants
-					
+
 					if (oldList) then
 						newItemInfo.merchants = oldList..","..tostring( vendorID )
 					else
 						newItemInfo.merchants = tostring( vendorID )
 					end
-					
+
 					InformantLocalUpdates.items[ itemid ] = newItemInfo
 				end
-				
+
 			end	-- if info
 		end	-- if link
 	end	--	for GetMerchantNumItems
@@ -670,17 +670,17 @@ end
 local function updateMerchantName()
 
 	if (not InformantLocalUpdates.vendor) then InformantLocalUpdates.vendor = {} end
-	
+
 	local vendorName = UnitName("NPC")
 	local vendorFaction = UnitFactionGroup("NPC")
 	if (vendorFaction ~= UnitFactionGroup("player")) then
 		vendorFaction = "Neutral"
 	end
 	-- TODO - we are not currently using the faction information for vendors
-	
+
 	local vendorGUID = UnitGUID("NPC")
 	local vendorID = tonumber(string.sub(vendorGUID,6,12),16)
-	
+
 	if (not self.vendors[ vendorID ] and not InformantLocalUpdates.vendor[ vendorID ]) then
 		-- add the new vendor name to our update list
 		local vendorInfo = {}
@@ -688,7 +688,7 @@ local function updateMerchantName()
 		vendorInfo.faction = vendorFaction;
 		InformantLocalUpdates.vendor[ vendorID ] = vendorInfo
 	end
-	
+
 	return vendorID
 end
 
@@ -696,9 +696,9 @@ end
 local function doUpdateMerchant()
 
 	if (not InformantLocalUpdates) then InformantLocalUpdates = {} end
-	
+
 	if ((not MerchantFrame:IsVisible()) or InRepairMode()) then return end
-	
+
 	if (not Informant.Settings.GetSetting('auto-update')) then return end
 
 	local vendorID = updateMerchantName()
@@ -718,9 +718,9 @@ end
 
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
-	
+
 	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
-	
+
 	this:RegisterEvent("MERCHANT_SHOW");
 	this:RegisterEvent("MERCHANT_UPDATE");
 
@@ -808,11 +808,11 @@ function onEvent(event, addon)
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
 	end
-	
+
 	if( event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE" ) then
 		doUpdateMerchant();
 	end
-	
+
 end
 
 function frameActive(isActive)

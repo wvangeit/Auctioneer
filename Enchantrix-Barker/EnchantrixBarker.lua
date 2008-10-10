@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -190,7 +190,7 @@ function EnchantrixBarker_OnEvent()
 		Enchantrix_BarkerDisplayButton:Hide();
 		Enchantrix_BarkerOptions_Frame:Hide();
 	end
-	
+
 
 	-- ccox - WoW 3.0 - Tradeskill Window no longer has space for the button
 	if select(4, GetBuildInfo() ) >= 30000 then
@@ -210,7 +210,7 @@ function EnchantrixBarker_OnEvent()
 			Enchantrix_BarkerOptions_TradeTab:Hide();
 		end
 	end
-	
+
 end
 
 function Enchantrix_BarkerOptions_OnShow()
@@ -251,7 +251,7 @@ local function craftUILoaded()
 
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
 	Stubby.UnregisterAddOnHook("Blizzard_TradeSkillUI", "Enchantrix")
-	
+
 	-- ccox - CraftFrame pre LK / 3.0, TradeSkillFrame after (where CraftFrame is nil)
 	local useFrame = CraftFrame or TradeSkillFrame;
 
@@ -259,7 +259,7 @@ local function craftUILoaded()
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
 		useFrame = ATSWFrame;
 	end
-	
+
 	-- ccox - WoW 3.0 - the tradskill window no longer has room for the barker button
 	if select(4, GetBuildInfo() ) >= 30000 then
 		Enchantrix_BarkerOptions_TradeTab:SetParent(useFrame);
@@ -272,7 +272,7 @@ local function craftUILoaded()
 		end
 	else
 		Enchantrix_BarkerDisplayButton:SetParent(useFrame);
-	
+
 		if (ATSWFrame ~= nil) then
 			-- this works for ATSW
 			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
@@ -287,11 +287,11 @@ local function craftUILoaded()
 	    local frame = Skillet:AddButtonToTradeskillWindow(Enchantrix_BarkerDisplayButton)
 	    useFrame = frame;
 	end
-	
+
 	Enchantrix_BarkerOptions_Frame:SetParent(useFrame);
 	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", useFrame, "TOPRIGHT");
 	relevelFrame(Enchantrix_BarkerOptions_Frame)
-	
+
 end
 
 function EnchantrixBarker_OnLoad()
@@ -313,7 +313,7 @@ end
 function Enchantrix_BarkerOptions_SetDefaults()
 	-- currently, we have no settings other than what's in the dialog
 	-- resetting the WHOLE profile will reset everything
-	
+
 	Barker.Settings.SetSetting("barker.reset_all", nil)
 
 	if Enchantrix_BarkerOptions_Frame:IsVisible() then
@@ -982,7 +982,7 @@ function Enchantrix_CreateBarker()
 		-- not in a recognized trade zone
 		return nil;
 	end
-	
+
 	local temp
 	if select(4, GetBuildInfo() ) >= 30000 then
 		temp = GetTradeSkillLine();
@@ -1001,7 +1001,7 @@ function Enchantrix_CreateBarker()
 
 	EnchantrixBarker_ResetBarkerString();
 	EnchantrixBarker_ResetPriorityList();
-	
+
 	local highestProfit = Enchantrix_BarkerGetConfig("highest_profit");
 	local profitMargin = Enchantrix_BarkerGetConfig("profit_margin");
 
@@ -1013,18 +1013,18 @@ function Enchantrix_CreateBarker()
 	local GetCraftReagentItemLinkFunc = GetCraftReagentItemLink or GetTradeSkillReagentItemLink
 
 	local craftCount = GetNumCraftsFunc()
-	
+
 	for index=1, craftCount do
-	
+
 		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded;
-		
+
 		-- ccox - WoW 3.0 - API change, and return value change
 		if select(4, GetBuildInfo() ) >= 30000 then
 			craftName, craftType, numEnchantsAvailable, isExpanded = GetTradeSkillInfo(index);
 		else
 			craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
 		end
-		
+
 		if ( numEnchantsAvailable > 0 ) then -- user has reagents
 
 			-- does this skill produce an enchant, or a trade good?
@@ -1169,7 +1169,7 @@ function Enchantrix_GetReagentHSP( itemLink )
 	if hsp == nil then
 		hsp = 0;
 	end
-	
+
 	-- if auc4 is missing, and auc5 has a price, use the auc5 price
 	if (hsp == 0 and AucAdvanced and price5) then
 		hsp = price5;
@@ -1199,12 +1199,12 @@ function EnchantrixBarker_AddEnchantToBarker( enchant )
 	local currBarker = EnchantrixBarker_GetBarkerString();
 
 	local category_key = EnchantrixBarker_GetItemCategoryKey( enchant.index )
-	
+
 	-- see if this category (self enchants) should be excluded from barking
 	if (categories[category_key] and categories[category_key].exclude) then
 		return false;
 	end
-	
+
 	local category_string = "";
 	local test_category = {};
 	if barkerCategories[ category_key ] then
@@ -1325,13 +1325,13 @@ function Enchantrix_GetShortDescriptor( index )
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute.search ) ~= nil ) then
 			--Barker.Util.DebugPrintQuick("Matched attribute: ", attribute.print, " in: ", long_str);
-			
+
 			local print_string = attribute.print;
 			if (print_string == nil) then
 				Barker.Util.DebugPrintQuick("Failed print lookup for: ", long_str);		-- should not fail
 				print_string = "unknown";
 			end
-			
+
 			if (not attribute.ignoreValues) then
 				statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
 				statvalue = statvalue:sub(statvalue:find('[0-9]+'));
@@ -1347,7 +1347,7 @@ function Enchantrix_GetShortDescriptor( index )
 
 	-- this happens for any enchant we don't have a special case for, which is relatively often
 	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfoFunc(index),  long_str,  enchant  );
-	
+
 	if (enchant == nil) then
 		Barker.Util.DebugPrintQuick("Failed enchant split for: ", long_str);		-- should not fail
 		return "unknown";

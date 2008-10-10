@@ -3,7 +3,7 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
+
 	PostMonitor - Records items posted up for auction
 
 	License:
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -66,12 +66,12 @@ function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, depos
 	pendingPost.deposit = deposit
 	table.insert(private.PendingPosts, pendingPost)
 	--debugPrint("private.addPendingPost() - Added pending post")
-	
+
 	-- Register for the response events if this is the first pending post.
 	if (#private.PendingPosts == 1) then
 		--debugPrint("private.addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
 		Stubby.RegisterFunctionHook("AuctionFrameAuctions_Update", 10, private.onAuctionCreated)
-				
+
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 	end
 end
@@ -90,13 +90,13 @@ function private.removePendingPost()
 		if (#private.PendingPosts == 0) then
 			--debugPrint("private.removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
 			Stubby.UnregisterFunctionHook("AuctionFrameAuctions_Update", private.onAuctionCreated)
-			
+
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 		end
 
 		return post
 	end
-	
+
 	-- No pending post to remove!
 	return nil
 end
@@ -121,7 +121,7 @@ function private.onAuctionCreated()
 	local post = private.removePendingPost()
 	if (post) then
 		-- Add to sales database
-		local itemID, itemLink = private.getItemInfo(post.name, "itemid") --"of the" items are not handled well by this 
+		local itemID, itemLink = private.getItemInfo(post.name, "itemid") --"of the" items are not handled well by this
 		--debugPrint("first itemlink lookup", itemLink)
 		local Count = GetNumAuctionItems("owner")
 		Count = Count + 1
@@ -131,7 +131,7 @@ function private.onAuctionCreated()
 				--debugPrint("second itemlink lookup", itemLink)
 				break
 			end
-		end 
+		end
 		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 		private.databaseAdd("postedAuctions", itemID, itemLink, text)
 		debugPrint("Added", itemLink, "to the postedAuctions DB", post.minBid, post.buyoutPrice)

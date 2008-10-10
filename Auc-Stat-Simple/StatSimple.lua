@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -108,7 +108,7 @@ end
 
 function lib.GetPrice(hyperlink, faction, realm)
 	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
-	
+
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
@@ -124,7 +124,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     -- Stddev calculations for market price
     local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
     local dataset = {}
-    
+
 	if data.daily and data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
 		if stats[property] then
@@ -160,9 +160,9 @@ function lib.GetPrice(hyperlink, faction, realm)
                 end
                 daysUsed = 14
             end
-        end    
+        end
 	end
-	
+
     local mean = private.sum(unpack(dataset))/#dataset;
     local variance = 0;
     for k,v in ipairs(dataset) do
@@ -173,7 +173,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     else
         variance = variance/(#dataset-1)
     end
-	
+
 	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, sqrt(variance)
 end
 
@@ -192,7 +192,7 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 
 	--if nothing is returned, return nil
 	if not dayCount then return end
-	
+
 	-- If reportsafe is on use the mean of all 14 day samples. Else use the "traditional" Simple values.
 	if not AucAdvanced.Settings.GetSetting("stat.simple.reportsafe") then
 	   if (avg3 and seenDays > 3) or dayCount == 0 then
@@ -238,22 +238,22 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- as the mean plus 5 standard deviations)
 function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
-    
+
     if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
     -- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
-    
+
     if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
     end
-    
+
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
     if stddev == 0 then stddev = mean / sqrt(seenCount); end
-        
+
     -- Calculate the lower and upper bounds as +/- 3 standard deviations
     local lower, upper = mean - 3*stddev, mean + 3*stddev;
-    
+
     bellCurve:SetParameters(mean, stddev);
     return bellCurve, lower, upper;
 end
@@ -273,8 +273,8 @@ local AAStatSimpleData
 
 function lib.ClearItem(hyperlink, faction, realm)
 	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then 
-		return 
+	if (linkType ~= "item") then
+		return
 	end
 	if (factor ~= 0) then property = property.."x"..factor end
 	if not faction then faction = AucAdvanced.GetFaction() end
@@ -286,7 +286,7 @@ function lib.ClearItem(hyperlink, faction, realm)
 	if (AAStatSimpleData.RealmData[realm] and AAStatSimpleData.RealmData[realm][faction]) then
 		AAStatSimpleData.RealmData[realm][faction]["means"][itemID] = nil
 		AAStatSimpleData.RealmData[realm][faction]["daily"][itemID] = nil
-	end	
+	end
 end
 
 
@@ -302,13 +302,13 @@ function private.SetupConfigGui(gui)
 		"Simple module averages all of the prices for items that it sees and provides "..
 		"moving 3, 7, and 14 day averages.  It also provides daily minimum buyout "..
 		"along with a running average minimum buyout within 10% variance.")
-	
+
 	gui:AddHelp(id, "what moving day average",
 		"What does 'moving day average' mean?",
 		"Moving average means that it places more value on yesterday's moving average "..
 		"than today's average.  The determined amount is then used for "..
 		"tomorrow's moving average calculation.")
-	
+
 	gui:AddHelp(id, "how day average calculated",
 		"How is the moving day averages calculated exactly?",
 		"Todays Moving Average is ((X-1)*YesterdaysMovingAverage + TodaysAverage) / X, "..
@@ -330,31 +330,31 @@ function private.SetupConfigGui(gui)
 		"This way you know how good a market is dealing.  If the MBO (minimum buyout) "..
 		"is bigger than the average MBO, then it's usually a good time to sell, and "..
 		"if the average MBO is greater than the MBO, then it's a good time to buy.")
-	
+
 	gui:AddHelp(id, "average minimum buyout variance",
 		"What's the '10% variance' mentioned earlier for?",
 		"If the current MBO is inside a 10% range of the running average, "..
 		"the current MBO is averaged in to the running average at 50% (normal).  "..
 		"If the current MBO is outside the 10% range, the current MBO will only "..
 		"be averaged in at a 12.5% rate.")
-	
+
 	gui:AddHelp(id, "why have variance",
 		"What's the point of a variance on minimum buyout?",
 		"Because some people put their items on the market for rediculous price "..
 		"(too low or too high), so this helps keep the average from getting out "..
 		"of hand.")
-	
+
 	gui:AddHelp(id, "why multiply stack size simple",
 		"Why have the option to multiply stack size?",
 		"The original Stat-Simple multiplied by the stack size of the item, "..
 		"but some like dealing on a per-item basis.")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.enable", "Enable Simple Stats")
 	gui:AddTip(id, "Allow Simple Stats to gather and return price data")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.tooltip", "Show simple stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Simple module on or off")
 	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
@@ -380,9 +380,9 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	
+
 	if not AucAdvanced.Settings.GetSetting("stat.simple.tooltip") then return end
-	
+
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not AucAdvanced.Settings.GetSetting("stat.simple.quantmul") then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
@@ -608,7 +608,7 @@ function private.sum(...)
     for x = 1, select('#', ...) do
         total = total + select(x, ...);
     end
-    
+
     return total;
 end
 

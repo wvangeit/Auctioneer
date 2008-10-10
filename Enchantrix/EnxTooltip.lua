@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -217,7 +217,7 @@ local function millingTooltip(prospect, funcVars, retVal, frame, name, link, qua
 	local totalFive = {}
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	local totalNumber, totalQuantity
-	
+
 	for result, resYield in pairs( prospect ) do
 		if (not lines) then lines = {} end
 		local style, extra = Enchantrix.Util.GetPricingModel();
@@ -323,7 +323,7 @@ end
 
 
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
-	
+
 	-- first, see if this is a prospectable item (short list)
 	local prospect = Enchantrix.Storage.GetItemProspects(link)
 	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then
@@ -478,7 +478,7 @@ end
 -- using the Craft APIs
 local function getReagentsFromCraftFrame(craftIndex)
 	local reagentList = {}
-	
+
 	local getReagentsFunc = GetCraftNumReagents or GetTradeSkillNumReagents;	-- ccox - WoW 3.0
 	local getReagentLinkFunc = GetCraftReagentItemLink or GetTradeSkillReagentItemLink;	 -- ccox - WoW 3.0
 	local getReagentInfoFunc = GetCraftReagentInfo or GetTradeSkillReagentInfo;	-- ccox - WoW 3.0
@@ -548,7 +548,7 @@ local function getReagentsFromTooltip(frame)
 
 		-- NOTE - ccox - if reagents aren't being found, Blizzard may have added more formatting that needs to be removed above
 		-- Enchantrix.Util.DebugPrintQuick("cleaned reagent string ", reagent )
-		
+
 		-- Get and chomp counts, e.g "Strange Dust (2)"
 		local _, _, count = reagent:find("%((%d+)%)$")
 		if count then
@@ -589,7 +589,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	end
 
 	if not reagentList or (#reagentList < 1) then
-	
+
 		-- clean up the craft item string
 		--Enchantrix.Util.DebugPrintQuick("original name is ", name )
 		name = name:gsub("^%a+:", "")	-- remove crafting type "Enchanting:"
@@ -766,9 +766,9 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		end
 	elseif ltype == "enchant" or ltype == "spell" then
 -- ccox - debugging Wow 3.0 -- Enchantrix.Util.DebugPrintQuick("tooltip inputs", funcVars, retVal, frame, name, link, quality, count )
-		
+
 		name = name or ""	-- tooltip hook gives a nil name in 3.0!  Filed as a bug with Blizzard
-		
+
 		enchantTooltip(funcVars, retVal, frame, name, link, false)
 	end
 end

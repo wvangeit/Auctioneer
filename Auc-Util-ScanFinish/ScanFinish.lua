@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -249,9 +249,9 @@ function PlayCompleteSound()
 			end
 			strConfiguredSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
 			if blnLibEmbedded then
-				strConfiguredSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"		
+				strConfiguredSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"
 			end
-			
+
 			--Known PlaySoundFile bug seems to require some event preceeding it to get it to work reliably
 			--Can get this working as a print to screen or an internal sound. Other developers
 			--suggested this workaround.
@@ -347,8 +347,8 @@ function IsLibEmbedded()
 	for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 		--print("  Debug:Comparing Auc-Util-"..libName.." with "..module)
 		if "Auc-Util-"..libName == module then
-			if blnDebug then 
-				print("  Debug:Auc-Util-"..libName.." is an embedded module") 
+			if blnDebug then
+				print("  Debug:Auc-Util-"..libName.." is an embedded module")
 			end
 			blnResult = true
 			break

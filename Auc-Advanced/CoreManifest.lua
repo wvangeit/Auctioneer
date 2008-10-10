@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -51,7 +51,7 @@ if (tocVersion < 30000) then
 	msg.Done:SetText("Done")
 	msg.Done:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -10, 10)
 	msg.Done:SetScript("OnClick", function() msg:Hide() end)
-	
+
 	msg.Text = msg:CreateFontString(nil, "HIGH")
 	msg.Text:SetPoint("TOPLEFT", msg, "TOPLEFT", 20, -20)
 	msg.Text:SetPoint("BOTTOMRIGHT", msg.Done, "TOPRIGHT", -10, 10)

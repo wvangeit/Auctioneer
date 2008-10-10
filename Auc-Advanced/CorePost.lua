@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -361,19 +361,19 @@ end
 
 --[[
     GetDepositAmount(sig, [count]) has been depreciated in favor of GetDepositCost(item, duration, faction, count)
-    You must pass item where item is -- itemID or "itemString" or "itemName" or "itemLink" --but faction duration(12, 24, or 48)[defaults to 24], faction("home" or "neutral")[defaults to home] 
+    You must pass item where item is -- itemID or "itemString" or "itemName" or "itemLink" --but faction duration(12, 24, or 48)[defaults to 24], faction("home" or "neutral")[defaults to home]
     and count(stacksize)[defaults to 1] are optional
 ]]
 
 function GetDepositCost(item, duration, faction, count)
 	-- Die if unable to complete function
 	if not item then return end
-    
+
 	-- Set up function defaults if not specifically provided
 	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 	end
 	if (faction == "neutral") then faction = .75 else faction = .15 end
 	if not count then count = 1 end
-	
+
 	if (GetSellValue) then
 		local gsv = GetSellValue(item)
 		local deposit
@@ -390,7 +390,7 @@ end
 -- lib.GetDepositAmount(sig, count) has been depreciated please use new global GetDepositCost(item, duration, faction, count)
 function lib.GetDepositAmount(sig, count)
 	AucAdvanced.API.ShowDeprecationAlert("GetDepositCost(item, duration, faction, count)", "item must be itemID or \"itemString\" or \"itemName\" or \"itemLink\" instead. Item sig will no longer be supported.");
-    
+
     local itemid = strsplit(":", sig)
 	local rate = AucAdvanced.depositRate
 	local newfaction

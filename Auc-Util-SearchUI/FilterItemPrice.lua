@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -120,7 +120,7 @@ function lib:MakeGuiConfig(gui)
 	gui:MakeScrollable(id)
 
 	gui:AddControl(id, "Header",     0,      "ItemPrice Filter Criteria")
-	
+
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemprice.enable", "Enable ItemPrice filtering")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
@@ -130,15 +130,15 @@ function lib:MakeGuiConfig(gui)
 			default("ignoreitemprice.filter."..name, true)
 		end
 	end
-	
+
 	function private.UpdateControls()
 		if private.ignorelistGUI.sheet.selected then
 			private.removebutton:Enable()
 		else
 			private.removebutton:Disable()
 		end
-	end	
-	
+	end
+
 	private.ignorelistGUI = CreateFrame("Frame", nil, gui.tabs[id][3])
 	private.ignorelistGUI:SetPoint("BOTTOMRIGHT", gui.tabs[id][3], "TOPRIGHT", -50, -200)
 	private.ignorelistGUI:SetPoint("TOPLEFT", gui.tabs[id][3], "TOPRIGHT", -350, -20)
@@ -156,14 +156,14 @@ function lib:MakeGuiConfig(gui)
 	}, private.OnEnterSheet, private.OnLeaveSheet, private.OnClickSheet, nil, private.UpdateControls)
 	private.ignorelistGUI.sheet:EnableSelect(true)
 	private.ignorelistGUI.sheet:SetData(private.sheetdata)
-	
+
 	private.removebutton = CreateFrame("Button", nil, gui.tabs[id][3], "OptionsButtonTemplate")
 	private.removebutton:SetPoint("TOPRIGHT", private.ignorelistGUI, "TOPLEFT", -10, -20)
 	private.removebutton:SetText("Remove Selected")
 	private.removebutton:SetWidth(150)
 	private.removebutton:SetScript("OnClick", private.remove)
 	private.removebutton:Disable()
-	
+
 	local selected
 end
 
@@ -181,7 +181,7 @@ function lib.Filter(item, searcher)
 	local price = item[Const.PRICE]
 	local count = item[Const.COUNT] or 1
 	price = math.floor(price/count)
-	
+
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then

@@ -22,10 +22,10 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]] 
+--]]
 if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
@@ -94,7 +94,7 @@ local STAROFELUNE = 23428
 local NIGHTSEYE = 23441
 
 -- This table is validating that each ID within it is a gem from prospecting.
-local isGem = 
+local isGem =
 	{
 	[TIGERSEYE] = true,
 	[MALACHITE] = true,
@@ -124,7 +124,7 @@ local isGem =
 }
 
 -- This table is validating that each ID within it is a mat from disenchanting.
-local isDEMats = 
+local isDEMats =
 	{
 	[VOID] = true,
 	[NEXUS] = true,
@@ -171,12 +171,12 @@ function lib.gemAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if isGem[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
+					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a gem!")
 					end
-					UseContainerItem(bag, slot) 
+					UseContainerItem(bag, slot)
 				end
 			end
 		end
@@ -193,13 +193,13 @@ function lib.dematAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if isDEMats[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
+					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
 					end
-					UseContainerItem(bag, slot) 
-				end 
+					UseContainerItem(bag, slot)
+				end
 			end
 		end
 	end
@@ -216,21 +216,21 @@ function lib.disenchantAction()
 				if itemCount == nil then itemCount = 1 end
 				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
-					if(aimethod == "Disenchant") then 
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")		
+					if(aimethod == "Disenchant") then
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")
 						end
 						UseContainerItem(bag, slot)
 						runstop = 1
-					end 
+					end
 				else --look for btmScan or SearchUI reason codes if above fails
 					local reason, text = lib.getReason(itemLink, itemName, itemCount, "disenchant")
 					if reason and text then
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Disenchant)")	
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Disenchant)")
 						end
 						UseContainerItem(bag, slot)
 					end
@@ -250,22 +250,22 @@ function lib.prospectAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				runstop = 0
 				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
-					if(aimethod == "Prospect") then 
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")		
+					if(aimethod == "Prospect") then
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")
 						end
-						UseContainerItem(bag, slot) 
+						UseContainerItem(bag, slot)
 						runstop = 1
 					end
 				else --look for btmScan or SearchUI reason codes if above fails
 					local reason, text = lib.getReason(itemLink, itemName, itemCount, "prospect")
 					if reason and text then
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")	
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")
 						end
 						UseContainerItem(bag, slot)
 					end
@@ -281,8 +281,8 @@ end
 lib.ammailgui = CreateFrame("Frame", "", UIParent); lib.ammailgui:Hide()
 function lib.makeMailGUI()
 	-- Set frame visuals
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)	
-	lib.ammailgui:ClearAllPoints()	
+	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
+	lib.ammailgui:ClearAllPoints()
 	lib.ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
 	lib.ammailgui:SetFrameStrata("DIALOG")
 	lib.ammailgui:SetHeight(75)
@@ -297,7 +297,7 @@ function lib.makeMailGUI()
 	lib.ammailgui:EnableMouse(true)
 	lib.ammailgui:SetMovable(true)
 	lib.ammailgui:SetClampedToScreen(true)
-	
+
 	-- Make highlightable drag bar
 	lib.ammailgui.Drag = CreateFrame("Button", "", lib.ammailgui)
 	lib.ammailgui.Drag:SetPoint("TOPLEFT", lib.ammailgui, "TOPLEFT", 10,-5)
@@ -308,7 +308,7 @@ function lib.makeMailGUI()
 	lib.ammailgui.Drag:SetScript("OnMouseUp", function() lib.ammailgui:StopMovingOrSizing() end)
 	lib.ammailgui.Drag:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.Drag, "Click and drag to reposition window.") end)
 	lib.ammailgui.Drag:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	-- Text Header
 	lib.mguiheader = lib.ammailgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguiheader:SetText("AutoMagic: Mail Loader")
@@ -318,10 +318,10 @@ function lib.makeMailGUI()
 	lib.mguiheader:SetPoint("TOPLEFT",  lib.ammailgui, "TOPLEFT", 0, 0)
 	lib.mguiheader:SetPoint("TOPRIGHT", lib.ammailgui, "TOPRIGHT", 0, 0)
 	lib.ammailgui.mguiheader = lib.mguiheader
-	
+
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	
-		
+
+
 	lib.mguibtmrules = lib.ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguibtmrules:SetText("BTM/IS Rule:")
 	lib.mguibtmrules:SetJustifyH("LEFT")
@@ -329,14 +329,14 @@ function lib.makeMailGUI()
 	lib.mguibtmrules:SetHeight(10)
 	lib.mguibtmrules:SetPoint("TOPLEFT",  lib.ammailgui, "TOPLEFT", 8, -16)
 	lib.ammailgui.mguibtmrules = lib.mguibtmrules
-	
+
 	lib.ammailgui.loadde = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadde:SetText(("Disenchant"))
 	lib.ammailgui.loadde:SetPoint("TOPLEFT", lib.mguibtmrules, "BOTTOMLEFT", 0, 1)
 	lib.ammailgui.loadde:SetScript("OnClick", lib.disenchantAction)
 	lib.ammailgui.loadde:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadde, "Add all items tagged \nfor DE to the mail.") end)
 	lib.ammailgui.loadde:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 --[[	lib.ammailgui.mailto = CreateFrame("EditBox", "", lib.ammailgui, "InputBoxTemplate")
 	lib.ammailgui.mailto:SetPoint("TOPLEFT", lib.ammailgui.loaddemats, "BOTTOMRIGHT", 0, -12)
 	lib.ammailgui.mailto:SetAutoFocus(false)
@@ -345,7 +345,7 @@ function lib.makeMailGUI()
 	lib.ammailgui.mailto:SetMaxLetters(12)
 	--lib.ammailgui.loaddemailto:SetScript("OnEnterPressed", silvertocopper)
 	--lib.ammailgui.loaddemailto:SetScript("OnTabPressed", silvertocopper)
-	
+
 	lib.mguimailtotxt = lib.ammailgui:CreateFontString(four, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguimailtotxt:SetText("Set Recipiant to:")
 	lib.mguimailtotxt:SetJustifyH("LEFT")
@@ -354,14 +354,14 @@ function lib.makeMailGUI()
 	lib.mguimailtotxt:SetPoint("TOPRIGHT",  lib.ammailgui.mailto, "TOPLEFT", 0, -25)
 	--lib.mguimailfor:SetPoint("TOPRIGHT", lib.ammailgui.loadprospect, "BOTTOMRIGHT", 0, 0)
 	lib.ammailgui.mguimailtotxt = lib.mguimailtotxt]]
-	
+
 	lib.ammailgui.loadprospect = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadprospect:SetText(("Prospect"))
 	lib.ammailgui.loadprospect:SetPoint("TOPLEFT", lib.ammailgui.loadde, "BOTTOMLEFT", 0, 0)
 	lib.ammailgui.loadprospect:SetScript("OnClick", lib.prospectAction)
 	lib.ammailgui.loadprospect:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadprospect, "Add all items tagged \nfor Prospect to the mail.") end)
 	lib.ammailgui.loadprospect:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	lib.mguimailfor = lib.ammailgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
 	lib.mguimailfor:SetText("Misc:")
 	lib.mguimailfor:SetJustifyH("LEFT")
@@ -370,21 +370,21 @@ function lib.makeMailGUI()
 	lib.mguimailfor:SetPoint("TOPLEFT",  lib.mguibtmrules, "TOPRIGHT", 25, 0)
 	--lib.mguimailfor:SetPoint("TOPRIGHT", lib.ammailgui.loadprospect, "BOTTOMRIGHT", 0, 0)
 	lib.ammailgui.mguimailfor = lib.mguimailfor
-	
+
 	lib.ammailgui.loadgems = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loadgems:SetText(("Gems"))
 	lib.ammailgui.loadgems:SetPoint("TOPLEFT", lib.mguimailfor, "BOTTOMLEFT", 0, 0)
 	lib.ammailgui.loadgems:SetScript("OnClick", lib.gemAction)
 	lib.ammailgui.loadgems:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadgems, "Add all Gems to the mail.") end)
 	lib.ammailgui.loadgems:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	lib.ammailgui.loaddemats = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loaddemats:SetText(("Chant Mats"))
 	lib.ammailgui.loaddemats:SetPoint("TOPLEFT", lib.ammailgui.loadgems, "BOTTOMLEFT", 0, 0)
 	lib.ammailgui.loaddemats:SetScript("OnClick", lib.dematAction)
 	lib.ammailgui.loaddemats:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loaddemats, "Add all Enchanting mats \nto the mail.") end)
 	lib.ammailgui.loaddemats:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
 
-end 
+
+end
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

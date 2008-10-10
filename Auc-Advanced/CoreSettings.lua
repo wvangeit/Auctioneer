@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -152,14 +152,14 @@ end
 
 local function setter(setting, value)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-	
+
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
 	end
-	
+
 	-- is the setting actually a function ref? if so call it.
 	-- This was added to enable Protect Window to update its
 	-- status without a UI reload by calling a function rather
@@ -370,7 +370,7 @@ function lib.MakeGuiConfig()
   	gui:AddCat("Core Options")
 
 	id = gui:AddTab("Profiles")
-	
+
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
@@ -414,23 +414,23 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
 	gui:AddTip(id, "Display the summation of an Auction House scan")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", "Enable searching click-hooks")
 	gui:AddTip(id, "Enables the click-hooks for searching")
-	
+
 	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, "Processing priority: %d")
 	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
-    
+
     gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
     gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.");
-    
-	
+
+
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progress bar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
-	
+
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", "See home faction data everywhere unless at a neutral ah.")
 	gui:AddTip(id, "This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data.")
-	
+
 	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
 	last = gui:GetLast(id)
 	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList(), "matcherdynamiclist")
@@ -440,9 +440,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
-    
-    
-	gui:AddTip(id, "This allows you to select which chat window Auctioneer Advanced prints its output to.")	
+
+
+	gui:AddTip(id, "This allows you to select which chat window Auctioneer Advanced prints its output to.")
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
 		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image.")
@@ -467,12 +467,12 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is preferred output frame",
 		"What is the Preferred Output Frame?",
 		"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer Advanced will print all subsequent output to that window.")
-        
+
     gui:AddHelp(id, "what is accuracy",
         "What is Market Pricing error?",
         "Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers).");
-        
-	
+
+
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
   	gui:AddCat("Match Modules")

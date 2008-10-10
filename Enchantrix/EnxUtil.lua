@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -372,7 +372,7 @@ function getReagentPrice(reagentID, extra)
 				price5 = AucAdvanced.API.GetMarketValue(link);
 			end
 		end
-		if Auctioneer and Enchantrix.State.Auctioneer_Loaded 
+		if Auctioneer and Enchantrix.State.Auctioneer_Loaded
 			and Auctioneer.Util and Auctioneer.Statistic then
 			local itemKey = ("%d:0:0"):format(reagentID);
 			local realm = Auctioneer.Util.GetAuctionKey()
@@ -760,7 +760,7 @@ end
 -- NOTE - ccox - this ignores the skill requirements due to item quality!
 function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	local maxLevel;
-	
+
 	if (skill >= 375) then
 		maxLevel = 220;
 	elseif (skill >= 350) then
@@ -776,7 +776,7 @@ function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 		-- skill 1 to 124
 		maxLevel = 15 + (5 * math.floor(skill / 25));
 	end
-	
+
 	return maxLevel;
 end
 
@@ -787,13 +787,13 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 
 	if (level > 200) then
 		return 375;
-	
+
 	elseif (level >= 152) then
 		return 350;			-- ccox - rare/blue items are still 325 due to a Blizzard bug, hope it gets fixed soon
-			
+
 	elseif (level >= 130) then
 		return 325;
-	
+
 	elseif (level > 65) then
 	-- someone changed their math with the Burning Crusade
 
@@ -898,7 +898,7 @@ function Enchantrix.Util.GetUserSkillByName( name )
 			end
 		end
 	end
-	
+
 	Enchantrix.Util.SkillCacheRank[ name ] = resultRank
 	Enchantrix.Util.SkillCacheTimeStamp[ name ] = GetTime()
 
@@ -979,7 +979,7 @@ function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 	end
 	local n = #Enchantrix.Constants.DisenchantReagentList;
 	local style, extra = Enchantrix.Util.GetPricingModel();
-	
+
 	for i = 1, n do
 		local reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);
@@ -1006,7 +1006,7 @@ function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 				if (five) then myValue=myValue+five c=c+1 end
 				myValue = myValue / c
 			end
-			
+
 			-- provide fallbacks in case a valuation is missing
 			-- don't leave a nil value!
 			if (not myValue or myValue == 0) then

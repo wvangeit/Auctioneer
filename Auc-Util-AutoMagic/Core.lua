@@ -22,10 +22,10 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]] 
+--]]
 if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
@@ -33,7 +33,7 @@ local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdva
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
 
--- Setting mats and gems itemID's to something understandable 
+-- Setting mats and gems itemID's to something understandable
 -- enchant mats
 local VOID = 22450
 local NEXUS = 20725
@@ -93,7 +93,7 @@ local STAROFELUNE = 23428
 local NIGHTSEYE = 23441
 
 -- This table is validating that each ID within it is a gem from prospecting.
-local isGem = 
+local isGem =
 	{
 	[TIGERSEYE] = true,
 	[MALACHITE] = true,
@@ -123,7 +123,7 @@ local isGem =
 }
 
 -- This table is validating that each ID within it is a mat from disenchanting.
-local isDEMats = 
+local isDEMats =
 	{
 	[VOID] = true,
 	[NEXUS] = true,
@@ -160,16 +160,16 @@ local isDEMats =
 lib.vendorlist = {}
 function lib.vendorAction()
 	lib.vendorlist = {} --this needs to be cleared and recalcuated on EVERY vendor open. Not just when we confirm a sell
-	for bag=0,4 do 
+	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
-				runstop = 0  --Teslek, not sure why you are using this with elseif statements only one branch will be run anyways? 
+				runstop = 0  --Teslek, not sure why you are using this with elseif statements only one branch will be run anyways?
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
-				if lib.autoSellList[ itemID ] then 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
+				if lib.autoSellList[ itemID ] then
 					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Custom Add"
 					runstop = 1
 				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
@@ -198,20 +198,20 @@ function lib.disenchantAction()
 				if itemCount == nil then itemCount = 1 end
 				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if (get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
-					if(aimethod == "Disenchant") then 
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")	
+					if(aimethod == "Disenchant") then
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Disenchant)")
 						end
-						UseContainerItem(bag, slot) 
+						UseContainerItem(bag, slot)
 						runstop = 1
-					end 
+					end
 				else --look for btmScan or SearchUI reason codes if above fails
 					local reason, text = lib.getReason(itemLink, itemName, itemCount, "disenchant")
 					if reason and text then
-						if (get("util.automagic.chatspam")) then 
+						if (get("util.automagic.chatspam")) then
 							print("AutoMagic has loaded", itemName, " due to ",text ,"Rule(Disenchant)")
 						end
 						UseContainerItem(bag, slot)
@@ -232,22 +232,22 @@ function lib.prospectAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				runstop = 0
 				if (get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
-					if(aimethod == "Prospect") then 
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")		
+					if(aimethod == "Prospect") then
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to Item Suggest(Prospect)")
 						end
-						UseContainerItem(bag, slot) 
+						UseContainerItem(bag, slot)
 						runstop = 1
 					end
 				else --look for btmScan or SearchUI reason codes if above fails
 					local reason, text = lib.getReason(itemLink, itemName, itemCount, "prospect")
 					if reason and text then
-						if (get("util.automagic.chatspam")) then 
-							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")	
+						if (get("util.automagic.chatspam")) then
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Prospect)")
 						end
 						UseContainerItem(bag, slot)
 					end
@@ -267,12 +267,12 @@ function lib.gemAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if isGem[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
+					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a gem!")
 					end
-					UseContainerItem(bag, slot) 
+					UseContainerItem(bag, slot)
 				end
 			end
 		end
@@ -289,13 +289,13 @@ function lib.dematAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink) 
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				if isDEMats[ itemID ] then
-					if (get("util.automagic.chatspam")) then 
+					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
 					end
-					UseContainerItem(bag, slot) 
-				end 
+					UseContainerItem(bag, slot)
+				end
 			end
 		end
 	end
@@ -313,7 +313,7 @@ function lib.getReason(itemLink, itemName, itemCount, text)
 
 			if(bids and bids[1] and bids[1] == text) then
 				return bids[1], "BTM"
-			end 
+			end
 		end
 	end
 
@@ -323,7 +323,7 @@ function lib.getReason(itemLink, itemName, itemCount, text)
 			return reason, "SearchUI"
 		end
 	end
-	
+
 	return
 end
 

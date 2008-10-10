@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -111,14 +111,14 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
             lib.GetOwnAuctionDetails()
         end
         if not lib.ownResults then return end
-    
+
         local itemName = name
-        
+
         local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
-		
+
 		local results = lib.ownResults[itemName]
 		local counts = lib.ownCounts[itemName]
-		
+
 		if counts and #counts>0 then
             local sumBid, sumBO = 0, 0
             local countBid, countBO = 0, 0
@@ -136,10 +136,10 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 				_, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(hyperlink, 1, avgBid, avgBO)
 			end
 			r,g,b = r or 1,g or 1, b or 1
-			
+
             EnhTooltip.AddLine(format("  Posted %2d at avg/ea", countBO or countBid)..
 				(avgBO and "" or " (bid)"), avgBO or avgBid)
-            EnhTooltip.LineColor(r,g,b)    
+            EnhTooltip.LineColor(r,g,b)
 		end
     end
 end
@@ -155,22 +155,22 @@ end
 function lib.GetPrice(link, serverKey, match)
 	local sig = lib.GetSigFromLink(link)
 	local curModel, curModelText
-	
+
 	if not sig then
        	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
-	
+
 	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
 	curModelText = curModel
 	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
-	
+
 	if match then
 		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
 		if match == nil then
 			match = AucAdvanced.Settings.GetSetting("util.appraiser.match")
 		end
 	end
-	
+
 	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
@@ -221,16 +221,16 @@ function lib.GetPrice(link, serverKey, match)
 				deposit = GetDepositCost(link, 12, newfaction)
 			end
 			if (not deposit) then deposit = 0 end
-			
+
 			--scale up for duration > 12 hours
 			if deposit > 0 then
 				deposit = deposit * duration/720
 			end
-			
+
 			markdown = newBuy * markdown
 			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
 		end
-		
+
 		if not newBid then
 			newBid = 0
 		end
@@ -244,7 +244,7 @@ function lib.GetPrice(link, serverKey, match)
 			end
 		end
 
-		
+
 		if newBid and (not newBuy or newBid > newBuy) then
 			newBuy = newBid
 		end
@@ -252,7 +252,7 @@ function lib.GetPrice(link, serverKey, match)
 
 	local stack = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".stack") or AucAdvanced.Settings.GetSetting("util.appraiser.stack")
 	local number = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".number") or AucAdvanced.Settings.GetSetting("util.appraiser.number")
-		
+
 	if stack == "max" then
 		_, _, _, _, _, _, _, stack = GetItemInfo(link)
 	end
@@ -283,22 +283,22 @@ local array = {}
 --returns pricing and posting settings
 function lib.GetPriceArray(link, _, match)
 	while (#array > 0) do table.remove(array) end
-	
+
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = lib.GetPrice(link, _, match)
-	
+
 	array.price = newBuy
 	array.seen = seen
-	
+
 	array.stack = stack
 	array.number = number
 	array.duration = duration
-	
+
 	return array
 end
 
 function lib.GetOwnAuctionDetails()
     local results = {}
-    local counts = {}		
+    local counts = {}
     local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
     if totalAuctions >0 then
 	for i=1, totalAuctions do
@@ -308,7 +308,7 @@ function lib.GetOwnAuctionDetails()
             results[name] = {}
             counts[name] = {}
 		end
-		local r = results[name][count] 
+		local r = results[name][count]
 		if not r then
 			r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
 			results[name][count] = r

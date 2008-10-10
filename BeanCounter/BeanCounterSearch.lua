@@ -5,7 +5,7 @@
 
 	BeanCounterSearch - Search routines for BeanCounter data
 	URL: http://auctioneeraddon.com/
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -32,7 +32,7 @@
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals()
 
-local function debugPrint(...) 
+local function debugPrint(...)
     if get("util.beancounter.debugSearch") then
         private.debugPrint("BeanCounterSearch",...)
     end
@@ -49,10 +49,10 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 	--Run the compression function once per session, use first search as trigger
 	--Check the postedDB tables and remove any entries that are older than 31 Days
 	if not private.compressed then private.refreshItemIDArray() private.sortArrayByDate() private.compactDB() private.prunePostedDB()  private.compressed = true end
-	
+
 	if not itemName then return end
 	if not settings then settings = private.getCheckboxSettings() end
-	
+
 	tbl = {}
 	for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
 		if itemLink:lower():find(itemName:lower(), 1, true)  then
@@ -70,7 +70,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 			end
 		end
 	end
-	
+
 	if queryReturn then --need to return the ItemID results to calling function
 		return(private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName))
 	else
@@ -107,9 +107,9 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	data.temp["completedBids/Buyouts"] = {}
 	data.temp.failedAuctions = {}
 	data.temp.failedBids = {}
-	
+
 	--debugPrint(id, settings, queryReturn, count, itemTexture)
-	
+
 	--Retrives all matching results
 	for i in pairs(private.serverData) do
 		if settings.selectbox[2] == "alliance" and private.serverData[i]["faction"] and private.serverData[i]["faction"]:lower() ~= settings.selectbox[2] then
@@ -147,7 +147,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 						for _, text in ipairs(itemKey) do
 							table.insert(data.temp.failedBids, {i, id, index,text})
 						end
-						
+
 					end
 				end
 			end
@@ -166,7 +166,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	if #data.temp.failedBids > count then
 		data.temp.failedBids = private.reduceSize(data.temp.failedBids, count)
 	end
-	
+
 	--Return Data as raw if requesting addon wants un-formated data --FAST
 	if queryReturn == "none" then
 		for i,v in pairs(data.temp)do
@@ -188,7 +188,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 				match = false --we want exact matches and this is not one
 			end
 		end
-		
+
 		if match then
 			table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4], settings))
 			if not queryReturn then --do not create style tables if this data is being returned to an addon
@@ -210,7 +210,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 				match = false --we want exact matches and this is not one
 			end
 		end
-		
+
 		if match then
 			table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
 			if not queryReturn then
@@ -232,7 +232,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 				match = false --we want exact matches and this is not one
 			end
 		end
-		
+
 		if match then
 			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
 			if not queryReturn then
@@ -254,7 +254,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 				match = false --we want exact matches and this is not one
 			end
 		end
-		
+
 		if match then
 			table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
 			if not queryReturn then
@@ -266,21 +266,21 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			end
 		end
 	end
-	
+
 	--BC CLASSIC DATA SEARCH Only usable when a plain text search is used
 	if settings.classic and classic and not tonumber(classic)then
 		data, style = private.classicSearch(data, style, classic, settings, dateString)
 	end
 	if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-		if itemTexture then 
+		if itemTexture then
 			private.frame.icon:SetNormalTexture(itemTexture)
 		else
 			private.frame.icon:SetNormalTexture(nil)
-		end		
+		end
 		private.frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
 		private.frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 		private.frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
-		
+
 		--If the user has scrolled to far and search is not showing scroll back to starting position
 		if  not private.frame.resultlist.sheet.rows[1][1]:IsShown() then
 			private.frame.resultlist.sheet.panel:ScrollToCoords(0,0)
@@ -303,20 +303,20 @@ end
 	function private.COMPLETEDAUCTIONS(id, itemKey, text) --this passes the player, itemID and text as string or as an already seperated table
 			tbl = text
 			if type(text) == "string" then tbl = private.unpackString(text) end
-		
+
 			local pricePer = 0
 			local stack = tonumber(tbl[1]) or 0
 			if stack > 0 then pricePer =  (tbl[2]-tbl[3]+tbl[4])/stack end
-							
+
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
-			
+
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
-			
+
 			return({
 				itemLink or "Failed to get Link", --itemname
 				_BC('UiAucSuccessful'), --status
-				 
+
 				tonumber(tbl[6]) or 0,  --bid
 				tonumber(tbl[5]) or 0,  --buyout
 				tonumber(tbl[2]), --Profit,
@@ -335,12 +335,12 @@ end
 	function private.FAILEDAUCTIONS(id, itemKey, text)
 			tbl = text
 			if type(text) == "string" then tbl = private.unpackString(text) end
-			
+
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
 
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
-			
+
 			return({
 				itemLink, --itemname
 				_BC('UiAucExpired'), --status
@@ -362,21 +362,21 @@ end
 	function private.COMPLETEDBIDSBUYOUTS(id, itemKey, text)
 			tbl = text
 			if type(text) == "string" then tbl= private.unpackString(text) end
-			
+
 			local pricePer, stack, text = 0, tonumber(tbl[1]), _BC('UiWononBuyout')
 			--If the auction was won on bid change text, and adjust ProfitPer
-			if tbl[5] ~= tbl[4] then	
-				text = _BC('UiWononBid') 
+			if tbl[5] ~= tbl[4] then
+				text = _BC('UiWononBid')
 				if stack > 0 then	pricePer = (tbl[5]-tbl[2]+tbl[3])/stack end
 			else --Devide by BUY price if it was won on Buy
 				if stack > 0 then	pricePer = (tbl[4]-tbl[2]+tbl[3])/stack end
 			end
-			
+
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  BeanCounterDB["ItemIDArray"][itemID..":"..suffix]
 
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
-			
+
 			return({
 				itemLink, --itemname
 				text, --status
@@ -421,14 +421,14 @@ end
 				tbl[2], --time,
 			})
 	end
-	
-	
+
+
 
 --[[ BeanCounter Classic Search routine ]]--
---Only used by classic search now	
+--Only used by classic search now
 function private.fragmentsearch(compare, itemName, exact, classic)
-	if exact and private.frame.searchBox:GetText() ~= "" then 
-		if compare:lower() == itemName:lower() then return true end --If we are searching older classic data 
+	if exact and private.frame.searchBox:GetText() ~= "" then
+		if compare:lower() == itemName:lower() then return true end --If we are searching older classic data
 	else
 		local match = (compare:lower():find(itemName:lower(), 1, true) ~= nil)
 		return match
@@ -451,13 +451,13 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 					local status = _BC('UiAucSuccessful').." CL"
 
 					if tbl[2] == "1" then
-						if not settings.failedauction then break end --used to filter Exp auc 
+						if not settings.failedauction then break end --used to filter Exp auc
 						status = _BC('UiAucExpired').." CL"
 						tbl[9] = "-"
-					else   
+					else
 						if not settings.auction then break end --used to filter comp auc if user only wants expend
 					end
-					
+
 					local stack = tonumber(tbl[3]) or 1
 					local price = tonumber(tbl[6]) or 0
 					if stack < 1 then    stack = 1 end
@@ -479,8 +479,8 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 							0,  --fee
 							0, --current wealth
 							tbl[1], --time,
-							})   
-							
+							})
+
 					style[#data] = {}
 					style[#data][12] = {["date"] = dateString}
 					if status == _BC('UiAucSuccessful').." CL" then
@@ -495,7 +495,7 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 			end
 		end
 	end
-	
+
 	if settings.bid then
 		for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
 			for index, text in pairs(v) do
@@ -535,7 +535,7 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 							tbl[1], --time,
 							})
 					style[#data] = {}
-					style[#data][12] = {["date"] = dateString}	
+					style[#data][12] = {["date"] = dateString}
 					style[#data][2] = {["textColor"] = {1,1,0}}
 					style[#data][8] ={["textColor"] = {1,1,0}}
 				end

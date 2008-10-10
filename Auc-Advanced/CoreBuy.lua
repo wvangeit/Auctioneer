@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -186,9 +186,9 @@ function lib.ScanPage()
 			else
 				ishigh = false --we're buying, not bidding, so being high bidder doesn't matter
 			end
-			if ((not owner) or (not private.CurAuction["sellername"]) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"])) 
+			if ((not owner) or (not private.CurAuction["sellername"]) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"]))
 			and (not ishigh)
-			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"]) 
+			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"])
 			and (buyout == private.CurAuction["buyout"]) then --found the auction we were looking for
 				if (private.CurAuction["price"] >= (curBid + minIncrement)) or (private.CurAuction["price"] >= buyout) then
 					private.CurAuction["index"] = i
@@ -220,7 +220,7 @@ function private.PerformPurchase()
 	end
 
 	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
-	
+
 	private.CurAuction["reason"] = private.Prompt.Reason:GetText()
 	--Add bid to list of bids we're watching for
 	local pendingBid = replicate(private.CurAuction)
@@ -230,7 +230,7 @@ function private.PerformPurchase()
 		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "AucAdv_CoreBuy", private.onEventHookBid)
 	end
-	
+
 	--get ready for next bid action
 	private.CurAuction = {}
 	private.Prompt:Hide()
@@ -240,7 +240,7 @@ end
 function private.removePendingBid()
 	if (#private.PendingBids > 0) then
 		table.remove(private.PendingBids, 1)
-		
+
 		--Unregister events if no more bids pending
 		if (#private.PendingBids == 0) then
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
@@ -264,7 +264,7 @@ function private.onEventHookBid(_, event, arg1)
 		if (arg1 == ERR_ITEM_NOT_FOUND or
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
-			arg1 == ERR_AUCTION_HIGHER_BID or 
+			arg1 == ERR_AUCTION_HIGHER_BID or
 			arg1 == ERR_ITEM_MAX_COUNT) then
 			private.onBidFailed(arg1)
 		end
@@ -307,7 +307,7 @@ function private.OnUpdate()
 		end
 	elseif private.CurAuction["link"] then --AH was closed, so reinsert current request back into the queue
 		table.insert(private.BuyRequests, 1, {
-			private.CurAuction["link"], 
+			private.CurAuction["link"],
 			private.CurAuction["sellername"],
 			private.CurAuction["count"],
 			private.CurAuction["minbid"],

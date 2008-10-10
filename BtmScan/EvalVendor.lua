@@ -34,7 +34,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -111,7 +111,7 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
-	
+
 	gui:AddHelp(id, "what is the vendor evaluator",
 		"What is the Vendor evaluator?",
 		"This evaluator allows you to purchase items that can be sold to a vendor for more than you pay for it based on your settings here.\n\n"..
@@ -121,7 +121,7 @@ function lib:setup(gui)
 		"Profit Settings: Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
 		""..
 		"\n")
-		
+
 	gui:AddControl(id, "Subhead",          0,    libName.." General Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")

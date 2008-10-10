@@ -26,7 +26,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -87,7 +87,7 @@ function private.QueryCurrent(SortTable, SortColumn, reverse)
 	end
 end
 
---Beginner Tooltips script display for all UI elements 
+--Beginner Tooltips script display for all UI elements
 function private.buttonTooltips(self, text)
 	if get("util.compactui.tooltiphelp") and text and self then
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
@@ -100,12 +100,12 @@ function private.HookAH()
 	private.switchUI:SetParent(AuctionFrameBrowse)
 	private.switchUI:SetPoint("TOPRIGHT", AuctionFrameBrowse, "TOPRIGHT", -157, -17)
 
-	
+
 	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
 		private.MyAuctionFrameUpdate = function() end
 		return
 	end
-		
+
 	AuctionFrameBrowse_Update = private.MyAuctionFrameUpdate
 	local button, lastButton, origButton
 	local line
@@ -115,7 +115,7 @@ function private.HookAH()
 	BrowseDurationSort:Hide()
 	BrowseHighBidderSort:Hide()
 	BrowseCurrentBidSort:Hide()
-	
+
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
 		if (i <= NUM_BROWSE_TO_DISPLAY) then
@@ -427,7 +427,7 @@ function private.ButtonClick(me, mouseButton)
 	--Display the ignore player UI
 	elseif (IsAltKeyDown() ) and me.Owner:GetText() then
 		if not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
-		
+
 		private.sellerIgnore:ClearAllPoints()	private.sellerIgnore:SetPoint("TOPLEFT", me.Owner,"TOPRIGHT") private.sellerIgnore:Show()
 		--if toon not ignored the ignore
 		local seller = me.Owner:GetText()
@@ -665,11 +665,11 @@ function private.SetAuction(button, pos)
 	end
 	--if player is ignored then color name red otherwise set normal
 	if owner and AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[owner] then
-		button.Owner:SetTextColor(1,0,0) 
+		button.Owner:SetTextColor(1,0,0)
 	else
-		button.Owner:SetTextColor(1,1,1) 
+		button.Owner:SetTextColor(1,1,1)
 	end
-	
+
 	local perUnit = 1
 	if (private.PerItem:GetChecked()) then
 		perUnit = count
@@ -693,7 +693,7 @@ end
 function private.MyAuctionFrameUpdate()
 	if not BrowseScrollFrame then return end
 
-	if WOWEcon_AH_PerItem_Enable 
+	if WOWEcon_AH_PerItem_Enable
 	and WOWEcon_AH_PerItem_Enable:IsVisible() then
 		WOWEcon_AH_PerItem_Enable:Hide()
 	end
@@ -715,7 +715,7 @@ function private.MyAuctionFrameUpdate()
 		numBatchAuctions = 0
 		totalAuctions = 0
 	end
-	
+
 	if ( numBatchAuctions == 0 ) then
 		BrowseNoResultsText:Show()
 	else
@@ -837,13 +837,13 @@ private.sellerIgnore.no:SetHeight(10)
 local font = private.sellerIgnore.no:GetFontString()
 font:SetFontObject("GameFontNormalSmall" )
 font:SetTextHeight(10)
-	
+
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
 	private.gui = gui --stores our ID id we use this to open the config button to correct frame
-	private.guiID = id 
-	
+	private.guiID = id
+
 	gui:AddHelp(id, "what compactui",
 		"What is CompactUI?",
 		"CompactUI is a space optimized browse interface to replace the default Blizzard auction browse interface.\n"..
@@ -866,7 +866,7 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is popup",
 		"What does enabling the popup help do?",
 		"Displays a little popup tooltip over various parts of the CompactUI")
-	
+
 	gui:AddHelp(id, "what is collapse",
 		"What does removing smaller denomination coins do?",
 		"Removing smaller denomination coins removes coins from the lowest order when the coins are zero and their removal would not affect the accuracy of the price display.\n"..

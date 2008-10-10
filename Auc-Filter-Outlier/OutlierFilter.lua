@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -89,7 +89,7 @@ function lib.AuctionFilter(operation, itemData)
 		end
 		cache[link] = value
 	end
-	
+
 	-- If there's no value then we can't filter it
 	if value == 0 then return false end
 

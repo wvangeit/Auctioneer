@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -76,12 +76,12 @@ end
 function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-	
+
 	local bag = this:GetParent():GetID()
 	local slot = this:GetID()
 
 	local link = GetContainerItemLink(bag, slot)
-	
+
 	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "RightButton") and (IsAltKeyDown()) then
@@ -101,7 +101,7 @@ end
 function private.ClickLinkHook(item, link, button)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-	
+
 	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then

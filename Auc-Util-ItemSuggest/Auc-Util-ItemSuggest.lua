@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that allows the added tooltip for suggesting 
+	This is an Auctioneer Advanced module that allows the added tooltip for suggesting
 	what should be done with an item based on weights and skills set. This module is also
 	used by other modules in Auctioneer Advanced.
 
@@ -82,7 +82,7 @@ default("util.itemsuggest.deplength", "48")
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
-	
+
 	gui:AddHelp(id, "what itemsuggest",
         "What is the ItemSuggest module?",
         "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant or prospect that item.")
@@ -96,7 +96,7 @@ function lib.SetupConfigGui(gui)
 	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	
+
 	gui:AddControl(id, "Header",     0,    "ItemSuggest Recommendation Bias")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
 	gui:AddTip(id, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
@@ -106,7 +106,7 @@ function lib.SetupConfigGui(gui)
 	gui:AddTip(id, "Weight ItemSuggest recommendations for Disenchanting higher or lower.")
 	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
-	
+
 	gui:AddControl(id, "Header",     0,    "Deposit cost influence")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs?")
 	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
@@ -116,7 +116,7 @@ function lib.SetupConfigGui(gui)
 	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs?")
 	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
-	
+
 end
 
 function lib.itemsuggest(hyperlink, quantity)
@@ -124,25 +124,25 @@ function lib.itemsuggest(hyperlink, quantity)
 	if (quantity == nil) then quantity = 1 end
 	VendorValue = lib.GetVendorValue(hyperlink, quantity)
 	AppraiserValue = lib.GetAppraiserValue(hyperlink, quantity)
-	
-	if (get("util.itemsuggest.jewelcraftskill") == 0) then 
+
+	if (get("util.itemsuggest.jewelcraftskill") == 0) then
 		ProspectValue = 0
-	else 
+	else
 		ProspectValue = lib.GetProspectValue(hyperlink, quantity)
 	end
-	
-	if (get("util.itemsuggest.enchantskill") == 0) then 
+
+	if (get("util.itemsuggest.enchantskill") == 0) then
 		DisenchantValue = 0
-	else	
+	else
 		DisenchantValue = lib.GetDisenchantValue(hyperlink, quantity)
 	end
-	
+
 	-- Do super duper nil check
 	if VendorValue == nil then VendorValue = 0 end
 	if AppraiserValue == nil then AppraiserValue = 0 end
 	if ProspectValue == nil then ProspectValue = 0 end
 	if DisenchantValue == nil then DisenchantValue = 0 end
-	
+
 	-- Adjust final values based on custom weights by enduser
 	local adjustment = get("util.itemsuggest.vendorweight") or 0
 	VendorValue = VendorValue * adjustment / 100
@@ -156,21 +156,21 @@ function lib.itemsuggest(hyperlink, quantity)
 	-- Determine which method 'wins' the battle
 	bestvalue = math.max(0, VendorValue, AppraiserValue, ProspectValue, DisenchantValue)
 	bestmethod = "Unknown"
-	if bestvalue == 0 then 
+	if bestvalue == 0 then
 		bestmethod = "Unknown"
 		bestvalue = "Unknown"
-	elseif bestvalue == VendorValue then 
+	elseif bestvalue == VendorValue then
 		bestmethod = "Vendor"
-	elseif bestvalue == AppraiserValue then 
+	elseif bestvalue == AppraiserValue then
 		bestmethod = "Auction"
 	elseif bestvalue == ProspectValue then
 		bestmethod = "Prospect"
 	elseif bestvalue == DisenchantValue then
 		bestmethod = "Disenchant"
 	end
-	
+
 	-- Hand the winner back to caller...
-	return bestmethod, bestvalue 
+	return bestmethod, bestvalue
 end
 
 function lib.GetAppraiserValue(hyperlink, quantity)
@@ -184,8 +184,8 @@ function lib.GetAppraiserValue(hyperlink, quantity)
 	end
 	if (get("util.itemsuggest.includebrokerage")) then
 		AppraiserValue = AppraiserValue - AppraiserValue * brokerRate
-	end	
-	
+	end
+
 return AppraiserValue end
 
 function lib.GetDisenchantValue(hyperlink, quantity)
@@ -195,25 +195,25 @@ function lib.GetDisenchantValue(hyperlink, quantity)
 	if (iQual == nil or iQual <= 1 or iLevel == nil) then return end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
 	local market
-	
+
 	if (skillneeded > get("util.itemsuggest.enchantskill"))  then
 		return DisenchantValue
 	else
 		_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(hyperlink)
-		
+
 		if (market == 0)  then
 			return DisenchantValue
 		end
-	end	
-		
+	end
+
 	local adjusted = market or 0
-	
+
 	if (get("util.itemsuggest.includebrokerage")) then
 		local brokerRate, depositRate = 0.05, 0.05
 		local amount = (adjusted * brokerRate)
 		adjusted = adjusted - amount
 	end
-	
+
 	DisenchantValue = adjusted
 return DisenchantValue end
 
@@ -228,7 +228,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 		local _, itemid, _, _, _, _ = decode(hyperlink)  -- lType, id, suffix, factor, enchant, seed
 		local trashTotal, marketTotal, depositTotal, brokerTotal = 0, 0, 0, 0
 		local brokerRate, depositRate = 0.05, 0.05
-		
+
 		if (prospects) == nil then return ProspectValue end
 		for result, yield in pairs(prospects) do
 		-- adjust for stack size

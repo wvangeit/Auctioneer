@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -108,10 +108,10 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",   0.21, 0, "general.name.regexp", "Regexp")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",   0.35, 0, "general.name.invert", "Invert")
-	
+
 	gui:SetLast(id, cont)
 	last = cont
-	
+
 	gui:AddControl(id, "Note",       0.0, 1, 100, 14, "Type:")
 	gui:AddControl(id, "Selectbox",   0.0, 1, private.getTypes, "general.type", "ItemType")
 	gui:SetLast(id, last)
@@ -120,7 +120,7 @@ function lib:MakeGuiConfig(gui)
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Note",       0.7, 1, 100, 14, "TimeLeft:")
 	gui:AddControl(id, "Selectbox",  0.7, 1, private.getTimeLeft(), "general.timeleft", "TimeLeft")
-	
+
 	last = gui:GetLast(id)
 	gui:SetControlWidth(0.37)
 	gui:AddControl(id, "NumeriSlider",     0,   1, "general.ilevel.min", 0, 200, 1, "Min item level")
@@ -135,7 +135,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "NumeriSlider",     0.6, 0, "general.ulevel.max", 0, 80, 1, "Max user level")
 
 	gui:SetLast(id, cont)
-	
+
 	last = gui:GetLast(id)
 	gui:SetControlWidth(0.35)
 	gui:AddControl(id, "Text",       0,   1, "general.seller", "Seller name")
@@ -146,7 +146,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",   0.23, 0, "general.seller.regexp", "Regexp")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",   0.37, 0, "general.seller.invert", "Invert")
-	
+
 	gui:SetLast(id, cont)
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "general.minbid", 0, 999999999, "Minimum Bid")
 	gui:SetLast(id, cont)

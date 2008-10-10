@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced Matcher module that returns an undercut price 
+	This is an Auctioneer Advanced Matcher module that returns an undercut price
 	based on the current market snapshot
 
 	License:
@@ -25,13 +25,13 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
---if not BeanCounter then 
+--if not BeanCounter then
 --	AucAdvanced.Print("BeanCounter not loaded")
---	return 
+--	return
 --end
 if not AucAdvanced then return end
 
@@ -57,7 +57,7 @@ end
 function lib.GetMatchArray(hyperlink, marketprice)
 	local matchArray = {}
 	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") or not BeanCounter or not BeanCounter.API.isLoaded then --check setting is on, beancounter exists, and that the database is sound
-		return 
+		return
 	end
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -90,7 +90,7 @@ if daterange then
 				for i, text in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId][key]) do
 					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
-					
+
 					if (now - auctime) < (numdays) then
 						tempnum = tempnum + 1
 					end
@@ -104,7 +104,7 @@ if daterange then
 				for i, text in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId][key]) do
 					local stack, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
-					
+
 					if (now - auctime) < (numdays) then
 						tempnum = tempnum + 1
 					end
@@ -126,18 +126,18 @@ if daterange then
 			end
 		end
 	end
-	
+
 	increase = math.pow(increase, math.pow(success, 0.8))
 	decrease = math.pow(decrease, math.pow(failed, 0.8))
 	matchprice = matchprice * increase
 	matchprice = matchprice * decrease
-	
+
 	if (marketprice > 0) then
 		if (matchprice > (marketprice * (maxincrease*0.01))) then
 			matchprice = (marketprice * (maxincrease*0.01))
 		elseif (matchprice < (marketprice * (maxdecrease*0.01))) then
 			matchprice = (marketprice * (maxdecrease*0.01))
-		end		
+		end
 		marketdiff = (((matchprice - marketprice)/marketprice)*100)
 		if (marketdiff-floor(marketdiff))<0.5 then
 			marketdiff = floor(marketdiff)
@@ -190,33 +190,33 @@ function private.SetupConfigGui(gui)
 		"The BeanCount module uses BeanCounter's data to adjust the price based on the item's past selling history.")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	
+
 	gui:AddControl(id, "Subhead",    0,    "Price Adjustments")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.enable", "Enable Auc-Match-BeanCount")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -20, 0, 0.1, "Auction failure markdown: %g%%")
 	gui:AddTip(id, "This controls how much you want to markdown an auction for every time it has failed to sell.\n"..
 		"This is cumulative.  ie a setting of 10% with two failures will set the price at 81% of market")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 0.1, "Auction success markup: %g%%")
 	gui:AddTip(id, "This controls how much you want to markup an auction for every time it has sold.\n"..
 		"This is cumulative.  ie a setting of 10% with two successes will set the price at 121% of market")
-		
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.maxup", 101, 300, 1, "Maximum: %g%%")
 	gui:AddTip(id, "Sets the maximum that you are willing to set the price at, as a % of baseline")
-		
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.maxdown", 1, 99, 1, "Minimum: %g%%")
 	gui:AddTip(id, "Sets the minimum that you are willing to set the price at, as a % of baseline")
-		
+
 	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.showhistory", "Show history of successes and failures")
 	gui:AddTip(id, "This will add the number of successes and failures for that item to Appraiser's right-hand panel")
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.daterange", "Only use recent data")
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
 	gui:AddControl(id, "WideSlider", 0, 2, "match.beancount.numdays", 1, 300, 1, "Use data from last %g days")
 	gui:AddTip(id, "Only use data from the last x days, as set by the slider.")
-	
+
 	--gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.matchstacksize", "Seprerate data by stack size. Only available if Use recent data is set")
 	--gui:AddTip(id, "Only use data for the current stack size.")
 end

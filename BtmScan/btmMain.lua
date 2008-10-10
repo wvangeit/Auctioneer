@@ -101,7 +101,7 @@ BtmScan.OnLoad = function ()
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
 	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.PostCanSendAuctionQuery)
-	
+
 	if BeanCounter then
 		Stubby.RegisterFunctionHook("BeanCounter.Private.databaseAdd", 600, BtmScan.BeanCounterStored)
 	end
@@ -185,7 +185,7 @@ end
 --hook beancounters storeage event
 local CallBackString
 function BtmScan.BeanCounterStored(_, _, event)
-	if CallBackString and event == "postedBids" then 
+	if CallBackString and event == "postedBids" then
 		--BeanCounter.Print("Sent to beanc @", time(), T)
 		BeanCounter.Private.storeReasonForBid(CallBackString)
 		CallBackString = nil
@@ -242,7 +242,7 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
-		
+
 		-- Get the current number of auctions and pages
 		local pageCount, totalCount = GetNumAuctionItems("list")
 		local totalPages = math.floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
@@ -289,7 +289,7 @@ BtmScan.OnUpdate = function(...)
 				end
 				if (TopScanActive) then
 					page = 0
-				end	
+				end
 			AuctionFrameBrowse.page = page
 			if SortAuctionClearSort then SortAuctionClearSort("list") end--the If-Then can be removed once 2.3 is live
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
@@ -345,7 +345,7 @@ function BtmScan.IsPageReady(timeout)
 		BtmScan.Print("Page scan timed out (" .. GetTime() .. ")")
 		return true
 	end
-	
+
 	local pageCount, totalCount = GetNumAuctionItems("list")
 	for idx = 1, pageCount do
 		local link = GetAuctionItemLink("list", idx)
@@ -368,7 +368,7 @@ function BtmScan.PageScan(resume)
 	else
 		-- We will get notified when to check the page. No need to poll.
 	end
-	
+
 	-- BtmScan.Print("Ready (" .. GetTime() .. ")")
 
 	BtmScan.pageScan = nil
@@ -409,14 +409,14 @@ function BtmScan.PageScan(resume)
 			item.use, item.lvl, item.min, item.inc, item.buy,
 			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
 			item.remain = GetAuctionItemTimeLeft("list", item.pos)
-			
+
 			item.count = item.count or 1
 
 			if (item.owner ~= UnitName("player") and not item.high) then
 				-- Disassemble the link
 				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
-				
+
 				-- read ItemConfig
 				local itemconfig = itemConfigTable[item.sig]
 				if (itemconfig) then
@@ -444,7 +444,7 @@ function BtmScan.PageScan(resume)
 						if (not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
 					end
 					if (not BtmScan.Settings.GetSetting("allow.buy")) then item.canbuy = false end
-					
+
 					-- Check that item won't put us below reserve
 					if (item.canbid and balance - item.bid < reserve) then
 						item.canbid = false
@@ -452,7 +452,7 @@ function BtmScan.PageScan(resume)
 					elseif (item.canbuy and balance - item.buy < reserve) then
 						item.canbuy = false
 					end
-					
+
 					-- Check maxprice setting and for buyout price
 					if (item.canbid and item.bid > maxprice) then
 						item.canbid = false
@@ -463,7 +463,7 @@ function BtmScan.PageScan(resume)
 						-- can't buy if no buyout
 						item.canbuy = false
 					end
-					
+
 					-- Check that price isn't above ignore price, if any
 					local autoignore = BtmScan.NoPrompt[item.sig]
 					if (autoignore) then
@@ -474,7 +474,7 @@ function BtmScan.PageScan(resume)
 							item.canbuy = false
 						end
 					end
-					
+
 					-- Initialize the purchasing variables
 					item.purchase = 0   -- The amount to purchase for
 					item.reason = ""    -- The reason why we are purchasing
@@ -790,7 +790,7 @@ end
 
 -- Get a GSC value and work out what it's worth
 BtmScan.ParseGSC = function (price)
-	price = string.gsub(price, "|c[%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d]", " ") 
+	price = string.gsub(price, "|c[%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d]", " ")
 	price = string.gsub(price, "[gG]", "0000 ")
 	price = string.gsub(price, "[sS]", "00 ")
 	price = string.gsub(price, "[^0-9]+", " ")	-- Note that we're stripping out all non-digits here, so any garbage in the input stream is automatically lost now
@@ -1081,12 +1081,12 @@ BtmScan.Command = function (msg)
 			known = true
 		end
 	end
-	
+
 	if known == false then
 		BtmScan.Print(tr("BottomScanner: %1 [%2]", tr("Unknown command"), cmd))
 		help = true
 	end
-	
+
 	if (help) then
 		BtmScan.Print(tr("BottomScanner help:"))
 		BtmScan.Print(tr(" %1 [%2]", "config", tr("Opens up the configuration screen")))
@@ -1443,7 +1443,7 @@ BtmScan.GetDisplayPrice = function(total, count)
 			result = totalCoins .. " / " .. unitCoins
 		else
 			result = unitCoins .. " / " .. totalCoins
-		end	
+		end
 	end
 	return result
 end
@@ -1545,12 +1545,12 @@ BtmScan.PerformPurchase = function()
 	end
 
 	local buyout, btext, ptext = false, "", "Bidding on"
-	if item.purchase == item.buy then 
-		buyout = true 
-		btext = " ("..tr("buyout")..")" 
+	if item.purchase == item.buy then
+		buyout = true
+		btext = " ("..tr("buyout")..")"
 		ptext = "Purchasing"
 	end
-	
+
 	BtmScan.Log(tr(ptext.." %1x%2 at %3 for %4%5", item.link, item.count, BtmScan.GSC(item.purchase,1), item.what, btext))
 	PlaceAuctionBid("list", i, item.purchase)
 	local bids = BtmScan.Settings.GetSetting("bid.list")
@@ -1697,7 +1697,7 @@ BtmScan.Prompt.Item:SetScript("OnClick", function(this,button)
 		SetItemRef(item.link, item.link, button)
 	end
 end)
-	
+
 
 BtmScan.Prompt.Lines = {}
 for i = 1, 10 do
@@ -1904,7 +1904,7 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.PlayButton:SetWidth(24)
 	BtmScan.PlayButton:SetScript("OnClick", BtmScan.ToggleScan)
 	BtmScan.PlayButton:Show()
-	
+
 	BtmScan.ConfigButton = CreateFrame("Button", nil, BtmScan.LogParent, "OptionsButtonTemplate")
 	BtmScan.ConfigButton:SetPoint("TOPLEFT", BtmScan.PlayButton, "TOPRIGHT", 10, -2)
 	BtmScan.ConfigButton:SetText("Configure")
@@ -2009,10 +2009,10 @@ end
 -------------------------------------------------------------------------------
 function BtmScan.unpackItemConfiguration(packedItemConfiguration,   resultTable)
 	local itemconfig = resultTable or {}
-	itemconfig.maxPrice, 
-	itemconfig.isIgnore, 
-	itemconfig.ignoreModuleList, 
-	itemconfig.buyBelow, 
+	itemconfig.maxPrice,
+	itemconfig.isIgnore,
+	itemconfig.ignoreModuleList,
+	itemconfig.buyBelow,
 	itemconfig.maxCount = strsplit(";",packedItemConfiguration)
 
 	itemconfig.maxPrice = tonumber(itemconfig.maxPrice)
@@ -2022,7 +2022,7 @@ function BtmScan.unpackItemConfiguration(packedItemConfiguration,   resultTable)
 	end
 	itemconfig.buyBelow = tonumber(itemconfig.buyBelow)
 	itemconfig.maxCount = tonumber(itemconfig.maxCount)
-	
+
 	return itemconfig
 end
 

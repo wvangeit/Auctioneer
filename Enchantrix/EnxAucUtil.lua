@@ -25,7 +25,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -49,7 +49,7 @@ local priceTable = {}
 local priceTableAge
 function lib.IsValidAlgorithm(hyperlink)
 	if not get("export.aucadv") then return false end
-    
+
     if get("ScanValueType") == "adv:stat:Appraiser" then return false end  -- Stops infinite loop from using Appraiser prices which uses Market Price which uses Enchantrix.
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)

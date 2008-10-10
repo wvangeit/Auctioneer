@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -109,7 +109,7 @@ local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
 	['printframe'] = 1,
-	
+
 	['chatShowFindings'] = true,
 
 	['ToolTipEmbedInGameTip'] = false,
@@ -528,7 +528,7 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab(_ENCH("GuiAutoDeOptions"))
 	gui:AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
-	
+
 	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
 	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", "this string isn't shown but needs to be long for layout")
 	gui:AddControl(id, "Button",     0, 1, "autode.deleteItem", "remove item")

@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
@@ -32,12 +32,12 @@
 		To create an btmscan evaluator for enchanters that will watch for
 		enchanting reagents or disenchantable items that will disenchant
 		into the reagents wanted.
-		
+
 		The choice of what reagents is controlled by sliders representing
 		a percentage of market price that you are willing to pay.
 		The sliders run from 0 to 200 with 0 = not needed,
 		100 = pay market price, and 200 = pay twice market price.
-		
+
 	BEWARNED:
 		THIS IS NOT FOR MAKING A PROFIT, IT IS FOR FINDING REAGENTS
 
@@ -93,7 +93,7 @@ local SOUL = 11083
 local STRANGE = 10940
 
 -- a table we can check for item ids
-local validReagents = 
+local validReagents =
 	{
 	[VOID] = true,
 	[NEXUS] = true,
@@ -136,7 +136,7 @@ function lib:valuate(item, tooltip)
 
 	-- Bail immediately if we're not enabled
 	if (not get(lcName..".enable")) then return end
-	
+
 	-- Check for bogus/corrupted item links
 	if not (item and item.qual) then return end
 
@@ -148,27 +148,27 @@ function lib:valuate(item, tooltip)
 	local market = 0;
 
 
-	
+
 	-- first, is this an enchanting reagent itself?
 	-- if so, just use the value of the reagent
-	
+
 	if validReagents[ item.id ] then
-					
+
 		local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(item.id);
-		
+
 		-- if no Auc4 price, use Auc5 price
 		if (not reagentPrice) then
 			reagentPrice = five
 		end
-		
+
 		-- still nothing, try the baseline (hard coded)
 		if (not reagentPrice) then
 			reagentPrice = baseline
 		end
-		
+
 		-- be safe and handle nil results
 		local adjustment = get(lcName..".PriceAdjust."..item.id) or 0;
-		
+
 		market = (reagentPrice or 0) * adjustment / 100;
 	end
 
@@ -176,14 +176,14 @@ function lib:valuate(item, tooltip)
 	-- second, see if we can disenchant the item
 
 	if (not market or market == 0) then
-		
+
 		-- All disenchantable items are "uncommon" quality or higher
 		-- so bail on items that are white or gray
 		if (item.qual <= 1) then return end
 
 		-- Check to see if the ilevel is below the disenchant threshold
-		local name,_,iQual,iLevel = GetItemInfo(item.link) 
-		
+		local name,_,iQual,iLevel = GetItemInfo(item.link)
+
 		if (get(lcName..".level.custom")) then
 			if (NonDisenchantables) then
 				if (NonDisenchantables[item.id..":0:0"]) then
@@ -212,40 +212,40 @@ function lib:valuate(item, tooltip)
 				return
 			end
 		end
-		
-		
+
+
 		-- Give up if it doesn't disenchant to anything
 		local data = Enchantrix.Storage.GetItemDisenchants(item.link)
 		if not data then return end
 
 		local total = data.total
-		
+
 		if (total and total[1] > 0) then
 			local totalNumber, totalQuantity = unpack(total)
 			for result, resData in pairs(data) do
 				if (result ~= "total") then
 					local resNumber, resQuantity = unpack(resData)
-					
+
 					local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(result);
-					
+
 					-- if no Auc4 price, use Auc5 price
 					if (not reagentPrice) then
 						reagentPrice = five
 					end
-					
+
 					-- still nothing, try the baseline (hard coded)
 					if (not reagentPrice) then
 						reagentPrice = baseline
 					end
-					
+
 					local resYield = resQuantity / totalNumber;
 					local resPrice = (reagentPrice or 0) * resYield;
 					--local percentage = resNumber / totalNumber;
 					--local simpleYield = resQuantity/resNumber;
-					
+
 					-- be safe and handle nil results
 					local adjustment = get(lcName..".PriceAdjust."..result) or 0;
-					
+
 					market = market + resPrice * adjustment / 100;
 				end
 			end
@@ -256,7 +256,7 @@ function lib:valuate(item, tooltip)
 
 	-- If we don't know what it's worth, then there's not much we can do
 	if( not market or market <= 0) then return end
-	
+
 	item:info("Market price", market)
 
 
@@ -275,7 +275,7 @@ function lib:valuate(item, tooltip)
 	-- If the current purchase price is more than our valuation,
 	-- another module "wins" this purchase.
 	if (value < item.purchase) then return end
-	
+
 	local price = 0;
 
 	-- Check to see what the most we can pay for this item is.
@@ -348,7 +348,7 @@ define(lcName..'.PriceAdjust.'..NEXUS, 100)
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
-	
+
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
@@ -357,7 +357,7 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.min", 0, 375, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")
-	
+
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reagent Price Modification")
 
@@ -367,33 +367,33 @@ function lib:setup(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..GMYSTIC, 0, 200, 1, "Greater Mystic Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..GASTRAL, 0, 200, 1, "Greater Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..GMAGIC, 0, 200, 1, "Greater Magic Essence %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LPLANAR, 0, 200, 1, "Lesser Planar Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LETERNAL, 0, 200, 1, "Lesser Eternal Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LNETHER, 0, 200, 1, "Lesser Nether Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LMYSTIC, 0, 200, 1, "Lesser Mystic Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LASTRAL, 0, 200, 1, "Lesser Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LMAGIC, 0, 200, 1, "Lesser Magic Essence %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..ARCANE, 0, 200, 1, "Arcane Dust %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..ILLUSION, 0, 200, 1, "Illusion Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..DREAM, 0, 200, 1, "Dream Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..VISION, 0, 200, 1, "Vision Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SOUL, 0, 200, 1, "Soul Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..STRANGE, 0, 200, 1, "Strange Dust %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LPRISMATIC, 0, 200, 1, "Large Prismatic Shard %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LBRILLIANT, 0, 200, 1, "Large Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LRADIANT, 0, 200, 1, "Large Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LGLOWING, 0, 200, 1, "Large Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..LGLIMMERING, 0, 200, 1, "Large Glimmering Shard %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SPRISMATIC, 0, 200, 1, "Small Prismatic Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SBRILLIANT, 0, 200, 1, "Small Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SRADIANT, 0, 200, 1, "Small Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SGLOWING, 0, 200, 1, "Small Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..SGLIMMERING, 0, 200, 1, "Small Glimmering Shard %s%%")
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..VOID, 0, 200, 1, "Void Crystal %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, lcName..".PriceAdjust."..NEXUS, 0, 200, 1, "Nexus Crystal %s%%")
 

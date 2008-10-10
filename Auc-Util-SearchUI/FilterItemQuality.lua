@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -70,7 +70,7 @@ function lib:MakeGuiConfig(gui)
 	gui:MakeScrollable(id)
 
 	gui:AddControl(id, "Header",     0,      "ItemQuality Filter Criteria")
-	
+
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemquality.enable", "Enable ItemQuality filtering")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
@@ -80,7 +80,7 @@ function lib:MakeGuiConfig(gui)
 			default("ignoreitemquality.filter."..name, false)
 		end
 	end
-	
+
 	gui:AddControl(id, "Subhead",      0,    "Item Quality by Type")
 	for i = 0, 6 do
 		local last = gui:GetLast(id)
@@ -108,7 +108,7 @@ function lib.Filter(item, searcher)
 			or (searcher and (not get("ignoreitemquality.filter."..searcher))) then
 		return
 	end
-	
+
 	local itype = item[Const.ITYPE]
 	local quality = item[Const.QUALITY]
 	quality = qualname[quality]

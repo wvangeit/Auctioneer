@@ -26,7 +26,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -102,51 +102,51 @@ end
 --role: refreshes the page based on settings, and updates private.lastPage, private.interval, and private.manualSearchPause
 function lib.RefreshPage()
 	private.interval = get("realtime.reload.interval")
-	
+
 	--Check to see if the AH is open for business
 	if not (AuctionFrame and AuctionFrame:IsVisible()) then
 		private.interval = 1 --Try again in one second
 		return
 	end
-	
+
 	--Check to see if we can send a query
 	if not (CanSendAuctionQuery()) then
 		private.interval = 1 --try again in one second
 		return
 	end
-	
+
 	--Check to see if AucAdv is already scanning
 	if AucAdvanced.Scan.IsScanning() or AucAdvanced.Scan.IsPaused() then
 		private.timer = 0
 		private.interval = get("realtime.reload.manpause")
 		return
 	end
-	
+
 	--Get the current number of auctions and pages
 	local pageCount, totalCount = GetNumAuctionItems("list")
 	local totalPages = math.floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
 	if (totalPages < 0) then
 		totalPages = 0
 	end
-	
+
 	--set the AH page count to a signal value, if this is our first time
 	if (not private.pageCount) then
 		private.pageCount = -1
 	end
-	
+
 	--Decide whether we are just starting to use the Realtime queries (as opposed to piggybacking), which means we are going to do a few quick scans to get to the last page
 	if (totalPages ~= private.pageCount) then
 		private.pageCount = totalPages
 		private.interval = 3 --cut short the delay, we want to get to the last page quickly
 	end
-	
+
 	--every 5 pages, go back one just to doublecheck that nothing got by us
 	private.offset = (private.offset + 1) % 5
 	local offset = 0
 	if private.offset == 0 then
 		offset = 1
 	end
-	
+
 	local page = private.pageCount - offset or 0
 	if get("realtime.reload.topscan") then
 		private.topScan = not private.topScan --flip the variable, so we alternate first and last pages
@@ -175,7 +175,7 @@ function private.OnUpdate(me, elapsed)
 		private.timer = 0
 	else
 		private.timer = private.timer + elapsed
-		
+
 		--Check whether enough time has elapsed to do anything
 		if private.timer < private.interval then
 			return
@@ -183,7 +183,7 @@ function private.OnUpdate(me, elapsed)
 		private.timer = private.timer - private.interval
 		private.lastTry = private.lastTry - private.interval
 	end
-	
+
 	--if we've gotten to this point, it's time to refresh the page
 	if (private.IsScanning) and (get("realtime.reload.enable")) then
 		lib.RefreshPage()
@@ -230,12 +230,12 @@ function lib.ScanPage()
 		-- we don't want to freeze the computer by trying to process a getall, so return
 		return
 	end
-	
+
 	--this is a new page, so no alert sound has been played for it yet
 	private.playedsound = false
 	--store the current pagecount
 	private.pageCount = math.floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
-	
+
 	--Put all the searchers that are activated into our local table, so that the get()s are only called every page, not every auction
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if get("realtime.use."..name) then
@@ -255,7 +255,7 @@ function lib.ScanPage()
 			else
 				curBid = 0
 			end
-			
+
 			-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
 			private.ItemTable[Const.LINK]    = link
 			private.ItemTable[Const.ILEVEL]  = iLevel
@@ -280,7 +280,7 @@ function lib.ScanPage()
 			private.ItemTable[Const.FACTOR]  = factor
 			private.ItemTable[Const.ENCHANT]  = enchant
 			private.ItemTable[Const.SEED]  = seed
-			
+
 			for i, searcher in pairs(private.searchertable) do
 				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false) then
 					private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])

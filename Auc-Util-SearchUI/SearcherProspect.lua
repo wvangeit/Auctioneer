@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -58,13 +58,13 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Header",     0,      "Prospect search criteria")
 
 	local last = gui:GetLast(id)
-	
+
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "prospect.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "prospect.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "prospect.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "prospect.level.min", 0, 375, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "prospect.level.max", 25, 375, 25, "Maximum skill: %s")
-	
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
@@ -72,7 +72,7 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.brokerage", "Subtract auction fees")
-	
+
 	gui:AddControl(id, "Subhead",           0.42,    "Note:")
 	gui:AddControl(id, "Note",              0.42, 1, 290, 30, "The \"Pct\" Column is \% of Prospect Value")
 end
@@ -92,7 +92,7 @@ function lib.Search(item)
 	if not prospects then
 		return false, "Item not Prospectable"
 	end
-	
+
 	local market, _, pctstring
 	local minskill = 0
 	local maxskill = 375
@@ -106,18 +106,18 @@ function lib.Search(item)
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to Prospect"
 	end
-	
+
 	_, _, _, market = Enchantrix.Storage.GetItemProspectTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
 		return false, "Item not Prospectable"
 	end
-	
+
 	--adjust for stack size
 	market = market * item[Const.COUNT]
-	
+
 	--adjust for brokerage costs
 	local brokerage = get("prospect.adjust.brokerage")
-	
+
 	if brokerage then
 		market = market * 0.95
 	end

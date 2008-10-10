@@ -3,12 +3,12 @@
 	File courtesy of http://wowwatcher.com/
 	Not currently generated from the database
 	This is a hand combined list from several sources
-	
+
 	TODO - ccox - this list is getting kinda big, can we compress this in any way?
 		maybe give ranges for contiguous items?
 			how many such groups do we have?
 			and could more be contiguous if we check the item numbers?
-		
+
 ]]
 NonDisenchantables = {
 	["192:0:0"] = true,
@@ -2059,7 +2059,7 @@ NonDisenchantables = {
 	["31614:0:0"] = true,
 	["31616:0:0"] = true,
 	["31618:0:0"] = true,
-	["31619:0:0"] = true,	
+	["31619:0:0"] = true,
 	["31619:0:0"] = true,
 	["31620:0:0"] = true,
 	["31621:0:0"] = true,

@@ -5,7 +5,7 @@
 
 	BeanCounterAPI - Functions for other addons to get BeanCounter Data
 	URL: http://auctioneeraddon.com/
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -34,13 +34,13 @@ lib.API = {}
 local private = lib.Private
 local private, print, get, set, _BC = lib.getLocals()
 
-local function debugPrint(...) 
+local function debugPrint(...)
     if get("util.beancounter.debugAPI") then
         private.debugPrint("BeanCounterAPI",...)
     end
 end
 --[[External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
-Can be item Name or Link or itemID 
+Can be item Name or Link or itemID
 If itemID or Link search will be faster than a plain text lookup
 ]]
 local SearchRequest = {}
@@ -54,15 +54,15 @@ function lib.API.search(name, settings, queryReturn, count)
 			SearchRequest = {}
 			SearchRequest[name] = 0
 		end
-		
+
 		--the function getItemInfo will return a plain text name on itemID or itemLink searches and nil if a plain text search is passed
 		local itemName, itemLink = private.getItemInfo(name, "itemid")
 		if not itemLink then itemName, itemLink = tostring(name) end
-		
+
 		if not settings then
-			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = private.frame.classicCheck:GetChecked(), 
+			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = private.frame.classicCheck:GetChecked(),
 						["bid"] = true, ["outbid"] = private.frame.bidFailedCheck:GetChecked(), ["auction"] = true,
-						["failedauction"] = private.frame.auctionFailedCheck:GetChecked() 
+						["failedauction"] = private.frame.auctionFailedCheck:GetChecked()
 						}
 		end
 		--search data
@@ -76,7 +76,7 @@ function lib.API.search(name, settings, queryReturn, count)
 			SearchRequest[1] = private.startSearch(itemName, settings, queryReturn, count)
 		end
 		--return data or displayItemName in select box
-		if queryReturn then 
+		if queryReturn then
 			return(SearchRequest[1])
 		else
 			if itemLink then
@@ -85,32 +85,32 @@ function lib.API.search(name, settings, queryReturn, count)
 				private.frame.searchBox:SetText(itemName)
 			end
 		end
-	end	
+	end
 end
 
 --[[ Returns the Sum of all AH sold vs AH buys along with the date range
 If no player name is supplied then the entire server profit will be totaled
 if no item name is provided then all items will be returned
-if no date range is supplied then a sufficently large range to cover the entire BeanCounter History will be used. 
+if no date range is supplied then a sufficently large range to cover the entire BeanCounter History will be used.
 ]]
 function lib.API.getAHProfit(player, item, lowDate, highDate)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 
-	local sum, high, low, number =  0, 0198796618, 2198796618 --high and low are date ranges that will always fall out of the BeanCounters range of Dates 
+	local sum, high, low, number =  0, 0198796618, 2198796618 --high and low are date ranges that will always fall out of the BeanCounters range of Dates
 	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true}
 	local tbl = private.startSearch(item, settings, "none")
-	
+
 	for i,v in pairs(tbl.completedAuctions) do
 		local Time = tonumber(v[5])
 		number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
-		--Allow the user to filter a time range to look at 
+		--Allow the user to filter a time range to look at
 		if lowDate and highDate then
-			if Time >= lowDate and Time <= highDate then  
+			if Time >= lowDate and Time <= highDate then
 				sum = sum + number
 			end
 		else --if no date ranges are supplied we find the min and max dates in the Database and return them as the range
-			if Time > high then high = Time elseif Time < low then low = Time end 
+			if Time > high then high = Time elseif Time < low then low = Time end
 			sum = sum + number
 		end
 	end
@@ -118,7 +118,7 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 		local Time = tonumber(v[5])
 		number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
 		if lowDate and highDate then
-			if Time >= lowDate and Time <= highDate then  
+			if Time >= lowDate and Time <= highDate then
 				sum = sum - number
 			end
 		else
@@ -137,9 +137,9 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 	if not days then days = 7 end
-	--Get data from BeanCounter 
-	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true} 
-	local tbl = private.startSearch(item, settings, "none") 
+	--Get data from BeanCounter
+	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true}
+	local tbl = private.startSearch(item, settings, "none")
 	--Merge and edit provided table to needed format
 	for i,v in pairs(tbl) do
 		for a,b in pairs(v) do
@@ -152,10 +152,10 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	if #tbl == 0 then return {0}, 0, 0 end
 	--sort by date
 	table.sort(tbl, function(a,b) return a[5] > b[5] end)
-	--get min and max dates.	
+	--get min and max dates.
 	local high, low, count, sum, number = tbl[1][5], tbl[#tbl][5], 1, 0, 0
 	local range = high - (days* 86400)
-	
+
 	tbl.sums = {}
 	tbl.sums[count] = {}
 	for i,v in ipairs(tbl) do
@@ -166,8 +166,8 @@ function lib.API.getAHProfitGraph(player, item ,days)
 			elseif v[4] == "Auction won" then
 				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
 				sum = sum - number
-			end 
-			tbl.sums[count] = sum	
+			end
+			tbl.sums[count] = sum
 		else
 			count = count + 1
 			range = range - (days * 86400)
@@ -179,7 +179,7 @@ function lib.API.getAHProfitGraph(player, item ,days)
 			elseif v[4] == "Auction won" then
 				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
 				sum = sum - number
-			end 
+			end
 			tbl.sums[count] = sum
 		end
 	end
@@ -196,7 +196,7 @@ we store itemKeys with a unique ID but our name array does not
 ]]
 function lib.API.getArrayItemLink(itemString)
 	local itemID, suffix = lib.API.decodeLink(itemString)
-	if BeanCounterDB.ItemIDArray[itemID..":"..suffix] then 
+	if BeanCounterDB.ItemIDArray[itemID..":"..suffix] then
 		return BeanCounterDB.ItemIDArray[itemID..":"..suffix]
 	end
 	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
@@ -237,19 +237,19 @@ end
 
 --[[Return REASON codes for tooltip or other use
 This allows a way to get it that wont break if I change the internal DB layout
-Pass a itemlink and stack count   
+Pass a itemlink and stack count
 Returns :  "Reason, time of purchase, what you payed"  or nil
 NOTE: Reason could possibly be "", decided to return data anyways, calling module can decide if it want to use data or not
 ]]
 function lib.API.getBidReason(itemLink, quantity)
 	if not itemLink or not quantity then return end
-	
+
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
-	
+
 	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
 		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
-			local quan, _, _, _, bid, _, Time, reason = string.split(";", v)			
+			local quan, _, _, _, bid, _, Time, reason = string.split(";", v)
 			if tonumber(quan) == tonumber(quantity) and reason and Time then
 				return reason, Time, tonumber(bid)
 			end
@@ -277,10 +277,10 @@ do
 		local caller, source, functionName =
 		debugstack(3):match(SOURCE_PATTERN),        -- Keep in mind this will be truncated to only the first in the tuple
 		debugstack(2):match(SOURCE_PATTERN);        -- This will give us both the source and the function name
-		
+
 		caller, source, functionName = caller or "Unknown.lua:000", source or "Unknown.lua:000", functionName or "Unknown" --Stop nil errors if data is missing
 		functionName = functionName .. "()";
-			
+
 		-- Check for this source & caller combination
 		seenCalls[source] = seenCalls[source] or {};
 		if not seenCalls[source][caller] then
@@ -301,8 +301,8 @@ do
 				(comments and "\n\n"..comments or "")
 				)
 		end
-		
+
 	end
-			
+
 end
 

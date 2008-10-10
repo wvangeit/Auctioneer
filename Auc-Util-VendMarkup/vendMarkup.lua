@@ -27,7 +27,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -86,7 +86,7 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 
 	local id = gui:AddTab(libName, libType.." Modules")
-	
+
 	gui:AddHelp(id, "what vendmarkup",
 		"What is the Vendor Markup module?",
 		"This module will give you the price to vendor an item multiplied by a percentage of that vendor's price to give you the vendor markup price.\n"..

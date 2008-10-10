@@ -3,8 +3,8 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
-	BeanCounterFrames - AuctionHouse UI for Beancounter 
+
+	BeanCounterFrames - AuctionHouse UI for Beancounter
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -32,7 +32,7 @@
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals()
 
-local function debugPrint(...) 
+local function debugPrint(...)
     if get("util.beancounter.debugFrames") then
         private.debugPrint("BeanCounterFrames",...)
     end
@@ -42,20 +42,20 @@ local frame
 function private.AuctionUI()
 	if frame then return end
 	frame = private.frame
-	
+
 	--Create the TAB
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("BeanCounter")
 	frame.ScanTab:Show()
-	
+
 	PanelTemplates_DeselectTab(frame.ScanTab)
-	
+
 	if AucAdvanced then
 		AucAdvanced.AddTab(frame.ScanTab, frame)
 	else
 		private.AddTab(frame.ScanTab, frame)
 	end
-	
+
 	function frame.ScanTab.OnClick(_, _, index)
 		if private.frame:GetParent() == BeanCounterBaseFrame then
 			BeanCounterBaseFrame:Hide()
@@ -63,9 +63,9 @@ function private.AuctionUI()
 			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
 			--private.frame:SetWidth(834.
 			--private.frame:SetHeight(450)
-			private.relevelFrame(frame)--make sure our frame stays in proper order		
+			private.relevelFrame(frame)--make sure our frame stays in proper order
 		end
-	
+
 		if not index then index = this:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
@@ -77,9 +77,9 @@ function private.AuctionUI()
 			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotLeft")
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
-			
+
 			--print(tab:GetName())
-			
+
 			if (AuctionDressUpFrame:IsVisible()) then
 				AuctionDressUpFrame:Hide()
 				AuctionDressUpFrame.reshow = true
@@ -94,13 +94,13 @@ function private.AuctionUI()
 			frame:Hide()
 		end
 	end
-	
+
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
 --Change parent to our GUI base frame/ Also used to display our Config frame
 function private.GUI(_, button)
 	if (button == "LeftButton") then
-		if private.frame:GetParent() == AuctionFrame then 
+		if private.frame:GetParent() == AuctionFrame then
 			private.frame:SetParent("BeanCounterBaseFrame")
 			private.frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
 		end
@@ -112,14 +112,14 @@ function private.GUI(_, button)
 		else
 			BeanCounterBaseFrame:Hide()
 		end
-	else 
+	else
 		if not lib.Gui:IsVisible() then
 			lib.Gui:Show()
 		else
 			lib.Gui:Hide()
 		end
 	end
-		
+
 end
 
 --Seperated frame items from frame creation, this should allow the same code to be reused for AH UI and Standalone UI
@@ -136,16 +136,16 @@ function private.CreateFrames()
 	})
 	base:SetBackdropColor(0,0,0, 1)
 	base:Hide()
-	
+
 	base:SetPoint("CENTER", UIParent, "CENTER")
 	base:SetWidth(834.5)
 	base:SetHeight(450)
-	
-	
+
+
 	base:SetMovable(true)
 	base:EnableMouse(true)
 	base:SetToplevel(true)
-	
+
 	base.Drag = CreateFrame("Button", nil, base)
 	base.Drag:SetPoint("TOPLEFT", base, "TOPLEFT", 10,-5)
 	base.Drag:SetPoint("TOPRIGHT", base, "TOPRIGHT", -10,-5)
@@ -154,7 +154,7 @@ function private.CreateFrames()
 
 	base.Drag:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.Drag:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
-	
+
 	base.DragBottom = CreateFrame("Button",nil, base)
 	base.DragBottom:SetPoint("BOTTOMLEFT", base, "BOTTOMLEFT", 10,5)
 	base.DragBottom:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10,5)
@@ -163,31 +163,31 @@ function private.CreateFrames()
 
 	base.DragBottom:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.DragBottom:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
-			
+
 	--Launch BeanCounter GUI Config frame
 	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
 	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
 	base.Config:SetScript("OnClick", function() base:Hide() end)
 	base.Config:SetText(_BC('UiDone'))
-			
+
 	--Create the Actual Usable Frame
 	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
 	private.frame = frame
 	frame:Hide()
-	
+
 	private.frame:SetPoint("TOPLEFT", base, "TOPLEFT")
 	private.frame:SetWidth(828)
-	private.frame:SetHeight(450)	
-	
+	private.frame:SetHeight(450)
+
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
-	title:SetText(_BC("UiAddonTitle")) 
+	title:SetText(_BC("UiAddonTitle"))
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-	
-	--Beginner Tooltips script display for all UI elements 
+
+	--Beginner Tooltips script display for all UI elements
 	function private.buttonTooltips(self, text)
 		if get("util.beancounter.displaybeginerTooltips") and text and self then
 			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
@@ -202,8 +202,8 @@ function private.CreateFrames()
 	frame.Config:SetText("Configure")
 	frame.Config:SetScript("OnEnter", function() private.buttonTooltips( frame.Config, "Opens the BeanCounter configuration window") end)
 	frame.Config:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	
+
+
 	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
 	function frame.IconClicked()
 		local objtype, _, link = GetCursorInfo()
@@ -211,12 +211,12 @@ function private.CreateFrames()
 		if objtype == "item" then
 			local itemID = lib.API.decodeLink(link)
 			local _, itemName =  lib.API.getItemString(link)
-			local itemTexture = select(2, private.getItemInfo(link, "name")) 
+			local itemTexture = select(2, private.getItemInfo(link, "name"))
 			frame.searchBox:SetText(itemName)
 			private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 		end
-	end 
-	
+	end
+
 	frame.slot = frame:CreateTexture(nil, "BORDER")
 	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 23, -125)
 	frame.slot:SetWidth(45)
@@ -233,13 +233,13 @@ function private.CreateFrames()
 	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
 	frame.icon:SetScript("OnEnter", function() private.buttonTooltips( frame.icon, "Drop an item here to start a search for it.\nDisplays current search's icon if possible") end)
 	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	--help text
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
 	frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
 	frame.slot.help:SetWidth(100)
-		
+
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.SelectBoxSetting = {"1","server"}
 	function private.ChangeControls(obj, arg1,arg2,...)
@@ -248,10 +248,10 @@ function private.CreateFrames()
 	--Default Server wide
 	--Used GLOBALSTRINGS for the horde alliance translations
 	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", FACTION_ALLIANCE.." ".._BC('UiData')},{"horde", FACTION_HORDE.." ".._BC('UiData')},}
-	for name,data in pairs(private.serverData) do 
+	for name,data in pairs(private.serverData) do
 		table.insert(vals,{name, name.." ".._BC('UiData')})
-	end	
-	
+	end
+
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
 	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-80)
@@ -261,7 +261,7 @@ function private.CreateFrames()
 	frame.selectbox.box:SetText(private.realmName.." ".._BC('UiData'))
 	frame.selectbox.box.button:SetScript("OnEnter", function() private.buttonTooltips( frame.selectbox.box.button, "Filter search results by server, player, faction") end)
 	frame.selectbox.box.button:SetScript("OnLeave", function() GameTooltip:Hide() end)
-		
+
 	--Search box
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
 	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -180)
@@ -273,8 +273,8 @@ function private.CreateFrames()
 	end)
 	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, "Enter search query's here or leave blank to search all") end)
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	
+
+
 	--Search Button
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
@@ -295,29 +295,29 @@ function private.CreateFrames()
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
+					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 				end
 			end
 		end
-	end	
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)	
-	
+	end
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)
+
 	function private.ClickLinkHook(itemString, link, button)
 			if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
 				local itemID = lib.API.decodeLink(link)
-				local _, itemName = lib.API.getItemString(link)				
+				local _, itemName = lib.API.getItemString(link)
 				local _, itemTexture = private.getItemInfo(link, "name")
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					--debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
+					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 				end
 			end
 		end
 	end
 	hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
-	
+
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
 	frame.exactCheck:SetChecked(get("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
@@ -332,19 +332,19 @@ function private.CreateFrames()
 	frame.classicCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
 	frame.classicCheck:SetScript("OnClick", function() local on if frame.classicCheck:GetChecked() then on = true end set("util.beancounter.ButtonClassicCheck", on) end)
 	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
-	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
+	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
 	frame.classicCheck:Hide()
 	frame.classicCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.classicCheck, "Display results from BeanCounter Classic Database") end)
 	frame.classicCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	--no need to show this button if theres no classic data to search
 	if BeanCounterAccountDB then
-		if BeanCounterAccountDB[private.realmName] then 
+		if BeanCounterAccountDB[private.realmName] then
 			frame.classicCheck:Show() --Show id classic has server data
 			frame.classicCheck:SetChecked(get("util.beancounter.ButtonClassicCheck")) --Recall last checked state
 		end
 	end
-	
+
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(get("util.beancounter.ButtonBidCheck"))
@@ -354,8 +354,8 @@ function private.CreateFrames()
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
 	frame.bidCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, "Display items bought from the Auction House") end)
 	frame.bidCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	
+
+
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
 	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) end)
@@ -364,7 +364,7 @@ function private.CreateFrames()
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, "Display items you were outbided on.") end)
 	frame.bidFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(get("util.beancounter.ButtonAuctionCheck"))
@@ -374,17 +374,17 @@ function private.CreateFrames()
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
 	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, "Display items sold at the Auction House") end)
 	frame.auctionCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	
+
+
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
 	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) end)
 	frame.auctionFailedCheck:SetScale(0.85)
-	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions')) 
+	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions'))
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
 	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, "Display items you failed to sell.") end)
 	frame.auctionFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-		
+
 	--[[search Purchases (vendor/trade)
 	frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
 	frame.buyCheck:SetChecked(true)
@@ -395,7 +395,7 @@ function private.CreateFrames()
 	frame.sellCheck:SetChecked(true)
 	getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
 	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
-		
+
 	--Create the results window
 	frame.resultlist = CreateFrame("Frame", nil, frame)
 	frame.resultlist:SetBackdrop({
@@ -404,13 +404,13 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	
+
 	frame.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
 	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
 	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 3, 0)
 	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
-	
-	--Scripts that are executed when we mouse over a TOOLTIP frame	
+
+	--Scripts that are executed when we mouse over a TOOLTIP frame
 	function private.scrollSheetOnEnter(button, row, index)
 		local link, name, _
 		link = frame.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
@@ -425,7 +425,7 @@ function private.CreateFrames()
 			else
 				GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
 			end
-		end			
+		end
         end
 	function private.scrollSheetOnLeave(button, row, index)
 		GameTooltip:Hide()
@@ -433,33 +433,33 @@ function private.CreateFrames()
 	--records the column width changes
 	 --store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column,  width)
-		if not width then 
+		if not width then
 			set("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
 			self.labels[column].button:SetWidth(get("columnwidth."..self.labels[column]:GetText()))
 		else
 			set("columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
-		
+
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ _BC('UiNameHeader'), "TOOLTIP",  get("columnwidth.".._BC('UiNameHeader')) },
 		{ _BC('UiTransactions'), "TEXT", get("columnwidth.".._BC('UiTransactions')) },
-		
+
 		{_BC('UiBidTransaction') , "COIN", get("columnwidth.".._BC('UiBidTransaction')) },
 		{ _BC('UiBuyTransaction') , "COIN", get("columnwidth.".._BC('UiBuyTransaction')) },
 		{ _BC('UiNetHeader'), "COIN", get("columnwidth.".._BC('UiNetHeader')) },
 		{ _BC('UiQuantityHeader'), "TEXT", get("columnwidth.".._BC('UiQuantityHeader')) },
-		{ _BC('UiPriceper'), "COIN", get("columnwidth.".._BC('UiPriceper')) }, 
-		
+		{ _BC('UiPriceper'), "COIN", get("columnwidth.".._BC('UiPriceper')) },
+
 		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", get("columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer) },
-				
+
 		{ _BC('UiDepositTransaction'), "COIN", get("columnwidth.".._BC('UiDepositTransaction')) },
-		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) }, 
-		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) }, 
+		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) },
+		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) },
 		{ _BC('UiDateHeader'), "text", get("columnwidth.".._BC('UiDateHeader')) },
 	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
-	--Add tooltip help to the scrollframe headers	
+	--Add tooltip help to the scrollframe headers
 	for i = 1, #frame.resultlist.sheet.labels do
 		local self = frame.resultlist.sheet.labels[i].button
 		local text = frame.resultlist.sheet.labels[i]:GetText()
@@ -467,15 +467,15 @@ function private.CreateFrames()
 		self:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	end
 
-		
+
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
-		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), 
+		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(),
 			["bid"] = frame.bidCheck:GetChecked(), ["failedbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked(),
-			["failedauction"] = frame.auctionFailedCheck:GetChecked() 
+			["failedauction"] = frame.auctionFailedCheck:GetChecked()
 			}
 	end
-		
+
 	private.CreateMailFrames()
 
 end
@@ -485,21 +485,21 @@ function private.CreateMailFrames()
 	frame:Hide()
 	private.MailGUI = frame
 	local count, total = 0,0
-	
+
 	frame:SetPoint("TOPLEFT", MailFrame, "TOPLEFT", 19,-71)
 	frame:SetPoint("BOTTOMRIGHT", MailFrame, "BOTTOMRIGHT", -39,115)
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("CENTER", frame, "CENTER", 0,60)
 	title:SetText("BeanCounter is recording your mail")
-	
+
 	local body = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	body:SetPoint("CENTER", frame, "CENTER", 0, 30)
 	body:SetText("Please do not close the mail frame or")
 	local body1 = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	body1:SetPoint("CENTER", frame, "CENTER", 0,0)
 	body1:SetText("Auction Items will not be recorded")
-		
+
 	local countdown = frame:CreateFontString("BeanCounterMailCount", "OVERLAY", "GameFontNormalLarge")
 	private.CountGUI = countdown
 	countdown:SetPoint("CENTER", frame, "CENTER", 0, -60)
@@ -601,13 +601,13 @@ end
 function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	if not itemLink then return end
 	if not get("util.beancounter.displayReasonCodeTooltip") then return end
-	
+
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	debugPrint("Add to Tooltip", itemLink, reason)
 	if not reason then return end
 	if reason == "" then reason = "Unknown" end
 	Time = SecondsToTime((time() - Time))
-	
+
 	EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, Time ), tonumber(bid))
 	EnhTooltip.LineColor(0.9,0.6,0.2)
 end

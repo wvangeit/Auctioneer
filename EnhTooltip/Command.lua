@@ -22,7 +22,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
@@ -64,7 +64,7 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 				gui:Hide()
 			else
 				gui:Show()
-			end		
+			end
 		else
 			private.Print("Configator library is not found. Can't open configuration UI")
 		end
@@ -101,7 +101,7 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 		else
 			private.Print("Unknown option for show argument: ", subcommand)
 		end
-		
+
 		local state
 		if subcommand2 == "on" then
 			state = true
@@ -110,8 +110,8 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 		else
 			private.Print("Unknown state for show argument: ", subcommand2)
 		end
-				
-		if optionName or (state ~= nil) then	
+
+		if optionName or (state ~= nil) then
 			EnhTooltip.Settings.SetSetting(optionName, state)
 			private.Print("Enhanced tooltip for ", subcommand, " is now ",subcommand2)
 		end
@@ -124,8 +124,8 @@ function private.CommandHandler(command, subcommand, subcommand2, ...)
 			private.Print("External calls are now allowed")
 		else
 			private.Print("Unknown state for block argument: ", subcommand)
-		end		
-	else	
+		end
+	else
 		-- No match found
 		private.Print("Unable to find command: ", command)
 		private.Print("Type {{/ett help}} for help")

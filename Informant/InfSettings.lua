@@ -26,11 +26,11 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		
-		
+
+
 data layout:
 		InformantConfig = {
 
@@ -342,64 +342,64 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab(_INFM("GuiTabGeneral"))
 	gui:AddControl(id, "Header",     0,    _INFM("GuiGeneralOptions"))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "all", _INFM('GuiMainEnable') )
 	gui:AddTip(id, _INFM('HelpOnoff'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "embed", _INFM('GuiEmbed') )
 	gui:AddTip(id, _INFM('HelpEmbed'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-name", _INFM('GuiInfoName'))
 	gui:AddTip(id, _INFM('HelpName'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _INFM('GuiVendor'))
 	gui:AddTip(id, _INFM('HelpVendor'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-buy", _INFM('GuiVendorBuy'))
 	gui:AddTip(id, _INFM('HelpVendorBuy'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-sell", _INFM('GuiVendorSell'))
 	gui:AddTip(id, _INFM('HelpVendorSell'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-usage", _INFM('GuiInfoUsage'))
 	gui:AddTip(id, _INFM('HelpUsage'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-stack", _INFM('GuiInfoStack'))
 	gui:AddTip(id, _INFM('HelpStack'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _INFM('GuiInfoMerchant'))
 	gui:AddTip(id, _INFM('HelpMerchant'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('GuiInfoNoMerchants'))
 	gui:AddTip(id, _INFM('HelpZeroMerchants'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _INFM('GuiInfoQuest'))
 	gui:AddTip(id, _INFM('HelpQuest'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-icon", _INFM('GuiInfoIcon'))
 	gui:AddTip(id, _INFM('HelpIcon'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-ilevel", _INFM('GuiInfoILevel'))
 	gui:AddTip(id, _INFM('HelpILevel'))
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _INFM('GuiInfoLink'))
 	gui:AddTip(id, _INFM('HelpLink'))
-	
+
 	-- TODO - localize me!
 	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", "Automatically update item information at merchants")
 	gui:AddTip(id, "Allow Informant to scan your bags and merchant inventory for updates")
-	
+
 	-- TODO - localize me!
 	gui:AddHelp(id, "what is",
 		"What is Informant?",
 		"Informant provides extra information about items in tooltips, in an information window, and to other addons."
 	)
-	
+
 	gui:AddHelp(id, "how to use information window",
 		"How do I use the Information Window?",
 		"You can bind a key to toggle the Informant information window to get more detailed information about items.  To do this, you need to open game options, select \"Key Bindings\" and look for Informant: Toggle Information Window."
 	)
-	
+
 
 	id = gui:AddTab(_INFM("GuiTabProfiles"))
 	gui:AddControl(id, "Header",     0,    _INFM("GuiConfigProfiles"))
@@ -407,18 +407,18 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    _INFM("GuiActivateProfile"))
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
 	gui:AddTip(id, "Select the profile that you wish to use for this character")	-- TODO - localize me!
-	
+
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", _INFM("GuiDeleteProfileButton"))
 	gui:AddTip(id, "Deletes the currently selected profile")	-- TODO - localize me!
-	
+
 	gui:AddControl(id, "Button",     0, 1, "profile.default", _INFM("GuiResetProfileButton"))
 	gui:AddTip(id, "Reset all settings for the current profile")	-- TODO - localize me!
 
 	gui:AddControl(id, "Subhead",    0,    _INFM("GuiCreateReplaceProfile"))
-	
+
 	gui:AddControl(id, "Text",       0, 1, "profile.name", _INFM("GuiNewProfileName"))
 	gui:AddTip(id, "Enter the name of the profile that you wish to create")	-- TODO - localize me!
-	
+
 	gui:AddControl(id, "Button",     0, 1, "profile.save", _INFM("GuiSaveProfileButton"))
 	gui:AddTip(id, "Click this button to create or overwrite the specified profile name")	-- TODO - localize me!
 

@@ -24,7 +24,7 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
+		You have an implicit license to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
@@ -96,13 +96,13 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	end
 	array.g_price = price
 	array.g_seen = seen or 0
-	
+
 	if AucAdvanced.Settings.GetSetting("stat.wowecon.useglobal") then
 		array.price = array.g_price
 		array.seen = array.g_seen
 		array.specific = false
 	end
-	
+
 	return array
 end
 
@@ -142,7 +142,7 @@ function private.SetupConfigGui(gui)
 		"fewer data points, causing your server specific price to "..
 		"possibly get out of whack for some items.  This option lets you force the "..
 		"Wowecon stat to always use global prices, if you'd prefer.")
-	
+
 	gui:AddHelp(id, "prices dont match",
 		"The Wowecon price used by Appraiser doesn't match the Wowecon tooltip.  What gives?",
 		"Wowecon gives you the option to hide server specific prices if seen "..
@@ -167,7 +167,7 @@ function private.SetupConfigGui(gui)
 		"price data that WOWEcon displays by default, since WOWEcon can get very "..
 		"specific with the data that it returns. Enabling this option will let you "..
 		"see the exact price that this module is reporting for the current item.")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", "Enable WOWEcon Stats")
