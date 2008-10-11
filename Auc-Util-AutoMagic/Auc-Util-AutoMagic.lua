@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
-	Version: 5.0.PRE.3312 (BillyGoat)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
