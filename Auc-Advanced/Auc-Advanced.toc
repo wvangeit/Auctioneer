@@ -27,7 +27,6 @@ CorePost.lua
 CoreSettings.lua
 CoreBuy.lua
 CoreScan.lua
-CoreReport.lua
 CoreAPI.lua
 
 Modules\Active.xml
