@@ -38,6 +38,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local libName = "Disenchant"
 local lcName = libName:lower()
@@ -221,4 +222,3 @@ function lib:setup(gui)
 	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Auction fees basis")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
 end
-

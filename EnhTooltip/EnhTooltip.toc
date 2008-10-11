@@ -10,6 +10,7 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
+Support\Load.xml
 
 Libs\Load.xml
 TinyMoneyFrame.lua

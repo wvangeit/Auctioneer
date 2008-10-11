@@ -30,6 +30,8 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 		Many thanks to the folks at http://www.wowhead.com for providing much of this data.
 --]]
+Informant_RegisterRevision("$URL$", "$Rev$")
+
 -- Numeric Codes and the Skills associated with them.
 Informant.SetSkills({
 	[171]="Alchemy",

@@ -12,6 +12,7 @@
 ## Revision: $Id$
 ## URL: http://enchantrix.org
 ##
+Support\Load.xml
 EnxManifest.lua
 
 Libs\Load.xml

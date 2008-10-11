@@ -28,6 +28,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals()
@@ -611,6 +612,3 @@ function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
 	EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, Time ), tonumber(bid))
 	EnhTooltip.LineColor(0.9,0.6,0.2)
 end
-
-
-

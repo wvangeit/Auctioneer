@@ -29,6 +29,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 EnchantrixBarkerLocalizations = {
 

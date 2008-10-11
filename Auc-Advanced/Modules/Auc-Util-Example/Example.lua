@@ -9,7 +9,10 @@
 
 ]]
 
-return --Comment out this return to see the example module running.
+if true then
+	 --Comment out this return to see the example module running.
+	 return
+end
 
 --^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^--
 

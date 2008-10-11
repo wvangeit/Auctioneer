@@ -38,6 +38,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 -- If auctioneer is not loaded, then we cannot run.
 if not (AucAdvanced or (Auctioneer and Auctioneer.Statistic)) then return end
@@ -265,4 +266,3 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "Use Market Matching values from Appraiser:")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".buyout.check", "Use Buyout Price instead of Bid Price:")
 end
-

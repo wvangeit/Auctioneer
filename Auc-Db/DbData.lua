@@ -1,3 +1,5 @@
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
+
 if not AucDB then return end
 
 local lib = AucDB

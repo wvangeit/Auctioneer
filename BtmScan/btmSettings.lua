@@ -59,6 +59,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local lib = {}
 BtmScan.Settings = lib
@@ -394,16 +395,14 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar", true)
-	if SlideBar then
-		sideIcon = SlideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
-		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-		sideIcon:SetScript("OnClick", lib.Toggle)
-		sideIcon.tip = {
-			"Bottom Scanner",
-			"Bottom Scanner allows you to continually scan the Auction House's new auctions for bargains. When it finds a good deal, it will ask you if you wish to purchase it.",
-			"{{Click}} to edit the configuration options.",
-		}
-	end
+local SlideBar = LibStub:GetLibrary("SlideBar", true)
+if SlideBar then
+	sideIcon = SlideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
+	sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+	sideIcon:SetScript("OnClick", lib.Toggle)
+	sideIcon.tip = {
+		"Bottom Scanner",
+		"Bottom Scanner allows you to continually scan the Auction House's new auctions for bargains. When it finds a good deal, it will ask you if you wish to purchase it.",
+		"{{Click}} to edit the configuration options.",
+	}
 end

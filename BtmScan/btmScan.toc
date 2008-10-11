@@ -11,7 +11,7 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/BottomScanner/
 ##
-
+Support\Load.xml
 Libs\Load.xml
 
 btmObject.lua

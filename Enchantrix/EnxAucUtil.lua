@@ -30,9 +30,9 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
 ]]
+Enchantrix_RegisterRevision("$URL$","$Rev$")
 
 -- Provide fixed price data by registering ourselves as a bonafide legitimate AuctioneerAdvanced module.
-
 if (not AucAdvanced) then return end
 
 local lib = {}

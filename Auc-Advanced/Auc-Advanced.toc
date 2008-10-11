@@ -12,8 +12,8 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
-CoreManifest.lua
 Support\Load.xml
+CoreManifest.lua
 Libs\Load.xml
 
 CoreStrings.lua

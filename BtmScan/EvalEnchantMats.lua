@@ -47,7 +47,7 @@
 		me through my basic programming mistakes. also thanks to chardonnay
 		and iain who posted baserules for me to copy off.
 ]]
-
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local libName = "Enchant Mats"			-- I'd love to use "Enchanting Materials" but the UI isn't too savvy about long names
 local lcName = libName:lower()

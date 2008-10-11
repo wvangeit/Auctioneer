@@ -39,19 +39,16 @@ manifest.revs = { }
 manifest.dist = {
 --[[<%revisions%>]]}
 
+local libRevision = LibStub("LibRevision")
 function manifest.RegisterRevision(path, revision)
-	local _,_, file = path:find("%$URL: .*/enchantrix/([^%$]+) %$")
-	local _,_, rev = revision:find("%$Rev: (%d+) %$")
+	local detail, file, rev = libRevision:Set(path,revision,"5.1.DEV.", 'auctioneer', 'libs')
 	if not file then return end
-	if not rev then rev = 0 else rev = tonumber(rev) or 0 end
-
 	manifest.revs[file] = rev
 	if (nLog) then
 		nLog.AddMessage("Enchantrix", "EnxRevision", N_INFO, "Loaded revisioned file", "Loaded", file, "revision", rev)
 	end
 end
 Enchantrix_RegisterRevision = manifest.RegisterRevision
-
 
 function manifest.ShowMessage(msg)
 	local messageFrame = manifest.messageFrame

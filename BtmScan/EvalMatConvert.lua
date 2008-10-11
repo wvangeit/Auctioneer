@@ -44,6 +44,7 @@ tooltip line, it will add the line to the "open" tooltip, it is possible for it 
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local libName = "EMatsConvert"
 local lcName = libName:lower()

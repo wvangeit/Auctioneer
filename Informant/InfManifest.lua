@@ -40,9 +40,9 @@ manifest.revs = { }
 manifest.dist = {
 --[[<%revisions%>]]}
 
+local libRevision = LibStub("LibRevision")
 function manifest.RegisterRevision(path, revision)
-	local _,_, file = path:find("%$URL: .*/informant/([^%$]+) %$")
-	local _,_, rev = revision:find("%$Rev: (%d+) %$")
+	local detail, file, rev = libRevision:Set(path,revision,"5.1.DEV.", 'auctioneer', 'libs')
 	if not file then return end
 	if not rev then rev = 0 else rev = tonumber(rev) or 0 end
 

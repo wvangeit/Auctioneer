@@ -28,6 +28,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 -- Barker namespace
 Barker = {

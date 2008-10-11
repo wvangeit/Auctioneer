@@ -38,6 +38,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 -- If auctioneer is not loaded, then we cannot run.
 if not (AucAdvanced or (Auctioneer and Auctioneer.Statistic)) then return end
@@ -221,4 +222,3 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
 	gui:AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average re-listings: %0.1fx")
 end
-

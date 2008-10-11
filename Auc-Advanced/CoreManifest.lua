@@ -72,23 +72,32 @@ end
 AucAdvanced = {}
 local lib = AucAdvanced
 
+lib.Version="<%version%>";
+if (lib.Version == "<".."%version%>") then
+	lib.Version = "5.1.DEV";
+end
+local major, minor, release, revision = strsplit(".", lib.Version)
+lib.MajorVersion = major
+lib.MinorVersion = minor
+lib.RelVersion = release
+lib.Revision = revision
+
+local versionPrefix = lib.MajorVersion.."."..lib.MinorVersion.."."..lib.RelVersion.."."
+
+lib.moduledetail = {}
 lib.revisions = {}
 lib.distribution = {--[[<%revisions%>]]} --Currently unused, needs a change in the build script
 
+local libRevision = LibStub("LibRevision")
+
 function lib.RegisterRevision(path, revision)
-	if (not path and revision) then
-		return
+	if (not path and revision) then return end
+
+	local detail, file, rev = libRevision:Set(path, revision, versionPrefix, "auctioneer", "libs")
+	if file then
+		lib.revisions[file] = rev
 	end
-
-	local file = path:match("%$URL: .*/auctioneer/([^%$]+) %$")
-	local rev = revision:match("(%d+)")
-
-	if (not file) then
-		return
-	end
-	rev = tonumber(rev) or 0
-
-	lib.revisions[file] = rev
+	return detail, file, rev
 end
 
 function lib.GetCurrentRevision()

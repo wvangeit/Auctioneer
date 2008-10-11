@@ -42,11 +42,6 @@ if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 
-AucAdvanced.Version="<%version%>";
-if (AucAdvanced.Version == "<".."%version%>") then
-	AucAdvanced.Version = "5.0.DEV";
-end
-
 local private = {}
 
 -- For our modular stats system, each stats engine should add their
@@ -274,4 +269,5 @@ end
 function AucAdvanced.Debug.Assert(test, message)
 	return DebugLib.Assert(addonName, test, message)
 end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

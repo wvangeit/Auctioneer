@@ -33,6 +33,8 @@
 --	AucAdvanced.Print("BeanCounter not loaded")
 --	return
 --end
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
+
 if not AucAdvanced then return end
 
 local libType, libName = "Match", "BeanCount"
@@ -220,5 +222,3 @@ function private.SetupConfigGui(gui)
 	--gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.matchstacksize", "Seprerate data by stack size. Only available if Use recent data is set")
 	--gui:AddTip(id, "Only use data for the current stack size.")
 end
-
-AucAdvanced.RegisterRevision("$URL$", "$Rev$")

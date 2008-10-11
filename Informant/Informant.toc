@@ -10,6 +10,7 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Informant
+Support\Load.xml
 InfManifest.lua
 
 Libs\Load.xml

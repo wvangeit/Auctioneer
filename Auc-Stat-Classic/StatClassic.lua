@@ -417,3 +417,4 @@ function private.StoreData(ItemString, median, seen, ahKey)
 	data[ahKey][ItemString] = PriceString
 end
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

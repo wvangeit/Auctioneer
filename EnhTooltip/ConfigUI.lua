@@ -59,6 +59,7 @@ Usage:
 	val = EnhTooltip.Settings.GetSetting('suppressEnhancedTooltip')
 	EnhTooltiprix.Settings.SetSetting('suppressEnhancedTooltip', true );
 ]]
+LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 -- TODO
 -- Remove debug output

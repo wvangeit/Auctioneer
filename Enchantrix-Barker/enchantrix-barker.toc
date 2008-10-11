@@ -10,6 +10,7 @@
 ## Revision: $Id$
 ## URL: http://enchantrix.org
 ##
+Support\Load.xml
 BarkerManifest.lua
 
 BarkerObjects.lua
