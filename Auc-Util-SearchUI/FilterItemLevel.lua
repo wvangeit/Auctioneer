@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is a plugin module for the SearchUI that assists in searching by refined paramaters
+	This is a plugin module for the SearchUI that assists in searching by refined parameters
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -70,11 +70,13 @@ function lib:MakeGuiConfig(gui)
 			default("ignoreitemlevel.filter."..name, false)
 		end
 	end
-
+-- Assume valid minimum item level is 1 and valid max item level is 200 (for rare BoE WotLK craftables).
+-- Configure slider controls to reflect this range of values.
+-- See norganna.org JIRA ASER-106 for additional info about this assumption.
 	gui:AddControl(id, "Subhead",     0,  "Minimum itemLevels by Type")
 	for i = 1, 13 do
-		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 1, 140, 1, "Min iLevel for "..typename[i]..": %s")
 		default("ignoreitemlevel.minlevel."..typename[i], 61)
+		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 1, 200, 1, "Min iLevel for "..typename[i]..": %s")
 	end
 end
 
