@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - EasyBuyout Utility Module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EasyBuyout.lua 3054 2008-04-27 23:07:17Z MentalPower $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced module that does something nifty.
@@ -364,4 +364,4 @@ function private.EasyBidAuction(getID)
     CloseAuctionStaticPopups();
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/Modules/Auc-Util-EasyBuyout/EasyBuyout.lua $", "$Rev: 3054 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

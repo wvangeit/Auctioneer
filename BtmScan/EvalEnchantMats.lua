@@ -1,6 +1,6 @@
 --[[
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EvalEnchantMats.lua 2193 2007-09-18 06:10:48Z mentalpower $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 

@@ -1,7 +1,7 @@
 --[[
 	BottomScanner - An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: FilterItemQuality.lua 2311 2007-10-09 15:10:00Z rockslice $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Mail-GUI.lua 3108 2008-05-14 02:52:35Z testleK $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -247,4 +247,4 @@ function lib.makeconfirmsellui()
 end
 
 lib.makeconfirmsellui()
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/ConfirmSellUI.lua $", "$Rev: 3108 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
