@@ -70,13 +70,14 @@ function lib:MakeGuiConfig(gui)
 			default("ignoreitemlevel.filter."..name, false)
 		end
 	end
--- Assume valid minimum item level is 1 and valid max item level is 200 (for rare BoE WotLK craftables).
+
+-- Assume valid minimum item level is 0 and valid max item level is 225.
 -- Configure slider controls to reflect this range of values.
--- See norganna.org JIRA ASER-106 for additional info about this assumption.
+-- See norganna.org JIRA ASER-106 for additional info about this value range.
 	gui:AddControl(id, "Subhead",     0,  "Minimum itemLevels by Type")
 	for i = 1, 13 do
 		default("ignoreitemlevel.minlevel."..typename[i], 61)
-		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 1, 200, 1, "Min iLevel for "..typename[i]..": %s")
+		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 0, 225, 1, "Min iLevel for "..typename[i]..": %s")
 	end
 end
 
