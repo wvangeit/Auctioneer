@@ -93,7 +93,7 @@ default("general.maxbuy", 999999999)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	id = gui:AddTab(lib.tabname, "Searchers")
+	local id = gui:AddTab(lib.tabname, "Searchers")
 
 	-- Add the help
 	gui:AddSearcher("Parameter", "Search for items by general properties such as name, level etc", 100)
