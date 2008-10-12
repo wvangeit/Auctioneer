@@ -722,6 +722,23 @@ function private.snatch()
 	print("SearchUI will now snatch "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
 end
 
+local function keyPairs(t,f)
+	local a, i = {}, 0
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a, f)
+	local iter = function ()
+		i = i + 1
+		if a[i] == nil then return nil
+		else return a[i], t[a[i]] end
+	end
+	return iter
+end
+
+function lib.AddSearcher(gui, searchType, searchDetail, searchPos)
+	if not gui.searchers[searchPos] then gui.searchers[searchPos] = {} end
+	gui.searchers[searchPos][searchType] = searchDetail
+end
+
 function lib.MakeGuiConfig()
 	if gui then return end
 
@@ -730,13 +747,20 @@ function lib.MakeGuiConfig()
 	local id, last, cont
 	local selected
 
-	gui = Configator:Create(setter,getter, 900, 500, 0, 300)
+	gui = Configator:Create(setter,getter, 900, 500, 0, 220)
+	gui.expandGap = 20
+	gui.expandOnActivate = true
+
+	gui.searchers = {}
+	gui.AddSearcher = function (self, searchType, searchDetail, searchPos)
+		lib.AddSearcher(self, searchType, searchDetail, searchPos)
+	end
 
 	private.gui = gui
 	gui.frame = CreateFrame("Frame", nil, gui)
 	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25)
 	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0)
-	gui.frame:SetHeight(275)
+	gui.frame:SetHeight(200)
 	gui.frame:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
 		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
@@ -860,9 +884,15 @@ function lib.MakeGuiConfig()
 	gui.Search:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.Search:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
-	gui:AddCat("Searches")
+	gui:AddCat("Welcome")
+
+	id = gui:AddTab("About")
+	gui.aboutTab = id
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Subhead",    0,    "About the SearchUI")
+
+	gui:AddCat("Searchers")
 	gui:AddCat("Filters")
-	id = gui:AddTab("General parameters", "Searches") -- Merely a place holder
 
 	id = gui:AddTab("Saved Searches", "Options")
 	gui:AddControl(id, "Header",     0,    "Saved Searches")
@@ -1037,6 +1067,31 @@ function lib.MakeGuiConfig()
 	for name, callback in pairs(private.callbacks) do
 		callback(gui)
 	end
+
+	-- Add the welcome text now
+	local b = "  |TInterface\\QuestFrame\\UI-Quest-BulletPoint.blp:13|t "
+	local w = ""
+	w=w.."The Auctioneer Search UI is here to assist you in finding the Auctions that are of special interest to you.\n"
+	w=w.."\n"
+	w=w.."It has 2 modes of operation:\n"
+	w=w..b.."Offline - Searches are applied against the current data\n"
+	w=w..b.."Realtime - Searches are applied against the realtime scans of the AH\n"
+	w=w.."\n"
+	w=w.."There are also 2 types of searching modules that exist in the Search UI:\n"
+	w=w..b.."Searchers - Searches for a specific set of criteria, only 1 searcher is active at once\n"
+	w=w..b.."Filters - All filters always apply their criteria, excluding non-matching items from the search.\n"
+	w=w.."\n"
+	w=w.."In order to begin using the Search UI, you should first setup your filters to exclude the items you don't wish to find, then select a searcher to perform a search.\n"
+	w=w.."\n"
+	w=w.."Here's a quick list of the searchers and filters that you may wish to investigate:\n" 
+	for pos, sdata in keyPairs(gui.searchers) do
+		for searchType, searchDetail in keyPairs(sdata) do
+			w=w..b.."|cffffce00"..searchType.."|r - "..searchDetail.."\n" 
+		end
+	end
+	
+	gui:AddControl(gui.aboutTab, "Note", 0, 1, nil, nil, w)
+	gui:ActivateTab(gui.aboutTab)
 end
 
 local sideIcon
@@ -1223,6 +1278,9 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 end
 
 local PerformSearch = function()
+	if gui.tabs.active then
+		gui:ContractFrame(gui.tabs.active)
+	end
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
 	local scandata = replicate((AucAdvanced.Scan.GetScanData()))
@@ -1285,7 +1343,7 @@ function private.OnUpdate()
 		end
 	end
 	if gui and gui:IsShown() then
-		if gui.config.selectedCat == "Searches" then
+		if gui.config.selectedCat == "Searchers" then
 			if not gui.Search:IsShown() then
 				gui.Search:Show()
 			end

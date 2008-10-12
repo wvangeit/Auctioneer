@@ -143,8 +143,13 @@ default("converter.enableDepleted", true)--................
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
 
+	-- Add the help
+	gui:AddSearcher("Converter", "Search for items which can be converted into other items for profit (essences, motes, etc)", 100)
+	gui:AddHelp(id, "converter searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for items that can be converted to another item which is worth more money.")
 
 	local last = gui:GetLast(id)
 	gui:AddControl(id, "Header",     0,      "Converter search criteria")

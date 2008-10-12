@@ -44,6 +44,12 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
+	-- Add the help
+	gui:AddSearcher("Time Left", "Filter out items based on how long is left for the auction", 600)
+	gui:AddHelp(id, "timeleft filter",
+		"What does this filter do?",
+		"This filter provides the ability to filter out items that have more than a given amount of time left at auction. It can selectively apply it's filters only for certain types of searches.")
+
 	gui:AddControl(id, "Header",     0,      "TimeLeft Filter Criteria")
 
 	local last = gui:GetLast(id)

@@ -69,6 +69,12 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
+	-- Add the help
+	gui:AddSearcher("ItemQuality", "Filter items by quality and type", 600)
+	gui:AddHelp(id, "itemquality filter",
+		"What does this filter do?",
+		"This filter provides the ability to filter out specific item types which have a given quality. It can selectively apply it's filters only for certain types of searches.")
+
 	gui:AddControl(id, "Header",     0,      "ItemQuality Filter Criteria")
 
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemquality.enable", "Enable ItemQuality filtering")

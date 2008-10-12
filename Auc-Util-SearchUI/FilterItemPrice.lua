@@ -119,6 +119,12 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
 
+	-- Add the help
+	gui:AddSearcher("Item Price", "Filter specific items by their price", 600)
+	gui:AddHelp(id, "itemprice filter",
+		"What does this filter do?",
+		"This filter provides the ability to exclude specific items that exceed a certain \"ignore\" price. You can selectively apply this filter to specific searches.")
+
 	gui:AddControl(id, "Header",     0,      "ItemPrice Filter Criteria")
 
 	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemprice.enable", "Enable ItemPrice filtering")

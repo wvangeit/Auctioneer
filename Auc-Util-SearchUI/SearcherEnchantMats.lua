@@ -144,8 +144,20 @@ default("enchantmats.PriceAdjust."..NEXUS, 100)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
 	gui:MakeScrollable(id)
+
+	-- Add the help
+	gui:AddSearcher("Enchant Mats", "Search for items which will disenchant for you into given reagents (for levelling)", 100)
+	gui:AddHelp(id, "enchantmats searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for items which will disenchant into the reagents you need to have in order to level your enchanting skill. It is not a searcher meant for profit, but rather least cost for levelling.")
+
+	if not (Enchantrix and Enchantrix.Storage) then
+		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
+		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with EnchantMats")
+		return
+	end
 
 	gui:AddControl(id, "Header",     0,      "EnchantMats search criteria")
 

@@ -43,7 +43,13 @@ default("vendor.allow.buy", true)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
+
+	-- Add the help
+	gui:AddSearcher("Vendor", "Search for items which can be resold to the vendor for profit", 100)
+	gui:AddHelp(id, "vendor searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to find items which are below the price that a vendor would buy the item for. Using this searcher, you can buy these items and then take them to the vendor to cash in.")
 
 	gui:AddControl(id, "Header",     0,      "Vendor search criteria")
 

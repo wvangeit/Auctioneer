@@ -49,11 +49,17 @@ local frame
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
 	gui:MakeScrollable(id)
+
+	-- Add the help
+	gui:AddSearcher("Snatch", "Search for items which you want to buy when they are available for less than a given price", 100)
+	gui:AddHelp(id, "snatch searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to snap up items which meet your fixed price constraints. It is useful whenever you say \"I always want to buy this when it is cheaper that X/item\".")
+
 	--we add a single invisible element to set the normal gui
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")

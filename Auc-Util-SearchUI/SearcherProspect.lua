@@ -47,7 +47,13 @@ default("prospect.allow.buy", true)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
+
+	-- Add the help
+	gui:AddSearcher("Prospect", "Search for items which will prospect for you into given reagents (for levelling)", 100)
+	gui:AddHelp(id, "prospect searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for items which will prospect into the reagents you need to have in order to level your gemcrafting skill. It is not a searcher meant for profit, but rather least cost for levelling.")
 
 	if not (Enchantrix and Enchantrix.Storage) then
 		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")

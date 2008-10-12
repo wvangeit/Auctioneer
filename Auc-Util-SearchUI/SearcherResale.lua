@@ -48,7 +48,13 @@ default("resale.allow.buy", true)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
+
+	-- Add the help
+	gui:AddSearcher("Resale", "Search for undervalued items which can be directly resold for profit", 100)
+	gui:AddHelp(id, "resale searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for items that are being sold under market value, and which you can resell for profit after the fees and deposits are accounted for.")
 
 	gui:AddControl(id, "Header",     0,      "Resale search criteria")
 

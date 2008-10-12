@@ -47,7 +47,13 @@ default("disenchant.allow.buy", true)
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
+
+	-- Add the help
+	gui:AddSearcher("Disenchant", "Search for items which can be disenchanted, prospected or milled for profit", 100)
+	gui:AddHelp(id, "disenchant searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for items that are able to be disenchanted, prospected, or milled into items that on average will have a greater value than the purchase price of the given item.")
 
 	if not (Enchantrix and Enchantrix.Storage) then
 		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")

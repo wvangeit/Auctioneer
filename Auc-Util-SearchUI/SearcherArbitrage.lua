@@ -94,8 +94,14 @@ default("arbitrage.search.style", "Cross-Faction")
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
-	local id = gui:AddTab(lib.tabname, "Searches")
+	local id = gui:AddTab(lib.tabname, "Searchers")
 	gui:MakeScrollable(id)
+
+	-- Add the help
+	gui:AddSearcher("Arbitrage", "Find items which can be neutral, cross-faction or cross-realm traded", 100)
+	gui:AddHelp(id, "arbitrage searcher",
+		"What does this searcher do?",
+		"This searcher provides the ability to search for specific items that can be traded to neutral, cross faction or cross realm for a profit.")
 
 	gui:AddControl(id, "Header",     0,      "Arbitrage search criteria")
 
