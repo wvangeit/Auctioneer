@@ -99,11 +99,13 @@ function private.GetPriceData()
 				if recount >= count/4 then
 					Qone = i*stattable["step"]
 				end
-			elseif median == 0 then
+			end
+			if median == 0 then
 				if recount >= count/2 then
 					median = i*stattable["step"]
 				end
-			elseif Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
+			end
+			if Qthree == 0 and count > 4 then--Q3 is meaningless with very little data
 				if recount >= count * 3/4 then
 					Qthree = i*stattable["step"]
 				end
