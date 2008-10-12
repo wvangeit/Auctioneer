@@ -1010,6 +1010,7 @@ StorePageFunction = function()
 			coroutine.yield()
 		end
 		local itemLink = GetAuctionItemLink("list", i)
+		itemLink = AucAdvanced.FixLichLink(itemLink)
 		if itemLink then
 			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
 		 	local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)

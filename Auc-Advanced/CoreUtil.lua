@@ -157,18 +157,26 @@ end
 function lib.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
-		local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed = breakHyperlink("Hitem:", 6, strsplit("|", link))
+		local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed, lichKing = breakHyperlink("Hitem:", 6, strsplit("|", link))
 		if (lType ~= "item") then return end
 		id = tonumber(id) or 0
 		enchant = tonumber(enchant) or 0
 		suffix = tonumber(suffix) or 0
 		seed = tonumber(seed) or 0
 		local factor = lib.GetFactor(suffix, seed)
-		return lType, id, suffix, factor, enchant, seed
+		return lType, id, suffix, factor, enchant, seed, lichKing
 	elseif (vartype == "number") then
 		return "item", link, 0, 0, 0, 0
 	end
 	return
+end
+
+--forces the lvl indicator added in wow 3.0 to be 80, to ensure links remain the same internally between characters
+--only use on itemlinks
+function lib.FixLichLink(link)
+	if not link then return end
+	link = link:gsub("(.*:).-(|h)", "%10%2")
+	return link
 end
 
 function lib.GetFaction()

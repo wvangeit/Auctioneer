@@ -640,6 +640,7 @@ function lib.GetLinkFromSig(sig)
 
 	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
 	name, link = GetItemInfo(link)
+	link = AucAdvanced.FixLichLink(link)
 	return link, name -- name is ignored by most calls
 end
 

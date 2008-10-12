@@ -176,6 +176,8 @@ function lib.ScanPage()
 	local batch = GetNumAuctionItems("list")
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
+		link = AucAdvanced.FixLichLink(link)
+		private.CurAuction["link"] = AucAdvanced.FixLichLink(private.CurAuction["link"])
 		if link == private.CurAuction["link"] then
 			local price = private.CurAuction["price"]
 			local buy = private.CurAuction["buyout"]
