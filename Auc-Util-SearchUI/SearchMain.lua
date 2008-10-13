@@ -177,8 +177,10 @@ end
 -- Default setting values
 local settingDefaults = {
 	["searchspeed"] = 100,
-	["reserve"] = 1,
+	["reserve"] = 0,
+	["reserve.enable"] = false,
 	["maxprice"] = 10000000,
+	["maxprice.enable"] = false,
 	["tooltiphelp.show"] = true,
 }
 
@@ -848,9 +850,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",           0,    "Setup general options")
 	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search process priority: %s")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "reserve", 1, 99999999, "Reserve Amount")
+	gui:AddControl(id, "Checkbox",         0, 1, "reserve.enable", "Enable reserve amount:")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "reserve", 0, 99999999, "Reserve Amount")
 	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxprice", 1, 99999999, "Maximum Price")
+	gui:AddControl(id, "Checkbox",         0, 1, "maxprice.enable", "Enable maximum price:")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 99999999, "Maximum Price")
+	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 
 	gui:AddControl(id, "Subhead",          0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",          0, 1, "tooltiphelp.show", "Show tooltip help over buttons")
@@ -1133,11 +1138,14 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		else
 			item["reason"] = searcher.tabname
 		end
+		local enablemax = lib.GetSetting("maxprice.enable")
 		local maxprice = lib.GetSetting("maxprice") or 10000000
+		local enableres = lib.GetSetting("reserve.enable")
 		local reserve = lib.GetSetting("reserve") or 1
+
 		local balance = GetMoney()
 
-		if (cost <= maxprice) and ((balance-cost) > reserve) then
+		if (cost <= maxprice or not enablemax) and ((balance-cost) > reserve or not enableres) then
 			--Check to see whether the item already exists in the results table
 			local isdupe = false
 			if not nodupes then
@@ -1201,7 +1209,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 				end
 				return true, item["profit"], value
 			end
-		elseif cost > maxprice then
+		elseif cost > maxprice and not enablemax then
 			return false, "Price higher than maxprice"
 		else
 			return false, "Balance lower than reserve"

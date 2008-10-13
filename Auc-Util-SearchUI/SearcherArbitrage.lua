@@ -70,7 +70,6 @@ function private.getRealmList()
 	realms[current] = curPlayer
 	
 	for realm,_ in pairs(realms) do
-		p("Processing", realm)
 		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
 			realm = strsub(realm, 1, (strlen(realm)-9))
 		end
@@ -82,7 +81,6 @@ function private.getRealmList()
 		end
 		if current ~= realm then
 			table.insert(private.realmlist, realm)
-			p("inserting", realm)
 		end
 	end
 	return private.realmlist
