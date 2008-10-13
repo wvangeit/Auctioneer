@@ -44,6 +44,8 @@ private.sheetData = {}
 private.isSearching = false
 local coSearch
 local SettingCache = {}
+local currentSettings = {}
+local hasUnsaved = nil
 
 private.tleft = {
 	"|cff000001|cffe5e5e530m", -- 30m
@@ -203,22 +205,31 @@ local function initData()
 		AucAdvancedData.UtilSearchUiData = data
 	end
 	if not data.SavedSearches then data.SavedSearches = {} end
-	if not data.Settings then data.Settings = {} end
 	if not data.Global then data.Global = {} end
 	initData = function() end
+end
+
+local function isGlobalSetting(setting)
+	local a,b,c = strsplit(".", setting)
+	if a == "configator" then return true end
 end
 
 local function setter(setting, value)
 	AucAdvancedData.UtilSearchUI = nil -- Remove old settings
 	initData()
 
-	local db = AucAdvancedData.UtilSearchUiData.Settings
+	local db = currentSettings
 
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
+	end
+
+	if (isGlobalSetting(setting)) then
+		AucAdvancedData.UtilSearchUiData.Global[setting] = value
+		return
 	end
 
 	-- for defaults, just remove the value and it'll fall through
@@ -232,7 +243,7 @@ local function setter(setting, value)
 	end
 	db[setting] = value
 
-	AucAdvancedData.UtilSearchUiData.Unsaved = true
+	hasUnsaved = true
 	lib.UpdateSave()
 
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -253,7 +264,13 @@ end
 
 local function getter(setting)
 	initData()
-	local db = AucAdvancedData.UtilSearchUiData.Settings
+	local db = currentSettings
+
+	if (isGlobalSetting(setting)) then
+		local value = AucAdvancedData.UtilSearchUiData.Global[setting]
+		if value then return value end
+		return getDefault(setting)
+	end
 
 	if ( db[setting] ~= nil ) then
 		return db[setting]
@@ -522,9 +539,9 @@ function lib.LoadSearch()
 		message("SearchUI warning:\nThat search does not exist, please select an available search from the menu.")
 		return
 	end
-	AucAdvancedData.UtilSearchUiData.Settings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name]) 
+	currentSettings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name]) 
 	AucAdvancedData.UtilSearchUiData.Selected = name
-	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	hasUnsaved = nil
 	lib.UpdateSave()
 	gui:Refresh()
 end
@@ -532,9 +549,9 @@ end
 function lib.SaveSearch()
 	initData()
 	local name = gui.saves.name:GetText()
-	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(AucAdvancedData.UtilSearchUiData.Settings) 
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(currentSettings) 
 	AucAdvancedData.UtilSearchUiData.Selected = name
-	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	hasUnsaved = nil
 	lib.UpdateSave()
 	gui:Refresh()
 end
@@ -543,7 +560,7 @@ function lib.DeleteSearch()
 	initData()
 	local name = gui.saves.name:GetText()
 	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = nil
-	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	hasUnsaved = nil
 	AucAdvancedData.UtilSearchUiData.Selected = ""
 	gui.saves.name:SetText("")
 	lib.UpdateSave()
@@ -552,8 +569,8 @@ end
 
 function lib.ResetSearch()
 	initData()
-	AucAdvancedData.UtilSearchUiData.Settings = {}
-	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	currentSettings = {}
+	hasUnsaved = nil
 	AucAdvancedData.UtilSearchUiData.Selected = ""
 	gui.saves.name:SetText("")
 	lib.UpdateSave()
@@ -571,7 +588,7 @@ function lib.UpdateSave()
 			gui.saves.name:SetTextColor(1, 1, 1, 1)
 			curColor = "white"
 		end
-	elseif AucAdvancedData.UtilSearchUiData.Unsaved then
+	elseif hasUnsaved then
 		if curColor ~= "red" then
 			gui.saves.name:SetTextColor(1, 0.5, 0.1, 1)
 			curColor = "red"
