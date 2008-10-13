@@ -99,6 +99,7 @@ do
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
         if not itemLink then return; end
+		local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
         -- Look up in the cache if it's recent enough
         local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
@@ -125,8 +126,8 @@ do
         -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax = 0, #pdfList;
         for _, engine in ipairs(engines) do
-            local i, min, max = engine.pdf(itemLink, serverKey);
-            local priceArray = engine.array(itemLink, serverKey);
+            local i, min, max = engine.pdf(saneLink, serverKey);
+            local priceArray = engine.array(saneLink, serverKey);
 
             if priceArray and (priceArray.seen or 0) > seen then
                 seen = priceArray.seen;
@@ -263,19 +264,21 @@ do
 end
 
 function lib.ClearItem(itemLink, serverKey)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules("ClearItem")
 	for pos, engineLib in ipairs(modules) do
-		engineLib.ClearItem(itemLink, serverKey)
+		engineLib.ClearItem(saneLink, serverKey)
 	end
 end
 
 function lib.GetAlgorithms(itemLink)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetPrice or engineLib.GetPriceArray then
 			if not engineLib.IsValidAlgorithm
-			or engineLib.IsValidAlgorithm(itemLink) then
+			or engineLib.IsValidAlgorithm(saneLink) then
 				local engine = engineLib.GetName()
 				table.insert(engines, engine)
 			end
@@ -285,11 +288,12 @@ function lib.GetAlgorithms(itemLink)
 end
 
 function lib.IsValidAlgorithm(algorithm, itemLink)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 			if engineLib.IsValidAlgorithm then
-				return engineLib.IsValidAlgorithm(itemLink)
+				return engineLib.IsValidAlgorithm(saneLink)
 			end
 			return true
 		end
@@ -315,15 +319,16 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
     end
     serverKey = serverKey or AucAdvanced.GetFaction()
 
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		engine = engineLib.GetName()
 		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 			if engineLib.IsValidAlgorithm
-			and not engineLib.IsValidAlgorithm(itemLink) then
+			and not engineLib.IsValidAlgorithm(saneLink) then
 				return
 			end
-			local algosig = strjoin(":", algorithm, itemLink, serverKey)
+			local algosig = strjoin(":", algorithm, saneLink, serverKey)
 			for pos, history in ipairs(private.algorithmstack) do
 				if (history == algosig) then
 					-- We are looping
@@ -339,13 +344,13 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 			local price, seen, array
 			table.insert(private.algorithmstack, algosig)
 			if (engineLib.GetPriceArray) then
-				array = engineLib.GetPriceArray(itemLink, serverKey)
+				array = engineLib.GetPriceArray(saneLink, serverKey)
 				if (array) then
 					price = array.price
 					seen = array.seen
 				end
 			else
-				price = engineLib.GetPrice(itemLink, serverKey)
+				price = engineLib.GetPrice(saneLink, serverKey)
 			end
 			table.remove(private.algorithmstack, -1)
 			return price, seen, array
@@ -364,6 +369,11 @@ function lib.QueryImage(query, faction, realm, ...)
 
 	local prevQuery = private.prevQuery
 	local curResults = private.curResults
+
+	local saneQueryLink
+	if query.link then
+		saneQueryLink = AucAdvanced.SanitizeLink(query.link)
+	end
 
 	local invalid = false
 	for k,v in pairs(prevQuery) do
@@ -386,7 +396,7 @@ function lib.QueryImage(query, faction, realm, ...)
 			if (not data) then break end
 			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
 			if query.filter and query.filter(data, ...) then break end
-			if query.link and data[Const.LINK] ~= query.link then break end
+			if query.link and data[Const.LINK] ~= saneQueryLink then break end
 			if query.itemId and data[Const.ITEMID] ~= query.itemId then break end
 			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
 			if query.factor and data[Const.FACTOR] ~= query.factor then break end
@@ -460,6 +470,7 @@ end
 --Market matcher APIs
 private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
     if reserved then
         lib.ShowDeprecationAlert("AucAdvanced.API.GetBestMatch(itemLink, algorithm, serverKey)",
@@ -476,16 +487,16 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
     local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
 	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 
-	local matchers = lib.GetMatchers(itemLink)
+	local matchers = lib.GetMatchers(saneLink)
 	local total, count, diff, _ = 0, 0, 0
 
 
 	local priceArray = {}
 
 	if algorithm == "market" then
-		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, serverKey)
+		priceArray.price, priceArray.seen = lib.GetMarketValue(saneLink, serverKey)
 	elseif type(algorithm) == "string" then
-		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
+		_, _, priceArray = lib.GetAlgorithmValue(algorithm, saneLink, serverKey)
 	else
 		priceArray.price = algorithm
 	end
@@ -493,8 +504,8 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	local InfoString = ""
 	if not priceArray or not priceArray.price then return end
 	for index, matcher in ipairs(matchers) do
-		if lib.IsValidMatcher(matcher, itemLink) then
-			local value, MatchpriceArray = lib.GetMatcherValue(matcher, itemLink, priceArray.price)
+		if lib.IsValidMatcher(matcher, saneLink) then
+			local value, MatchpriceArray = lib.GetMatcherValue(matcher, saneLink, priceArray.price)
 			priceArray.price = value
 			count = count + 1
 			diff = diff + MatchpriceArray.diff
@@ -525,13 +536,14 @@ function lib.GetMatcherDropdownList()
 end
 
 function lib.GetMatchers(itemLink)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetMatchArray then
 			if not engineLib.IsValidMatcher
-			or engineLib.IsValidMatcher(itemLink) then
+			or engineLib.IsValidMatcher(saneLink) then
 				local engine = engineLib.GetName()
 				table.insert(engines, engine)
 			end
@@ -561,13 +573,14 @@ function lib.GetMatchers(itemLink)
 end
 
 function lib.IsValidMatcher(matcher, itemLink)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		local engine = engineLib.GetName()
 		if engine == matcher and engineLib.GetMatchArray then
 			if engineLib.IsValidMatcher then
-				return engineLib.IsValidMatcher(itemLink)
+				return engineLib.IsValidMatcher(saneLink)
 			end
 			return engineLib
 		end
@@ -576,12 +589,13 @@ function lib.IsValidMatcher(matcher, itemLink)
 end
 
 function lib.GetMatcherValue(matcher, itemLink, price)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	if (type(matcher) == "string") then
-		matcher = lib.IsValidMatcher(matcher, itemLink)
+		matcher = lib.IsValidMatcher(matcher, saneLink)
 	end
 	if not matcher then return end
 	--If matcher is not a table at this point, the following code will throw an "attempt to index a <something> value" type error
-	local matchArray = matcher.GetMatchArray(itemLink, price)
+	local matchArray = matcher.GetMatchArray(saneLink, price)
 	if not matchArray then
 		matchArray = {}
 		matchArray.value = price
@@ -595,14 +609,15 @@ end
 -- Allows the return of Appraiser price values to other functions.
 -- If Appraiser is not loaded it uses Market Price
 function lib.GetAppraiserValue(itemLink, useMatching)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
 	if not AucAdvanced.Modules.Util.Appraiser then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(itemLink)
+		newBuy, seen = AucAdvanced.API.GetMarketValue(saneLink)
 		curModelText = "Market"
 		return newBuy, newBuy, seen, curModelText
 	end
 
-	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, 0, useMatching)
+	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(saneLink, 0, useMatching)
 	lib.ShowDeprecationAlert("AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching)");
 
 	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
@@ -638,9 +653,9 @@ function lib.GetLinkFromSig(sig)
 	if not factor then factor = "0" end
 	if not enchant then enchant = "0" end
 
-	link = ("item:%d:%d:0:0:0:0:%d:%d"):format(id, enchant, suffix, factor)
+	link = ("item:%d:%d:0:0:0:0:%d:%d:0"):format(id, enchant, suffix, factor)
 	name, link = GetItemInfo(link)
-	link = AucAdvanced.FixLichLink(link)
+	link = AucAdvanced.SanitizeLink(link)
 	return link, name -- name is ignored by most calls
 end
 

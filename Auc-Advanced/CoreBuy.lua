@@ -89,7 +89,8 @@ function lib.CanBuy(price, seller)
 end
 
 function lib.PushSearch()
-	private.CurAuction["link"] = private.BuyRequests[1][1]
+	local link = private.BuyRequests[1][1]
+	private.CurAuction["link"] = AucAdvanced.SanitizeLink(link)
 	private.CurAuction["sellername"] = private.BuyRequests[1][2]
 	private.CurAuction["count"] = private.BuyRequests[1][3]
 	private.CurAuction["minbid"] = private.BuyRequests[1][4]
@@ -176,8 +177,7 @@ function lib.ScanPage()
 	local batch = GetNumAuctionItems("list")
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
-		link = AucAdvanced.FixLichLink(link)
-		private.CurAuction["link"] = AucAdvanced.FixLichLink(private.CurAuction["link"])
+		link = AucAdvanced.SanitizeLink(link)
 		if link == private.CurAuction["link"] then
 			local price = private.CurAuction["price"]
 			local buy = private.CurAuction["buyout"]

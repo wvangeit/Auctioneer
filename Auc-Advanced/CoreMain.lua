@@ -65,7 +65,9 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 		AucAdvanced.Scan.GetImage()
 	end
 
-	AucAdvanced.SendProcessorMessage("tooltip", frame, name, hyperlink, quality, quantity, cost, additional)
+	local saneLink = AucAdvanced.SanitizeLink(hyperlink)
+
+	AucAdvanced.SendProcessorMessage("tooltip", frame, name, saneLink, quality, quantity, cost, additional)
 end
 
 function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
