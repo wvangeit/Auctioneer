@@ -1411,7 +1411,7 @@ BtmScan.UndoTooltip = function ()
 	GameTooltip:Hide()
 end
 
-function BtmScan.AuctionFrameTabClickHook(_,_, index)
+function BtmScan.AuctionFrameTabClickHook(self, _,_, index)
 	if (not index) then index = this:GetID() end
 
 	local tab = getglobal("AuctionFrameTab"..index)
