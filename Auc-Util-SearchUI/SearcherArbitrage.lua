@@ -60,7 +60,17 @@ function private.getRealmList()
 	local found = false
 	private.realmlist = {}
 	local _,current,_ = AucAdvanced.GetFaction()
-	for realm,_ in pairs(AucAdvancedData["UtilSearchUI"]) do
+
+	local realms = AucAdvancedData.AserArbitrageRealms
+	if not realms then
+		realms = {}
+		AucAdvancedData.AserArbitrageRealms = realms
+	end
+	local curPlayer = UnitName("player")
+	realms[current] = curPlayer
+	
+	for realm,_ in pairs(realms) do
+		p("Processing", realm)
 		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
 			realm = strsub(realm, 1, (strlen(realm)-9))
 		end
@@ -72,6 +82,7 @@ function private.getRealmList()
 		end
 		if current ~= realm then
 			table.insert(private.realmlist, realm)
+			p("inserting", realm)
 		end
 	end
 	return private.realmlist

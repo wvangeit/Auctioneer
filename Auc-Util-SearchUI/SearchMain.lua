@@ -166,38 +166,6 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	end
 end
 
-local function getProfileParamName()
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local realmKey = AucAdvanced.GetFaction()
-	if not realmKey then
-		return
-	end
-	if (not AucAdvancedData.UtilSearchUI[realmKey]) then AucAdvancedData.UtilSearchUI[realmKey] = {} end
-	return AucAdvancedData.UtilSearchUI[realmKey]["lastProfile"] or realmKey
-end
-
-local function getProfileParam()
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local realmKey = AucAdvanced.GetFaction()
-	if not realmKey then
-		return
-	end
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local SearchUISettings = AucAdvancedData.UtilSearchUI
-	local profileName = getProfileParamName()
-	if (not SearchUISettings["profile."..profileName]) then
-		if profileName ~= realmKey then
-			profileName = realmKey
-			SearchUISettings[realmKey]["lastProfile"] = realmKey
-		end
-		if profileName == realmKey then
-			SearchUISettings["profile."..profileName] = {}
-		end
-	end
-	return SearchUISettings["profile."..profileName]
-end
-
-
 local function cleanse( search )
 	if (search) then
 		search = {}
@@ -227,15 +195,24 @@ function lib.SetDefault(setting, default)
 	settingDefaults[setting] = default
 end
 
-local function setter(setting, value)
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local realmKey = AucAdvanced.GetFaction()
-	if not realmKey then
-		return
+local function initData()
+	local data = AucAdvancedData.UtilSearchUiData
+	if not data then
+		data = {}
+		data.Version = 1
+		AucAdvancedData.UtilSearchUiData = data
 	end
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local SearchUISettings = AucAdvancedData.UtilSearchUI
-	local currentProfile = SearchUISettings[realmKey]["lastProfile"]
+	if not data.SavedSearches then data.SavedSearches = {} end
+	if not data.Settings then data.Settings = {} end
+	if not data.Global then data.Global = {} end
+	initData = function() end
+end
+
+local function setter(setting, value)
+	AucAdvancedData.UtilSearchUI = nil -- Remove old settings
+	initData()
+
+	local db = AucAdvancedData.UtilSearchUiData.Settings
 
 	-- turn value into a canonical true or false
 	if value == 'on' then
@@ -250,175 +227,13 @@ local function setter(setting, value)
 		value = nil
 	end
 
-	--[[
-	gui:AddControl(id, "Selectbox",  0, 1, "search.load", "profile", "Load search")
-	gui:AddControl(id, "Button",     0, 1, "search.delete", "Delete search")
-	cont = gui:GetLast(id)
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Subhead",    0.5,    "Save current search")
-	gui:AddControl(id, "Text",       0.5, 1, "search.name", "Name this search")
-	last = gui:GetLast(id)
-	gui:AddControl(id, "Button",     0.7, 1, "search.save", "Save now")
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.5, 1, "search.new", "New search")
-	]]
-	local a,b,c = strsplit(".", setting)
-	if (a == "search") then
-		if (setting == "search.new") then
-			value = "Custom"
-
-			-- Create the new search
-			SearchUISettings["profile."..value] = {}
-
-			-- Set the current search to the new profile
-			SearchUISettings[realmKey]["lastProfile"] = value
-
-			-- Get the new current profile
-			local newSearch = getProfileParam()
-
-			-- Clean it out and then resave all data
-			cleanse(newSearch)
-
-			-- Add the new profile to the profiles list
-			local profiles = SearchUISettings["profiles"]
-			if (not profiles) then
-				profiles = { realmKey }
-				SearchUISettings["profiles"] = profiles
-			end
-
-			-- Check to see if it already exists
-			local found = false
-			for pos, name in ipairs(profiles) do
-				if (name == value) then found = true end
-			end
-
-			-- If not, add it and then sort it
-			if (not found) then
-				table.insert(profiles, value)
-				table.sort(profiles)
-			end
-
-		elseif (setting == "search.save") then
-			value = gui.elements["search.name"]:GetText()
-
-			-- Create the new profile
-			SearchUISettings["profile."..value] = replicate(getProfileParam() or {})
-
-			-- Set the new profile to the current setup
-			SearchUISettings[realmKey]["lastProfile"] = value
-			-- Get the new current profile
-			local newSearch = getProfileParam()
-
-			-- Add the new profile to the profiles list
-			local profiles = SearchUISettings["profiles"]
-			if (not profiles) then
-				profiles = { realmKey }
-				SearchUISettings["profiles"] = profiles
-			end
-
-			-- Check to see if it already exists
-			local found = false
-			for pos, name in ipairs(profiles) do
-				if (name == value) then found = true end
-			end
-
-			-- If not, add it and then sort it
-			if (not found) then
-				table.insert(profiles, value)
-				table.sort(profiles)
-			end
-
-		elseif (setting == "search.delete") then
-			-- User clicked the Delete button, see what the select box's value is.
-			value = gui.elements["profile"].value
-
-			-- If there's a profile name supplied
-			if (value) then
-				-- Clean it's profile container of values
-				cleanse(SearchUISettings["profile."..value])
-
-				-- Delete it's profile container
-				SearchUISettings["profile."..value] = nil
-
-				-- Find it's entry in the profiles list
-				local profiles = SearchUISettings["profiles"]
-				if (profiles) then
-					for pos, name in ipairs(profiles) do
-						-- If this is it, then extract it
-						if (name == value and name ~= realmKey) then
-							table.remove(profiles, pos)
-						end
-					end
-				end
-
-				-- If the user was using this one, then move them to Default
-				if (getProfileParamName() == value) then
-					SearchUISettings[realmKey]["lastProfile"] = realmKey
-				end
-			end
-
-		elseif (setting == "search.default") then
-			-- User clicked the reset settings button
-
-			-- Get the current profile from the select box
-			value = gui.elements["profile"].value
-
-			-- Clean it's profile container of values
-			SearchUISettings["profile."..value] = {}
-			-- Set the current profile to the default profile
-			SearchUISettings[realmKey]["lastProfile"] = realmKey
-
-		elseif (setting == "profile") then
-			-- User selected a different value in the select box, get it
-			value = gui.elements["profile"].value
-
-			-- Change the user's current profile to this new one
-			SearchUISettings[realmKey]["lastProfile"] = value
-
-		end
-
-		-- Refresh all values to reflect current data
-		gui:Refresh()
-	else
-		-- If the user tries to modify a saved search, we switch to custom profile
-		if currentProfile ~= "Custom" then
-			if SearchUISettings["profile.Custom"] then
-				empty(SearchUISettings["profile.Custom"])
-			else
-				SearchUISettings["profile.Custom"] = {}
-			end
-
-			SearchUISettings["profile.Custom"] = replicate(SearchUISettings["profile."..setting])
-
-			-- Set the last profile to custom
-			currentProfile = "Custom"
-			SearchUISettings[realmKey]["lastProfile"] = currentProfile
-
-			-- Add the new profile to the profiles list
-			local profiles = SearchUISettings["profiles"]
-			if (not profiles) then
-				profiles = { realmKey }
-				SearchUISettings["profiles"] = profiles
-			end
-
-			-- Check to see if it already exists
-			local found = false
-			for pos, name in ipairs(profiles) do
-				if (name == currentProfile) then found = true end
-			end
-
-			-- If not, add it and then sort it
-			if (not found) then
-				table.insert(profiles, currentProfile)
-				table.sort(profiles)
-			end
-		end
-
-		-- Set the value for this setting in the current search
-		local db = getProfileParam()
-		if db[setting] == value then return end
-		db[setting] = value
+	if db[setting] == value then
+		return
 	end
+	db[setting] = value
+
+	AucAdvancedData.UtilSearchUiData.Unsaved = true
+	lib.UpdateSave()
 
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
@@ -437,43 +252,9 @@ function lib.SetSetting(...)
 end
 
 local function getter(setting)
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local realmKey = AucAdvanced.GetFaction()
-	if not realmKey then
-		return
-	end
-	if (not AucAdvancedData.UtilSearchUI) then AucAdvancedData.UtilSearchUI = {} end
-	local SearchUISettings = AucAdvancedData.UtilSearchUI
-	if not setting then return end
+	initData()
+	local db = AucAdvancedData.UtilSearchUiData.Settings
 
-	local a,b,c = strsplit(".", setting)
-	if (a == 'profile') then
-		if (b == 'profiles') then
-			local pList = SearchUISettings["profiles"]
-			if (not pList) then
-				pList = { realmKey }
-			end
-			--Make sure the current realm is included in the list
-			local hasRealm = false
-			for i,j in pairs(pList) do
-				if j == realmKey then
-					hasRealm = true
-					break
-				end
-			end
-			if not hasRealm then
-				table.insert(pList, realmKey)
-				table.sort(pList)
-			end
-			return pList
-		end
-	end
-
-	if (setting == 'profile') then
-		return getProfileParamName()
-	end
-
-	local db = getProfileParam()
 	if ( db[setting] ~= nil ) then
 		return db[setting]
 	else
@@ -734,6 +515,75 @@ local function keyPairs(t,f)
 	return iter
 end
 
+function lib.LoadSearch()
+	initData()
+	local name = gui.saves.name:GetText()
+	if not AucAdvancedData.UtilSearchUiData.SavedSearches[name] then
+		message("SearchUI warning:\nThat search does not exist, please select an available search from the menu.")
+		return
+	end
+	AucAdvancedData.UtilSearchUiData.Settings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name]) 
+	AucAdvancedData.UtilSearchUiData.Selected = name
+	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	lib.UpdateSave()
+	gui:Refresh()
+end
+
+function lib.SaveSearch()
+	initData()
+	local name = gui.saves.name:GetText()
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(AucAdvancedData.UtilSearchUiData.Settings) 
+	AucAdvancedData.UtilSearchUiData.Selected = name
+	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	lib.UpdateSave()
+	gui:Refresh()
+end
+
+function lib.DeleteSearch()
+	initData()
+	local name = gui.saves.name:GetText()
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = nil
+	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	AucAdvancedData.UtilSearchUiData.Selected = ""
+	gui.saves.name:SetText("")
+	lib.UpdateSave()
+	gui:Refresh()
+end
+
+function lib.ResetSearch()
+	initData()
+	AucAdvancedData.UtilSearchUiData.Settings = {}
+	AucAdvancedData.UtilSearchUiData.Unsaved = nil
+	AucAdvancedData.UtilSearchUiData.Selected = ""
+	gui.saves.name:SetText("")
+	lib.UpdateSave()
+	gui:Refresh()
+end
+
+local curColor = "white"
+function lib.UpdateSave()
+	if not gui then return end
+	if not AucAdvancedData.UtilSearchUiData then return end
+
+	local name = gui.saves.name:GetText()
+	if AucAdvancedData.UtilSearchUiData.Selected ~= name then
+		if curColor ~= "white" then
+			gui.saves.name:SetTextColor(1, 1, 1, 1)
+			curColor = "white"
+		end
+	elseif AucAdvancedData.UtilSearchUiData.Unsaved then
+		if curColor ~= "red" then
+			gui.saves.name:SetTextColor(1, 0.5, 0.1, 1)
+			curColor = "red"
+		end
+	else
+		if curColor ~= "green" then
+			gui.saves.name:SetTextColor(0.3, 1, 0.3, 1)
+			curColor = "green"
+		end
+	end
+end
+
 function lib.AddSearcher(gui, searchType, searchDetail, searchPos)
 	if not gui.searchers[searchPos] then gui.searchers[searchPos] = {} end
 	gui.searchers[searchPos][searchType] = searchDetail
@@ -747,9 +597,12 @@ function lib.MakeGuiConfig()
 	local id, last, cont
 	local selected
 
-	gui = Configator:Create(setter,getter, 900, 500, 0, 220)
-	gui.expandGap = 20
+	gui = Configator:Create(setter,getter, 900, 500, 5, 350, 20, 5)
+	gui:SetBackdropColor(0,0,0,1)
+
+	gui.expandGap = 25
 	gui.expandOnActivate = true
+	gui.autoScrollTabs = true
 
 	gui.searchers = {}
 	gui.AddSearcher = function (self, searchType, searchDetail, searchPos)
@@ -760,7 +613,7 @@ function lib.MakeGuiConfig()
 	gui.frame = CreateFrame("Frame", nil, gui)
 	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25)
 	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0)
-	gui.frame:SetHeight(200)
+	gui.frame:SetHeight(335)
 	gui.frame:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
 		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
@@ -768,6 +621,84 @@ function lib.MakeGuiConfig()
 		insets = { left = 32, right = 32, top = 32, bottom = 32 }
 	})
 	gui.frame:SetBackdropColor(0, 0, 0, 1)
+
+	gui.saves = CreateFrame("Frame", nil, gui)
+	gui.saves:SetPoint("TOPRIGHT", gui, "TOPRIGHT", -5,-7)
+	gui.saves:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 10,0)
+	gui.saves:SetHeight(28)
+--	gui.saves:SetBackdrop({
+--		bgFile = "Interface/Tooltips/ChatBubble-Background",
+--		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+--		tile = true, tileSize = 32, edgeSize = 18,
+--		insets = { left = 20, right = 20, top = 20, bottom = 20 }
+--	})
+--	gui.saves:SetBackdropColor(0, 0, 0, 1)
+
+	gui.saves.title = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	gui.saves.title:SetPoint("LEFT", gui.saves, "LEFT", 10,0)
+	gui.saves.title:SetText("Saved searches:")
+
+	gui.saves.name = CreateFrame("EditBox", "SearchUiSaveName", gui.saves, "InputBoxTemplate")
+	gui.saves.name:SetPoint("LEFT", gui.saves.title, "RIGHT", 10,0)
+	gui.saves.name:SetAutoFocus(false)
+	gui.saves.name:SetWidth(220)
+	gui.saves.name:SetHeight(18)
+
+	if AucAdvancedData.UtilSearchUiData then
+		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or "" 
+		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
+			gui.saves.name:SetText(curSearch)
+			lib.LoadSearch()
+		else
+			gui.saves.name:SetText("")
+			lib.ResetSearch()
+		end
+	end
+
+	local SelectBox = LibStub:GetLibrary("SelectBox")
+
+	gui.saves.select = SelectBox:Create("SearchUiSaveSelect", gui.saves, 200, function(pos, key, value)
+		gui.saves.name:SetText(value)
+	end, function ()
+		local saves = AucAdvancedData.UtilSearchUiData.SavedSearches
+		local items = {}
+		if (saves) then
+			for name, sdata in keyPairs(saves) do
+				table.insert(items, name)
+			end
+		end
+		return items
+	end, "")
+	gui.saves.select:SetPoint("RIGHT", gui.saves.name, "RIGHT", 10,-5)
+	gui.saves.select:SetInputHidden(true)
+
+	gui.saves.load = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.load:SetPoint("LEFT", gui.saves.name, "RIGHT", 25, 0)
+	gui.saves.load:SetWidth(70)
+	gui.saves.load:SetHeight(20)
+	gui.saves.load:SetText("Load")
+	gui.saves.load:SetScript("OnClick", function() lib.LoadSearch() end)
+
+	gui.saves.save = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.save:SetPoint("LEFT", gui.saves.load, "RIGHT", 5, 0)
+	gui.saves.save:SetWidth(70)
+	gui.saves.save:SetHeight(20)
+	gui.saves.save:SetText("Save")
+	gui.saves.save:SetScript("OnClick", function() lib.SaveSearch() end)
+
+	gui.saves.delete = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.delete:SetPoint("LEFT", gui.saves.save, "RIGHT", 5, 0)
+	gui.saves.delete:SetWidth(70)
+	gui.saves.delete:SetHeight(20)
+	gui.saves.delete:SetText("Delete")
+	gui.saves.delete:SetScript("OnClick", function() lib.DeleteSearch() end)
+
+	gui.saves.reset = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.reset:SetPoint("LEFT", gui.saves.delete, "RIGHT", 10, 0)
+	gui.saves.reset:SetWidth(70)
+	gui.saves.reset:SetHeight(20)
+	gui.saves.reset:SetText("Reset")
+	gui.saves.reset:SetScript("OnClick", function() lib.ResetSearch() end)
 
 	function lib.UpdateControls()
 		if gui.sheet.selected then
@@ -893,21 +824,6 @@ function lib.MakeGuiConfig()
 
 	gui:AddCat("Searchers")
 	gui:AddCat("Filters")
-
-	id = gui:AddTab("Saved Searches", "Options")
-	gui:AddControl(id, "Header",     0,    "Saved Searches")
-	last = gui:GetLast(id)
-	gui:AddControl(id, "Subhead",    0,    "Load a saved search")
-	gui:AddControl(id, "Selectbox",  0, 1, "search.load", "profile", "Load search")
-	gui:AddControl(id, "Button",     0, 1, "search.delete", "Delete search")
-	cont = gui:GetLast(id)
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Subhead",    0.5,    "Save current search")
-	gui:AddControl(id, "Text",       0.5, 1, "search.name", "Name this search")
-	last = gui:GetLast(id)
-	gui:AddControl(id, "Button",     0.7, 1, "search.save", "Save now")
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.5, 1, "search.new", "New search")
 
 	gui:AddCat("Options")
 	id = gui:AddTab("General Options", "Options")
@@ -1353,6 +1269,8 @@ function private.OnUpdate()
 			end
 		end
 	end
+
+	lib.UpdateSave()
 end
 
 private.updater = CreateFrame("Frame", nil, UIParent)
