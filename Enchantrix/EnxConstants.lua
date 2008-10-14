@@ -74,17 +74,17 @@ const.StaticPrices = {
 
 	[2772] =    3500, -- Iron Ore
 	[3356] =     250, -- Kingsblood
-	[3371] =     110, -- Empty Vial
-	[3372] =     187, -- Leaded Vial
+	[3371] =     110, -- Empty Vial		-- should use vendor price
+	[3372] =     187, -- Leaded Vial	-- should use vendor price
 	[3819] =    5000, -- Wintersbite
 	[3829] =   32500, -- Frost Oil
-	[4470] =     436, -- Simple Wood
+	[4470] =     436, -- Simple Wood	-- should use vendor price
 	[4625] =    3000, -- Firebloom
 	[5500] =   42000, -- Iridescent Pearl
 	[5637] =    7610, -- Large Fang
 	[6037] =   10000, -- Truesilver Bar
 	[6048] =    5999, -- Shadow Protection Potion
-	[6217] =   11100, -- Copper Rod
+	[6217] =   11100, -- Copper Rod		-- should use vendor price
 	[6370] =    4940, -- Blackmouth Oil
 	[6371] =    5000, -- Fire Oil
 	[7067] =   12344, -- Elemental Earth
@@ -103,11 +103,11 @@ const.StaticPrices = {
 	[8170] =    4625, -- Rugged Leather
 	[8831] =    5000, -- Purple Lotus
 	[8838] =    5325, -- Sungrass
-	[8925] =     500, -- Crystal Vial
+	[8925] =     500, -- Crystal Vial	-- should use vendor price
 	[9224] =   35900, -- Elixir of Demonslaying
 	[11128] =  32944, -- Golden Rod
 	[11144] =  44500, -- Truesilver Rod
-	[11291] =   4500, -- Star Wood
+	[11291] =   4500, -- Star Wood		-- should use vendor price
 	[11382] = 186900, -- Blood of the Mountain
 	[11754] =   3600, -- Black Diamond
 	[12359] =  12000, -- Thorium Bar
@@ -121,9 +121,9 @@ const.StaticPrices = {
 	[13468] =  95000, -- Black Lotus
 	[13926] =  17500, -- Golden Pearl
 	[16206] = 550000, -- Arcanite Rod
-	[17034] =    650, -- Maple Seed
-	[17035] =    676, -- Stranglethorn Seed
-	[18256] =   5821, -- Imbued Vial
+	[17034] =    650, -- Maple Seed		-- should use vendor price
+	[17035] =    676, -- Stranglethorn Seed		-- should use vendor price
+	[18256] =   5821, -- Imbued Vial	-- should use vendor price
 	[18512] =  17332, -- Larval Acid
 	[21884] = 250000, -- Primal Fire
 	[21885] = 200000, -- Primal Water
@@ -137,6 +137,7 @@ const.StaticPrices = {
 	[25843] = 188500, -- Fel Iron Rod
 	[25844] = 250000, -- Adamantite Rod
 	[25845] = 369397, -- Eternium Rod
+	[23571] = 1500000, -- Primal MIght
 
 	[24186] =     50, 	-- COPPERPOWDER, vendor
 	[24188] =    125, 	-- TINPOWDER, vendor
@@ -204,8 +205,9 @@ const.StaticPrices = {
 	[34056] =  25000, 	-- Lesser Cosmic Essence
 	[34057] = 900000, 	-- Abyss Crystal
 
-	[41741] = 800000, 	-- Cobalt Rod
+	[41741] = 500000, 	-- Cobalt Rod
 	[41745] = 800000, 	-- Titanium Rod
+	[41163] =  20000, 	-- Titanium bar
 
 	[35622] = 200000, 	-- Eternal Water
 	[35623] = 200000, 	-- Eternal Air
@@ -213,20 +215,21 @@ const.StaticPrices = {
 	[35625] = 200000, 	-- Eternal Life
 	[35627] = 200000, 	-- Eternal Shadow
 	[36860] = 200000, 	-- Eternal Fire
-
-	[36923] = 200000, 	-- Chalcedony
-	[36929] = 200000, 	-- Huge Citrine
-	[36917] = 200000, 	-- Bloodstone
-	[36926] = 200000, 	-- Shadow Crystal
-	[36920] = 200000, 	-- Sun Crystal
-	[36932] = 200000, 	-- Dark Jade
-
-	[36933] = 800000, 	-- Forest Emerald
-	[36918] = 800000, 	-- Scarlet Ruby
-	[36927] = 800000, 	-- Twilight Opal
-	[36930] = 800000, 	-- Monarch Topaz
-	[36924] = 800000, 	-- Sky Sapphire
-	[36921] = 800000, 	-- Autumn's Glow
+	[37705] =  10000,	-- Crystallized Water
+	
+	[36923] = 100000, 	-- Chalcedony
+	[36929] = 100000, 	-- Huge Citrine
+	[36917] = 100000, 	-- Bloodstone
+	[36926] = 100000, 	-- Shadow Crystal
+	[36920] = 100000, 	-- Sun Crystal
+	[36932] = 100000, 	-- Dark Jade
+	
+	[36933] = 400000, 	-- Forest Emerald
+	[36918] = 400000, 	-- Scarlet Ruby
+	[36927] = 400000, 	-- Twilight Opal
+	[36930] = 400000, 	-- Monarch Topaz
+	[36924] = 400000, 	-- Sky Sapphire
+	[36921] = 400000, 	-- Autumn's Glow
 }
 
 const.DUST = 1
@@ -374,7 +377,7 @@ local EPIC = 4
 
 -- disenchanting level bracket upper bounds
 -- e.g. an ilevel 52 item goes into bracket 55
-const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 220 }
+const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 250 }
 
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
@@ -495,7 +498,7 @@ const.baseDisenchantTable = {
    [151] = { { VOID      , 1.00, 1.5 }, },
    [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
    [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [220] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 213, so far
+   [250] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 226, so far
   },
   [const.ARMOR] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
@@ -514,7 +517,7 @@ const.baseDisenchantTable = {
    [151] = { { VOID      , 1.00, 1.5 }, },
    [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
    [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [220] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 213, so far
+   [250] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 226, so far
   },
  },
 }
