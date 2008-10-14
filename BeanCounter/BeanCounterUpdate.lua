@@ -619,7 +619,10 @@ function private.update._2_02()
 	private.playerData["version"] = 2.02
 end
 
-
+local function upgradeItemLink(link)
+	link = string.gsub(link, "(|Hitem:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+)(|h)", "%1:80%2")
+	return link
+end
 
 --Updates all keys and itemLinks due to extension in WotLK expansion
 --NOT IMPLEMENTED UNTIL CLIENT VERSION IS 30000
@@ -633,7 +636,7 @@ function private.update._2_03()
 					for itemID, value in pairs(data) do
 						local temp = {}
 						for itemString, index in pairs(value) do
-							itemString = itemString..":80"
+							itemString = upgradeItemLink(itemString)
 							temp[itemString] = index
 						end
 						private.serverData[player][DB][itemID] = temp
@@ -649,8 +652,7 @@ function private.update._2_03()
 		print("WOW version 30000 ItemLink Array upgrade started")
 		local temp = {}
 		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
-			v = v:gsub("(.*item:.-)|(.*)", "%1:80|%2" )
-			temp[i] = v
+			temp[i] = upgradeItemLink(v)
 		end
 		BeanCounterDB["ItemIDArray"] = temp
 		set("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
