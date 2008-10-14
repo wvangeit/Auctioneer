@@ -619,10 +619,7 @@ function private.update._2_02()
 	private.playerData["version"] = 2.02
 end
 
-local function upgradeItemLink(link)
-	link = string.gsub(link, "(|Hitem:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+)(|h)", "%1:80%2")
-	return link
-end
+
 
 --Updates all keys and itemLinks due to extension in WotLK expansion
 --NOT IMPLEMENTED UNTIL CLIENT VERSION IS 30000
@@ -631,15 +628,17 @@ function private.update._2_03()
 		private.integrityCheck(true)
 		print("WOW version 30000 detected begining Update")
 		for player, v in pairs(private.serverData)do
-			for DB, data in pairs(private.serverData[player]) do
-				if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
-					for itemID, value in pairs(data) do
-						local temp = {}
-						for itemString, index in pairs(value) do
-							itemString = upgradeItemLink(itemString)
-							temp[itemString] = index
+			if private.serverData[player]["version"] < 2.03 then
+				for DB, data in pairs(private.serverData[player]) do
+					if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
+						for itemID, value in pairs(data) do
+							local temp = {}
+							for itemString, index in pairs(value) do
+								itemString = itemString..":80"
+								temp[itemString] = index
+							end
+							private.serverData[player][DB][itemID] = temp
 						end
-						private.serverData[player][DB][itemID] = temp
 					end
 				end
 			end
@@ -652,7 +651,8 @@ function private.update._2_03()
 		print("WOW version 30000 ItemLink Array upgrade started")
 		local temp = {}
 		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
-			temp[i] = upgradeItemLink(v)
+			v = v:gsub("(.*item:.-)|(.*)", "%1:80|%2" )
+			temp[i] = v
 		end
 		BeanCounterDB["ItemIDArray"] = temp
 		set("util.beancounter.ItemLinkArray.upgradedtoWotLK", true)
