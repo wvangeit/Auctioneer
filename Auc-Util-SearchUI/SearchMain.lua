@@ -208,7 +208,6 @@ local function initData()
 	end
 	if not data.SavedSearches then data.SavedSearches = {} end
 	if not data.Global then data.Global = {} end
-	initData = function() end
 end
 
 local function isGlobalSetting(setting)
