@@ -156,6 +156,16 @@ end
 
 local lastSaneLink, lastSanitized
 function lib.SanitizeLink(link)
+	local _
+	if not link then
+		return
+	end
+	if type(link) == "number" then
+		_, link = GetItemInfo(link)
+	end
+	if type(link) ~= "string" then
+		return
+	end
 	if lastSanitized and (lastSanitized == link or lastSaneLink == link) then
 		return lastSaneLink
 	end
