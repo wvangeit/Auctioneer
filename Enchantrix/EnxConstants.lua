@@ -313,8 +313,8 @@ local VISION = 11137
 local SOUL = 11083
 local STRANGE = 10940
 
-local DREAM = 34052
-local SDREAM = 34053
+local DREAM_SHARD = 34052
+local SDREAM_SHARD = 34053
 local INFINITE = 34054
 local GCOSMIC = 34055
 local LCOSMIC = 34056
@@ -406,9 +406,9 @@ const.baseDisenchantTable = {
    [99]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [115] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },	-- highest level BC green
-   [151] = { { INFINITE, 0.20, 1.5 }, { LCOSMIC , 0.75, 1.5 }, { SDREAM     , 0.05, 1.0 }, },
-   [164] = { { INFINITE, 0.20, 3.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM      , 0.05, 1.0 }, },
-   [200] = { { INFINITE, 0.20, 3.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM      , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
+   [151] = { { INFINITE, 0.20, 1.5 }, { LCOSMIC , 0.75, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
+   [164] = { { INFINITE, 0.20, 3.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },
+   [200] = { { INFINITE, 0.20, 3.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
   },
   [const.ARMOR] = {
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
@@ -429,9 +429,9 @@ const.baseDisenchantTable = {
    [99]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [115] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },	-- highest level BC green
-   [151] = { { INFINITE, 0.75, 1.5 }, { LCOSMIC , 0.20, 1.5 }, { SDREAM     , 0.05, 1.0 }, },
-   [164] = { { INFINITE, 0.75, 3.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM      , 0.05, 1.0 }, },
-   [200] = { { INFINITE, 0.75, 3.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM      , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
+   [151] = { { INFINITE, 0.75, 1.5 }, { LCOSMIC , 0.20, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
+   [164] = { { INFINITE, 0.75, 3.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },
+   [200] = { { INFINITE, 0.75, 3.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
   },
  },
  [RARE] = {
@@ -454,9 +454,9 @@ const.baseDisenchantTable = {
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [115] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },	-- highest level BC blue is 115
    [120] = { { LPRISMATIC , 0.05, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [151] = { { SDREAM     , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [164] = { { SDREAM     , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM      , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
+   [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
   },
   [const.ARMOR] = {
    [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
@@ -477,9 +477,9 @@ const.baseDisenchantTable = {
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [115] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },	-- highest level BC blue
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [151] = { { SDREAM     , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [164] = { { SDREAM     , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM      , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
+   [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
   },
  },
  [EPIC] = {
