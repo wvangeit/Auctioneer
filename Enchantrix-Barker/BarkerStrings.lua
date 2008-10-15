@@ -25,11 +25,10 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit license to use this AddOn with these facilities
+		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 EnchantrixBarkerLocalizations = {
 
@@ -203,6 +202,7 @@ EnchantrixBarkerLocalizations = {
 		["Chest"]	= "Brust";
 		["Cloak"]	= "Umhang";
 		["Darnassus"]	= "Darnassus";
+		["Enchanting"]	= "Verzaubern";
 		["EnchSearchAgility"]	= "beweglichkeit";
 		["EnchSearchAllResistance1"]	= "Widerstand gegen alle Schulen von Magie";
 		["EnchSearchAllResistance2"]	= "Widerstand gegen alle Magieschulen";
@@ -220,6 +220,7 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchDMGAbsorption"]	= "absorption";
 		["EnchSearchFireRes"]	= "feuerwiderstand";
 		["EnchSearchFrostRes"]	= "frostwiderstand";
+		["EnchSearchHealing"]	= "Heilung";
 		["EnchSearchHealth"]	= "gesundheit";
 		["EnchSearchIntellect"]	= "intelligenz";
 		["EnchSearchMana"]	= "mana";
@@ -286,6 +287,7 @@ EnchantrixBarkerLocalizations = {
 		["ShortBeastslayer"]	= "Wildtier";
 		["ShortBoarSpeed"]	= "Ebersflinkheit";
 		["ShortCatSwiftness"]	= "Katzenschnelligkeit";
+		["ShortHealing"]	= "heilung";
 		["ShortHealth"]	= "GES";
 		["ShortMana"]	= "Mana";
 		["ShortManaPerFive"]	= "Mana/5sek";
@@ -1246,7 +1248,7 @@ EnchantrixBarkerLocalizations = {
 		["BarkerNoEnchantsAvail"]	= "Enchantrix: Вы не имеете зачарований или реагентов чтоб их сделать.";
 
 		-- Section: Commands
-		["CmdBarker"]	= "крикун";
+		["CmdBarker"]	= "Продавец";
 		["CmdClear"]	= "Очистить";
 		["CmdDefault"]	= "Стандартные";
 		["CmdDisable"]	= "выведите из строя\n";
@@ -1338,9 +1340,9 @@ EnchantrixBarkerLocalizations = {
 		["BarkerNotTradeZone"]	= "Enchantrix Barker: Вы не торговой зоне.";
 
 		-- Section: Generic Strings
-		["AGI"]	= "Ловк.";
+		["AGI"]	= "Лов.";
 		["AllStats"]	= "Все параметры";
-		["Crusader"]	= "Рыцарь";
+		["Crusader"]	= "Крестоносец";
 		["DEF"]	= "Защ";
 		["DMG"]	= "Урон";
 		["DMGAbsorb"]	= "Поглощение урона";
@@ -1351,6 +1353,7 @@ EnchantrixBarkerLocalizations = {
 		["ShadowRes"]	= "сопр.тени";
 		["ShortAllRes"]	= "все сопр.";
 		["ShortArmor"]	= "броня";
+		["ShortBattlemaster"]	= "Мастер Битв";
 		["ShortBeastslayer"]	= "Зверь";
 		["ShortBoarSpeed"]	= "Скорость кабана";
 		["ShortCatSwiftness"]	= "Стремительность кошки";
@@ -1359,7 +1362,11 @@ EnchantrixBarkerLocalizations = {
 		["ShortMana"]	= "мана";
 		["ShortManaPerFive"]	= "мана/5сек";
 		["ShortMongoose"]	= "Мангуст";
+		["ShortSoulfrost"]	= "Душелед";
 		["ShortSpellPower"]	= "заклинание";
+		["ShortSpellSurge"]	= "Поток чар";
+		["ShortSunfire"]	= "Солнечный огонь";
+		["ShortVitality"]	= "Живучесть";
 		["SPI"]	= "Дух";
 		["STA"]	= "Выносл.";
 		["STR"]	= "Сила";
@@ -1413,11 +1420,12 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsMana"]	= "Мана";
 		["BarkerOptionsManaTooltip"]	= "Приоритетность чар для маны";
 		["BarkerOptionsNatureResistance"]	= "Защита от магии природы";
-		["BarkerOptionsNatureResistanceTooltip"]	= "Приритетная цена для энчата на Природный Резист";
+		["BarkerOptionsNatureResistanceTooltip"]	= "Приоритетная цена для энчата на Природный Резист";
 		["BarkerOptionsOther"]	= "Другие";
 		["BarkerOptionsOtherTooltip"]	= "Приоритет для зачарования перед снитем шкур, шахтерством, верховой ездой и др.";
 		["BarkerOptionsPricePriorityTitle"]	= "Полный приоритет цен";
 		["BarkerOptionsPricePriorityTooltip"]	= "Это устанавливает, как важная оценка подходит полному приоритету для рекламирования.";
+		["BarkerOptionsPriceSweetspotTitle"]	= "Фактор цены SweetSpot";
 		["BarkerOptionsPriceSweetspotTooltip"]	= "Это используется, чтобы расположить по приоритетам очаровывает возле этой цены для рекламирования.";
 		["BarkerOptionsProfitMarginTitle"]	= "Размер Прибыли";
 		["BarkerOptionsProfitMarginTooltip"]	= "Процентный доход, чтобы добавить стоимости базовых материалов";
@@ -1428,13 +1436,13 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsShadowResistanceTooltip"]	= "Приоритет для Сопротивления магии тени";
 		["BarkerOptionsShieldPriorityTooltip"]	= "Приоритет для зачарования щита";
 		["BarkerOptionsSpiritPriority"]	= "Дух";
-		["BarkerOptionsSpiritPriorityTooltip"]	= "Приоритет для зачарований на дух";
+		["BarkerOptionsSpiritPriorityTooltip"]	= "Приоритет для наложения чар на дух";
 		["BarkerOptionsStaminaPriority"]	= "Выносливость";
 		["BarkerOptionsStaminaPriorityTooltip"]	= "Приоритет для зачарования на выносливость";
 		["BarkerOptionsStatsPriority"]	= "Полный приоритет базовых показателей";
 		["BarkerOptionsStatsPriorityTooltip"]	= "Это устанавливает, как важен полный приоритет на базовые показатели для рекламирования.";
 		["BarkerOptionsStrengthPriority"]	= "Сила";
-		["BarkerOptionsStrengthPriorityTooltip"]	= "Приоритет для зачарования на силу";
+		["BarkerOptionsStrengthPriorityTooltip"]	= "Приоритет для наложения чар на силу";
 		["BarkerOptionsTab1Title"]	= "Доход и Ценовые Приоритеты";
 
 	};
@@ -1481,7 +1489,8 @@ EnchantrixBarkerLocalizations = {
 		["Bracer"]	= "腰部";
 		["Chest"]	= "胸部";
 		["Cloak"]	= "肩部";
-		["Darnassus"]	= "达纳苏丝";
+		["Darnassus"]	= "达纳苏斯";
+		["Enchanting"]	= "附魔";
 		["EnchSearchAgility"]	= "敏捷";
 		["EnchSearchAllResistance1"]	= "所有抗性";
 		["EnchSearchAllResistance2"]	= "所有抗性";
@@ -1493,12 +1502,13 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchBoarSpeed"]	= "移动速度提升和[0-9]+耐力";
 		["EnchSearchCatSwiftness"]	= "移动速度提升和[0-9]+敏捷";
 		["EnchSearchCrusader"]	= "治疗[0-9]+到[0-9]+和提升耐力";
-		["EnchSearchDamage1"]	= "毒药?伤害";
+		["EnchSearchDamage1"]	= "点?伤害";
 		["EnchSearchDamage2"]	= "\+[0-9]+伤害";
 		["EnchSearchDefense"]	= "防御";
 		["EnchSearchDMGAbsorption"]	= "吸收";
 		["EnchSearchFireRes"]	= "火焰抗性";
 		["EnchSearchFrostRes"]	= "冰霜抗性";
+		["EnchSearchHealing"]	= "治疗";
 		["EnchSearchHealth"]	= "生命";
 		["EnchSearchIntellect"]	= "智力";
 		["EnchSearchMana"]	= "魔法";
@@ -1525,15 +1535,15 @@ EnchantrixBarkerLocalizations = {
 		["Ring"]	= "耳环";
 		["Shattrath"]	= "沙塔斯城";
 		["Shield"]	= "盾牌";
-		["ShortDarnassus"]	= "Dar ";
+		["ShortDarnassus"]	= "达纳";
 		["ShortExodar"]	= "Exo";
-		["ShortIronForge"]	= "IF ";
-		["ShortOrgrimmar"]	= "Org ";
-		["ShortShattrath"]	= "Sha";
-		["ShortSilvermoon"]	= "SmC";
-		["ShortStormwind"]	= "SW ";
-		["ShortThunderBluff"]	= "TB ";
-		["ShortUndercity"]	= "UC ";
+		["ShortIronForge"]	= "铁";
+		["ShortOrgrimmar"]	= "奥格";
+		["ShortShattrath"]	= "沙城";
+		["ShortSilvermoon"]	= "银月";
+		["ShortStormwind"]	= "暴风";
+		["ShortThunderBluff"]	= "雷霆";
+		["ShortUndercity"]	= "幽暗 ";
 		["SilvermoonCity"]	= "银月城";
 		["StormwindCity"]	= "暴风城";
 		["TheExodar"]	= "埃索达";
@@ -1565,6 +1575,7 @@ EnchantrixBarkerLocalizations = {
 		["ShortBeastslayer"]	= "野兽";
 		["ShortBoarSpeed"]	= "野豬之速";
 		["ShortCatSwiftness"]	= "貓之迅捷";
+		["ShortHealing"]	= "治疗";
 		["ShortHealth"]	= "生命";
 		["ShortMana"]	= "魔法";
 		["ShortManaPerFive"]	= "5秒回蓝";
