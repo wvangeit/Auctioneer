@@ -297,6 +297,7 @@ function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 			stackPrice = bidPrice
 		end
 	end
+	if not stackPrice then return end
 
 	if not itemWorth then
 		if (priceModel == "market") then
