@@ -204,10 +204,13 @@ function lib.API.getArrayItemLink(itemString)
 	return
 end
 
---[[Turns an itemLink into an itemString and extracts the itemName]]
+--[[Turns an itemLink into an itemString and extracts the itemName
+Returns sanitized itemlinks. Since hyperlinks now vary depending on level of player who looks/creates them
+]]
 function lib.API.getItemString(itemLink)
 	if not itemLink or not type(itemLink) == "string" then return end
 	local itemString, itemName = itemLink:match("H(item:.-)|h%[(.-)%]")
+	itemString = itemString:gsub("(item:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+):%d+", "%1:80")
 	return itemString, itemName
 end
 
