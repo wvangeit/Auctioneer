@@ -476,7 +476,7 @@ local function getBaseTableDisenchants(level, quality, type, item)
 	end
 
 	-- no matching entry found, this is bad because this is the backup!
-	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level )
+	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level, item )
 	return nil
 end
 

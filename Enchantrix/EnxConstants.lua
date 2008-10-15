@@ -436,6 +436,7 @@ const.baseDisenchantTable = {
  },
  [RARE] = {
   [const.WEAPON] = {
+   [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [20]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [25]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [30]  = { { LGLIMMERING, 1.00, 1.0 }, },
@@ -458,6 +459,7 @@ const.baseDisenchantTable = {
    [200] = { { DREAM      , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
   },
   [const.ARMOR] = {
+   [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [20]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [25]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [30]  = { { LGLIMMERING, 1.00, 1.0 }, },

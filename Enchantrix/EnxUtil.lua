@@ -110,7 +110,7 @@ function getReagentInfo(reagentID)
 		-- copy in the default cache data (English only)
 		-- the localizations will get updated as the items come into the user's cache
 		EnchantConfig.cache.reagentItemInfoBackup = Enchantrix.Constants.BackupReagentItemInfo;
-		end
+	end
 
 	local cache = EnchantConfig.cache.reagentItemInfoBackup
 
@@ -144,7 +144,12 @@ function getReagentInfo(reagentID)
 		-- last resort is getting the data from our cache, because the WoW cache does not have this item
 		-- remember: the cache is not our primary storage for this data, only a backup
 		if ( cache[id] ) then
+			-- try the user's cache first
 			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = deserializeItemInfo( cache[id] );
+		elseif (Enchantrix.Constants.BackupReagentItemInfo[ id ]) then
+			-- fallback to hard coded cache, copy to user cache if found
+			cache[id] = Enchantrix.Constants.BackupReagentItemInfo[ id ]
+			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = deserializeItemInfo( Enchantrix.Constants.BackupReagentItemInfo[ id ] );
 		end
 	end
 
