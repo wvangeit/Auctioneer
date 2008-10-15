@@ -48,6 +48,7 @@ local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
 
 local saveProspect					-- Enchantrix.Storage.SaveProspect()
 local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
+local getItemProspectTotals			-- Enchantrix.Storage.GetItemProspectTotals()
 
 local saveMilling					-- Enchantrix.Storage.SaveMilling
 local getItemMilling				-- Enchantrix.Storage.GetItemMilling()
@@ -633,6 +634,7 @@ Enchantrix.Storage = {
 
 	SaveProspect = saveProspect,
 	GetItemProspects = getItemProspects,
+	GetItemProspectTotals = getItemProspectTotals,
 
 	SaveMilling = saveMilling,
 	GetItemMilling = getItemMilling,

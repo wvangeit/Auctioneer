@@ -790,7 +790,7 @@ end
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
 
-	if (level > 200) then
+	if (level >= 200) then
 		return 375;
 
 	elseif (level >= 152) then
