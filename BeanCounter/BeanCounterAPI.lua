@@ -210,6 +210,7 @@ Returns sanitized itemlinks. Since hyperlinks now vary depending on level of pla
 function lib.API.getItemString(itemLink)
 	if not itemLink or not type(itemLink) == "string" then return end
 	local itemString, itemName = itemLink:match("H(item:.-)|h%[(.-)%]")
+	if not itemString then return end
 	itemString = itemString:gsub("(item:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+):%d+", "%1:80")
 	return itemString, itemName
 end
