@@ -262,7 +262,7 @@ local function OrigAuctionOnClick(...)
 	if ( IsModifiedClick() ) then
 		HandleModifiedItemClick(GetAuctionItemLink("owner", this:GetParent():GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame)));
 	else
-		AuctionsButton_OnClick(self);
+		AuctionsButton_OnClick(...);
 	end
 end
 -- handler for modifiers
