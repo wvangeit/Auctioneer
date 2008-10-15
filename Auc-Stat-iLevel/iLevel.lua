@@ -158,6 +158,7 @@ function lib.GetPrice(hyperlink, faction)
 	if (linkType ~= "item") then return end
 
 	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(hyperlink)
+	if not equipPos then return end
 	equipPos = tonumber(iTypes[equipPos]) or -1
 	if quality < 1 then return end
 	if not equipPos then return end
@@ -371,10 +372,23 @@ function lib.ClearItem(hyperlink, faction, realm)
 	if (linkType ~= "item") then return end
 
 	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(hyperlink)
+	if not equipPos then 
+		print(libType.."-"..libName..": unable to retrieve data for item: "..hyperlink)
+		return
+	end
 	equipPos = tonumber(iTypes[equipPos]) or -1
-	if quality < 1 then return end
-	if not equipPos then return end
-	if equipPos < 1 then return end
+	if quality < 1 then
+		print(libType.."-"..libName..": item is not in database")
+		return
+	end
+	if not equipPos then
+		print(libType.."-"..libName..": item is not in database")
+		return
+	end
+	if equipPos < 1 then
+		print(libType.."-"..libName..": item is not in database")
+		return
+	end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
 
 	if not faction then faction = AucAdvanced.GetFaction() end
@@ -384,8 +398,10 @@ function lib.ClearItem(hyperlink, faction, realm)
 		if data[faction][itemSig] then
 			print(libType.."-"..libName..": clearing data for iLevel=%d/quality=%d/equip=%d items for {{"..faction.."}}")
 			data[faction][itemSig][iLevel] = nil
+			return
 		end
 	end
+	print(libType.."-"..libName..": item is not in database")
 end
 
 --[[ Local functions ]]--
