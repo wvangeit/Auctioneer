@@ -148,22 +148,11 @@ function private.UpgradeDatabaseVersion()
 		private.update._2_01()
 	elseif private.playerData["version"] < 2.02 then --runs validate to correct ;Used won, Used Failed messages and prevent postDB function errors.
 		private.update._2_02()
+	elseif private.playerData["version"] < 2.03 then--if not upgraded yet then upgrade
+		private.update._2_03()
+	elseif private.playerData["version"] < 2.04 then --runs validate to correctjust to ckeck itemstrings from teh 3.0 changes
+		private.update._2_04()
 	end
-	--WOW 3.0 HACK
-	if private.serverVersion >= 30000 then
-		private.version = 2.03 --change private version so bean Does not freak that DB is one higher than Expected after the upgarde.
-
-		if private.playerData["version"] < 2.03 then--if not upgraded yet then upgrade
-			private.update._2_03()
-		end
-	end
-	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
-	if not get("util.beancounter.integrityCheckComplete") then
-		private.integrityCheck(true)
-	elseif not get("util.beancounter.integrityCheck") then
-		private.integrityCheck()
-	end
-
 end
 
 --[[This changes the database to use ; and to replace itemNames with itemlink]]--
@@ -467,10 +456,24 @@ local integrityClean, integrityCount = true, 0
 			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedBids" or DB == "postedAuctions" then
 				for itemID, value in pairs(data) do
 					for itemString, data in pairs(value) do
+						local _, itemStringLength = itemString:gsub(":", ":")
 						--check that the data is a string and table
 						if type(itemString) ~= "string"  or  type(data) ~= "table" then
 							private.serverData[player][DB][itemID][itemString] = nil
 							debugPrint("Failed: Invalid format", DB, data, "", itemString)
+							integrityClean = false
+						elseif itemStringLength > 9 then --Bad itemstring purge
+							debugPrint("Failed: Invalid itemString", DB, data, "", itemString)
+							local _, link = GetItemInfo(itemString) --ask server for a good itemlink
+							local itemStringNew = lib.API.getItemString(link) --get NEW itemString from itemlink
+							if itemStringNew then
+								debugPrint(itemStringNew, "New link recived replacing")
+								private.serverData[player][DB][itemID][itemStringNew] = data
+								private.serverData[player][DB][itemID][itemString] = nil
+							else
+								debugPrint(itemString, "New link falied purging item")
+								private.serverData[player][DB][itemID][itemString] = nil
+							end
 							integrityClean = false
 						else
 							for index, text in pairs(data) do
@@ -660,4 +663,15 @@ function private.update._2_03()
 	end
 
 	print("WOW version 30000 Update finished")
+	
+	private.update._2_04()
+end
+--this is just to bring us to post WoW 3.0 so some of the hacks can be removed
+function private.update._2_04()
+	private.integrityCheck(true)
+	
+	for player, v in pairs(private.serverData)do
+		private.serverData[player]["version"] = 2.04
+	end
+	
 end

@@ -44,7 +44,7 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 2.02,
+	version = 2.04,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 
@@ -294,7 +294,10 @@ end
 --Add data to DB
 --~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
 function private.databaseAdd(key, itemID, itemLink, value, compress)
-	if not key or not itemID or not itemLink or not value then print("BeanCounter database add error: Missing required data") print("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress) return end
+	if not key or not itemID or not itemLink or not value then 
+		print("BeanCounter database add error: Missing required data") print("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress)
+		return
+	end
 
 	local _, suffix = lib.API.decodeLink(itemLink)
 	local itemString = lib.API.getItemString(itemLink)
