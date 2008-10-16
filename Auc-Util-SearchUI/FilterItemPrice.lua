@@ -38,19 +38,9 @@ lib.tabname = "ItemPrice"
 -- Set our defaults
 default("ignoreitemprice.enable", true)
 
-local ignorelist = get("ignoreitemprice.ignorelist")
-if not ignorelist then
-	ignorelist = {}
-end
+local ignorelist = {}
 private.tempignorelist = {}
 private.sheetdata = {}
-for item, cost in pairs(ignorelist) do
-	local link = AucAdvanced.API.GetLinkFromSig(item)
-	if not link then
-		link = item
-	end
-	table.insert(private.sheetdata, {link, cost})
-end
 
 function private.OnEnterSheet(button, row, index)
 	if private.ignorelistGUI.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
@@ -70,6 +60,28 @@ function private.OnLeaveSheet(button, row, index)
 end
 
 function private.OnClickSheet(button, row, index)
+end
+
+--Processor function
+--this handles any notifications that SearchUI core needs to send us
+function lib.Processor(msg, ...)
+	if msg == "config" then --saved search has changed, so reload the ignorelist
+		ignorelist = get("ignoreitemprice.ignorelist")
+		if not ignorelist then
+			ignorelist = {}
+		end
+		empty(private.sheetdata)
+		for item, cost in pairs(ignorelist) do
+			local link = AucAdvanced.API.GetLinkFromSig(item)
+			if not link then
+				link = item
+			end
+			table.insert(private.sheetdata, {link, cost})
+		end
+		if private.ignorelistGUI and private.ignorelistGUI.sheet then
+			private.ignorelistGUI.sheet:SetData(private.sheetdata)
+		end
+	end
 end
 
 --lib.AddIgnore(sig, price, temp)

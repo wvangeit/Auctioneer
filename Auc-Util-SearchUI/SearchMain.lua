@@ -353,6 +353,21 @@ function lib.NotifyCallbacks(msg, ...)
 			end
 		end
 	end
+	for name, filter in pairs(lib.Filters) do
+		local processor = filter.Processor
+		if processor then
+			local pType = type(processor)
+			if pType == "table" then
+				processor = pType[msg]
+				pType = type(processor)
+				if processor and pType == "function" then
+					processor(...)
+				end
+			elseif pType == "function" then
+				processor(msg, ...)
+			end
+		end
+	end
 end
 
 function lib.RemoveCallback(name, callback)
@@ -422,7 +437,9 @@ function private.removeline()
 	end
 	table.remove(private.sheetData, gui.sheet.selected)
 	--gui.frame.remove:Disable()
+	gui.sheet.selected = nil
 	gui.sheet:SetData(private.sheetData)
+	lib.UpdateControls()
 	gui.sheet.selected = gui.sheet.sort[selected]
 	gui.sheet:Render() --need to redraw, so the selection looks right
 	lib.UpdateControls()

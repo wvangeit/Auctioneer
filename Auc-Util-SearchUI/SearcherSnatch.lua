@@ -227,6 +227,20 @@ function lib:MakeGuiConfig(gui)
 	lib.PopulateBagSheet()
 end
 
+--Processor function
+--this handles any notifications that SearchUI core needs to send us
+function lib.Processor(msg, ...)
+	if msg == "config" then --saved search has changed, so reload the ignorelist
+		private.snatchList =  get("snatch.itemsList")
+		--if there was no saved snatchList, create an empty table
+		if not private.snatchList then
+			private.snatchList = {}
+			set("snatch.itemsList", private.snatchList)
+		end
+		lib.refreshData()
+	end
+end
+
 function private.OnEnterSnatch(button, row, index)
 	if frame.snatchlist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.snatchlist.sheet.rows[row][index]:GetText()
@@ -416,7 +430,9 @@ function lib.refreshData()
 
 		table.insert(Data, {v.link, v.price, appraiser or 0})
 	end
-	frame.snatchlist.sheet:SetData(Data, Style)
+	if frame then
+		frame.snatchlist.sheet:SetData(Data, Style)
+	end
 end
 
 function lib.PopulateBagSheet()
