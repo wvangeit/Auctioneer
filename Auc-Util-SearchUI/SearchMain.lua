@@ -207,6 +207,7 @@ local function initData()
 		AucAdvancedData.UtilSearchUiData = data
 	end
 	if not data.SavedSearches then data.SavedSearches = {} end
+	if not data.Current then data.Current = {} end
 	if not data.Global then data.Global = {} end
 end
 
@@ -254,6 +255,8 @@ local function setter(setting, value)
 			end
 		end
 	end
+
+	lib.NotifyCallbacks('config', 'changed', setting, value)
 end
 
 function lib.SetSetting(...)
@@ -324,11 +327,39 @@ end
 
 private.callbacks = {}
 function lib.AddCallback(name, callback)
-	if (gui) then
-		callback(gui)
-		return
-	end
 	private.callbacks[name] = callback
+	if (gui) then
+		lib.NotifyCallbacks('guiconfig', gui)
+	end
+end
+
+function lib.NotifyCallbacks(msg, ...)
+	for name, callback in pairs(private.callbacks) do
+		callback(msg, ...)
+	end
+
+	for name, searcher in pairs(lib.Searchers) do
+		local processor = searcher.Processor
+		if processor then
+			local pType = type(processor)
+			if pType == "table" then
+				processor = pType[msg]
+				pType = type(processor)
+				if processor and pType == "function" then
+					processor(...)
+				end
+			elseif pType == "function" then
+				processor(msg, ...)
+			end
+		end
+	end
+end
+
+function lib.RemoveCallback(name, callback)
+	if private.callbacks[name] == callback then
+		private.callbacks[name] = nil
+		return true
+	end
 end
 
 local searcherKit = {}
@@ -533,6 +564,50 @@ local function keyPairs(t,f)
 	return iter
 end
 
+local function isEqual(a, b, l)
+	if not l then l = 0
+	elseif l > 10 then return false end
+
+	local ta, tb = type(a), type(b)
+	if ta ~= tb then return false end
+	if ta == 'table' then
+		for k,v in pairs(a) do
+			if not isEqual(v, b[k], l+1) then return false end
+		end
+		for k,v in pairs(b) do
+			if not isEqual(v, a[k], l+1) then return false end
+		end
+	else
+		if tostring(a) ~= tostring(b) then
+			return false
+		end
+	end
+	return true
+end
+lib.IsEqual = isEqual
+
+function lib.LoadCurrent()
+	initData()
+	local name = gui.saves.name:GetText()
+	currentSettings = AucAdvancedData.UtilSearchUiData.Current
+	if not currentSettings then
+		lib.LoadSearch()
+		return
+	end
+	
+	local existing = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
+	if not existing then
+		hasUnsaved = true
+	elseif not isEqual(currentSettings, existing) then
+		hasUnsaved = true
+	else
+		hasUnsaved = nil
+	end
+	lib.UpdateSave()
+	gui:Refresh()
+	lib.NotifyCallbacks('config', 'loaded', nil)
+end
+
 function lib.LoadSearch()
 	initData()
 	local name = gui.saves.name:GetText()
@@ -541,10 +616,12 @@ function lib.LoadSearch()
 		return
 	end
 	currentSettings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name]) 
+	AucAdvancedData.UtilSearchUiData.Current = currentSettings
 	AucAdvancedData.UtilSearchUiData.Selected = name
 	hasUnsaved = nil
 	lib.UpdateSave()
 	gui:Refresh()
+	lib.NotifyCallbacks('config', 'loaded', name)
 end
 
 function lib.SaveSearch()
@@ -555,6 +632,7 @@ function lib.SaveSearch()
 	hasUnsaved = nil
 	lib.UpdateSave()
 	gui:Refresh()
+	lib.NotifyCallbacks('config', 'saved', name)
 end
 
 function lib.DeleteSearch()
@@ -566,24 +644,37 @@ function lib.DeleteSearch()
 	gui.saves.name:SetText("")
 	lib.UpdateSave()
 	gui:Refresh()
+	lib.NotifyCallbacks('config', 'deleted', name)
 end
 
 function lib.ResetSearch()
 	initData()
 	currentSettings = {}
+	AucAdvancedData.UtilSearchUiData.Current = currentSettings
 	hasUnsaved = nil
 	AucAdvancedData.UtilSearchUiData.Selected = ""
 	gui.saves.name:SetText("")
 	lib.UpdateSave()
 	gui:Refresh()
+	lib.NotifyCallbacks('config', 'reset')
 end
 
 local curColor = "white"
-function lib.UpdateSave()
+local curName
+function lib.UpdateSave(inUpdate)
 	if not gui then return end
 	if not AucAdvancedData.UtilSearchUiData then return end
 
 	local name = gui.saves.name:GetText()
+	if inUpdate and curName == name then return end
+		
+	if hasUnsaved then
+		local saved = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
+		if saved and isEqual(currentSettings, saved) then
+			hasUnsaved = false
+		end
+	end
+
 	if AucAdvancedData.UtilSearchUiData.Selected ~= name then
 		if curColor ~= "white" then
 			gui.saves.name:SetTextColor(1, 1, 1, 1)
@@ -666,16 +757,15 @@ function lib.MakeGuiConfig()
 		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or "" 
 		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
 			gui.saves.name:SetText(curSearch)
-			lib.LoadSearch()
 		else
 			gui.saves.name:SetText("")
-			lib.ResetSearch()
 		end
+		lib.LoadCurrent()
 	end
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 
-	gui.saves.select = SelectBox:Create("SearchUiSaveSelect", gui.saves, 200, function(pos, key, value)
+	gui.saves.select = SelectBox:Create("SearchUiSaveSelect", gui.saves, 220, function(pos, key, value)
 		gui.saves.name:SetText(value)
 	end, function ()
 		local saves = AucAdvancedData.UtilSearchUiData.SavedSearches
@@ -687,7 +777,10 @@ function lib.MakeGuiConfig()
 		end
 		return items
 	end, "")
-	gui.saves.select:SetPoint("RIGHT", gui.saves.name, "RIGHT", 10,-5)
+	gui.saves.select:SetParent(gui.saves)
+	gui.saves.select:SetScale(0.999)
+	gui.saves.select:SetScale(1.0)
+	gui.saves.select:SetPoint("RIGHT", gui.saves.name, "RIGHT", 38,-4)
 	gui.saves.select:SetInputHidden(true)
 
 	gui.saves.load = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
@@ -1000,10 +1093,8 @@ function lib.MakeGuiConfig()
 			filter:MakeGuiConfig(gui)
 		end
 	end
-	-- Any callbacks?
-	for name, callback in pairs(private.callbacks) do
-		callback(gui)
-	end
+
+	lib.NotifyCallbacks('guiconfig', gui)
 
 	-- Add the welcome text now
 	local b = "  |TInterface\\QuestFrame\\UI-Quest-BulletPoint.blp:13|t "
@@ -1294,7 +1385,7 @@ function private.OnUpdate()
 		end
 	end
 
-	lib.UpdateSave()
+	lib.UpdateSave(true)
 end
 
 private.updater = CreateFrame("Frame", nil, UIParent)
