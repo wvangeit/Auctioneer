@@ -234,14 +234,8 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 
 	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
 	--ItemLink will be used minus its unique ID
-	local itemString --WOW 3.0 HACK
-	if private.serverVersion >= 30000 then
-		itemString = itemLink:match("^.*(item:.+):.-:.-")-- ignore Unique ID
-		debugPrint("3.0 Hack find stacksize", itemString, itemlink)
-	else
-		itemString = itemLink:match("^.*(item:.+):.-") -- ignore Unique ID
-	end
-
+	local itemString = itemLink:match("^.*(item:.+):.-:.-")-- ignore Unique ID
+	
 	for i,v in pairs (private.playerData[key][itemID]) do
 		if i:match(itemString) or i == itemString then
 			for index, text in pairs(v) do

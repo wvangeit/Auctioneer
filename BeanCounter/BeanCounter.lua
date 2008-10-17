@@ -58,7 +58,6 @@ local private = {
 	--BeanCounterMail
 	reconcilePending = {},
 	inboxStart = {},
-	serverVersion = select(4, GetBuildInfo()),--WOW 3.0 HACK
 	}
 
 lib.Private = private --allow beancounter's sub lua's access
@@ -303,13 +302,7 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 	local itemString = lib.API.getItemString(itemLink)
 	--if this will be a compressed entry replace uniqueID with 0
 	if compress then
-		if private.serverVersion >= 30000 then
-			debugPrint("WOW 3.0 HACK Database Add before", itemString)
-			itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")--WOW 3.0 HACK
-			debugPrint("WOW 3.0 HACK Database Add after", itemString)
-		else
-			itemString  = itemString:gsub("^(item:%d+:.+:.-):.*", "%1:0")
-		end
+		itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")
 	end
 
 	if private.playerData[key][itemID] then --if ltemID exsists

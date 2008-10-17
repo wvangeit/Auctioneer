@@ -627,26 +627,23 @@ end
 --Updates all keys and itemLinks due to extension in WotLK expansion
 --NOT IMPLEMENTED UNTIL CLIENT VERSION IS 30000
 function private.update._2_03()
-	if private.serverVersion >= 30000 then  --WOW 3.0 HACK
-		private.integrityCheck(true)
-		print("WOW version 30000 detected begining Update")
-		for player, v in pairs(private.serverData)do
-			if private.serverData[player]["version"] < 2.03 then
-				for DB, data in pairs(private.serverData[player]) do
-					if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
-						for itemID, value in pairs(data) do
-							local temp = {}
-							for itemString, index in pairs(value) do
-								itemString = itemString..":80"
-								temp[itemString] = index
-							end
-							private.serverData[player][DB][itemID] = temp
+	private.integrityCheck(true)
+	for player, v in pairs(private.serverData)do
+		if private.serverData[player]["version"] < 2.03 then
+			for DB, data in pairs(private.serverData[player]) do
+				if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
+					for itemID, value in pairs(data) do
+						local temp = {}
+						for itemString, index in pairs(value) do
+							itemString = itemString..":80"
+							temp[itemString] = index
 						end
+						private.serverData[player][DB][itemID] = temp
 					end
 				end
 			end
-			private.serverData[player]["version"] = 2.03
 		end
+		private.serverData[player]["version"] = 2.03
 	end
 
 	--Upgrade the itemID array's itemLinks only needs to run once
