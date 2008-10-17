@@ -408,7 +408,7 @@ function lib.SetWorkingItem(link)
 	private.workingItemLink = link
 end
 
-function lib.ClickLinkHook(_, _ link, button)
+function lib.ClickLinkHook(_, _, link, button)
 	if link and private.frame and private.frame:IsShown() then
 		if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
 			lib.SetWorkingItem(link)
