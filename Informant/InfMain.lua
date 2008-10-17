@@ -77,20 +77,22 @@ InformantConfig = {}
 -- LOCAL DEFINES
 
 CLASS_TO_CATEGORY_MAP = {
-	[2]  = 1, --Weapon
-	[4]  = 2, --Armor
-	[1]  = 3, --Container
-	[0]  = 4, --Consumable
-	[7]  = 5, --Trade Goods
-	[6]  = 6, --Projectile
-	[11] = 7, --Quiver
-	[9]  = 8, --Recipe
-	[3]  = 9, --Gem
-	[15] = 10, --Miscellaneous
-	[13] = 10, --Miscellaneous
-	[5] = 10, --Miscellaneous
-	[12] = 11, --Quest
-}
+	[2] = 1, --Weapon
+	[4] = 2, --Armor
+	[1] = 3, --Container
+	[0] = 4, --Consumable
+	[16] = 5, --Glyph
+	[7] = 6, --Trade Goods
+	[6] = 7, --Projectile
+	[11] = 8, --Quiver
+	[9] = 9, --Recipe
+	[3] = 10, --Gem
+	[15] = 11, --Miscellaneous
+	[13] = 11, --Miscellaneous
+	[5] = 11, --Miscellaneous
+	[12] = 12, --Quest
+} 
+
 
 -- FUNCTION DEFINITIONS
 
