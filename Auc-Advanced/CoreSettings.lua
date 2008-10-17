@@ -110,6 +110,7 @@ local settingDefaults = {
 	['locale'] = 'default',
 	['scandata.tooltip.display'] = false,
 	['scandata.tooltip.modifier'] = true,
+	["tooltip.marketprice.show"] = true,
 	['scandata.force'] = false,
 	['scandata.summary'] = true,
 	['clickhook.enable'] = true,
@@ -412,6 +413,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
 	gui:AddTip(id, "Forces the scan data to load when Auctioneer Advanced is first loaded rather than on demand when first needed")
 
+	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", "Display Market Price in tooltip")
+	gui:AddTip(id, "Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice")
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
 	gui:AddTip(id, "Display the summation of an Auction House scan")
 

@@ -67,6 +67,35 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 
 	local saneLink = AucAdvanced.SanitizeLink(hyperlink)
 
+	if getter("tooltip.marketprice.show") then
+		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
+		--we could just return here, but we want an indication that we don't have any data
+		if not seen then seen = 0 end
+		if not market then market = 0 end
+		if quantity == 1 then
+			EnhTooltip.AddLine("Market Price: (seen "..tostring(seen)..")", market)
+		else
+			EnhTooltip.AddLine("Market Price x"..tostring(quantity)..": (seen "..tostring(seen)..")", market*quantity)
+		end
+		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		if IsShiftKeyDown() then
+			local modules = AucAdvanced.GetAllModules(nil, "Stat")
+			for pos, engineLib in ipairs(modules) do
+				if engineLib.GetItemPDF then
+					local pricearray = engineLib.GetPriceArray(saneLink)
+					if pricearray.price and pricearray.price > 0 then
+						if quantity == 1 then
+							EnhTooltip.AddLine("  "..engineLib.libName.." price:", pricearray.price)
+						else
+							EnhTooltip.AddLine("  "..engineLib.libName.." price x"..tostring(quantity)..":", pricearray.price*quantity)
+						end
+						EnhTooltip.LineColor(0.3, 0.9, 0.8)
+					end
+				end
+			end
+		end
+	end
+	
 	AucAdvanced.SendProcessorMessage("tooltip", frame, name, saneLink, quality, quantity, cost, additional)
 end
 
