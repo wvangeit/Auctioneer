@@ -620,6 +620,7 @@ end
 function private.update._2_02()
 	private.integrityCheck(true)
 	private.playerData["version"] = 2.02
+	private.update._2_03()
 end
 
 
