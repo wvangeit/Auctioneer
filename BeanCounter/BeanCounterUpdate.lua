@@ -480,7 +480,7 @@ local integrityClean, integrityCount = true, 0
 							end
 							integrityClean = false
 						elseif itemStringLength < 9 then
-							itemStringNew = itemString..":80"
+							local itemStringNew = itemString..":80"
 							private.serverData[player][DB][itemID][itemStringNew] = data
 							private.serverData[player][DB][itemID][itemString] = nil
 							integrityClean = false
