@@ -111,13 +111,13 @@ function lib.Filter(item, searcher)
 		end
 	end
 
-	s = success
-	f = failed
+	local s = success
+	local f = failed
 	
-	target_ratio = get("ignoreitemauctionhistory.target_ratio")
-	min_scan_filter = get("ignoreitemauctionhistory.min_scan_filter")
+	local target_ratio = get("ignoreitemauctionhistory.target_ratio")
+	local min_scan_filter = get("ignoreitemauctionhistory.min_scan_filter")
 
-	actual_ratio = 0
+	local actual_ratio = 0
 	
 	-- if we have fewer than the minimum sightings, we're not filtering
 	if (s+f) < min_scan_filter then
