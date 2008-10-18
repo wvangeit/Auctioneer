@@ -15,6 +15,7 @@
 	<script file="FilterItemQuality.lua"/>
 	<script file="FilterItemLevel.lua"/>
 	<script file="FilterItemPrice.lua"/>
+	<script file="FilterItemAuctionHistory.lua"/>
 	<Script>
 		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>
