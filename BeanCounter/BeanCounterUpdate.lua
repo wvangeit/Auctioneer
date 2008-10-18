@@ -152,6 +152,10 @@ function private.UpgradeDatabaseVersion()
 		private.update._2_03()
 	elseif private.playerData["version"] < 2.04 then --runs validate to correctjust to ckeck itemstrings from teh 3.0 changes
 		private.update._2_04()
+	elseif private.playerData["version"] < 2.05 then
+		private.update._2_05()
+	elseif private.playerData["version"] < 2.06 then
+		private.update._2_06()
 	end
 end
 
@@ -475,6 +479,11 @@ local integrityClean, integrityCount = true, 0
 								private.serverData[player][DB][itemID][itemString] = nil
 							end
 							integrityClean = false
+						elseif itemStringLength < 9 then
+							itemStringNew = itemString..":80"
+							private.serverData[player][DB][itemID][itemStringNew] = data
+							private.serverData[player][DB][itemID][itemString] = nil
+							integrityClean = false
 						else
 							for index, text in pairs(data) do
 								tbl = {strsplit(";", text)}
@@ -592,8 +601,6 @@ function private.update._2_00C(player, key, itemID, itemLink, value)
 end
 --removes old "Wealth entry to make room for reason codes
 function private.update._2_01()
-	private.integrityCheck()
-
 	for player, v in pairs(private.serverData)do
 		for DB, data in pairs(private.serverData[player]) do
 			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
@@ -612,13 +619,10 @@ function private.update._2_01()
 		end
 		private.serverData[player]["version"] = 2.01
 	end
-
-	private.integrityCheck(true)
 	private.update._2_02()
 end
 --runs validate to correct ;Used won, Used Failed messages and prevent postDB function errors.
 function private.update._2_02()
-	private.integrityCheck(true)
 	private.playerData["version"] = 2.02
 	private.update._2_03()
 end
@@ -628,7 +632,6 @@ end
 --Updates all keys and itemLinks due to extension in WotLK expansion
 --NOT IMPLEMENTED UNTIL CLIENT VERSION IS 30000
 function private.update._2_03()
-	private.integrityCheck(true)
 	for player, v in pairs(private.serverData)do
 		if private.serverData[player]["version"] < 2.03 then
 			for DB, data in pairs(private.serverData[player]) do
@@ -666,10 +669,37 @@ function private.update._2_03()
 end
 --this is just to bring us to post WoW 3.0 so some of the hacks can be removed
 function private.update._2_04()
-	private.integrityCheck(true)
-	
 	for player, v in pairs(private.serverData)do
 		private.serverData[player]["version"] = 2.04
 	end
-	
+	private.update._2_05()
 end
+--Bah run one last integrity check.
+function private.update._2_05()
+	private.integrityCheck(true)
+	for player, v in pairs(private.serverData)do
+		private.serverData[player]["version"] = 2.05
+	end
+	private.update._2_06()
+end
+function private.update._2_06()
+	private.integrityCheck(true)
+
+	local temp = {}
+	for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
+		if v:match("^|.-|Hitem:.-|h%[.-%]:.-|h|r") then
+			v = v:gsub( "(.*)(|h%[.-%]):80(|h|r)", "%1:80%2%3")
+		elseif v:match("^|.-|Hitem:.-:.-:.-:.-:.-:.-:.-:.-:%d-|h%[.-%]|h|r") then
+		 --do nothing normal link
+		else--purge it, will be recreated when server sees it once again
+			v = nil
+		end
+		temp[i] = v
+	end
+	BeanCounterDB["ItemIDArray"] = temp
+		
+	for player, v in pairs(private.serverData)do
+		private.serverData[player]["version"] = 2.06
+	end
+end
+	
