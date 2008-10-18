@@ -71,10 +71,12 @@ local function itemStringFromLink(link)
 	return itemString
 end
 
+-- remove the uniqueID and viewer level from the link
+-- this needs to be updated whenever the link format changes
 local function genericizeItemLink(link)
 	-- strip out unique id
-	local _, _, head, tail = string.find(link, "^(|c%x+|H.+:)[-%d]+(|h.+)")
-	return head .. "0" .. tail
+	local _, _, head, tail = string.find(link, "^(|c%x+|H.+:)[-%d]+:%d+(|h.+)")
+	return head .. "0:0" .. tail
 end
 
 local function ignoreItemPermanent(link)
