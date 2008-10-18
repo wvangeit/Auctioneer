@@ -439,7 +439,7 @@ function private.ButtonClick(me, mouseButton)
 			private.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
 		end
 	else
-		if ( AUCTION_DISPLAY_ON_CHARACTER == "1" ) then
+		if GetCVarBool("auctionDisplayOnCharacter") then
 			DressUpItemLink(GetAuctionItemLink("list", me.id))
 		end
 		SetSelectedAuctionItem("list", me.id)
