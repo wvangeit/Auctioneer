@@ -83,7 +83,7 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 			for pos, engineLib in ipairs(modules) do
 				if engineLib.GetItemPDF then
 					local pricearray = engineLib.GetPriceArray(saneLink)
-					if pricearray.price and pricearray.price > 0 then
+					if pricearray and pricearray.price and pricearray.price > 0 then
 						if quantity == 1 then
 							EnhTooltip.AddLine("  "..engineLib.libName.." price:", pricearray.price)
 						else
