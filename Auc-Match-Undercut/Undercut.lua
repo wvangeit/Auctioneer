@@ -147,8 +147,46 @@ end
 
 local array = {}
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+function private.GetPriceModels()
+	if not private.scanValueNames then private.scanValueNames = {} end
+	for i = 1, #private.scanValueNames do
+		private.scanValueNames[i] = nil
+	end
 
+	table.insert(private.scanValueNames,{"market", "Market value"})
+	local algoList = AucAdvanced.API.GetAlgorithms()
+	for pos, name in ipairs(algoList) do
+		table.insert(private.scanValueNames,{name, "Stats: "..name})
+	end
+	return private.scanValueNames
+end
+
+function private.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+	if not get("match.undercut.tooltip") then return end
+	local model = get("match.undercut.model")
+	if not model then return end
+	local market
+	if model == "market" then
+		market = AucAdvanced.API.GetMarketValue(link)
+	else
+		market = AucAdvanced.API.GetAlgorithmValue(model, link)
+	end
+	local matcharray = lib.GetMatchArray(link, market)
+	if not matcharray.value or matcharray.value <= 0 then return end
+	if matcharray.competing == 0 then
+		EnhTooltip.AddLine("Undercut: |cff00ff00No competition")
+	elseif matcharray.returnstring:find("Can not match") then
+		EnhTooltip.AddLine("Undercut: |cffff0000Cannot Undercut")
+	elseif matcharray.returnstring:find("Lowest") then
+		if matcharray.value >= market then
+			EnhTooltip.AddLine("Undercut: |cff40ff00Competition Above market")
+		else
+			EnhTooltip.AddLine("Undercut: |cfffff000Undercutting competition")
+		end
+	end
+	EnhTooltip.LineColor(0.3, 0.9, 0.8)
+	EnhTooltip.AddLine("  Moving price "..tostring(matcharray.diff).."%:", matcharray.value)
+	EnhTooltip.LineColor(0.3, 0.9, 0.8)
 end
 
 function lib.OnLoad()
@@ -160,6 +198,8 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -20)
 	AucAdvanced.Settings.SetDefault("match.undermarket.overmarket", 10)
 	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 1)
+	AucAdvanced.Settings.SetDefault("match.undercut.tooltip", true)
+	AucAdvanced.Settings.SetDefault("match.undercut.model", "market")
 end
 
 --[[ Local functions ]]--
@@ -197,6 +237,12 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Specify the amount to undercut by a specific amount, instead of by a percentage")
 
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, "Undercut Amount")
+	gui:AddControl(id, "Subhead",    0,    "Tooltip Setting")
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip", "Show undercut status in tooltip")
+	gui:AddTip(id, "Add a line to the tooltip showing whether the current competition is undercuttable")
+	gui:AddControl(id, "Note",       0, 2, 500, 15, "Tooltip price valuation method")
+	gui:AddControl(id, "Selectbox",  0, 2, private.GetPriceModels, "match.undercut.model", "Pricing model to use")
+	gui:AddTip(id, "The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else")
 
 end
 
