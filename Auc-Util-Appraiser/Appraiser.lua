@@ -80,30 +80,15 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
 
-	local sig = lib.GetSigFromLink(hyperlink)
-	if sig then
-		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
-		if curModel == "default" then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-		end
-
-		local value
-		if curModel == "fixed" then
-			value = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.buy")
-			if not value then
-				value = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.bid")
-			end
-		elseif curModel == "market" then
-			value = AucAdvanced.API.GetMarketValue(hyperlink)
-		else
-			value = AucAdvanced.API.GetAlgorithmValue(curModel, hyperlink)
-		end
-
+	local value, bid, _, _, curModel = lib.GetPrice(hyperlink)
 		if value then
-			EnhTooltip.AddLine("Appraiser |cffddeeff("..curModel..")|r x|cffddeeff"..quantity.."|r", value * quantity)
+			EnhTooltip.AddLine("Appraiser (|cffddeeff"..curModel.."|r) x|cffddeeff"..quantity.."|r", value * quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
+				EnhTooltip.AddLine("  Starting bid x|cffddeeff"..quantity.."|r", bid * quantity)
+				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			end
 		end
-	end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
         -- Just to make sure it has the data seeing it likes to not load when you first load the auction house currently
         local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");

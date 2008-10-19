@@ -243,6 +243,7 @@ end
 
 -- Configure our defaults
 AucAdvanced.Settings.SetDefault("util.appraiser.enable", false)
+AucAdvanced.Settings.SetDefault("util.appraiser.bidtooltip", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
 AucAdvanced.Settings.SetDefault("util.appraiser.ownauctions", false)
 AucAdvanced.Settings.SetDefault("util.appraiser.altModel", "market")
@@ -293,6 +294,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    lib.libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
 	gui:AddTip(id, "This option will cause the current Appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.appraiser.bidtooltip", "Also show starting bid")
+	gui:AddTip(id, "This option will cause Appraiser to also show the starting bid price in the tooltip")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.ownauctions", "Show own Auctions in the tooltips?")
 	gui:AddTip(id, "This option will cause your current auctions to be displayed in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", "Color Appraiser items by their PriceLevel data")
