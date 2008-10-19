@@ -50,12 +50,12 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Searchers")
 
 	-- Add the help
-	gui:AddSearcher("Prospect", "Search for items which will prospect for you into given reagents (for levelling)", 100)
+	gui:AddSearcher("Prospect", "Search for items which can be prospected for profit", 100)
 	gui:AddHelp(id, "prospect searcher",
 		"What does this searcher do?",
-		"This searcher provides the ability to search for items which will prospect into the reagents you need to have in order to level your gemcrafting skill. It is not a searcher meant for profit, but rather least cost for levelling.")
+		"This searcher provides the ability to search for ores which will prospect into gems that on average will have a greater value than the purchase price of the original ore.")
 
-	if not (Enchantrix and Enchantrix.Storage) then
+	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemProspectTotals) then
 		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
 		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with Prospect")
 		return
@@ -84,19 +84,19 @@ function lib:MakeGuiConfig(gui)
 end
 
 function lib.Search(item)
-	if not (Enchantrix and Enchantrix.Storage) then
+	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemProspectTotals) then
 		return false, "Enchantrix not detected"
 	end
 	if (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
 		return false, "No buyout"
 	end
 	if item[Const.QUALITY] ~= 1 then -- All prospectable ores are "Common" quality
-		return false, "Item not Prospectable"
+		return false, "Item not prospectable"
 	end
 	-- Give up if it doesn't prospect to anything
 	local prospects = Enchantrix.Storage.GetItemProspects(item[Const.LINK])
 	if not prospects then
-		return false, "Item not Prospectable"
+		return false, "Item not prospectable"
 	end
 
 	local market, _, pctstring
@@ -110,12 +110,12 @@ function lib.Search(item)
 	end
 	local skillneeded = Enchantrix.Util.JewelCraftSkillRequiredForItem(item[Const.LINK])
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
-		return false, "Skill not high enough to Prospect"
+		return false, "Skill not high enough to prospect"
 	end
 
 	_, _, _, market = Enchantrix.Storage.GetItemProspectTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
-		return false, "Item not Prospectable"
+		return false, "Item not prospectable"
 	end
 
 	--adjust for stack size

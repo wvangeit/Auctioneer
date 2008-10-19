@@ -7,6 +7,7 @@
 	<Script file="SearcherDisenchant.lua"/>
 	<Script file="SearcherEnchantMats.lua"/>
 	<Script file="SearcherProspect.lua"/>
+	<Script file="SearcherMilling.lua"/>
 	<Script file="SearcherConverter.lua"/>
 	<Script file="SearcherSnatch.lua"/>
     <Script file="SearcherVendor.lua"/>

@@ -50,10 +50,10 @@ function lib:MakeGuiConfig(gui)
 	local id = gui:AddTab(lib.tabname, "Searchers")
 
 	-- Add the help
-	gui:AddSearcher("Disenchant", "Search for items which can be disenchanted, prospected or milled for profit", 100)
+	gui:AddSearcher("Disenchant", "Search for items which can be disenchanted for profit", 100)
 	gui:AddHelp(id, "disenchant searcher",
 		"What does this searcher do?",
-		"This searcher provides the ability to search for items that are able to be disenchanted, prospected, or milled into items that on average will have a greater value than the purchase price of the given item.")
+		"This searcher provides the ability to search for items that are able to be disenchanted into reagents that on average will have a greater value than the purchase price of the given item.")
 
 	if not (Enchantrix and Enchantrix.Storage) then
 		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
@@ -91,7 +91,7 @@ function lib.Search(item)
 		return false, "No buyout"
 	end
 	if item[Const.QUALITY] <= 1 then
-		return false, "Item not DEable"
+		return false, "Item not disenchantable"
 	end
 	local market, _, pctstring
 	local minskill = 0
@@ -104,11 +104,11 @@ function lib.Search(item)
 	end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], item[Const.QUALITY])
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
-		return false, "Skill not high enough to DE"
+		return false, "Skill not high enough to disenchant"
 	end
 	_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
-		return false, "Item not DEable"
+		return false, "Item not disenchantable"
 	end
 
 	--adjust for brokerage costs
