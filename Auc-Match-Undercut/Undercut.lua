@@ -172,7 +172,7 @@ function private.ProcessTooltip(frame, name, link, quality, quantity, cost, addi
 		market = AucAdvanced.API.GetAlgorithmValue(model, link)
 	end
 	local matcharray = lib.GetMatchArray(link, market)
-	if not matcharray.value or matcharray.value <= 0 then return end
+	if not matcharray or not matcharray.value or matcharray.value <= 0 then return end
 	if matcharray.competing == 0 then
 		EnhTooltip.AddLine("Undercut: |cff00ff00No competition")
 	elseif matcharray.returnstring:find("Can not match") then
