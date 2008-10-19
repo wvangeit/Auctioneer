@@ -52,6 +52,7 @@ local getItemProspectTotals			-- Enchantrix.Storage.GetItemProspectTotals()
 
 local saveMilling					-- Enchantrix.Storage.SaveMilling
 local getItemMilling				-- Enchantrix.Storage.GetItemMilling()
+local getItemMillingTotals			-- Enchantrix.Storage.GetItemMillingTotals()
 
 
 -- Local functions
@@ -358,6 +359,32 @@ function getItemDisenchantTotals(link)
 end
 
 
+-- NOTE - ccox - calculation copied from itemTooltip, I couldn't easily reuse the code
+-- TODO - REVISIT - ccox - share the code with itemTooltip
+-- NOTE - RockSlice - this function now returns value for one herb
+function getItemMillingTotals(link)
+	local data = Enchantrix.Storage.GetItemMilling(link)
+	if not data then
+		-- error message would have been printed inside GetItemMilling
+		return
+	end
+	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
+
+	for result, resProb in pairs(data) do
+		local style, extra = Enchantrix.Util.GetPricingModel()
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result,extra)
+		local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
+		totalHSP = totalHSP + resHSP
+		totalMed = totalMed + resMed
+		totalMkt = totalMkt + resMkt
+		totalFive = totalFive + resFive
+	end
+	--so far, we've been calculating per milling.  We need price per unit
+	totalHSP, totalMed, totalMkt, totalFive = totalHSP/5, totalMed/5, totalMkt/5, totalFive/5
+	return totalHSP, totalMed, totalMkt, totalFive
+end
+
+
 -- NOTE - ccox - calculation copied from itemTooltip, but not remotely shareable
 -- this version takes a table of pre-calculated reagent prices
 -- this simplifies the inner loop of some calculations, and allow for custom pricing
@@ -638,6 +665,7 @@ Enchantrix.Storage = {
 
 	SaveMilling = saveMilling,
 	GetItemMilling = getItemMilling,
+	GetItemMillingTotals = getItemMillingTotals,
 }
 
 -- Make all globals local to this file
