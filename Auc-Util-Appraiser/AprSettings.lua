@@ -305,6 +305,7 @@ function private.SetupConfigGui(gui)
 		{"RIGHT", "Right"},
 		{"TOP", "Top"},
 		{"BOTTOM", "Bottom"},
+		{"OFF", "Off"},
 	}, "util.appraiser.colordirection", "Pick the gradient direction")
 	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the Appraiser Browse window (if enabled).")
 

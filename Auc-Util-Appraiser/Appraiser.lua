@@ -54,6 +54,10 @@ function lib.Processor(callbackType, ...)
 			private.frame.SetPriceFromModel()
 			private.frame.UpdateControls()
 			private.frame.salebox.config = nil
+			local change = ... --get the reason if its a scrollframe color change re-render the window
+			if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
+				private.frame.UpdateImage()
+			end
 		end
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
