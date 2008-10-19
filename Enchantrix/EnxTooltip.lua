@@ -136,24 +136,6 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 	totalMkt = totalMkt * groups;
 	totalFive = totalFive * groups;
 
-	-- Terse mode
-	if Enchantrix.Settings.GetSetting('ToolTipProspectTerseFormat') and not IsControlKeyDown() then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipProspectShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctVal'), totalFive, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueHSP') and totalHSP > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueMedian') and totalMed > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowBaselineValue') and totalMkt > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		end
-		return
-	end
-
 	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
 		-- Header
 		local totalText = ""
@@ -254,24 +236,6 @@ local function millingTooltip(prospect, funcVars, retVal, frame, name, link, qua
 	totalMed = totalMed * groups;
 	totalMkt = totalMkt * groups;
 	totalFive = totalFive * groups;
-
-	-- Terse mode
-	if Enchantrix.Settings.GetSetting('ToolTipMillingTerseFormat') and not IsControlKeyDown() then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipMillingShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctVal'), totalFive, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipMillingShowAuctValueHSP') and totalHSP > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipMillingShowAuctValueMedian') and totalMed > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipMillingShowBaselineValue') and totalMkt > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		end
-		return
-	end
 
 	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
 		-- Header
@@ -400,29 +364,6 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
-
-	-- Terse mode
-	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
-		if (allFixed) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueFixedVal'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		else
-			if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			end
-		end
-		return
-	end
 
 	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
 		-- Header

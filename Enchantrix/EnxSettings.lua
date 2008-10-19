@@ -113,7 +113,6 @@ local settingDefaults = {
 	['chatShowFindings'] = true,
 
 	['ToolTipEmbedInGameTip'] = false,
-	['ToolTipTerseFormat'] = false,
 	['TooltipShowValues'] = true,
 	['TooltipShowAuctValueHSP'] = true,
 	['TooltipShowAuctValueMedian'] = true,
@@ -126,7 +125,6 @@ local settingDefaults = {
 	['TooltipProspectLevels'] = true,		-- should the tooltip show skill level needed to prospect?
 	['TooltipProspectValues'] = true,		-- should the tooltip show prospecting values
 	['TooltipProspectMats'] = true,			-- should the item tooltip show what it prospects into? (for those who are just greedy)
-	['ToolTipProspectTerseFormat'] = false,
 	['TooltipProspectShowAuctValueHSP'] = true,
 	['TooltipProspectShowAuctValueMedian'] = true,
 	['TooltipProspectShowBaselineValue'] = true,
@@ -136,7 +134,6 @@ local settingDefaults = {
 	['TooltipMillingLevels'] = true,		-- should the tooltip show skill level needed to Milling?
 	['TooltipMillingValues'] = true,		-- should the tooltip show Millinging values
 	['TooltipMillingMats'] = true,			-- should the item tooltip show what it Millings into? (for those who are just greedy)
-	['ToolTipMillingTerseFormat'] = false,
 	['TooltipMillingShowAuctValueHSP'] = true,
 	['TooltipMillingShowAuctValueMedian'] = true,
 	['TooltipMillingShowBaselineValue'] = true,
@@ -508,7 +505,6 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
-	gui:AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", _ENCH("GuiValueTerse"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
 		if (Auctioneer) then
 			gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
