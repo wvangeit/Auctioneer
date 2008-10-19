@@ -383,7 +383,7 @@ end
 The below code manages the mailboxes Icon color /read/unread status
 
 ]]--
-function private.mailFrameClick(index)
+function private.mailFrameClick(self, index)
 	if BeanCounterDB[private.realmName][private.playerName]["mailbox"][index] then
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
 	end
