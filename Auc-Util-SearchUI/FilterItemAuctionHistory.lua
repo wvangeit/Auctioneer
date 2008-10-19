@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Search UI - Filter IgnoreItemauctionhistory
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: FilterItemAuctionHistory.lua 3277 2008-07-28 12:04:47Z Norganna $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is a plugin module for the SearchUI that assists in searching by refined paramaters
@@ -136,4 +136,4 @@ function lib.Filter(item, searcher)
 	return false
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-SearchUI/FilterItemAuctionHistory.lua $", "$Rev: 3277 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
