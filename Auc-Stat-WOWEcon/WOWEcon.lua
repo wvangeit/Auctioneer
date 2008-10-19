@@ -76,12 +76,16 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not (Wowecon and Wowecon.API) then return end
 
+	--Remove trailing :80 from item link, WoWEcon doesn't expect it and can't handle it.
+	hyperlink = string.gsub(hyperlink, "(|Hitem:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+):%d+(|h)", "%1%2")
+
 	array.hyperlink = hyperlink
 	hyperlink = private.Sanitize(hyperlink)
 	array.sanitized = hyperlink
 
 	-- Get our statistics
 	local price,seen,specific = Wowecon.API.GetAuctionPrice_ByLink(hyperlink)
+
 	array.price = price
 	array.seen = seen or 0
 	array.specific = specific
@@ -192,7 +196,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.tooltip") then return end
 	lib.GetPriceArray(hyperlink)
 
-	if array.seen > 0 then
+	if array.seen and array.seen > 0 then
 		EnhTooltip.AddLine(libName.." prices (seen "..array.seen..")")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 
