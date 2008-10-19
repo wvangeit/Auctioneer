@@ -125,6 +125,7 @@ function lib.PushSearch()
 	if equiploc == "" then
 		equiploc = nil
 	end
+	equiploc = Const.InvTypes[equiploc]
 	AucAdvanced.Scan.PushScan()
 	AucAdvanced.Scan.StartScan(private.CurAuction["itemname"], minlevel, minlevel, equiploc, TypeID, SubTypeID, nil, rarity)
 end
@@ -138,10 +139,21 @@ function lib.FinishedSearch(query)
 		if equiploc == "" then
 			equiploc = nil
 		end
+		equiploc = Const.InvTypes[equiploc]
 		if (rarity == query.quality) and (minlevel == query.minUseLevel) and (equiploc == query.invType)
 		and (private.CurAuction["itemname"] == query.name) then
 			print("AucAdv: Auction for "..private.CurAuction["link"].." no longer exists")
 			empty(private.CurAuction)
+		elseif not AucAdvanced.Scan.IsScanning() then
+			table.insert(private.BuyRequests, 1, {
+				private.CurAuction["link"],
+				private.CurAuction["sellername"],
+				private.CurAuction["count"],
+				private.CurAuction["minbid"],
+				private.CurAuction["buyout"],
+				private.CurAuction["price"]
+			})
+			empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
 		end
 	end
 end
