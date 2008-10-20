@@ -54,6 +54,7 @@ lib.Print = print
 private.BuyRequests = {}
 private.CurAuction = {}
 private.PendingBids = {}
+private.Searching = false
 
 --[[
 	to add an auction to the Queue:
@@ -68,8 +69,12 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 		print("AucAdv: Can't buy "..link.." : "..problem)
 		return
 	end
-
-	table.insert(private.BuyRequests, {link, seller, count, minbid, buyout, price, reason})
+	link = AucAdvanced.SanitizeLink(link)
+	if buyout > 0 and price > buyout then
+		price = buyout
+	end
+	table.insert(private.BuyRequests, {link = link, sellername=seller, count=count, minbid=minbid, buyout=buyout, price=price, reason = reason})
+	lib.ScanPage()
 end
 
 --[[
@@ -89,27 +94,16 @@ function lib.CanBuy(price, seller)
 end
 
 function lib.PushSearch()
-	local link = private.BuyRequests[1][1]
-	private.CurAuction["link"] = AucAdvanced.SanitizeLink(link)
-	private.CurAuction["sellername"] = private.BuyRequests[1][2]
-	private.CurAuction["count"] = private.BuyRequests[1][3]
-	private.CurAuction["minbid"] = private.BuyRequests[1][4]
-	private.CurAuction["buyout"] = private.BuyRequests[1][5]
-	private.CurAuction["price"] = private.BuyRequests[1][6]
-	if (private.CurAuction["buyout"] > 0) and (private.CurAuction["price"] > private.CurAuction["buyout"]) then
-		private.CurAuction["price"] = private.CurAuction["buyout"]
-	end
-	private.CurAuction["reason"] = private.BuyRequests[1][7] or ""
-	table.remove(private.BuyRequests, 1)
-	local canbuy, reason = lib.CanBuy(private.CurAuction["price"], private.CurAuction["sellername"])
+	local link = private.BuyRequests[1]["link"]
+	local canbuy, reason = lib.CanBuy(private.BuyRequests[1]["price"], private.BuyRequests[1]["sellername"])
 	if not canbuy then
-		print("AucAdv: Can't buy "..private.CurAuction["link"].." : "..reason)
-		private.CurAuction = {}
+		print("AucAdv: Can't buy "..private.BuyRequests[1]["link"].." : "..reason)
+		table.remove(private.BuyRequests[1])
 		return
 	end
 
 	local minlevel, equiploc, itemType, itemSubType, stack, rarity, TypeID, SubTypeID
-	private.CurAuction["itemname"], _, rarity, _, minlevel, itemType, itemSubType, stack, equiploc = GetItemInfo(private.CurAuction["link"])
+	private.BuyRequests[1]["itemname"], _, rarity, _, minlevel, itemType, itemSubType, stack = GetItemInfo(link)
 	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
 		if catName == itemType then
 			TypeID = catId
@@ -122,40 +116,36 @@ function lib.PushSearch()
 			break
 		end
 	end
-	if equiploc == "" then
-		equiploc = nil
-	end
-	equiploc = Const.InvTypes[equiploc]
 	AucAdvanced.Scan.PushScan()
-	AucAdvanced.Scan.StartScan(private.CurAuction["itemname"], minlevel, minlevel, equiploc, TypeID, SubTypeID, nil, rarity)
+	private.Searching = true
+	AucAdvanced.Scan.StartScan(private.BuyRequests[1]["itemname"], minlevel, minlevel, nil, TypeID, SubTypeID, nil, rarity)
 end
 
 function lib.FinishedSearch(query)
-	if private.CurAuction["link"] then
-		local _, _, rarity, _, minlevel, _, _, _, equiploc = GetItemInfo(private.CurAuction["link"])
-		if minlevel == 0 then
-			minlevel = nil
-		end
-		if equiploc == "" then
-			equiploc = nil
-		end
-		equiploc = Const.InvTypes[equiploc]
-		if (rarity == query.quality) and (minlevel == query.minUseLevel) and (equiploc == query.invType)
-		and (private.CurAuction["itemname"] == query.name) then
-			print("AucAdv: Auction for "..private.CurAuction["link"].." no longer exists")
-			empty(private.CurAuction)
-		elseif not AucAdvanced.Scan.IsScanning() then
-			table.insert(private.BuyRequests, 1, {
-				private.CurAuction["link"],
-				private.CurAuction["sellername"],
-				private.CurAuction["count"],
-				private.CurAuction["minbid"],
-				private.CurAuction["buyout"],
-				private.CurAuction["price"]
-			})
-			empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
+	if #private.BuyRequests > 0 then
+		for i, BuyRequest in pairs(private.BuyRequests) do
+			local _, _, rarity, _, minlevel, _, _, _, equiploc = GetItemInfo(BuyRequest["link"])
+			if minlevel == 0 then
+				minlevel = nil
+			end
+			if (rarity == query.quality) and (minlevel == query.minUseLevel)
+			and (BuyRequest["itemname"] == query.name) then
+				print("AucAdv: Auction for "..BuyRequest["link"].." no longer exists")
+				table.remove(private.BuyRequests, i)
+	--		elseif not AucAdvanced.Scan.IsScanning() then
+	--			table.insert(private.BuyRequests, 1, {
+	--				private.CurAuction["link"],
+	--				private.CurAuction["sellername"],
+	--				private.CurAuction["count"],
+	--				private.CurAuction["minbid"],
+	--				private.CurAuction["buyout"],
+	--				private.CurAuction["price"]
+	--			})
+	--			empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
+			end
 		end
 	end
+	private.Searching = false
 end
 
 function private.PromptPurchase()
@@ -175,7 +165,11 @@ function private.PromptPurchase()
 	else
 		private.Prompt.Text:SetText("Are you sure you want to buyout")
 	end
-	private.Prompt.Value:SetText(private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
+	if private.CurAuction["count"] == 1 then
+		private.Prompt.Value:SetText(private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
+	else
+		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
+	end
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
 	private.Prompt.Reason:SetText(private.CurAuction["reason"])
 	local width = private.Prompt.Value:GetStringWidth() or 0
@@ -183,35 +177,39 @@ function private.PromptPurchase()
 end
 
 function lib.ScanPage()
-	if not private.CurAuction["link"] then
-		return
-	end
+	if #private.BuyRequests == 0 then return end
+	if private.Prompt:IsVisible() then return end
 	local batch = GetNumAuctionItems("list")
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		link = AucAdvanced.SanitizeLink(link)
-		if link == private.CurAuction["link"] then
-			local price = private.CurAuction["price"]
-			local buy = private.CurAuction["buyout"]
-			local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", i)
-			if ishigh and ((not buy) or (buy <= 0) or (price < buy)) then
-				print("Unable to bid on "..link..". Already highest bidder")
-				private.CurAuction = {}
-			else
-				ishigh = false --we're buying, not bidding, so being high bidder doesn't matter
-			end
-			if ((not owner) or (not private.CurAuction["sellername"]) or (private.CurAuction["sellername"] == "") or (owner == private.CurAuction["sellername"]))
-			and (not ishigh)
-			and (count == private.CurAuction["count"]) and (minBid == private.CurAuction["minbid"])
-			and (buyout == private.CurAuction["buyout"]) then --found the auction we were looking for
-				if (private.CurAuction["price"] >= (curBid + minIncrement)) or (private.CurAuction["price"] >= buyout) then
-					private.CurAuction["index"] = i
-					private.CurAuction["texture"] = texture
-					private.PromptPurchase()
-					return
+		for j, BuyRequest in pairs(private.BuyRequests) do
+			if link == BuyRequest["link"] then
+				local price = BuyRequest["price"]
+				local buy = BuyRequest["buyout"]
+				local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", i)
+				if ishigh and ((not buy) or (buy <= 0) or (price < buy)) then
+					print("Unable to bid on "..link..". Already highest bidder")
+					table.remove(private.BuyRequests, j)
 				else
-					print("Unable to bid on "..link..". Price invalid")
-					private.CurAuction = {}
+					ishigh = false --we're buying, not bidding, so being high bidder doesn't matter
+				end
+				if ((not owner) or (not BuyRequest["sellername"]) or (BuyRequest["sellername"] == "") or (owner == BuyRequest["sellername"]))
+				and (not ishigh)
+				and (count == BuyRequest["count"]) and (minBid == BuyRequest["minbid"])
+				and (buyout == BuyRequest["buyout"]) then --found the auction we were looking for
+					if (BuyRequest["price"] >= (curBid + minIncrement)) or (BuyRequest["price"] >= buyout) then
+						private.CurAuction = replicate(BuyRequest)
+						private.CurAuction["index"] = i
+						private.CurAuction["texture"] = texture
+						private.CurAuction["link"] = AucAdvanced.SanitizeLink(link)
+						table.remove(private.BuyRequests, j)
+						private.PromptPurchase()
+						return
+					else
+						print("Unable to bid on "..link..". Price invalid")
+						table.remove(private.BuyRequests, j)
+					end
 				end
 			end
 		end
@@ -219,15 +217,16 @@ function lib.ScanPage()
 end
 
 function private.PerformPurchase()
+	private.Searching = false
 	if type(private.CurAuction["price"])~="number" then
 		AucAdvanced.Print("Cancelling bid: invalid price: "..type(private.CurAuction["price"])..":"..tostring(private.CurAuction["price"]))
-		private.CurAuction = {}
+		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
 		return
 	elseif type(private.CurAuction["index"]) ~= "number" then
 		AucAdvanced.Print("Cancelling bid: invalid index: "..type(private.CurAuction["index"])..":"..tostring(private.CurAuction["index"]))
-		private.CurAuction = {}
+		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
 		return
@@ -246,9 +245,10 @@ function private.PerformPurchase()
 	end
 
 	--get ready for next bid action
-	private.CurAuction = {}
+	empty(private.CurAuction)
 	private.Prompt:Hide()
 	AucAdvanced.Scan.SetPaused(false)
+	lib.ScanPage()--check the page for any more auctions
 end
 
 function private.removePendingBid()
@@ -264,9 +264,12 @@ function private.removePendingBid()
 end
 
 function private.CancelPurchase()
+	private.Searching = false
 	private.CurAuction = {}
 	private.Prompt:Hide()
 	AucAdvanced.Scan.SetPaused(false)
+	--scan the page again for other auctions
+	lib.ScanPage()
 end
 
 function private.onEventHookBid(_, event, arg1)
@@ -314,10 +317,10 @@ end
 
 function private.OnUpdate()
 	if AuctionFrame and AuctionFrame:IsVisible() then
-		if (not private.CurAuction["link"])
-				and (not AucAdvanced.Scan.IsPaused())
-				and (#private.BuyRequests > 0) then
-			lib.PushSearch()
+		if (not private.Prompt:IsShown()) --if we have a prompt, we don't need to look any more
+			and (not private.Searching)
+			and (#private.BuyRequests > 0) then
+				lib.PushSearch()
 		end
 	elseif private.CurAuction["link"] then --AH was closed, so reinsert current request back into the queue
 		table.insert(private.BuyRequests, 1, {
@@ -328,6 +331,7 @@ function private.OnUpdate()
 			private.CurAuction["buyout"],
 			private.CurAuction["price"]
 		})
+		private.Prompt:Hide()
 		empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
 	end
 end
@@ -362,7 +366,7 @@ private.updateFrame:SetScript("OnEvent", private.OnEvent)
 
 private.Prompt = CreateFrame("frame", "AucAdvancedBuyPrompt", UIParent)
 private.Prompt:Hide()
-private.Prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
+private.Prompt:SetPoint("TOPRIGHT", "UIParent", "TOPRIGHT", -400, -100)
 private.Prompt:SetFrameStrata("DIALOG")
 private.Prompt:SetHeight(120)
 private.Prompt:SetWidth(400)
@@ -419,7 +423,7 @@ private.Prompt.Yes:SetScript("OnClick", private.PerformPurchase)
 
 private.Prompt.No = CreateFrame("Button", "AucAdvancedBuyPromptNo", private.Prompt, "OptionsButtonTemplate")
 private.Prompt.No:SetText("Cancel")
-private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -20, 0)
+private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -60, 0)
 private.Prompt.No:SetScript("OnClick", private.CancelPurchase)
 
 private.Prompt.DragTop = CreateFrame("Button", nil, private.Prompt)
