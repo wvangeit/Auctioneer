@@ -83,7 +83,7 @@ local HUGEEMERALD = 12364
 local BLOODGARNET = 23077
 local FLAMESPESSARITE = 21929
 local GOLDENDRAENITE = 23112
-local DEEPPERIDOT = 23709
+local DEEPPERIDOT = 23079
 local AZUREMOONSTONE = 23117
 local SHADOWDRAENITE = 23107
 local LIVINGRUBY = 23436
@@ -162,7 +162,7 @@ local isDEMats =
 -- Mail Functions
 ---------------------------------------------------------
 function lib.gemAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -184,7 +184,7 @@ function lib.gemAction()
 end
 
 function lib.dematAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -206,7 +206,7 @@ function lib.dematAction()
 end
 
 function lib.disenchantAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -241,7 +241,7 @@ function lib.disenchantAction()
 end
 
 function lib.prospectAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
