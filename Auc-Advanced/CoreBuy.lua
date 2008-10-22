@@ -83,6 +83,9 @@ end
 	Note that this will not catch all, but if it says you can't, you can't
 ]]
 function lib.CanBuy(price, seller)
+	if not price then
+		return false, "no price given"
+	end
 	local money = GetMoney()
 	local realm = GetRealmName()
 	if seller and AucAdvancedConfig["users."..realm.."."..seller] then
