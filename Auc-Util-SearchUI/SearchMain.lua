@@ -449,6 +449,7 @@ function private.removeall()
 	lib.CleanTable(private.sheetData)
 	gui.sheet.selected = nil
 	gui.sheet:SetData(private.sheetData)
+	gui.sheet:Render() --need to redraw, so the selection looks right
 	lib.UpdateControls()
 end
 
@@ -1329,6 +1330,11 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 						cur/count
 					})
 					gui.sheet:SetData(private.sheetData)
+					if #private.sheetData == 1 then --sheet was empty, so select the just added auction
+						gui.sheet.selected = 1
+						gui.sheet:Render() --need to redraw, so the selection looks right
+						lib.UpdateControls()
+					end
 				end
 				return true, item["profit"], value
 			end

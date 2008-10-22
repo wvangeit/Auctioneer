@@ -60,7 +60,9 @@ default("realtime.alert.chat", true)
 default("realtime.alert.showwindow", true)
 default("realtime.alert.sound", "DoorBell")
 
+local SearchUIgui
 function lib:MakeGuiConfig(gui)
+	SearchUIgui = gui
 	local id = gui:AddTab(lib.tabname, "Options")
 	gui:MakeScrollable(id)
 
@@ -302,6 +304,12 @@ function private.alert(link, cost, reason)
 	end
 	if get("realtime.alert.showwindow") then
 		AucSearchUI.Show()
+		if SearchUIgui then
+			if SearchUIgui.tabs.active then
+				SearchUIgui:ContractFrame(SearchUIgui.tabs.active)
+			end
+			SearchUIgui:ClearFocus()
+		end
 	end
 	local SoundPath = get("realtime.alert.sound")
 	if SoundPath and (SoundPath ~= "none") and not private.playedsound then
