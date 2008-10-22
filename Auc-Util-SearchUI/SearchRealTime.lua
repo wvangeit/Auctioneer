@@ -59,6 +59,7 @@ default("realtime.maxprice", 10000000)
 default("realtime.alert.chat", true)
 default("realtime.alert.showwindow", true)
 default("realtime.alert.sound", "DoorBell")
+default("realtime.skipresults", false)
 
 local SearchUIgui
 function lib:MakeGuiConfig(gui)
@@ -91,6 +92,9 @@ function lib:MakeGuiConfig(gui)
 		{"DoorBell", "DoorBell (BottomScan-style)"},
 	}, "realtime.alert.sound", "Pick the sound to play")
 	gui:AddTip(id, "The selected sound will play whenever a bargain is found")
+	gui:AddControl(id, "Subhead",       0,    "Power-user setting: One-Click Buying")
+	gui:AddControl(id, "Checkbox",      0, 1, "realtime.skipresults", "Skip results and go straight to purchase confirmation !Power-user setting!")
+	gui:AddTip(id, "One-Click Buying: RTS will queue the purchase instead of listing the item in SearchUI")
 	gui:AddControl(id, "Subhead",          0,    "Searchers to use")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
@@ -282,10 +286,22 @@ function lib.ScanPage()
 			private.ItemTable[Const.FACTOR]  = factor
 			private.ItemTable[Const.ENCHANT]  = enchant
 			private.ItemTable[Const.SEED]  = seed
-
+			
+			local skipresults = get("realtime.skipresults")
 			for i, searcher in pairs(private.searchertable) do
-				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false) then
+				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false, skipresults) then
 					private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])
+					if skipresults then
+						local price = 0
+						AucAdvanced.Buy.QueueBuy(private.ItemTable[Const.LINK],
+							private.ItemTable[Const.SELLER],
+							private.ItemTable[Const.COUNT],
+							private.ItemTable[Const.MINBID],
+							private.ItemTable[Const.BUYOUT],
+							private.ItemTable["cost"],
+							AucSearchUI.Private.cropreason(private.ItemTable["reason"])
+							)
+					end
 				end
 			end
 		end
@@ -302,7 +318,7 @@ function private.alert(link, cost, reason)
 	if get("realtime.alert.chat") then
 		print("SearchUI: "..reason..": Found "..link.." for "..EnhTooltip.GetTextGSC(cost, true))
 	end
-	if get("realtime.alert.showwindow") then
+	if get("realtime.alert.showwindow") and (not get("realtime.skipresults")) then
 		AucSearchUI.Show()
 		if SearchUIgui then
 			if SearchUIgui.tabs.active then

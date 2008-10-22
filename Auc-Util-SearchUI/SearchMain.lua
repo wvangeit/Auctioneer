@@ -1283,35 +1283,35 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 				end
 			end
 			if nodupes or (not isdupe) then
-				if not debugonly then
-					local level, _, r, g, b
-					local pctstring = ""
-					if not pct and AucAdvanced.Modules.Util.PriceLevel then
-						local valueper
-						if value then
-							valueper = value/item[Const.COUNT]
-						end
-						if buyorbid == "bid" then
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], valueper)
-						else
-							level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
-						end
-						if level then
-							r = r*255
-							g = g*255
-							b = b*255
-							--first color code here is for sorting purposes
-							pctstring = string.format("|cff%06d|cff%02x%02x%02x"..math.floor(level), 100*level, r, g, b)
-							pct = pctstring
-						end
+				local level, _, r, g, b
+				local pctstring = ""
+				if not pct and AucAdvanced.Modules.Util.PriceLevel then
+					local valueper
+					if value then
+						valueper = value/item[Const.COUNT]
 					end
-					item["pct"] = pct
-					item["cost"] = cost
-					local count = item[Const.COUNT] or 1
-					local min = item[Const.MINBID] or 0
-					local cur = item[Const.CURBID] or 0
-					local buy = item[Const.BUYOUT] or 0
-					local price = item[Const.PRICE] or 0
+					if buyorbid == "bid" then
+						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.PRICE], valueper)
+					else
+						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
+					end
+					if level then
+						r = r*255
+						g = g*255
+						b = b*255
+						--first color code here is for sorting purposes
+						pctstring = string.format("|cff%06d|cff%02x%02x%02x"..math.floor(level), 100*level, r, g, b)
+						pct = pctstring
+					end
+				end
+				item["pct"] = pct
+				item["cost"] = cost
+				local count = item[Const.COUNT] or 1
+				local min = item[Const.MINBID] or 0
+				local cur = item[Const.CURBID] or 0
+				local buy = item[Const.BUYOUT] or 0
+				local price = item[Const.PRICE] or 0
+				if not debugonly then
 					table.insert(private.sheetData, {
 						item[Const.LINK],
 						item["pct"],
