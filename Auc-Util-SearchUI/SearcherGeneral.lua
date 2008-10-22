@@ -59,6 +59,19 @@ function private.getSubTypes()
 	return subtypetable
 end
 
+function private.getQuality()
+	return {
+			{-1, "All"},
+			{0, "Poor"},
+			{1, "Common"},
+			{2, "Uncommon"},
+			{3, "Rare"},
+			{4, "Epic"},
+			{5, "Legendary"},
+			{6, "Artifact"},
+		}
+end
+
 function private.getTimeLeft()
 	return {
 			{0, "Any"},
@@ -76,6 +89,7 @@ default("general.name.regexp", false)
 default("general.name.invert", false)
 default("general.type", "All")
 default("general.subtype", "All")
+default("general.quality", -1)
 default("general.timeleft", 0)
 default("general.ilevel.min", 0)
 default("general.ilevel.max", 150)
@@ -127,6 +141,9 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Note",       0.7, 1, 100, 14, "TimeLeft:")
 	gui:AddControl(id, "Selectbox",  0.7, 1, private.getTimeLeft(), "general.timeleft", "TimeLeft")
 
+	gui:AddControl(id, "Note",       0.0, 1, 100, 14, "Quality:")
+	gui:AddControl(id, "Selectbox",   0.0, 1, private.getQuality(), "general.quality", "ItemQuality")
+
 	last = gui:GetLast(id)
 	gui:SetControlWidth(0.37)
 	gui:AddControl(id, "NumeriSlider",     0,   1, "general.ilevel.min", 0, 200, 1, "Min item level")
@@ -168,6 +185,7 @@ function lib.Search(item)
 	if private.NameSearch("name", item[Const.NAME])
 			and private.TypeSearch(item[Const.ITYPE], item[Const.ISUB])
 			and private.TimeSearch(item[Const.TLEFT])
+			and private.QualitySearch(item[Const.QUALITY])
 			and private.LevelSearch("ilevel", item[Const.ILEVEL])
 			and private.LevelSearch("ulevel", item[Const.ULEVEL])
 			and private.NameSearch("seller", item[Const.SELLER])
@@ -269,6 +287,18 @@ function private.TimeSearch(iTleft)
 		return true
 	else
 		private.debug = "Time left wrong"
+		return false
+	end
+end
+
+function private.QualitySearch(iqual)
+	local quality = get("general.quality")
+	if quality == -1 then
+		return true
+	elseif quality == iqual then
+		return true
+	else
+		private.debug = "Wrong Quality"
 		return false
 	end
 end
