@@ -182,6 +182,22 @@ local settingDefaults = {
 	["maxprice"] = 10000000,
 	["maxprice.enable"] = false,
 	["tooltiphelp.show"] = true,
+	--Scrollframe defaults 
+	["columnwidth.Item"] = 120,
+	["columnwidth.Pct"] = 30,
+	["columnwidth.Profit"] = 85,
+	["columnwidth.Stk"] = 30,
+	["columnwidth.Buyout"] = 85,
+	["columnwidth.Bid"] = 85,
+	["columnwidth.Reason"] = 85,
+	["columnwidth.Seller"] = 75,
+	["columnwidth.Left"] = 40,
+	["columnwidth.Buy/ea"] = 85,
+	["columnwidth.Bid/ea"] = 85,
+	["columnwidth.MinBid"] = 85,
+	["columnwidth.CurBid"] = 85,
+	["columnwidth.Min/ea"] = 85,
+	["columnwidth.Cur/ea"] = 85,
 }
 
 local function getDefault(setting)
@@ -927,24 +943,34 @@ function lib.MakeGuiConfig()
 			QueryAuctionItems(name)
 		end
 	end
-
+	--records the column width changes
+	--store width by header name, that way if column reorginizing is added we apply size to proper column
+	function private.OnResizeSheet(self, column, width)
+		if not width then
+			lib.SetSetting("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(lib.GetSetting("columnwidth."..self.labels[column]:GetText()))
+		else
+			lib.SetSetting("columnwidth."..self.labels[column]:GetText(), width)
+		end
+	end	
+	
 	gui.sheet = ScrollSheet:Create(gui.frame, {
-		{ "Item",   "TOOLTIP", 120 },
-		{ "Pct",    "TEXT", 30  },
-		{ "Profit", "COIN", 85, { DESCENDING=true } },
-		{ "Stk",    "INT",  30  },
-		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-		{ "Bid",    "COIN", 85, { DESCENDING=true } },
-		{ "Reason", "TEXT", 85  },
-		{ "Seller", "TEXT", 75  },
-		{ "Left",   "TEXT", 40  },
-		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
-		{ "Bid/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
-		{ "MinBid", "COIN", 85, { DESCENDING=true } },
-		{ "CurBid", "COIN", 85, { DESCENDING=true } },
-		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
-		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
-	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, nil, lib.UpdateControls)
+		{ "Item",   "TOOLTIP", lib.GetSetting("columnwidth.Item") }, --120
+		{ "Pct",    "TEXT", lib.GetSetting("columnwidth.Pct")   }, --30
+		{ "Profit", "COIN", lib.GetSetting("columnwidth.Profit") , { DESCENDING=true } }, --85
+		{ "Stk",    "INT",  lib.GetSetting("columnwidth.Stk")  }, --30
+		{ "Buyout", "COIN", lib.GetSetting("columnwidth.Buyout"), { DESCENDING=true } }, --85
+		{ "Bid",    "COIN", lib.GetSetting("columnwidth.Bid"), { DESCENDING=true } }, --85
+		{ "Reason", "TEXT", lib.GetSetting("columnwidth.Reason")  }, --85
+		{ "Seller", "TEXT", lib.GetSetting("columnwidth.Seller")  }, --75
+		{ "Left",   "TEXT", lib.GetSetting("columnwidth.Left")  }, --40
+		{ "Buy/ea", "COIN", lib.GetSetting("columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
+		{ "Bid/ea", "COIN", lib.GetSetting("columnwidth.Bid/ea"), { DESCENDING=true, DEFAULT=true } }, --85
+		{ "MinBid", "COIN", lib.GetSetting("columnwidth.MinBid"), { DESCENDING=true } }, --85
+		{ "CurBid", "COIN", lib.GetSetting("columnwidth.CurBid"), { DESCENDING=true } }, --85
+		{ "Min/ea", "COIN", lib.GetSetting("columnwidth.Min/ea"), { DESCENDING=true } }, --85
+		{ "Cur/ea", "COIN", lib.GetSetting("columnwidth.Cur/ea"), { DESCENDING=true } }, --85
+	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, private.OnResizeSheet, lib.UpdateControls)
 
 
 	gui.sheet:EnableSelect(true)
