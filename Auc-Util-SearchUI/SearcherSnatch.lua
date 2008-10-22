@@ -322,7 +322,7 @@ function lib.Search(item)
 	local stackSize = item[Const.COUNT] or 1
 
 	if private.snatchList[itemsig] then
-		value =  stackSize * private.snatchList[itemsig].price
+		value =  stackSize * (private.snatchList[itemsig].price or 0)
 
 		if item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value and get("snatch.allow.buy") then
 			return "buy", value
@@ -350,7 +350,11 @@ function lib.AddSnatch(itemlink, price, count)
 		count=nil
 	end
 	--add item to snatch list
-	private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count}
+	if price then
+		private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count}
+	else
+		private.snatchList[itemsig] = nil
+	end
 	set("snatch.itemsList", private.snatchList)
 	lib.finishedItem()
 end
