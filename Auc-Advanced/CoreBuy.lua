@@ -180,7 +180,7 @@ function lib.ScanPage()
 	if #private.BuyRequests == 0 then return end
 	if private.Prompt:IsVisible() then return end
 	local batch = GetNumAuctionItems("list")
-	for i = 1, batch do
+	for i = batch, 1, -1 do
 		local link = GetAuctionItemLink("list", i)
 		link = AucAdvanced.SanitizeLink(link)
 		for j, BuyRequest in pairs(private.BuyRequests) do
@@ -323,16 +323,12 @@ function private.OnUpdate()
 				lib.PushSearch()
 		end
 	elseif private.CurAuction["link"] then --AH was closed, so reinsert current request back into the queue
-		table.insert(private.BuyRequests, 1, {
-			private.CurAuction["link"],
-			private.CurAuction["sellername"],
-			private.CurAuction["count"],
-			private.CurAuction["minbid"],
-			private.CurAuction["buyout"],
-			private.CurAuction["price"]
-		})
+		table.insert(private.BuyRequests, 1, private.CurAuction)
+		private.Searching = false
 		private.Prompt:Hide()
 		empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
+	else
+		private.Searching = false
 	end
 end
 
