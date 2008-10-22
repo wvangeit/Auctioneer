@@ -52,6 +52,9 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.AuctionFilter(operation, itemData)
+	if not get("filter.outlier.activated") then
+		return
+	end
 	if reset then
 		model = get("filter.outlier.model")
 		if model ~= "market" and not AucAdvanced.API.IsValidAlgorithm(model) then
