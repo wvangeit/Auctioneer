@@ -37,21 +37,7 @@ lib.tabname = "ItemQuality"
 -- Set our defaults
 default("ignoreitemquality.enable", false)
 
-local typename = {
-	[1] = "Armor",
-	[2] = "Consumable",
-	[3] = "Container",
-	[4] = "Gem",
-	[5] = "Key",
-	[6] = "Miscellaneous",
-	[7] = "Reagent",
-	[8] = "Recipe",
-	[9] = "Projectile",
-	[10] = "Quest",
-	[11] = "Quiver",
-	[12] = "Trade Goods",
-	[13] = "Weapon",
-}
+local typename
 
 local qualname = {
 	[0] = "Poor",
@@ -65,6 +51,9 @@ local qualname = {
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
+	if not typename then
+		typename = {GetAuctionItemClasses()}
+	end
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
@@ -95,7 +84,7 @@ function lib:MakeGuiConfig(gui)
 			gui:SetLast(id, last)
 		end
 	end
-	for i = 1, 13 do
+	for i = 1, #typename do
 		for j = 0, 6 do
 			local last = gui:GetLast(id)
 			gui:AddControl(id, "Checkbox", j*0.07+0.02, 1, "ignoreitemquality."..typename[i].."."..qualname[j], "")
@@ -110,6 +99,9 @@ end
 --This function will return true if the item is to be filtered
 --Item is the itemtable, and searcher is the name of the searcher being called. If searcher is not given, it will assume you want it active.
 function lib.Filter(item, searcher)
+	if not typename then
+		typename = {GetAuctionItemClasses()}
+	end
 	if (not get("ignoreitemquality.enable"))
 			or (searcher and (not get("ignoreitemquality.filter."..searcher))) then
 		return

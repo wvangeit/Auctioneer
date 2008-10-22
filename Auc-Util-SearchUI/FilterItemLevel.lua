@@ -37,24 +37,13 @@ lib.tabname = "ItemLevel"
 -- Set our defaults
 default("ignoreitemlevel.enable", false)
 
-local typename = {
-	[1] = "Armor",
-	[2] = "Consumable",
-	[3] = "Container",
-	[4] = "Gem",
-	[5] = "Key",
-	[6] = "Miscellaneous",
-	[7] = "Reagent",
-	[8] = "Recipe",
-	[9] = "Projectile",
-	[10] = "Quest",
-	[11] = "Quiver",
-	[12] = "Trade Goods",
-	[13] = "Weapon",
-}
+local typename
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
+	if not typename then
+		typename = {GetAuctionItemClasses()}
+	end
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Filters")
 	gui:MakeScrollable(id)
@@ -81,7 +70,7 @@ function lib:MakeGuiConfig(gui)
 -- Configure slider controls to reflect this range of values.
 -- See norganna.org JIRA ASER-106 for additional info about this value range.
 	gui:AddControl(id, "Subhead",     0,  "Minimum itemLevels by Type")
-	for i = 1, 13 do
+	for i = 1, #typename do
 		default("ignoreitemlevel.minlevel."..typename[i], 61)
 		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 0, 225, 1, "Min iLevel for "..typename[i]..": %s")
 	end
@@ -91,6 +80,10 @@ end
 --This function will return true if the item is to be filtered
 --Item is the itemtable, and searcher is the name of the searcher being called. If searcher is not given, it will assume you want it active.
 function lib.Filter(item, searcher)
+	if not typename then
+		typename = {GetAuctionItemClasses()}
+	end
+
 	if (not get("ignoreitemlevel.enable"))
 			or (searcher and (not get("ignoreitemlevel.filter."..searcher))) then
 		return
