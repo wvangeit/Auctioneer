@@ -1188,6 +1188,9 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 	if not searcherName or not item or #item == 0 then
 		return
 	end
+	if item[Const.SELLER] == UnitName("player") then
+		return false, "Blocked: Can't buy own auction"
+	end
 	local searcher = lib.Searchers[searcherName]
 	if not searcher then
 		return
