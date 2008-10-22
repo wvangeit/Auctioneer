@@ -36,7 +36,7 @@ local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Vendor"
 -- Set our defaults
 default("vendor.profit.min", 1)
-default("vendor.profit.pct", 50)
+default("vendor.profit.pct", 0)
 default("vendor.allow.bid", true)
 default("vendor.allow.buy", true)
 
@@ -56,7 +56,7 @@ function lib:MakeGuiConfig(gui)
 	local last = gui:GetLast(id)
 
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "vendor.profit.min", 1, 99999999, "Minimum Profit")
-	gui:AddControl(id, "Slider",            0, 1, "vendor.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
+	gui:AddControl(id, "Slider",            0, 1, "vendor.profit.pct", 0, 100, .5, "Min Discount: %0.01f%%")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "vendor.allow.bid", "Allow Bids")
