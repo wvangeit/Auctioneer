@@ -144,7 +144,7 @@ function lib:MakeGuiConfig(gui)
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
 			gui:AddControl(id, "Checkbox", 0, 1, "ignoreitemprice.filter."..name, name)
-			gui:AddTip(id, "Filter Time-left when searching with "..name)
+			gui:AddTip(id, "Filter ItemPrice (Ignorelist) when searching with "..name)
 			default("ignoreitemprice.filter."..name, true)
 		end
 	end
