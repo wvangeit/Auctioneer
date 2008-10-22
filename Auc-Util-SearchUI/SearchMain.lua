@@ -911,7 +911,20 @@ function lib.MakeGuiConfig()
 	end
 
 	function lib.OnClickSheet(button, row, index)
-	--	lib.DoSomethingWithLinkFunctionHere(link)
+		if IsShiftKeyDown() then --Add the item link to chat
+			local link = gui.sheet.rows[row][1]:GetText()
+			if not link then
+				return
+			end
+			ChatEdit_InsertLink(private.sheetData[row][1])
+		elseif IsAltKeyDown() then --Search for the item in browse tab.
+			local name = gui.sheet.rows[row][1]:GetText()
+			if not name then
+				return
+			end
+			name = GetItemInfo(name)
+			QueryAuctionItems(name)
+		end
 	end
 
 	gui.sheet = ScrollSheet:Create(gui.frame, {
