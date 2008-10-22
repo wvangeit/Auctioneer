@@ -28,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "StringRope"
-local LIBRARY_VERSION_MINOR = 3
+local LIBRARY_VERSION_MINOR = 4
 
 --[[-----------------------------------------------------------------
 
@@ -85,7 +85,7 @@ function lib:New(size)
 	if size < 0 then size = 65500 end
 	if size > 65500 then size = 65500 end
 	if size < 25 then size = 25 end
-	local new = { strings = {}, size = size }
+	local new = { strings = {}, size = size, len = 0 }
 	for k,v in pairs(self.kit) do
 		new[k] = v
 	end
@@ -99,6 +99,7 @@ lib.kit = {}
 function lib.kit:Clear()
 	local size = #self.strings
 	for i = size, 1, -1 do self.strings[i] = nil end
+	self.len = 0
 end
 -- Checks to see if the rope is empty
 function lib.kit:IsEmpty()
@@ -115,6 +116,7 @@ function lib.kit:Add(text)
 		self:Clear()
 		self:Add(text)
 	end
+	self.len = self.len + text:len()
 	return tinsert(self.strings, text)
 end
 -- Adds a number of substrings to the StringRope instance

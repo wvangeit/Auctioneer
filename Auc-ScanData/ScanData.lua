@@ -309,14 +309,25 @@ function lib.Unpack(realm)
 
 	for faction, fData in pairs(sData) do
 		if fData.image and type(fData.image) == "string" then
-			local loader, err = loadstring(fData.image)
-			if (loader) then
-				fData.image = loader()
-				collectgarbage()
-			else
-				print("Error loading scan image: {{", err, "}}")
-				fData.image = nil --clear the image, so we're not left with a string where we expect a table.
+			if fData.image ~= "rope" then
+				fData.ropes = { fData.image }
 			end
+
+			fData.image = {}
+			for pos, rope in ipairs(fData.ropes) do
+				local loader, err = loadstring(rope)
+				if (loader) then
+					local items = loader()
+					for pos, item in ipairs(items) do
+						tinsert(fData.image, item)
+					end
+				else
+					print("Error loading scan image: {{", err, "}}")
+					fData.image = nil --clear the image, so we're not left with a string where we expect a table.
+				end
+			end
+
+			collectgarbage()
 		end
 	end
 end
@@ -329,12 +340,15 @@ function lib.OnUnload()
 	local StringRope = LibStub:GetLibrary("StringRope")
 	local rope = StringRope:New(-1)
 
+	local maxLen = 2^22
+
 	if not (AucScanData and AucScanData.scans) then return end
 
 	-- Convert all image data to loadstring strings
 	for server, sData in pairs(AucScanData.scans) do
 		for faction, fData in pairs(sData) do
 			if fData.image and type(fData.image) == "table" then
+				fData.ropes = {}
 				rope:Add("return {")
 				local fCount = #fData.image
 				for i = 1, fCount do
@@ -360,9 +374,16 @@ function lib.OnUnload()
 					elseif item == nil then
 						rope:Add("nil,")
 					end
+					if rope.len and rope.len > maxLen then
+						rope:Add("}");
+						tinsert(fData.ropes, rope:Get())
+						rope:Clear()
+						rope:Add("return {")
+					end
 				end
 				rope:Add("}")
-				fData.image = rope:Get()
+				fData.image = "rope"
+				tinsert(fData.ropes, rope:Get())
 				rope:Clear()
 			end
 		end
