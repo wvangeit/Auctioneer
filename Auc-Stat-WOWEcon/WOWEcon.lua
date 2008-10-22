@@ -193,6 +193,7 @@ function lib.OnLoad(addon)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.tooltip") then return end
 	lib.GetPriceArray(hyperlink)
 
