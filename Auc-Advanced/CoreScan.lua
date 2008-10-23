@@ -969,8 +969,8 @@ function lib.GetAuctionItem(list, i)
 		local nextBid = minBid
 		if bidAmount > 0 then nextBid = bidAmount + minIncrement end
 		if not count or count == 0 then count = 1 end
-		if not highbidder then highbidder = false
-		else highbidder = true end
+		if not highBidder then highBidder = false
+		else highBidder = true end
 		if not owner then owner = "" end
 
 		return {
