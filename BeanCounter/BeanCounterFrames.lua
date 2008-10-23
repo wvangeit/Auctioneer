@@ -396,7 +396,16 @@ function private.CreateFrames()
 	frame.sellCheck:SetChecked(true)
 	getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
 	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
-
+	--creates teh report text that tells info on # of entries
+	frame.DBCount = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.DBCount:SetPoint("TOPLEFT", frame, "TOPLEFT", 70, -40)
+	frame.DBCount:SetText("Items: "..private.DBSumEntry)
+	
+	frame.DBItems = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.DBItems:SetPoint("TOPLEFT", frame, "TOPLEFT", 70, -55)
+	frame.DBItems:SetText("Entries: "..private.DBSumItems)
+	private.sumDatabase() --Sums database Done on first Start and Search of the session
+	
 	--Create the results window
 	frame.resultlist = CreateFrame("Frame", nil, frame)
 	frame.resultlist:SetBackdrop({

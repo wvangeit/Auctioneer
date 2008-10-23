@@ -69,6 +69,7 @@ function private.mailMonitor(event,arg1)
 		InboxFrame:Show()
 		MailFrameTab2:Show()
 		private.MailGUI:Hide()
+		private.sumDatabase() --Sum total fo DB for the display on browse pane
 	end
 end
 

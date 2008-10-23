@@ -50,7 +50,8 @@ local private = {
 
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
-
+	DBSumEntry = 0,
+	DBSumItems = 0,
 	--BeanCounter Bids/posts
 	PendingBids = {},
 	PendingPosts = {},
@@ -387,6 +388,27 @@ end
 
 --[[ DATABASE MAINTIANACE FUNCTIONS
 ]]
+--Sum all entries for display in window  TODO:Add in check for lua key value limitations
+function private.sumDatabase()
+	private.DBSumEntry, private.DBSumItems = 0, 0
+	for player, v in pairs(private.serverData)do
+		for DB, data in pairs(v) do
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+				for itemID, value in pairs(data) do
+					for itemString, data in pairs(value) do
+						private.DBSumEntry = private.DBSumEntry +1
+						for index, text in pairs(data) do
+							private.DBSumItems = private.DBSumItems+1
+						end
+					end
+				end
+			end
+		end
+	end
+	private.frame.DBCount:SetText("Items: "..private.DBSumEntry)
+	private.frame.DBItems:SetText("Entries: "..private.DBSumItems)
+end
+
 --Recreate/refresh ItemIName to ItemID array
 function private.refreshItemIDArray(announce)
 	for player, v in pairs(private.serverData)do
