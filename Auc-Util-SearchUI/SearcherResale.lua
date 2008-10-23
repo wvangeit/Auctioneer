@@ -44,6 +44,18 @@ default("resale.adjust.deposit", true)
 default("resale.adjust.listings", 3)
 default("resale.allow.bid", true)
 default("resale.allow.buy", true)
+default("resale.model", "Appraiser")
+
+function private.GetPriceModels()
+	if not private.modelNames then private.modelNames = {} end
+	empty(private.modelNames)
+	table.insert(private.modelNames,{"market", "Market value"})
+	local algoList = AucAdvanced.API.GetAlgorithms()
+	for pos, name in ipairs(algoList) do
+		table.insert(private.modelNames,{name, "Stats: "..name})
+	end
+	return private.modelNames
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -70,6 +82,10 @@ function lib:MakeGuiConfig(gui)
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "resale.allow.buy", "Allow Buyouts")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, private.GetPriceModels, "resale.model", "Pricing model to use to base price on")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+	
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.deposit", "Subtract deposit")
@@ -79,7 +95,14 @@ end
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
 
-	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
+	local model = get("resale.model")
+	if model == "market" then
+		market, seen = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+	elseif model == "Appraiser" and AucAdvanced.Modules.Util.Appraiser then
+		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
+	else
+		market, seen = AucAdvanced.API.GetAlgorithmValue(model, link)
+	end
 	if not market then
 		return false, "No appraiser price"
 	end
