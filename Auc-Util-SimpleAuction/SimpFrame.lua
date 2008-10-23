@@ -78,7 +78,7 @@ end
 
 function private.GetItems(link)
 	local matching = AucAdvanced.API.QueryImage({ link = link })
-	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0
+	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0,0,0,0,0,0
 	local items = {}
 
 	local live = false
@@ -90,16 +90,24 @@ function private.GetItems(link)
 				local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
 				if item then
 					table.insert(items, item)
-					local bid, buy, owner = item[const.MINBID], items[const.BUYOUT], items[const.OWNER]
-					if not uBid then uBid = bid else uBid = min(uBid, bid) end
-					if not uBuy then uBuy = buy elseif buy then uBuy = min(uBuy, buy) end
+					local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
+					if not uBid then
+						uBid = bid
+					else
+						uBid = min(uBid, bid)
+					end
+					if not uBuy then
+						uBuy = buy
+					elseif buy then
+						uBuy = min(uBuy, buy)
+					end
 				end
 			end
 		end
 	end
 
 	for pos, item in ipairs(matching) do 
-		local bid, buy, owner, stk = item[const.MINBID], items[const.BUYOUT], items[const.OWNER], item[const.COUNT]
+		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.OWNER], item[const.COUNT]
 		stk = stk or 1
 		local bidea, buyea
 		if bid then bidea = bid/stk end
@@ -176,7 +184,7 @@ function private.UpdateDisplay()
 	end
 
 	if GetSellValue then
-		local vendor = GetSellValue(oLink)
+		local vendor = GetSellValue(oLink) or 0
 		if vendor > cBid / cStack then
 			frame.err:SetText("Warning: Bid is below vendor price")
 		end
@@ -206,7 +214,13 @@ end
 function private.UpdatePricing()
 	local link = frame.icon.itemLink
 	if link then
-		local mid, mktseen = AucAdvanced.API.GetMarketValue(itemLink)
+		local mid, seen = AucAdvanced.API.GetMarketValue(link)
+		if not mid then
+			mid = 0
+		end
+		if not seen then
+			seen = 0
+		end
 		local imgseen, items, lBid, lBuy, uBid, uBuy = private.GetItems(link)
 
 		local stack = tonumber(frame.stacks.size:GetText())
@@ -249,7 +263,7 @@ function private.UpdatePricing()
 		end
 
 		if not buy and GetSellValue then
-			local vendor = GetSellValue(link)
+			local vendor = GetSellValue(link) or 0
 			local vBuy = vendor * 3
 			bid, buy, reason = vBuy * stack * 0.8, vBuy * stack, "Marking up vendor"
 		end
