@@ -66,13 +66,13 @@ function lib:MakeGuiConfig(gui)
 		end
 	end
 
--- Assume valid minimum item level is 0 and valid max item level is 225.
+-- Assume valid minimum item level is 0 and valid max item level is 300.
 -- Configure slider controls to reflect this range of values.
--- See norganna.org JIRA ASER-106 for additional info about this value range.
+-- See norganna.org JIRA ASER-106 and ASER-132 for additional info about this value range.
 	gui:AddControl(id, "Subhead",     0,  "Minimum itemLevels by Type")
 	for i = 1, #typename do
 		default("ignoreitemlevel.minlevel."..typename[i], 61)
-		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 0, 225, 1, "Min iLevel for "..typename[i]..": %s")
+		gui:AddControl(id, "WideSlider",   0, 1, "ignoreitemlevel.minlevel."..typename[i], 0, 300, 1, "Min iLevel for "..typename[i]..": %s")
 	end
 end
 
