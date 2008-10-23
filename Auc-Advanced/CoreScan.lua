@@ -948,6 +948,40 @@ function private.NoDupes(pageData, compare)
 	end
 	return true
 end
+
+function lib.GetAuctionItem(list, i)
+	local itemLink = GetAuctionItemLink(list, i)
+	if itemLink then
+		itemLink = AucAdvanced.SanitizeLink(itemLink)
+		local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+		local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)
+		--[[
+			Returns Integer giving range of time left for query
+			1 -- short time (Less than 30 mins)
+			2 -- medium time (30 mins to 2 hours)
+			3 -- long time (2 hours to 8 hours)
+			4 -- very long time (8 hours+)
+		]]
+		local timeLeft = GetAuctionItemTimeLeft(list, i)
+		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(list, i)
+		local invType = Const.InvTypes[itemEquipLoc]
+		local buyoutPrice = buyoutPrice or 0
+		local nextBid = minBid
+		if bidAmount > 0 then nextBid = bidAmount + minIncrement end
+		if not count or count == 0 then count = 1 end
+		if not highbidder then highbidder = false
+		else highbidder = true end
+		if not owner then owner = "" end
+
+		return {
+			itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
+			timeLeft, curTime, name, texture, count, quality, canUse, level,
+			minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
+			0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
+		}
+	end
+end
+
 local Getallstarttime = GetTime()
 StorePageFunction = function()
 	if (private.curPage == -1) then
@@ -997,11 +1031,6 @@ StorePageFunction = function()
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
 
-	-- Take a picture of everything we've got on the page so far.
- 	local _, itemLink, itemLevel, itemType, itemSubType, itemEquipLoc
-	local timeLeft, name, texture, count, quality, canUse, level, minBid
-	local minIncrement, buyoutPrice, bidAmount, highBidder, owner
-	local invType, nextBid
 
 	local storecount = 0
 	for i = 1, numBatchAuctions do
@@ -1009,38 +1038,9 @@ StorePageFunction = function()
 			lib.ProgressBars(GetAllProgressBar, 100*i/numBatchAuctions, true)
 			coroutine.yield()
 		end
-		local itemLink = GetAuctionItemLink("list", i)
-		if itemLink then
-			itemLink = AucAdvanced.SanitizeLink(itemLink)
-			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
-		 	local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)
-			--[[
-				Returns Integer giving range of time left for query
-				1 -- short time (Less than 30 mins)
-				2 -- medium time (30 mins to 2 hours)
-				3 -- long time (2 hours to 8 hours)
-				4 -- very long time (8 hours+)
-			]]
-			timeLeft = GetAuctionItemTimeLeft("list", i)
-			name, texture, count, quality, canUse, level, minBid,
-			minIncrement, buyoutPrice, bidAmount, highBidder, owner =
-			GetAuctionItemInfo("list", i)
-			invType = Const.InvTypes[itemEquipLoc]
-			buyoutPrice = buyoutPrice or 0
-			nextBid = minBid
-			if bidAmount > 0 then nextBid = bidAmount + minIncrement end
-			if not count or count == 0 then count = 1 end
-			if not highbidder then highbidder = false
-			else highbidder = true end
-			if not owner then owner = "" end
 
-			local itemData = {
-				itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
-				timeLeft, curTime, name, texture, count, quality, canUse, level,
-				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
-				0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
-			}
-
+		local itemData = lib.GetAuctionItem("list", i)
+		if itemData then
 			local legacyScanning = private.legacyScanning
 			if legacyScanning == nil then
 				if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
