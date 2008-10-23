@@ -452,7 +452,7 @@ function lib.MakeGuiConfig()
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterDatabaseMaintenance')) --"BeanCounter Database Maintenance"
 	gui:AddControl(id, "Subhead",    0,    _BC('C_Resortascendingtime')) --"Resort all entries by ascending time"
-	gui:AddControl(id, "Button",     0, 1, "database.sort", _BC('C_Resort Database')) --"Resort Database"
+	gui:AddControl(id, "Button",     0, 1, "database.sort", _BC('C_ResortDatabase')) --"Resort Database"
 	gui:AddTip(id, _BC('TTResort Database'))--"This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions"
 
 	gui:AddControl(id, "Subhead",    0,    _BC('C_ScanDatabase')) --"Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using."
