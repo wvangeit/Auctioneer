@@ -174,7 +174,7 @@ function private.PromptPurchase()
 		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
 	end
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
-	private.Prompt.Reason:SetText(private.CurAuction["reason"])
+	private.Prompt.Reason:SetText(private.CurAuction["reason"] or "")
 	local width = private.Prompt.Value:GetStringWidth() or 0
 	private.Prompt:SetWidth(math.max((width + 70), 400))
 end
