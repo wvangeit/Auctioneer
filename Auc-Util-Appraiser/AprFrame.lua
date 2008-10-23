@@ -1284,7 +1284,7 @@ function private.CreateFrames()
 		-- else
 			-- print(("Got link from parameter: {{%s}}"):format(link))
 		end
-		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack, equipLoc = GetItemInfo(link)
+		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack = GetItemInfo(link)
 		local itemTypeId, itemSubId
 		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
 			if catName == itemType then
@@ -1298,14 +1298,12 @@ function private.CreateFrames()
 				break
 			end
 		end
-		if equipLoc == "" then equipLoc = nil end
-		equipLoc = Const.InvTypes[equipLoc]
 		print(("Refreshing view of {{%s}}"):format(name))
 		if background and type(background) == 'boolean' then
-			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
+			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
 		else
 			AucAdvanced.Scan.PushScan()
-			AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
+			AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
 		end
 	end
 
