@@ -1007,6 +1007,22 @@ function private.CreateFrames()
 		private.gui:ActivateTab(private.guiId)
 	end)
 
+	frame.scanbutton = CreateFrame("Button", "AucAdvScanButton", AuctionFrameBrowse, "OptionsButtonTemplate")
+	frame.scanbutton:SetText("Scan")
+	frame.scanbutton:SetParent("AuctionFrameBrowse")
+	frame.scanbutton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0)
+	frame.scanbutton:SetScript("OnClick", function()
+		if not AucAdvanced.Scan.IsScanning() then
+			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
+		end
+	end)
+
+	if get("util.simpleauc.scanbutton") then
+		frame.scanbutton:Show()
+	else
+		frame.scanbutton:Hide()
+	end
+
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
 

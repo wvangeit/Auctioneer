@@ -48,6 +48,7 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
+		private.UpdateConfig(...)
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
 	elseif (callbackType == "postresult") then
@@ -71,6 +72,18 @@ function lib.OnLoad()
 	default("util.simpleauc.columnwidth.BLANK", 0.05)
 	--Default options
 	default("util.simpleauc.clickhook", true)
+	default("util.simpleauc.scanbutton", true)
+end
+
+function private.UpdateConfig()
+	if private.frame then
+		local frame = private.frame
+		if get("util.simpleauc.scanbutton") then
+			frame.scanbutton:Show()
+		else
+			frame.scanbutton:Hide()
+		end
+	end
 end
 
 function private.SetupConfigGui(gui)
@@ -85,8 +98,10 @@ function private.SetupConfigGui(gui)
 		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
 
 	gui:AddControl(id, "Header",       0,    lib.libName.." options")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.clickhook", "Allow alt-click into post frame")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.clickhook", "Allow alt-click item in bag instead of drag")
 	gui:AddTip(id, "Enables an alt-click mouse-hook so you can alt-click your inventory items into the SimpleAuction post frame")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.scanbutton", "Show big red scan button at bottom of seach window")
+	gui:AddTip(id, "Displays the old-style \"Scan\" button at the bottom of the browse window.")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
