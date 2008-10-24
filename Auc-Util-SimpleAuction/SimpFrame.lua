@@ -47,7 +47,6 @@ function private.postPickupContainerItemHook(_,_,bag, slot)
 		frame.CursorItem = nil
 	end
 end
-Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
 
 function private.ShiftFocus(frame, ...)
 	--print("Shifting focus on", frame:GetName(), ...)
@@ -735,6 +734,7 @@ function private.CreateFrames()
 	frame.cache = {}
 	frame.CurItem = {}
 	frame.detail = {0,0,0,"",""}
+	Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
 
 	frame:SetParent(AuctionFrame)
 	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
