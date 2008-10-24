@@ -86,7 +86,7 @@ function private.LoadAuctionImage()
 
 	if AucScanData and (not AucScanData.Version or AucScanData.Version < SCANDATA_VERSION) then
 		AucScanData = nil
-		lib.Print("Note: ScanData format upgrade (to {{{v"..SCANDATA_VERSION.."}}}), please rescan auction house as soon as possible.")
+		lib.Print("Note: ScanData format upgrade (to {{v"..SCANDATA_VERSION.."}}), please rescan auction house as soon as possible.")
 	end
 
 	if not AucScanData then AucScanData = {Version = SCANDATA_VERSION} end
