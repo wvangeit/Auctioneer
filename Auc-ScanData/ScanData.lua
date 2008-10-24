@@ -366,6 +366,10 @@ function lib.OnUnload()
 									rope:Add(("%q,"):format(v))
 								elseif t == "number" then
 									rope:Add(v..",")
+								elseif t == "boolean" then
+									rope:Add(tostring(v)..",")
+								else
+									rope:Add("nil--[["..t.."]],")
 								end
 							end
 							pos = pos + 1
@@ -373,6 +377,8 @@ function lib.OnUnload()
 						rope:Add("},")
 					elseif item == nil then
 						rope:Add("nil,")
+					else
+						rope:Add("nil--[["..type(item).."]],")
 					end
 					if rope.len and rope.len > maxLen then
 						rope:Add("}");

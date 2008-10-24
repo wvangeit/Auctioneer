@@ -43,7 +43,7 @@ if not AucAdvanced then return end
 if (not AucAdvanced.Scan) then AucAdvanced.Scan = {} end
 
 -- Increment every time scandata format changes:
-local SCANDATA_VERSION = "1.1"
+local SCANDATA_VERSION = "1.2"
 
 local lib = AucAdvanced.Scan
 local private = {}
@@ -86,7 +86,7 @@ function private.LoadAuctionImage()
 
 	if AucScanData and (not AucScanData.Version or AucScanData.Version < SCANDATA_VERSION) then
 		AucScanData = nil
-		lib.Print("Warning, Scan Data in wrong format, clearing data")
+		lib.Print("Note: ScanData format upgrade (to {{{v"..SCANDATA_VERSION.."}}}), please rescan auction house as soon as possible.")
 	end
 
 	if not AucScanData then AucScanData = {Version = SCANDATA_VERSION} end
