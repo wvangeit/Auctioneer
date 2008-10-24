@@ -35,6 +35,7 @@ local lib = AucAdvanced.Modules.Util.SimpleAuction
 local private = lib.Private
 local const = AucAdvanced.Const
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local Const = const
 
 local frame
 local TAB_NAME = "Post"
@@ -87,7 +88,8 @@ end
 --aBuy: average price for current competing auctions
 function private.GetItems(link)
 	local name = GetItemInfo(link)
-	local matching = AucAdvanced.API.QueryImage({ name = name })
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	local matching = AucAdvanced.API.QueryImage({ itemId = id })
 	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0
 	local player = UnitName("player")
 	local items = {}
@@ -149,6 +151,7 @@ function private.GetItems(link)
 				aBuy = (aBuy or 0) + buy
 				aSeen = (aSeen or 0)+ stk
 			end
+			table.insert(items, item)
 		end
 	end
 	aBuy = (aBuy or 0)/(aSeen or 1)
@@ -247,15 +250,18 @@ function private.UpdateDisplay()
 		end
 	end
 
-	local coinsBid, coinsBuy
+	local coinsBid, coinsBuy, coinsBidEa, coinsBuyEa
 	if cBid > 0 then
 		coinsBid = coins(cBid)
+		coinsBidEa = coins(cBid/cStack)
 	else
 		coinsBid = "no"
+		coinsBidEa = "no"
 		frame.err:SetText("Error: No bid price set")
 	end
 	if cBuy > 0 then
 		coinsBuy = coins(cBuy)
+		coinsBuyEa = coins(cBuy/cStack)
 		if cBuy < cBid then
 			frame.err:SetText("Error: Buyout cannot be less than bid price")
 		end
@@ -263,17 +269,71 @@ function private.UpdateDisplay()
 		coinsBuy = "no"
 	end
 
-	local text = "Auctioning %d lots of %d sized stacks at %s bid / %s buyout per stack"
-	frame.info:SetText(text:format(cNum, cStack, coinsBid, coinsBuy))
+	local lots = "lot"
+	if cNum > 1 then lots = "lots" end
+
+	local text
+	if (cStack > 1) then
+		text = string.format("Auctioning %d %s of %d sized stacks at %s bid/%s buyout per stack (%s/%s ea)", cNum, lots, cStack, coinsBid, coinsBuy, coinsBidEa, coinsBuyEa)
+	else
+		text = string.format("Auctioning %d %s of this item at %s bid/%s buyout each", cNum, lots, coinsBid, coinsBuy)
+	end
+	frame.info:SetText(text)
 	frame.stacks.equals:SetText("= "..(cStack * cNum))
-	
+end
+
+function private.UpdateCompetition(image)
+	local data = {}
+	local style = {}
+	for i = 1, #image do
+		local result = image[i]
+		local tLeft = result[Const.TLEFT]
+		if (tLeft == 1) then tLeft = "30m"
+		elseif (tLeft == 2) then tLeft = "2h"
+		elseif (tLeft == 3) then tLeft = "12h"
+		elseif (tLeft == 4) then tLeft = "48h"
+		end
+		local count = result[Const.COUNT]
+		data[i] = {
+			--result[Const.NAME],
+			result[Const.SELLER],
+			tLeft,
+			count,
+			math.floor(0.5+result[Const.MINBID]/count),
+			math.floor(0.5+result[Const.CURBID]/count),
+			math.floor(0.5+result[Const.BUYOUT]/count),
+			result[Const.MINBID],
+			result[Const.CURBID],
+			result[Const.BUYOUT],
+			result[Const.LINK]
+		}
+		local curbid = result[Const.CURBID]
+		if curbid == 0 then
+			curbid = result[Const.MINBID]
+		end
+		--color ignored/self sellers
+		local seller = result[Const.SELLER]
+		local player = UnitName("player")
+		if seller == player then
+			if not style[i] then style[i] = {} end
+			style[i][1] = { textColor = {0,1,0} }
+		elseif AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
+			if not style[i] then style[i] = {} end
+			style[i][1] = { textColor = {1,0,0} }
+		end
+	end
+	frame.imageview.sheet:SetData(data, style)
+
+	--reset scroll position if new items list is too short to show
+	if  not frame.imageview.sheet.rows[1][1]:IsShown() then
+		frame.imageview.sheet.panel:ScrollToCoords(0,0)
+	end
 end
 
 function private.UpdatePricing()
 	local link = frame.icon.itemLink
 	if not link then return end
 	local mid, seen = 0,0
-	--local imgseen,_,lowBid, lowBuy, matchBid, matchBuy, aveBuy, aSeen = private.GetItems(link)
 	local stack = frame.stacks.size:GetNumber()
 	local _,_,_,_,_,_,_,stx = GetItemInfo(link)
 	local total = GetItemCount(link) or 0
@@ -301,6 +361,10 @@ function private.UpdatePricing()
 
 	local buy, bid
 	local reason = ""
+
+	-- We need this out here because it fetches the items from the image
+	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
+	private.UpdateCompetition(image)
 	
 	--check for fixed price
 	if frame.CurItem.manual then
@@ -309,7 +373,6 @@ function private.UpdatePricing()
 		reason = "Manual pricing on item"
 	end
 	if not buy then
-		local imgseen,_,matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
 		--Check for undercut first
 		if frame.options.undercut:GetChecked() then
 			if lowBuy and lowBuy > 0 then
