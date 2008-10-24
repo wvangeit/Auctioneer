@@ -46,7 +46,7 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "auctionui") then
         private.CreateFrames(...)
 	elseif (callbackType == "config") then
-		--private.SetupConfigGui(...)
+		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
@@ -58,17 +58,35 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 end
 
 function lib.OnLoad()
---Default sizes for the scrollframe column widths
-default("util.simple.columnwidth.Seller", 89)
-default("util.simple.columnwidth.Left", 32)
-default("util.simple.columnwidth.Stk", 32 )
-default("util.simple.columnwidth.Min/ea", 65)
-default("util.simple.columnwidth.Cur/ea", 65)
-default("util.simple.columnwidth.Buy/ea", 65)
-default("util.simple.columnwidth.MinBid", 76)
-default("util.simple.columnwidth.CurBid", 76)
-default("util.simple.columnwidth.Buyout", 80)
-default("util.simple.columnwidth.BLANK", 0.05)
+	--Default sizes for the scrollframe column widths
+	default("util.simpleauc.columnwidth.Seller", 89)
+	default("util.simpleauc.columnwidth.Left", 32)
+	default("util.simpleauc.columnwidth.Stk", 32 )
+	default("util.simpleauc.columnwidth.Min/ea", 65)
+	default("util.simpleauc.columnwidth.Cur/ea", 65)
+	default("util.simpleauc.columnwidth.Buy/ea", 65)
+	default("util.simpleauc.columnwidth.MinBid", 76)
+	default("util.simpleauc.columnwidth.CurBid", 76)
+	default("util.simpleauc.columnwidth.Buyout", 80)
+	default("util.simpleauc.columnwidth.BLANK", 0.05)
+	--Default options
+	default("util.simpleauc.clickhook", true)
+end
+
+function private.SetupConfigGui(gui)
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	gui:MakeScrollable(id)
+	private.gui = gui
+	private.guiId = id
+
+	gui:AddHelp(id, "what simpleauc",
+		"What is SimpleAuction?",
+		"Simple Auction is a simplified, more automated way of posting items. It focuses it's emphasis on easy pricing and maximum sale speed with a minimum of configuration options and learning curve.\n"..
+		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
+
+	gui:AddControl(id, "Header",       0,    lib.libName.." options")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.clickhook", "Allow alt-click into post frame")
+	gui:AddTip(id, "Enables an alt-click mouse-hook so you can alt-click your inventory items into the SimpleAuction post frame")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

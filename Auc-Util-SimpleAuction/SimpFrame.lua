@@ -447,8 +447,13 @@ end
 function private.IconClicked()
 	local objType, _, itemLink = GetCursorInfo()
 	ClearCursor()
+	if objType ~= "item" then itemLink = nil end
+	private.LoadItemLink(itemLink)
+end
+
+function private.LoadItemLink(itemLink)
 	empty(frame.CurItem)
-	if objType == "item" then
+	if itemLink then
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
 		local itemCount = GetItemCount(itemLink)
@@ -508,7 +513,7 @@ end
 function private.LoadConfig()
 	if not frame.CurItem.link then return end
 	local id = private.SigFromLink(frame.CurItem.link)
-	local settingstring = get("util.simple."..private.realmKey.."."..id)
+	local settingstring = get("util.simpleauc."..private.realmKey.."."..id)
 	if not settingstring then return end
 	local bid, buy, duration, number, stack = strsplit(":", settingstring)
 	bid = tonumber(bid)
@@ -550,7 +555,7 @@ end
 function private.RemoveConfig()
 	if not frame.CurItem.link then return end
 	local id = private.SigFromLink(frame.CurItem.link)
-	set("util.simple."..private.realmKey.."."..id, nil)
+	set("util.simpleauc."..private.realmKey.."."..id, nil)
 end
 
 function private.SaveConfig()
@@ -563,7 +568,7 @@ function private.SaveConfig()
 		tostring(frame.CurItem.number),
 		tostring(frame.CurItem.stack)
 		)
-	set("util.simple."..private.realmKey.."."..id, settingstring)
+	set("util.simpleauc."..private.realmKey.."."..id, settingstring)
 end
 
 function private.ClearSetting()
@@ -823,15 +828,14 @@ function private.CreateFrames()
 	frame.options:AddOption("undercut", "Undercut competitors")
 	frame.options:AddOption("remember", "Remember fixed price")
 
-	function frame.ClickBagHook(_,_,button)
-		if (not AucAdvanced.Settings.GetSetting("util.simpleauc.clickhook")) then return end
+	function frame.ClickBagHook(_,_,obj,button)
+		if (not get("util.simpleauc.clickhook")) then return end
 		local bag = this:GetParent():GetID()
 		local slot = this:GetID()
-		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
 		local link = GetContainerItemLink(bag, slot)
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
-				print("Got", button, link)
+				private.LoadItemLink(link)
 			end
 		end
 	end
@@ -863,7 +867,7 @@ function private.CreateFrames()
 	end
 
 	function frame.ClickAnythingHook(link)
-		if not AucAdvanced.Settings.GetSetting("util.simpleauc.clickhookany") then return end
+		if not get("util.simpleauc.clickhookany") then return end
 		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
 		if (arg1=="LeftButton" or arg3=="LeftButton") and IsAltKeyDown() then
 			frame.SelectItem(nil, nil, link)
@@ -887,28 +891,36 @@ function private.CreateFrames()
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column, width)
 		if not width then
-			AucAdvanced.Settings.SetSetting("util.simple.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
-			self.labels[column].button:SetWidth(AucAdvanced.Settings.GetSetting("util.simple.columnwidth."..self.labels[column]:GetText()))
+			set("util.simpleauc.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(get("util.simpleauc.columnwidth."..self.labels[column]:GetText()))
 		else
-			AucAdvanced.Settings.SetSetting("util.simple.columnwidth."..self.labels[column]:GetText(), width)
+			set("util.simpleauc.columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
 	function private.onClick(button, row, index)
 		
 	end
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Seller", "TEXT", get("util.simple.columnwidth.Seller")}, --89
-		{ "Left",   "INT",  get("util.simple.columnwidth.Left")}, --32
-		{ "Stk",    "INT",  get("util.simple.columnwidth.Stk")}, --32
-		{ "Min/ea", "COIN", get("util.simple.columnwidth.Min/ea"), { DESCENDING=true } }, --65
-		{ "Cur/ea", "COIN", get("util.simple.columnwidth.Cur/ea"), { DESCENDING=true } }, --65
-		{ "Buy/ea", "COIN", get("util.simple.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --65
-		{ "MinBid", "COIN", get("util.simple.columnwidth.MinBid"), { DESCENDING=true } }, --76
-		{ "CurBid", "COIN", get("util.simple.columnwidth.CurBid"), { DESCENDING=true } }, --76
-		{ "Buyout", "COIN", get("util.simple.columnwidth.Buyout"), { DESCENDING=true } }, --80
-		{ "", "TEXT", get("util.simple.columnwidth.BLANK")}, --Hidden column to carry the link --0
+		{ "Seller", "TEXT", get("util.simpleauc.columnwidth.Seller")}, --89
+		{ "Left",   "INT",  get("util.simpleauc.columnwidth.Left")}, --32
+		{ "Stk",    "INT",  get("util.simpleauc.columnwidth.Stk")}, --32
+		{ "Min/ea", "COIN", get("util.simpleauc.columnwidth.Min/ea"), { DESCENDING=true } }, --65
+		{ "Cur/ea", "COIN", get("util.simpleauc.columnwidth.Cur/ea"), { DESCENDING=true } }, --65
+		{ "Buy/ea", "COIN", get("util.simpleauc.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --65
+		{ "MinBid", "COIN", get("util.simpleauc.columnwidth.MinBid"), { DESCENDING=true } }, --76
+		{ "CurBid", "COIN", get("util.simpleauc.columnwidth.CurBid"), { DESCENDING=true } }, --76
+		{ "Buyout", "COIN", get("util.simpleauc.columnwidth.Buyout"), { DESCENDING=true } }, --80
+		{ "", "TEXT", get("util.simpleauc.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, private.onClick, private.onResize, nil)
-			
+	
+	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
+	frame.config:SetText("Configure")
+	frame.config:SetScript("OnClick", function()
+		AucAdvanced.Settings.Show()
+		private.gui:ActivateTab(private.guiId)
+	end)
+
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
 
