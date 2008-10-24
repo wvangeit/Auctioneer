@@ -406,13 +406,13 @@ function private.UpdatePricing()
 			end
 		end
 		--look for average of current competition
-		if (not buy) and aveBuy then
+		if not buy and aveBuy and aveBuy > 0 then
 			buy = aveBuy
 			bid = buy * 0.8
 			reason = "Using current market data"
 		end
 		--Vendor markup
-		if (not buy) and GetSellValue then
+		if not buy and GetSellValue then
 			local vendor = GetSellValue(link)
 			if vendor and vendor > 0 then
 				buy = vendor * 3
