@@ -40,7 +40,7 @@ local frame
 local TAB_NAME = "Post"
 
 function private.ShiftFocus(frame, ...)
-	print("Shifting focus on", frame:GetName(), ...)
+	--print("Shifting focus on", frame:GetName(), ...)
 	local dest
 	if IsShiftKeyDown() then
 		dest = frame.prevFrame
@@ -76,9 +76,20 @@ function private.SigFromLink(link)
 	-- returns nil
 end
 
+--Returns:
+--numitems: number of competing items
+--items: table with competition
+--uBid: bid matching your current auction
+--uBuy: buy matching your current auction
+--lBid: bid undercutting competition by 1c
+--lBuy: buy undercutting competition by 1c
+--aSeen: number of items in competing auctions
+--aBuy: average price for current competing auctions
 function private.GetItems(link)
-	local matching = AucAdvanced.API.QueryImage({ link = link })
-	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0,0,0,0,0,0
+	local name = GetItemInfo(link)
+	local matching = AucAdvanced.API.QueryImage({ name = name })
+	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0
+	local player = UnitName("player")
 	local items = {}
 
 	local live = false
@@ -89,44 +100,58 @@ function private.GetItems(link)
 			for i = 1, n do
 				local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
 				if item then
-					table.insert(items, item)
-					local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
-					if not uBid then
-						uBid = bid
-					else
-						uBid = min(uBid, bid)
-					end
-					if not uBuy then
-						uBuy = buy
-					elseif buy then
-						uBuy = min(uBuy, buy)
+					if item[const.NAME] == name then
+						table.insert(items, item)
+						local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
+						if not uBid then
+							uBid = bid
+						else
+							uBid = min(uBid, bid)
+						end
+						if not uBuy then
+							uBuy = buy
+						elseif buy then
+							uBuy = min(uBuy, buy)
+						end
 					end
 				end
 			end
 		end
 	end
-
 	for pos, item in ipairs(matching) do 
 		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.OWNER], item[const.COUNT]
 		stk = stk or 1
 		local bidea, buyea
-		if bid then bidea = bid/stk end
-		if buy then buyea = buy/stk end
+		if bid and bid > 0 then
+			bidea = bid/stk
+		end
+		if buy and buy > 0 then
+			buyea = buy/stk
+		end
 
-		if owner == player then
+		if owner and owner == player then
 			if not live then
 				if not uBid then uBid = bidea else uBid = min(uBid, bidea) end
 				if not uBuy then uBuy = buyea elseif buyea then uBuy = min(uBuy, buyea) end
 			end
 		else
-			if not lBid then lBid = bidea else lBid = min(lBid, bidea) end
-			if not lBuy then lBuy = buyea elseif buyea then lBuy = min(lBuy, buyea) end
+			if not lBid then
+				lBid = bidea
+			else
+				lBid = min(lBid, bidea)
+			end
+			if not lBuy then
+				lBuy = buyea
+			elseif buyea then
+				lBuy = min(lBuy, buyea)
+			end
 			if buy then
-				aBuy = aBuy + buy
-				aSeen = aSeen + stk
+				aBuy = (aBuy or 0) + buy
+				aSeen = (aSeen or 0)+ stk
 			end
 		end
 	end
+	aBuy = (aBuy or 0)/(aSeen or 1)
 	return #items, items, uBid, uBuy, lBid, lBuy, aSeen, aBuy
 end
 
@@ -155,12 +180,15 @@ end
 
 function private.UpdateDisplay()
 	local cBid, cBuy = MoneyInputFrame_GetCopper(frame.minprice), MoneyInputFrame_GetCopper(frame.buyout)
-	local cStack = tonumber(frame.stacks.size:GetText())
-	local cNum = tonumber(frame.stacks.num:GetText()) or 1
+	frame.CurItem.buy, frame.CurItem.bid = cBuy, cBid
+	local cStack = frame.stacks.size:GetNumber() or 1
+	frame.CurItem.stack = cStack
+	local cNum = frame.stacks.num:GetNumber() or 1
+	frame.CurItem.number = cNum
 	local oStack, oBid, oBuy, oReason, oLink = unpack(frame.detail)
 	local lStack = frame.stacks.size.lastSize or oStack
 
-	print("Updating", unpack(frame.detail))
+	--print("Updating", unpack(frame.detail))
 
 	local dBid = abs(cBid/lStack*oStack-oBid)
 	local dBuy = abs(cBuy/lStack*oStack-oBuy)
@@ -176,10 +204,16 @@ function private.UpdateDisplay()
 	elseif priceType == "fixed" and cStack ~= lStack then
 		cBid = cBid / lStack * cStack
 		cBuy = cBuy / lStack * cStack
+		cBid = ceil(cBid)
+		cBuy = ceil(cBuy)
 		MoneyInputFrame_ResetMoney(frame.minprice)
-		MoneyInputFrame_SetCopper(frame.minprice, ceil(cBid))
+		MoneyInputFrame_SetCopper(frame.minprice, cBid)
+		frame.CurItem.bid = cBid
+		frame.CurItem.bidper = cBid/frame.CurItem.stack
 		MoneyInputFrame_ResetMoney(frame.buyout)
-		MoneyInputFrame_SetCopper(frame.buyout, ceil(cBuy))
+		MoneyInputFrame_SetCopper(frame.buyout, cBuy)
+		frame.CurItem.buy = cBuy
+		frame.CurItem.buyper = cBuy/frame.CurItem.stack
 		frame.err:SetText("Adjusted price to new stack size")
 	end
 
@@ -210,145 +244,217 @@ function private.UpdateDisplay()
 	frame.info:SetText(text:format(cNum, cStack, coinsBid, coinsBuy))
 	frame.stacks.equals:SetText("= "..(cStack * cNum))
 	
-	private.UpdateScrollframe()
-end
-
-function private.UpdateScrollframe()
-	local Const = AucAdvanced.Const
-	local _, _, _, _, oLink = unpack(frame.detail)
-	
-	if not oLink then return end
-	
-	local _, itemId, suffix, factor = decode(oLink)
-	itemId = tonumber(itemId)
-	suffix = tonumber(suffix) or 0
-	factor = tonumber(factor) or 0
-	
-	local results = AucAdvanced.API.QueryImage({
-	itemId = itemId,
-	suffix = suffix,
-	factor = factor,
-	})
-	local data = {}
-	for i = 1, #results do
-		local result = results[i]
-		local tLeft = result[Const.TLEFT]
-		if (tLeft == 1) then tLeft = "30m"
-		elseif (tLeft == 2) then tLeft = "2h"
-		elseif (tLeft == 3) then tLeft = "12h"
-		elseif (tLeft == 4) then tLeft = "48h"
-		end
-		local count = result[Const.COUNT]
-		data[i] = {
-		result[Const.SELLER],
-		tLeft,
-		count,
-		math.floor(0.5+result[Const.MINBID]/count),
-		math.floor(0.5+result[Const.CURBID]/count),
-		math.floor(0.5+result[Const.BUYOUT]/count),
-		result[Const.MINBID],
-		result[Const.CURBID],
-		result[Const.BUYOUT],
-		result[Const.LINK]
-		}
-		local curbid = result[Const.CURBID]
-		if curbid == 0 then
-			curbid = result[Const.MINBID]
-		end
-	end
-	
-	frame.imageview.sheet:SetData(data)
-	--reset scroll position if new items list is too short to show
-	if  not frame.imageview.sheet.rows[1][1]:IsShown() then
-		frame.imageview.sheet.panel:ScrollToCoords(0,0)
-	end
 end
 
 function private.UpdatePricing()
 	local link = frame.icon.itemLink
-	if link then
-		local mid, seen = AucAdvanced.API.GetMarketValue(link)
-		if not mid then
-			mid = 0
-		end
-		if not seen then
-			seen = 0
-		end
-		local imgseen, items, lBid, lBuy, uBid, uBuy = private.GetItems(link)
+	if not link then return end
+	local mid, seen = 0,0
+	--local imgseen,_,lowBid, lowBuy, matchBid, matchBuy, aveBuy, aSeen = private.GetItems(link)
+	local stack = frame.stacks.size:GetNumber()
+	local _,_,_,_,_,_,_,stx = GetItemInfo(link)
+	local total = GetItemCount(link) or 0
+	stx = min(stx, total)
 
-		local stack = tonumber(frame.stacks.size:GetText())
-		local _,_,_,_,_,_,_,stx = GetItemInfo(link)
-		local total = GetItemCount(link) or 0
-		stx = min(stx, total)
+	if not stack or stack == 0 or stack > stx then
+		stack = stx
+		frame.stacks.size:SetNumber(stack)
+		frame.CurItem.stack = stack
+	end
 
-		if not stack or stack > stx then
-			stack = stx
-			frame.stacks.size:SetText(stack)
-		end
+	local num = frame.stacks.num:GetNumber()
+	if not num or num == 0 then
+		num = 1
+		frame.stacks.num:SetNumber(num)
+		frame.CurItem.number = num
+	end
 
-		local num = tonumber(frame.stacks.num:GetText())
-		if not num then
-			num = 1
-			frame.stacks.num:SetText(num)
-		end
-
-		local bid, buy, reason
-		
-		if mid and (seen > 5 or imgseen < 3) then
-			bid, buy, reason = mid * stack * 0.8, mid * stack, "Using market value"
-		end
-		if frame.options.matchmy:GetChecked() then
-			if lBid or lBuy then
-				bid, buy, reason = lBid * stack, lBuy * stack, "Matching your prices"
-			end
-		end
+	local buy, bid
+	local reason = ""
+	
+	--check for fixed price
+	if frame.CurItem.manual then
+		buy = frame.CurItem.buyper
+		bid = frame.CurItem.bidper
+		reason = "Manual pricing on item"
+	end
+	if not buy then
+		local imgseen,_,matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
+		--Check for undercut first
 		if frame.options.undercut:GetChecked() then
-			if uBid and uBuy and (uBid < bid or uBuy < buy) then
-				bid, buy, reason = uBid * stack - 1, uBuy * stack - 1, "Undercutting market"
-				if bid > buy * 0.8 then
-					bid = bid * 0.8
+			if lowBuy and lowBuy > 0 then
+				buy = lowBuy - 1/stack
+				if lowBid and lowBid > 0 and lowBid <= lowBuy then
+					bid = lowBid - 1/stack
+				else
+					bid = buy * 0.8
 				end
+				reason = "Undercutting market"
+			end
+		--then matching current
+		elseif frame.options.matchmy:GetChecked() then
+			if matchBuy and matchBuy > 0 then
+				buy = matchBuy
+				if matchBid and matchBid > 0 and matchBid <= matchBuy then
+					bid = matchBid
+				else
+					bid = buy * 0.8
+				end
+				reason = "Matching your prices"
 			end
 		end
-
-		if not buy and aBuy then
-			bid, buy, reason = aBuy * stack * 0.8, aBuy * stack, "Using current market data"
+		--if no buy price yet, look for marketprice
+		if not buy then
+			local market, seen = AucAdvanced.API.GetMarketValue(link)
+			if market and (market > 0) and (seen > 5 or aSeen < 3) then
+				buy = market
+				bid = market * 0.8
+				reason = "Using market value"
+			end
 		end
-
-		if not buy and GetSellValue then
-			local vendor = GetSellValue(link) or 0
-			local vBuy = vendor * 3
-			bid, buy, reason = vBuy * stack * 0.8, vBuy * stack, "Marking up vendor"
-		end
-
-		if not bid and buy then
+		--look for average of current competition
+		if (not buy) and aveBuy then
+			buy = aveBuy
 			bid = buy * 0.8
+			reason = "Using current market data"
 		end
-		if not bid then
-			bid, buy, reason = 1, 0, "Unable to calculate price" 
+		--Vendor markup
+		if (not buy) and GetSellValue then
+			local vendor = GetSellValue(link)
+			if vendor and vendor > 0 then
+				buy = vendor * 3
+				bid = buy * 0.8
+				reason = "Marking up vendor"
+			end
 		end
+	end
+	if not buy then
+		buy = 0
+	end
+	if not bid then
+		bid = buy * 0.8
+	end
+	--multiply by stacksize
+	bid = bid * stack
+	buy = buy * stack
+	--We give up
+	if bid == 0 then
+		bid = 1
+		buy = 0
+		reason = "Unable to calculate price" 
+	end
+	
+	if (stack * num) > stx then
+		reason = "Error: You don't have that many"
+	end
+	bid, buy = ceil(tonumber(bid) or 1), ceil(tonumber(buy) or 0)
 
-		bid, buy = tonumber(bid) or 1, tonumber(buy) or 0
+	MoneyInputFrame_ResetMoney(frame.minprice)
+	MoneyInputFrame_SetCopper(frame.minprice, bid)
+	frame.CurItem.bid = bid
+	frame.CurItem.bidper = bid/stack
 
-		MoneyInputFrame_ResetMoney(frame.minprice)
-		MoneyInputFrame_SetCopper(frame.minprice, ceil(bid))
+	MoneyInputFrame_ResetMoney(frame.buyout)
+	MoneyInputFrame_SetCopper(frame.buyout, buy)
+	frame.CurItem.buy = buy
+	frame.CurItem.buyper = buy/stack
 
-		MoneyInputFrame_ResetMoney(frame.buyout)
-		MoneyInputFrame_SetCopper(frame.buyout, ceil(buy))
+	frame.detail = { stack, bid, buy, reason, link }
+	frame.err:SetText(reason)
 
-		frame.detail = { stack, bid, buy, reason, link }
-		frame.err:SetText(reason)
+	private.UpdateDisplay(reason)
+end
 
-		private.UpdateDisplay(reason)
+--function runs when we're alerted to a possible change in one of the controls.
+--we check if something is actually different, and if so, update.
+function private.CheckUpdate()
+	if not frame.CurItem.link then return end
+	local buy = MoneyInputFrame_GetCopper(frame.buyout)
+	local bid = MoneyInputFrame_GetCopper(frame.minprice)
+	local stack = frame.stacks.size:GetNumber()
+	local number = frame.stacks.num:GetNumber()
+	local match = frame.options.matchmy:GetChecked()
+	local undercut = frame.options.undercut:GetChecked()
+	local remember = frame.options.remember:GetChecked()
+	local duration = frame.duration.time.selected
+	if frame.CurItem.buy ~= buy then --New Buyout manually entered
+		--print("buy changed")
+		frame.CurItem.buy = buy
+		frame.CurItem.buyper = buy/(stack or 1)
+		frame.CurItem.manual = true
+		private.UpdateDisplay()
+	elseif frame.CurItem.bid ~= bid then --New Bid manually entered
+		--print("bid changed")
+		frame.CurItem.bid = bid
+		frame.CurItem.bidper = bid/(stack or 1)
+		frame.CurItem.manual = true
+		private.UpdateDisplay()
+	elseif stack and stack > 0 and frame.CurItem.stack ~= stack then --new stack size entered
+		--print("stack changed: "..tostring(stack))
+		frame.CurItem.stack = stack
+		private.UpdatePricing()
+	elseif number and number > 0 and frame.CurItem.number ~= number then --new number of stacks entered
+		--print("number changed: "..tostring(number))
+		frame.CurItem.number = number
+		private.UpdatePricing()
+	elseif frame.CurItem.match ~= match then
+		--print("match changed")
+		frame.CurItem.match = match
+		if match then --turn off other checkboxes 
+			frame.CurItem.manual = false
+			frame.CurItem.undercut = nil
+			frame.options.undercut:SetChecked(false)
+			frame.CurItem.remember = nil
+			frame.options.remember:SetChecked(false)
+		end
+		private.UpdatePricing()
+	elseif frame.CurItem.undercut ~= undercut then
+		--print("undercut changed")
+		frame.CurItem.undercut = undercut
+		if undercut then --turn off other checkboxes 
+			frame.CurItem.manual = false
+			frame.CurItem.match = nil
+			frame.options.matchmy:SetChecked(false)
+			frame.CurItem.remember = nil
+			frame.options.remember:SetChecked(false)
+		end
+		private.UpdatePricing()
+	elseif frame.CurItem.duration ~= duration then
+		--print("duration changed")
+		frame.CurItem.duration = duration
+		private.UpdatePricing()
+	elseif frame.CurItem.remember ~= remember then
+		--print("remember changed")
+		frame.CurItem.manual = true
+		frame.CurItem.remember = remember
+		if remember then
+			private.SaveConfig()
+			frame.CurItem.match = nil
+			frame.options.matchmy:SetChecked(false)
+			frame.CurItem.undercut = nil
+			frame.options.undercut:SetChecked(false)
+		else
+			private.RemoveConfig()
+		end
+		private.UpdatePricing()
+	else return
+	end
+	if frame.CurItem.remember then
+		private.SaveConfig()
 	end
 end
 
 function private.IconClicked()
 	local objType, _, itemLink = GetCursorInfo()
 	ClearCursor()
+	empty(frame.CurItem)
 	if objType == "item" then
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
+		itemLink = AucAdvanced.SanitizeLink(itemLink)
 		local itemCount = GetItemCount(itemLink)
+		frame.CurItem.link = itemLink
+		frame.CurItem.name = itemName
+		frame.CurItem.count = itemCount
 		frame.icon.itemLink = itemLink
 		frame.icon:SetNormalTexture(itemTexture)
 		local size = 18
@@ -366,20 +472,144 @@ function private.IconClicked()
 		frame.icon.itemLink = nil
 		frame.icon:SetNormalTexture(nil)
 		frame.icon.count:SetText("")
-		frame.name:SetText("")
-		frame.name:SetText(itemName)
+		frame.name:SetText("Drop item onto slot")
 	end
-	frame.info:SetText("")
-	frame.err:SetText("")
+	frame.info:SetText("To auction an item, drag it from your bag.")
+	frame.err:SetText("-- No item selected --")
 	frame.stacks.equals:SetText("= 0")
-	private.UpdatePricing()
+	private.ClearSetting()
+	private.LoadConfig()
+	--private.UpdatePricing()
 end
 
 function private.DoTooltip()
+	if not frame.CurItem.link then return end
+	GameTooltip:SetOwner(frame.icon, "ANCHOR_NONE")
+	GameTooltip:SetHyperlink(frame.CurItem.link)
+	if EnhTooltip then
+		EnhTooltip.TooltipCall(GameTooltip, frame.CurItem.name, frame.CurItem.link, -1, frame.CurItem.count)
+	end
+	GameTooltip:ClearAllPoints()
+	GameTooltip:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 10, 0)
 end
 
-function private.UndoTooltip
-()
+function private.UndoTooltip()
+	GameTooltip:Hide()
+end
+
+--we check for valuechanged on update,  so that multiple controls changing at once will only yield one check
+function private.OnUpdate()
+	if frame.CurItem.valuechanged then
+		frame.CurItem.valuechanged = nil
+		private.CheckUpdate()
+	end
+end
+
+function private.LoadConfig()
+	if not frame.CurItem.link then return end
+	local id = private.SigFromLink(frame.CurItem.link)
+	local settingstring = get("util.simple."..private.realmKey.."."..id)
+	if not settingstring then return end
+	local bid, buy, duration, number, stack = strsplit(":", settingstring)
+	bid = tonumber(bid)
+	buy = tonumber(buy)
+	duration = tonumber(duration)
+	number = tonumber(number)
+	stack = tonumber(stack)
+	MoneyInputFrame_ResetMoney(frame.minprice)
+	MoneyInputFrame_SetCopper(frame.minprice, bid)
+	MoneyInputFrame_ResetMoney(frame.buyout)
+	MoneyInputFrame_SetCopper(frame.buyout, buy)
+	frame.stacks.size:SetNumber(stack)
+	frame.stacks.num:SetNumber(number)
+	frame.options.undercut:SetChecked(false)
+	frame.options.matchmy:SetChecked(false)
+	frame.options.remember:SetChecked(true)
+	frame.duration.time.selected = duration
+	for i, j in pairs(frame.duration.time.intervals) do
+		if duration == j then
+			frame.duration.time[i]:SetChecked(true)
+		else
+			frame.duration.time[i]:SetChecked(false)
+		end
+	end
+	frame.CurItem.bid = bid
+	frame.CurItem.bidper = bid/stack
+	frame.CurItem.buy = buy
+	frame.CurItem.buyper = buy/stack
+	frame.CurItem.duration = duration
+	frame.CurItem.number = number
+	frame.CurItem.stack = stack
+	frame.CurItem.match = nil
+	frame.CurItem.undercut = nil
+	frame.CurItem.remember = true
+	frame.CurItem.manual = true
+	private.UpdatePricing()
+end
+
+function private.RemoveConfig()
+	if not frame.CurItem.link then return end
+	local id = private.SigFromLink(frame.CurItem.link)
+	set("util.simple."..private.realmKey.."."..id, nil)
+end
+
+function private.SaveConfig()
+	if not frame.CurItem.link then return end
+	local id = private.SigFromLink(frame.CurItem.link)
+	local settingstring = strjoin(":",
+		tostring(frame.CurItem.bid),
+		tostring(frame.CurItem.buy),
+		tostring(frame.CurItem.duration),
+		tostring(frame.CurItem.number),
+		tostring(frame.CurItem.stack)
+		)
+	set("util.simple."..private.realmKey.."."..id, settingstring)
+end
+
+function private.ClearSetting()
+	frame.CurItem.bid = nil
+	frame.CurItem.bidper = nil
+	frame.CurItem.buy = nil
+	frame.CurItem.buyper = nil
+	frame.CurItem.stack = nil
+	frame.CurItem.number = nil
+	frame.CurItem.match = nil
+	frame.CurItem.undercut = nil
+	frame.CurItem.remember = nil
+	frame.CurItem.manual = nil
+	frame.CurItem.duration = nil
+	MoneyInputFrame_ResetMoney(frame.minprice)
+	MoneyInputFrame_ResetMoney(frame.buyout)
+	frame.stacks.num:SetNumber(0)
+	frame.stacks.size:SetNumber(0)
+	frame.options.matchmy:SetChecked(false)
+	frame.options.undercut:SetChecked(false)
+	frame.options.remember:SetChecked(false)
+	frame.duration.time.selected = 48
+	frame.duration.time[1]:SetChecked(false)
+	frame.duration.time[2]:SetChecked(false)
+	frame.duration.time[3]:SetChecked(true)
+	private.UpdatePricing()
+end
+
+function private.PostAuction()
+	if not frame.CurItem.link then
+		print("Posting Failed: No Item Selected")
+		return
+	end
+	local link = frame.CurItem.link
+	local number = frame.CurItem.number
+	local stack = frame.CurItem.stack
+	local bid = frame.CurItem.bid
+	local buy = frame.CurItem.buy
+	local duration = frame.CurItem.duration
+	if frame.CurItem.count < (stack * number) then
+		print("Posting Failed: Not enough items available")
+		return
+	end
+	local sig = private.SigFromLink(link)
+	print("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
+	AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
 end
 
 function private.CreateFrames()
@@ -395,10 +625,13 @@ function private.CreateFrames()
 	local MatchString = ""
 	frame.list = {}
 	frame.cache = {}
+	frame.CurItem = {}
+	frame.detail = {0,0,0,"",""}
 
 	frame:SetParent(AuctionFrame)
 	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
 	frame:SetPoint("BOTTOMRIGHT", AuctionFrame, "BOTTOMRIGHT")
+	frame:SetScript("OnUpdate", private.OnUpdate)
 
 	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.title:SetPoint("TOP", frame,  "TOP", 0, -20)
@@ -447,6 +680,9 @@ function private.CreateFrames()
 	frame.minprice = CreateFrame("Frame", "AucAdvSimpFrameStart", frame, "MoneyInputFrameTemplate")
 	frame.minprice.isMoneyFrame = true
 	frame.minprice:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -120)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.minprice, function()
+			frame.CurItem.valuechanged = true
+		end)
 	frame.minprice.label = frame.minprice:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.minprice.label:SetPoint("BOTTOMLEFT", frame.minprice, "TOPLEFT", 0, 0)
 	frame.minprice.label:SetText("Starting price:")
@@ -455,6 +691,9 @@ function private.CreateFrames()
 	frame.buyout = CreateFrame("Frame", "AucAdvSimpFrameBuyout", frame, "MoneyInputFrameTemplate")
 	frame.buyout.isMoneyFrame = true
 	frame.buyout:SetPoint("TOPLEFT", frame.minprice, "BOTTOMLEFT", 0, -20)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.buyout, function()
+			frame.CurItem.valuechanged = true
+		end)
 	frame.buyout.label = frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.buyout.label:SetPoint("BOTTOMLEFT", frame.buyout, "TOPLEFT", 0, 0)
 	frame.buyout.label:SetText("Buyout price:")
@@ -472,6 +711,7 @@ function private.CreateFrames()
 		intervals = {12, 24, 48},
 		selected = 48,
 		OnClick = function (obj, ...)
+			frame.CurItem.valuechanged = true
 			local self = frame.duration.time
 			for pos, dur in ipairs(self.intervals) do
 				if obj == self[pos] then
@@ -513,6 +753,8 @@ function private.CreateFrames()
 	frame.stacks.num:SetAutoFocus(false)
 	frame.stacks.num:SetHeight(18)
 	frame.stacks.num:SetWidth(40)
+	frame.stacks.num:SetNumeric(true)
+	frame.stacks.num:SetScript("OnTextChanged", function() frame.CurItem.valuechanged = true end)
 
 	frame.stacks.mult = frame.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.stacks.mult:SetPoint("BOTTOMLEFT", frame.stacks.num, "BOTTOMRIGHT", 5, 0)
@@ -523,6 +765,8 @@ function private.CreateFrames()
 	frame.stacks.size:SetAutoFocus(false)
 	frame.stacks.size:SetHeight(18)
 	frame.stacks.size:SetWidth(30)
+	frame.stacks.size:SetNumeric(true)
+	frame.stacks.size:SetScript("OnTextChanged", function() frame.CurItem.valuechanged = true end)
 
 	frame.stacks.equals = frame.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.stacks.equals:SetPoint("BOTTOMLEFT", frame.stacks.size, "BOTTOMRIGHT", 5, 0)
@@ -540,11 +784,13 @@ function private.CreateFrames()
 	frame.create:SetPoint("BOTTOMRIGHT", AuctionFrameMoneyFrame, "TOPRIGHT", 0, 10)
 	frame.create:SetWidth(140)
 	frame.create:SetText("Create Auction")
+	frame.create:SetScript("OnClick", private.PostAuction)
 
-	frame.remember = CreateFrame("Button", "AucAdvSimpFrameRemember", frame, "OptionsButtonTemplate")
-	frame.remember:SetPoint("BOTTOMRIGHT", frame.create, "TOPRIGHT", 0, 0)
-	frame.remember:SetWidth(140)
-	frame.remember:SetText("Remember")
+	frame.clear = CreateFrame("Button", "AucAdvSimpFrameRemember", frame, "OptionsButtonTemplate")
+	frame.clear:SetPoint("BOTTOMRIGHT", frame.create, "TOPRIGHT", 0, 5)
+	frame.clear:SetWidth(140)
+	frame.clear:SetText("Clear Setting")
+	frame.clear:SetScript("OnClick", function() private.ClearSetting() private.RemoveConfig() end)
 
 	MoneyInputFrame_SetPreviousFocus(frame.minprice, frame.stacks.size)
 	MoneyInputFrame_SetNextFocus(frame.minprice, AucAdvSimpFrameBuyoutGold)
@@ -563,6 +809,8 @@ function private.CreateFrames()
 		self.last = item
 
 		item:SetHitRectInsets(-1, -140, 3, 3)
+		item:SetScript("OnClick", function() frame.CurItem.valuechanged = true end)
+
 
 		item.label = item:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		item.label:SetPoint("LEFT", item, "RIGHT", 0, 0)
@@ -573,6 +821,7 @@ function private.CreateFrames()
 
 	frame.options:AddOption("matchmy", "Match my current")
 	frame.options:AddOption("undercut", "Undercut competitors")
+	frame.options:AddOption("remember", "Remember fixed price")
 
 	function frame.ClickBagHook(_,_,button)
 		if (not AucAdvanced.Settings.GetSetting("util.simpleauc.clickhook")) then return end
