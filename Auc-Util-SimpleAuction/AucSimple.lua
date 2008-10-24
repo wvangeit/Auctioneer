@@ -58,6 +58,17 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 end
 
 function lib.OnLoad()
+--Default sizes for the scrollframe column widths
+default("util.simple.columnwidth.Seller", 71)
+default("util.simple.columnwidth.Left", 25)
+default("util.simple.columnwidth.Stk", 27 )
+default("util.simple.columnwidth.Min/ea", 65)
+default("util.simple.columnwidth.Cur/ea", 65)
+default("util.simple.columnwidth.Buy/ea", 65)
+default("util.simple.columnwidth.MinBid", 65)
+default("util.simple.columnwidth.CurBid", 65)
+default("util.simple.columnwidth.Buyout", 68)
+default("util.simple.columnwidth.BLANK", 0.05)
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -209,6 +209,59 @@ function private.UpdateDisplay()
 	local text = "Auctioning %d lots of %d sized stacks at %s bid / %s buyout per stack"
 	frame.info:SetText(text:format(cNum, cStack, coinsBid, coinsBuy))
 	frame.stacks.equals:SetText("= "..(cStack * cNum))
+	
+	private.UpdateScrollframe()
+end
+
+function private.UpdateScrollframe()
+	local Const = AucAdvanced.Const
+	local _, _, _, _, oLink = unpack(frame.detail)
+	
+	if not oLink then return end
+	
+	local _, itemId, suffix, factor = decode(oLink)
+	itemId = tonumber(itemId)
+	suffix = tonumber(suffix) or 0
+	factor = tonumber(factor) or 0
+	
+	local results = AucAdvanced.API.QueryImage({
+	itemId = itemId,
+	suffix = suffix,
+	factor = factor,
+	})
+	local data = {}
+	for i = 1, #results do
+		local result = results[i]
+		local tLeft = result[Const.TLEFT]
+		if (tLeft == 1) then tLeft = "30m"
+		elseif (tLeft == 2) then tLeft = "2h"
+		elseif (tLeft == 3) then tLeft = "12h"
+		elseif (tLeft == 4) then tLeft = "48h"
+		end
+		local count = result[Const.COUNT]
+		data[i] = {
+		result[Const.SELLER],
+		tLeft,
+		count,
+		math.floor(0.5+result[Const.MINBID]/count),
+		math.floor(0.5+result[Const.CURBID]/count),
+		math.floor(0.5+result[Const.BUYOUT]/count),
+		result[Const.MINBID],
+		result[Const.CURBID],
+		result[Const.BUYOUT],
+		result[Const.LINK]
+		}
+		local curbid = result[Const.CURBID]
+		if curbid == 0 then
+			curbid = result[Const.MINBID]
+		end
+	end
+	
+	frame.imageview.sheet:SetData(data)
+	--reset scroll position if new items list is too short to show
+	if  not frame.imageview.sheet.rows[1][1]:IsShown() then
+		frame.imageview.sheet.panel:ScrollToCoords(0,0)
+	end
 end
 
 function private.UpdatePricing()
@@ -568,6 +621,45 @@ function private.CreateFrames()
 		end
 	end
 
+	
+	frame.imageview = CreateFrame("Frame", nil, frame)
+	frame.imageview:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	
+	frame.imageview:SetBackdropColor(0, 0, 0, 1)
+	frame.imageview:SetPoint("TOPLEFT", frame, "TOPLEFT", 185, -100)
+	frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
+	frame.imageview:SetPoint("BOTTOM", frame, "BOTTOM", 0, 35)
+	--records the column width changes
+	--store width by header name, that way if column reorginizing is added we apply size to proper column
+	function private.onResize(self, column, width)
+		if not width then
+			AucAdvanced.Settings.SetSetting("util.simple.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(AucAdvanced.Settings.GetSetting("util.simple.columnwidth."..self.labels[column]:GetText()))
+		else
+			AucAdvanced.Settings.SetSetting("util.simple.columnwidth."..self.labels[column]:GetText(), width)
+		end
+	end
+	function private.onClick(button, row, index)
+		
+	end
+	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
+		{ "Seller", "TEXT", get("util.simple.columnwidth.Seller")}, --75
+		{ "Left",   "INT",  get("util.simple.columnwidth.Left")}, --40
+		{ "Stk",    "INT",  get("util.simple.columnwidth.Stk")}, --30
+		{ "Min/ea", "COIN", get("util.simple.columnwidth.Min/ea"), { DESCENDING=true } }, --85
+		{ "Cur/ea", "COIN", get("util.simple.columnwidth.Cur/ea"), { DESCENDING=true } }, --85
+		{ "Buy/ea", "COIN", get("util.simple.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
+		{ "MinBid", "COIN", get("util.simple.columnwidth.MinBid"), { DESCENDING=true } }, --85
+		{ "CurBid", "COIN", get("util.simple.columnwidth.CurBid"), { DESCENDING=true } }, --85
+		{ "Buyout", "COIN", get("util.simple.columnwidth.Buyout"), { DESCENDING=true } }, --85
+		{ "", "TEXT", get("util.simple.columnwidth.BLANK")}, --Hidden column to carry the link --0
+	}, nil, nil, private.onClick, private.onResize, nil)
+			
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
 
