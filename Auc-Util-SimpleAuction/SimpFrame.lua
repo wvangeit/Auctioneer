@@ -178,7 +178,22 @@ local function coins(money)
 	end
 end
 
+function private.SetIconCount(itemCount)
+	local size = 18
+	if itemCount > 999 then
+		local size = 14
+	elseif itemCount > 99 then
+		local size = 16
+	elseif itemCount > 9 then
+		local size = 17
+	end
+	frame.icon.count:SetFont(AucAdvSimpleNumberFontLarge.font, size, "OUTLINE")
+	frame.icon.count:SetText(itemCount)
+end
+
 function private.UpdateDisplay()
+	local link = frame.icon.itemLink
+	if not link then return end
 	local cBid, cBuy = MoneyInputFrame_GetCopper(frame.minprice), MoneyInputFrame_GetCopper(frame.buyout)
 	frame.CurItem.buy, frame.CurItem.bid = cBuy, cBid
 	local cStack = frame.stacks.size:GetNumber() or 1
@@ -187,6 +202,13 @@ function private.UpdateDisplay()
 	frame.CurItem.number = cNum
 	local oStack, oBid, oBuy, oReason, oLink = unpack(frame.detail)
 	local lStack = frame.stacks.size.lastSize or oStack
+	local total = GetItemCount(link) or 0
+
+	if (total == 0) then
+		private.LoadItemLink()
+		return
+	end
+	private.SetIconCount(total)
 
 	--print("Updating", unpack(frame.detail))
 
@@ -200,7 +222,8 @@ function private.UpdateDisplay()
 	end
 
 	if priceType == "auto" and cStack ~= oStack then
-		return private.UpdatePricing()
+		private.UpdatePricing()
+		return
 	elseif priceType == "fixed" and cStack ~= lStack then
 		cBid = cBid / lStack * cStack
 		cBuy = cBuy / lStack * cStack
@@ -254,6 +277,13 @@ function private.UpdatePricing()
 	local stack = frame.stacks.size:GetNumber()
 	local _,_,_,_,_,_,_,stx = GetItemInfo(link)
 	local total = GetItemCount(link) or 0
+
+	if (total == 0) then
+		private.LoadItemLink()
+		return
+	end
+	private.SetIconCount(total)
+
 	stx = min(stx, total)
 
 	if not stack or stack == 0 or stack > stx then
@@ -344,7 +374,7 @@ function private.UpdatePricing()
 		reason = "Unable to calculate price" 
 	end
 	
-	if (stack * num) > stx then
+	if (stack * num) > total then
 		reason = "Error: You don't have that many"
 	end
 	bid, buy = ceil(tonumber(bid) or 1), ceil(tonumber(buy) or 0)
@@ -462,14 +492,7 @@ function private.LoadItemLink(itemLink)
 		frame.CurItem.count = itemCount
 		frame.icon.itemLink = itemLink
 		frame.icon:SetNormalTexture(itemTexture)
-		local size = 18
-		if itemCount > 999 then
-			local size = 14
-		elseif itemCount > 99 then
-			local size = 16
-		end
-		frame.icon.count:SetFont(AucAdvSimpleNumberFontLarge.font, size, "OUTLINE")
-		frame.icon.count:SetText(itemCount)
+		private.SetIconCount(itemCount)
 
 		frame.name:SetText(itemName)
 		frame.name:SetTextColor(GetItemQualityColor(itemRarity))
@@ -925,6 +948,15 @@ function private.CreateFrames()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+
+	function frame:OnEvent(event, ...)
+		if event == "BAG_UPDATE" then
+			private.UpdateDisplay()
+		end
+	end
+
+	frame:SetScript("OnEvent", frame.OnEvent)
+	frame:RegisterEvent("BAG_UPDATE")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
