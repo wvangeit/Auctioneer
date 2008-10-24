@@ -59,15 +59,15 @@ end
 
 function lib.OnLoad()
 --Default sizes for the scrollframe column widths
-default("util.simple.columnwidth.Seller", 71)
-default("util.simple.columnwidth.Left", 25)
-default("util.simple.columnwidth.Stk", 27 )
+default("util.simple.columnwidth.Seller", 89)
+default("util.simple.columnwidth.Left", 32)
+default("util.simple.columnwidth.Stk", 32 )
 default("util.simple.columnwidth.Min/ea", 65)
 default("util.simple.columnwidth.Cur/ea", 65)
 default("util.simple.columnwidth.Buy/ea", 65)
-default("util.simple.columnwidth.MinBid", 65)
-default("util.simple.columnwidth.CurBid", 65)
-default("util.simple.columnwidth.Buyout", 68)
+default("util.simple.columnwidth.MinBid", 76)
+default("util.simple.columnwidth.CurBid", 76)
+default("util.simple.columnwidth.Buyout", 80)
 default("util.simple.columnwidth.BLANK", 0.05)
 end
 

@@ -648,15 +648,15 @@ function private.CreateFrames()
 		
 	end
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Seller", "TEXT", get("util.simple.columnwidth.Seller")}, --75
-		{ "Left",   "INT",  get("util.simple.columnwidth.Left")}, --40
-		{ "Stk",    "INT",  get("util.simple.columnwidth.Stk")}, --30
-		{ "Min/ea", "COIN", get("util.simple.columnwidth.Min/ea"), { DESCENDING=true } }, --85
-		{ "Cur/ea", "COIN", get("util.simple.columnwidth.Cur/ea"), { DESCENDING=true } }, --85
-		{ "Buy/ea", "COIN", get("util.simple.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --85
-		{ "MinBid", "COIN", get("util.simple.columnwidth.MinBid"), { DESCENDING=true } }, --85
-		{ "CurBid", "COIN", get("util.simple.columnwidth.CurBid"), { DESCENDING=true } }, --85
-		{ "Buyout", "COIN", get("util.simple.columnwidth.Buyout"), { DESCENDING=true } }, --85
+		{ "Seller", "TEXT", get("util.simple.columnwidth.Seller")}, --89
+		{ "Left",   "INT",  get("util.simple.columnwidth.Left")}, --32
+		{ "Stk",    "INT",  get("util.simple.columnwidth.Stk")}, --32
+		{ "Min/ea", "COIN", get("util.simple.columnwidth.Min/ea"), { DESCENDING=true } }, --65
+		{ "Cur/ea", "COIN", get("util.simple.columnwidth.Cur/ea"), { DESCENDING=true } }, --65
+		{ "Buy/ea", "COIN", get("util.simple.columnwidth.Buy/ea"), { DESCENDING=true, DEFAULT=true } }, --65
+		{ "MinBid", "COIN", get("util.simple.columnwidth.MinBid"), { DESCENDING=true } }, --76
+		{ "CurBid", "COIN", get("util.simple.columnwidth.CurBid"), { DESCENDING=true } }, --76
+		{ "Buyout", "COIN", get("util.simple.columnwidth.Buyout"), { DESCENDING=true } }, --80
 		{ "", "TEXT", get("util.simple.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, private.onClick, private.onResize, nil)
 			
