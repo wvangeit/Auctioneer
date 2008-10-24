@@ -194,6 +194,7 @@ do
             if inverseZ[k] > confidence then break; end
             nearest = inverseZ[k];
         end
+		if not nearest or nearest == 0 then nearest = 0.1 end
 
         local stddev = median * nearest / sqrt(seen);   -- unbiased population estimate from inverse Z lookup
         curve:SetParameters(median, stddev);
