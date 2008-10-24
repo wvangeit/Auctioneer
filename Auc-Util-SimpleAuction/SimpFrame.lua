@@ -40,6 +40,15 @@ local Const = const
 local frame
 local TAB_NAME = "Post"
 
+function private.postPickupContainerItemHook(_,_,bag, slot)
+	if (CursorHasItem()) then
+		frame.CursorItem = {bag = bag, slot = slot}
+	else
+		frame.CursorItem = nil
+	end
+end
+Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
+
 function private.ShiftFocus(frame, ...)
 	--print("Shifting focus on", frame:GetName(), ...)
 	local dest
@@ -539,12 +548,17 @@ end
 
 function private.IconClicked()
 	local objType, _, itemLink = GetCursorInfo()
+	local size
+	if CursorHasItem() and frame.CursorItem then
+		_, size = GetContainerItemInfo(frame.CursorItem.bag, frame.CursorItem.slot)
+	end
+	frame.CursorItem = nil
 	ClearCursor()
 	if objType ~= "item" then itemLink = nil end
-	private.LoadItemLink(itemLink)
+	private.LoadItemLink(itemLink, size)
 end
 
-function private.LoadItemLink(itemLink)
+function private.LoadItemLink(itemLink, size)
 	empty(frame.CurItem)
 	if itemLink then
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
@@ -570,6 +584,9 @@ function private.LoadItemLink(itemLink)
 	frame.stacks.equals:SetText("= 0")
 	private.ClearSetting()
 	private.LoadConfig()
+	if itemLink and size then
+		frame.stacks.size:SetNumber(size)
+	end
 	--private.UpdatePricing()
 end
 
@@ -919,9 +936,10 @@ function private.CreateFrames()
 		local bag = this:GetParent():GetID()
 		local slot = this:GetID()
 		local link = GetContainerItemLink(bag, slot)
+		local _, size = GetContainerItemInfo(bag, slot)
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
-				private.LoadItemLink(link)
+				private.LoadItemLink(link, size)
 			end
 		end
 	end
