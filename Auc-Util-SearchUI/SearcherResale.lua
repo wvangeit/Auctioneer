@@ -95,13 +95,16 @@ end
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
 
+	if not item[Const.LINK] then
+		return false, "No link"
+	end
 	local model = get("resale.model")
 	if model == "market" then
 		market, seen = AucAdvanced.API.GetMarketValue(item[Const.LINK])
 	elseif model == "Appraiser" and AucAdvanced.Modules.Util.Appraiser then
 		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
 	else
-		market, seen = AucAdvanced.API.GetAlgorithmValue(model, link)
+		market, seen = AucAdvanced.API.GetAlgorithmValue(model, item[Const.LINK])
 	end
 	if not market then
 		return false, "No appraiser price"
