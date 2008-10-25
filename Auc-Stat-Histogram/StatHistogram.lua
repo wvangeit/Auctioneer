@@ -229,12 +229,16 @@ function lib.GetItemPDF(link, faction)
 	local targetarea = math.min(1, count/30) --if count is less than thirty, we're not very sure about the price
 
 	PDcurve["step"] = step
-	PDcurve["min"] = stattable["min"]
-	PDcurve["max"] = stattable["max"]
+	PDcurve["min"] = stattable["min"]-1
+	PDcurve["max"] = stattable["max"]+1
 
 	for i = stattable["min"], stattable["max"] do
 		curcount = curcount + stattable[i]
-		PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+		if count == stattable[i] then
+			PDcurve[i] = 1
+		else
+			PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+		end
 		area = area + step*PDcurve[i]
 	end
 
@@ -243,7 +247,7 @@ function lib.GetItemPDF(link, faction)
 		areamultiplier = targetarea/area
 	end
 	for i = PDcurve["min"], PDcurve["max"] do
-		PDcurve[i]= PDcurve[i] * areamultiplier
+		PDcurve[i]= (PDcurve[i] or 0) * areamultiplier
 	end
 	return private.ItemPDF, PDcurve["min"]*PDcurve["step"], PDcurve["max"]*PDcurve["step"]
 end
