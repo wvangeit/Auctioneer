@@ -42,6 +42,7 @@ local iTypes = AucAdvanced.Const.InvTypes
 local KEEP_NUM_POINTS = 500
 
 local data
+local pricecache
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
@@ -74,7 +75,7 @@ lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 	if (not data) then private.makeData() end
-
+	pricecache = nil
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -170,6 +171,12 @@ function lib.GetPrice(hyperlink, faction)
 
 	if not data[faction][itemSig] then return end
 
+	if pricecache and pricecache[faction] and pricecache[faction][itemSig] and pricecache[faction][itemSig][iLevel] then
+		local ave, mean, _, stddev, var, cnt, conf = strsplit(",", pricecache[faction][itemSig][iLevel])
+		ave, mean, stddev, var, cnt, conf = tonumber(ave), tonumber(mean), tonumber(stddev), tonumber(var), tonumber(cnt), tonumber(conf)
+		return ave, mean, _, stddev, var, cnt, conf
+	end
+	
 	local stats = private.UnpackStats(data[faction][itemSig])
 	if not stats[iLevel] then return end
 
@@ -223,7 +230,10 @@ function lib.GetPrice(hyperlink, faction)
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-
+	if not pricecache then pricecache = {} end
+	if not pricecache[faction] then pricecache[faction] = {} end
+	if not pricecache[faction][itemSig] then pricecache[faction][itemSig] = {} end
+	pricecache[faction][itemSig][iLevel] = strjoin(",", average or "", mean or "", "false", stdev or "", variance or "", count or "", confidence or "")
 	return average, mean, false, stdev, variance, count, confidence
 end
 
