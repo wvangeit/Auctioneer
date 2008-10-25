@@ -201,7 +201,7 @@ function private.CreateFrames()
 	frame.Config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -139, -13)
 	frame.Config:SetScript("OnClick", function() private.GUI() end)
 	frame.Config:SetText("Configure")
-	frame.Config:SetScript("OnEnter", function() private.buttonTooltips( frame.Config, "Opens the BeanCounter configuration window") end)
+	frame.Config:SetScript("OnEnter", function() private.buttonTooltips( frame.Config, _BC('TTOpenconfig')) end)--"Opens the BeanCounter configuration window"
 	frame.Config:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
@@ -212,7 +212,7 @@ function private.CreateFrames()
 		if objtype == "item" then
 			local itemID = lib.API.decodeLink(link)
 			local _, itemName =  lib.API.getItemString(link)
-			local itemTexture = select(2, private.getItemInfo(link, "name"))
+			local itemTexture = select(2, private.getItemInfo(link, "name")) 
 			frame.searchBox:SetText(itemName)
 			private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 		end
@@ -232,7 +232,7 @@ function private.CreateFrames()
 	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.icon:SetScript("OnClick", frame.IconClicked)
 	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
-	frame.icon:SetScript("OnEnter", function() private.buttonTooltips( frame.icon, "Drop an item here to start a search for it.\nDisplays current search's icon if possible") end)
+	frame.icon:SetScript("OnEnter", function() private.buttonTooltips( frame.icon, _BC('TT_ItemIconBox')) end) --"Drop an item here to start a search for it.\nDisplays current search's icon if possible"
 	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--help text
@@ -260,7 +260,7 @@ function private.CreateFrames()
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
 	frame.selectbox.box:SetText(private.realmName.." ".._BC('UiData'))
-	frame.selectbox.box.button:SetScript("OnEnter", function() private.buttonTooltips( frame.selectbox.box.button, "Filter search results by server, player, faction") end)
+	frame.selectbox.box.button:SetScript("OnEnter", function() private.buttonTooltips( frame.selectbox.box.button, _BC('TT_BeanCounterSelectBox')) end)--"Filter search results by server, player, faction"
 	frame.selectbox.box.button:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--Search box
@@ -272,7 +272,7 @@ function private.CreateFrames()
 	frame.searchBox:SetScript("OnEnterPressed", function()
 		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
 	end)
-	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, "Enter search query's here or leave blank to search all") end)
+	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, _BC('TT_SearchBox')) end) --"Enter search query's here or leave blank to search all"
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
@@ -325,7 +325,7 @@ function private.CreateFrames()
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
 	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) end)
 	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
-	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, "Only match the Exact text in the search box") end)
+	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, _BC('TT_ExactCheck')) end) --"Only match the Exact text in the search box"
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--search classic data
@@ -335,7 +335,7 @@ function private.CreateFrames()
 	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
 	frame.classicCheck:Hide()
-	frame.classicCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.classicCheck, "Display results from BeanCounter Classic Database") end)
+	frame.classicCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.classicCheck, _BC('TT_ClassicCheck')) end) --"Display results from BeanCounter Classic Database"
 	frame.classicCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--no need to show this button if theres no classic data to search
@@ -353,7 +353,7 @@ function private.CreateFrames()
 	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
-	frame.bidCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, "Display items bought from the Auction House") end)
+	frame.bidCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, _BC('TT_BidCheck')) end) --"Display items bought from the Auction House"
 	frame.bidCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
@@ -363,7 +363,7 @@ function private.CreateFrames()
 	frame.bidFailedCheck:SetScale(0.85)
 	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
-	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, "Display items you were outbided on.") end)
+	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidFailedCheck, _BC('TT_BidFailedCheck')) end) --"Display items you were outbided on."
 	frame.bidFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--search Auctions
@@ -373,7 +373,7 @@ function private.CreateFrames()
 	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
-	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, "Display items sold at the Auction House") end)
+	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, _BC('TT_AuctionCheck')) end) --"Display items sold at the Auction House"
 	frame.auctionCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
@@ -383,7 +383,7 @@ function private.CreateFrames()
 	frame.auctionFailedCheck:SetScale(0.85)
 	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions'))
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
-	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, "Display items you failed to sell.") end)
+	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, _BC('TT_AuctionFailedCheck')) end) --Display items you failed to sell.
 	frame.auctionFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--[[search Purchases (vendor/trade)
@@ -433,7 +433,7 @@ function private.CreateFrames()
 				GameTooltip:SetHyperlink(link)
 				if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
 			else
-				GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
+				GameTooltip:SetText(_BC('TooltipFailed'), 1.0, 1.0, 1.0) --"Unable to get Tooltip Info"
 			end
 		end
         end
@@ -473,7 +473,7 @@ function private.CreateFrames()
 	for i = 1, #frame.resultlist.sheet.labels do
 		local self = frame.resultlist.sheet.labels[i].button
 		local text = frame.resultlist.sheet.labels[i]:GetText()
-		self:SetScript("OnEnter", function() private.buttonTooltips( self, text.."\nRightclick+Drag to resize\nCTRL+RightClick to reset") end)
+		self:SetScript("OnEnter", function() private.buttonTooltips( self, text.._BC('TT_ScrollHeader') ) end) --\nRightclick+Drag to resize\nCTRL+RightClick to reset
 		self:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	end
 
@@ -501,14 +501,14 @@ function private.CreateMailFrames()
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("CENTER", frame, "CENTER", 0,60)
-	title:SetText("BeanCounter is recording your mail")
+	title:SetText(_BC('UiMailFrameRecording')) --BeanCounter is recording your mail
 
 	local body = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	body:SetPoint("CENTER", frame, "CENTER", 0, 30)
-	body:SetText("Please do not close the mail frame or")
+	body:SetText(_BC('UiMailFrameWait1')) --Please do not close the mail frame or
 	local body1 = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	body1:SetPoint("CENTER", frame, "CENTER", 0,0)
-	body1:SetText("Auction Items will not be recorded")
+	body1:SetText(_BC('UiMailFrameWait2')) --"Auction Items will not be recorded"
 
 	local countdown = frame:CreateFontString("BeanCounterMailCount", "OVERLAY", "GameFontNormalLarge")
 	private.CountGUI = countdown
@@ -537,7 +537,7 @@ function private.CreateErrorFrames(error, expectedVersion, playerVersion)
 	frame.loadError.close = CreateFrame("Button", nil, frame.loadError, "OptionsButtonTemplate")
 	frame.loadError.close:SetPoint("BOTTOMRIGHT", frame.loadError, "BOTTOMRIGHT", -10, 10)
 	frame.loadError.close:SetScript("OnClick", function() frame.loadError:Hide() end)
-	frame.loadError.close:SetText("Ok")
+	frame.loadError.close:SetText( _BC('Ok') )
 
 	frame.loadError.text = frame.loadError:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.loadError.text:SetPoint("LEFT", frame.loadError, "LEFT", 25, 30)
