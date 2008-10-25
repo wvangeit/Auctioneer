@@ -103,7 +103,7 @@ function private.GetItems(link)
 	local items = {}
 
 	local live = false
-	if AuctionFrame:IsVisible() then
+	if AuctionFrame and AuctionFrame:IsVisible() then
 		live = true
 		local n = GetNumAuctionItems("owner")
 		if n and n > 0 then
@@ -188,6 +188,7 @@ local function coins(money)
 		return GSC_1:format(COPPER, c)
 	end
 end
+private.coins = coins
 
 function private.SetIconCount(itemCount)
 	local size = 18

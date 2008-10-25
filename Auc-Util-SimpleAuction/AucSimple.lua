@@ -55,7 +55,102 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+local function whitespace(length)
+	local spaces = ""
+	for index = length, 0, -1 do
+		spaces = spaces.." "
+	end
+	return spaces
+end
+
+function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+	if not get("util.simpleauc.tooltip") then return end
+	local realm = AucAdvanced.GetFaction()
+	local id = private.SigFromLink(link)
+	local settingstr = get("util.simpleauc."..realm.."."..id)
+	local market, seen, fixbuy, fixbid, stack
+	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
+	local reason = "Market"
+
+	market, seen = AucAdvanced.API.GetMarketValue(link)
+	if (not market) or (market <= 0) or (not (seen > 5 or aSeen < 3)) then
+		market = aveBuy
+		reason = "Current"
+	end
+	if (not market) and GetSellValue then
+		local vendor = GetSellValue(link)
+		if vendor and vendor > 0 then
+			market = vendor * 3
+			reason = "Vendor markup"
+		end
+	end
+	if not market or market <= 0 then
+		market = 0
+		reason = "No data"
+	end
+	
+	local coinsBid, coinsBuy, coinsBidEa, coinsBuyEa = "no","no","no","no"
+	if market > 0 then
+		coinsBid = private.coins(market*0.8*quantity)
+		coinsBidEa = private.coins(market*0.8)
+		coinsBuy = private.coins(market*quantity)
+		coinsBuyEa = private.coins(market)
+	end
+	if quantity == 1 then
+		local text = string.format("%s: %s bid/%s buyout", libName, coinsBid, coinsBuy)
+		EnhTooltip.AddLine(text)
+		EnhTooltip.LineColor(0.4, 1.0, 0.9)
+	else
+		local text = string.format("%s x%d: %s bid/%s buyout", libName, quantity, coinsBid, coinsBuy)
+		local textea =  string.format("%s(Or individually: %s/%s)", whitespace(5), coinsBidEa, coinsBuyEa)
+		EnhTooltip.AddLine(text)
+		EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		EnhTooltip.AddLine(textea)
+		EnhTooltip.LineColor(0.3, .8, 0.7)
+	end
+	if settingstr then
+		fixbid, fixbuy, _, _, stack = strsplit(":", settingstr)
+		fixbid, fixbuy, stack = tonumber(fixbid), tonumber(fixbuy), tonumber(stack)
+		fixbid = ceil(fixbid/stack)
+		fixbuy = ceil(fixbuy/stack)
+	end
+	
+	if fixbid then
+		coinsBuy = "no"
+		coinsBid = private.coins(fixbid*quantity)
+		if fixbuy then
+			coinsBuy = private.coins(fixbuy*quantity)
+		end
+		if quantity == 1 then
+			local text = string.format("%sFixed: %s bid/%s buyout", whitespace(12), coinsBid, coinsBuy)
+			EnhTooltip.AddLine(text)
+			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		else
+			local text = string.format("%sFixed x%d: %s bid/%s buyout", whitespace(12), quantity, coinsBid, coinsBuy)
+			EnhTooltip.AddLine(text)
+			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		end
+	end
+	if lowBid and lowBid > 0 then
+		coinsBuy = "no"
+		coinsBid = private.coins(lowBid*quantity)
+		if lowBuy and lowBuy > 0 then
+			coinsBuy = private.coins(lowBuy*quantity)
+		end
+		if quantity == 1 then
+			local text = string.format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
+			EnhTooltip.AddLine(text)
+			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		else
+			local text = string.format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
+			EnhTooltip.AddLine(text)
+			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		end
+	else
+		EnhTooltip.AddLine("  No Competition")
+		EnhTooltip.LineColor(0.4, 1.0, 0.9)
+	end
+	
 end
 
 function lib.OnLoad()
@@ -73,6 +168,7 @@ function lib.OnLoad()
 	--Default options
 	default("util.simpleauc.clickhook", true)
 	default("util.simpleauc.scanbutton", true)
+	default("util.simpleauc.tooltip", true)
 end
 
 function private.UpdateConfig()
@@ -98,6 +194,8 @@ function private.SetupConfigGui(gui)
 		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
 
 	gui:AddControl(id, "Header",       0,    lib.libName.." options")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.tooltip", "Show prices in tooltip")
+	gui:AddTip(id, "Shows market price and potential undercut price for the current item in the tooltip")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.clickhook", "Allow alt-click item in bag instead of drag")
 	gui:AddTip(id, "Enables an alt-click mouse-hook so you can alt-click your inventory items into the SimpleAuction post frame")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.scanbutton", "Show big red scan button at bottom of seach window")
