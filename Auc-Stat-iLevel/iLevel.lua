@@ -39,7 +39,7 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local iTypes = AucAdvanced.Const.InvTypes
 
-local KEEP_NUM_POINTS = 5000
+local KEEP_NUM_POINTS = 500
 
 local data
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
