@@ -827,17 +827,11 @@ function getRowCount()
 	return #lines
 end
 
-function scrollUpdate(offset)
+function scrollUpdate()
 	local numLines = getRowCount()
+	local offset = 0
 	if (numLines > 25) then
-		if (not offset) then
-			offset = FauxScrollFrame_GetOffset(InformantFrameScrollBar)
-		else
-			if (offset > numLines - 25) then offset = numLines - 25 end
-			FauxScrollFrame_SetOffset(InformantFrameScrollBar, offset)
-		end
-	else
-		offset = 0
+		offset = FauxScrollFrame_GetOffset(InformantFrameScrollBar)
 	end
 	local line
 	for i=1, 25 do

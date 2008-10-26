@@ -338,7 +338,7 @@
 				</Anchors>
 				<Scripts>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(Informant.GetRowCount(), Informant.ScrollUpdate)
+						FauxScrollFrame_OnVerticalScroll(self, offset, Informant.GetRowCount(), Informant.ScrollUpdate)
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
