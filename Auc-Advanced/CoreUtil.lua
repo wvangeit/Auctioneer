@@ -36,6 +36,23 @@ if not AucAdvanced then return end
 local lib = AucAdvanced
 local private = {}
 
+--Localization via babylonian
+local Babylonian = LibStub("Babylonian")
+assert(Babylonian, "Babylonian is not installed")
+local babylonian = Babylonian(AuctioneerLocalizations)
+function lib.localizations(stringKey, locale)
+--locale = "deDE" --left in for testing purposes
+	if (locale) then
+		if (type(locale) == "string") then
+			return babylonian(locale, stringKey) or stringKey
+		else
+			return babylonian(GetLocale(), stringKey)
+		end
+	else
+		return babylonian[stringKey] or stringKey
+	end
+end
+
 --The folowing function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
 function lib.getFrameNames(option)
 	local frames = {}
@@ -404,7 +421,7 @@ function lib.GetModuleLocals()
 	return lib.Print, lib.DecodeLink,
 	lib.Recycle, lib.Acquire, lib.Replicate, lib.Empty,
 	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault,
-	lib.Debug.DebugPrint, lib.Fill
+	lib.Debug.DebugPrint, lib.Fill, lib.localizations
 end
 
 private.checkedModules = {}
