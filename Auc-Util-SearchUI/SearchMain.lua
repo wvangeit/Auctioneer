@@ -511,14 +511,26 @@ function private.purchase()
 	if not gui.sheet.selected then
 		return
 	end
+	local enableres = lib.GetSetting("reserve.enable")
+	local reserve = lib.GetSetting("reserve") or 1
+	local bidqueue = gui.frame.cancel.value or 0
+	local balance = GetMoney()
+	balance = balance - bidqueue --account for money we've already "spent"
+
+	local price = 0
 	if string.match(private.data.reason, ":buy") then
-		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+		price = private.data.buyout
 	elseif string.match(private.data.reason, ":bid") then
-		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+		price = private.data.bid
 	elseif private.data.buyout then
-		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
+		price = private.data.buyout
 	else
-		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
+		price = private.data.bid
+	end
+	if ((balance-price) > reserve or not enableres) then
+		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
+	else
+		print("Purchase cancelled: Reserve reached")
 	end
 	private.removeline()
 end
@@ -746,7 +758,7 @@ function lib.MakeGuiConfig()
 	gui.expandGap = 25
 	gui.expandOnActivate = true
 	gui.autoScrollTabs = true
-
+	
 	gui.searchers = {}
 	gui.AddSearcher = function (self, searchType, searchDetail, searchPos)
 		lib.AddSearcher(self, searchType, searchDetail, searchPos)
@@ -928,14 +940,15 @@ function lib.MakeGuiConfig()
 	end
 
 	function lib.OnClickSheet(button, row, index)
+		index = index - (index%15-1)
 		if IsShiftKeyDown() then --Add the item link to chat
-			local link = gui.sheet.rows[row][1]:GetText()
+			local link = gui.sheet.rows[row][index]:GetText()
 			if not link then
 				return
 			end
-			ChatEdit_InsertLink(private.sheetData[row][1])
+			ChatEdit_InsertLink(link)
 		elseif IsAltKeyDown() then --Search for the item in browse tab.
-			local name = gui.sheet.rows[row][1]:GetText()
+			local name = gui.sheet.rows[row][index]:GetText()
 			if not name then
 				return
 			end
@@ -975,7 +988,7 @@ function lib.MakeGuiConfig()
 
 	gui.sheet:EnableSelect(true)
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
-	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 35)
+	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 60)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 	gui.Search:SetFrameLevel(11)
@@ -1064,14 +1077,55 @@ function lib.MakeGuiConfig()
 	gui.frame.snatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 10)
+	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 35)
 	gui.frame.clear:SetText("Clear")
 	gui.frame.clear:SetScript("OnClick", private.removeall)
 	gui.frame.clear:Enable()
 	gui.frame.clear.TooltipText = "Clear results list"
 	gui.frame.clear:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.clear:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-
+	
+	gui.frame.cancel = CreateFrame("Button", "AucAdvSearchUICancelButton", gui.frame, "OptionsButtonTemplate")
+	gui.frame.cancel:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 10)
+	gui.frame.cancel:SetWidth(22)
+	gui.frame.cancel:SetHeight(18)
+	gui.frame.cancel:Disable()
+	gui.frame.cancel:SetScript("OnClick", function()
+		AucAdvanced.Buy.Private.BuyRequests = {}
+		gui.frame.cancel.size = 0
+		gui.frame.cancel.value = 0
+	end)
+	gui.frame.cancel.size = 0
+	gui.frame.cancel.value = 0
+	gui.frame.cancel:SetScript("OnUpdate", function()
+		local queuesize = #AucAdvanced.Buy.Private.BuyRequests
+		if queuesize > 0 and queuesize ~= gui.frame.cancel.size then
+			local value = 0
+			for i,j in pairs(AucAdvanced.Buy.Private.BuyRequests) do
+				value = value + j["price"]
+			end
+			gui.frame.cancel.label:SetText(tostring(queuesize)..": "..EnhTooltip.GetTextGSC(value, true))
+			gui.frame.cancel.value = value
+			gui.frame.cancel:Enable()
+			gui.frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
+		elseif queuesize == 0 and gui.frame.cancel:IsEnabled() == 1 then
+			gui.frame.cancel.label:SetText("")
+			gui.frame.cancel:Disable()
+			gui.frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
+		end
+	end)
+	gui.frame.cancel.tex = gui.frame.cancel:CreateTexture(nil, "OVERLAY")
+	gui.frame.cancel.tex:SetPoint("TOPLEFT", gui.frame.cancel, "TOPLEFT", 4, -2)
+	gui.frame.cancel.tex:SetPoint("BOTTOMRIGHT", gui.frame.cancel, "BOTTOMRIGHT", -4, 2)
+	gui.frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
+	gui.frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
+	gui.frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
+	gui.frame.cancel.label = gui.frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	gui.frame.cancel.label:SetPoint("LEFT", gui.frame.cancel, "RIGHT", 5, 0)
+	gui.frame.cancel.label:SetTextColor(1, 0.8, 0)
+	gui.frame.cancel.label:SetText("")
+	gui.frame.cancel.label:SetJustifyH("LEFT")
+	
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
 	gui.frame.buyout:SetText("Buyout")
@@ -1292,8 +1346,10 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 		local maxprice = lib.GetSetting("maxprice") or 10000000
 		local enableres = lib.GetSetting("reserve.enable")
 		local reserve = lib.GetSetting("reserve") or 1
+		local bidqueue = gui.frame.cancel.value or 0
 
 		local balance = GetMoney()
+		balance = balance - bidqueue --account for money we've already "spent"
 
 		if (cost <= maxprice or not enablemax) and ((balance-cost) > reserve or not enableres) then
 			--Check to see whether the item already exists in the results table
@@ -1391,8 +1447,7 @@ local PerformSearch = function()
 	gui.frame.progressbar:Show()
 
 	--clear the results table
-	lib.CleanTable(private.sheetData)
-	gui.sheet:SetData(private.sheetData)
+	private.removeall()
 
 	private.isSearching = true
 	for i, data in ipairs(scandata.image) do
