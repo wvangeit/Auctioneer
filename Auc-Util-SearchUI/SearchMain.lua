@@ -47,6 +47,8 @@ local SettingCache = {}
 local currentSettings = {}
 local hasUnsaved = nil
 
+local TAB_NAME = "Search"
+
 private.tleft = {
 	"|cff000001|cffe5e5e530m", -- 30m
 	"|cff000002|cffe5e5e52h",  --2h
@@ -74,6 +76,10 @@ function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
 		--private.SetupConfigGui(...)
 		-- We don't have one of these
+	elseif (callbackType == "auctionclose") then
+		if private.isAttached then 
+			lib.DetachFromAH()
+		end
 	elseif (callbackType == "auctionui") then
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.HookAH()
@@ -83,6 +89,8 @@ function lib.Processor(callbackType, ...)
 		if not gui then
 			lib.MakeGuiConfig()
 		end
+
+		lib.CreateAuctionFrames()
 	elseif (callbackType == "pagefinished") then
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.FinishedPage(...)
@@ -179,6 +187,7 @@ local settingDefaults = {
 	["searchspeed"] = 100,
 	["reserve"] = 0,
 	["reserve.enable"] = false,
+	["global.createtab"] = true,
 	["maxprice"] = 10000000,
 	["maxprice.enable"] = false,
 	["tooltiphelp.show"] = true,
@@ -230,6 +239,7 @@ end
 local function isGlobalSetting(setting)
 	local a,b,c = strsplit(".", setting)
 	if a == "configator" then return true end
+	if a == "global" then return true end
 end
 
 local function setter(setting, value)
@@ -334,6 +344,7 @@ function lib.Hide()
 end
 
 function lib.Toggle()
+	if private.isAttached then return end
 	if (gui and gui:IsShown()) then
 		lib.Hide()
 	else
@@ -744,6 +755,96 @@ function lib.AddSearcher(gui, searchType, searchDetail, searchPos)
 	gui.searchers[searchPos][searchType] = searchDetail
 end
 
+function lib.AttachToAH()
+	if private.isAttached then return end
+	local height, width = 410, 830
+	gui.buttonTop = -30
+	gui:SetPosition(gui.AuctionFrame, width, height, 5, 7+height)
+	gui:HideBackdrop()
+	gui:EnableMouse(false)
+	gui:Show()
+	private.isAttached = true
+end
+
+function lib.DetachFromAH()
+	if not private.isAttached then return end
+	gui.buttonTop = 0
+	gui:SetPosition()
+	gui:EnableMouse(true)
+	gui:ShowBackdrop()
+	gui:Hide()
+	private.isAttached = nil
+end
+
+function lib.CreateAuctionFrames()
+	if not lib.GetSetting("global.createtab") then return end
+
+	local frame = CreateFrame("Frame", "AucAdvSearchUiAuctionFrame", AuctionFrame)
+	gui.AuctionFrame = frame
+
+	frame:SetParent(AuctionFrame)
+	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
+	frame:SetPoint("BOTTOMRIGHT", AuctionFrame, "BOTTOMRIGHT")
+
+	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.title:SetPoint("TOP", frame,  "TOP", 0, -20)
+	frame.title:SetText("SearchUi - Auction search interface.")
+
+	local myTabName = "AuctionFrameTabUtilSearchUi"
+	frame.tab = CreateFrame("Button", myTabName, AuctionFrame, "AuctionTabTemplate")
+	frame.tab:SetText(TAB_NAME)
+	frame.tab:Show()
+
+	function frame.tab.OnClick(_, _, index)
+		if not index then index = this:GetID() end
+		local tab = getglobal("AuctionFrameTab"..index)
+		if (tab and tab:GetName() == myTabName) then
+			AuctionFrameTopLeft:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameTopLeft")
+			AuctionFrameTop:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameTopMid")
+			AuctionFrameTopRight:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameTopRight")
+			AuctionFrameBotLeft:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameBotLeft")
+			AuctionFrameBot:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameBotMid")
+			AuctionFrameBotRight:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameBotRight")
+			AuctionFrameMoneyFrame:Hide()
+			frame:Show()
+			lib.AttachToAH()
+		else
+			AuctionFrameMoneyFrame:Show()
+			frame:Hide()
+			lib.DetachFromAH()
+		end
+	end
+
+	PanelTemplates_DeselectTab(frame.tab)
+	AucAdvanced.AddTab(frame.tab, frame)
+
+	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
+
+	frame.money = frame:CreateTexture(nil, "ARTWORK")
+	frame.money:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\GoldMoney")
+	frame.money:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 18, 34)
+	frame.money:SetWidth(256)
+	frame.money:SetHeight(32)
+
+	frame.backing = CreateFrame("Frame", nil, frame)
+	frame.backing:SetPoint("TOPLEFT", frame, "TOPLEFT", 17, -70)
+	frame.backing:SetPoint("BOTTOMRIGHT", frame.money, "TOPLEFT", 145, 2)
+	frame.backing:SetBackdrop({ bgFile="Interface\\AddOns\\Auc-Advanced\\Textures\\BlackBack", edgeFile="Interface\\AddOns\\Auc-Advanced\\Textures\\WhiteCornerBorder", tile=1, tileSize=8, edgeSize=8, insets={left=3, right=3, top=3, bottom=3} })
+	frame.backing:SetBackdropColor(0,0,0, 0.60)
+
+	AucSUI = frame
+--[[
+	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
+	frame.config:SetText("Configure")
+	frame.config:SetScript("OnClick", function()
+		AucAdvanced.Settings.Show()
+		private.gui:ActivateTab(private.guiId)
+	end)
+]]
+	
+end
+
 function lib.MakeGuiConfig()
 	if gui then return end
 
@@ -766,9 +867,9 @@ function lib.MakeGuiConfig()
 
 	private.gui = gui
 	gui.frame = CreateFrame("Frame", nil, gui)
+	gui.frame:SetPoint("TOP", gui, "TOP", 0, -115)
 	gui.frame:SetPoint("BOTTOMRIGHT", gui.Done, "TOPRIGHT", 0,25)
 	gui.frame:SetPoint("LEFT", gui:GetButton(1), "RIGHT", 5,0)
-	gui.frame:SetHeight(335)
 	gui.frame:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
 		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
@@ -796,7 +897,7 @@ function lib.MakeGuiConfig()
 	gui.saves.name = CreateFrame("EditBox", "SearchUiSaveName", gui.saves, "InputBoxTemplate")
 	gui.saves.name:SetPoint("LEFT", gui.saves.title, "RIGHT", 10,0)
 	gui.saves.name:SetAutoFocus(false)
-	gui.saves.name:SetWidth(220)
+	gui.saves.name:SetWidth(200)
 	gui.saves.name:SetHeight(18)
 
 	if AucAdvancedData.UtilSearchUiData then
@@ -1019,6 +1120,10 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 99999999, "Maximum Price")
 	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 
+	id = gui:AddTab("Global Settings", "Settings")
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",           0,    "Setup global options")
+
 	gui:AddControl(id, "Subhead",          0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",          0, 1, "tooltiphelp.show", "Show tooltip help over buttons")
 	gui:AddControl(id, "Checkbox",         0, 1, "debug.show", "Show debug line in tooltip for auctions")
@@ -1028,6 +1133,9 @@ function lib.MakeGuiConfig()
 			gui:AddTip(id, "Show a debug line in the tooltip over auctions for searcher: "..name)
 		end
 	end
+
+	gui:AddControl(id, "Subhead",          0,    "Integration")
+	gui:AddControl(id, "Checkbox",          0, 1, "global.createtab", "Create tab in auction house (requires restart)")
 
 	gui:SetScript("OnKeyDown", lib.UpdateControls)
 
@@ -1077,7 +1185,7 @@ function lib.MakeGuiConfig()
 	gui.frame.snatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 35)
+	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 10)
 	gui.frame.clear:SetText("Clear")
 	gui.frame.clear:SetScript("OnClick", private.removeall)
 	gui.frame.clear:Enable()
