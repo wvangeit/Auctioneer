@@ -832,7 +832,6 @@ function lib.CreateAuctionFrames()
 	frame.backing:SetBackdrop({ bgFile="Interface\\AddOns\\Auc-Advanced\\Textures\\BlackBack", edgeFile="Interface\\AddOns\\Auc-Advanced\\Textures\\WhiteCornerBorder", tile=1, tileSize=8, edgeSize=8, insets={left=3, right=3, top=3, bottom=3} })
 	frame.backing:SetBackdropColor(0,0,0, 0.60)
 
-	AucSUI = frame
 --[[
 	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
