@@ -101,7 +101,7 @@ function lib.PushSearch()
 	local canbuy, reason = lib.CanBuy(private.BuyRequests[1]["price"], private.BuyRequests[1]["sellername"])
 	if not canbuy then
 		print("AucAdv: Can't buy "..private.BuyRequests[1]["link"].." : "..reason)
-		table.remove(private.BuyRequests[1])
+		table.remove(private.BuyRequests,1)
 		return
 	end
 
@@ -285,6 +285,8 @@ function private.onEventHookBid(_, event, arg1)
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
 			arg1 == ERR_AUCTION_HIGHER_BID or
+			arg1 == ERR_AUCTION_BID_INCREMENT or
+			arg1 == ERR_AUCTION_MIN_BID or
 			arg1 == ERR_ITEM_MAX_COUNT) then
 			private.onBidFailed(arg1)
 		end
