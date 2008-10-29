@@ -77,6 +77,7 @@ function lib.OnLoad(addon)
 	default("util.protectwindow.processprotect", true)
 	default("util.ahwindowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
 	default("util.ahwindowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
+	default("util.ahwindowcontrol.searchuiscale", 1) --This is the default SearchUI scale
 end
 
 --after Auction House Loads Hook the Window Display event
@@ -112,11 +113,13 @@ function private.SetupConfigGui(gui)
 		{3, "When Scanning"}
 	}, "util.protectwindow.protectwindow", "Prevent other windows from closing the Auction House window.")
 	gui:AddTip(id, "This will prevent other windows from closing the Auction House window when you open them, according to your settings.")
+			
 	gui:AddControl(id, "Checkbox", 0, 1, "util.protectwindow.processprotect", "Check this to protect the window until processing is done.")
 	gui:AddTip(id, "This option allows you to extend protection from the end of the scan until processing is done.")
 	gui:AddHelp(id, "What is ProtectWindow",
 		"What does Protecting the AH Window do?",
 		"The Auction House window is normally closed when you open other windows, such as the Social window, the Quest Log, or your profession windows.  This option allows it to remain open, behind those other windows.")
+	
 	--AuctionFrame Scale
 	gui:AddControl(id, "Header", 0, "") --Spacer for options
 	gui:AddControl(id, "Header", 0,	"Window Size Options")
@@ -125,11 +128,18 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is Auction House Scale",
 			"Auction House Scale?",
 			"The Auction House scale slider adjusts the overall size of the entire Auction House window. The default size is 1.")
+	--CompactUI
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, "CompactUI Font Scale")
 	gui:AddTip(id, "This option allows you to adjust the text size of the CompactUI on the Browse tab. The default size is 0.")
 	gui:AddHelp(id, "what is CompactUI Font Scale",
 			"CompactUI Font Scale?",
 			"The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.")
+	--SearchUI
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.searchuiscale",     0.5, 2, 0.1, "SearchUI Scale")
+	gui:AddTip(id, "This option allows you to adjust the overall size of the non auction house SearchUI window. The default size is 1.")
+	gui:AddHelp(id, "what is SearchUI Scale",
+			"SearchUI Scale?",
+			"The SearchUI scale slider adjusts the overall size of the non auction house SearchUI window. The default size is 1.")
 end
 
 
@@ -148,35 +158,42 @@ end
 
 --Enable or Disable the move scripts
 function private.MoveFrame()
-	if not AuctionFrame then return end
-
-	if get("util.mover.activated") then
-		AuctionFrame:SetMovable(true)
-		AuctionFrame:SetClampedToScreen(true)
-		AuctionFrame:SetScript("OnMouseDown", function()  AuctionFrame:StartMoving() end)
-		AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing()
-						set("util.mover.anchors", {AuctionFrame:GetPoint()}) --store the current anchor points
-					end)
-	else
-		AuctionFrame:SetMovable(false)
-		AuctionFrame:SetScript("OnMouseDown", function() end)
-		AuctionFrame:SetScript("OnMouseUp", function() end)
+	--AH needs to exist
+	if AuctionFrame then
+		if get("util.mover.activated") then
+			AuctionFrame:SetMovable(true)
+			AuctionFrame:SetClampedToScreen(true)
+			AuctionFrame:SetScript("OnMouseDown", function()  AuctionFrame:StartMoving() end)
+			AuctionFrame:SetScript("OnMouseUp", function() AuctionFrame:StopMovingOrSizing()
+			set("util.mover.anchors", {AuctionFrame:GetPoint()}) --store the current anchor points
+			end)
+		else
+			AuctionFrame:SetMovable(false)
+			AuctionFrame:SetScript("OnMouseDown", function() end)
+			AuctionFrame:SetScript("OnMouseUp", function() end)
+		end
+		if get("util.ahwindowcontrol.auctionscale") then
+			AuctionFrame:SetScale(get("util.ahwindowcontrol.auctionscale"))
+		end
+		if get("util.compactui.activated") then
+			for i = 1,14 do
+				local button = _G["BrowseButton"..i]
+				local increase = get('util.ahwindowcontrol.compactuiscale') or 0
+				if not button.Count then return end -- we get called before compactUI has built the frame
+				button.Count:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+				button.Name:SetFont(STANDARD_TEXT_FONT, 10 + increase)
+				button.rLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+				button.iLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+				button.tLeft:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+				button.Owner:SetFont(STANDARD_TEXT_FONT, 10 + increase)
+				button.Value:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+			end
+		end
 	end
-	if get("util.ahwindowcontrol.auctionscale") then
-		AuctionFrame:SetScale(get("util.ahwindowcontrol.auctionscale"))
-	end
-	if get("util.compactui.activated") then
-		for i = 1,14 do
-			local button = _G["BrowseButton"..i]
-			local increase = get('util.ahwindowcontrol.compactuiscale') or 0
-			if not button.Count then return end -- we get called before compactUI has built the frame
-			button.Count:SetFont(STANDARD_TEXT_FONT, 11 + increase)
-			button.Name:SetFont(STANDARD_TEXT_FONT, 10 + increase)
-			button.rLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
-			button.iLevel:SetFont(STANDARD_TEXT_FONT, 11 + increase)
-			button.tLeft:SetFont(STANDARD_TEXT_FONT, 11 + increase)
-			button.Owner:SetFont(STANDARD_TEXT_FONT, 10 + increase)
-			button.Value:SetFont(STANDARD_TEXT_FONT, 11 + increase)
+	--searchUi needs to exist
+	if AucAdvanced.Modules.Util.SearchUI and AucAdvanced.Modules.Util.SearchUI.Private.gui then
+		if get("util.ahwindowcontrol.searchuiscale") then
+			AucAdvanced.Modules.Util.SearchUI.Private.gui:SetScale(get("util.ahwindowcontrol.searchuiscale"))
 		end
 	end
 end
