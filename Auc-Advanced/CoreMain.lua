@@ -205,8 +205,9 @@ function private.OnEvent(...)
 			private.OnLoad(addon)
 		end
 	elseif (event == "AUCTION_HOUSE_SHOW") then
-		-- Do Nothing for now
+		AucAdvanced.SendProcessorMessage("auctionopen")
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
+		AucAdvanced.SendProcessorMessage("auctionclose")
 		AucAdvanced.Scan.Interrupt()
 	elseif (event == "PLAYER_LOGOUT") then
 		AucAdvanced.Scan.Commit(true)
