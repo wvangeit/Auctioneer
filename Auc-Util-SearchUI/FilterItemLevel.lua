@@ -92,7 +92,12 @@ function lib.Filter(item, searcher)
 	local itype = item[Const.ITYPE]
 	local ilevel = item[Const.ILEVEL]
 
-	if ilevel < get("ignoreitemlevel.minlevel."..itype) then
+	local minlevel = get("ignoreitemlevel.minlevel."..itype)
+	if not ilevel then
+		return true, "Error: no ilevel"
+	elseif not minlevel then
+		return true, "Error: no min level set for "..itype
+	elseif ilevel < minlevel then
 		return true, "ItemLevel too low"
 	end
 end
