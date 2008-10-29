@@ -1531,30 +1531,6 @@ function private.CreateFrames()
 		print("-----------------------------------")
 	end
 
-	function frame.ClickBagHook(_,_,button)
-		if (not AucAdvanced.Settings.GetSetting("util.appraiser.clickhook")) then return end
-		local bag = this:GetParent():GetID()
-		local slot = this:GetID()
-		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
-		local link = GetContainerItemLink(bag, slot)
-		if (frame.salebox and frame.salebox:IsVisible()) then
-			if link then
-				if (button == "LeftButton") and (IsAltKeyDown()) then
-					frame.GetItemByLink(link)
-					if (IsShiftKeyDown()) then
-						local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack")
-						local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number")
-						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", count)
-						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", 1)
-						frame.PostBySig(frame.salebox.sig)
-						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", stack)
-						AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", number)
-					end
-				end
-			end
-		end
-	end
-
 	function frame.ClickAnythingHook(link)
 		if not AucAdvanced.Settings.GetSetting("util.appraiser.clickhookany") then return end
 		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
@@ -2770,7 +2746,6 @@ function private.CreateFrames()
 	frame.salebox.totalbuyout:SetJustifyV("CENTER")
 	frame.salebox.totalbuyout:Hide()
 
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
