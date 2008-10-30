@@ -372,7 +372,7 @@ function private.UpdatePricing()
 	local reason = ""
 
 	-- We need this out here because it fetches the items from the image
-	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
+	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aSeen, aveBuy = private.GetItems(link)
 	private.UpdateCompetition(image)
 	
 	--check for fixed price
