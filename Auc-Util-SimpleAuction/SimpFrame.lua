@@ -276,6 +276,7 @@ function private.UpdateDisplay()
 		end
 	else
 		coinsBuy = "no"
+		coinsBuyEa = "no"
 	end
 
 	local lots = "lot"
