@@ -51,9 +51,10 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "configchanged") then
 		if private.frame then
 			private.frame.salebox.config = true
-			private.frame.SetPriceFromModel()
-			private.frame.UpdateControls()
-			private.frame.salebox.config = nil
+		--	private.frame.SetPriceFromModel()
+			private.frame.UpdatePricing()
+			private.frame.UpdateDisplay()
+		--	private.frame.salebox.config = nil
 			local change = ... --get the reason if its a scrollframe color change re-render the window
 			if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
 				private.frame.UpdateImage()
@@ -68,7 +69,7 @@ function lib.Processor(callbackType, ...)
 			private.frame.cache = {}
 			private.frame.GenerateList()
 			private.frame.UpdateImage()
-			private.frame.SetPriceFromModel()
+			private.frame.UpdatePricing()
 		end
 	elseif (callbackType == "postresult") then
 		private.frame.Reselect(select(3, ...))
