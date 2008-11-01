@@ -761,7 +761,7 @@ function private.CreateFrames()
 		end
 		if duration ~= frame.valuecache.duration then
 			frame.valuecache.duration = duration
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", duration)
+			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", private.durations[duration][1])
 			frame.UpdatePricing()
 		elseif matcher ~= frame.valuecache.matcher then
 			frame.valuecache.matcher = matcher
@@ -1500,7 +1500,7 @@ function private.CreateFrames()
 			print("Skipping "..link..": invalid buyout value")
 			return
 		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
-			print("Skipping "..link..": invalid duration")
+			print("Skipping "..link..": invalid duration: "..tostring(duration))
 			return
 		elseif not (total and total > 0) or (number > 0 and number * stack > total) then
 			print("Skipping "..link..": You do not have enough items to do that")
