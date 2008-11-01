@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local libType, libName = "Match", "Undercut"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -133,12 +133,12 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	matchArray.value = matchprice
 	if lowest then
 		if matchprice<=lowestBidOnly then
-			matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lowest Price"
+			matchArray.returnstring = _TRANS('Undercut: % change: ') ..marketdiff.."\n".._TRANS('Undercut: Lowest Price')
 		else
-			matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lower bid-only auctions"
+			matchArray.returnstring = _TRANS('Undercut: % change: ') ..marketdiff.."\n".._TRANS('Undercut: Lower bid-only auctions')
 		end
 	else
-		matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Can not match lowest price"
+		matchArray.returnstring = _TRANS('Undercut: % change: ') ..marketdiff.."\n".._TRANS('Undercut: Can not match lowest price')
 	end
 	matchArray.competing = competing
 	matchArray.diff = marketdiff
@@ -153,7 +153,7 @@ function private.GetPriceModels()
 		private.scanValueNames[i] = nil
 	end
 
-	table.insert(private.scanValueNames,{"market", "Market value"})
+	table.insert(private.scanValueNames,{"market", _TRANS('Market value') })
 	local algoList = AucAdvanced.API.GetAlgorithms()
 	for pos, name in ipairs(algoList) do
 		table.insert(private.scanValueNames,{name, "Stats: "..name})
@@ -174,18 +174,18 @@ function private.ProcessTooltip(frame, name, link, quality, quantity, cost, addi
 	local matcharray = lib.GetMatchArray(link, market)
 	if not matcharray or not matcharray.value or matcharray.value <= 0 then return end
 	if matcharray.competing == 0 then
-		EnhTooltip.AddLine("Undercut: |cff00ff00No competition")
+		EnhTooltip.AddLine(_TRANS('Undercut: ').."|cff00ff00".._TRANS('No competition'))
 	elseif matcharray.returnstring:find("Can not match") then
-		EnhTooltip.AddLine("Undercut: |cffff0000Cannot Undercut")
+		EnhTooltip.AddLine(_TRANS('Undercut:').." |cffff0000".._TRANS('Cannot Undercut'))
 	elseif matcharray.returnstring:find("Lowest") then
 		if matcharray.value >= market then
-			EnhTooltip.AddLine("Undercut: |cff40ff00Competition Above market")
+			EnhTooltip.AddLine(_TRANS('Undercut: ').."|cff40ff00".._TRANS('Competition Above market'))
 		else
-			EnhTooltip.AddLine("Undercut: |cfffff000Undercutting competition")
+			EnhTooltip.AddLine(_TRANS('Undercut: ').."|cfffff000".._TRANS('Undercutting competition'))
 		end
 	end
 	EnhTooltip.LineColor(0.3, 0.9, 0.8)
-	EnhTooltip.AddLine("  Moving price "..tostring(matcharray.diff).."%:", matcharray.value)
+	EnhTooltip.AddLine(_TRANS('  Moving price ') ..tostring(matcharray.diff).."%:", matcharray.value)
 	EnhTooltip.LineColor(0.3, 0.9, 0.8)
 end
 
@@ -210,39 +210,40 @@ function private.SetupConfigGui(gui)
 	--gui:MakeScrollable(id)
 
 	gui:AddHelp(id, "what undercut module",
-		"What is this undercut module?",
-		"The undercut module allows you to undercut the lowest price of all currently available "..
-		"items, based on your settings.\n\n"..
-		"It is recommended to have undercut run after any other matcher modules.")
+		_TRANS('What is this undercut module?') ,
+		_TRANS('The undercut module allows you to undercut the lowest price of all currently available ') ..
+		_TRANS('items, based on your settings.').."\n\n"..
+		_TRANS('It is recommended to have undercut run after any other matcher modules.') )
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Header",     0,   _TRANS('Undercut options') )
 
-	gui:AddControl(id, "Subhead",    0,    "Competition Matching")
+	gui:AddControl(id, "Subhead",    0,   _TRANS( 'Competition Matching') )
 
-	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.enable", "Enable Auc-Match-Undercut")
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.enable", _TRANS('Enable Auc-Match-Undercut') )
+	gui:AddTip(id, _TRANS('Enable this module\'s functions.') )
+	
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, _TRANS('Max under market price (markdown): ').."%d%%")
+	gui:AddTip(id, _TRANS('This controls how much below the market price you are willing to undercut before giving up.').."\n"..
+		_TRANS('If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.') )
 
-	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
-	gui:AddTip(id, "This controls how much below the market price you are willing to undercut before giving up.\n"..
-		"If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, _TRANS('Max over market price (markup):').." %d%%")
+	gui:AddTip(id, _TRANS('This controls how much above the market price you are willing to mark up.').."\n"..
+		_TRANS('If there is no competition, or the competition is marked up higher than this value,').."\n"..
+		_TRANS('AucAdvanced will set the price to this value above market.') )
 
-	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
-	gui:AddTip(id, "This controls how much above the market price you are willing to mark up.\n"..
-		"If there is no competition, or the competition is marked up higher than this value,\n"..
-		"AucAdvanced will set the price to this value above market.")
+	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, _TRANS('Undercut: ').."%g%%")
+	gui:AddTip(id, _TRANS('This controls the minimum undercut.  AucAdvanced will try to undercut the competition by this amount') )
 
-	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, "Undercut: %g%%")
-	gui:AddTip(id, "This controls the minimum undercut.  AucAdvanced will try to undercut the competition by this amount")
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", _TRANS('Specify undercut amount by coin value') )
+	gui:AddTip(id, _TRANS('Specify the amount to undercut by a specific amount, instead of by a percentage') )
 
-	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", "Specify undercut amount by coin value")
-	gui:AddTip(id, "Specify the amount to undercut by a specific amount, instead of by a percentage")
-
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, "Undercut Amount")
-	gui:AddControl(id, "Subhead",    0,    "Tooltip Setting")
-	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip", "Show undercut status in tooltip")
-	gui:AddTip(id, "Add a line to the tooltip showing whether the current competition is undercuttable")
-	gui:AddControl(id, "Note",       0, 2, 500, 15, "Tooltip price valuation method")
-	gui:AddControl(id, "Selectbox",  0, 2, private.GetPriceModels, "match.undercut.model", "Pricing model to use")
-	gui:AddTip(id, "The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, _TRANS('Undercut Amount') )
+	gui:AddControl(id, "Subhead",    0,    _TRANS('Tooltip Setting') )
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip",_TRANS( 'Show undercut status in tooltip') )
+	gui:AddTip(id, _TRANS('Add a line to the tooltip showing whether the current competition is undercuttable') )
+	gui:AddControl(id, "Note",       0, 2, 500, 15, _TRANS('Tooltip price valuation method') )
+	gui:AddControl(id, "Selectbox",  0, 2, private.GetPriceModels, "match.undercut.model", _TRANS('Pricing model to use') )
+	gui:AddTip(id, _TRANS('The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else')) 
 
 end
 
