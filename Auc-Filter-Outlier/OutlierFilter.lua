@@ -36,7 +36,7 @@ if not AucAdvanced then return end
 local libType, libName = "Filter", "Outlier"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local data
 
@@ -163,69 +163,69 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(libName, libType.." Modules")
 
 	gui:AddHelp(id, "what outlier filter",
-		"What is this Outlier Filter?",
-		"When you get auctions that are posted up, many of the more common ones can become prey to people listing auctions for many times the \"real worth\" of the actual item.\n"..
-		"This filter detects such outliers and prevents them from being entered into the data stream if it's value exceeds a specified percentage of the normal value of the item. While still allowing for normal fluctuations in the prices of the items from day to day.")
+		_TRANS('What is this Outlier Filter?') ,
+		_TRANS('When you get auctions that are posted up, many of the more common ones can become prey to people listing auctions for many times the \'real worth\' of the actual item.\n')..
+		_TRANS('This filter detects such outliers and prevents them from being entered into the data stream if it\'s value exceeds a specified percentage of the normal value of the item. While still allowing for normal fluctuations in the prices of the items from day to day.') )
 
 	gui:AddHelp(id, "can retroactive",
-		"Can it remove old outliers?",
-		"The simple answer is no, it only works from this point on. Any settings you apply are applied from here on in, and any current stats are left alone.\n"..
-		"The complex answer? Well, you see there's this bowl of soup...")
+		_TRANS('Can it remove old outliers?') ,
+		_TRANS('The simple answer is no, it only works from this point on. Any settings you apply are applied from here on in, and any current stats are left alone.\n')..
+		_TRANS('The complex answer? Well, you see there\'s this bowl of soup...') )
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.activated", "Enable use of the outlier filter")
-	gui:AddTip(id, "Ticking this box will enable the outlier filter to perform filtering of your auction scans")
+	gui:AddControl(id, "Header",     0,    _TRANS('Outlier options') )
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.activated", _TRANS('Enable use of the outlier filter') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable the outlier filter to perform filtering of your auction scans') )
 
-	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "filter.outlier.model", "Pricing model to use for the valuation")
-	gui:AddTip(id, "The pricing model that will be used to determine the base pricing level")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('Price valuation method:') )
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "filter.outlier.model", _TRANS('Pricing model to use for the valuation') )
+	gui:AddTip(id, _TRANS('The pricing model that will be used to determine the base pricing level') )
 
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.minseen", 1, 50, 1, "Minimum seen: %d")
-	gui:AddTip(id, "If an item has been seen less than this many times, it will not be filtered")
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.minseen", 1, 50, 1, _TRANS('Minimum seen: %d') )
+	gui:AddTip(id, _TRANS('If an item has been seen less than this many times, it will not be filtered') )
 
-	gui:AddControl(id, "Subhead",    0,    "Settings per quality:")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('Settings per quality:') )
 
 	local _,_,_, hex = GetItemQualityColor(0)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.poor.enabled", "Enable filtering "..hex.."poor|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on poor quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.poor.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.poor.enabled", _TRANS('Enable filtering ')..hex.._TRANS('poor|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on poor quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.poor.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(1)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.common.enabled", "Enable filtering "..hex.."common|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on common quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.common.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.common.enabled", _TRANS('Enable filtering ')..hex.._TRANS('common|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on common quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.common.level", 100, 5000, 25, _TRANS('Cap growth to: ').."%d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(2)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.uncommon.enabled", "Enable filtering "..hex.."uncommon|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on uncommon quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.uncommon.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.uncommon.enabled", _TRANS('Enable filtering ') ..hex.._TRANS('uncommon|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on uncommon quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.uncommon.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(3)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.rare.enabled", "Enable filtering "..hex.."rare|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on rare quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.rare.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.rare.enabled", _TRANS('Enable filtering ')..hex.._TRANS('rare|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on rare quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.rare.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(4)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.epic.enabled", "Enable filtering "..hex.."epic|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on epic quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.epic.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.epic.enabled", _TRANS('Enable filtering ') ..hex.._TRANS('epic|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on epic quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.epic.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(5)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.legendary.enabled", "Enable filtering "..hex.."legendary|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on legendary quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.legendary.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.legendary.enabled", _TRANS('Enable filtering ') ..hex.._TRANS('legendary|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on legendary quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.legendary.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 	local _,_,_, hex = GetItemQualityColor(6)
-	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.artifact.enabled", "Enable filtering "..hex.."artifact|r quality items")
-	gui:AddTip(id, "Ticking this box will enable outlier filtering on artifact quality items")
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.artifact.level", 100, 5000, 25, "Cap growth to: %d%%")
-	gui:AddTip(id, "Set the maximum percentage that an item's price can grow before being filtered")
+	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.artifact.enabled", _TRANS('Enable filtering ') ..hex.._TRANS('artifact|r quality items') )
+	gui:AddTip(id, _TRANS('Ticking this box will enable outlier filtering on artifact quality items') )
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.artifact.level", 100, 5000, 25, _TRANS('Cap growth to:').." %d%%")
+	gui:AddTip(id, _TRANS('Set the maximum percentage that an item\'s price can grow before being filtered') )
 
 end
 
