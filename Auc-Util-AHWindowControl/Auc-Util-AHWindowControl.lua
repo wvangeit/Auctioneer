@@ -92,54 +92,54 @@ function private.SetupConfigGui(gui)
 	id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _TRANS('AHWC_Interface_WindowMovementOptions') ) --"Window Movement Options"
-	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated",  _TRANS('AHWC_Interface_Allowmovable') ) --"Allow the auction frame to be movable?"
-	gui:AddTip(id, _TRANS('AHWC_HelpTooltip_Allowmovable') ) --"Ticking this box will enable the ability to relocate the auction frame"
+	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated",  _TRANS('AHWC_Interface_AllowMovable') ) --"Allow the auction frame to be movable?"
+	gui:AddTip(id, _TRANS('AHWC_HelpTooltip_AllowMovable') ) --"Ticking this box will enable the ability to relocate the auction frame"
 	gui:AddHelp(id, "what is AHWindowControl",
 		_TRANS('AHWC_Help_whatisthis'),--"What is this utility?"
 		_TRANS'AHWC_Help_whatisthisAnswer')--This utility allows you to drag and relocate the auction frame for this play session. Just click and move where you desire. It also alows you to protect the Auction House from closing when opening certain Blizzard windows."
-	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.rememberlastpos", _TRANS('AHWC_Interface_remberlastposition') ) --"Remember last known window position?"
-	gui:AddTip(id, _TRANS('AHWC_HelpToolTip_remberlastposition') ) --"If this box is checked, the auction frame will reopen in the last location it was moved to."
+	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.rememberlastpos", _TRANS('AHWC_Interface_RemberLastPosition') ) --"Remember last known window position?"
+	gui:AddTip(id, _TRANS('AHWC_HelpToolTip_RemberLastPosition') ) --"If this box is checked, the auction frame will reopen in the last location it was moved to."
 	gui:AddHelp(id, "what is remeberpos",
-		_TRANS('AHWC_Help_remberlastposition'), --"Remember last known window position?"
-		_TRANS('AHWC_Help_remberlastpositionAnswer') ) --"This will remember the auction frame's last position and re-apply it each session."
+		_TRANS('AHWC_Help_RemberLastPosition'), --"Remember last known window position?"
+		_TRANS('AHWC_Help_RemberLastPositionAnswer') ) --"This will remember the auction frame's last position and re-apply it each session."
 
 	--Window Protection
-	gui:AddControl(id, "Header", 0,	_TRANS("Window Protection Options") )
-	gui:AddControl(id, "Subhead", 0, _TRANS("Protect the Auction House window:") )
+	gui:AddControl(id, "Header", 0,	_TRANS("AHWC_Interface_WindowProtectionOptions") ) --WindowProtectionOptions
+	gui:AddControl(id, "Subhead", 0, _TRANS("AHWC_Interface_ProtectAuctionWindow") ) --Protect the Auction House window:
 	--Note the function reference in the place of the setting name.  See changes in getter, setter, and getDefault to accomodate this.
 	gui:AddControl(id, "Selectbox", 0, 1, {
-		{1, _TRANS("Never") },
-		{2, _TRANS("Always") },
-		{3, _TRANS("When Scanning") }
-	}, "util.protectwindow.protectwindow", _TRANS("Prevent other windows from closing the Auction House window.") )
-	gui:AddTip(id, _TRANS("This will prevent other windows from closing the Auction House window when you open them, according to your settings.") )
+		{1, _TRANS("AHWC_Interface_Never") }, --Never
+		{2, _TRANS("AHWC_Interface_Always") }, --Always
+		{3, _TRANS("AHWC_Interface_Scanning") } --When Scanning
+	}, "util.protectwindow.protectwindow", _TRANS("AHWC_Interface_PreventClosingAuctionHouse") ) --"Prevent other windows from closing the Auction House window."
+	gui:AddTip(id, _TRANS("AHWC_HelpToolTip_PreventClosingAuctionHouse") ) --This will prevent other windows from closing the Auction House window when you open them, according to your settings.
 			
-	gui:AddControl(id, "Checkbox", 0, 1, "util.protectwindow.processprotect", _TRANS("Check this to protect the window until processing is done.") )
-	gui:AddTip(id, _TRANS("This option allows you to extend protection from the end of the scan until processing is done.") )
+	gui:AddControl(id, "Checkbox", 0, 1, "util.protectwindow.processprotect", _TRANS("AHWC_Interface_ProtectProcessing") ) --Check this to protect the window until processing is done.
+	gui:AddTip(id, _TRANS("AHWC_HelpToolTip_ProtectProcessing") ) --This option allows you to extend protection from the end of the scan until processing is done.
 	gui:AddHelp(id, "What is ProtectWindow",
-		_TRANS("What does Protecting the AH Window do?"),
-		_TRANS("The Auction House window is normally closed when you open other windows, such as the Social window, the Quest Log, or your profession windows.  This option allows it to remain open, behind those other windows.") )
-	
+		_TRANS("AHWC_Help_ProtectWindow"), --What does Protecting the AH Window do?
+		_TRANS("AHWC_Help_ProtectWindowAnswer") )
+		--The Auction House window is normally closed when you open other windows, such as the Social window, the Quest Log, or your profession windows.  This option allows it to remain open, behind those other windows.
 	--AuctionFrame Scale
 	gui:AddControl(id, "Header", 0, "") --Spacer for options
-	gui:AddControl(id, "Header", 0,	_TRANS("Window Size Options") )
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.auctionscale",    0.5, 2, 0.1, _TRANS("Auction House Scale") )
-	gui:AddTip(id, _TRANS("This option allows you to adjust the overall size of the Auction House window. Default is 1.") )
+	gui:AddControl(id, "Header", 0,	_TRANS("AHWC_Interface_WindowSizeOptions") ) --Window Size Options
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.auctionscale",    0.5, 2, 0.1, _TRANS("AHWC_Interface_AuctionHouseScale") ) --Auction House Scale
+	gui:AddTip(id, _TRANS("AHWC_HelpToolTip_AuctionHouseScale") ) --This option allows you to adjust the overall size of the Auction House window. Default is 1.
 	gui:AddHelp(id, "what is Auction House Scale",
-			_TRANS("Auction House Scale?"),
-			_TRANS("The Auction House scale slider adjusts the overall size of the entire Auction House window. The default size is 1.") )
+			_TRANS("AHWC_Help_AuctionHouseScale"), --Auction House Scale? 
+			_TRANS("AHWC_Help_AuctionHouseScaleAnswer") )--The Auction House scale slider adjusts the overall size of the entire Auction House window. The default size is 1.
 	--CompactUI
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, _TRANS("CompactUI Font Scale") )
-	gui:AddTip(id, _TRANS("This option allows you to adjust the text size of the CompactUI on the Browse tab. The default size is 0.") )
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.compactuiscale",    -5, 5, 0.2, _TRANS("AHWC_Interface_CompactUIFontScale") ) --CompactUI Font Scale
+	gui:AddTip(id, _TRANS("AHWC_HelpTooltip_CompactUIFontScale") ) --This option allows you to adjust the text size of the CompactUI on the Browse tab. The default size is 0.
 	gui:AddHelp(id, "what is CompactUI Font Scale",
-			_TRANS("CompactUI Font Scale?"),
-			_TRANS("The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.") )
+			_TRANS("AHWC_Help_CompactUIFontScale"), --CompactUI Font Scale?
+			_TRANS("AHWC_Help_CompactUIFontScaleAnswer") ) --The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.
 	--SearchUI
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.searchuiscale",     0.5, 2, 0.1, _TRANS("SearchUI Scale") )
-	gui:AddTip(id, _TRANS("This option allows you to adjust the overall size of the non auction house SearchUI window. The default size is 1.") )
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.searchuiscale",     0.5, 2, 0.1, _TRANS("AHWC_Interface_SearchUIScale") ) --SearchUI Scale
+	gui:AddTip(id, _TRANS("AHWC_HelpTooltip_SearchUIScale") ) --This option allows you to adjust the overall size of the non auction house SearchUI window. The default size is 1.
 	gui:AddHelp(id, "what is SearchUI Scale",
-			_TRANS("SearchUI Scale?"),
-			_TRANS("The SearchUI scale slider adjusts the overall size of the non auction house SearchUI window. The default size is 1.") )
+			_TRANS("AHWC_Help_SearchUIScale"), --SearchUI Scale?
+			_TRANS("AHWC_Help_SearchUIScaleAnswer") ) --The SearchUI scale slider adjusts the overall size of the non auction house SearchUI window. The default size is 1.
 end
 
 
