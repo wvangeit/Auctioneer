@@ -387,8 +387,8 @@ function private.CreateFrames()
 			--color ignored sellers
 			if AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
 				if not style[i] then style[i] = {} end
-				style[i][2] = {}
-				style[i][2].textColor = {1,0,0}
+				style[i][1] = {}
+				style[i][1].textColor = {1,0,0}
 			end
 		end
 		frame.refresh:Enable()
