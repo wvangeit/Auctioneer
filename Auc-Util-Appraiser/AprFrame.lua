@@ -326,6 +326,27 @@ function private.CreateFrames()
 			suffix = suffix,
 			factor = factor,
 		})
+		local seen
+		if results[1] then
+			seen = results[1][Const.TIME]
+		end
+		if not seen then
+			local _, realm, faction = AucAdvanced.GetFaction()
+			if AucScanData and AucScanData["scans"] and AucScanData["scans"][realm] and AucScanData["scans"][realm][faction] then
+				seen = AucScanData["scans"][realm][faction]["LastFullScan"]
+			end
+		end
+		if not seen then seen = 0 end
+		if (time() - seen) < 60 then
+			frame.age:SetText("Data is < 1 minute old")
+		elseif ((time() - seen) / 3600) <= 48 then
+			frame.age:SetText("Data is "..SecondsToTime(time() - seen, true).." old")
+		elseif seen == 0 then
+			frame.age:SetText("No data for "..string.sub(frame.salebox.name:GetText(), 12, -4))
+		else
+			frame.age:SetText("Data is > 48 hours old")
+		end
+		
 		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 
 		local data = {}
