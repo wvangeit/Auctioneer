@@ -528,8 +528,8 @@ function private.CreateFrames()
 		MoneyInputFrame_ResetMoney(frame.salebox.buy)
 		MoneyInputFrame_SetCopper(frame.salebox.bid, newBid)
 		MoneyInputFrame_SetCopper(frame.salebox.buy, newBuy)
-		frame.valuecache.bid = newBid
-		frame.valuecache.buy = newBuy
+		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.bid.modelvalue = newBid
 		frame.salebox.buy.modelvalue = newBuy
 	end
@@ -575,10 +575,11 @@ function private.CreateFrames()
 			defStack = tonumber(defStack)
 		end
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
+		local range = math.max(curNumber, frame.salebox.count/frame.salebox.stacksize)
 		if frame.salebox.stacksize > 1 then
-			frame.salebox.number:SetAdjustedRange(curNumber, -2, -1)--make sure the slider can handle the setting before we set it
+			frame.salebox.number:SetAdjustedRange(range, -2, -1)--make sure the slider can handle the setting before we set it
 		else
-			frame.salebox.number:SetAdjustedRange(curNumber, -1)--make sure the slider can handle the setting before we set it
+			frame.salebox.number:SetAdjustedRange(range, -1)--make sure the slider can handle the setting before we set it
 		end
 		frame.salebox.number:SetAdjustedValue(curNumber)
 
@@ -616,7 +617,7 @@ function private.CreateFrames()
 		frame.salebox.model.value = curModel
 		frame.salebox.model:UpdateValue()
 		frame.valuecache.model = curModel
-		frame.SetPriceFromModel(curModel)
+		--frame.SetPriceFromModel(curModel)
 
 		frame.UpdatePricing()
 		frame.UpdateDisplay()
@@ -739,10 +740,6 @@ function private.CreateFrames()
 			end
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".numberonly", numberonly)
 		end
-		if duration ~= frame.valuecache.duration then
-			frame.valuecache.duration = duration
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", duration)
-		end
 		if ignore ~= frame.valuecache.ignore then
 			frame.valuecache.ignore = ignore
 			if ignore then
@@ -762,7 +759,11 @@ function private.CreateFrames()
 			end
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".bulk", bulk)
 		end
-		if matcher ~= frame.valuecache.matcher then
+		if duration ~= frame.valuecache.duration then
+			frame.valuecache.duration = duration
+			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", duration)
+			frame.UpdatePricing()
+		elseif matcher ~= frame.valuecache.matcher then
 			frame.valuecache.matcher = matcher
 			if matcher then
 				matcher = "on"
@@ -825,8 +826,8 @@ function private.CreateFrames()
 		end
 		MoneyInputFrame_SetCopper(frame.salebox.buy, buy)
 		MoneyInputFrame_SetCopper(frame.salebox.bid, bid)
-		frame.valuecache.bid = bid
-		frame.valuecache.buy = buy
+		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.model:SetText(curModelText)
 		frame.UpdateImage()
 	end
@@ -1090,6 +1091,12 @@ function private.CreateFrames()
 					totalDeposit = totalDeposit + (depositVal * curNumber)
 				end
 			else
+				local maxStax = frame.salebox.count
+				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
+				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
+					maxStax = SavedNumber
+				end
+				frame.salebox.number:SetAdjustedRange(maxStax, -1)
 				if (curNumber == -1) then
 					curNumber = frame.salebox.count
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
@@ -2702,6 +2709,7 @@ function private.CreateFrames()
 	frame.salebox.numberentry:SetScript("OnEnter", function() return frame.SetButtonTooltip("Set the number of stacks to be posted") end)
 	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
+		frame.salebox.numberentry:ClearFocus()
 		frame.updated = true
 	end)
 	frame.salebox.numberentry:SetScript("OnTabPressed", function()
