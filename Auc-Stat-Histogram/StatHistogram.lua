@@ -36,7 +36,7 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Histogram"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local data
 local totaldata
@@ -52,12 +52,12 @@ function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
-		print("Help for Auctioneer Advanced - "..libName)
+		print(_TRANS('Help for Auctioneer Advanced - Histogram') )
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - this", libName, "help")
-		print(line, "clear}} - clear current", myFaction, libName, "price database")
+		print(line,_TRANS( 'help}} - this Histogram help') )
+		print(line, _TRANS('clear}} - clear current') , myFaction, libName, _TRANS('price database') )
 	elseif (command == "clear") then
-		print("Clearing "..libName.." stats for {{", myFaction, "}}")
+		print(_TRANS('Clearing Histogram stats for {{') , myFaction, "}}")
 		data[myFaction] = nil
 	end
 end
@@ -338,43 +338,43 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what histogram stats",
-		"What are Histogram stats?",
-		"Histogram stats record a histogram of past prices.")
+		_TRANS('What are Histogram stats?') ,
+		_TRANS('Histogram stats record a histogram of past prices.') )
 	gui:AddHelp(id, "what advantages",
-		"What advantages does Histogram have?",
-		"Histogram stats don't have a limitation to how many, "..
-		"or how long, it can keep data, so it can keep track of high-volume items well")
+		_TRANS('What advantages does Histogram have?') ,
+		_TRANS('Histogram stats don\'t have a limitation to how many, ') ..
+		_TRANS('or how long, it can keep data, so it can keep track of high-volume items well') )
 	gui:AddHelp(id, "what disadvantage",
-		"What disadvantages does Histogram have?",
-		"Histogram rounds prices slightly to help store them, so there is a slight precision loss."..
-		"  However, it is precise to 1/250th of market price. (an item with market price 250g will have"..
-		" prices stored to the nearest 1g)")
+		_TRANS('What disadvantages does Histogram have?') ,
+		_TRANS('Histogram rounds prices slightly to help store them, so there is a slight precision loss.') ..
+		_TRANS('  However, it is precise to 1/250th of market price. (an item with market price 250g will have') ..
+		_TRANS(' prices stored to the nearest 1g)') )
 	gui:AddHelp(id, "what median",
-		"What is the median?",
-		"The median value is the value where half of the prices seen are above, and half are below.")
+		_TRANS('What is the median?') ,
+		_TRANS('The median value is the value where half of the prices seen are above, and half are below.') )
 	gui:AddHelp(id, "what IQR",
-		"What is the IQR?",
-		"The IQR is a measure of spread.  The middle half of the prices seen is confined with the range of IQR."..
-		"  An item with median 100g, and IQR 10g, has very consistent data.  If the IQR was 100g, the prices "..
-		"are all over the place.")
+		_TRANS('What is the IQR?') ,
+		_TRANS('The IQR is a measure of spread.  The middle half of the prices seen is confined with the range of IQR.') ..
+		_TRANS('  An item with median 100g, and IQR 10g, has very consistent data.  If the IQR was 100g, the prices ') ..
+		_TRANS('are all over the place.') )
 
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    "Histogram options")
+	gui:AddControl(id, "Header",     0,    _TRANS('Histogram options') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.enable", "Enable Histogram Stats")
-	gui:AddTip(id, "Allow Histogram to gather and return price data")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.enable", _TRANS('Enable Histogram Stats') )
+	gui:AddTip(id, _TRANS('Allow Histogram to gather and return price data') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.tooltip", "Show Histogram stats in the tooltips?")
-	gui:AddTip(id, "Toggle display of stats from the Histogram module on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.median", "Display Median")
-	gui:AddTip(id, "Toggle display of 'Median' calculation in tooltips on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.iqr", "Display IQR")
-	gui:AddTip(id, "Toggle display of 'IQR' calculation in tooltips on or off.  See help for further explanation.")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.precision", "Display Precision")
-	gui:AddTip(id, "Toggle display of 'precision' calculation in tooltips on or off")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.tooltip", _TRANS('Show Histogram stats in the tooltips?') )
+	gui:AddTip(id, _TRANS('Toggle display of stats from the Histogram module on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.median", _TRANS('Display Median') )
+	gui:AddTip(id, _TRANS('Toggle display of \'Median\' calculation in tooltips on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.iqr", _TRANS('Display IQR') )
+	gui:AddTip(id, _TRANS('Toggle display of \'IQR\' calculation in tooltips on or off.  See help for further explanation.') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.precision", _TRANS('Display Precision') )
+	gui:AddTip(id, _TRANS('Toggle display of \'precision\' calculation in tooltips on or off') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.quantmul", "Multiply by Stack Size")
-	gui:AddTip(id, "Multiplies by current Stack Size if on")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.quantmul", _TRANS('Multiply by Stack Size') )
+	gui:AddTip(id, _TRANS('Multiplies by current Stack Size if on') )
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
@@ -394,17 +394,17 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	end
 	if median then
 		if quantity == 1 then
-			EnhTooltip.AddLine(libName.." prices: (seen "..tostring(count)..")")
+			EnhTooltip.AddLine(libName.._TRANS(' prices: (seen ') ..tostring(count)..")")
 		else
-			EnhTooltip.AddLine(libName.." prices x"..tostring(quantity)..": (seen "..tostring(count)..")")
+			EnhTooltip.AddLine(libName.._TRANS(' prices x') ..tostring(quantity).._TRANS(': (seen ') ..tostring(count)..")")
 		end
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		local iqr = Qthree-Qone
 		if get("stat.histogram.median") then
-			EnhTooltip.AddLine("  median:", median*quantity)
+			EnhTooltip.AddLine(_TRANS('  median:') , median*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 			if quantity > 1 then
-				EnhTooltip.AddLine("   (or individually):", median)
+				EnhTooltip.AddLine(_TRANS('   (or individually):') , median)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
 			end
 		end
@@ -413,7 +413,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if get("stat.histogram.precision") then
-		EnhTooltip.AddLine("  precision:", step*quantity)
+		EnhTooltip.AddLine(_TRANS('  precision:') , step*quantity)
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		--EnhTooltip.AddLine("  index: "..tostring(math.floor(median/step)))
@@ -441,7 +441,7 @@ function lib.ClearItem(hyperlink, faction)
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
 	data[faction][itemId][property] = nil
-	print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
+	print(libType.."-"..libName.._TRANS(': clearing data for ') ..hyperlink.._TRANS(' for ').."{{"..faction.."}}")
 end
 
 --[[ Local functions ]]--
