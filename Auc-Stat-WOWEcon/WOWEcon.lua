@@ -33,7 +33,7 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "WOWEcon"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 function private.Sanitize(hyperlink)
 	local lType, id, suffix, factor, enchant, seed = decode(hyperlink)
@@ -135,54 +135,41 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what global price",
-		"What are global prices?",
-		"Wowecon provides two different types of prices: a global price, averaged across "..
-		"all servers, and a server specific price, for just your server and faction.")
+		_TRANS('What are global prices?') ,
+		_TRANS('Wowecon provides two different types of prices: a global price, averaged across all servers, and a server specific price, for just your server and faction.')
+		)
 
 	gui:AddHelp(id, "why use global",
-		"Why should I use global prices?",
-		"Server specific prices can be useful if your server has prices which are far "..
-		"removed from the average, but often these prices are based on many "..
-		"fewer data points, causing your server specific price to "..
-		"possibly get out of whack for some items.  This option lets you force the "..
-		"Wowecon stat to always use global prices, if you'd prefer.")
+		_TRANS('Why should I use global prices?') ,
+		_TRANS('Server specific prices can be useful if your server has prices which are far removed from the average, but often these prices are based on many fewer data points, causing your server specific price to possibly get out of whack for some items.  This option lets you force the Wowecon stat to always use global prices, if you\'d prefer.') 
+		)
 
 	gui:AddHelp(id, "prices dont match",
-		"The Wowecon price used by Appraiser doesn't match the Wowecon tooltip.  What gives?",
-		"Wowecon gives you the option to hide server specific prices if seen "..
-		"fewer than a given number of times.  Even though these prices are "..
-		"hidden from the tooltip, they are still reported to Appraiser.  "..
-		"If you are not using the global price option here, you should "..
-		"check to make sure there isn't a hidden server specific price for your server, "..
-		"with just a small number of seen times.")
+		_TRANS('The Wowecon price used by Appraiser doesn\'t match the Wowecon tooltip.  What gives?') ,
+		_TRANS('Wowecon gives you the option to hide server specific prices if seen fewer than a given number of times.  Even though these prices are hidden from the tooltip, they are still reported to Appraiser.  If you are not using the global price option here, you should check to make sure there isn\'t a hidden server specific price for your server, with just a small number of seen times.') 
+		)
 
 	gui:AddHelp(id, "sanitize link",
 		"What does the sanitize link option do?",
-		"Sanitizing the link can improve the price data you receive from WOWEcon by "..
-		"removing the parts of the link that are very specific (such as enchants, "..
-		"item factors, and gem informatio) to just get the price information for the "..
-		"common base item. This will generally only affect items that are slightly "..
-		"different from the normal base item, and have no, or very little price data "..
-		"due to their uniqueness.")
+		_TRANS('Sanitizing the link can improve the price data you receive from WOWEcon by removing the parts of the link that are very specific (such as enchants, item factors, and gem informatio) to just get the price information for the common base item. This will generally only affect items that are slightly different from the normal base item, and have no, or very little price data due to their uniqueness.') 
+		)
 
 	gui:AddHelp(id, "show price tooltip",
-		"Why would I want to show the WOWEcon price in the tooltip?",
-		"The pricing data that Appraiser uses for the items may be different to the "..
-		"price data that WOWEcon displays by default, since WOWEcon can get very "..
-		"specific with the data that it returns. Enabling this option will let you "..
-		"see the exact price that this module is reporting for the current item.")
+		_TRANS('Why would I want to show the WOWEcon price in the tooltip?') ,
+		_TRANS('The pricing data that Appraiser uses for the items may be different to the price data that WOWEcon displays by default, since WOWEcon can get very specific with the data that it returns. Enabling this option will let you see the exact price that this module is reporting for the current item.') 
+		)
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Header",     0,    "WOWEcon options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", "Enable WOWEcon Stats")
-	gui:AddTip(id, "Allow WOWEcon to gather and return price data")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('Enable WOWEcon Stats') )
+	gui:AddTip(id, _TRANS('Allow WOWEcon to gather and return price data') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", "Always use global price, not server price")
-	gui:AddTip(id, "Toggle use of server specific Wowecon price stats, if they exist")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", "Sanitize links before sending to WOWEcon API")
-	gui:AddTip(id, "Removes ultra-specific item data from links before issuing the price request")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", "Show WOWEcon value in tooltip (see note)")
-	gui:AddTip(id, "Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", _TRANS('Always use global price, not server price') )
+	gui:AddTip(id, _TRANS( 'Toggle use of server specific Wowecon price stats, if they exist') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", _TRANS('Sanitize links before sending to WOWEcon API') )
+	gui:AddTip(id, _TRANS('Removes ultra-specific item data from links before issuing the price request') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", _TRANS('Show WOWEcon value in tooltip (see note)') )
+	gui:AddTip(id, _TRANS( 'Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip') )
 end
 
 function lib.OnLoad(addon)
@@ -198,27 +185,27 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	lib.GetPriceArray(hyperlink)
 
 	if array.seen and array.seen > 0 then
-		EnhTooltip.AddLine(libName.." prices (seen "..array.seen..")")
+		EnhTooltip.AddLine(_TRANS('WOWEcon prices (seen ') ..array.seen..")")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 
 		if array.specific then
-			EnhTooltip.AddLine("  Server price:", array.price * quantity)
+			EnhTooltip.AddLine(_TRANS('  Server price:') , array.price * quantity)
 		else
-			EnhTooltip.AddLine("  Global price:", array.price * quantity)
+			EnhTooltip.AddLine(_TRANS('  Global price:') , array.price * quantity)
 		end
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		if (quantity > 1) then
-			EnhTooltip.AddLine("    (or individually)", array.price)
+			EnhTooltip.AddLine(_TRANS('    (or individually)') , array.price)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 
 		if IsModifierKeyDown() then
 			if array.specific then
-				EnhTooltip.AddLine("  Global (seen "..array.g_seen.."):", array.g_price * quantity)
+				EnhTooltip.AddLine(_TRANS('  Global (seen ') ..array.g_seen.."):", array.g_price * quantity)
 			elseif array.s_seen > 0 then
-				EnhTooltip.AddLine("  Server (seen "..array.s_seen.."):", array.s_price * quantity)
+				EnhTooltip.AddLine_TRANS(('  Server (seen ') ..array.s_seen.."):", array.s_price * quantity)
 			else
-				EnhTooltip.AddLine("  Never seen for server")
+				EnhTooltip.AddLine(_TRANS('  Never seen for server') )
 			end
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
