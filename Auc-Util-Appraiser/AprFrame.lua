@@ -562,6 +562,7 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
+		frame.salebox.stackentry:SetNumber(curStack)
 
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
@@ -582,6 +583,13 @@ function private.CreateFrames()
 			frame.salebox.number:SetAdjustedRange(range, -1)--make sure the slider can handle the setting before we set it
 		end
 		frame.salebox.number:SetAdjustedValue(curNumber)
+		if curNumber == -2 then
+			frame.salebox.numberentry:SetText("Full")
+		elseif curNumber = -1 then
+			frame.salebox.numberentry:SetText("All")
+		else
+			frame.salebox.numberentry:SetNumber(curNumber)
+		end
 
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
 		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
