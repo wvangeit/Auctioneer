@@ -33,7 +33,7 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Sales"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local cache = {}
 -- don't recalc time every query, that would be ridiculous
@@ -151,7 +151,7 @@ function lib.GetPrice(hyperlink, faction, realm)
             reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
             thistime = tonumber(thistime)
             if priceper and qty and priceper>0 and qty>0 then
-                if reason == "Won on Buyout" or reason == "Won on Bid" then
+                if reason == _TRANS('Won on Buyout')  or reason == _TRANS('Won on Bid')  then
                     boughtqty = boughtqty + qty
                     bought = bought + priceper*qty
                     boughtseen = boughtseen + 1
@@ -163,7 +163,7 @@ function lib.GetPrice(hyperlink, faction, realm)
                         boughtqty7 = boughtqty7 + qty
                         bought7 = bought7 + priceper*qty
                     end
-                elseif reason == "Auc Successful" then
+                elseif reason == _TRANS('Auc Successful')  then
                     soldqty = soldqty + qty
                     sold = sold + priceper*qty
                     soldseen = soldseen + 1
@@ -194,7 +194,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == "Auc Successful" then
+        if priceper and qty and priceper>0 and qty>0 and reason == _TRANS('Auc Successful')  then
             variance = variance + ((mean - priceper) ^ 2);
             count = count + 1
         end
@@ -209,7 +209,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     local total = 0
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == "Auc Successful" then
+        if priceper and qty and priceper>0 and qty>0 and reason == _TRANS('Auc Successful')  then
         	if (math.abs(priceper - mean) < deviation) then
 			    total = total + priceper * qty
 			    number = number + qty
@@ -276,7 +276,7 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 end
 
 function lib.ClearItem(hyperlink, faction, realm)
-	print(libType.."-"..libName.." does not store data itself. It uses your Beancounter data.")
+	print(libType.._TRANS('- Sales does not store data itself. It uses your Beancounter data.') )
 end
 
 function lib.OnLoad(addon)
@@ -311,59 +311,59 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
     if (boughtseen+soldseen>0) then
-		EnhTooltip.AddLine(libName.." prices:")
+		EnhTooltip.AddLine(_TRANS('Sales prices:') )
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 
         if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
             if (boughtseen > 0) then
-                EnhTooltip.AddLine("  Total Bought |cffddeeff"..(boughtqty).."|r at avg each", bought)
+                EnhTooltip.AddLine(_TRANS('  Total Bought').." |cffddeeff"..(boughtqty).."|r ".._TRANS('at avg each'), bought)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
             if (soldseen > 0) then
-                EnhTooltip.AddLine("  Total Sold |cffddeeff"..(soldqty).."|r at avg each", sold)
+                EnhTooltip.AddLine(_TRANS('  Total Sold').." |cffddeeff"..(soldqty).."|r ".._TRANS('at avg each'), sold)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
             if (boughtqty7 > 0) then
-                EnhTooltip.AddLine("  7 Days Bought |cffddeeff"..(boughtqty7).."|r at avg each", bought7)
+                EnhTooltip.AddLine(_TRANS('  7 Days Bought').." |cffddeeff"..(boughtqty7).."|r ".._TRANS('at avg each'), bought7)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
             if (soldqty7 > 0) then
-                EnhTooltip.AddLine("  7 Days Sold |cffddeeff"..(soldqty7).."|r at avg each", sold7)
+                EnhTooltip.AddLine(_TRANS('  7 Days Sold').." |cffddeeff"..(soldqty7).."|r ".._TRANS('at avg each'), sold7)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
             if (boughtqty3 > 0) then
-                EnhTooltip.AddLine("  3 Days Bought |cffddeeff"..(boughtqty3).."|r at avg each", bought3)
+                EnhTooltip.AddLine(_TRANS('  3 Days Bought').." |cffddeeff"..(boughtqty3).."|r ".._TRANS('at avg each'), bought3)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
             if (soldqty3 > 0) then
-                EnhTooltip.AddLine("  3 Days Sold |cffddeeff"..(soldqty3).."|r at avg each", sold3)
+                EnhTooltip.AddLine(_TRANS('  3 Days Sold').." |cffddeeff"..(soldqty3).."|r ".._TRANS('at avg each'), sold3)
                 EnhTooltip.LineColor(0.3, 0.9, 0.8)
             end
         end
         if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.sales.normal") then
-				EnhTooltip.AddLine("  Normalized (stack)", average*quantity)
+				EnhTooltip.AddLine(_TRANS('  Normalized (stack)') , average*quantity)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
 				if (quantity > 1) then
-					EnhTooltip.AddLine("  (or individually)", average)
+					EnhTooltip.AddLine(_TRANS('  (or individually)') , average)
 					EnhTooltip.LineColor(0.3, 0.9, 0.8)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.stdev") then
-				EnhTooltip.AddLine("  Std Deviation", stdev*quantity)
+				EnhTooltip.AddLine(_TRANS('  Std Deviation') , stdev*quantity)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
                 if (quantity > 1) then
-                    EnhTooltip.AddLine("  (or individually)", stdev)
+                    EnhTooltip.AddLine(_TRANS('  (or individually)') , stdev)
                     EnhTooltip.LineColor(0.3, 0.9, 0.8);
                 end
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.confid") then
-				EnhTooltip.AddLine("  Confidence: "..(floor(confidence*1000))/1000)
+				EnhTooltip.AddLine(_TRANS('  Confidence: ') ..(floor(confidence*1000))/1000)
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
 			end
 		end
@@ -375,30 +375,30 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what sales stats",
-		"What are sales stats?",
-		"Sales stats are the numbers that are generated by the sales module from the "..
-		"BeanCounter database. It averages all of the prices for items that you have sold")
+		_TRANS('What are sales stats?') ,
+		_TRANS('Sales stats are the numbers that are generated by the sales module from the ') ..
+		_TRANS('BeanCounter database. It averages all of the prices for items that you have sold') )
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Header",     0,    _TRANS('Sales options') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", "Enable Sales Stats")
-	gui:AddTip(id, "Allow Sales to contribute to Market Price.")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('Enable Sales Stats') )
+	gui:AddTip(id, _TRANS('Allow Sales to contribute to Market Price.') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.tooltip", "Show sales stats in the tooltips?")
-	gui:AddTip(id, "Toggle display of stats from the Sales module on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg3", "Display Moving 3 Day Mean")
-   	gui:AddTip(id, "Toggle display of 3-Day mean from the Sales module on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg7", "Display Moving 7 Day Mean")
-	gui:AddTip(id, "Toggle display of 7-Day mean from the Sales module on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg", "Display Overall Mean")
-	gui:AddTip(id, "Toggle display of Permanent mean from the Sales module on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.normal", "Display Normalized")
-	gui:AddTip(id, "Toggle display of 'Normalized' calculation in tooltips on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.stdev", "Display Standard Deviation")
-	gui:AddTip(id, "Toggle display of 'Standard Deviation' calculation in tooltips on or off")
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.confid", "Display Confidence")
-	gui:AddTip(id, "Toggle display of 'Confidence' calculation in tooltips on or off")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.tooltip", _TRANS('Show sales stats in the tooltips?') )
+	gui:AddTip(id, _TRANS('Toggle display of stats from the Sales module on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg3", _TRANS('Display Moving 3 Day Mean') )
+   	gui:AddTip(id, _TRANS('Toggle display of 3-Day mean from the Sales module on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg7", _TRANS('Display Moving 7 Day Mean') )
+	gui:AddTip(id, _TRANS('Toggle display of 7-Day mean from the Sales module on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg", _TRANS('Display Overall Mean') )
+	gui:AddTip(id, _TRANS('Toggle display of Permanent mean from the Sales module on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.normal", _TRANS('Display Normalized') )
+	gui:AddTip(id, _TRANS('Toggle display of \'Normalized\' calculation in tooltips on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.stdev", _TRANS('Display Standard Deviation') )
+	gui:AddTip(id, _TRANS('Toggle display of \'Standard Deviation\' calculation in tooltips on or off') )
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.confid", _TRANS('Display Confidence') )
+	gui:AddTip(id,_TRANS( 'Toggle display of \'Confidence\' calculation in tooltips on or off') )
 
 	end
 
