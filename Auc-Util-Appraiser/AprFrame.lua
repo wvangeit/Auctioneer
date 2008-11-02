@@ -585,7 +585,7 @@ function private.CreateFrames()
 		frame.salebox.number:SetAdjustedValue(curNumber)
 		if curNumber == -2 then
 			frame.salebox.numberentry:SetText("Full")
-		elseif curNumber = -1 then
+		elseif curNumber == -1 then
 			frame.salebox.numberentry:SetText("All")
 		else
 			frame.salebox.numberentry:SetNumber(curNumber)
