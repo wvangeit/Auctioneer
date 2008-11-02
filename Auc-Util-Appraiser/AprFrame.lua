@@ -576,7 +576,7 @@ function private.CreateFrames()
 			defStack = tonumber(defStack)
 		end
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
-		local range = math.max(curNumber, frame.salebox.count/frame.salebox.stacksize)
+		local range = math.max(curNumber, math.floor(frame.salebox.count/frame.salebox.stacksize))
 		if frame.salebox.stacksize > 1 then
 			frame.salebox.number:SetAdjustedRange(range, -2, -1)--make sure the slider can handle the setting before we set it
 		else
