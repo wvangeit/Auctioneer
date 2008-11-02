@@ -294,7 +294,7 @@ AucAdvanced.Settings.SetDefault("stat.simple.tooltip", true)
 AucAdvanced.Settings.SetDefault("stat.simple.quantmul", true)
 
 function private.SetupConfigGui(gui)
-	local id = gui:AddTab(lib.libName, _TRANS('Simple Modules') )
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules" )
 
 	gui:AddHelp(id, "what simple stats",
 		_TRANS('What are simple stats?') ,
