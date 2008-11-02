@@ -607,6 +607,10 @@ function private.CreateFrames()
 			frame.salebox.matcher:SetChecked(curMatch)
 		end
 		frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
+		
+		local ignore = AucAdvanced.Settings.GetSetting("util.appraiser.item."..frame.salebox.sig..".ignore") or false
+		frame.salebox.ignore:SetChecked(ignore)
+		frame.valuecache.bulk = frame.salebox.ignore:GetChecked()
 
 		local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bulk") or false
 		frame.salebox.bulk:SetChecked(curBulk)
