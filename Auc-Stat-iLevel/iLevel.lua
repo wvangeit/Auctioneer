@@ -119,14 +119,14 @@ function lib.GetItemPDF(hyperlink, faction, realm)
 	-- DEFAULT_CHAT_FRAME:AddMessage("-----");
 	-- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
 
-	if not (mean and stddev) or mean == 0 or stddev == 0 then
+	if not (average and stddev) or average == 0 or stddev == 0 then
 		return nil;                 -- No data, cannot determine pricing
 	end
 
-	local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
+	local lower, upper = average - 3 * stddev, average + 3 * stddev;
 
-	-- Build the PDF based on standard deviation & mean
-	BellCurve:SetParameters(mean, stddev);
+	-- Build the PDF based on standard deviation & average
+	BellCurve:SetParameters(average, stddev);
 	return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
 end
 
