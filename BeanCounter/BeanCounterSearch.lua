@@ -227,10 +227,11 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
 		if settings.exact and settings.suffix then
-			if v[3]:match(".*:("..settings.suffix.."):.-") then
+			local _, suffix = lib.API.decodeLink(v[3])
+			if suffix == settings.suffix then
 				-- do nothing and add item to data table
 			else
-				match = false --we want exact matches and this is not one
+				match = false
 			end
 		end
 
