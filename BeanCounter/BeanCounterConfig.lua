@@ -377,15 +377,12 @@ local _, _, get, set, _ = lib.getLocals()--now we can set our get, set locals to
 private.setter = setter
 private.getter = getter
 function lib.MakeGuiConfig()
-
-
 	if gui then return end
 
 	local id
 	local Configator = LibStub:GetLibrary("Configator")
 	gui = Configator:Create(setter, getter)
 
-	local baseGUI
 	lib.Gui = gui
 
   	gui:AddCat("BeanCounter")

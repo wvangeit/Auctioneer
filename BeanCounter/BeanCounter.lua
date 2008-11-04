@@ -92,10 +92,8 @@ if AucAdvanced and AucAdvanced.NewModule then
 		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
 			local item = ...
 			if item.name then lib.API.search(item.name) end
-
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
-
 		end
 	end
 end
@@ -317,7 +315,6 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 	end
 	--Insert into the ItemName:ItemID dictionary array
 	if itemID and suffix and itemLink then
-		--debugPrint("Added to name array", itemID, suffix, itemLink)
 		BeanCounterDB["ItemIDArray"][itemID..":"..suffix] =  itemLink
 	end
 end
