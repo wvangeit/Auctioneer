@@ -131,26 +131,27 @@ function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, addition
 			EnhTooltip.LineColor(0.4, 1.0, 0.9)
 		end
 	end
-	if lowBid and lowBid > 0 then
-		coinsBuy = "no"
-		coinsBid = private.coins(lowBid*quantity)
-		if lowBuy and lowBuy > 0 then
-			coinsBuy = private.coins(lowBuy*quantity)
-		end
-		if quantity == 1 then
-			local text = string.format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
-			EnhTooltip.AddLine(text)
-			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+	if get("util.simpleauc.tooltip.undercut") then
+		if lowBid and lowBid > 0 then
+			coinsBuy = "no"
+			coinsBid = private.coins(lowBid*quantity)
+			if lowBuy and lowBuy > 0 then
+				coinsBuy = private.coins(lowBuy*quantity)
+			end
+			if quantity == 1 then
+				local text = string.format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
+				EnhTooltip.AddLine(text)
+				EnhTooltip.LineColor(0.4, 1.0, 0.9)
+			else
+				local text = string.format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
+				EnhTooltip.AddLine(text)
+				EnhTooltip.LineColor(0.4, 1.0, 0.9)
+			end
 		else
-			local text = string.format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
-			EnhTooltip.AddLine(text)
+			EnhTooltip.AddLine("  No Competition")
 			EnhTooltip.LineColor(0.4, 1.0, 0.9)
 		end
-	else
-		EnhTooltip.AddLine("  No Competition")
-		EnhTooltip.LineColor(0.4, 1.0, 0.9)
 	end
-	
 end
 
 function lib.OnLoad()
@@ -167,14 +168,31 @@ function lib.OnLoad()
 	default("util.simpleauc.columnwidth.BLANK", 0.05)
 	--Default options
 	default("util.simpleauc.clickhook", true)
+	default("util.simpleauc.clickhook.doubleclick", false)
 	default("util.simpleauc.scanbutton", true)
+	default("util.simpleauc.scanbutton.disable.wowecon", true)
 	default("util.simpleauc.tooltip", true)
+	default("util.simpleauc.tooltip.undercut", true)
+	default("util.simpleauc.auto.duration", 48)
+	default("util.simpleauc.auto.match", true)
+	default("util.simpleauc.auto.undercut", true)
+	default("util.simpleauc.undercut", "percent")
+	default("util.simpleauc.undercut.fixed", 1)
+	default("util.simpleauc.undercut.percent", 2.5)
 end
 
 function private.UpdateConfig()
 	if private.frame then
 		local frame = private.frame
+		local showing = false
 		if get("util.simpleauc.scanbutton") then
+			showing = true
+			if get("util.simpleauc.scanbutton.disable.wowecon") and IsAddOnLoaded("WowEcon") then
+				showing = false
+			end
+		end
+
+		if showing then
 			frame.scanbutton:Show()
 		else
 			frame.scanbutton:Hide()
@@ -194,12 +212,42 @@ function private.SetupConfigGui(gui)
 		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
 
 	gui:AddControl(id, "Header",       0,    lib.libName.." options")
+	gui:AddControl(id, "Subhead",      0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.tooltip", "Show prices in tooltip")
-	gui:AddTip(id, "Shows market price and potential undercut price for the current item in the tooltip")
+	gui:AddTip(id, "Shows market price for the current item in the tooltip")
+	gui:AddControl(id, "Checkbox",     0, 2, "util.simpleauc.tooltip.undercut", "Show undercut prices in tooltip")
+	gui:AddTip(id, "Shows potential undercut price for the current item in the tooltip")
+
+	gui:AddControl(id, "Subhead",      0,    "Shortcuts")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.clickhook", "Allow alt-click item in bag instead of drag")
 	gui:AddTip(id, "Enables an alt-click mouse-hook so you can alt-click your inventory items into the SimpleAuction post frame")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.scanbutton", "Show big red scan button at bottom of seach window")
+	gui:AddControl(id, "Checkbox",     0, 2, "util.simpleauc.clickhook.doubleclick", "Allow double-alt-clicking to auto-post the item")
+	gui:AddTip(id, "If you alt-click twice in succession, the item will be posted automatically at the current price")
+
+	gui:AddControl(id, "Subhead",      0,    "Defaults")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.auto.match", "Automatically match your current price if not remembering item price")
+	gui:AddTip(id, "When items are posted, if there is no remembered price, and you currently have auctioning items, your current price will be matched")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.auto.undercut", "Automatically undercut the current price if not matching or remembering")
+	gui:AddTip(id, "When items are posted, if there is no remembered price and the item is not automatching, the competition will be undercut")
+	gui:AddControl(id, "Label",        0, 1, nil, "Automatically set the duration for an item unless remembering:")
+	gui:AddControl(id, "Selectbox",    0, 2, {{12, "12 hour"}, {24, "24 hour"}, {48, "48 hour"}}, "util.simpleauc.auto.duration", "Auto Duration")
+	gui:AddTip(id, "When items are posted, if there is no remembered price, the duration will default to this value")
+
+	gui:AddControl(id, "Subhead",      0,    "Defaults")
+	gui:AddControl(id, "Label",        0, 1, nil, "Undercut basis:")
+	gui:AddControl(id, "Selectbox",    0, 2, {{"fixed", "Fixed value"}, {"percent", "Percentage"}}, "util.simpleauc.undercut", "Undercuts by")
+	gui:AddTip(id, "When the auction is to be undercut, specify how you want the lowest price to be undercut")
+	gui:AddControl(id, "Label",        0, 1, nil, "Fixed undercut value amount:")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "util.simpleauc.undercut.fixed", 0, 999999999)
+	gui:AddTip(id, "This is the fixed amount to undercut the lowest auction by")
+	gui:AddControl(id, "Label",        0, 1, nil, "Percentage undercut amount:")
+	gui:AddControl(id, "NumeriWide", 0, 3, "util.simpleauc.undercut.percent", 0,100, 0.5, "Percentage: %s%%")
+	gui:AddTip(id, "This is the percentage to undercut the lowest auction by")
+
+	gui:AddControl(id, "Subhead",      0,    "Scan button")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.scanbutton", "Show big red scan button at bottom of browse window")
 	gui:AddTip(id, "Displays the old-style \"Scan\" button at the bottom of the browse window.")
+	gui:AddControl(id, "Checkbox",     0, 2, "util.simpleauc.scanbutton.disable.wowecon", "Except if WowEcon is loaded")
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

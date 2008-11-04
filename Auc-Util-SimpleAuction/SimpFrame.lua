@@ -49,7 +49,6 @@ function private.postPickupContainerItemHook(_,_,bag, slot)
 end
 
 function private.ShiftFocus(frame, ...)
-	--print("Shifting focus on", frame:GetName(), ...)
 	local dest
 	if IsShiftKeyDown() then
 		dest = frame.prevFrame
@@ -85,6 +84,33 @@ function private.SigFromLink(link)
 	-- returns nil
 end
 
+function private.GetMyPrice(link, items)
+	local uBid, uBuy
+	local n = GetNumAuctionItems("owner")
+	if n and n > 0 then
+		for i = 1, n do
+			local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
+			if item then
+				if item[const.NAME] == name then
+					if items then table.insert(items, item) end
+					local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
+					if not uBid then
+						uBid = bid
+					else
+						uBid = min(uBid, bid)
+					end
+					if not uBuy then
+						uBuy = buy
+					elseif buy then
+						uBuy = min(uBuy, buy)
+					end
+				end
+			end
+		end
+	end
+	return uBid, uBuy
+end
+
 --Returns:
 --numitems: number of competing items
 --items: table with competition
@@ -98,35 +124,14 @@ function private.GetItems(link)
 	local name = GetItemInfo(link)
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 	local matching = AucAdvanced.API.QueryImage({ itemId = id })
-	local aSeen, lBid, lBuy, uBid, uBuy, aBuy = 0
+	local aSeen, lBid, lBuy, uBid, uBuy, aBuy, aveBuy = 0
 	local player = UnitName("player")
 	local items = {}
 
 	local live = false
 	if AuctionFrame and AuctionFrame:IsVisible() then
 		live = true
-		local n = GetNumAuctionItems("owner")
-		if n and n > 0 then
-			for i = 1, n do
-				local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
-				if item then
-					if item[const.NAME] == name then
-						table.insert(items, item)
-						local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
-						if not uBid then
-							uBid = bid
-						else
-							uBid = min(uBid, bid)
-						end
-						if not uBuy then
-							uBuy = buy
-						elseif buy then
-							uBuy = min(uBuy, buy)
-						end
-					end
-				end
-			end
-		end
+		uBid, uBuy = private.GetMyPrice(link, items)
 	end
 	for pos, item in ipairs(matching) do 
 		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.OWNER], item[const.COUNT]
@@ -162,8 +167,8 @@ function private.GetItems(link)
 			table.insert(items, item)
 		end
 	end
-	aBuy = (aBuy or 0)/(aSeen or 1)
-	return #items, items, uBid, uBuy, lBid, lBuy, aSeen, aBuy
+	aveBuy = (aBuy or 0)/(aSeen or 1)
+	return #items, items, uBid, uBuy, lBid, lBuy, aSeen, aveBuy
 end
 
 local GOLD="ffd100"
@@ -221,8 +226,6 @@ function private.UpdateDisplay()
 		return
 	end
 	private.SetIconCount(total)
-
-	--print("Updating", unpack(frame.detail))
 
 	local dBid = abs(cBid/lStack*oStack-oBid)
 	local dBuy = abs(cBuy/lStack*oStack-oBuy)
@@ -386,13 +389,29 @@ function private.UpdatePricing()
 		--Check for undercut first
 		if frame.options.undercut:GetChecked() then
 			if lowBuy and lowBuy > 0 then
-				buy = lowBuy - 1/stack
+				local underBuy, underBid, by = 1,1, "default 1c"
+
+				local model = get("util.simpleauc.undercut")
+				local fixed = get("util.simpleauc.undercut.fixed")
+				local percent = get("util.simpleauc.undercut.percent")
+				local pct = tonumber(percent)/100
+				if model == "fixed" then
+					underBuy = fixed
+					underBid = fixed
+					by = "fixed amount: "..coins(fixed)
+				else
+					underBuy = lowBuy*pct
+					underBid = (lowBid or 0)*pct
+					by = percent.."% ("..coins(underBuy)..")"
+				end
+
+				buy = lowBuy - underBuy
 				if lowBid and lowBid > 0 and lowBid <= lowBuy then
-					bid = lowBid - 1/stack
+					bid = lowBid - underBid
 				else
 					bid = buy * 0.8
 				end
-				reason = "Undercutting market"
+				reason = "Undercutting market by "..by
 			end
 		--then matching current
 		elseif frame.options.matchmy:GetChecked() then
@@ -481,27 +500,22 @@ function private.CheckUpdate()
 	local remember = frame.options.remember:GetChecked()
 	local duration = frame.duration.time.selected
 	if frame.CurItem.buy ~= buy then --New Buyout manually entered
-		--print("buy changed")
 		frame.CurItem.buy = buy
 		frame.CurItem.buyper = buy/(stack or 1)
 		frame.CurItem.manual = true
 		private.UpdateDisplay()
 	elseif frame.CurItem.bid ~= bid then --New Bid manually entered
-		--print("bid changed")
 		frame.CurItem.bid = bid
 		frame.CurItem.bidper = bid/(stack or 1)
 		frame.CurItem.manual = true
 		private.UpdateDisplay()
 	elseif stack and stack > 0 and frame.CurItem.stack ~= stack then --new stack size entered
-		--print("stack changed: "..tostring(stack))
 		frame.CurItem.stack = stack
 		private.UpdatePricing()
 	elseif number and number > 0 and frame.CurItem.number ~= number then --new number of stacks entered
-		--print("number changed: "..tostring(number))
 		frame.CurItem.number = number
 		private.UpdatePricing()
 	elseif frame.CurItem.match ~= match then
-		--print("match changed")
 		frame.CurItem.match = match
 		if match then --turn off other checkboxes 
 			frame.CurItem.manual = false
@@ -512,7 +526,6 @@ function private.CheckUpdate()
 		end
 		private.UpdatePricing()
 	elseif frame.CurItem.undercut ~= undercut then
-		--print("undercut changed")
 		frame.CurItem.undercut = undercut
 		if undercut then --turn off other checkboxes 
 			frame.CurItem.manual = false
@@ -523,11 +536,9 @@ function private.CheckUpdate()
 		end
 		private.UpdatePricing()
 	elseif frame.CurItem.duration ~= duration then
-		--print("duration changed")
 		frame.CurItem.duration = duration
 		private.UpdatePricing()
 	elseif frame.CurItem.remember ~= remember then
-		--print("remember changed")
 		frame.CurItem.manual = true
 		frame.CurItem.remember = remember
 		if remember then
@@ -585,6 +596,23 @@ function private.LoadItemLink(itemLink, size)
 	frame.stacks.equals:SetText("= 0")
 	private.ClearSetting()
 	private.LoadConfig()
+
+	if not frame.options.remember:GetChecked() then
+		local uBid, uBuy = private.GetMyPrice(itemLink)
+		if uBid and get("util.simpleauc.auto.match") then
+			frame.options.matchmy:SetChecked(true)
+			frame.options.undercut:SetChecked(false)
+			frame.CurItem.match = true
+			frame.CurItem.undercut = nil
+		elseif get("util.simpleauc.auto.undercut") then
+			frame.options.matchmy:SetChecked(false)
+			frame.options.undercut:SetChecked(true)
+			frame.CurItem.match = nil
+			frame.CurItem.undercut = true
+		end
+	end
+
+	
 	if itemLink and size then
 		frame.stacks.size:SetNumber(size)
 	end
@@ -691,13 +719,20 @@ function private.ClearSetting()
 	MoneyInputFrame_ResetMoney(frame.buyout)
 	frame.stacks.num:SetNumber(0)
 	frame.stacks.size:SetNumber(0)
-	frame.options.matchmy:SetChecked(false)
-	frame.options.undercut:SetChecked(false)
+
+	local under, match, dur =
+		get("util.simpleauc.auto.undercut"),
+		get("util.simpleauc.auto.match"),
+		get("util.simpleauc.auto.duration")
+	if under then match = false end
+
+	frame.options.matchmy:SetChecked(match)
+	frame.options.undercut:SetChecked(under)
 	frame.options.remember:SetChecked(false)
-	frame.duration.time.selected = 48
-	frame.duration.time[1]:SetChecked(false)
-	frame.duration.time[2]:SetChecked(false)
-	frame.duration.time[3]:SetChecked(true)
+	frame.duration.time.selected = dur
+	frame.duration.time[1]:SetChecked(dur == 12)
+	frame.duration.time[2]:SetChecked(dur == 24)
+	frame.duration.time[3]:SetChecked(dur == 48)
 	private.UpdatePricing()
 end
 
@@ -711,7 +746,7 @@ function private.PostAuction()
 	local stack = frame.CurItem.stack
 	local bid = frame.CurItem.bid
 	local buy = frame.CurItem.buy
-	local duration = frame.CurItem.duration
+	local duration = frame.CurItem.duration or 48
 	if frame.CurItem.count < (stack * number) then
 		print("Posting Failed: Not enough items available")
 		return
@@ -942,6 +977,22 @@ function private.CreateFrames()
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
 				private.LoadItemLink(link, size)
+
+				if not private.clickdata then private.clickdata = {} end
+				local last = private.clickdata
+				local now = GetTime()
+				if last[1] == bag and last[2] == slot and now - last[3] < 0.5 then
+					-- Is a double click
+					print("Auto auctioning double-alt-clicked item")
+					if not frame.options.remember:GetChecked() then
+						frame.options.undercut:SetChecked(true)
+					end
+					private.CheckUpdate()
+					private.PostAuction()
+				end
+				last[1] = bag
+				last[2] = slot
+				last[3] = now
 			end
 		end
 	end
