@@ -2371,7 +2371,7 @@ function private.CreateFrames()
 			money = math.floor(tonumber(coins) or 0)
 			if money == 0 then zero = true end
 		end
-		TinyMoneyFrame_Update(line[2], money)
+		line[2]:SetValue(money)
 		if zero then
 			getglobal("AppraisalManifestCoins"..id.."CopperButton"):Show()
 		end
@@ -2381,7 +2381,7 @@ function private.CreateFrames()
 		local id = obj.id
 		local line = frame.manifest.lines[id]
 		line[1]:SetText("")
-		TinyMoneyFrame_Update(line[2], 0)
+		line[2]:SetValue(0)
 	end
 
 	local function linesClear(obj)
@@ -2395,28 +2395,6 @@ function private.CreateFrames()
 		obj.pos = obj.pos + 1
 		if (obj.pos > obj.max) then return end
 		obj[obj.pos]:Set(text, coins, r,g,b)
-	end
-
-	local function createMoney()
-		local n = moneyCount + 1
-		moneyCount = n
-		local name = LIBSTRING.."MoneyFrame"..n
-		m = CreateFrame("Frame",name,nil,"SmallMoneyFrameTemplate")
-		m:UnregisterAllEvents()
-		m:Show()
-		m:SetScript("OnHide",moneyFrameOnHide)
-		m:SetFrameStrata("TOOLTIP")
-		m.info = MoneyTypeInfo["STATIC"]
-
-		m.gold = getglobal(name .. "GoldButton")
-		m.silver = getglobal(name .. "SilverButton")
-		m.copper = getglobal(name .. "CopperButton")
-
-		m.gold:EnableMouse(false)
-		m.silver:EnableMouse(false)
-		m.copper:EnableMouse(false)
-
-		return m
 	end
 
 	local myStrata = frame.manifest:GetFrameStrata()
