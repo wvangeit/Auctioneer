@@ -41,7 +41,7 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	tooltip:SetFrame(frame)
 
 	local extra = tooltip:GetExtra()
-	local itemType,itemID,suffix,factor,enchant,seed,gem1,gem2,gem3,gemBonus = tooltip:DecodeLink(link)
+	local itemType, itemID, randomProp, factor, enchant, uniqID, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus = tooltip:DecodeLink(link)
 	if itemType ~= "item" then return end
 
 	local quant = 0
