@@ -59,7 +59,11 @@ local private = {
 	--BeanCounterMail
 	reconcilePending = {},
 	inboxStart = {},
-	}
+	serverVersion = select(4, GetBuildInfo()),--WOW 3.0 HACK
+}
+
+local tooltip = LibStub("nTipHelper:1")
+private.tooltip = tooltip
 
 lib.Private = private --allow beancounter's sub lua's access
 --Taken from AucAdvCore
@@ -140,9 +144,9 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-
-	--ToolTip Hooks here rather than Aunctioneer's Callback so we can choose Placement @ bottom of frame
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 700, private.processTooltip)
+	
+	tooltip:Activate()
+	tooltip:AddCallback(private.processTooltip, 700)
 
 	lib.API.isLoaded = true
 end
@@ -299,6 +303,7 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 
 	local _, suffix = lib.API.decodeLink(itemLink)
 	local itemString = lib.API.getItemString(itemLink)
+
 	--if this will be a compressed entry replace uniqueID with 0
 	if compress then
 		itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")
@@ -347,7 +352,7 @@ function private.storeReasonForBid(CallBack)
 	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
-
+	
 	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
 		for i, v in pairs(private.playerData.postedBids[itemID][itemString]) do
 			local tbl = private.unpackString(v)

@@ -37,7 +37,7 @@ local libType, libName = "Stat", "Debug"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-
+  
 local data
 
 function lib.CommandHandler(command, ...)
@@ -165,24 +165,25 @@ end
 
 --[[ Local functions ]]--
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 
 	if not AucAdvanced.Settings.GetSetting("stat.debug.tooltip") then return end
 
+	tooltip:SetColor(0.8, 0.9, 0.3)
+
 	if not quantity or quantity < 1 then quantity = 1 end
 	local array = lib.GetPriceArray(hyperlink)
 	if not array then
-		EnhTooltip.AddLine("  Debug: No price data")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("Debug: No price data")
 		return
 	end
 
+	tooltip:AddLine("Debug pricing")
 	for i = 1, #array.pricelist do
-		EnhTooltip.AddLine("  Debug "..i..":", array.pricelist[i])
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("  Debug "..i..":", array.pricelist[i])
 	end
 end
 

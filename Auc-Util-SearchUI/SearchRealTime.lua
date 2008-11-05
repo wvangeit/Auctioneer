@@ -316,7 +316,7 @@ end
 --(subject to options)
 function private.alert(link, cost, reason)
 	if get("realtime.alert.chat") then
-		print("SearchUI: "..reason..": Found "..link.." for "..EnhTooltip.GetTextGSC(cost, true))
+		print("SearchUI: "..reason..": Found "..link.." for "..AucAdvanced.Coins(cost, true))
 	end
 	if get("realtime.alert.showwindow") and (not get("realtime.skipresults")) then
 		AucSearchUI.Show()

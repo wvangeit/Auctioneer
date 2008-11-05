@@ -169,6 +169,14 @@ local addonName = "Enchantrix Barker"
 
 -- UI code
 
+local function getGSC(money)
+	money = math.floor(tonumber(money) or 0)
+	local g = math.floor(money / 10000)
+	local s = math.floor(money % 10000 / 100)
+	local c = money % 100
+	return g,s,c
+end
+
 function EnchantrixBarker_OnEvent()
 
 	--Returns "Enchanting" for enchantwindow
@@ -211,6 +219,26 @@ function EnchantrixBarker_OnEvent()
 		end
 	end
 
+
+	-- ccox - WoW 3.0 - Tradeskill Window no longer has space for the button
+	if select(4, GetBuildInfo() ) >= 30000 then
+		if craftName and craftName == _BARKLOC('Enchanting') then
+			if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
+				if( Barker.Settings.GetSetting('barker') ) then
+					Enchantrix_BarkerOptions_TradeTab:Show();
+					Enchantrix_BarkerOptions_TradeTab.tooltipText = _BARKLOC('OpenBarkerWindow');
+				else
+					Enchantrix_BarkerOptions_TradeTab:Hide();
+					Enchantrix_BarkerOptions_TradeTab:Hide();
+				end
+			end
+		elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
+			-- we are closing, or it's a different craft/trade, hide the button and frame
+			Enchantrix_BarkerOptions_TradeTab:Hide();
+			Enchantrix_BarkerOptions_TradeTab:Hide();
+		end
+	end
+	
 end
 
 function Enchantrix_BarkerOptions_OnShow()
@@ -259,7 +287,7 @@ local function craftUILoaded()
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
 		useFrame = ATSWFrame;
 	end
-
+	
 	-- ccox - WoW 3.0 - the tradskill window no longer has room for the barker button
 	if select(4, GetBuildInfo() ) >= 30000 then
 		Enchantrix_BarkerOptions_TradeTab:SetParent(useFrame);
@@ -272,7 +300,7 @@ local function craftUILoaded()
 		end
 	else
 		Enchantrix_BarkerDisplayButton:SetParent(useFrame);
-
+	
 		if (ATSWFrame ~= nil) then
 			-- this works for ATSW
 			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
@@ -774,7 +802,7 @@ function EnchantrixBarker_OptionsSlider_GetTextFromValue( value, units )
 	if units == 'percentage' then
 		valuestr = value..'%'
 	elseif units == 'money' then
-		local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(value);
+		local p_gold,p_silver,p_copper = getGSC(value);
 
 		if( p_gold > 0 ) then
 			valuestr = p_gold.."g";
@@ -982,6 +1010,13 @@ function Enchantrix_CreateBarker()
 		-- not in a recognized trade zone
 		return nil;
 	end
+	
+	local temp
+	if select(4, GetBuildInfo() ) >= 30000 then
+		temp = GetTradeSkillLine();
+	else
+		temp = GetCraftSkillLine(1);
+	end
 
 	local temp
 	if select(4, GetBuildInfo() ) >= 30000 then
@@ -1059,8 +1094,8 @@ function Enchantrix_CreateBarker()
 				};
 				availableEnchants[ numAvailable] = enchant;
 
-				local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-				local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+				local p_gold,p_silver,p_copper = getGSC(enchant.price);
+				local pr_gold,pr_silver,pr_copper = getGSC(enchant.profit);
 
 				EnchantrixBarker_AddEnchantToPriorityList( enchant )
 				numAvailable = numAvailable + 1;
@@ -1262,7 +1297,7 @@ function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
 end
 
 function EnchantrixBarker_GetBarkerEnchantString( enchant )
-	local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+	local p_gold,p_silver,p_copper = getGSC(enchant.price);
 
 	enchant_barker = Enchantrix_GetShortDescriptor(enchant.index).." - ";
 	if( p_gold > 0 ) then

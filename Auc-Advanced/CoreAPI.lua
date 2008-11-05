@@ -99,7 +99,7 @@ do
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
         if not itemLink then return; end
-		local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
         -- Look up in the cache if it's recent enough
         local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
@@ -110,18 +110,18 @@ do
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
 
-        -- Rebuild the engine cache
-        if #engines == 0 then
-			local modules = AucAdvanced.GetAllModules(nil, "Stat")
-			for pos, engineLib in ipairs(modules) do
-                local fn = engineLib.GetItemPDF;
-                if fn then
-                    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
-                elseif nLog then
-                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
-                end
-            end
-        end
+	if #engines == 0 then
+		-- Rebuild the engine cache
+		local modules = AucAdvanced.GetAllModules(nil, "Stat")
+		for pos, engineLib in ipairs(modules) do
+			local fn = engineLib.GetItemPDF;
+			if fn then
+			    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
+			elseif nLog then
+			    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+			end
+		end
+	end
 
         -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax = 0, #pdfList;

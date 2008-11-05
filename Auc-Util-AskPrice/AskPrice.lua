@@ -188,7 +188,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	--If the stack size is grater than one, add the unit price to the message
 	local strMarketOne
 	if (count > 1) then
-		strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketPrice, nil, true))
+		strMarketOne = ("(%s each)"):format(AucAdvanced.Coins(marketPrice, nil, true))
 	else
 		strMarketOne = ""
 	end
@@ -205,7 +205,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		private.sendWhisper(
 			("%sMarket Value: %s%s"):format(
 				"    ",
-				EnhTooltip.GetTextGSC(marketPrice * count, nil, true),
+				AucAdvanced.Coins(marketPrice * count, nil, true),
 				strMarketOne),
 			player
 		)
@@ -225,7 +225,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		local strVendOne
 		--Again if the stack Size is greater than one, add the unit price to the message
 		if (count > 1) then
-			strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true))
+			strVendOne = ("(%s each)"):format(AucAdvanced.Coins(vendorPrice, nil, true))
 		else
 			strVendOne = ""
 		end
@@ -233,7 +233,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		private.sendWhisper(
 			("%sSell to vendor for: %s%s"):format(
 				"    ",
-				EnhTooltip.GetTextGSC(
+				AucAdvanced.Coins(
 					vendorPrice * count,
 					nil,
 					true

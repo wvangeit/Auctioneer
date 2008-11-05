@@ -301,7 +301,7 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -311,60 +311,48 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
     if (boughtseen+soldseen>0) then
-		EnhTooltip.AddLine(_TRANS('Sales prices:') )
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine(_TRANS('Sales prices:'))
 
         if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
             if (boughtseen > 0) then
-                EnhTooltip.AddLine(_TRANS('  Total Bought').." |cffddeeff"..(boughtqty).."|r ".._TRANS('at avg each'), bought)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  Total Bought').." |cffddeeff"..(boughtqty).."|r ".._TRANS('at avg each'), bought)
             end
             if (soldseen > 0) then
-                EnhTooltip.AddLine(_TRANS('  Total Sold').." |cffddeeff"..(soldqty).."|r ".._TRANS('at avg each'), sold)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  Total Sold').." |cffddeeff"..(soldqty).."|r ".._TRANS('at avg each'), sold)
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
             if (boughtqty7 > 0) then
-                EnhTooltip.AddLine(_TRANS('  7 Days Bought').." |cffddeeff"..(boughtqty7).."|r ".._TRANS('at avg each'), bought7)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  7 Days Bought').." |cffddeeff"..(boughtqty7).."|r ".._TRANS('at avg each'), bought7)
             end
             if (soldqty7 > 0) then
-                EnhTooltip.AddLine(_TRANS('  7 Days Sold').." |cffddeeff"..(soldqty7).."|r ".._TRANS('at avg each'), sold7)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  7 Days Sold').." |cffddeeff"..(soldqty7).."|r ".._TRANS('at avg each'), sold7)
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
             if (boughtqty3 > 0) then
-                EnhTooltip.AddLine(_TRANS('  3 Days Bought').." |cffddeeff"..(boughtqty3).."|r ".._TRANS('at avg each'), bought3)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  3 Days Bought').." |cffddeeff"..(boughtqty3).."|r ".._TRANS('at avg each'), bought3)
             end
             if (soldqty3 > 0) then
-                EnhTooltip.AddLine(_TRANS('  3 Days Sold').." |cffddeeff"..(soldqty3).."|r ".._TRANS('at avg each'), sold3)
-                EnhTooltip.LineColor(0.3, 0.9, 0.8)
+                tooltip:AddLine(_TRANS('  3 Days Sold').." |cffddeeff"..(soldqty3).."|r ".._TRANS('at avg each'), sold3)
             end
         end
         if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.sales.normal") then
-				EnhTooltip.AddLine(_TRANS('  Normalized (stack)') , average*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Normalized (stack)'), average*quantity)
 				if (quantity > 1) then
-					EnhTooltip.AddLine(_TRANS('  (or individually)') , average)
-					EnhTooltip.LineColor(0.3, 0.9, 0.8)
+					tooltip:AddLine(_TRANS('  (or individually)'), average)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.stdev") then
-				EnhTooltip.AddLine(_TRANS('  Std Deviation') , stdev*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Std Deviation'), stdev*quantity)
                 if (quantity > 1) then
-                    EnhTooltip.AddLine(_TRANS('  (or individually)') , stdev)
-                    EnhTooltip.LineColor(0.3, 0.9, 0.8);
+                    tooltip:AddLine(_TRANS('  (or individually)'), stdev)
                 end
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.confid") then
-				EnhTooltip.AddLine(_TRANS('  Confidence: ') ..(floor(confidence*1000))/1000)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Confidence: ')..(floor(confidence*1000))/1000)
 			end
 		end
 

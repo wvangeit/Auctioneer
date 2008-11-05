@@ -1,10 +1,10 @@
-## Title: Auc-Advanced |cff665555(core)
-## Notes: AuctioneerAdvanced, An addon to help keep track of items values. You must at least enable a statistics extension (like Auc:Stats:Simple) to start tracking stats.
+## Title: Auc-Auctioneer |cff774422(core)
+## Notes: Auctioneer, An addon to help keep track of items values. You must at least enable a statistics extension (like Auc:Stats:Simple) to start tracking stats.
 ##
 ## Interface: 30000
 ## LoadOnDemand: 0
-## Dependencies: EnhTooltip, Stubby
-## OptionalDependencies: !nLog, SlideBar, Configator, Babylonian, DebugLib
+## Dependencies: Stubby
+## OptionalDependencies: !nLog, SlideBar, Configator, Babylonian, DebugLib, TipHelper, LibExtraTip
 ## SavedVariables: AucAdvancedConfig, AucAdvancedData
 ## SavedVariablesPerCharacter: AucAdvancedLocal
 ##

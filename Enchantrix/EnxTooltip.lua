@@ -39,9 +39,12 @@ local itemTooltip
 local enchantTooltip
 local hookTooltip
 
+local tooltip = LibStub("nTipHelper:1")
+
 function addonLoaded()
 	-- Hook in new tooltip code
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, hookTooltip)
+	tooltip:Activate()
+	tooltip:AddCallback(hookTooltip, 400)
 end
 
 tooltipFormat = {
@@ -89,7 +92,7 @@ tooltipFormat = {
 }
 
 
-local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
+local function prospectTooltip(prospect, tooltip, name, link, quality, count)
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
@@ -136,16 +139,15 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 	totalMkt = totalMkt * groups;
 	totalFive = totalFive * groups;
 
+	tooltip:SetColor(0.8,0.8,0.2);
 	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
 		-- Header
 		local totalText = ""
-		EnhTooltip.AddLine(_ENCH('FrmtProspectInto')..totalText, nil, embed);
-		EnhTooltip.LineColor(0.8,0.8,0.2);
+		tooltip:AddLine(_ENCH('FrmtProspectInto')..totalText, nil, embed);
 		-- Sort in order of decreasing probability before adding to tooltip
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
-			EnhTooltip.AddLine(line.str, nil, embed)
-			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			tooltip:AddLine(line.str, nil, embed)
 			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
@@ -154,35 +156,30 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		local reqSkill = Enchantrix.Util.JewelCraftSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserJewelCraftingSkill();
 		local deText = format(_ENCH("TooltipProspectLevel"), reqSkill );
-		EnhTooltip.AddLine(deText, nil, embed);
 		if (userSkill < reqSkill) then
-			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
 		else
-			EnhTooltip.LineColor(0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
 		end
 	end
 
+	tooltip:SetColor(0.1,0.6,0.6);
 	if (Enchantrix.Settings.GetSetting('TooltipProspectValues')) then
 		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipProspectShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctVal'), totalFive, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtProspectValueAuctVal'), totalFive, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueHSP') and totalHSP > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtProspectValueAuctHsp'), totalHSP, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueMedian') and totalMed > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtProspectValueAuctMed'), totalMed, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipProspectShowBaselineValue') and totalMkt > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtProspectValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtProspectValueMarket'), totalMkt, embed);
 		end
 	end
 
 end
-
 
 
 -- ccox - TODO WOTLK - change strings to milling, see if this can share code with prospecting!
@@ -190,7 +187,7 @@ end
 
 -- ccox - WOTLK - localize strings!
 
-local function millingTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
+local function millingTooltip(prospect, tooltip, name, link, quality, count)
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
@@ -237,16 +234,15 @@ local function millingTooltip(prospect, funcVars, retVal, frame, name, link, qua
 	totalMkt = totalMkt * groups;
 	totalFive = totalFive * groups;
 
+	tooltip:SetColor(0.8,0.8,0.2)
 	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
 		-- Header
 		local totalText = ""
-		EnhTooltip.AddLine(_ENCH('FrmtMillsInto')..totalText, nil, embed);
-		EnhTooltip.LineColor(0.8,0.8,0.2);
+		tooltip:AddLine(_ENCH('FrmtMillsInto')..totalText, nil, embed);
 		-- Sort in order of decreasing probability before adding to tooltip
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
-			EnhTooltip.AddLine(line.str, nil, embed)
-			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			tooltip:AddLine(line.str, nil, embed)
 			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
@@ -256,49 +252,44 @@ local function millingTooltip(prospect, funcVars, retVal, frame, name, link, qua
 		local reqSkill = Enchantrix.Util.InscriptionSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserInscriptionSkill();
 		local deText = format(_ENCH("TooltipMillingLevel"), reqSkill );
-		EnhTooltip.AddLine(deText, nil, embed);
 		if (userSkill < reqSkill) then
-			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
 		else
-			EnhTooltip.LineColor(0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
 		end
 	end
 
+	tooltip:SetColor(0.1,0.6,0.6)
 	if (Enchantrix.Settings.GetSetting('TooltipMillingValues')) then
 		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipMillingShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctVal'), totalFive, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtMillingValueAuctVal'), totalFive, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipMillingShowAuctValueHSP') and totalHSP > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtMillingValueAuctHsp'), totalHSP, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipMillingShowAuctValueMedian') and totalMed > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtMillingValueAuctMed'), totalMed, embed);
 		end
 		if (Enchantrix.Settings.GetSetting('TooltipProspectShowBaselineValue') and totalMkt > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtMillingValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtMillingValueMarket'), totalMkt, embed);
 		end
 	end
-
 end
 
 
-function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+function itemTooltip(tooltip, name, link, quality, count)
 
 	-- first, see if this is a prospectable item (short list)
 	local prospect = Enchantrix.Storage.GetItemProspects(link)
 	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then
-		prospectTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
+		prospectTooltip(prospect, tooltip, name, link, quality, count)
 		return
 	end
 
 	-- next, see if this is a millable item (short list)
 	local milling = Enchantrix.Storage.GetItemMilling(link)
 	if (milling and Enchantrix.Settings.GetSetting('TooltipShowMilling')) then
-		millingTooltip(milling, funcVars, retVal, frame, name, link, quality, count)
+		millingTooltip(milling, tooltip, name, link, quality, count)
 		return
 	end
 
@@ -365,16 +356,15 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
+	tooltip:SetColor(0.8,0.8,0.2);
 	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
 		-- Header
 		local totalText = ""
-		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
-		EnhTooltip.LineColor(0.8,0.8,0.2);
+		tooltip:AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
 		-- Sort in order of decreasing probability before adding to tooltip
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
-			EnhTooltip.AddLine(line.str, nil, embed)
-			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			tooltip:AddLine(line.str, nil, embed)
 			if n >= 5 then break end -- Don't add more than 5 lines
 		end
 	end
@@ -383,34 +373,29 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		local reqSkill = Enchantrix.Util.DisenchantSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserEnchantingSkill();
 		local deText = format(_ENCH("TooltipShowDisenchantLevel"), reqSkill );
-		EnhTooltip.AddLine(deText, nil, embed);
 		if (userSkill < reqSkill) then
-			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
 		else
-			EnhTooltip.LineColor(0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
 		end
 	end
 
+	tooltip:SetColor(0.1,0.6,0.6);
 	if (Enchantrix.Settings.GetSetting('TooltipShowValues')) then
 		if (allFixed) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueFixedVal'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+			tooltip:AddLine(_ENCH('FrmtValueFixedVal'), totalHSP, embed);
 		else
 			if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
+				tooltip:AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
 			end
 			if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
+				tooltip:AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			end
 			if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
+				tooltip:AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			end
 			if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
+				tooltip:AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			end
 		end
 	end
@@ -428,7 +413,7 @@ local function getReagentsFromCraftFrame(craftIndex)
 	for i = 1, numReagents do
 		local link = getReagentLinkFunc(craftIndex, i)
 		if link then
-			local hlink = EnhTooltip.HyperlinkFromLink(link)
+			local hlink = link:match("|H([^|]+)|h")
 			local reagentName, reagentTexture, reagentCount, playerReagentCount = getReagentInfoFunc(craftIndex, i)
 			table.insert(reagentList, {hlink, reagentCount})
 		end
@@ -445,7 +430,7 @@ local function getReagentsFromTradeFrame(craftIndex)
 	for i = 1, numReagents do
 		local link = GetTradeSkillReagentItemLink(craftIndex, i)
 		if link then
-			local hlink = EnhTooltip.HyperlinkFromLink(link)
+			local hlink = link:match("|H([^|]+)|h")
 			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(craftIndex, i)
 			table.insert(reagentList, {hlink, reagentCount})
 		end
@@ -514,7 +499,7 @@ end
 -- this can be used by non enchanters when clicking on an enchant tooltip
 -- this is also used inside the enchanting/crafting trade window
 
-function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
+function enchantTooltip(tooltip, name, link, isItem)
 
 -- TODO - ccox - for items, get the number made!  But what about items with random yield?
 -- TODO - ccox - this really should recursively descend crafted items for true costs not AH prices
@@ -617,15 +602,16 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		else
 			icon = "Interface\\Icons\\Spell_Holy_GreaterHeal"
 		end
-		EnhTooltip.SetIcon(icon)
-		EnhTooltip.AddLine(name)
-		EnhTooltip.AddLine(EnhTooltip.HyperlinkFromLink(link))
+		--tooltip:SetIcon(icon)
+		local hLink = link:match("|H([^|]+)|h")
+		tooltip:AddLine(name)
+		tooltip:AddLine(hLink)
 	end
-	EnhTooltip.AddLine(_ENCH('FrmtSuggestedPrice'), nil, embed)
-	EnhTooltip.LineColor(0.8,0.8,0.2)
+	tooltip:AddLine(_ENCH('FrmtSuggestedPrice'), 0.8,0.8,0.2, embed)
 
 	local price = 0
 	local unknownPrices
+	tooltip:SetColor(0.7,0.7,0.1)
 	-- Add reagent list to tooltip and sum reagent prices
 	for _, reagent in pairs(reagentList) do
 		local line = "  "
@@ -639,17 +625,16 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		end
 		line = line.." x"..reagent[COUNT]
 		if reagent[COUNT] > 1 and reagent[PRICE] then
-			line = line.." ".._ENCH('FrmtPriceEach'):format(EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent[PRICE], 3)))
-			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent[PRICE] * reagent[COUNT], 3), embed)
+			line = line.." ".._ENCH('FrmtPriceEach'):format(AucAdvanced.Coins(Enchantrix.Util.Round(reagent[PRICE], 3)))
+			tooltip:AddLine(line, Enchantrix.Util.Round(reagent[PRICE] * reagent[COUNT], 3), embed)
 			price = price + reagent[PRICE] * reagent[COUNT]
 		elseif reagent[PRICE] then
-			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent[PRICE], 3), embed)
+			tooltip:AddLine(line, Enchantrix.Util.Round(reagent[PRICE], 3), embed)
 			price = price + reagent[PRICE]
 		else
-			EnhTooltip.AddLine(line, nil, embed)
+			tooltip:AddLine(line, nil, embed)
 			unknownPrices = true
 		end
-		EnhTooltip.LineColor(0.7,0.7,0.1)
 	end
 
 	-- add barker line, if barker is loaded
@@ -667,51 +652,46 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 
 
 	-- Totals
+	tooltip:SetColor(0.8,0.8,0.2)
 	if price > 0 then
-
-		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
-		EnhTooltip.LineColor(0.8,0.8,0.2)
+		tooltip:AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 
 		if (Barker and Barker.Settings.GetSetting('barker')) then
 			-- "Barker Price (%d%% margin)"
-			EnhTooltip.AddLine(_ENCH('FrmtBarkerPrice'):format(Barker.Util.Round(margin)), barkerPrice, embed)
-			EnhTooltip.LineColor(0.8,0.8,0.2)
+			tooltip:AddLine(_ENCH('FrmtBarkerPrice'):format(Barker.Util.Round(margin)), barkerPrice, embed)
 		end
 
 		if not Enchantrix.State.Auctioneer_Loaded then
-			EnhTooltip.AddLine(_ENCH('FrmtWarnAuctNotLoaded'))
-			EnhTooltip.LineColor(0.6,0.6,0.1)
+			tooltip:AddLine(_ENCH('FrmtWarnAuctNotLoaded'), 0.6,0.6,0.1)
 		end
 
 		if unknownPrices then
-			EnhTooltip.AddLine(_ENCH('FrmtWarnPriceUnavail'))
-			EnhTooltip.LineColor(0.6,0.6,0.1)
+			tooltip:AddLine(_ENCH('FrmtWarnPriceUnavail'), 0.6,0.6,0.1)
 		end
 	else
-		EnhTooltip.AddLine(_ENCH('FrmtWarnNoPrices'))
-		EnhTooltip.LineColor(0.6,0.6,0.1)
+		tooltip:AddLine(_ENCH('FrmtWarnNoPrices'), 0.6,0.6,0.1)
 	end
 end
 
-function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
+function hookTooltip(tip, link, count, name, link, quality)
 	-- nothing to do, if enchantrix is disabled
 	if (not Enchantrix.Settings.GetSetting('all')) then
 		return
 	end
+	tooltip:SetFrame(tip)
 
-	local ltype = EnhTooltip.LinkType(link)
-	if ltype == "item" then
-		itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+	local itemType, itemId = tooltip:DecodeLink(link)
+	if itemType == "item" then
+		itemTooltip(tooltip, name, link, quality, count)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
-			enchantTooltip(funcVars, retVal, frame, name, link, true)
+			enchantTooltip(tooltip, name, link, true)
 		end
 	elseif ltype == "enchant" or ltype == "spell" then
--- ccox - debugging Wow 3.0 -- Enchantrix.Util.DebugPrintQuick("tooltip inputs", funcVars, retVal, frame, name, link, quality, count )
-
-		name = name or ""	-- tooltip hook gives a nil name in 3.0!  Filed as a bug with Blizzard
-
-		enchantTooltip(funcVars, retVal, frame, name, link, false)
+		name = name or ""
+		enchantTooltip(tooltip, name, link, false)
 	end
+
+	tooltip:ClearFrame(tip)
 end
 
 Enchantrix.Tooltip = {

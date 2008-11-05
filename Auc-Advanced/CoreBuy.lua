@@ -169,7 +169,7 @@ function private.PromptPurchase()
 		private.Prompt.Text:SetText("Are you sure you want to buyout")
 	end
 	if private.CurAuction["count"] == 1 then
-		private.Prompt.Value:SetText(private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
+		private.Prompt.Value:SetText(private.CurAuction["link"].." for "..AucAdvanced.Coins(private.CurAuction["price"],true).."?")
 	else
 		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
 	end
@@ -350,7 +350,6 @@ end
 function private.ShowTooltip()
 	GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
 	GameTooltip:SetHyperlink(private.CurAuction["link"])
-	EnhTooltip.TooltipCall(GameTooltip, private.CurAuction["itemname"], private.CurAuction["link"], -1, private.CurAuction["count"], private.CurAuction["price"])
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("TOPRIGHT", private.Prompt.Item, "TOPLEFT", -10, -20)
 end

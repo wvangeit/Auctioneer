@@ -240,6 +240,7 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
 
     if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+    if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
     -- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
 
@@ -367,7 +368,7 @@ end
 
 --[[ Local functions ]]--
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -385,37 +386,29 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then
-		EnhTooltip.AddLine(_TRANS('Simple prices:') )
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine(_TRANS('Simple prices:'))
 
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
-			EnhTooltip.AddLine(_TRANS('  Seen').." |cffddeeff"..(seenCount+dayCount).."|r ".._TRANS('over').." |cffddeeff"..seenDays.."|r ".._TRANS('days:'))
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  Seen').." |cffddeeff"..(seenCount+dayCount).."|r ".._TRANS('over').." |cffddeeff"..seenDays.."|r ".._TRANS('days:'))
 		end
 		if (seenDays > 6) and dispAvg14 then
-			EnhTooltip.AddLine(_TRANS('  14 day average') , avg14*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  14 day average'), avg14*quantity)
 		end
 		if (seenDays > 2) and dispAvg7 then
-			EnhTooltip.AddLine(_TRANS('  7 day average') , avg7*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  7 day average'), avg7*quantity)
 		end
 		if (seenDays > 0) and dispAvg3 then
-			EnhTooltip.AddLine(_TRANS('  3 day average') , avg3*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  3 day average'), avg3*quantity)
 		end
 		if (seenDays > 0) and (avgmins > 0) and dispAvgMBO then
-			EnhTooltip.AddLine(_TRANS('  Average MBO') , avgmins*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  Average MBO'), avgmins*quantity)
 		end
 		if (dayCount > 0) then
-			EnhTooltip.AddLine(_TRANS('  Seen').." |cffddeeff"..dayCount.."|r ".._TRANS('today'), dayAverage*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  Seen').." |cffddeeff"..dayCount.."|r ".._TRANS('today'), dayAverage*quantity)
 		end
 		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
-			EnhTooltip.AddLine(_TRANS(' Today\'s Min BO') , minBuyout*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS(' Today\'s Min BO'), minBuyout*quantity)
 		end
 	end
 end

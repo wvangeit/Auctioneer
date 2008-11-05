@@ -67,6 +67,8 @@ local self = {}
 local lines = {}
 local addonName = "Informant"
 
+local tooltip = LibStub("nTipHelper:1")
+
 -- GLOBAL VARIABLES
 
 BINDING_HEADER_INFORMANT_HEADER = _INFM('BindingHeader')
@@ -143,6 +145,26 @@ function getItem(itemID, static)
 		buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
 		buy = tonumber(buy)
 		sell = tonumber(sell)
+	end
+	
+	-- if we have a local correction for this item, merge in the corrected data
+	local itemUpdateData
+	if (InformantLocalUpdates and InformantLocalUpdates.items) then
+		itemUpdateData = InformantLocalUpdates.items[ itemID ]
+		if (itemUpdateData) then
+			if (itemUpdateData.buy) then
+				buy = tonumber(itemUpdateData.buy)
+			end
+			if (itemUpdateData.sell) then
+				sell = tonumber(itemUpdateData.sell)
+			end
+			if (itemUpdateData.stack) then
+				stack = tonumber(itemUpdateData.stack)
+			end
+			if (itemUpdateData.quantity) then
+				quantity = tonumber(itemUpdateData.quantity)
+			end
+		end
 	end
 
 	-- if we have a local correction for this item, merge in the corrected data
@@ -441,12 +463,12 @@ local function showItem(itemInfo)
 		local count = itemInfo.itemCount or 1
 
 		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy, true)
-			local sgsc = EnhTooltip.GetTextGSC(sell, true)
+			local bgsc = tooltip:Coins(buy)
+			local sgsc = tooltip:Coins(sell)
 
 			if (count and (count > 1)) then
-				local bqgsc = EnhTooltip.GetTextGSC(buy*count, true)
-				local sqgsc = EnhTooltip.GetTextGSC(sell*count, true)
+				local bqgsc = tooltip:Coins(buy*count)
+				local sqgsc = tooltip:Coins(sell*count)
 				addLine(_INFM('FrmtInfoBuymult'):format(count, bgsc)..": "..bqgsc, "ee8822")
 				addLine(_INFM('FrmtInfoSellmult'):format(count, sgsc)..": "..sqgsc, "ee8822")
 			else
@@ -473,7 +495,7 @@ local function showItem(itemInfo)
 		if (itemInfo.isPlayerMade) then
 			addLine(_INFM('InfoPlayerMade'):format(itemInfo.tradeSkillLevel, itemInfo.tradeSkillName), "5060ff")
 		end
-
+		
 		local numReq = 0
 		local numRew = 0
 		local numSta = 0
@@ -720,6 +742,11 @@ end
 
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
+	
+	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
+	
+	this:RegisterEvent("MERCHANT_SHOW");
+	this:RegisterEvent("MERCHANT_UPDATE");
 
 	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
 
@@ -731,7 +758,9 @@ end
 
 local function frameLoaded()
 	Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, Informant.TooltipHandler)
+
+	tooltip:Activate()
+	tooltip:AddCallback(Informant.TooltipHandler, 300)
 
 	onLoad()
 
@@ -815,6 +844,11 @@ function onEvent(event, addon)
 		doUpdateMerchant();
 	end
 
+	
+	if( event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE" ) then
+		doUpdateMerchant();
+	end
+	
 end
 
 function frameActive(isActive)
@@ -1012,4 +1046,5 @@ Informant = {
 	OnEvent = onEvent,
 	DebugPrint = infDebugPrint
 }
+
 

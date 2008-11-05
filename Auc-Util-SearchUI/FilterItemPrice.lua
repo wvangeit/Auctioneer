@@ -49,8 +49,7 @@ function private.OnEnterSheet(button, row, index)
 		name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			GameTooltip:SetHyperlink(link)
-			EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
+			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
 		end
 	end
 end
@@ -203,12 +202,12 @@ function lib.Filter(item, searcher)
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then
-			return true, "Item ignored at "..EnhTooltip.GetTextGSC(ignorelist[sig], true)
+			return true, "Item ignored at "..AucAdvanced.Coins(ignorelist[sig], true)
 		end
 	end
 	if private.tempignorelist[sig] then
 		if price >= private.tempignorelist[sig] then
-			return true, "Item ignored for session at "..EnhTooltip.GetTextGSC(private.tempignorelist[sig], true)
+			return true, "Item ignored for session at "..AucAdvanced.Coins(private.tempignorelist[sig], true)
 		end
 	end
 end
@@ -232,12 +231,12 @@ function lib.PostFilter(item, searcher, buyorbid)
 	local sig = AucAdvanced.API.GetSigFromLink(item[Const.LINK])
 	if ignorelist[sig] then
 		if price >= ignorelist[sig] then
-			return true, "Item ignored at "..EnhTooltip.GetTextGSC(ignorelist[sig], true)
+			return true, "Item ignored at "..AucAdvanced.Coins(ignorelist[sig], true)
 		end
 	end
 	if private.tempignorelist[sig] then
 		if price >= private.tempignorelist[sig] then
-			return true, "Item ignored for session at "..EnhTooltip.GetTextGSC(private.tempignorelist[sig], true)
+			return true, "Item ignored for session at "..AucAdvanced.Coins(private.tempignorelist[sig], true)
 		end
 	end
 end

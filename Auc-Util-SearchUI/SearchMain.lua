@@ -146,8 +146,9 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	ItemTable[Const.ENCHANT]  = enchant
 	ItemTable[Const.SEED]  = seed
 
-	EnhTooltip.AddLine("SearchUI:")
-	EnhTooltip.LineColor(1,0.7,0.3)
+	tooltip:SetColor(1,0.7,0.3)
+	tooltip:AddLine("SearchUI:")
+
 	local active = false
 	for name, searcher in pairs(lib.Searchers) do
 		if lib.GetSetting("debug."..name) then
@@ -155,24 +156,24 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 			local success, returnvalue, value = lib.SearchItem(name, ItemTable, true, true)
 			if success then
 				if value then
-					EnhTooltip.AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue)
-					EnhTooltip.LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue)
+					tooltip:LineColor(1,0.7,0.3)
 				elseif returnvalue then
-					EnhTooltip.AddLine("  "..name.." profit:", returnvalue)
-					EnhTooltip.LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." profit:", returnvalue)
+					tooltip:LineColor(1,0.7,0.3)
 				else
-					EnhTooltip.AddLine("  "..name.." success")
-					EnhTooltip.LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." success")
+					tooltip:LineColor(1,0.7,0.3)
 				end
 			else
-				EnhTooltip.AddLine("  "..name..":"..returnvalue)
-				EnhTooltip.LineColor(1,0.7,0.3)
+				tooltip:AddLine("  "..name..":"..returnvalue)
+				tooltip:LineColor(1,0.7,0.3)
 			end
 		end
 	end
 	if not active then --if it hasn't changed, we're not enabled for any searcher
-		EnhTooltip.AddLine("  No debugging enabled")
-		EnhTooltip.LineColor(1,0.7,0.3)
+		tooltip:AddLine("  No debugging enabled")
+		tooltip:LineColor(1,0.7,0.3)
 	end
 end
 
@@ -561,7 +562,7 @@ function private.ignore()
 	local count = private.data.stack or 1
 	price = math.floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price)
-	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
+	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 	private.removeline()
 end
 
@@ -587,7 +588,7 @@ function private.ignoretemp()
 	local count = private.data.stack or 1
 	price = math.floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
-	print("SearchUI now ignoring "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true).." for the session")
+	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true).." for the session")
 	private.removeline()
 end
 
@@ -988,10 +989,10 @@ function lib.MakeGuiConfig()
 			end
 			if private.data.buyout and (private.data.buyout > 0) then
 				gui.frame.buyout:Enable()
-				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(private.data.buyout, true))
+				gui.frame.buyoutbox:SetText(AucAdvanced.Coins(private.data.buyout, true))
 			else
 				gui.frame.buyout:Disable()
-				gui.frame.buyoutbox:SetText(EnhTooltip.GetTextGSC(0, true))
+				gui.frame.buyoutbox:SetText(AucAdvanced.Coins(0, true))
 			end
 
 			if private.data.bid then
@@ -1029,9 +1030,8 @@ function lib.MakeGuiConfig()
 			name = GetItemInfo(link)
 			if link and name then
 				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-				GameTooltip:SetHyperlink(link)
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
-			end
+				AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
+			end		
 		end
 	end
 

@@ -51,10 +51,10 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if (get("util.itemsuggest.enablett")) then
 		local aimethod = lib.itemsuggest(hyperlink, quantity)
-		EnhTooltip.AddLine("Suggestion: ".. aimethod.. " this item")
+		tooltip:AddLine("Suggestion: ".. aimethod.. " this item")
 	end
 end
 
@@ -157,7 +157,7 @@ function lib.itemsuggest(hyperlink, quantity)
 	bestvalue = math.max(0, VendorValue, AppraiserValue, ProspectValue, DisenchantValue)
 	bestmethod = "Unknown"
 	if bestvalue == 0 then
-		bestmethod = "Unknown"
+		bestmethod = "Unkown"
 		bestvalue = "Unknown"
 	elseif bestvalue == VendorValue then
 		bestmethod = "Vendor"

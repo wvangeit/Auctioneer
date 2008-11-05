@@ -35,6 +35,7 @@ if not AucAdvanced then return end
 
 local lib = AucAdvanced
 local private = {}
+local tooltip = LibStub("nTipHelper:1")
 
 --Localization via babylonian
 local Babylonian = LibStub("Babylonian")
@@ -151,65 +152,16 @@ function lib.Print(...)
 	end
 end
 
-local function breakHyperlink(match, matchlen, ...)
-	local v
-	local n = select("#", ...)
-	for i = 2, n do
-		v = select(i, ...)
-		if (v:sub(1,matchlen) == match) then
-			return strsplit(":", v:sub(2))
-		end
-	end
-end
-lib.breakHyperlink = breakHyperlink
-lib.BreakHyperlink = breakHyperlink
-
-function lib.GetFactor(suffix, seed)
-	if (suffix < 0) then
-		return bit.band(seed, 65535)
-	end
-	return 0
-end
-
-local lastSaneLink, lastSanitized
-function lib.SanitizeLink(link)
-	local _
-	if not link then
-		return
-	end
-	if type(link) == "number" then
-		_, link = GetItemInfo(link)
-	end
-	if type(link) ~= "string" then
-		return
-	end
-	if lastSanitized and (lastSanitized == link or lastSaneLink == link) then
-		return lastSaneLink
-	end
-	lastSaneLink = string.gsub(link, "(|Hitem:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+):%d+(|h)", "%1:80%2")
-	lastSanitized = link
-	return lastSaneLink
-end
-
-function lib.DecodeLink(link)
-	local vartype = type(link)
-	if (vartype == "string") then
-		local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed,hLevel = breakHyperlink("Hitem:", 6, strsplit("|", link))
-		if (lType ~= "item") then return end
-		id = tonumber(id) or 0
-		enchant = tonumber(enchant) or 0
-		suffix = tonumber(suffix) or 0
-		seed = tonumber(seed) or 0
-		local factor = lib.GetFactor(suffix, seed)
-		return lType, id, suffix, factor, enchant, seed
-	elseif (vartype == "number") then
-		return "item", link, 0, 0, 0, 0
-	end
-	return
-end
+function lib.GetFactor(...) return tooltip:GetFactor(...) end
+function lib.SanitizeLink(...) return tooltip:SanitizeLink(...) end
+function lib.DecodeLink(...) return tooltip:DecodeLink(...) end
+function lib.GetLinkQuality(...) return tooltip:GetLinkQuality(...) end
+function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end
+lib.breakHyperlink = lib.BreakHyperlink
 
 function lib.GetFaction()
 	local realmName = GetRealmName()
+	local currentZone = GetMinimapZoneText()
 	local factionGroup = lib.GetFactionGroup()
 	if not factionGroup then return end
 
@@ -483,6 +435,21 @@ function lib.SendProcessorMessage(...)
 	for pos, engineLib in ipairs(modules) do
 		engineLib.Processor(...)
 	end
+end
+
+-- Returns the tooltip helper
+function lib.GetTooltip()
+	return tooltip
+end
+
+-- Turns a copper amount into colorized text
+function lib.Coins(amount)
+	return (tooltip:coins(amount))
+end
+
+-- Creates a new coin object
+function lib.CreateMoney(height)
+	return (tooltip:CreateMoney(height))
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

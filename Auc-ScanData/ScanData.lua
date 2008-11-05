@@ -253,9 +253,11 @@ function lib.GetDistribution(hyperlink)
 	return exact, suffix, base, myColors
 end
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
 	local getter = AucAdvanced.Settings.GetSetting
 	if not getter("scandata.tooltip.display") then return  end
+
+	tooltip:SetColor(0.3, 0.9, 0.8)
 
 	local full = false
 	if (getter("scandata.tooltip.modifier") and IsShiftKeyDown()) then
@@ -265,39 +267,31 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	local doColor = true
 	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
     local stacksize
-	-- hasColor does not exist and Colored does not use the first argument for anything.
-    -- if hasColor then doColor = true end
 
 	if full and (base+suffix+exact > 0) then
-		EnhTooltip.AddLine("Items in image:")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("Items in image:")
 		if (exact > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r exact "..lib.Colored(doColor, dist.exact, "matches"))
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  |cffddeeff"..exact.."|r exact "..lib.Colored(doColor, dist.exact, "matches"))
 		end
 		if (suffix > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r suffix "..lib.Colored(doColor, dist.suffix, "matches"))
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  |cffddeeff"..exact.."|r suffix "..lib.Colored(doColor, dist.suffix, "matches"))
 		end
 		if (base > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r base "..lib.Colored(doColor, dist.base, "matches"))
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  |cffddeeff"..exact.."|r base "..lib.Colored(doColor, dist.base, "matches"))
 		end
         if (dist.stack and #(dist.stack) > 1) then
             for stackSize, stackColor in pairs(dist.stack) do
-                EnhTooltip.AddLine("  Stacks of "..stackSize.."  "..lib.Colored(doColor, stackColor, "in image"))
+                tooltip:AddLine("  Stacks of "..stackSize.."  "..lib.Colored(doColor, stackColor, "in image"))
             end
         end
 	elseif base+suffix+exact > 0 then
 		if (suffix+base > 0) then
-			EnhTooltip.AddLine("|cffddeeff"..exact.." +"..(suffix+base).."|r matches "..lib.Colored(doColor, dist.all, "in image"))
+			tooltip:AddLine("|cffddeeff"..exact.." +"..(suffix+base).."|r matches "..lib.Colored(doColor, dist.all, "in image"))
 		else
-            EnhTooltip.AddLine("|cffddeeff"..exact.."|r matches "..lib.Colored(doColor, dist.exact, "in image"))
+            tooltip:AddLine("|cffddeeff"..exact.."|r matches "..lib.Colored(doColor, dist.exact, "in image"))
 		end
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	else
-		EnhTooltip.AddLine("No matches in image.")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("No matches in image.")
 	end
 end
 

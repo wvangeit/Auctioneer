@@ -266,6 +266,7 @@ end
 
 AucAdvanced.Settings.SetDefault("stat.classic.tooltip", false)
 AucAdvanced.Settings.SetDefault("stat.classic.enable", true)
+AucAdvanced.Settings.SetDefault("stat.classic.enable", true)
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
@@ -285,7 +286,7 @@ function private.SetupConfigGui(gui)
 
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -295,16 +296,15 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	if not quantity or quantity < 1 then quantity = 1 end
 	local median, seen, confidence = lib.GetPrice(hyperlink)
 
+	tooltip:SetColor(0.3, 0.9, 0.8)
+
 	if (median and median > 0) then
-		EnhTooltip.AddLine("AucClassic price: (x"..quantity..")", median*quantity)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("AucClassic price: (x"..quantity..")", median*quantity)
 
 		if (quantity > 1) then
-			EnhTooltip.AddLine("  (or individually)", median)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine("  (or individually)", median)
 		end
-		EnhTooltip.AddLine("  Seen Count: |cffddeeff"..seen.."|r")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:AddLine("  Seen Count: |cffddeeff"..seen.."|r")
 	end
 end
 

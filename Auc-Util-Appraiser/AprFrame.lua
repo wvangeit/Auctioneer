@@ -1149,9 +1149,9 @@ function private.CreateFrames()
 			frame.manifest.lines:Add(("  Total Bid"), totalBid)
 			frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
 			frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
-			frame.salebox.depositcost:SetText("Deposit:      "..EnhTooltip.GetTextGSC(totalDeposit, true))
-			frame.salebox.totalbid:SetText("Total Bid:    "..EnhTooltip.GetTextGSC(totalBid, true))
-			frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
+			frame.salebox.depositcost:SetText("Deposit:      "..AucAdvanced.Coins(totalDeposit, true))
+			frame.salebox.totalbid:SetText("Total Bid:    "..AucAdvanced.Coins(totalBid, true))
+			frame.salebox.totalbuyout:SetText("Total Buyout: "..AucAdvanced.Coins(totalBuy, true))
 			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 				local MatchStringList = {strsplit("\n", MatchString)}
 				for i in pairs(MatchStringList) do
@@ -1558,7 +1558,7 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * stack)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(fullStacks, stack, EnhTooltip.GetTextGSC(bidVal, true), EnhTooltip.GetTextGSC(buyVal, true)))
+						print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))
 					else
 						print((" - Queueing {{%d}} lots of {{%d}}"):format(fullStacks, stack))
 						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
@@ -1573,7 +1573,7 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * remain)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(1, remain, EnhTooltip.GetTextGSC(bidVal, true), EnhTooltip.GetTextGSC(buyVal, true)))
+						print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))
 					else
 						print((" - Queueing {{%d}} lots of {{%d}}"):format(1, remain))
 						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
@@ -1588,7 +1588,7 @@ function private.CreateFrames()
 				buyVal = lib.RoundBuy(itemBuy * stack)
 				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 				if dryRun then
-					print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(number, stack, EnhTooltip.GetTextGSC(bidVal, true), EnhTooltip.GetTextGSC(buyVal, true)))
+					print((" - Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack"):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))
 				else
 					print((" - Queueing {{%d}} lots of {{%d}}"):format(number, stack))
 					AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
@@ -1604,7 +1604,7 @@ function private.CreateFrames()
 			buyVal = lib.RoundBuy(itemBuy)
 			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 			if dryRun then
-				print((" - Pretending to post {{%d}} items at {{%s}} min and {{%s}} buyout"):format(number, EnhTooltip.GetTextGSC(bidVal, true), EnhTooltip.GetTextGSC(buyVal, true)))
+				print((" - Pretending to post {{%d}} items at {{%s}} min and {{%s}} buyout"):format(number, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))
 			else
 				print((" - Queueing {{%d}} items"):format(number))
 				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
@@ -1621,8 +1621,8 @@ function private.CreateFrames()
 		else
 			print(("Queued up {{%d}} items"):format(totalNum))
 		end
-		print(("Total minbid value: %s"):format(EnhTooltip.GetTextGSC(totalBid, true)))
-		print(("Total buyout value: %s"):format(EnhTooltip.GetTextGSC(totalBuy, true)))
+		print(("Total minbid value: %s"):format(AucAdvanced.Coins(totalBid, true)))
+		print(("Total buyout value: %s"):format(AucAdvanced.Coins(totalBuy, true)))
 		print("-----------------------------------")
 	end
 
@@ -1713,10 +1713,7 @@ function private.CreateFrames()
 				local link = item[7]
 				local count = item[6]
 				GameTooltip:SetOwner(frame.itembox, "ANCHOR_NONE")
-				GameTooltip:SetHyperlink(link)
-				if (EnhTooltip) then
-					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, count)
-				end
+				AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0)
 			end
@@ -1726,10 +1723,7 @@ function private.CreateFrames()
 				local count = frame.salebox.count
 				local _,name = strsplit("[",(strsplit("]",frame.salebox.name:GetText()))) --isolates the text between the []
 				GameTooltip:SetOwner(frame.salebox.icon, "ANCHOR_NONE")
-				GameTooltip:SetHyperlink(link)
-				if (EnhTooltip) then
-					EnhTooltip.TooltipCall(GameTooltip, name, link, -1, count)
-				end
+				AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint("TOPRIGHT", frame.salebox.icon, "TOPLEFT", -10, 0)
 			end
@@ -2403,6 +2397,28 @@ function private.CreateFrames()
 		obj[obj.pos]:Set(text, coins, r,g,b)
 	end
 
+	local function createMoney()
+		local n = moneyCount + 1
+		moneyCount = n
+		local name = LIBSTRING.."MoneyFrame"..n
+		m = CreateFrame("Frame",name,nil,"SmallMoneyFrameTemplate")
+		m:UnregisterAllEvents()
+		m:Show()
+		m:SetScript("OnHide",moneyFrameOnHide)
+		m:SetFrameStrata("TOOLTIP")
+		m.info = MoneyTypeInfo["STATIC"]
+
+		m.gold = getglobal(name .. "GoldButton")
+		m.silver = getglobal(name .. "SilverButton")
+		m.copper = getglobal(name .. "CopperButton")
+
+		m.gold:EnableMouse(false)
+		m.silver:EnableMouse(false)
+		m.copper:EnableMouse(false)
+
+		return m
+	end
+
 	local myStrata = frame.manifest:GetFrameStrata()
 
 	frame.manifest.header = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -2423,11 +2439,9 @@ function private.CreateFrames()
 		text:SetJustifyH("LEFT")
 		text:SetHeight(9)
 
-		local coins = CreateFrame("Frame", "AppraisalManifestCoins"..i, frame.manifest, "EnhancedTooltipMoneyTemplate")
+		local coins = AucAdvanced.CreateMoney(8)
 		coins:SetPoint("RIGHT", text, "RIGHT", 0,0)
 		coins:SetFrameStrata(myStrata)
-		coins.info.showSmallerCoins = "backpack"
-		coins:SetScale(0.85)
 
 		local line = { text, coins, id = i, Hide = lineHide, Set = lineSet, Reset = lineReset }
 		lines[i] = line
@@ -2494,7 +2508,7 @@ function private.CreateFrames()
 				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
 					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
 						frame.imageview.purchase.buy:Enable()
-						frame.imageview.purchase.buy.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.buyout, true))
+						frame.imageview.purchase.buy.price:SetText(AucAdvanced.Coins(private.buyselection.buyout, true))
 					else
 						frame.imageview.purchase.buy:Disable()
 						frame.imageview.purchase.buy.price:SetText("")
@@ -2502,9 +2516,9 @@ function private.CreateFrames()
 
 					if private.buyselection.minbid then
 						if private.buyselection.curbid and private.buyselection.curbid > 0 then
-							frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(math.ceil(private.buyselection.curbid*1.05), true))
+							frame.imageview.purchase.bid.price:SetText(AucAdvanced.Coins(math.ceil(private.buyselection.curbid*1.05), true))
 						else
-							frame.imageview.purchase.bid.price:SetText(EnhTooltip.GetTextGSC(private.buyselection.minbid, true))
+							frame.imageview.purchase.bid.price:SetText(AucAdvanced.Coins(private.buyselection.minbid, true))
 						end
 						frame.imageview.purchase.bid:Enable()
 					else

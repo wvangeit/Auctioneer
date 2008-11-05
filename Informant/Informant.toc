@@ -3,8 +3,8 @@
 ##
 ## Interface: 30000
 ## LoadOnDemand: 1
-## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar
+## Dependencies: Stubby
+## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar, LibExtraTip, TipHelper
 ## SavedVariables: InformantConfig, InformantLocalUpdates
 ##
 ## Version: <%version%> (<%codename%>)

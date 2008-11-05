@@ -54,10 +54,31 @@ if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 -- Load DebugLib
 local DebugLib = LibStub("DebugLib")
 
-function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantity, cost, additional)
-	if EnhTooltip.LinkType(hyperlink) ~= "item" then
+local tooltip
+
+function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, rlvl, itype, isubtype, stack, equiploc, texture)
+	if not tip then return end
+
+	tooltip:SetFrame(tip)
+
+	local extra = tooltip:GetExtra()
+	AucAdvanced.DecodeLink(item, extra)
+	
+	if extra.itemType ~= "item" then
+		tooltip:ClearFrame(tip)
 		return -- Auctioneer hooks into item tooltips only
 	end
+
+	local cost
+	if extra.event == "SetLootItem" then
+		cost = extra.price
+	elseif extra.event == "SetAuctionItem" then
+		cost = extra.bidAmount
+		if cost then cost = cost + minIncrement
+		else cost = extra.minBid
+		end
+	end
+	quantity = tonumber(quantity) or 1
 
 	-- Check to see if we need to force load scandata
 	local getter = AucAdvanced.Settings.GetSetting
@@ -67,36 +88,49 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 
 	local saneLink = AucAdvanced.SanitizeLink(hyperlink)
 
+	tooltip:SetColor(0.3, 0.9, 0.8)
+	tooltip:SetMoneyAsText(false)
+	tooltip:SetEmbed(false)
+
 	if getter("tooltip.marketprice.show") then
 		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
 		--we could just return here, but we want an indication that we don't have any data
 		if not seen then seen = 0 end
 		if not market then market = 0 end
 		if quantity == 1 then
-			EnhTooltip.AddLine("Market Price: (seen "..tostring(seen)..")", market)
+			tooltip:AddLine("Market Price: (seen "..tostring(seen)..")", market)
 		else
-			EnhTooltip.AddLine("Market Price x"..tostring(quantity)..": (seen "..tostring(seen)..")", market*quantity)
+			tooltip:AddLine("Market Price x"..tostring(quantity)..": (seen "..tostring(seen)..")", market*quantity)
 		end
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+
 		if IsShiftKeyDown() then
-			local modules = AucAdvanced.GetAllModules(nil, "Stat")
 			for pos, engineLib in ipairs(modules) do
 				if engineLib.GetItemPDF then
 					local pricearray = engineLib.GetPriceArray(saneLink)
 					if pricearray and pricearray.price and pricearray.price > 0 then
 						if quantity == 1 then
-							EnhTooltip.AddLine("  "..engineLib.libName.." price:", pricearray.price)
+							tooltip:AddLine("  "..engineLib.libName.." price:", pricearray.price)
 						else
-							EnhTooltip.AddLine("  "..engineLib.libName.." price x"..tostring(quantity)..":", pricearray.price*quantity)
+							tooltip:AddLine("  "..engineLib.libName.." price x"..tostring(quantity)..":", pricearray.price*quantity)
 						end
-						EnhTooltip.LineColor(0.3, 0.9, 0.8)
 					end
 				end
 			end
 		end
 	end
-	
-	AucAdvanced.SendProcessorMessage("tooltip", frame, name, saneLink, quality, quantity, cost, additional)
+
+	local modules = AucAdvanced.GetAllModules(nil, "Stat")
+	for pos, engineLib in ipairs(modules) do
+		if (engineLib.Processor) then
+			-- TODO: Make these defaults configurable
+			tooltip:SetColor(0.3, 0.9, 0.8)
+			tooltip:SetMoneyAsText(false)
+			tooltip:SetEmbed(false)
+
+			engineLib.Processor("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
+		end
+	end
+	tooltip:ClearFrame(tip)
 end
 
 function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
@@ -111,8 +145,8 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "RightButton") and (IsAltKeyDown()) then
-				local itemID = EnhTooltip.BreakLink(link)
-				if (itemID) then
+				local itemType, itemID = AucAdvanced.DecodeLink(link)
+				if (itemType and itemType == "item" and itemID) then
 					local itemName = GetItemInfo(tostring(itemID))
 					if (itemName) then
 						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
@@ -131,8 +165,8 @@ function private.ClickLinkHook(item, link, button)
 	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
-				local itemID = EnhTooltip.BreakLink(link)
-				if (itemID) then
+				local itemType, itemID = AucAdvanced.DecodeLink(link)
+				if (itemType and itemType == "item" and itemID) then
 					local itemName = GetItemInfo(tostring(itemID))
 					if itemName then
 						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
@@ -149,15 +183,23 @@ function private.HookAH()
 	AucAdvanced.SendProcessorMessage("auctionui")
 end
 
+function private.HookTT()
+	tooltip = AucAdvanced.GetTooltip()
+	tooltip:Activate()
+	tooltip:AddCallback(private.OnTooltip, 600)
+end
+
 function private.OnLoad(addon)
 	addon = addon:lower()
 
 	-- Check if the actual addon itself is loading
 	if (addon == "auc-advanced") then
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
-		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
 		Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, private.ClickBagHook)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
+
+		private.HookTT()
+		
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)

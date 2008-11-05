@@ -50,6 +50,8 @@ local doBidBroker
 local doPercentLess
 local doFindMaterial
 
+local tooltip = LibStub("nTipHelper:1")
+
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix.State.GUI_Registered = nil
 
@@ -424,9 +426,12 @@ function percentLessFilter(auction, args)
 
 	if not Auctioneer and AucAdvanced then
 		auction = AucAdvanced.API.UnpackImageItem(auction)
+		local itemType, itemId = tooltip:DecodeLink(auction.link)
+		if (itemType ~= "item") then return false end
+
 		auction.auctionId = auction.id
 		auction.count = auction.stackSize
-		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		auction.itemId = itemId
 		if (auction.sellerName == UnitName("player") or auction.amBidder) then
 			return false
 		end
@@ -472,9 +477,12 @@ function bidBrokerFilter(auction, args)
 
 	if not Auctioneer and AucAdvanced then
 		auction = AucAdvanced.API.UnpackImageItem(auction)
+		local itemType, itemId = tooltip:DecodeLink(auction.link)
+		if (itemType ~= "item") then return false end
+
 		auction.auctionId = auction.id
 		auction.count = auction.stackSize
-		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		auction.itemId = itemId
 		if (auction.sellerName == UnitName("player") or auction.amBidder) then
 			return false
 		end
@@ -526,9 +534,12 @@ function findMaterialFilter(auction, args)
 
 	if not Auctioneer and AucAdvanced then
 		auction = AucAdvanced.API.UnpackImageItem(auction)
+		local itemType, itemId = tooltip:DecodeLink(auction.link)
+		if (itemType ~= "item") then return false end
+
 		auction.auctionId = auction.id
 		auction.count = auction.stackSize
-		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		auction.itemId = itemId
 		if (auction.sellerName == UnitName("player") or auction.amBidder) then
 			return false
 		end
@@ -660,7 +671,7 @@ function doPercentLess(percentLess, minProfit)
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('minPercentLessThanHSP'))
 	minProfit = math.max(minProfit, Enchantrix.Settings.GetSetting('minProfitMargin'))
 
-	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, AucAdvanced.Coins(minProfit)));
 
 	profitMargins = {};
 
@@ -708,9 +719,9 @@ function doPercentLess(percentLess, minProfit)
 				local margin = auctionItem.margin;
 				local output = _ENCH('FrmtPctlessLine'):format(
 					whiteText(a.count.."x")..link,
-					EnhTooltip.GetTextGSC(value * a.count),
-					EnhTooltip.GetTextGSC(a.buyoutPrice),
-					EnhTooltip.GetTextGSC(profit * a.count),
+					AucAdvanced.Coins(value * a.count),
+					AucAdvanced.Coins(a.buyoutPrice),
+					AucAdvanced.Coins(profit * a.count),
 					whiteText(margin.."%")
 				);
 				Enchantrix.Util.ChatPrint(output);
@@ -723,7 +734,7 @@ function doPercentLess(percentLess, minProfit)
 	end
 
 	if (skipped_auctions > 0) then
-		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkipped'):format(skipped_auctions, EnhTooltip.GetTextGSC(minProfit)));
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkipped'):format(skipped_auctions, AucAdvanced.Coins(minProfit)));
 	end
 
 	if (skipped_skill > 0) then
@@ -755,7 +766,7 @@ function doBidBroker(minProfit, percentLess)
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('minPercentLessThanHSP'))
 	min_profit_value = math.max(minProfit, Enchantrix.Settings.GetSetting('minProfitMargin'))
 
-	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(EnhTooltip.GetTextGSC(minProfit), percentLess));
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(AucAdvanced.Coins(minProfit), percentLess));
 
 	profitMargins = {};
 
@@ -825,10 +836,10 @@ function doBidBroker(minProfit, percentLess)
 					end
 					local output = _ENCH('FrmtBidbrokerLine'):format(
 						whiteText(a.count.."x")..link,
-						EnhTooltip.GetTextGSC(value * a.count),
+						AucAdvanced.Coins(value * a.count),
 						bidText,
-						EnhTooltip.GetTextGSC(currentBid),
-						EnhTooltip.GetTextGSC(profit * a.count),
+						AucAdvanced.Coins(currentBid),
+						AucAdvanced.Coins(profit * a.count),
 						whiteText(margin.."%"),
 						whiteText(timeLeftString(a.timeLeft))
 					);
@@ -987,9 +998,9 @@ function doFindMaterial(material, percentLess)
 -- TODO - ccox - localize
 			local output = ("%s, Valued at: %s, BO: %s, Save: %s, Less %s, Chance %s, Yield %s"):format(
 				whiteText(a.count.."x")..link,
-				EnhTooltip.GetTextGSC(value * a.count),
-				EnhTooltip.GetTextGSC(a.buyoutPrice),
-				EnhTooltip.GetTextGSC(profit * a.count),
+				AucAdvanced.Coins(value * a.count),
+				AucAdvanced.Coins(a.buyoutPrice),
+				AucAdvanced.Coins(profit * a.count),
 				whiteText(margin.."%"),
 				whiteText((100 * percentChance).."%"),
 				whiteText(yield * a.count)

@@ -196,6 +196,14 @@ function private.CreateFrames()
 		end
 	end
 
+	--Beginner Tooltips script display for all UI elements 
+	function private.buttonTooltips(self, text)
+		if private.getOption("util.beancounter.displaybeginerTooltips") and text and self then
+			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetText(text)
+		end
+	end
+
 	--Add Configuration Button for those who dont use sidebar.
 	frame.Config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.Config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -139, -13)
@@ -205,6 +213,7 @@ function private.CreateFrames()
 	frame.Config:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
+	
 	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
 	function frame.IconClicked()
 		local objtype, _, link = GetCursorInfo()
@@ -276,6 +285,7 @@ function private.CreateFrames()
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
+	
 	--Search Button
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
@@ -357,6 +367,7 @@ function private.CreateFrames()
 	frame.bidCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
+	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
 	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) end)
@@ -377,6 +388,7 @@ function private.CreateFrames()
 	frame.auctionCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
+	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
 	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) end)
@@ -431,7 +443,7 @@ function private.CreateFrames()
 		if frame.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 			if link and name then
 				GameTooltip:SetHyperlink(link)
-				if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
+				private.tooltip:ShowItemLink(GameTooltip, link, 1)
 			else
 				GameTooltip:SetText(_BC('TooltipFailed'), 1.0, 1.0, 1.0) --"Unable to get Tooltip Info"
 			end
@@ -608,16 +620,20 @@ function private.relevelFrames(myLevel, ...)
 	end
 end
 --Created SearchUI reason code data into tooltips
-function private.processTooltip(_, _, _, _, itemLink, _, quantity, _, ...)
+function private.processTooltip(tip, itemLink, quantity)
 	if not itemLink then return end
 	if not get("util.beancounter.displayReasonCodeTooltip") then return end
 
+	private.tooltip:SetFrame(tip)
 	local reason, Time, bid = lib.API.getBidReason(itemLink, quantity)
 	debugPrint("Add to Tooltip", itemLink, reason)
-	if not reason then return end
-	if reason == "" then reason = "Unknown" end
-	Time = SecondsToTime((time() - Time))
+	if reason then
+		if reason == "" then reason = "Unknown" end
+		Time = SecondsToTime((time() - Time))
 
-	EnhTooltip.AddLine( string.format("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}", reason, Time ), tonumber(bid))
-	EnhTooltip.LineColor(0.9,0.6,0.2)
+		local text = ("Last won for |CFFFFFFFF%s |CFFE59933{|CFFFFFFFF%s |CFFE59933 ago}"):format(reason, Time)
+		local cost = tonumber(bid)
+		private.tooltip:AddLine(text, cost, 0.9,0.6,0.2)
+	end
+	private.tooltip:ClearFrame(tip)
 end
