@@ -2363,17 +2363,12 @@ function private.CreateFrames()
 			line[1]:SetTextColor(1,1,1)
 		end
 		line[1]:Show()
-		line[2]:Show()
 
-		local zero = false
-		local money = 0
 		if coins then
-			money = math.floor(tonumber(coins) or 0)
-			if money == 0 then zero = true end
-		end
-		line[2]:SetValue(money)
-		if zero then
-			getglobal("AppraisalManifestCoins"..id.."CopperButton"):Show()
+			line[2]:SetValue(math.floor(tonumber(coins) or 0))
+			line[2]:Show()
+		else
+			line[2]:Hide()
 		end
 	end
 
@@ -2382,6 +2377,7 @@ function private.CreateFrames()
 		local line = frame.manifest.lines[id]
 		line[1]:SetText("")
 		line[2]:SetValue(0)
+		line[2]:Hide()
 	end
 
 	local function linesClear(obj)
@@ -2413,14 +2409,14 @@ function private.CreateFrames()
 		else
 			text:SetPoint("TOPLEFT", lines[i-1][1], "BOTTOMLEFT", 0,0)
 		end
-		text:SetPoint("RIGHT", frame.manifest, "RIGHT", 0,0)
+		text:SetPoint("RIGHT", frame.manifest, "RIGHT", -8,0)
 		text:SetJustifyH("LEFT")
 		text:SetHeight(9)
 
 		local coins = AucAdvanced.CreateMoney(8)
+		coins:SetParent(frame.manifest)
 		coins:SetPoint("RIGHT", text, "RIGHT", 0,0)
 		coins:SetFrameStrata(myStrata)
-
 		local line = { text, coins, id = i, Hide = lineHide, Set = lineSet, Reset = lineReset }
 		lines[i] = line
 	end
