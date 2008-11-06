@@ -104,10 +104,8 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 	else
 		local text = string.format("%s x%d: %s bid/%s buyout", libName, quantity, coinsBid, coinsBuy)
 		local textea =  string.format("%s(Or individually: %s/%s)", whitespace(5), coinsBidEa, coinsBuyEa)
-		tooltip:AddLine(text)
-		tooltip:SetColor(0.3, .8, 0.7)
+		tooltip:AddLine(text, 0.3, .8, 0.7)
 		tooltip:AddLine(textea)
-		tooltip:SetColor(0.4, 1.0, 0.9)
 	end
 	if settingstr then
 		fixbid, fixbuy, _, _, stack = strsplit(":", settingstr)
