@@ -171,7 +171,7 @@ function private.PromptPurchase()
 	if private.CurAuction["count"] == 1 then
 		private.Prompt.Value:SetText(private.CurAuction["link"].." for "..AucAdvanced.Coins(private.CurAuction["price"],true).."?")
 	else
-		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..EnhTooltip.GetTextGSC(private.CurAuction["price"],true).."?")
+		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..AucAdvanced.Coins(private.CurAuction["price"],true).."?")
 	end
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
 	private.Prompt.Reason:SetText(private.CurAuction["reason"] or "")

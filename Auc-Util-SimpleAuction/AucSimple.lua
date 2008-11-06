@@ -63,7 +63,7 @@ local function whitespace(length)
 	return spaces
 end
 
-function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
 	if not get("util.simpleauc.tooltip") then return end
 	local realm = AucAdvanced.GetFaction()
 	local id = private.SigFromLink(link)
@@ -71,6 +71,8 @@ function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, addition
 	local market, seen, fixbuy, fixbid, stack
 	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
 	local reason = "Market"
+
+	tooltip:SetColor(0.4, 1.0, 0.9)
 
 	market, seen = AucAdvanced.API.GetMarketValue(link)
 	if (not market) or (market <= 0) or (not (seen > 5 or aSeen < 3)) then
@@ -98,15 +100,14 @@ function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, addition
 	end
 	if quantity == 1 then
 		local text = string.format("%s: %s bid/%s buyout", libName, coinsBid, coinsBuy)
-		EnhTooltip.AddLine(text)
-		EnhTooltip.LineColor(0.4, 1.0, 0.9)
+		tooltip:AddLine(text)
 	else
 		local text = string.format("%s x%d: %s bid/%s buyout", libName, quantity, coinsBid, coinsBuy)
 		local textea =  string.format("%s(Or individually: %s/%s)", whitespace(5), coinsBidEa, coinsBuyEa)
-		EnhTooltip.AddLine(text)
-		EnhTooltip.LineColor(0.4, 1.0, 0.9)
-		EnhTooltip.AddLine(textea)
-		EnhTooltip.LineColor(0.3, .8, 0.7)
+		tooltip:AddLine(text)
+		tooltip:SetColor(0.3, .8, 0.7)
+		tooltip:AddLine(textea)
+		tooltip:SetColor(0.4, 1.0, 0.9)
 	end
 	if settingstr then
 		fixbid, fixbuy, _, _, stack = strsplit(":", settingstr)
@@ -123,12 +124,10 @@ function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, addition
 		end
 		if quantity == 1 then
 			local text = string.format("%sFixed: %s bid/%s buyout", whitespace(12), coinsBid, coinsBuy)
-			EnhTooltip.AddLine(text)
-			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+			tooltip:AddLine(text)
 		else
 			local text = string.format("%sFixed x%d: %s bid/%s buyout", whitespace(12), quantity, coinsBid, coinsBuy)
-			EnhTooltip.AddLine(text)
-			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+			tooltip:AddLine(text)
 		end
 	end
 	if get("util.simpleauc.tooltip.undercut") then
@@ -140,16 +139,13 @@ function lib.ProcessTooltip(frame, name, link, quality, quantity, cost, addition
 			end
 			if quantity == 1 then
 				local text = string.format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
-				EnhTooltip.AddLine(text)
-				EnhTooltip.LineColor(0.4, 1.0, 0.9)
+				tooltip:AddLine(text)
 			else
 				local text = string.format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
-				EnhTooltip.AddLine(text)
-				EnhTooltip.LineColor(0.4, 1.0, 0.9)
+				tooltip:AddLine(text)
 			end
 		else
-			EnhTooltip.AddLine("  No Competition")
-			EnhTooltip.LineColor(0.4, 1.0, 0.9)
+			tooltip:AddLine("  No Competition")
 		end
 	end
 end

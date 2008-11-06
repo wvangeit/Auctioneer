@@ -444,7 +444,7 @@ end
 
 -- Turns a copper amount into colorized text
 function lib.Coins(amount)
-	return (tooltip:coins(amount))
+	return (tooltip:Coins(amount))
 end
 
 -- Creates a new coin object

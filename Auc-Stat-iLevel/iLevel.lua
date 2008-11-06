@@ -321,7 +321,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, _TRANS('Multiplies by current stack size if on') )
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -333,34 +333,29 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
 
 	if (mean and mean > 0) then
-		EnhTooltip.AddLine(libName.._TRANS(' prices (') ..count.._TRANS(' points):') )
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:SetColor(0.3, 0.9, 0.8)
+
+		tooltip:AddLine(libName.._TRANS(' prices (') ..count.._TRANS(' points):') )
 
 		if AucAdvanced.Settings.GetSetting("stat.ilevel.mean") then
-			EnhTooltip.AddLine(_TRANS('  Mean price') , mean*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('  Mean price') , mean*quantity)
 		end
 		if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.normal") then
-				EnhTooltip.AddLine(_TRANS('  Normalized') , average*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Normalized') , average*quantity)
 				if (quantity > 1) then
-					EnhTooltip.AddLine(_TRANS('  (or individually)') , average)
-					EnhTooltip.LineColor(0.3, 0.9, 0.8)
+					tooltip:AddLine(_TRANS('  (or individually)') , average)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.stdev") then
-				EnhTooltip.AddLine(_TRANS('  Std Deviation') , stdev*quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Std Deviation') , stdev*quantity)
                 if (quantity > 1) then
-                    EnhTooltip.AddLine(_TRANS('  (or individually)') , stdev)
-                    EnhTooltip.LineColor(0.3, 0.9, 0.8);
+                    tooltip:AddLine(_TRANS('  (or individually)') , stdev)
                 end
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.confid") then
-				EnhTooltip.AddLine(_TRANS('  Confidence: ') ..(floor(confidence*1000))/1000)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine(_TRANS('  Confidence: ') ..(floor(confidence*1000))/1000)
 			end
 		end
 	end

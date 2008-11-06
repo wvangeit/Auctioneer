@@ -161,7 +161,7 @@ function private.GetPriceModels()
 	return private.scanValueNames
 end
 
-function private.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
 	if not get("match.undercut.tooltip") then return end
 	local model = get("match.undercut.model")
 	if not model then return end
@@ -173,20 +173,21 @@ function private.ProcessTooltip(frame, name, link, quality, quantity, cost, addi
 	end
 	local matcharray = lib.GetMatchArray(link, market)
 	if not matcharray or not matcharray.value or matcharray.value <= 0 then return end
+
+	tooltip:SetColor(0.3, 0.9, 0.8)
+
 	if matcharray.competing == 0 then
-		EnhTooltip.AddLine(_TRANS('Undercut: ').."|cff00ff00".._TRANS('No competition'))
+		tooltip:AddLine(_TRANS('Undercut: ').."|cff00ff00".._TRANS('No competition'))
 	elseif matcharray.returnstring:find("Can not match") then
-		EnhTooltip.AddLine(_TRANS('Undercut:').." |cffff0000".._TRANS('Cannot Undercut'))
+		tooltip:AddLine(_TRANS('Undercut:').." |cffff0000".._TRANS('Cannot Undercut'))
 	elseif matcharray.returnstring:find("Lowest") then
 		if matcharray.value >= market then
-			EnhTooltip.AddLine(_TRANS('Undercut: ').."|cff40ff00".._TRANS('Competition Above market'))
+			tooltip:AddLine(_TRANS('Undercut: ').."|cff40ff00".._TRANS('Competition Above market'))
 		else
-			EnhTooltip.AddLine(_TRANS('Undercut: ').."|cfffff000".._TRANS('Undercutting competition'))
+			tooltip:AddLine(_TRANS('Undercut: ').."|cfffff000".._TRANS('Undercutting competition'))
 		end
 	end
-	EnhTooltip.LineColor(0.3, 0.9, 0.8)
-	EnhTooltip.AddLine(_TRANS('  Moving price ') ..tostring(matcharray.diff).."%:", matcharray.value)
-	EnhTooltip.LineColor(0.3, 0.9, 0.8)
+	tooltip:AddLine(_TRANS('  Moving price ') ..tostring(matcharray.diff).."%:", matcharray.value)
 end
 
 function lib.OnLoad()

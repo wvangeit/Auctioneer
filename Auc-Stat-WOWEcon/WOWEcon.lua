@@ -179,35 +179,33 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.wowecon.tooltip", false)
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("stat.wowecon.tooltip") then return end
 	lib.GetPriceArray(hyperlink)
 
 	if array.seen and array.seen > 0 then
-		EnhTooltip.AddLine(_TRANS('WOWEcon prices (seen ') ..array.seen..")")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		tooltip:SetColor(0.3, 0.9, 0.8)
+
+		tooltip:AddLine(_TRANS('WOWEcon prices (seen ') ..array.seen..")")
 
 		if array.specific then
-			EnhTooltip.AddLine(_TRANS('  Server price:') , array.price * quantity)
+			tooltip:AddLine(_TRANS('  Server price:') , array.price * quantity)
 		else
-			EnhTooltip.AddLine(_TRANS('  Global price:') , array.price * quantity)
+			tooltip:AddLine(_TRANS('  Global price:') , array.price * quantity)
 		end
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		if (quantity > 1) then
-			EnhTooltip.AddLine(_TRANS('    (or individually)') , array.price)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			tooltip:AddLine(_TRANS('    (or individually)') , array.price)
 		end
 
 		if IsModifierKeyDown() then
 			if array.specific then
-				EnhTooltip.AddLine(_TRANS('  Global (seen ') ..array.g_seen.."):", array.g_price * quantity)
+				tooltip:AddLine(_TRANS('  Global (seen ') ..array.g_seen.."):", array.g_price * quantity)
 			elseif array.s_seen > 0 then
-				EnhTooltip.AddLine_TRANS(('  Server (seen ') ..array.s_seen.."):", array.s_price * quantity)
+				tooltip:AddLine_TRANS(('  Server (seen ') ..array.s_seen.."):", array.s_price * quantity)
 			else
-				EnhTooltip.AddLine(_TRANS('  Never seen for server') )
+				tooltip:AddLine(_TRANS('  Never seen for server') )
 			end
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 
 	end

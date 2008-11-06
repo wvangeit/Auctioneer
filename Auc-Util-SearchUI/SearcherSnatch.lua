@@ -248,9 +248,7 @@ function private.OnEnterSnatch(button, row, index)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			if (EnhTooltip) then
-				EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1)
-			end
+			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, 1)
 		end
 	end
 end

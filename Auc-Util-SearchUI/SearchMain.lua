@@ -607,7 +607,7 @@ function private.snatch()
 	local count = private.data.stack or 1
 	price = math.floor(price/count) + 1 -- +1 so the current item also matches the search
 	lib.Searchers.Snatch.AddSnatch(link,price)
-	print("SearchUI will now snatch "..private.data.link.." at "..EnhTooltip.GetTextGSC(price, true))
+	print("SearchUI will now snatch "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 end
 
 local function keyPairs(t,f)
@@ -1211,7 +1211,7 @@ function lib.MakeGuiConfig()
 			for i,j in pairs(AucAdvanced.Buy.Private.BuyRequests) do
 				value = value + j["price"]
 			end
-			gui.frame.cancel.label:SetText(tostring(queuesize)..": "..EnhTooltip.GetTextGSC(value, true))
+			gui.frame.cancel.label:SetText(tostring(queuesize)..": "..AucAdvanced.Coins(value, true))
 			gui.frame.cancel.value = value
 			gui.frame.cancel:Enable()
 			gui.frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)

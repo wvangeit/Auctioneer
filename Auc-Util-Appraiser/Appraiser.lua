@@ -85,12 +85,13 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
 
+	tooltip:SetColor(0.3, 0.9, 0.8)
+
 	local value, bid, _, _, curModel = lib.GetPrice(hyperlink)
 		if value then
 			tooltip:AddLine("Appraiser (|cffddeeff"..curModel.."|r) x|cffddeeff"..quantity.."|r", value * quantity)
 			if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
-				EnhTooltip.AddLine("  Starting bid x|cffddeeff"..quantity.."|r", bid * quantity)
-				EnhTooltip.LineColor(0.3, 0.9, 0.8)
+				tooltip:AddLine("  Starting bid x|cffddeeff"..quantity.."|r", bid * quantity)
 			end
 		end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
