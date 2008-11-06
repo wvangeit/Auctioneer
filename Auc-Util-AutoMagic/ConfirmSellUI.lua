@@ -114,7 +114,7 @@ function lib.ASCOnEnter(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
+			AucAdvanced.ShowItemLink(GameTooltip, link, count)
 			end
 		end
 	end

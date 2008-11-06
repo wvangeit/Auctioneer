@@ -422,7 +422,7 @@ function autosell.OnBagListEnter(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, 1)
+			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
 			end
 		end
 	end
@@ -434,7 +434,7 @@ function autosell.OnEnter(button, row, index)
 		local name = GetItemInfo(link)
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, 1)
+			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
 			end
 		end
 	end

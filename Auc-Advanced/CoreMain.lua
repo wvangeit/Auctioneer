@@ -185,7 +185,6 @@ end
 
 function private.HookTT()
 	tooltip = AucAdvanced.GetTooltip()
-	AucAdvanced.Tooltip = tooltip
 	tooltip:Activate()
 	tooltip:AddCallback(private.OnTooltip, 600)
 end

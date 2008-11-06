@@ -623,7 +623,7 @@ function private.DoTooltip()
 	if not frame.CurItem.link then return end
 	GameTooltip:SetOwner(frame.icon, "ANCHOR_NONE")
 	GameTooltip:SetHyperlink(frame.CurItem.link)
-	AucAdvanced.Tooltip:ShowItemLink(GameTooltip, frame.CurItem.link, frame.CurItem.count)
+	AucAdvanced.ShowItemLink(GameTooltip, frame.CurItem.link, frame.CurItem.count)
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 10, 0)
 end

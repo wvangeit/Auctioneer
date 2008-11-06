@@ -1713,7 +1713,7 @@ function private.CreateFrames()
 				local link = item[7]
 				local count = item[6]
 				GameTooltip:SetOwner(frame.itembox, "ANCHOR_NONE")
-				AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
+				AucAdvanced.ShowItemLink(GameTooltip, link, count)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0)
 			end
@@ -1723,7 +1723,7 @@ function private.CreateFrames()
 				local count = frame.salebox.count
 				local _,name = strsplit("[",(strsplit("]",frame.salebox.name:GetText()))) --isolates the text between the []
 				GameTooltip:SetOwner(frame.salebox.icon, "ANCHOR_NONE")
-				AucAdvanced.Tooltip:ShowItemLink(GameTooltip, link, count)
+				AucAdvanced.ShowItemLink(GameTooltip, link, count)
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint("TOPRIGHT", frame.salebox.icon, "TOPLEFT", -10, 0)
 			end
