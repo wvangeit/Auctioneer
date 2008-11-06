@@ -74,7 +74,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		cost = extra.price
 	elseif extra.event == "SetAuctionItem" then
 		cost = extra.bidAmount
-		if cost then cost = cost + minIncrement
+		if cost then cost = cost + extra.minIncrement
 		else cost = extra.minBid
 		end
 	end
