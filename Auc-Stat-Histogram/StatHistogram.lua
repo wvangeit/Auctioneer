@@ -47,6 +47,8 @@ local totalstattable = {}
 local PDcurve = {}
 local newstats = {}
 local array = {}
+local frame
+local pricecache
 
 function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
@@ -71,6 +73,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
+	elseif (callbackType == "scanstats") then
+		pricecache = nil
 	end
 end
 
@@ -82,6 +86,7 @@ function private.GetPriceData()
 	local median = 0
 	local Qone = 0
 	local Qthree = 0
+	local percent40, percent30 = 0, 0
 	local count = stattable["count"]
 	debugPrint("getPricedata: "..tostring(stattable["count"]), libType.."-"..libName)
 	local recount = 0
@@ -98,6 +103,16 @@ function private.GetPriceData()
 			if Qone == 0 and count > 4 then --Q1 is meaningless with very little data
 				if recount >= count/4 then
 					Qone = i*stattable["step"]
+				end
+			end
+			if percent30 == 0 then
+				if recount >= count*0.3 then
+					percent30 = i*stattable["step"]
+				end
+			end
+			if percent40 == 0 then
+				if recount >= count*0.4 then
+					percent40 = i*stattable["step"]
 				end
 			end
 			if median == 0 then
@@ -125,7 +140,7 @@ function private.GetPriceData()
 			refactored = true
 		end
 	end
-	return median, Qone, Qthree, step, count, refactored
+	return median, Qone, Qthree, step, count, refactored, percent40, percent30
 end
 
 function lib.GetPrice(link, faction)
@@ -140,8 +155,13 @@ function lib.GetPrice(link, faction)
 		debugPrint("GetPrice: No data", libType.."-"..libName)
 		return
 	end
+	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
+		local median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
+		median, Qone, Qthree, step, count = tonumber(median), tonumber(Qone), tonumber(Qthree), tonumber(step), tonumber(count)
+		return median, Qone, Qthree, step, count
+	end
 	private.UnpackStats(data[faction][itemId][property])
-	local median, Qone, Qthree, step, count, refactored = private.GetPriceData()
+	local median, Qone, Qthree, step, count, refactored, percent40, percent30 = private.GetPriceData()
 	if refactored then
 		--data has been refactored, so we need to repack it
 		data[faction][itemId][property] = private.PackStats()
@@ -150,7 +170,11 @@ function lib.GetPrice(link, faction)
 	end
 	--we're done with the data, so clear the table
 	empty(stattable)
-	return median, Qone, Qthree, step, count
+	if not pricecache then pricecache = {} end
+	if not pricecache[faction] then pricecache[faction] = {} end
+	if not pricecache[faction][itemId] then pricecache[faction][itemId] = {} end
+	pricecache[faction][itemId][property] = strjoin(",", median or "", Qone or "", Qthree or "", step or "", count or "")
+	return median, Qone, Qthree, step, count, percent40, percent30
 end
 
 
@@ -197,8 +221,16 @@ function lib.GetItemPDF(link, faction)
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
 	if not data[faction][itemId][property] then return end
+	local median, Qone, Qthree, step, count, refactored
+	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
+		local median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
+		median, Qone, Qthree, step, count = tonumber(median), tonumber(Qone), tonumber(Qthree), tonumber(step), tonumber(count)
+	end
+
 	private.UnpackStats(data[faction][itemId][property])
-	local median, Qone, Qthree, step, count, refactored = private.GetPriceData()
+	if not count or count == 0 then
+		median, Qone, Qthree, step, count, refactored = private.GetPriceData()
+	end
 	--[[if median and (median/step > 85) and (median/step < 115) and (not sessionseen[tostring(itemId).."-"..tostring(property)]) then
 		--print(median/step.."      "..step)
 		sessionseen[tostring(itemId).."-"..tostring(property)] = true
@@ -224,6 +256,12 @@ function lib.GetItemPDF(link, faction)
 	if not count or count == 0 then
 		return
 	end
+	
+	if not pricecache then pricecache = {} end
+	if not pricecache[faction] then pricecache[faction] = {} end
+	if not pricecache[faction][itemId] then pricecache[faction][itemId] = {} end
+	pricecache[faction][itemId][property] = strjoin(",", median or "", Qone or "", Qthree or "", step or "", count or "")
+	
 	local curcount = 0
 	local area = 0
 	local targetarea = math.min(1, count/30) --if count is less than thirty, we're not very sure about the price
@@ -274,7 +312,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
-
 	empty(stattable)
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
@@ -358,6 +395,112 @@ function private.SetupConfigGui(gui)
 		_TRANS('  An item with median 100g, and IQR 10g, has very consistent data.  If the IQR was 100g, the prices ') ..
 		_TRANS('are all over the place.') )
 
+	frame = gui.tabs[id].content
+	private.frame = frame
+	
+	frame.slot = frame:CreateTexture(nil, "BORDER")
+	frame.slot:SetDrawLayer("Artwork") -- or the border shades it
+	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -200)
+	frame.slot:SetWidth(45)
+	frame.slot:SetHeight(45)
+	frame.slot:SetTexCoord(0.17, 0.83, 0.17, 0.83)
+	frame.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+	function frame.IconClicked()
+		local objtype, _, link = GetCursorInfo()
+		ClearCursor()
+		if objtype == "item" then
+			lib.SetWorkingItem(link)
+		else
+			lib.SetWorkingItem()
+		end
+	end
+	function frame.ClickHook(link)
+		if not frame.slot:IsVisible() then return end
+		lib.SetWorkingItem(link)
+	end
+	hooksecurefunc("HandleModifiedItemClick", frame.ClickHook)
+	frame.icon = CreateFrame("Button", nil, frame)
+	frame.icon:SetPoint("TOPLEFT", frame.slot, "TOPLEFT", 2, -2)
+	frame.icon:SetPoint("BOTTOMRIGHT", frame.slot, "BOTTOMRIGHT", -2, 2)
+	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
+	frame.icon:SetScript("OnClick", frame.IconClicked)
+	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
+	frame.icon:SetScript("OnEnter", function() --set mouseover tooltip
+			if not frame.link then return end
+			GameTooltip:SetOwner(frame.icon, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetHyperlink(frame.link)
+		end)
+	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	
+	frame.name = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	frame.name:SetPoint("TOPLEFT", frame.slot, "TOPRIGHT", 5,-2)
+	frame.name:SetPoint("RIGHT", frame, "RIGHT", -15)
+	frame.name:SetHeight(20)
+	frame.name:SetJustifyH("LEFT")
+	frame.name:SetJustifyV("TOP")
+	frame.name:SetText("Insert or Alt-Click Item to start")
+	frame.name:SetTextColor(0.5, 0.5, 0.7)
+
+	frame.bargraph = CreateFrame("Frame", nil, frame)
+	frame.bargraph:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -250)
+	frame.bargraph:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -30, -250)
+	frame.bargraph:SetHeight(300)
+	frame.bargraph:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	frame.bargraph:SetBackdropColor(0, 0, 0.0, 0.5)
+	frame.bargraph.bars = {}
+	frame.bargraph.pdf = {}
+	frame.bargraph.max = 100
+	local graphwidth = frame.bargraph:GetWidth()-10
+	local graphheight = frame.bargraph:GetHeight()-10
+	for i = 1, 300 do
+		frame.bargraph.bars[i] = frame.bargraph:CreateTexture(nil)
+		local bar = frame.bargraph.bars[i]
+		bar:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMLEFT", (graphwidth*(i-1)/300)+5, 5)
+		bar:SetWidth(graphwidth/300)
+		bar:SetTexture(0.2, 0.8, 0.2)
+		function bar:SetValue(value)
+			if value == 0 then value = 0.001 end
+			self:SetHeight((self:GetParent():GetHeight()-20)*value)
+		end
+		bar:SetValue(0)
+	end
+	for i = 1, 300 do
+		frame.bargraph.pdf[i] = frame.bargraph:CreateTexture(nil)
+		local pdf = frame.bargraph.pdf[i]
+		pdf.offset = (graphwidth*(i-1)/300)+5
+		pdf:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMLEFT", pdf.offset, 50)
+		pdf:SetWidth(graphwidth/300)
+		pdf:SetHeight(5)
+		pdf:SetTexture(.2, .2, 0.8, .6)
+		function pdf:SetValue(value)
+			local bottom = (self:GetParent():GetHeight()-20)*value
+			self:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMLEFT", self.offset, bottom)
+		end
+		pdf:SetValue(0)
+	end
+
+	frame.key = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	frame.key:SetPoint("BOTTOMRIGHT", frame.bargraph, "TOPRIGHT", 0, 2)
+	frame.key:SetPoint("TOPLEFT", frame.bargraph, "TOPLEFT", 5, 22)
+	frame.key:SetJustifyH("RIGHT")
+	frame.key:SetJustifyV("TOP")
+	frame.key:SetText("|cff3fff3fRaw Data   |cffff3f3fMedian   |cff3f3fffPrice Probability")
+	
+	frame.med = frame.bargraph:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.med:SetPoint("TOP", frame.bargraph, "BOTTOM", -50, -10)
+	frame.med:SetPoint("BOTTOM", frame.bargraph, "BOTTOM", -50, -25)
+	frame.med:SetWidth(150)
+
+	frame.max = frame.bargraph:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.max:SetPoint("TOPRIGHT", frame.bargraph, "BOTTOMRIGHT", 0, -10)
+	frame.max:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMRIGHT", -150, -25)
+	
+	
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _TRANS('Histogram options') )
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
@@ -375,6 +518,93 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.quantmul", _TRANS('Multiply by Stack Size') )
 	gui:AddTip(id, _TRANS('Multiplies by current Stack Size if on') )
+	
+	gui:AddControl(id, "Subhead",    0,    "Item Data Viewer")
+	
+end
+
+function lib.SetWorkingItem(link)
+	--clear the graph
+	frame.name:SetText("Insert or Alt-Click Item to start")
+	frame.icon:SetNormalTexture(nil) --set icon texture
+	frame.link = nil
+	for i = 1,300 do
+		frame.bargraph.bars[i]:SetValue(0)
+		frame.bargraph.bars[i]:SetTexture(0.2, 0.8, 0.2)
+		frame.bargraph.pdf[i]:SetValue(0)
+	end
+	
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
+	if (linkType ~= "item") then return end
+	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
+	if not name or not texture then return end
+	frame.name:SetText(link)
+	frame.link = link
+	frame.icon:SetNormalTexture(texture) --set icon texture
+	
+	empty(stattable)
+	if (factor and factor ~= 0) then property = property.."x"..factor end
+
+	if not faction then faction = AucAdvanced.GetFaction() end
+	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
+		debugPrint("GetPrice: No data", libType.."-"..libName)
+		return
+	end
+	private.UnpackStats(data[faction][itemId][property])
+	
+	local maxvalue = 0
+	local indexes = 0
+	local count = stattable["count"]
+	local recount = 0
+	local median = 0
+	for i = stattable["min"], stattable["max"] do
+		indexes = indexes +1
+		if stattable[i] > maxvalue then maxvalue = stattable[i] end
+		recount = recount + stattable[i]
+		if median == 0 then
+			if recount >= count/2 then
+				median = i
+				frame.bargraph.bars[i]:SetTexture(0.8, 0.2, 0.2)
+			end
+		end
+	end
+	for i = stattable["min"], stattable["max"] do
+		frame.bargraph.bars[i]:SetValue(stattable[i]/maxvalue)
+	end
+	
+	--now show the PD curve
+	empty(PDcurve)
+	PDcurve["step"] = stattable["step"]
+	PDcurve["min"] = stattable["min"]
+	PDcurve["max"] = stattable["max"]
+	local curcount = 0
+	count = stattable["count"]
+	maxvalue = 0
+	for i = stattable["min"], stattable["max"] do
+		curcount = curcount + stattable[i]
+		if count == stattable[i] then
+			PDcurve[i] = 1
+		else
+			PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+		end
+		if PDcurve[i] > maxvalue then
+			maxvalue = PDcurve[i]
+		end
+	end
+	for i = PDcurve["min"], PDcurve["max"] do
+		PDcurve[i]= (PDcurve[i] or 0)
+	end
+	
+	for i = 1,300 do
+		if (i >= PDcurve["min"]) and (i <= PDcurve["max"]) then
+			frame.bargraph.pdf[i]:SetValue(PDcurve[i])
+		else
+			frame.bargraph.pdf[i]:SetValue(0)
+		end
+	end
+
+	frame.med:SetText("Median: "..AucAdvanced.Coins(median*stattable["step"], true))
+	frame.max:SetText("Max: "..AucAdvanced.Coins(300*stattable["step"], true))
 end
 
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
@@ -386,7 +616,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 
 	local quantmul = get("stat.histogram.quantmul")
 	if (not quantmul) or (not quantity) or (quantity < 1) then quantity = 1 end
-	local median, Qone, Qthree, step, count = lib.GetPrice(hyperlink)
+	local median, Qone, Qthree, step, count, percent40, percent30 = lib.GetPrice(hyperlink)
 	if not count then
 		count = 0
 	end
