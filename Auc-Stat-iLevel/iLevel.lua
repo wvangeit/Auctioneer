@@ -68,6 +68,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
+	elseif (callbackType == "scanstats") then
+		pricecache = nil
 	end
 end
 
@@ -75,7 +77,6 @@ lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 	if (not data) then private.makeData() end
-	pricecache = nil
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
