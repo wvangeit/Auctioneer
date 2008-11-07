@@ -763,6 +763,8 @@ function lib.AttachToAH()
 	gui:SetPosition(gui.AuctionFrame, width, height, 5, 7+height)
 	gui:HideBackdrop()
 	gui:EnableMouse(false)
+	gui:RealSetScale(0.9999)
+	gui:RealSetScale(1.0)
 	gui:Show()
 	private.isAttached = true
 end
@@ -773,6 +775,8 @@ function lib.DetachFromAH()
 	gui:SetPosition()
 	gui:EnableMouse(true)
 	gui:ShowBackdrop()
+	gui:RealSetScale(0.9999)
+	gui:RealSetScale(private.scale)
 	gui:Hide()
 	private.isAttached = nil
 end
@@ -863,6 +867,14 @@ function lib.MakeGuiConfig()
 	gui.searchers = {}
 	gui.AddSearcher = function (self, searchType, searchDetail, searchPos)
 		lib.AddSearcher(self, searchType, searchDetail, searchPos)
+	end
+
+	-- Only set scale if the gui isn't attached to the AH frame
+	gui.RealSetScale = gui.SetScale
+	function gui:SetScale(scale)
+		private.scale = scale
+		if private.isAttached then return end
+		gui:RealSetScale(scale)
 	end
 
 	private.gui = gui
