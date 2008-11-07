@@ -545,7 +545,7 @@ function lib.SetWorkingItem(link)
 	empty(stattable)
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
+	local faction = AucAdvanced.GetFaction()
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
 		debugPrint("GetPrice: No data", libType.."-"..libName)
 		return
