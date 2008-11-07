@@ -92,6 +92,8 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 	tooltip:SetMoneyAsText(false)
 	tooltip:SetEmbed(false)
 
+	local modules = AucAdvanced.GetAllModules(nil, "Stat")
+
 	if getter("tooltip.marketprice.show") then
 		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
 		--we could just return here, but we want an indication that we don't have any data
@@ -119,7 +121,6 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		end
 	end
 
-	local modules = AucAdvanced.GetAllModules(nil, "Stat")
 	for pos, engineLib in ipairs(modules) do
 		if (engineLib.Processor) then
 			-- TODO: Make these defaults configurable
