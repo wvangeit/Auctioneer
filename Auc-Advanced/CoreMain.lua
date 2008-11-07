@@ -92,7 +92,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 	tooltip:SetMoneyAsText(false)
 	tooltip:SetEmbed(false)
 
-	local modules = AucAdvanced.GetAllModules(nil, "Stat")
+	local modules = AucAdvanced.GetAllModules()
 
 	if getter("tooltip.marketprice.show") then
 		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
