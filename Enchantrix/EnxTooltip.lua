@@ -682,7 +682,7 @@ function hookTooltip(tip, link, count, name, link, quality)
 
 	local itemType, itemId = tooltip:DecodeLink(link)
 	if itemType == "item" then
-		itemTooltip(tooltip, name, link, quality, count)
+		itemTooltip(tooltip, name, link, quality, count or 1)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(tooltip, name, link, true)
 		end
