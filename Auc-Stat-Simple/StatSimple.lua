@@ -334,7 +334,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "why have variance",
 		_TRANS('SIMP_Help_WhyVariance') ,--What\'s the point of a variance on minimum buyout?
-		_TRANS('SIMP_Help_WhyVarianceAswer') --Because some people put their items on the market for rediculous price (too low or too high), so this helps keep the average from getting out of hand.
+		_TRANS('SIMP_Help_WhyVarianceAnswer') --Because some people put their items on the market for rediculous price (too low or too high), so this helps keep the average from getting out of hand.
 		)
 
 	gui:AddHelp(id, "why multiply stack size simple",
@@ -387,30 +387,30 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then
-		tooltip:AddLine(_TRANS('SIMP_Interface_SimplePrices') )--Simple prices:
+		tooltip:AddLine(_TRANS('SIMP_Tooltip_SimplePrices') )--Simple prices:
 
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
-			tooltip:AddLine(_TRANS('SIMP_Interface_SeenNumberDays'):format("|cffddeeff", seenCount+dayCount, "|r ", "|cffddeeff", seenDays, "|r")) --"  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
-
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_SeenNumberDays'):format("|cffddeeff", seenCount+dayCount, "|r", "|cffddeeff", seenDays, "|r") ) --"  Seen %s%s%s over %s%s%s days:")
+			
 		end
 		if (seenDays > 6) and dispAvg14 then
-			tooltip:AddLine(_TRANS('SIMP_Interface_14DayAverage') , avg14*quantity)--  14 day average
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_14DayAverage') , avg14*quantity)--  14 day average
 		end
 		if (seenDays > 2) and dispAvg7 then
-			tooltip:AddLine(_TRANS('SIMP_Interface_7DayAverage') , avg7*quantity) --  7 day average
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_7DayAverage') , avg7*quantity) --  7 day average
 		end
 		if (seenDays > 0) and dispAvg3 then
-			tooltip:AddLine(_TRANS('SIMP_Interface_3DayAverage') , avg3*quantity)--  3 day average
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_3DayAverage') , avg3*quantity)--  3 day average
 		end
 		if (seenDays > 0) and (avgmins > 0) and dispAvgMBO then
-			tooltip:AddLine(_TRANS('SIMP_Interface_AverageMBO') , avgmins*quantity)--  Average MBO
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_AverageMBO') , avgmins*quantity)--  Average MBO
 		end
 		if (dayCount > 0) then
-			tooltip:AddLine(_TRANS('  Seen').." |cffddeeff"..dayCount.."|r ".._TRANS('today'), dayAverage*quantity)
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_SeenToday'):format("|cffddeeff",dayCount ,"|r") , dayAverage*quantity) --Seen %s%s%s today
 		end
 		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
-			tooltip:AddLine(_TRANS('SIMP_Interface_TodaysMBO') , minBuyout*quantity)-- Today's Min BO
+			tooltip:AddLine(_TRANS('SIMP_Tooltip_TodaysMBO') , minBuyout*quantity)-- Today's Min BO
 		end
 	end
 end
@@ -549,10 +549,11 @@ function private.ClearData(faction, realmName)
 	if (not AAStatSimpleData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFaction()
 	if (realmName) then
-		print(_TRANS('Clearing Simple stats for').." {{"..faction.."}}")
+		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..faction.."}}") --Clearing Simple stats for
 	else
 		realmName = GetRealmName()
-		print(_TRANS('Clearing Simple stats for').." {{"..faction.."}} ".._TRANS('on').." {{"..realmName.."}}")
+		print(_TRANS('SIMP_Interface_ClearingSimpleStats'):format(faction, realmName) )--Clearing Simple stats for {{%s}} on {{%s}}
+		
 	end
 	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][faction]) then
 		AAStatSimpleData.RealmData[realmName][faction] = nil
