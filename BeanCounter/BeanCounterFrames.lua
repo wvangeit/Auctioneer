@@ -198,7 +198,7 @@ function private.CreateFrames()
 
 	--Beginner Tooltips script display for all UI elements 
 	function private.buttonTooltips(self, text)
-		if private.getOption("util.beancounter.displaybeginerTooltips") and text and self then
+		if get("util.beancounter.displaybeginerTooltips") and text and self then
 			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 			GameTooltip:SetText(text)
 		end
@@ -443,7 +443,7 @@ function private.CreateFrames()
 		if frame.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
 			if link and name then
 				GameTooltip:SetHyperlink(link)
-				private.tooltip:ShowItemLink(GameTooltip, link, 1)
+				--private.tooltip:ShowItemLink(GameTooltip, link, 1)
 			else
 				GameTooltip:SetText(_BC('TooltipFailed'), 1.0, 1.0, 1.0) --"Unable to get Tooltip Info"
 			end
