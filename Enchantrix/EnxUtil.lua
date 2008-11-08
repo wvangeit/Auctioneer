@@ -433,7 +433,7 @@ function getItemIdFromSig(sig)
 end
 
 function getItemIdFromLink(link)
-	local itemType, itemId = tooltip:BreakHyperlink(link)
+	local itemType, itemId = tooltip:DecodeLink(link)
 	if (itemType == "item") then
 		return itemId
 end
