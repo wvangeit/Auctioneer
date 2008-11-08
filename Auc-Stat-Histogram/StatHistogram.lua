@@ -88,6 +88,7 @@ function private.GetPriceData()
 	local Qthree = 0
 	local percent40, percent30 = 0, 0
 	local count = stattable["count"]
+	local refactored = false
 	debugPrint("getPricedata: "..tostring(stattable["count"]), libType.."-"..libName)
 	local recount = 0
 	--now find the Q1, median, and Q3 values
@@ -126,11 +127,13 @@ function private.GetPriceData()
 				end
 			end
 		end
-		count = recount --We've just rechecked the count, so save the correct value
-		stattable["count"] = count
+		if count ~= recount then
+			count = recount --We've just rechecked the count, so save the correct value
+			stattable["count"] = count
+			refactored = true
+		end
 	end
 	local step = stattable["step"]
-	local refactored = false
 	if count > 20 then --we've seen enough to get a fairly decent price to base the precision on
 		if (step > (median/85)) and (step > 1) then
 			private.refactor(median*3, 300)
@@ -213,6 +216,7 @@ end
 function lib.GetItemPDF(link, faction)
 	if not get("stat.histogram.enable") then return end
 	empty(PDcurve)
+	empty(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -223,7 +227,7 @@ function lib.GetItemPDF(link, faction)
 	if not data[faction][itemId][property] then return end
 	local median, Qone, Qthree, step, count, refactored
 	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
-		local median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
+		median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
 		median, Qone, Qthree, step, count = tonumber(median), tonumber(Qone), tonumber(Qthree), tonumber(step), tonumber(count)
 	end
 
@@ -231,22 +235,6 @@ function lib.GetItemPDF(link, faction)
 	if not count or count == 0 then
 		median, Qone, Qthree, step, count, refactored = private.GetPriceData()
 	end
-	--[[if median and (median/step > 85) and (median/step < 115) and (not sessionseen[tostring(itemId).."-"..tostring(property)]) then
-		--print(median/step.."      "..step)
-		sessionseen[tostring(itemId).."-"..tostring(property)] = true
-		local index = 1
-		for n in AucAdvancedStatHistogramTotalData:gmatch("[0-9]+") do
-			totalstattable[index] = tonumber(n)
-			index = index + 1
-		end
-		for i = stattable["min"], stattable["max"] do
-			totalstattable[i] = totalstattable[i] + math.floor(1000*stattable[i]/stattable["count"])
-		end
-		AucAdvancedStatHistogramTotalData = tostring(totalstattable[1])
-		for i = 2, 300 do
-			AucAdvancedStatHistogramTotalData = AucAdvancedStatHistogramTotalData..","..tostring(totalstattable[i] or 0)
-		end
-	end]]
 	if refactored then
 		--data has been refactored, so we need to repack it
 		data[faction][itemId][property] = private.PackStats()
