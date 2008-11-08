@@ -469,7 +469,7 @@ end
 
 
 	if value > evalPrice then
-		if (not get(lcName..".disabletooltip")) then
+		if doTooltip and (not get(lcName..".disabletooltip")) then
 			tooltip:AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")					
 		end
 
@@ -479,13 +479,13 @@ end
 	end
 
 	if emcAdjustedValue > evalPrice then
-		if (not get(lcName..".disabletooltip")) then
+		if doTooltip and (not get(lcName..".disabletooltip")) then
 			tooltip:AddLine("|cff00FF00 EMC: Convert me to sell! |r")			
 		end
 		emcBuyFor = "EMC: Convert 2 sell"
 		emcTrueSellValue = emcAdjustedValue
 	else
-		if (not get(lcName..".disabletooltip")) then
+		if doTooltip and (not get(lcName..".disabletooltip")) then
 			tooltip:AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
 		end
 		emcBuyFor = "EMC: Just sell me"
