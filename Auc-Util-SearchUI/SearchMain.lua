@@ -776,7 +776,7 @@ function lib.DetachFromAH()
 	gui:EnableMouse(true)
 	gui:ShowBackdrop()
 	gui:RealSetScale(0.9999)
-	gui:RealSetScale(private.scale)
+	gui:RealSetScale(private.scale or 1)
 	gui:Hide()
 	private.isAttached = nil
 end
