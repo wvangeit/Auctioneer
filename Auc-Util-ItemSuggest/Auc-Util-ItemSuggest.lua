@@ -157,7 +157,7 @@ function lib.itemsuggest(hyperlink, quantity)
 	bestvalue = math.max(0, VendorValue, AppraiserValue, ProspectValue, DisenchantValue)
 	bestmethod = "Unknown"
 	if bestvalue == 0 then
-		bestmethod = "Unkown"
+		bestmethod = "Unknown"
 		bestvalue = "Unknown"
 	elseif bestvalue == VendorValue then
 		bestmethod = "Vendor"
