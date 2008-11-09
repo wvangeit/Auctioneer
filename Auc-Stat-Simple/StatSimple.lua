@@ -162,8 +162,10 @@ function lib.GetPrice(hyperlink, faction, realm)
             end
         end
 	end
-
-    local mean = private.sum(unpack(dataset))/#dataset;
+    local mean = 0
+	if dataset and #dataset > 0 then
+		mean = private.sum(unpack(dataset))/#dataset;
+	end
     local variance = 0;
     for k,v in ipairs(dataset) do
         variance = variance + (mean - v)^2;
@@ -185,7 +187,7 @@ local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
 	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
 	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+	empty(array)
 
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
