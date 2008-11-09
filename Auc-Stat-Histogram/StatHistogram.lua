@@ -275,7 +275,7 @@ function lib.GetItemPDF(link, faction)
 	for i = PDcurve["min"], PDcurve["max"] do
 		PDcurve[i]= (PDcurve[i] or 0) * areamultiplier
 	end
-	return private.ItemPDF, PDcurve["min"]*PDcurve["step"], PDcurve["max"]*PDcurve["step"]
+	return private.ItemPDF, PDcurve["min"]*PDcurve["step"], PDcurve["max"]*PDcurve["step"], targetarea
 end
 
 lib.ScanProcessors = {}
