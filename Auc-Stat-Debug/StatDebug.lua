@@ -132,7 +132,8 @@ end
 
 -- Send back a fake PDF. We don't want Debug to influence statistic scores
 function lib.GetItemPDF(hyperlink)
-    return fakePDF, private.getBounds(lib.GetPrice(hyperlink))
+    local low, high = private.getBounds(lib.GetPrice(hyperlink));
+    return fakePDF, low, high, 0;
 end
 
 function lib.OnLoad(addon)
