@@ -68,6 +68,8 @@ local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdva
 ]]
 
 do
+    local EPSILON = 0.000001;
+    local IMPROVEMENT_FACTOR = 0.8;
     local cache = {};
     local pdfList = {};
     local engines = {};
@@ -99,7 +101,7 @@ do
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
         if not itemLink then return; end
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+        local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
         -- Look up in the cache if it's recent enough
         local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
@@ -110,23 +112,25 @@ do
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
 
-	if #engines == 0 then
-		-- Rebuild the engine cache
-		local modules = AucAdvanced.GetAllModules(nil, "Stat")
-		for pos, engineLib in ipairs(modules) do
-			local fn = engineLib.GetItemPDF;
-			if fn then
-			    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
-			elseif nLog then
-			    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
-			end
-		end
-	end
+        if #engines == 0 then
+            -- Rebuild the engine cache
+            local modules = AucAdvanced.GetAllModules(nil, "Stat")
+            for pos, engineLib in ipairs(modules) do
+                local fn = engineLib.GetItemPDF;
+                if fn then
+                    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
+                elseif nLog then
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+                end
+            end
+        end
 
         -- Run through all of the stat modules and get the PDFs
-        local c, oldPdfMax = 0, #pdfList;
+        local c, oldPdfMax, total = 0, #pdfList, 0;
         for _, engine in ipairs(engines) do
-            local i, min, max = engine.pdf(saneLink, serverKey);
+            local i, min, max, area = engine.pdf(saneLink, serverKey);
+            total = total + (area or 1);                                -- Add total area, assume 1 if not supplied
+            
             local priceArray = engine.array(saneLink, serverKey);
 
             if priceArray and (priceArray.seen or 0) > seen then
@@ -151,42 +155,12 @@ do
 
 
 
-        -- Ok, integrate from -10G to 10000G through all functions
-        local total, lastTotal = 0, 0;
+        -- Determine the totals from the PDFs
         local delta = (upperLimit - lowerLimit) * .01;
 
-
-        if #pdfList == 0 or delta < 0.000001 then
+        if #pdfList == 0 or delta < EPSILON or total < EPSILON then
             return;                 -- No PDFs available for this item
         end
-
-        repeat
-
-            lastTotal = total;
-            total = 0;
-            delta = delta * 0.75;
-
-            assert(delta > 0, "Infinite loop detected on pass 1 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
-
-            for i = 1, #pdfList do
-                local thisCall = pdfList[i];
-                for x = lowerLimit, upperLimit, delta do
-                    total = total + thisCall(x);
-                end
-            end
-
-            total = total * delta;
-
-            if total ~= total or total == 0 then
-                if nLog and total ~= total then
-                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-                elseif nLog then
-                    nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the integral for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-                end
-                return;                 -- Cannot calculate: NaN
-            end
-
-        until abs(total-lastTotal)/total < ERROR;
 
         local limit = total/2;
         local midpoint, lastMidpoint = 0, 0;
@@ -198,7 +172,7 @@ do
             lastMidpoint = midpoint;
             total = 0;
 
-            assert(delta > 0, "Infinite loop detected on pass 2 of market pricing for "..(GetItemInfo(itemLink) or itemLink));
+            assert(delta > 0, "Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink));
 
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
@@ -211,7 +185,7 @@ do
                 end
             end
 
-            delta = delta * 0.8;
+            delta = delta * IMPROVEMENT_FACTOR;
 
             if midpoint ~= midpoint or midpoint == 0 then
                 if nLog and midpoint ~= midpoint then
