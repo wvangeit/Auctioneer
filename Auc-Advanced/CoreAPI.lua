@@ -70,6 +70,7 @@ local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdva
 do
     local EPSILON = 0.000001;
     local IMPROVEMENT_FACTOR = 0.8;
+    local CORRECTION_FACTOR = 1000; -- 10 silver per gold, integration steps at tail
     local cache = {};
     local pdfList = {};
     local engines = {};
@@ -164,9 +165,16 @@ do
 
         local limit = total/2;
         local midpoint, lastMidpoint = 0, 0;
-
+        
+        -- Adjust the total such that we drop off the left/right tail from the total        
+        local accumulator = 0;
+        for _, pdf in ipairs(pdfList) do
+            for x = lowerLimit, lowerLimit - (upperLimit - lowerLimit), -CORRECTION_FACTOR * (upperLimit-lowerLimit) / 10000 do
+                accumulator = accumulator + pdf(x) * CORRECTION_FACTOR;
+            end
+        end            
         -- Now find the 50% point
-        total = 0;
+        total = accumulator;
 
         repeat
             lastMidpoint = midpoint;
