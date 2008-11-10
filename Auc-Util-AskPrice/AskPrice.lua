@@ -181,14 +181,32 @@ function private.sendRequest(request, details)
 	--Send the response
 	return private.sendResponse(link, count, player, answerCount, totalSeenCount, totalPrice, vendorPrice)
 end
-
+--recreate the simple coin value function from EH TT. Askprice is pretty much the only module that needs to whisper non-color coin values
+--look into adding this into nTipHelper
+local function coins(money)
+	money = math.floor(tonumber(money) or 0)
+	local g = math.floor(money / 10000)
+	local s = math.floor(money % 10000 / 100)
+	local c = money % 100
+	local gsc = ""
+	if (g > 0) then
+		gsc = gsc .. g .. "g "
+	end
+	if (s > 0) then
+		gsc = gsc .. s .. "s "
+	end
+	if (c > 0) then
+		gsc = gsc .. c .. "c "
+	end
+	return gsc
+end
 function private.sendResponse(link, count, player, answerCount, totalSeenCount, totalPrice, vendorPrice)
 	local marketPrice = totalPrice
 
 	--If the stack size is grater than one, add the unit price to the message
 	local strMarketOne
 	if (count > 1) then
-		strMarketOne = ("(%s each)"):format(AucAdvanced.Coins(marketPrice, nil, true))
+		strMarketOne = ("(%s each)"):format(coins(marketPrice))
 	else
 		strMarketOne = ""
 	end
@@ -205,7 +223,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		private.sendWhisper(
 			("%sMarket Value: %s%s"):format(
 				"    ",
-				AucAdvanced.Coins(marketPrice * count, nil, true),
+				coins(marketPrice * count),
 				strMarketOne),
 			player
 		)
@@ -225,7 +243,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		local strVendOne
 		--Again if the stack Size is greater than one, add the unit price to the message
 		if (count > 1) then
-			strVendOne = ("(%s each)"):format(AucAdvanced.Coins(vendorPrice, nil, true))
+			strVendOne = ("(%s each)"):format(coins(vendorPrice))
 		else
 			strVendOne = ""
 		end
@@ -233,11 +251,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		private.sendWhisper(
 			("%sSell to vendor for: %s%s"):format(
 				"    ",
-				AucAdvanced.Coins(
-					vendorPrice * count,
-					nil,
-					true
-				),
+				coins(vendorPrice * count),
 				strVendOne
 			),
 			player
