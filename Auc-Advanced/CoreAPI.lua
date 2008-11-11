@@ -167,16 +167,12 @@ do
         local midpoint, lastMidpoint = 0, 0;
         
         -- Now find the 50% point
-        print("Looking for limit of ", limit);
-
         repeat
             lastMidpoint = midpoint;
             total = 0;
 
             assert(delta > 0, "Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink));
             
-            print (lowerLimit, " ", upperLimit, " ", delta);
-
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
                     local val = pdfList[i](x);
@@ -184,7 +180,6 @@ do
                 end
 
                 if total > limit then
-                    print("Breaking out: Total ", total, " at value ", x);
                     midpoint = x;
                     break;
                 end
@@ -198,7 +193,6 @@ do
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
                 elseif nLog then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
-                    print("Gave up after total of ", total);
                 end
                 return;                 -- Cannot calculate: NaN
             end
@@ -208,8 +202,6 @@ do
         if midpoint and midpoint > 0 then
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
             
-            print("Midpoint ", midpoint, " at total ", total);
-
             -- Cache before finishing up
             local cacheTable = {}
             cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
