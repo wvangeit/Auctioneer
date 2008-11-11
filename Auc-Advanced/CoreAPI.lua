@@ -130,7 +130,6 @@ do
         local c, oldPdfMax, total = 0, #pdfList, 0;
         for _, engine in ipairs(engines) do
             local i, min, max, area = engine.pdf(saneLink, serverKey);
-            total = total + (area or 1);                                -- Add total area, assume 1 if not supplied
             
             local priceArray = engine.array(saneLink, serverKey);
 
@@ -139,6 +138,7 @@ do
             end
 
             if i then   -- pdfList[++c] = i;
+                total = total + (area or 1);                                -- Add total area, assume 1 if not supplied
                 c = c + 1;
                 pdfList[c] =  i;
                 if min < lowerLimit then lowerLimit = min; end
@@ -166,49 +166,49 @@ do
         local limit = total/2;
         local midpoint, lastMidpoint = 0, 0;
         
-        -- Adjust the total such that we drop off the left/right tail from the total        
-        local accumulator = 0;
-        for _, pdf in ipairs(pdfList) do
-            for x = lowerLimit, lowerLimit - (upperLimit - lowerLimit), -CORRECTION_FACTOR * (upperLimit-lowerLimit) / 10000 do
-                accumulator = accumulator + pdf(x) * CORRECTION_FACTOR;
-            end
-        end            
         -- Now find the 50% point
-        total = accumulator;
+        print("Looking for limit of ", limit);
 
         repeat
             lastMidpoint = midpoint;
             total = 0;
 
             assert(delta > 0, "Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink));
+            
+            print (lowerLimit, " ", upperLimit, " ", delta);
 
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
-                    total = total + pdfList[i](x) * delta;
+                    local val = pdfList[i](x);
+                    total = total + val * delta;
                 end
 
                 if total > limit then
+                    print("Breaking out: Total ", total, " at value ", x);
                     midpoint = x;
                     break;
                 end
             end
-
+            
             delta = delta * IMPROVEMENT_FACTOR;
+    
 
             if midpoint ~= midpoint or midpoint == 0 then
                 if nLog and midpoint ~= midpoint then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
                 elseif nLog then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                    print("Gave up after total of ", total);
                 end
                 return;                 -- Cannot calculate: NaN
             end
 
         until abs(midpoint - lastMidpoint)/midpoint < ERROR;
 
-
         if midpoint and midpoint > 0 then
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
+            
+            print("Midpoint ", midpoint, " at total ", total);
 
             -- Cache before finishing up
             local cacheTable = {}
