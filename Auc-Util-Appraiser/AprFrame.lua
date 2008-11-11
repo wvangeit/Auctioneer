@@ -1538,6 +1538,10 @@ function private.CreateFrames()
                 print(("%d stacks of %s already posted."):format(currentStackCount,link))
                 return
             end
+            if number*stack > total then
+                print(("Need %d of %s only have %d, posting %d"):format(number*stack,link,total,math.floor(total/stack)*stack))
+                number = math.floor(total/stack)
+            end
         end
 
 		print(("Posting batch of: %s"):format(link))
