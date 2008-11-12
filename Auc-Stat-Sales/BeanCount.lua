@@ -116,7 +116,8 @@ end
 local settings = nil
 function lib.GetPrice(hyperlink, faction, realm)
 	if not get("stat.sales.enable") then return end
-    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return false end
+    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) or not (BeanCounter.getLocals) then return false end
+    local _, _, _, _, _BC = BeanCounter.getLocals() --_BC used to access beancounters localization strings
     if not settings then
         -- faction seems to be nil when passed in
         faction = UnitFactionGroup("player"):lower()
@@ -151,7 +152,7 @@ function lib.GetPrice(hyperlink, faction, realm)
             reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
             thistime = tonumber(thistime)
             if priceper and qty and priceper>0 and qty>0 then
-                if reason == _TRANS('Won on Buyout')  or reason == _TRANS('Won on Bid')  then
+                if reason == _BC('UiWononBuyout')  or reason == _BC('UiWononBid')  then
                     boughtqty = boughtqty + qty
                     bought = bought + priceper*qty
                     boughtseen = boughtseen + 1
@@ -163,7 +164,7 @@ function lib.GetPrice(hyperlink, faction, realm)
                         boughtqty7 = boughtqty7 + qty
                         bought7 = bought7 + priceper*qty
                     end
-                elseif reason == _TRANS('Auc Successful')  then
+                elseif reason == _BC('UiAucSuccessful')  then
                     soldqty = soldqty + qty
                     sold = sold + priceper*qty
                     soldseen = soldseen + 1
@@ -194,7 +195,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == _TRANS('Auc Successful')  then
+        if priceper and qty and priceper>0 and qty>0 and reason == _BC('UiAucSuccessful') then
             variance = variance + ((mean - priceper) ^ 2);
             count = count + 1
         end
@@ -209,7 +210,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     local total = 0
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
     	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == _TRANS('Auc Successful')  then
+        if priceper and qty and priceper>0 and qty>0 and reason == _BC('UiAucSuccessful')  then
         	if (math.abs(priceper - mean) < deviation) then
 			    total = total + priceper * qty
 			    number = number + qty
@@ -276,7 +277,7 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 end
 
 function lib.ClearItem(hyperlink, faction, realm)
-	print(libType.._TRANS('- Sales does not store data itself. It uses your Beancounter data.') )
+	print(_TRANS('ASAL_Interface_SlashHelpClearingData') )-- Sales does not store data itself. It uses your Beancounter data.
 end
 
 function lib.OnLoad(addon)
@@ -311,48 +312,47 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
     if (boughtseen+soldseen>0) then
-		tooltip:AddLine(_TRANS('Sales prices:'))
+		tooltip:AddLine(_TRANS('ASAL_Tooltip_SalesPrices'))--Sales prices:
 
         if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
             if (boughtseen > 0) then
-                tooltip:AddLine(_TRANS('  Total Bought').." |cffddeeff"..(boughtqty).."|r ".._TRANS('at avg each'), bought)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalBought'):format(boughtqty), bought) --Total Bought {{%s}} at avg each
             end
             if (soldseen > 0) then
-                tooltip:AddLine(_TRANS('  Total Sold').." |cffddeeff"..(soldqty).."|r ".._TRANS('at avg each'), sold)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalSold'):format(soldqty), sold) --Total Sold {{%s}} at avg each
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
             if (boughtqty7 > 0) then
-                tooltip:AddLine(_TRANS('  7 Days Bought').." |cffddeeff"..(boughtqty7).."|r ".._TRANS('at avg each'), bought7)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysBought'):format(boughtqty7), bought7) --7 Days Bought {{%s}} at avg each
             end
             if (soldqty7 > 0) then
-                tooltip:AddLine(_TRANS('  7 Days Sold').." |cffddeeff"..(soldqty7).."|r ".._TRANS('at avg each'), sold7)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysSold'):format(soldqty7), sold7)--7 Days Sold {{%s}} at avg each
             end
         end
         if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
             if (boughtqty3 > 0) then
-                tooltip:AddLine(_TRANS('  3 Days Bought').." |cffddeeff"..(boughtqty3).."|r ".._TRANS('at avg each'), bought3)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysBought'):format(boughtqty3), bought3)--3 Days Bought {{%s}} at avg each
             end
             if (soldqty3 > 0) then
-                tooltip:AddLine(_TRANS('  3 Days Sold').." |cffddeeff"..(soldqty3).."|r ".._TRANS('at avg each'), sold3)
+                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysSold'):format(soldqty3), sold3)--3 Days Sold {{%s}} at avg each
             end
         end
         if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.sales.normal") then
-				tooltip:AddLine(_TRANS('  Normalized (stack)'), average*quantity)
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_NormalizedStack'), average*quantity)--
 				if (quantity > 1) then
-					tooltip:AddLine(_TRANS('  (or individually)'), average)
+					tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), average)--(or individually)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.stdev") then
-				tooltip:AddLine(_TRANS('  Std Deviation'), stdev*quantity)
-                if (quantity > 1) then
-                    tooltip:AddLine(_TRANS('  (or individually)'), stdev)
-                end
-
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_ StdDeviation'), stdev*quantity)--Std Deviation
+				if (quantity > 1) then
+				    tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), stdev)--(or individually)
+				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.sales.confid") then
-				tooltip:AddLine(_TRANS('  Confidence: ')..(floor(confidence*1000))/1000)
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Confidence')..(floor(confidence*1000))/1000)--Confidence: 
 			end
 		end
 
@@ -363,30 +363,29 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what sales stats",
-		_TRANS('What are sales stats?') ,
-		_TRANS('Sales stats are the numbers that are generated by the sales module from the ') ..
-		_TRANS('BeanCounter database. It averages all of the prices for items that you have sold') )
+		_TRANS('ASAL_Help_StatSales') ,--What are sales stats?'
+		_TRANS('ASAL_Help_StatSalesAnswer') )--Sales stats are the numbers that are generated by the sales module from the BeanCounter database. It averages all of the prices for items that you have sold
 
-	gui:AddControl(id, "Header",     0,    _TRANS('Sales options') )
+	gui:AddControl(id, "Header",     0,    _TRANS('ASAL_Interface_SalesOptions') )--Sales options
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('Enable Sales Stats') )
-	gui:AddTip(id, _TRANS('Allow Sales to contribute to Market Price.') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('ASAL_Interface_EnableSalesStats') )--Enable Sales Stats
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_EnableSalesStats') )--Allow Sales to contribute to Market Price.
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.tooltip", _TRANS('Show sales stats in the tooltips?') )
-	gui:AddTip(id, _TRANS('Toggle display of stats from the Sales module on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg3", _TRANS('Display Moving 3 Day Mean') )
-   	gui:AddTip(id, _TRANS('Toggle display of 3-Day mean from the Sales module on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg7", _TRANS('Display Moving 7 Day Mean') )
-	gui:AddTip(id, _TRANS('Toggle display of 7-Day mean from the Sales module on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg", _TRANS('Display Overall Mean') )
-	gui:AddTip(id, _TRANS('Toggle display of Permanent mean from the Sales module on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.normal", _TRANS('Display Normalized') )
-	gui:AddTip(id, _TRANS('Toggle display of \'Normalized\' calculation in tooltips on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.stdev", _TRANS('Display Standard Deviation') )
-	gui:AddTip(id, _TRANS('Toggle display of \'Standard Deviation\' calculation in tooltips on or off') )
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.confid", _TRANS('Display Confidence') )
-	gui:AddTip(id,_TRANS( 'Toggle display of \'Confidence\' calculation in tooltips on or off') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.tooltip", _TRANS('ASAL_Interface_ShowSalesStat') )--Show sales stats in the tooltips?
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_ShowSalesStat') )--Toggle display of stats from the Sales module on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg3", _TRANS('ASAL_Interface_Display3DayMean') )--Display Moving 3 Day Mean
+   	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_Display3DayMean') )--Toggle display of 3-Day mean from the Sales module on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg7", _TRANS('ASAL_Interface_Display7DayMean') )--Display Moving 7 Day Mean
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_Display7DayMean') )--Toggle display of 7-Day mean from the Sales module on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.avg", _TRANS('ASAL_Interface_DisplayOverallMean') )--Display Overall Mean
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayOverallMean') )--Toggle display of Permanent mean from the Sales module on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.normal", _TRANS('ASAL_Interface_DisplayNormalized') )--Display Normalized
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayNormalized') )--Toggle display of \'Normalized\' calculation in tooltips on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.stdev", _TRANS('ASAL_Interface_DisplayStdDeviation') )--Display Standard Deviation
+	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayStdDeviation') )--Toggle display of \'Standard Deviation\' calculation in tooltips on or off
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.sales.confid", _TRANS('ASAL_Interface_DisplayConfidence') )--Display Confidence
+	gui:AddTip(id,_TRANS('ASAL_HelpTooltip_DisplayConfidence') )--Toggle display of \'Confidence\' calculation in tooltips on or off
 
 	end
 
