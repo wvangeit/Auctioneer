@@ -393,7 +393,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
-			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenNumberDays'):format("|cffddeeff", seenCount+dayCount, "|r", "|cffddeeff", seenDays, "|r") ) --"  Seen %s%s%s over %s%s%s days:")
+			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenNumberDays'):format(seenCount+dayCount, seenDays) ) --Seen {{%s}} over {{%s}} days:
 			
 		end
 		if (seenDays > 6) and dispAvg14 then
@@ -409,7 +409,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_AverageMBO') , avgmins*quantity)--  Average MBO
 		end
 		if (dayCount > 0) then
-			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenToday'):format("|cffddeeff",dayCount ,"|r") , dayAverage*quantity) --Seen %s%s%s today
+			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenToday'):format(dayCount) , dayAverage*quantity) --Seen {{%s}} today:
 		end
 		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_TodaysMBO') , minBuyout*quantity)-- Today's Min BO
