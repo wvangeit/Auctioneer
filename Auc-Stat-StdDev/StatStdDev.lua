@@ -319,13 +319,13 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 			if AucAdvanced.Settings.GetSetting("stat.stddev.normal") then
 				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Normalized'), average*quantity)--  Normalized
 				if (quantity > 1) then
-					tooltip:AddLine("   ".._TRANS('SDEV_Tooltip_Individually'), average)--  (or individually)
+					tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Individually'), average)--  (or individually)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.stdev") then
 				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_StdDeviation'), stdev*quantity)--  Std Deviation
                 if (quantity > 1) then
-                    tooltip:AddLine("   ".._TRANS('SDEV_Tooltip_Individually'), stdev)--  (or individually)
+                    tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Individually'), stdev)--  (or individually)
                 end
 
 			end
@@ -357,7 +357,7 @@ function lib.ClearItem(hyperlink, faction, realm)
 	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
 	if (data[faction]) then
-		print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, faction))--- StdDev: clearing data for %s for {{%s"}}	
+		print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, faction))--- StdDev: clearing data for %s for {{%s}}	
 		data[faction][itemID] = nil
 	end
 end
