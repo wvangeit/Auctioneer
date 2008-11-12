@@ -1514,7 +1514,7 @@ function private.CreateFrames()
 		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
 			print("Skipping "..link..": invalid duration: "..tostring(duration))
 			return
-		elseif not (total and total > 0) or (number > 0 and number * stack > total) then
+		elseif (not (total and total > 0) or (number > 0 and number * stack > total)) and not numberOnly then
 			print("Skipping "..link..": You do not have enough items to do that")
 			return
 		elseif (number == -2) and (stack > total) then
