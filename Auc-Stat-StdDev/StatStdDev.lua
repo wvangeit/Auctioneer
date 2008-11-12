@@ -313,24 +313,24 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 		tooltip:AddLine(_TRANS('SDEV_Tooltip_PricesPoints'):format(count) )--StdDev prices %d points:
 
 		if AucAdvanced.Settings.GetSetting("stat.stddev.mean") then
-			tooltip:AddLine(_TRANS('SDEV_Tooltip_MeanPrice'), mean*quantity)-- Mean price
+			tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_MeanPrice'), mean*quantity)-- Mean price
 		end
 		if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.stddev.normal") then
-				tooltip:AddLine(_TRANS('SDEV_Tooltip_Normalized'), average*quantity)--  Normalized
+				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Normalized'), average*quantity)--  Normalized
 				if (quantity > 1) then
-					tooltip:AddLine(_TRANS('SDEV_Tooltip_Individually'), average)--  (or individually)
+					tooltip:AddLine("   ".._TRANS('SDEV_Tooltip_Individually'), average)--  (or individually)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.stdev") then
-				tooltip:AddLine(_TRANS('SDEV_Tooltip_StdDeviation'), stdev*quantity)--  Std Deviation
+				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_StdDeviation'), stdev*quantity)--  Std Deviation
                 if (quantity > 1) then
-                    tooltip:AddLine(_TRANS('SDEV_Tooltip_Individually'), stdev)--  (or individually)
+                    tooltip:AddLine("   ".._TRANS('SDEV_Tooltip_Individually'), stdev)--  (or individually)
                 end
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.confid") then
-				tooltip:AddLine(_TRANS('SDEV_Tooltip_Confidence')..(floor(confidence*1000))/1000)-- Confidence: 
+				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Confidence')..(floor(confidence*1000))/1000)-- Confidence: 
 			end
 		end
 	end
