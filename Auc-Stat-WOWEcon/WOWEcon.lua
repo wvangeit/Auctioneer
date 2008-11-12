@@ -135,41 +135,41 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what global price",
-		_TRANS('What are global prices?') ,
-		_TRANS('Wowecon provides two different types of prices: a global price, averaged across all servers, and a server specific price, for just your server and faction.')
+		_TRANS('WECN_Help_WhatGlobalPrices') ,--What are global prices?
+		_TRANS('WECN_Help_WhatGlobalPricesAnswer')--Wowecon provides two different types of prices: a global price, averaged across all servers, and a server specific price, for just your server and faction.
 		)
 
 	gui:AddHelp(id, "why use global",
-		_TRANS('Why should I use global prices?') ,
-		_TRANS('Server specific prices can be useful if your server has prices which are far removed from the average, but often these prices are based on many fewer data points, causing your server specific price to possibly get out of whack for some items.  This option lets you force the Wowecon stat to always use global prices, if you\'d prefer.') 
+		_TRANS('WECN_Help_WhyGlobalPrices') ,--Why should I use global prices?
+		_TRANS('WECN_Help_WhyGlobalPricesAnswer') --Server specific prices can be useful if your server has prices which are far removed from the average, but often these prices are based on many fewer data points, causing your server specific price to possibly get out of whack for some items.  This option lets you force the Wowecon stat to always use global prices, if you\'d prefer.
 		)
 
 	gui:AddHelp(id, "prices dont match",
-		_TRANS('The Wowecon price used by Appraiser doesn\'t match the Wowecon tooltip.  What gives?') ,
-		_TRANS('Wowecon gives you the option to hide server specific prices if seen fewer than a given number of times.  Even though these prices are hidden from the tooltip, they are still reported to Appraiser.  If you are not using the global price option here, you should check to make sure there isn\'t a hidden server specific price for your server, with just a small number of seen times.') 
+		_TRANS('WECN_Help_WoweconNoMatch') ,--The Wowecon price used by Appraiser doesn't match the Wowecon tooltip.  What gives?
+		_TRANS('WECN_Help_WoweconNoMatchAnswer') --Wowecon gives you the option to hide server specific prices if seen fewer than a given number of times.  Even though these prices are hidden from the tooltip, they are still reported to Appraiser.  If you are not using the global price option here, you should check to make sure there isn\'t a hidden server specific price for your server, with just a small number of seen times.
 		)
 
 	gui:AddHelp(id, "sanitize link",
-		"What does the sanitize link option do?",
-		_TRANS('Sanitizing the link can improve the price data you receive from WOWEcon by removing the parts of the link that are very specific (such as enchants, item factors, and gem informatio) to just get the price information for the common base item. This will generally only affect items that are slightly different from the normal base item, and have no, or very little price data due to their uniqueness.') 
+		_TRANS('WECN_Help_WhatSanitize') ,--What does the sanitize link option do?
+		_TRANS('WECN_Help_WhatSanitizeAnswer') --Sanitizing the link can improve the price data you receive from WOWEcon by removing the parts of the link that are very specific (such as enchants, item factors, and gem informatio) to just get the price information for the common base item. This will generally only affect items that are slightly different from the normal base item, and have no, or very little price data due to their uniqueness.
 		)
 
 	gui:AddHelp(id, "show price tooltip",
-		_TRANS('Why would I want to show the WOWEcon price in the tooltip?') ,
-		_TRANS('The pricing data that Appraiser uses for the items may be different to the price data that WOWEcon displays by default, since WOWEcon can get very specific with the data that it returns. Enabling this option will let you see the exact price that this module is reporting for the current item.') 
+		_TRANS('WECN_Help_WhyWOWEcon') ,--Why would I want to show the WOWEcon price in the tooltip?
+		_TRANS('WECN_Help_WhyWOWEconAnswer') --The pricing data that Appraiser uses for the items may be different to the price data that WOWEcon displays by default, since WOWEcon can get very specific with the data that it returns. Enabling this option will let you see the exact price that this module is reporting for the current item.
 		)
 
-	gui:AddControl(id, "Header",     0,    "WOWEcon options")
+	gui:AddControl(id, "Header",     0,    _TRANS('WECN_Interface_WOWEconOptions') )--WOWEcon options
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('Enable WOWEcon Stats') )
-	gui:AddTip(id, _TRANS('Allow WOWEcon to gather and return price data') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('WECN_Interface_EnableWOWEconStats') )--Enable WOWEcon Stats
+	gui:AddTip(id, _TRANS('WECN_HelpTooltip_EnableWOWEconStats') )--Allow WOWEcon to gather and return price data
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", _TRANS('Always use global price, not server price') )
-	gui:AddTip(id, _TRANS( 'Toggle use of server specific Wowecon price stats, if they exist') )
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", _TRANS('Sanitize links before sending to WOWEcon API') )
-	gui:AddTip(id, _TRANS('Removes ultra-specific item data from links before issuing the price request') )
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", _TRANS('Show WOWEcon value in tooltip (see note)') )
-	gui:AddTip(id, _TRANS( 'Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip') )
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", _TRANS('WECN_Interface_AlwaysGlobalPrice') )--Always use global price, not server price
+	gui:AddTip(id, _TRANS('WECN_HelpTooltip_AlwaysGlobalPrice') )--Toggle use of server specific Wowecon price stats, if they exist
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", _TRANS('WECN_Interface_SanitizeWOWEcon') )--Sanitize links before sending to WOWEcon API
+	gui:AddTip(id, _TRANS('WECN_HelpTooltip_SanitizeWOWEcon') )--Removes ultra-specific item data from links before issuing the price request
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", _TRANS('WECN_Interface_ShowWOWEconTooltip') )--Show WOWEcon value in tooltip (see note)
+	gui:AddTip(id, _TRANS('WECN_HelpTooltip_ShowWOWEconTooltip') )--Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip
 end
 
 function lib.OnLoad(addon)
@@ -187,24 +187,24 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 	if array.seen and array.seen > 0 then
 		tooltip:SetColor(0.3, 0.9, 0.8)
 
-		tooltip:AddLine(_TRANS('WOWEcon prices (seen ') ..array.seen..")")
+		tooltip:AddLine(_TRANS('WECN_Tooltip_PricesSeen')..array.seen)--WOWEcon prices seen:
 
 		if array.specific then
-			tooltip:AddLine(_TRANS('  Server price:') , array.price * quantity)
+			tooltip:AddLine("  ".._TRANS('WECN_Tooltip_ServerPrice') , array.price * quantity)--Server price:
 		else
-			tooltip:AddLine(_TRANS('  Global price:') , array.price * quantity)
+			tooltip:AddLine("  ".._TRANS('WECN_Tooltip_GlobalPrice') , array.price * quantity)--Global price:
 		end
 		if (quantity > 1) then
-			tooltip:AddLine(_TRANS('    (or individually)') , array.price)
+			tooltip:AddLine("  ".._TRANS('WECN_Tooltip_Individually') , array.price)--(or individually)
 		end
 
 		if IsModifierKeyDown() then
 			if array.specific then
-				tooltip:AddLine(_TRANS('  Global (seen ') ..array.g_seen.."):", array.g_price * quantity)
+				tooltip:AddLine("  ".._TRANS('WECN_Tooltip_GlobalSeen'):format(array.g_seen), array.g_price * quantity)--Global seen {{%s}}:
 			elseif array.s_seen > 0 then
-				tooltip:AddLine_TRANS(('  Server (seen ') ..array.s_seen.."):", array.s_price * quantity)
+				tooltip:AddLine("  ".._TRANS('WECN_Tooltip_ServerSeen'):format(array.s_seen), array.s_price * quantity)--Server seen {{%s}}:
 			else
-				tooltip:AddLine(_TRANS('  Never seen for server') )
+				tooltip:AddLine("  ".._TRANS('WECN_Tooltip_NeverSeen') )-- Never seen for server
 			end
 		end
 
