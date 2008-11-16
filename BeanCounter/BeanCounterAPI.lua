@@ -260,6 +260,18 @@ function lib.API.getBidReason(itemLink, quantity)
 			end
 		end
 	end
+	--not found on the current player lets see if we bought it on another player
+	for player in pairs(private.serverData) do
+		if private.serverData[player]["completedBids/Buyouts"][itemID] and private.serverData[player]["completedBids/Buyouts"][itemID][itemString] then
+			for i,v in pairs(private.serverData[player]["completedBids/Buyouts"][itemID][itemString]) do
+				local quan, _, _, _, bid, _, Time, reason = string.split(";", v)
+				if tonumber(quan) == tonumber(quantity) and reason and Time then
+					return reason, Time, tonumber(bid), player
+				end
+			end
+		end
+	end
+	
 	return --if nothing found return nil
 end
 
