@@ -36,9 +36,15 @@ local private = lib.Private
 local const = AucAdvanced.Const
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = const
+local pricecache
+
 
 local frame
 local TAB_NAME = "Post"
+
+function private.clearcache()
+	pricecache = nil
+end
 
 function private.postPickupContainerItemHook(_,_,bag, slot)
 	if (CursorHasItem()) then
