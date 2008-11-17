@@ -52,6 +52,7 @@ lib.Private = private
 local Const = AucAdvanced.Const
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 lib.Print = print
+local GetTime = GetTime
 
 private.isScanning = false
 private.curPage = 0
@@ -544,7 +545,10 @@ private.CommitQueuewasGetAll = {}
 local CommitRunning = false
 Commitfunction = function()
 
-	local ProcessSpeed = AucAdvanced.Settings.GetSetting("scancommit.speed")
+	local speed = AucAdvanced.Settings.GetSetting("scancommit.speed")/100
+	speed = speed^2.5
+	local processingTime = speed * 0.1 + 0.015
+		-- Min (1): 0.02s (~50 fps)      --    Max (100): 0.12s  (~8 fps).   Default (50):  0.037s (~25 fps)
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
 	--	if not private.curQuery then CommitRunning = false return end
@@ -573,7 +577,7 @@ Commitfunction = function()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
 	end
-	local totali = 2*(#scandata.image) + #TempcurScan
+	local totali = 2*(#scandata.image) + 3*#TempcurScan
 
 	local list, link, flag
 	local lut = {}
@@ -581,12 +585,16 @@ Commitfunction = function()
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	local dirtyCount = 0
 	local i = 0
+	local lastPause = GetTime()
+	
+	
 	for pos, data in ipairs(scandata.image) do
 		link = data[Const.LINK]
 		i = i + 1
-		if i % (ProcessSpeed*100) == 0 then
+		if GetTime() - lastPause >= processingTime then
 			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 1")
 			coroutine.yield()
+			lastPause = GetTime()
 		end
 		if link then
 			if private.IsInQuery(TempcurQuery, data) then
@@ -620,11 +628,12 @@ Commitfunction = function()
 
 	processStats("begin")
 	for index, data in ipairs(TempcurScan) do
-		i = i + 1
-		if i % (ProcessSpeed*10) == 0 then
+		i = i + 3
+		if GetTime() - lastPause >= processingTime then
 			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 2")
 			--CommitProgressBar:SetValue(100*i/totali)
 			coroutine.yield()
+			lastPause = GetTime()
 		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
@@ -666,9 +675,10 @@ Commitfunction = function()
 	for pos = #scandata.image, 1, -1 do
 		data = scandata.image[pos]
 		i = i + 1
-		if i % (ProcessSpeed*100) == 0 then
+		if GetTime() - lastPause >= processingTime then
 			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 3")
 			coroutine.yield()
+			lastPause = GetTime()
 		end
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local stillpossible = false
@@ -1268,16 +1278,10 @@ function lib.SetPaused(pause)
 	end
 end
 private.unexpectedClose = false
-local flip, flop, flipb, flopb = false, false, false, false
+local flipb, flopb = false, false
 function private.OnUpdate(me, dur)
 	if coroutine.status(CoCommit) == "suspended" then
-		flip = not flip
-		if flip then
-			flop = not flop
-			if flop then
-				CoroutineResume(CoCommit)
-			end
-		end
+		CoroutineResume(CoCommit)
 	else
 		if #private.CommitQueue > 0 then
 			CoCommit = coroutine.create(Commitfunction)
