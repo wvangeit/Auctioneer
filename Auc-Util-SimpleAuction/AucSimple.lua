@@ -39,6 +39,7 @@ local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdva
 local data, _
 local ownResults = {}
 local ownCounts = {}
+local pricecache
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -51,7 +52,9 @@ function lib.Processor(callbackType, ...)
 		private.UpdateConfig(...)
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
+		pricecache = nil
 	elseif (callbackType == "postresult") then
+		pricecache = nil
 	end
 end
 
