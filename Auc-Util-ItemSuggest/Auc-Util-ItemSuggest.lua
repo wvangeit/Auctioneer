@@ -38,6 +38,7 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, _
+local resultcache
 
 function lib.GetName()
 	return libName
@@ -48,6 +49,8 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then lib.SetupConfigGui(...) --Called when you should build your Configator tab.
 	elseif (callbackType == "listupdate") then --Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then --Called when your config options (if Configator) have been changed.
+	elseif (callbackType == "scanstats") then
+		resultcache = nil
 	end
 end
 
@@ -120,6 +123,10 @@ function lib.SetupConfigGui(gui)
 end
 
 function lib.itemsuggest(hyperlink, quantity)
+	if resultcache and resultcache[hyperlink] then
+		local bestmethod, bestvalue = strsplit(";", resultcache[hyperlink])
+		return bestmethod, tonumber(bestvalue)
+	end
 	-- Determine Base Values
 	if (quantity == nil) then quantity = 1 end
 	VendorValue = lib.GetVendorValue(hyperlink, quantity)
@@ -169,6 +176,8 @@ function lib.itemsuggest(hyperlink, quantity)
 		bestmethod = "Disenchant"
 	end
 
+	if not resultcache then resultcache = {} end
+	resultcache[hyperlink] = strjoin(";", bestmethod, tostring(bestvalue))
 	-- Hand the winner back to caller...
 	return bestmethod, bestvalue
 end
