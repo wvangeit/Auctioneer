@@ -626,17 +626,16 @@ function private.processTooltip(tip, itemLink, quantity)
 
 	private.tooltip:SetFrame(tip)
 	local reason, Time, bid, player = lib.API.getBidReason(itemLink, quantity)
-	if player and player == private.playerName then player = "" end
-	
+		
 	debugPrint("Add to Tooltip", itemLink, reason)
 	if reason then
 		if reason == "" then reason = "Unknown" end
 		Time = SecondsToTime((time() - Time))
 		local text = ""
-		if player == private.playerName then 
-			text = ("Last won for {{%s}} { {{%s}} } ago}"):format(reason, Time)
-		else
+		if player then
 			text = ("Last won by {{%s}} for {{%s}} { {{%s}} } ago}"):format(player or "", reason, Time)
+		else
+			text = ("Last won for {{%s}} { {{%s}} } ago}"):format(reason, Time)
 		end
 		local cost = tonumber(bid)
 		private.tooltip:AddLine(text, cost, 0.9,0.6,0.2)
