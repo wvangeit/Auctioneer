@@ -35,6 +35,7 @@ local libType, libName = "Match", "Undercut"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local pricecache --only used for tooltip info, as that's the only place where we know that the starting price will remain the same
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -47,6 +48,9 @@ function lib.Processor(callbackType, ...)
 		--Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then
 		--Called when your config options (if Configator) have been changed.
+		pricecache = nil
+	elseif (callbackType == "scanstats") then
+		pricecache = nil
 	end
 end
 
@@ -166,12 +170,23 @@ function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, ad
 	local model = get("match.undercut.model")
 	if not model then return end
 	local market
-	if model == "market" then
-		market = AucAdvanced.API.GetMarketValue(link)
-	else
-		market = AucAdvanced.API.GetAlgorithmValue(model, link)
+	local matcharray
+	
+	if pricecache and pricecache[link] then
+		matcharray = replicate(pricecache[link])
+		market = matcharray.market
 	end
-	local matcharray = lib.GetMatchArray(link, market)
+	if not matcharray then
+		if model == "market" then
+			market = AucAdvanced.API.GetMarketValue(link)
+		else
+			market = AucAdvanced.API.GetAlgorithmValue(model, link)
+		end
+		matcharray = lib.GetMatchArray(link, market)
+		if not pricecache then pricecache = {} end
+		pricecache[link] = replicate(matcharray)
+		pricecache[link]["market"] = market
+	end
 	if not matcharray or not matcharray.value or matcharray.value <= 0 then return end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
