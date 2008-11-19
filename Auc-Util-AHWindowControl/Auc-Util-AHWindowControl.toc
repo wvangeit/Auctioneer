@@ -1,5 +1,5 @@
 ## Title: Auc:Util:AHWindowControl
-## Notes: Add general utilitys to the Auction House Frame - protects from closing, allows repositioning, and limited scaling.
+## Notes: Add general utilities to the Auction House Frame - protects from closing, allows repositioning, and limited scaling.
 ##
 ## Interface: 30000
 ## LoadOnDemand: 0
