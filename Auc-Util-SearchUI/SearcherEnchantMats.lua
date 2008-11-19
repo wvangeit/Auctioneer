@@ -257,7 +257,7 @@ function lib.Search(item)
 
 
 		-- Give up if it doesn't disenchant to anything
-		local data = Enchantrix.Storage.GetItemDisenchants(item.link)
+		local data = Enchantrix.Storage.GetItemDisenchants(item[Const.LINK])
 		if not data then
 			return false, "Item not Disenchantable"
 		end
@@ -265,6 +265,7 @@ function lib.Search(item)
 		local total = data.total
 
 		if (total and total[1] > 0) then
+			market = 0
 			local totalNumber, totalQuantity = unpack(total)
 			for result, resData in pairs(data) do
 				if (result ~= "total") then
