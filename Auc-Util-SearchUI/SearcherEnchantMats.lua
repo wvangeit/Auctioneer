@@ -218,16 +218,21 @@ function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage) then
 		return false, "Enchantrix not detected"
 	end
+	
+	local itemLink = item[Const.LINK]
+	if (not itemLink) then
+		return false, "No item link"
+	end
 
 	-- first, is this an enchanting reagent itself?
 	-- if so, just use the value of the reagent
-	if validReagents[ Enchantrix.Util.GetItemIdFromLink(item[Const.LINK]) ] then
-		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
+	if validReagents[ Enchantrix.Util.GetItemIdFromLink(itemLink) ] then
+		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink)
 		if not market then
 			return false, "No appraiser price"
 		end
 		-- be safe and handle nil results
-		local adjustment = get("enchantmats.PriceAdjust."..Enchantrix.Util.GetItemIdFromLink(item[Const.LINK])) or 0
+		local adjustment = get("enchantmats.PriceAdjust."..Enchantrix.Util.GetItemIdFromLink(itemLink)) or 0
 
 		market = (market * item[Const.COUNT]) * adjustment / 100
 	end
@@ -250,14 +255,14 @@ function lib.Search(item)
 			maxskill = Enchantrix.Util.GetUserEnchantingSkill()
 		end
 
-		local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItem(item[Const.LINK])
+		local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItem(itemLink)
 		if (skillneeded < minskill) or (skillneeded > maxskill) then
 			return false, "Skill not high enough to Disenchant"
 		end
 
 
 		-- Give up if it doesn't disenchant to anything
-		local data = Enchantrix.Storage.GetItemDisenchants(item[Const.LINK])
+		local data = Enchantrix.Storage.GetItemDisenchants(itemLink)
 		if not data then
 			return false, "Item not Disenchantable"
 		end

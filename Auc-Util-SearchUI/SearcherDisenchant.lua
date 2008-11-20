@@ -87,13 +87,13 @@ function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage) then
 		return false, "Enchantrix not detected"
 	end
-	if (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
+	if (not get("disenchant.allow.bid")) and ((not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0)) then
 		return false, "No buyout"
 	end
 	if item[Const.QUALITY] <= 1 then
 		return false, "Item not disenchantable"
 	end
-	local market, _, pctstring
+	
 	local minskill = 0
 	local maxskill = 375
 	if get("disenchant.level.custom") then
@@ -106,7 +106,7 @@ function lib.Search(item)
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to disenchant"
 	end
-	_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(item[Const.LINK])
+	local _, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
 		return false, "Item not disenchantable"
 	end

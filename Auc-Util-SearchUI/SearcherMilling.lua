@@ -87,7 +87,7 @@ function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemMillingTotals) then
 		return false, "Enchantrix not detected"
 	end
-	if (not get("milling.allow.bid")) and (not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0) then
+	if (not get("milling.allow.bid")) and ((not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0)) then
 		return false, "No buyout"
 	end
 	if item[Const.QUALITY] ~= 1 then -- All millable herbs are "Common" quality
@@ -100,7 +100,6 @@ function lib.Search(item)
 		return false, "Item not millable"
 	end
 
-	local _, market
 	local minskill = 0
 	local maxskill = 375
 	if get("milling.level.custom") then
@@ -115,7 +114,7 @@ function lib.Search(item)
 		return false, "Skill not high enough to mill"
 	end
 
-	_, _, _, market = Enchantrix.Storage.GetItemMillingTotals(item[Const.LINK])
+	local _, _, _, market = Enchantrix.Storage.GetItemMillingTotals(item[Const.LINK])
 	if (not market) or (market == 0) then
 		return false, "Item not millable"
 	end
