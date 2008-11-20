@@ -794,6 +794,11 @@ end
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
 
+	if (not level or not quality) then
+		--Enchantrix.Util.DebugPrintQuick( "nil level or quality", level, quality )
+		return 0
+	end
+	
 	if (level >= 200) then
 		return 375;
 
@@ -836,7 +841,15 @@ end
 
 
 function Enchantrix.Util.InscriptionSkillRequiredForItem(link)
+	if (not link) then
+		--Enchantrix.Util.DebugPrintQuick( "nil link", link )
+		return 0
+	end
 	local item = getItemIdFromLink(link);
+	if (not item) then
+		--Enchantrix.Util.DebugPrintQuick( "nil item from link", link )
+		return 0
+	end
 	local resultBracket = Enchantrix.Constants.MillableItems[item];
 	if (not resultBracket) then
 		return 0
@@ -845,12 +858,24 @@ function Enchantrix.Util.InscriptionSkillRequiredForItem(link)
 end
 
 function Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
+	if (not link) then
+		--Enchantrix.Util.DebugPrintQuick( "nil link", link )
+		return 0
+	end
 	local item = getItemIdFromLink(link);
+	if (not id) then
+		--Enchantrix.Util.DebugPrintQuick( "nil item from link", link )
+		return 0
+	end
 	local minLevel = Enchantrix.Constants.ProspectMinLevels[item];
 	return minLevel;
 end
 
 function Enchantrix.Util.DisenchantSkillRequiredForItem(link)
+	if (not link) then
+		--Enchantrix.Util.DebugPrintQuick( "nil link", link )
+		return 0
+	end
 	local _, _, quality, itemLevel = GetItemInfo(link);
 	return  Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel, quality);
 end
@@ -875,7 +900,7 @@ function Enchantrix.Util.GetUserSkillByName( name )
 	local i, j
 	local resultRank = 0
 
-	-- search the skill tree for Mying skills
+	-- search the skill tree for the named skill
 	for i=0, GetNumSkillLines(), 1 do
 		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
 		-- expand the header if necessary
