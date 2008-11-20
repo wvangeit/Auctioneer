@@ -39,7 +39,7 @@ default("prospect.profit.min", 1)
 default("prospect.profit.pct", 50)
 default("prospect.level.custom", false)
 default("prospect.level.min", 0)
-default("prospect.level.max", 375)
+default("prospect.level.max", 450)
 default("prospect.adjust.brokerage", true)
 default("prospect.allow.bid", true)
 default("prospect.allow.buy", true)
@@ -68,8 +68,8 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "prospect.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "prospect.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "prospect.level.custom", "Use custom levels")
-	gui:AddControl(id, "Slider",            0, 2, "prospect.level.min", 0, 375, 25, "Minimum skill: %s")
-	gui:AddControl(id, "Slider",            0, 2, "prospect.level.max", 25, 375, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "prospect.level.min", 0, 450, 25, "Minimum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "prospect.level.max", 25, 450, 25, "Maximum skill: %s")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.allow.bid", "Allow Bids")
@@ -100,7 +100,7 @@ function lib.Search(item)
 	end
 
 	local minskill = 0
-	local maxskill = 375
+	local maxskill = 450
 	if get("prospect.level.custom") then
 		minskill = get("prospect.level.min")
 		maxskill = get("prospect.level.max")

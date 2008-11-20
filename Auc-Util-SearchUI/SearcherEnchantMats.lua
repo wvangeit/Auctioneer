@@ -105,7 +105,7 @@ local validReagents =
 -- Set our defaults
 default("enchantmats.level.custom", false)
 default("enchantmats.level.min", 0)
-default("enchantmats.level.max", 375)
+default("enchantmats.level.max", 450)
 default("enchantmats.allow.bid", true)
 default("enchantmats.allow.buy", true)
 
@@ -168,8 +168,8 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "enchantmats.allow.buy", "Allow Buyouts")
 
 	gui:AddControl(id, "Checkbox",         0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
-	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 375, 25, "Minimum skill: %s")
-	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.max", 25, 375, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 450, 25, "Minimum skill: %s")
+	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.max", 25, 450, 25, "Maximum skill: %s")
 
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
@@ -247,7 +247,7 @@ function lib.Search(item)
 		end
 
 		local minskill = 0
-		local maxskill = 375
+		local maxskill = 450
 		if get("enchantmats.level.custom") then
 			minskill = get("enchantmats.level.min")
 			maxskill = get("enchantmats.level.max")

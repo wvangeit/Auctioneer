@@ -39,7 +39,7 @@ default("milling.profit.min", 1)
 default("milling.profit.pct", 50)
 default("milling.level.custom", false)
 default("milling.level.min", 0)
-default("milling.level.max", 375)
+default("milling.level.max", 450)
 default("milling.adjust.brokerage", true)
 default("milling.allow.bid", true)
 default("milling.allow.buy", true)
@@ -68,8 +68,8 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "milling.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "milling.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "milling.level.custom", "Use custom levels")
-	gui:AddControl(id, "Slider",            0, 2, "milling.level.min", 0, 375, 25, "Minimum skill: %s")
-	gui:AddControl(id, "Slider",            0, 2, "milling.level.max", 25, 375, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "milling.level.min", 0, 450, 25, "Minimum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "milling.level.max", 25, 450, 25, "Maximum skill: %s")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.allow.bid", "Allow Bids")
@@ -101,7 +101,7 @@ function lib.Search(item)
 	end
 
 	local minskill = 0
-	local maxskill = 375
+	local maxskill = 450
 	if get("milling.level.custom") then
 		minskill = get("milling.level.min")
 		maxskill = get("milling.level.max")
