@@ -143,16 +143,16 @@ local settingDefaults = {
 
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 
-	['maxBuyoutPrice'] = 800000,
-	['defaultProfitMargin'] = 1000,		 -- default profit margin = 10s
-	['minProfitMargin'] = 100,			 -- min allowed profit margin = 1s (100c)
-	['defaultPercentLessThanHSP'] = 20,	 -- default for percentless scan = 20% under HSP
-	['minPercentLessThanHSP'] = 5,		 -- min for percentless scan = 5% under HSP
-	['defaultProfitPricePercent'] = 10,	 --default for bidbroker scan = 10% under HSP
-	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
+--	['maxBuyoutPrice'] = 800000,
+--	['defaultProfitMargin'] = 1000,		 -- default profit margin = 10s
+--	['minProfitMargin'] = 100,			 -- min allowed profit margin = 1s (100c)
+--	['defaultPercentLessThanHSP'] = 20,	 -- default for percentless scan = 20% under HSP
+--	['minPercentLessThanHSP'] = 5,		 -- min for percentless scan = 5% under HSP
+--	['defaultProfitPricePercent'] = 10,	 --default for bidbroker scan = 10% under HSP
+--	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
-	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
-	['RestrictUnbidded'] = false,		-- should bidbroker only show items that don't have bids?
+--	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
+--	['RestrictUnbidded'] = false,		-- should bidbroker only show items that don't have bids?
 
 	['AuctionBalanceEssencePrices'] = false,	-- should we balance the price of essences before doing auction scans?
 	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences
@@ -500,6 +500,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
 	gui:AddControl(id, "Checkbox",   0, 1, "chatShowFindings", _ENCH("GuiPrintYieldsInChat") )
 
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
+	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
+
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 
@@ -567,22 +570,6 @@ function lib.MakeGuiConfig()
 		end
 	end
 	gui:AddControl(id, "Checkbox",   0, 2, "TooltipMillingShowBaselineValue", _ENCH("GuiValueShowBaseline"))
-
-
-	id = gui:AddTab(_ENCH("GuiTabAuctions"))
-	gui:AddControl(id, "Header",     0,    _ENCH("GuiPLBBSettings"))
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1, 99999999, _ENCH("GuiMaxBuyout"))
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 1, nil, _ENCH("GuiDefaultProfitMargin"))
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 1, nil, _ENCH("GuiMinProfitMargin"))
-	gui:AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, _ENCH("GuiDefaultLessHSP"))
-	gui:AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, _ENCH("GuiMinLessHSP"))
-	gui:AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, _ENCH("GuiDefaultBBProfitPercent"))
-	gui:AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, _ENCH("GuiMinBBProfitPercent"))
-	gui:AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", _ENCH("GuiPLBBOnlyBelowDESkill"))
-	gui:AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", _ENCH("GuiBBUnbiddedOnly"))
-
-	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
-	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
 	id = gui:AddTab(_ENCH("GuiTabWeights"))
 	gui:MakeScrollable(id)
