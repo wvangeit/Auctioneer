@@ -67,6 +67,13 @@ local VISION = 11137
 local SOUL = 11083
 local STRANGE = 10940
 
+local DREAM_SHARD = 34052
+local SDREAM_SHARD = 34053
+local INFINITE = 34054
+local GCOSMIC = 34055
+local LCOSMIC = 34056
+local ABYSS = 34057
+
 -- a table we can check for item ids
 local validReagents =
 	{
@@ -100,6 +107,12 @@ local validReagents =
 	[VISION] = true,
 	[SOUL] = true,
 	[STRANGE] = true,
+	[DREAM_SHARD] = true,
+	[SDREAM_SHARD] = true,
+	[INFINITE] = true,
+	[GCOSMIC] = true,
+	[LCOSMIC] = true,
+	[ABYSS] = true,
 	}
 
 -- Set our defaults
@@ -140,6 +153,12 @@ default("enchantmats.PriceAdjust."..SGLOWING, 100)
 default("enchantmats.PriceAdjust."..SGLIMMERING, 100)
 default("enchantmats.PriceAdjust."..VOID, 100)
 default("enchantmats.PriceAdjust."..NEXUS, 100)
+default("enchantmats.PriceAdjust."..DREAM_SHARD, 100)
+default("enchantmats.PriceAdjust."..SDREAM_SHARD, 100)
+default("enchantmats.PriceAdjust."..INFINITE, 100)
+default("enchantmats.PriceAdjust."..GCOSMIC, 100)
+default("enchantmats.PriceAdjust."..LCOSMIC, 100)
+default("enchantmats.PriceAdjust."..ABYSS, 100)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -174,6 +193,7 @@ function lib:MakeGuiConfig(gui)
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GCOSMIC, 0, 200, 1, "Greater Cosmic Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GPLANAR, 0, 200, 1, "Greater Planar Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GETERNAL, 0, 200, 1, "Greater Eternal Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GNETHER, 0, 200, 1, "Greater Nether Essence %s%%")
@@ -181,6 +201,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GASTRAL, 0, 200, 1, "Greater Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GMAGIC, 0, 200, 1, "Greater Magic Essence %s%%")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LCOSMIC, 0, 200, 1, "Lesser Cosmic Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LPLANAR, 0, 200, 1, "Lesser Planar Essence %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LETERNAL, 0, 200, 1, "Lesser Eternal Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LNETHER, 0, 200, 1, "Lesser Nether Essence %s%%")
@@ -188,6 +209,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LASTRAL, 0, 200, 1, "Lesser Astral Essence %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LMAGIC, 0, 200, 1, "Lesser Magic Essence %s%%")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..INFINITE, 0, 200, 1, "Infinite Dust %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..ARCANE, 0, 200, 1, "Arcane Dust %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..ILLUSION, 0, 200, 1, "Illusion Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..DREAM, 0, 200, 1, "Dream Dust %s%%")
@@ -195,18 +217,21 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SOUL, 0, 200, 1, "Soul Dust %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..STRANGE, 0, 200, 1, "Strange Dust %s%%")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..DREAM_SHARD, 0, 200, 1, "Dream Shard %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LPRISMATIC, 0, 200, 1, "Large Prismatic Shard %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LBRILLIANT, 0, 200, 1, "Large Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LRADIANT, 0, 200, 1, "Large Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LGLOWING, 0, 200, 1, "Large Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..LGLIMMERING, 0, 200, 1, "Large Glimmering Shard %s%%")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SDREAM_SHARD, 0, 200, 1, "Small Dream Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SPRISMATIC, 0, 200, 1, "Small Prismatic Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SBRILLIANT, 0, 200, 1, "Small Brilliant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SRADIANT, 0, 200, 1, "Small Radiant Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SGLOWING, 0, 200, 1, "Small Glowing Shard %s%%")
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..SGLIMMERING, 0, 200, 1, "Small Glimmering Shard %s%%")
 
+	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..ABYSS, 0, 200, 1, "Abyss Crystal %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..VOID, 0, 200, 1, "Void Crystal %s%%" )
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..NEXUS, 0, 200, 1, "Nexus Crystal %s%%")
 end
