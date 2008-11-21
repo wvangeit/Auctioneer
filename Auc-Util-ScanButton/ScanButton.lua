@@ -74,7 +74,14 @@ function private.HookAH()
 	private.buttons.stop.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.stop.tex:SetTexCoord(0.25, 0.5, 0, 1)
 	private.buttons.stop.tex:SetVertexColor(1.0, 0.9, 0.1)
-
+	--displays remaining # of scans queued	
+	private.buttons.stop.count = private.buttons.stop:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	private.buttons.stop.count:ClearAllPoints()
+	private.buttons.stop.count:SetPoint("RIGHT", private.buttons.stop, "LEFT", -5, 0)
+	private.buttons.stop.count:SetTextColor(1, 0.8, 0)
+	private.buttons.stop.count:SetText("0")
+	private.buttons.stop.count:SetJustifyH("RIGHT")
+	
 	private.buttons.play = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.play:SetPoint("TOPLEFT", private.buttons.stop, "TOPRIGHT", 2,0)
 	private.buttons.play:SetWidth(22)
@@ -113,6 +120,11 @@ function private.UpdateScanProgress()
 	if scanning or paused then
 		private.buttons.stop:Enable()
 		private.buttons.stop.tex:SetVertexColor(1.0, 0.9, 0.1)
+		if AucAdvanced.Scan.Private.scanStack then
+			private.buttons.stop.count:SetText(#AucAdvanced.Scan.Private.scanStack)
+		else
+			private.buttons.stop.count:SetText("0")
+		end
 	else
 		private.buttons.stop:Disable()
 		private.buttons.stop.tex:SetVertexColor(0.3,0.3,0.3)
