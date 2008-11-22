@@ -586,7 +586,7 @@ function private.CreateFrames()
 		if curNumber == -2 then
 			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
 		elseif curNumber == -1 then
-			frame.salebox.numberentry:SetText("APPR_Interface_All")--All
+			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_All') )--All
 		else
 			frame.salebox.numberentry:SetNumber(curNumber)
 		end
