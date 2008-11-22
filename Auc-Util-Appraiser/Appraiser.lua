@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "Appraiser"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local data, _
 local ownResults = {}
@@ -89,9 +89,9 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 
 	local value, bid, _, _, curModel = lib.GetPrice(hyperlink)
 		if value then
-			tooltip:AddLine("Appraiser (|cffddeeff"..curModel.."|r) x|cffddeeff"..quantity.."|r", value * quantity)
+			tooltip:AddLine(_TRANS('APPR_Tooltip_AppraiserCurModel'):format(curModel, quantity) , value * quantity)--Appraiser ({{%s}}x{{%s}}
 			if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
-				tooltip:AddLine("  Starting bid x|cffddeeff"..quantity.."|r", bid * quantity)
+				tooltip:AddLine("  ".._TRANS('APPR_Tooltip_StartingBid'):format(quantity), bid * quantity)--Starting bid x {{%d}}
 			end
 		end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
@@ -127,8 +127,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 			end
 			r,g,b = r or 1,g or 1, b or 1
 
-            tooltip:AddLine(format("  Posted %2d at avg/ea", countBO or countBid)..
-				(avgBO and "" or " (bid)"), avgBO or avgBid, r,g,b)    
+            tooltip:AddLine("  ".._TRANS('APPR_Tooltip_PostedCount'):format(countBO or countBid, avgBO and "" or " (bid)"), avgBO or avgBid, r,g,b)--Posted %2d at avg/ea %s
 		end
     end
 end
