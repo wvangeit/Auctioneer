@@ -673,25 +673,31 @@ function enchantTooltip(tooltip, name, link, isItem)
 	end
 end
 
-function hookTooltip(tip, link, count, name, link, quality)
+function hookTooltip(tipFrame, item, count, name, link, quality)
+
 	-- nothing to do, if enchantrix is disabled
 	if (not Enchantrix.Settings.GetSetting('all')) then
 		return
 	end
-	tooltip:SetFrame(tip)
+	
+	tooltip:SetFrame(tipFrame)
 
 	local itemType, itemId = tooltip:DecodeLink(link)
+
+--Enchantrix.Util.DebugPrintQuick("enx tooltip hook called", item, count, name, link, quality, itemType, itemId );
+
 	if itemType == "item" then
+		name = name or ""
 		itemTooltip(tooltip, name, link, quality, count or 1)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(tooltip, name, link, true)
 		end
-	elseif ltype == "enchant" or ltype == "spell" then
+	elseif itemType == "enchant" or itemType == "spell" then
 		name = name or ""
 		enchantTooltip(tooltip, name, link, false)
 	end
 
-	tooltip:ClearFrame(tip)
+	tooltip:ClearFrame(tipFrame)
 end
 
 Enchantrix.Tooltip = {
