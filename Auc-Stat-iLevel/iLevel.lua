@@ -338,20 +338,20 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 		end
 		if (average and average > 0) then
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.normal") then
-				tooltip:AddLine("  "..__TRANS('ILVL_Tooltip_Normalized') , average*quantity)--Normalized
+				tooltip:AddLine("  ".._TRANS('ILVL_Tooltip_Normalized') , average*quantity)--Normalized
 				if (quantity > 1) then
-					tooltip:AddLine("  "..__TRANS('ILVL_Tooltip_Individually') , average)--(or individually)
+					tooltip:AddLine("  ".._TRANS('ILVL_Tooltip_Individually') , average)--(or individually)
 				end
 			end
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.stdev") then
-				tooltip:AddLine("  "..__TRANS('ILVL_Tooltip_StdDeviation') , stdev*quantity)--Std Deviation
+				tooltip:AddLine("  ".._TRANS('ILVL_Tooltip_StdDeviation') , stdev*quantity)--Std Deviation
                 if (quantity > 1) then
-                    tooltip:AddLine("  "..__TRANS('ILVL_Tooltip_Individually') , stdev)--(or individually)
+                    tooltip:AddLine("  ".._TRANS('ILVL_Tooltip_Individually') , stdev)--(or individually)
                 end
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.ilevel.confid") then
-				tooltip:AddLine("  "..__TRANS('ILVL_Tooltip_Confidence'):format((floor(confidence*1000))/1000) )--Confidence: %s
+				tooltip:AddLine("  ".._TRANS('ILVL_Tooltip_Confidence'):format((floor(confidence*1000))/1000) )--Confidence: %s
 			end
 		end
 	end
