@@ -1079,7 +1079,7 @@ function private.CreateFrames()
 					local rate = AucAdvanced.depositRate or 0.05
 					local newfaction
 					if rate == .25 then newfaction = "neutral" end
-					depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, remain)
+					depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, curSize)
 					if depositVal then
 						depositVal = depositVal * depositMult
 					else
