@@ -89,37 +89,36 @@ function private.SetupConfigGui(gui)
 
 	id = gui:AddTab(libName, libType.." Modules")
 	gui:AddHelp(id, "what basic filter",
-		_TRANS('What is the Basic Filter?') ,
-		_TRANS('This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the minimum item level, and the minimum quality (Junk, Common, Uncommon, Rare, etc)\n')..
-		_TRANS('It also allows you to specify items from a certain seller to not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items\n') )
+		_TRANS('BASC_Help_WhatBasicFilter') ,--What is the Basic Filter?
+		_TRANS('BASC_Help_WhatBasicFilterAnswer') )--This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the minimum item level, and the minimum quality (Junk, Common, Uncommon, Rare, etc). It also allows you to specify items from a certain seller to not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items
 
-	gui:AddControl(id, "Header", 0, _TRANS('Basic filter options') )
+	gui:AddControl(id, "Header", 0, _TRANS('BASC_Interface_BasicFilterOptions') )--Basic filter options
 	last = gui:GetLast(id)
 
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",	0, 1,"filter.basic.activated",  _TRANS('Enable use of the Basic filter') )
-	gui:AddTip(id, _TRANS('Ticking this box will enable the basic filter to perform filtering of your auction scans') )
+	gui:AddControl(id, "Checkbox",	0, 1,"filter.basic.activated",  _TRANS('BASC_Interface_EnableBasicFilter') )--Enable use of the Basic filter
+	gui:AddTip(id, _TRANS('BASC_HelpTooltip_EnableBasicFilterAnswer') )--Ticking this box will enable the basic filter to perform filtering of your auction scans
 
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.ignoreself", _TRANS('Ignore own auctions') )
-	gui:AddTip(id, _TRANS('Ticking this box will disable adding auctions that you posted yourself to the snapshot.') )
+	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.ignoreself", _TRANS('BASC_Interface_IgnoreOwnAuctions') )--Ignore own auctions
+	gui:AddTip(id, _TRANS('BASC_Help_IgnoreOwnAuctionsAnswer') )--Ticking this box will disable adding auctions that you posted yourself to the snapshot.
 
-	gui:AddControl(id, "Subhead",	0, _TRANS('Filter by Quality') )
-	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, _TRANS('Minimum Quality: %d') )
-	gui:AddTip(id, _TRANS('"Use this slider to choose the minimum quality to go into storage.').."\n"..
+	gui:AddControl(id, "Subhead",	0, _TRANS('BASC_Interface_FilterQuality') )--Filter by Quality
+	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, _TRANS('BASC_Interface_MinimumQuality') )--Minimum Quality: %d
+	gui:AddTip(id, _TRANS('BASC_HelpTooltip_MinimumQuality').."\n"..--Use this slider to choose the minimum quality to go into storage.
 		"\n"..
-		"0 = ".._TRANS('Junk').."(|cff9d9d9d ".._TRANS('Grey').."|r),\n"..
-		"1 = ".._TRANS('Common').." (|cffffffff ".._TRANS('White').."|r),\n"..
-		"2 = ".._TRANS('Uncommon').." (|cff1eff00 ".._TRANS('Green').."|r),\n"..
-		"3 = ".._TRANS('Rare').." (|cff0070dd".._TRANS(' Blue').."|r),\n"..
-		"4 = ".._TRANS('Epic').." (|cffa335ee ".._TRANS('Purple').."|r)")
+		"0 = (|cff9d9d9d ".._TRANS('BASC_HelpTooltip_MinimumQualityJunk').."|r),\n"..--Junk
+		"1 = (|cffffffff ".._TRANS('BASC_HelpTooltip_MinimumQualityCommon').."|r),\n"..--Common
+		"2 = (|cff1eff00 ".._TRANS('BASC_HelpTooltip_MinimumQualityUncommon').."|r),\n"..--Uncommon
+		"3 = (|cff0070dd".._TRANS('BASC_HelpTooltip_MinimumQualityRare').."|r),\n"..--Rare
+		"4 = (|cffa335ee ".._TRANS('BASC_HelpTooltip_MinimumQualityEpic').."|r)")--Epic
 
-	gui:AddControl(id, "Subhead",	0, _TRANS('Filter by Item Level') )
-	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, _TRANS('Minimum item level') )
-	gui:AddTip(id, _TRANS('Enter the minimum item level to go into storage.') )
+	gui:AddControl(id, "Subhead",	0, _TRANS('BASC_Interface_FilterItemLevel') )--Filter by Item Level
+	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, _TRANS('BASC_Interface_MinimumItemLevel') )--Minimum item level
+	gui:AddTip(id, _TRANS('BASC_HelpTooltip_MinimumItemLevel') )--Enter the minimum item level to go into storage.
 
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Subhead",	0.55,    _TRANS('Ignore List') )
+	gui:AddControl(id, "Subhead",	0.55,    _TRANS('BASC_Interface_IgnoreList') )--Ignore List
 	gui:AddControl(id, "Custom", 	0.55, 0, BasicFilter_IgnoreListFrame); BasicFilter_IgnoreListFrame:SetParent(gui.tabs[id][3])
 
 end
