@@ -436,7 +436,7 @@ function getItemIdFromLink(link)
 	local itemType, itemId = tooltip:DecodeLink(link)
 	if (itemType == "item") then
 		return itemId
-end
+	end
 end
 
 function getIType(link)
@@ -863,7 +863,7 @@ function Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
 		return 0
 	end
 	local item = getItemIdFromLink(link);
-	if (not id) then
+	if (not item) then
 		--Enchantrix.Util.DebugPrintQuick( "nil item from link", link )
 		return 0
 	end
