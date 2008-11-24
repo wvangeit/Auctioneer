@@ -8,7 +8,7 @@
 ## SavedVariables: AucAdvancedStat_iLevelData
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Stat-StdDev.toc 3573 2008-10-09 11:25:57Z Norganna $
+## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
 
