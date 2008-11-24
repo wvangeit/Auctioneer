@@ -395,10 +395,12 @@ function lib.ClearItem(hyperlink, faction, realm)
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
-	if data[faction] then
-		if data[faction][itemSig] then
+	if data[faction] and data[faction][itemSig] then
+		local stats = private.UnpackStats(data[faction][itemSig])
+		if stats[iLevel] then
 			print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, faction))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
-			data[faction][itemSig][iLevel] = nil
+			stats[iLevel] = nil
+			data[faction][itemSig] = private.PackStats(stats)
 			return
 		end
 	end
