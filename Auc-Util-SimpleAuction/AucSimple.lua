@@ -71,7 +71,7 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 	local id = private.SigFromLink(link)
 	local settingstr = get("util.simpleauc."..realm.."."..id)
 	local market, seen, fixbuy, fixbid, stack
-	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aveBuy, aSeen = private.GetItems(link)
+	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aSeen, aveBuy = private.GetItems(link)
 	local reason = "Market"
 
 	tooltip:SetColor(0.4, 1.0, 0.9)
@@ -81,7 +81,7 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 		market = aveBuy
 		reason = "Current"
 	end
-	if (not market) and GetSellValue then
+	if (not market or market <= 0) and GetSellValue then
 		local vendor = GetSellValue(link)
 		if vendor and vendor > 0 then
 			market = vendor * 3

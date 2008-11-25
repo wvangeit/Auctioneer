@@ -179,7 +179,7 @@ function private.GetItems(link)
 			table.insert(items, item)
 		end
 	end
-	aveBuy = (aBuy or 0)/(aSeen or 1)
+	aveBuy = (aBuy and aSeen>=1) and aBuy/aSeen or 0
 	if not pricecache then pricecache = {} end
 	pricecache[sig] = {}
 	pricecache[sig][1] = strjoin(":", tostring(uBid), tostring(uBuy), tostring(lBid), tostring(lBuy), tostring(aSeen), tostring(aveBuy))
