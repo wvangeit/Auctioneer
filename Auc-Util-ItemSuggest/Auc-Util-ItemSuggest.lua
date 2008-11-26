@@ -71,8 +71,8 @@ local ahdeplength = {
 	{'48', "48 hour"},
 }
 default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-default("util.itemsuggest.enchantskill", 375) -- Used for item AI
-default("util.itemsuggest.jewelcraftskill", 375)-- Used for item AI
+default("util.itemsuggest.enchantskill", 450) -- Used for item AI
+default("util.itemsuggest.jewelcraftskill", 450)-- Used for item AI
 default("util.itemsuggest.vendorweight", 100)-- Used for item AI
 default("util.itemsuggest.auctionweight", 100)-- Used for item AI
 default("util.itemsuggest.prospectweight", 100)-- Used for item AI
@@ -95,9 +95,9 @@ function lib.SetupConfigGui(gui)
 	gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
 
     gui:AddControl(id, "Header",     0,    "Set skill usage limits if desired")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 375, 25, "Max Enchanting Skill On Realm. %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 450, 5, "Max Enchanting Skill On Realm. %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 375, 25, "Max JewelCrafting Skill On Realm. %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 450, 5, "Max JewelCrafting Skill On Realm. %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
 
 	gui:AddControl(id, "Header",     0,    "ItemSuggest Recommendation Bias")
