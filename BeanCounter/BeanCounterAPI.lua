@@ -97,34 +97,34 @@ if no date range is supplied then a sufficently large range to cover the entire 
 function lib.API.getAHProfit(player, item, lowDate, highDate)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
-
-	local sum, high, low, number =  0, 0198796618, 2198796618 --high and low are date ranges that will always fall out of the BeanCounters range of Dates
+	
+	local sum, low, high, date = 0, 9999999999, 0
 	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true}
-	local tbl = private.startSearch(item, settings, "none")
+	local tbl = private.startSearch(item, settings, true, 10000000)
 
-	for i,v in pairs(tbl.completedAuctions) do
-		local Time = tonumber(v[5])
-		number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
-		--Allow the user to filter a time range to look at
-		if lowDate and highDate then
-			if Time >= lowDate and Time <= highDate then
-				sum = sum + number
+	for i,v in pairs(tbl) do
+		date = tonumber(v[12])
+		--if user passes a low and high date to use, filter out any not in the range
+		local dateRange = true
+		if date and lowDate and highDate then--if we have high/low then set range to false 
+			dateRange = false
+			if lowDate < date and date < highDate then --set back to true if we meet conditions
+				dateRange = true
 			end
-		else --if no date ranges are supplied we find the min and max dates in the Database and return them as the range
-			if Time > high then high = Time elseif Time < low then low = Time end
-			sum = sum + number
 		end
-	end
-	for i,v in pairs(tbl["completedBids/Buyouts"]) do
-		local Time = tonumber(v[5])
-		number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
-		if lowDate and highDate then
-			if Time >= lowDate and Time <= highDate then
-				sum = sum - number
+		
+		if dateRange then
+			--store lower and upper date ranges
+			if date and date < low then low = date end
+			if date and date > high then high = date end
+			--Sum the trxns	
+			if v[2] == _BC('UiAucSuccessful') then
+				sum = sum+v[5]
+			elseif v[2] == _BC('UiWononBid') then
+				sum = sum-v[3]
+			elseif v[2] == _BC('UiWononBuyout') then
+				sum = sum-v[4]
 			end
-		else
-			if Time > high then high = Time elseif Time < low then low = Time end
-			sum = sum - number
 		end
 	end
 	return sum, lowDate or low, highDate or high
