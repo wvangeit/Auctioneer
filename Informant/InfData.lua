@@ -17397,9 +17397,9 @@ Informant.SetDatabase({
 	[20555]=":15000:9:3:1:::1:0:", -- Plans: Darkrune Helm
 	[20556]=":40667:2:3:1:::1:0:", -- Wildstaff
 	[20557]="3500:175:0:1:100:::5:0:15353,15354", -- Hallow\'s End Pumpkin Treat
-	[20558]="::10:2:2147483647:::1:0:", -- Warsong Gulch Mark of Honor
-	[20559]="::10:2:2147483647:::1:0:", -- Arathi Basin Mark of Honor
-	[20560]="::10:2:2147483647:::1:0:", -- Alterac Valley Mark of Honor
+	[20558]="::10:2::Currency::1:0:", -- Warsong Gulch Mark of Honor
+	[20559]="::10:2::Currency::1:0:", -- Arathi Basin Mark of Honor
+	[20560]="::10:2::Currency::1:0:", -- Alterac Valley Mark of Honor
 	[20561]=":1:4:1:1:::1:0:", -- Flimsy Male Dwarf Mask
 	[20562]=":1:4:1:1:::1:0:", -- Flimsy Female Dwarf Mask
 	[20563]=":1:4:1:1:::1:0:", -- Flimsy Female Nightelf Mask
@@ -23820,7 +23820,7 @@ Informant.SetDatabase({
 	[29426]=":200:12:1:250:::1:0:", -- Firewing Signet
 	[29428]="::12:1:1:::1:0:", -- Bessy\'s Bell
 	[29429]="::12:1:1:::1:0:", -- Boom\'s Doom
-	[29434]="::10:4:2147483647:::1:0:", -- Badge of Justice
+	[29434]="::10:4::Currency::1:0:", -- Badge of Justice
 	[29443]="::0:1:20:::1:0:", -- Bloodmaul Brutebane Brew
 	[29445]="::12:1:1:::1:0:", -- Surveying Markers
 	[29447]="::12:1:1:::1:0:", -- Fel Zapper
@@ -30746,7 +30746,7 @@ Informant.SetDatabase({
 	[37831]="::12:1:1:::1:0:", -- Mikhail\'s Journal
 	[37833]="::12:1:1:::1:0:", -- Ruby Brooch
 	[37835]=":107343:4:4:1:::1:0:", -- Je\'Tze\'s Bell
-	[37836]="::10:1:2147483647:::1:0:", -- Venture Coin
+	[37836]="::10:1::Currency::1:0:", -- Venture Coin
 	[37837]="0:0:7:1:250:::1:0:", -- Unknown
 	[37840]=":45743:4:3:1:::1:0:", -- Shroud of Reverberation
 	[37841]=":57377:4:3:1:::1:0:", -- Slag Footguards
@@ -33203,8 +33203,8 @@ Informant.SetDatabase({
 	[40749]="0:0:4:4:1:::1:0:", -- Unknown
 	[40750]="::4:4:1:::1:0:29703,31581,28995,31579", -- Xintor\'s Expeditionary Boots
 	[40751]="0:0:4:4:1:::1:0:", -- Unknown
-	[40752]="::10:4:2147483647:::1:0:", -- Emblem of Heroism
-	[40753]="::10:4:2147483647:::1:0:", -- Emblem of Valor
+	[40752]="::10:4::Currency::1:0:", -- Emblem of Heroism
+	[40753]="::10:4::Currency::1:0:", -- Emblem of Valor
 	[40755]=":68214:4:3:1:::1:0:", -- Enticing Sabatons
 	[40756]=":59053:4:3:1:::1:0:", -- Shoulders of the Seducer
 	[40757]=":32779:4:3:1:::1:0:", -- Shackles of Dark Whispers
@@ -33769,7 +33769,7 @@ Informant.SetDatabase({
 	[41593]=":4000:7:3:20::197:1:0:", -- Ebonweave
 	[41594]=":4000:7:3:20::197:1:0:", -- Moonshroud
 	[41595]=":4000:7:3:20::197:1:0:", -- Spellweave
-	[41596]="::10:2:2147483647:::1:0:", -- Dalaran Jewelcrafter\'s Token
+	[41596]="::10:2::Currency::1:0:", -- Dalaran Jewelcrafter\'s Token
 	[41597]="0:62500:1:3:1:::1:0:", -- Unknown
 	[41598]="0:45000:1:3:1:::1:0:", -- Unknown
 	[41599]=":12500:1:2:1:::1:0:", -- Frostweave Bag
@@ -34272,7 +34272,7 @@ Informant.SetDatabase({
 	[42422]="::13:1:10:::1:0:", -- Jotunheim Cage Key
 	[42423]="::12:1:10:::1:0:", -- Stormforged Eye
 	[42424]="::12:1:1:::1:0:", -- Diamond Tipped Pick
-	[42425]="::10:2:2147483647:::1:0:", -- Strand of the Ancients Mark of Honor
+	[42425]="::10:2::Currency::1:0:", -- Strand of the Ancients Mark of Honor
 	[42428]="8500:425:0:1:20:::5:0:29548", -- Carrot Cupcake
 	[42429]="16000:800:0:1:20:::5:0:29548", -- Red Velvet Cupcake
 	[42430]="8500:425:0:1:20:::5:0:29548", -- Dalaran Doughnut
@@ -34656,7 +34656,7 @@ Informant.SetDatabase({
 	[43012]=":200:7:1:20::185:1:0:", -- Rhino Meat
 	[43013]=":150:7:1:20::185:1:0:", -- Chilled Meat
 	[43015]="0:15000:0:1:20:::1:0:", -- Unknown
-	[43016]="::10:2:2147483647:::1:0:", -- Dalaran Cooking Award
+	[43016]="::10:2::Currency::1:0:", -- Dalaran Cooking Award
 	[43018]="::9:2:1:::1:0:31032,31031", -- Recipe: Mega Mammoth Meal
 	[43019]="::9:2:1:::1:0:31032,31031", -- Recipe: Tender Shoveltusk Steak
 	[43020]="::9:2:1:::1:0:31032,31031", -- Recipe: Spiced Wyrm Burger
@@ -34814,7 +34814,7 @@ Informant.SetDatabase({
 	[43217]="::12:1:10:::1:0:", -- Crystalline Heartwood
 	[43218]="::12:1:10:::1:0:", -- Ancient Elven Masonry
 	[43225]="::12:1:8:::1:0:", -- Crystallized Energy
-	[43228]="::10:3:2147483647:::1:0:", -- Stone Keeper\'s Shard
+	[43228]="::10:3::Currency::1:0:", -- Stone Keeper\'s Shard
 	[43229]="::12:1:1:::1:0:", -- Death\'s Gaze Orb
 	[43230]="4000:1000:0:1:20:::1:0:29961,2622,29015,28832,29922,30239,1325,5169,3561,16683,3490,30438,27176,5139,26598,27038,31115,25736,4585,29968,16268,29535,24313,30069,20121,29947,3334,27031,30244,30010,26950,29037,12097,10364,23732,3969,6779,3090,1457,27053,26382,27133,12096,26900,1326,29909,24349,27089,3135,15175,26945,28347,26568,24148,3551,18006,30306,27149,28869,3542,27186,24357", -- Instant Poison VIII
 	[43231]="4500:1125:0:1:20:::1:0:29961,2622,29015,28832,29922,30239,1325,5169,3561,16683,3490,30438,27176,5139,26598,27038,31115,25736,4585,29968,16268,29535,24313,30069,20121,29947,3334,27031,30244,30010,26950,29037,12097,10364,23732,3969,6779,3090,1457,27053,26382,27133,12096,26900,1326,29909,24349,27089,3135,15175,26945,28347,26568,24148,3551,18006,30306,27149,28869,3542,27186,24357", -- Instant Poison IX
@@ -34882,8 +34882,8 @@ Informant.SetDatabase({
 	[43300]="::4:4:1:::1:0:", -- Loremaster\'s Colors
 	[43305]=":39461:4:3:1:::1:0:", -- Shroud of Akali
 	[43306]=":48130:4:3:1:::1:0:", -- Gal\'darah\'s Signet
-	[43307]="0:0:10:4:2147483647:::1:0:", -- Unknown
-	[43308]="0:0:10:4:2147483647:::1:0:", -- Unknown
+	[43307]="0:0:10:4::Currency::1:0:", -- Unknown
+	[43308]="0:0:10:4::Currency::1:0:", -- Unknown
 	[43309]=":48130:4:3:1:::1:0:", -- Amulet of the Stampede
 	[43310]=":104119:4:3:1:::1:0:", -- Engraved Chestplate of Eck
 	[43311]=":67178:4:3:1:::1:0:", -- Helmet of the Shrine
@@ -35128,7 +35128,7 @@ Informant.SetDatabase({
 	[43586]=":138964:4:4:1:::1:0:", -- Icebane Chestguard
 	[43587]=":71644:4:4:1:::1:0:", -- Icebane Girdle
 	[43588]=":104024:4:4:1:::1:0:", -- Icebane Treads
-	[43589]="::10:2:2147483647:::1:0:", -- Wintergrasp Mark of Honor
+	[43589]="::10:2::Currency::1:0:", -- Wintergrasp Mark of Honor
 	[43590]=":99260:4:4:1:::1:0:", -- Polar Vest
 	[43591]=":53027:4:4:1:::1:0:", -- Polar Cord
 	[43592]=":79830:4:4:1:::1:0:", -- Polar Boots

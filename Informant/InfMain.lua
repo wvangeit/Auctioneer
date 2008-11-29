@@ -89,6 +89,7 @@ CLASS_TO_CATEGORY_MAP = {
 	[11] = 8, --Quiver
 	[9] = 9, --Recipe
 	[3] = 10, --Gem
+	[10] = 11, --Miscellaneous(Currency)
 	[15] = 11, --Miscellaneous
 	[13] = 11, --Miscellaneous
 	[5] = 11, --Miscellaneous
