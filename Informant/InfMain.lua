@@ -148,26 +148,14 @@ function getItem(itemID, static)
 		sell = tonumber(sell)
 	end
 	
-	-- if we have a local correction for this item, merge in the corrected data
-	local itemUpdateData
-	if (InformantLocalUpdates and InformantLocalUpdates.items) then
-		itemUpdateData = InformantLocalUpdates.items[ itemID ]
-		if (itemUpdateData) then
-			if (itemUpdateData.buy) then
-				buy = tonumber(itemUpdateData.buy)
-			end
-			if (itemUpdateData.sell) then
-				sell = tonumber(itemUpdateData.sell)
-			end
-			if (itemUpdateData.stack) then
-				stack = tonumber(itemUpdateData.stack)
-			end
-			if (itemUpdateData.quantity) then
-				quantity = tonumber(itemUpdateData.quantity)
-			end
-		end
+	-- work around a blizzard bug where honor tokens return stack size 2147483647
+	-- this only seems to happen for the obsolete honor tokens shown in the currency frame
+	-- See JIRA INF-41
+	if (itemSubType == "Money(OBSOLETE)" and itemStackSize == 2147483647) then
+		itemStackSize = nil
+		stack = nil
 	end
-
+	
 	-- if we have a local correction for this item, merge in the corrected data
 	local itemUpdateData
 	if (InformantLocalUpdates and InformantLocalUpdates.items) then
@@ -1045,7 +1033,8 @@ Informant = {
 	GetLocale = getLocale,
 	GetQuestName = getQuestName,
 	OnEvent = onEvent,
-	DebugPrint = infDebugPrint
+	DebugPrint = infDebugPrint,
+	DebugPrintQuick = debugPrintQuick
 }
 
 
