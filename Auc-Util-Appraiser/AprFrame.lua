@@ -1102,7 +1102,8 @@ function private.CreateFrames()
 					totalBuy = totalBuy + (buyVal * curNumber)
 					totalDeposit = totalDeposit + (depositVal * curNumber)
 				end
-			else
+			else -- non-stackable
+				frame.salebox.stack.label:SetText(_TRANS('APPR_Interface_NotStackable')) --Item is not stackable
 				local maxStax = frame.salebox.count
 				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
 				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
