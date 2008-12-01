@@ -151,7 +151,7 @@ function getItem(itemID, static)
 	-- work around a blizzard bug where honor tokens return stack size 2147483647
 	-- this only seems to happen for the obsolete honor tokens shown in the currency frame
 	-- See JIRA INF-41
-	if (itemSubType == "Money(OBSOLETE)" and itemStackSize == 2147483647) then
+	if (itemStackSize == 2147483647) then
 		itemStackSize = nil
 		stack = nil
 	end
