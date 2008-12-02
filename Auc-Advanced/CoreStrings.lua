@@ -80,8 +80,6 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Es wurde während des Klickens des Posteneinstellungsbuttons eine unbekannte Tastenkombination gedrückt.";
 		["APPR_Help_CannotPostAuctions"]	= "Die Auktion kann nicht eingestellt werden:";
 		["APPR_Help_Duration"]	= "- Dauer: {{%d hours}}";
-		["APPR_Help_HowBid priceCalculated"]	= "Wie wird der gebotene Preis kalkuliert?";
-		["APPR_Help_HowBid priceCalculatedAnswer"]	= "Außer für Gegenstände zum Festpreis, wird der Startgebotspreis auf Basis des ursprünglichen Aufkaufpreises kalkuliert. Die Optionen zur Kalkulation des gebotenen Preises ermöglicht es Ihnen genauer zu spezifizieren, wie der gebotene Preis reduziert werden soll. Die Optionen sind kumulativ, so dass Sie sowohl einen Preisabschlagsprozent festlegen, als auch die Hinterlegunskosten abziehen können. Der gebotene Wert wird sodann wie folgt kalkuliert: (%s Aufkauf %s-%s Preisabschlag %s-%s Hinterlegung %s)";
 		["APPR_Help_HowMarkdownPctCalculated"]	= "Wie wird der Preisabschlagsprozent kalkuliert?";
 		["APPR_Help_HowMarkdownPctCalculatedAnswer"]	= "Die Summe wird durch die Multiplikation des kalkulierten Wertes mit dem Prozentbetrag berechnet, der in den Optionen näher spezifiziert ist. Dieser Betrag wird dann zur Erzeugung des Startgebotspreises von dem kalkulierten Wert abgezogen (gemeinsam mit dem festen Abzugsbetrag und/oder der Hinterlegungssumme, falls näher spezifiziert).";
 		["APPR_Help_NeedOnlyHavePosting"]	= "Benötige %d von %s : Verfüge nur über %d , Stelle %d ein.";
@@ -290,6 +288,7 @@ AuctioneerLocalizations = {
 		["ILVL_HelpTooltip_DisplayMean"]	= "Schaltet die Anzeige der Durchschnittsberechnung im Tooltip an oder aus";
 		["ILVL_HelpTooltip_DisplayNormalized"]	= "Stellt die Anzeige der Normalisierungsberechnung in tooltips an oder aus";
 		["ILVL_HelpTooltip_DisplayStdDeviation"]	= "Schaltet die Anzeige der Standardabweichung im Tooltip an oder aus";
+		["ILVL_HelpTooltip_EnableILevelStats"]	= "Erlaubt iLevel das Sammeln und die Ausgabe von Preisdaten";
 		["ILVL_HelpTooltip_MultiplyStack"]	= "Multipliziert mit der aktuellen Stapelgrösse, wenn aktiviert";
 		["ILVL_HelpTooltip_ShowiLevel"]	= "Schaltet die Anzeige der Statistiken aus dem iLevel-Modul an oder aus";
 		["OUTL_HelpTooltip_MaximumPct"]	= "Setzt den maximalen Prozentsatz um den der Gegenstandspreis steigen darf, bevor er rausgefiltert wird";
@@ -416,6 +415,7 @@ AuctioneerLocalizations = {
 		["APPR_Interface_NoteMinBidLessVendor"]	= "Achtung: Mindestgebot <= Händlerpreis";
 		["APPR_Interface_NoteNoAuctionableItems"]	= "Achtung: Keine Gegenstände für Auktion";
 		["APPR_Interface_NoteNumbersRounded"]	= "Sollen Preise auf einen gewissen Anteil (z.B. Mehrfache von 0.25 = 0.25, 0.50, 0.75) oder auf einen bestimmten Stoppwert (z.B. immer 0.95, 0.99) gerundet werden, bitte diese Option nutzen. \nEs können entweder Anteil (z.B. 0.25) oder Stoppwert (z.B. 0.95) gesetzt werden. Dazu bitte den Schieberegler benutzen.\nAußerdem kann festgelegt werden, ab welchem Betrag Rundungen zur nächst höheren Einheit stattfinden sollen (z.B. ist der Betrag auf 5g gesetzt, wird 4g 72s 15c noch bei der Kupferstelle gerundet, jedoch 5g 72s 15c bereits bei der Silberstelle).     ";
+		["APPR_Interface_NotStackable"]	= "Gegenstand ist nicht Stapelbar";
 		["APPR_Interface_NumberAllFullStacks"]	= "Anzahl: Alle vollen Stapel (%d) = %d";
 		["APPR_Interface_NumberAllItems"]	= "Anzahl: Alle Items = %d";
 		["APPR_Interface_NumberAllStacksPlus"]	= "Anzahl: Alle vollen Stapel (%d) + %d = %d";
@@ -659,8 +659,8 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Unknown key combination pressed while clicking batch post button.";
 		["APPR_Help_CannotPostAuctions"]	= "Cannot post auctions:";
 		["APPR_Help_Duration"]	= "- Duration: {{%d hours}}";
-		["APPR_Help_HowBid priceCalculated"]	= "How does the bid price get calculated?";
-		["APPR_Help_HowBid priceCalculatedAnswer"]	= "Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).";
+		["APPR_Help_HowBidPriceCalculated"]	= "How does the bid price get calculated?";
+		["APPR_Help_HowBidPriceCalculatedAnswer"]	= "Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).";
 		["APPR_Help_HowMarkdownPctCalculated"]	= "How is the markdown percentage calculated?";
 		["APPR_Help_HowMarkdownPctCalculatedAnswer"]	= "The amount is calculated by multiplying the calculated value by the percentage amount which is specified in the options. This amount is then subtracted from the calculated value (along with the fixed subtract amount and/or the deposit amount if specified) to produce the starting bid price.";
 		["APPR_Help_NeedOnlyHavePosting"]	= "Need %d of %s only have %d, posting %d";
@@ -1259,6 +1259,10 @@ AuctioneerLocalizations = {
 		["AHWC_Help_CompactUIFontScaleAnswer"]	= "La barra de escala de fuente de CompactUI ajusta el tamaño del texto mostrado en la pestaña Browse de AucAdvance CompactUI. El tamaño por defecto es 0.";
 		["AHWC_Help_ProtectWindowAnswer"]	= "La ventana de la Casa de Subastas es normalmente cerrada cuando abres otras ventanas, como son la ventana Social, el Registro de Busqueda, o la ventana de Profesion. Esta option permite mantenerla abierta, detras de esas otras ventanas.";
 
+		-- Section: HelpTooltip
+		["AHWC_HelpToolTip_AuctionHouseScale"]	= "Esta opción permite ajustar el tamaño de la ventana de la Casa de Subastas. Por defecto es 1.";
+		["AHWC_HelpToolTip_PreventClosingAuctionHouse"]	= "Esto evitará que cuando abras otras ventanas se cierre la ventana de la Casa de Subastas";
+
 		-- Section: Interface
 		["AHWC_Interface_AllowMovable"]	= "Permitir que el marco de subasta sea movible";
 		["AHWC_Interface_Always"]	= "Siempre";
@@ -1357,9 +1361,9 @@ AuctioneerLocalizations = {
 
 		-- Section: Tooltip
 		["APPR_Tooltip_AppraiserCurModel"]	= "Appraiser ({{%s}}x{{%s}} ";
-		["APPR_Tooltip_PostedCount"]	= "Entrada %2d a avg/ea %s ";
+		["APPR_Tooltip_PostedCount"]	= "Entrada %2d a media/cada %s ";
 		["APPR_Tooltip_StartingBid"]	= "Puja inicial x {{%d}} ";
-		["ASAL_Tooltip_ StdDeviation"]	= "Variacion Std";
+		["ASAL_Tooltip_ StdDeviation"]	= "Variacion Estandar";
 		["ASAL_Tooltip_3DaysBought"]	= "compra media 3 dias {{%s}}";
 		["ASAL_Tooltip_3DaysSold"]	= "venta media 3 dias {{%s}}";
 		["ASAL_Tooltip_7DaysBought"]	= "compra media 7 dias {{%s}}";
@@ -1371,37 +1375,37 @@ AuctioneerLocalizations = {
 		["ASAL_Tooltip_TotalBought"]	= "total comprados {{%s}} de media cada";
 		["ASAL_Tooltip_TotalSold"]	= "total vendidos {{%s}} de media cada";
 		["ILVL_Tooltip_Confidence"]	= "Confianza: %s";
-		["ILVL_Tooltip_iLevelPrices"]	= "iLevel precios (%s points): ";
+		["ILVL_Tooltip_iLevelPrices"]	= "iLevel precios (%s puntos): ";
 		["ILVL_Tooltip_Individually"]	= "(o individual)";
 		["ILVL_Tooltip_MeanPrice"]	= "precio bruto";
-		["ILVL_Tooltip_Normalized"]	= "normalizado";
-		["ILVL_Tooltip_StdDeviation"]	= "Variacion Std";
+		["ILVL_Tooltip_Normalized"]	= "Normalizado";
+		["ILVL_Tooltip_StdDeviation"]	= "Variacion Estandar";
 		["PURC_Tooltip_14DayAverage"]	= "media 14 dias";
 		["PURC_Tooltip_3DayAverage"]	= "media 3 dias";
 		["PURC_Tooltip_7DayAverage"]	= "media 7 dias";
 		["PURC_Tooltip_PurchasedPrices"]	= "Precios comprado:";
 		["PURC_Tooltip_SeenNumberDays"]	= "Vistos {{%s}} en {{%s}} Dias:";
-		["PURC_Tooltip_SeenToday"]	= "Vistos {{%s}}hoy";
+		["PURC_Tooltip_SeenToday"]	= "Vistos {{%s}} hoy";
 		["SDEV_Tooltip_Confidence"]	= "confianza:";
 		["SDEV_Tooltip_Individually"]	= "(o individual)";
 		["SDEV_Tooltip_MeanPrice"]	= "precio bruto";
-		["SDEV_Tooltip_Normalized"]	= "normalizado";
+		["SDEV_Tooltip_Normalized"]	= "Normalizado";
 		["SDEV_Tooltip_PricesPoints"]	= "StdDev precio {{%d}} puntos:";
-		["SDEV_Tooltip_StdDeviation"]	= "Variacon Std";
+		["SDEV_Tooltip_StdDeviation"]	= "Desviación Estandar";
 		["SHTG_Tooltip_Individually"]	= "(o individual):";
 		["SHTG_Tooltip_IQR"]	= "IQR:";
 		["SHTG_Tooltip_Median"]	= "media:";
 		["SHTG_Tooltip_Precision"]	= "precision:";
-		["SHTG_Tooltip_Prices"]	= "precios historial x {{%s}}) : (visto {{%s}}) \n";
+		["SHTG_Tooltip_Prices"]	= "precios historial x {{%s}}) : (visto {{%s}})\n";
 		["SHTG_Tooltip_PricesSeenOnce"]	= "precios historial: (visto {{%s}}) ";
 		["SIMP_Tooltip_14DayAverage"]	= "media 14 dias";
 		["SIMP_Tooltip_3DayAverage"]	= "media 3 dias";
 		["SIMP_Tooltip_7DayAverage"]	= "media 7 dias";
-		["SIMP_Tooltip_AverageMBO"]	= "media CA";
+		["SIMP_Tooltip_AverageMBO"]	= "Media Por Objetivos";
 		["SIMP_Tooltip_SeenNumberDays"]	= "Vistos {{%s}} en {{%s}} dias:";
 		["SIMP_Tooltip_SeenToday"]	= "Vistos {{%s}} Hoy:";
-		["SIMP_Tooltip_SimplePrices"]	= "precios Simple";
-		["SIMP_Tooltip_TodaysMBO"]	= "media CA de hoy";
+		["SIMP_Tooltip_SimplePrices"]	= "Precios simples:";
+		["SIMP_Tooltip_TodaysMBO"]	= "Media precio de compra de hoy";
 		["UCUT_Tooltip_CannotUndercut"]	= "rebaja: %s No puedo rebajar";
 		["UCUT_Tooltip_CompetitionAbove"]	= "Rebaja: %s Competencia supera mercado";
 		["UCUT_Tooltip_MovingPrice"]	= "precio flotante";
@@ -1441,8 +1445,6 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchUnknownKeyCombo"]	= "La combinaison principale inconnue a pressé tout en cliquant sur le bouton de poteau en lots";
 		["APPR_Help_CannotPostAuctions"]	= "Ne peut pas mettre ces articles en vente:";
 		["APPR_Help_Duration"]	= "- Durée: {{%d hours}} ";
-		["APPR_Help_HowBid priceCalculated"]	= "Comment fait le prix de soumission offert obtenez calculé";
-		["APPR_Help_HowBid priceCalculatedAnswer"]	= "Excepté des articles de prix rigide, le prix de soumission offert commençant est calculé a basé outre du prix racheté original. Les options de calcul de prix de soumission offert te permettent de spécifier comment le prix de soumission offert est réduit, et les options sont cumulatives, ainsi si vous placez un pour cent de baisse, et soustraient le coût de dépôt, puis la valeur d'offre sera calculée As (%s Rachat %s-%s Baisse %s-%s Dépôt %s)";
 		["APPR_Help_HowMarkdownPctCalculated"]	= "Comment le pourcentage de baisse est-il calculé ? ";
 		["APPR_Help_HowMarkdownPctCalculatedAnswer"]	= "La quantité est calculée en multipliant la valeur calculée par la quantité de pourcentage qui est spécifiée dans les options. Cette quantité est alors soustraite de la valeur calculée (avec le fixe soustrayez la quantité et/ou la quantité de dépôt si spécifique) pour produire le prix de soumission offert commençant.";
 		["APPR_Help_NeedOnlyHavePosting"]	= "Il faut %d %s, vous n'en avez que %d, on en envoie %d";
@@ -1653,6 +1655,7 @@ AuctioneerLocalizations = {
 		["SIMP_Tooltip_7DayAverage"]	= "Moyenne sur 7 jours";
 		["SIMP_Tooltip_SimplePrices"]	= "Prix simples:";
 		["WECN_Tooltip_GlobalPrice"]	= "Prix global:";
+		["WECN_Tooltip_GlobalSeen"]	= "Vue globale {{%s}}:";
 		["WECN_Tooltip_Individually"]	= "(ou individuellement)";
 		["WECN_Tooltip_NeverSeen"]	= "Jamais vu sur ce serveur";
 
@@ -1717,7 +1720,6 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Ongekende toetscombinatie ingedrukt tijdens het klikken van de batchpost knop.";
 		["APPR_Help_CannotPostAuctions"]	= "Kan auctions niet verzenden:";
 		["APPR_Help_Duration"]	= "- Tijd: {{%d uren}}";
-		["APPR_Help_HowBid priceCalculated"]	= "Hoe wordt de bied prijs berekend?";
 
 		-- Section: HelpTooltip
 		["AHWC_HelpTooltip_AllowMovable"]	= "Deze optie stelt je in staat het Aution venster te verplaatsen";
@@ -1870,7 +1872,6 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Зажата неизвестная комбинация кнопок при нажатии кнопки отправки.";
 		["APPR_Help_CannotPostAuctions"]	= "Невозможно объявить аукцион:";
 		["APPR_Help_Duration"]	= "- Продолжительность: {{%d часов}}";
-		["APPR_Help_HowBid priceCalculated"]	= "Как будет считаться ставка?";
 		["APPR_Help_HowMarkdownPctCalculated"]	= "Как вычисляется процент уценки?";
 		["APPR_Help_HowMarkdownPctCalculatedAnswer"]	= "Результирующее значение вычисляется умножением расчитанного значения на значение в процентах, которое указано в настройках. После этого, это значение вычитается из расчетной величины (вместе с фиксированой величиной вычета и (или) величиной депозита , если она указана) для получения начальной цены ставки";
 		["APPR_Help_NeedOnlyHavePosting"]	= "Нужно %d из %s, есть только %d, отправлено %d";
