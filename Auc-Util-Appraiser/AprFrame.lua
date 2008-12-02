@@ -1001,7 +1001,7 @@ function private.CreateFrames()
 						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllFullStacks'):format(maxStax, fullPop))--Number: All full stacks (%d) = %d
 						frame.salebox.totalsize:SetText("("..(fullPop)..")")
 					else
-						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllStacksPlus'):format(maxStax, remain, count))--Number: All full stacks (%d) = %d
+						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllStacksPlus'):format(maxStax, remain, count))--Number: All stacks (%d) plus %d = %d
 						frame.salebox.totalsize:SetText("("..(count)..")")
 					end
 					if (maxStax > 0) then

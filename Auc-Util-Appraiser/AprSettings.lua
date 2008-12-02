@@ -328,7 +328,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_UseMatchingDefault') )--Use Matching by Default
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.match", _TRANS('APPR_Interface_UseMatchingDefault') )--Use Matching by Default
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_UseMatchingDefault') )--This option determines whether to default to checking or unchecking the match competition checkbox.
-	gui:AddControl(id, "Subhead",    0,   _TRANS( 'APPR_Interface_DefaultListingTime') )--Default Listing Time
+	gui:AddControl(id, "Subhead",    0,   _TRANS('APPR_Interface_DefaultListingTime') )--Default Listing Time
 	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", _TRANS('APPR_Interface_DefaultListingDuration') )--Default listing duration
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_DefaultListingDuration') )--You may set a default auction listing duration for items that do not have a specific duration set.
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_DefaultStackSize') )--Default Stack Size
@@ -360,8 +360,8 @@ function private.SetupConfigGui(gui)
 		_TRANS('APPR_Help_WhatStartingBidAnswer') )--The starting bid is also known as the minimum bid. It is the price that the first bidder must match or exceed in order to place the bid. From there, the next bids must go up in bid increments based off the current bid.
 
 	gui:AddHelp(id, "how bid calculated?",
-		_TRANS('APPR_Help_HowBid priceCalculated') ,--How does the bid price get calculated?
-		_TRANS('APPR_Help_HowBid priceCalculatedAnswer).'):format("|cffffff00","|r", "|cffffff00", "|r", " |cffffff00", "|r" ) )--Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).
+		_TRANS('APPR_Help_HowBidPriceCalculated') ,--How does the bid price get calculated?
+		_TRANS('APPR_Help_HowBidPriceCalculatedAnswer).'):format("|cffffff00","|r", "|cffffff00", "|r", " |cffffff00", "|r" ) )--Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).
 
 	gui:AddHelp(id, "how markdown calculated",
 		_TRANS('APPR_Help_HowMarkdownPctCalculated') ,--How is the markdown percentage calculated?
@@ -373,8 +373,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.buy", _TRANS('APPR_Interface_RoundBuyoutValue') )--Round buyout value
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_RoundBuyoutValue') )--This option causes the buyout amount for any stacks posted to be rounded according to the following rules
 	gui:AddControl(id, "Selectbox",  0, 1, {
-				{"unit","APPR_Interface_StopValue"},--Stop value
-				{"div","APPR_Interface_Divisions"}--Divisions
+				{"unit",_TRANS('APPR_Interface_StopValue') },--Stop value
+				{"div",_TRANS('APPR_Interface_Divisions') }--Divisions
 				}, "util.appraiser.round.method", _TRANS('APPR_Interface_RoundingMethodUse') )--Rounding method to use
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_RoundingMethodUse') )--You select the rounding algorithm to use for rounding the selected stack prices.
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, _TRANS('APPR_Interface_Rounding').." %0.02f" )--Rounding at:
