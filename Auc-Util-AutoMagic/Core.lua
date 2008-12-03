@@ -32,129 +32,87 @@ local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
-
--- Setting mats and gems itemID's to something understandable
--- enchant mats
-local VOID = 22450
-local NEXUS = 20725
-local LPRISMATIC = 22449
-local LBRILLIANT = 14344
-local LRADIANT = 11178
-local LGLOWING = 11139
-local LGLIMMERING = 11084
-local SPRISMATIC = 22448
-local SBRILLIANT = 14343
-local SRADIANT = 11177
-local SGLOWING = 11138
-local SGLIMMERING = 10978
-local GPLANAR = 22446
-local GETERNAL = 16203
-local GNETHER = 11175
-local GMYSTIC = 11135
-local GASTRAL = 11082
-local GMAGIC = 10939
-local LPLANAR = 22447
-local LETERNAL = 16202
-local LNETHER = 11174
-local LMYSTIC = 11134
-local LASTRAL = 10998
-local LMAGIC = 10938
-local ARCANE = 22445
-local ILLUSION = 16204
-local DREAM = 11176
-local VISION = 11137
-local SOUL = 11083
-local STRANGE = 10940
--- gems
-local TIGERSEYE = 818
-local MALACHITE = 774
-local SHADOWGEM = 1210
-local LESSERMOONSTONE = 1705
-local MOSSAGATE = 1206
-local CITRINE = 3864
-local JADE = 1529
-local AQUAMARINE = 7909
-local STARRUBY = 7910
-local AZEROTHIANDIAMOND = 12800
-local BLUESAPPHIRE = 12361
-local LARGEOPAL = 12799
-local HUGEEMERALD = 12364
-local BLOODGARNET = 23077
-local FLAMESPESSARITE = 21929
-local GOLDENDRAENITE = 23112
-local DEEPPERIDOT = 23709
-local AZUREMOONSTONE = 23117
-local SHADOWDRAENITE = 23107
-local LIVINGRUBY = 23436
-local NOBLETOPAZ = 23439
-local DAWNSTONE = 23440
-local TALASITE = 23427
-local STAROFELUNE = 23428
-local NIGHTSEYE = 23441
-
 -- This table is validating that each ID within it is a gem from prospecting.
 local isGem =
 	{
-	[TIGERSEYE] = true,
-	[MALACHITE] = true,
-	[SHADOWGEM] = true,
-	[LESSERMOONSTONE] = true,
-	[MOSSAGATE] = true,
-	[CITRINE] = true,
-	[JADE] = true,
-	[AQUAMARINE] = true,
-	[STARRUBY] = true,
-	[AZEROTHIANDIAMOND] = true,
-	[BLUESAPPHIRE] = true,
-	[LARGEOPAL] = true,
-	[HUGEEMERALD] = true,
-	[BLOODGARNET] = true,
-	[FLAMESPESSARITE] = true,
-	[GOLDENDRAENITE] = true,
-	[DEEPPERIDOT] = true,
-	[AZUREMOONSTONE] = true,
-	[SHADOWDRAENITE] = true,
-	[LIVINGRUBY] = true,
-	[NOBLETOPAZ] = true,
-	[DAWNSTONE] = true,
-	[TALASITE] = true,
-	[STAROFELUNE] = true,
-	[NIGHTSEYE] = true,
+	[818] = true,--TIGERSEYE
+	[774] = true,--MALACHITE
+	[1210] = true,--SHADOWGEM
+	[1705] = true,--LESSERMOONSTONE
+	[1206] = true,--MOSSAGATE
+	[3864] = true,--CITRINE
+	[1529] = true,--JADE
+	[7909] = true,--AQUAMARINE
+	[7910] = true,--STARRUBY
+	[12800] = true,--AZEROTHIANDIAMOND
+	[12361] = true,--BLUESAPPHIRE
+	[12799] = true,--LARGEOPAL
+	[12364] = true,--HUGEEMERALD
+	[23077] = true,--BLOODGARNET
+	[21929] = true,--FLAMESPESSARITE
+	[23112] = true,--GOLDENDRAENITE
+	[23709] = true,--DEEPPERIDOT
+	[23117] = true,--AZUREMOONSTONE
+	[23107] = true,--SHADOWDRAENITE
+	[23436] = true,--LIVINGRUBY
+	[23439] = true,--NOBLETOPAZ
+	[23440] = true,--DAWNSTONE
+	[23437] = true,--TALASITE
+	[23428] = true,--STAROFELUNE
+	[23441] = true,--NIGHTSEYE
+	[36920] = true,--SUNCRYSTAL
+	[36926] = true,--SHADOWCRYSTAL
+	[36929] = true,--HUGECITRINE
+	[36932] = true,--DARKJADE
+	[36923] = true,--CHALCEDONY
+	[36917] = true,--BLOODSTONE
+	[36927] = true,--TWILIGHTOPAL
+	[36924] = true,--SKYSAPPHIRE
+	[36918] = true,--SCARLETRUBY
+	[36930] = true,--MONARCHTOPAZ
+	[36933] = true,---FORESTEMERALD
+	[36921] = true,--AUTUMNSGLOW
 }
 
 -- This table is validating that each ID within it is a mat from disenchanting.
 local isDEMats =
 	{
-	[VOID] = true,
-	[NEXUS] = true,
-	[LPRISMATIC] = true,
-	[LBRILLIANT] = true,
-	[LRADIANT] = true,
-	[LGLOWING] = true,
-	[LGLIMMERING] = true,
-	[SPRISMATIC] = true,
-	[SBRILLIANT] = true,
-	[SRADIANT] = true,
-	[SGLOWING] = true,
-	[SGLIMMERING] = true,
-	[GPLANAR] = true,
-	[GETERNAL] = true,
-	[GNETHER] = true,
-	[GMYSTIC] = true,
-	[GASTRAL] = true,
-	[GMAGIC] = true,
-	[LPLANAR] = true,
-	[LETERNAL] = true,
-	[LNETHER] = true,
-	[LMYSTIC] = true,
-	[LASTRAL] = true,
-	[LMAGIC] = true,
-	[ARCANE] = true,
-	[ILLUSION] = true,
-	[DREAM] = true,
-	[VISION] = true,
-	[SOUL] = true,
-	[STRANGE] = true,
+	[34057] = true,--Abyss Crystal
+	[22450] = true,--Void Crystal
+	[20725] = true,--Nexus Crystal
+	[34052] = true,--Dream Shard
+	[34053] = true,--Small Dream Shard
+	[22449] = true,--Large Prismatic Shards
+	[14344] = true,--Large Brillianr Shards
+	[11178] = true,--Large Radiant Shards
+	[11139] = true,--Large Glowing Shards
+	[11084] = true,--Large Glimmering Shards
+	[22448] = true,--Small Primatic Shards
+	[14343] = true,--Small Brilliant Shards
+	[11177] = true,--Small Radiant Shards
+	[11138] = true,--Small Glowing Shards
+	[10978] = true,--Small Glimmering Shards
+	[34055] = true,--Greater Cosmic Essence
+	[34056] = true,--Lesser Cosmic Essence
+	[22446] = true,--Greater Planer Essence
+	[16203] = true,--Greater Eternal Essence
+	[11175] = true,--Greater Nether Essence
+	[11135] = true,--Greater Mystic Essence
+	[11082] = true,--Greater Astral Essence
+	[10939] = true,--Greater Magic Essence
+	[22447] = true,--Lesser Planer Essence
+	[16202] = true,--Lesser Eternal Essence
+	[11174] = true,--Lesser Nether Essence
+	[11134] = true,--Lesser Mystic Essence
+	[10998] = true,--Lesser Astral Essence
+	[10938] = true,--Lesser Magic Essence
+	[34054] = true, --Infinite Dust
+	[22445] = true,--Arcane Dust
+	[16204] = true,--Illusion Dust
+	[11176] = true,--Dream Dust
+	[11137] = true,--Vision Dust
+	[11083] = true,--Soul Dust
+	[10940] = true,--Strange Dust
 }
 
 lib.vendorlist = {}
@@ -188,7 +146,7 @@ function lib.vendorAction()
 end
 
 function lib.disenchantAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -199,7 +157,7 @@ function lib.disenchantAction()
 				runstop = 0
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
-				if (get("util.automagic.overidebtmmail") == true) then
+				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
 					if(aimethod == "Disenchant") then
 						if (get("util.automagic.chatspam")) then
@@ -212,7 +170,7 @@ function lib.disenchantAction()
 					local reason, text = lib.getReason(itemLink, itemName, itemCount, "disenchant")
 					if reason and text then
 						if (get("util.automagic.chatspam")) then
-							print("AutoMagic has loaded", itemName, " due to ",text ,"Rule(Disenchant)")
+							print("AutoMagic has loaded", itemName, " due to", text ,"Rule(Disenchant)")
 						end
 						UseContainerItem(bag, slot)
 					end
@@ -223,7 +181,7 @@ function lib.disenchantAction()
 end
 
 function lib.prospectAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -234,7 +192,7 @@ function lib.prospectAction()
 				local _, itemID, _, _, _, _ = decode(itemLink)
 				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 				runstop = 0
-				if (get("util.automagic.overidebtmmail") == true) then
+				if (AucAdvanced.Modules.Util.ItemSuggest and get("util.automagic.overidebtmmail") == true) then
 					local aimethod = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest(itemLink, itemCount)
 					if(aimethod == "Prospect") then
 						if (get("util.automagic.chatspam")) then
@@ -258,7 +216,7 @@ function lib.prospectAction()
 end
 
 function lib.gemAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
@@ -280,7 +238,7 @@ function lib.gemAction()
 end
 
 function lib.dematAction()
-	MailFrameTab_OnClick(2)
+	MailFrameTab_OnClick(nil, 2)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
