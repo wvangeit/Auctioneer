@@ -336,10 +336,11 @@ function private.OnUpdate()
 				lib.PushSearch()
 		end
 	elseif private.CurAuction["link"] then --AH was closed, so reinsert current request back into the queue
-		table.insert(private.BuyRequests, 1, private.CurAuction)
+		table.insert(private.BuyRequests, 1, replicate(private.CurAuction))
 		private.Searching = false
-		private.Prompt:Hide()
 		empty(private.CurAuction)--clear the CurAuction table so that we know to start a new search again
+		private.Prompt:Hide()
+		AucAdvanced.Scan.SetPaused(false)
 	else
 		private.Searching = false
 	end
