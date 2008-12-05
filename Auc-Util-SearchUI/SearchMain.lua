@@ -546,7 +546,40 @@ function private.purchase()
 	end
 	private.removeline()
 end
+--Will buy/bid ALL auctions based on "reason" column
+function private.purchaseall()
+	gui.sheet.selected = gui.sheet.sort[1]
+	if not gui.sheet.selected then
+		return
+	end
+	lib.UpdateControls()
+	local count = 0
+	while #gui.sheet.sort > 0 and (gui.sheet.sort[1] or count < 5000 ) do
+		count = count+1--emergency break routine
+		local enableres = lib.GetSetting("reserve.enable")
+		local reserve = lib.GetSetting("reserve") or 1
+		local bidqueue = gui.frame.cancel.value or 0
+		local balance = GetMoney()
+		balance = balance - bidqueue --account for money we've already "spent"
 
+		local price = 0
+		if string.match(private.data.reason, ":buy") then
+			price = private.data.buyout
+		elseif string.match(private.data.reason, ":bid") then
+			price = private.data.bid
+		elseif private.data.buyout then
+			price = private.data.buyout
+		else
+			price = private.data.bid
+		end
+		if ((balance-price) > reserve or not enableres) then
+			AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
+		else
+			print("Purchase cancelled: Reserve reached")
+		end
+		private.removeline()
+	end
+end
 function private.ignore()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
 	local price
@@ -1155,7 +1188,7 @@ function lib.MakeGuiConfig()
 	gui.frame.purchase:SetText("Purchase")
 	gui.frame.purchase:SetScript("OnClick", private.purchase)
 	gui.frame.purchase:Disable()
-	gui.frame.purchase.TooltipText = "Bid/BuyOut selected auction\nbased on 'reason' column"
+	gui.frame.purchase.TooltipText = "Bid/BuyOut selected auction\nbased on 'reason' column. \nHold CTRL+ALT+SHIFT to purchase all items."
 	gui.frame.purchase:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.purchase:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
@@ -1622,6 +1655,14 @@ function private.OnUpdate()
 				gui.Search:Hide()
 			end
 		end
+		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
+			gui.frame.purchase:SetText("Purchase All")
+			gui.frame.purchase:SetScript("OnClick", private.purchaseall)
+		else
+			gui.frame.purchase:SetText("Purchase")
+			gui.frame.purchase:SetScript("OnClick", private.purchase)
+		end
+		
 	end
 
 	lib.UpdateSave(true)
