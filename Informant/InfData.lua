@@ -6839,7 +6839,7 @@ Informant.SetDatabase({
 	[3894]="29986:5997:4:1:1:::1:0:5819,8129,1310,1323,5812,27067,5508,1349,4177,3095,25274,980,16626,5126,11182,16753", -- Brigandine Helm
 	[3897]="::12:1:1:::1:0:", -- Dizzy\'s Eye
 	[3898]="::12:1:1:::1:0:", -- Library Scrip
-	[3899]=":25: Volume 3":0:25::171:1:0:", -- Legends of the Gurubashi, Volume 3
+	[3899]=":25:15:0:1:::1:0:", -- Legends of the Gurubashi, Volume 3
 	[3900]="::12:1:20:::1:0:", -- Pupellyverbos Port
 	[3901]="::12:1:20:::1:0:", -- Bloodscalp Tusk
 	[3902]=":1317:2:2:1:::1:0:", -- Staff of Nobles
@@ -10112,7 +10112,7 @@ Informant.SetDatabase({
 	[9314]="50:12:0:1:5:::1:0:8117,8118,8116,8122,23208,8121,15011,15012", -- Red Streaks Firework
 	[9315]="40:10:0:1:5:::1:0:8117,8121,15011,8118,8116,8122,15012", -- Yellow Rose Firework
 	[9316]="::12:1:1:::1:0:", -- Prismatic Punch Card
-	[9317]="100:25: White and Blue Firework":1:25::171,185:1:1:8117,8121,8118,8116,8122", -- Red, White and Blue Firework
+	[9317]="100:25:0:1:5:::1:0:8117,8121,8118,8116,8122", -- Red, White and Blue Firework
 	[9318]="20:5:0:1:5:::1:0:8117,8121,15011,8118,8116,8122,15012", -- Red Firework
 	[9319]="::0:1:1:::1:0:", -- Nimboya\'s Laden Pike
 	[9320]="::12:1:20:::1:0:", -- Witherbark Skull
@@ -15371,7 +15371,7 @@ Informant.SetDatabase({
 	[17124]="::12:1:100:::1:0:", -- Syndicate Emblem
 	[17125]="::12:1:1:::1:0:", -- Seal of Ravenholdt
 	[17126]="::12:1:1:::1:0:", -- Elegant Letter
-	[17182]=":160402: Hand of Ragnaros":5:160402::171:1:0:", -- Sulfuras, Hand of Ragnaros
+	[17182]=":160402:2:5:1:::1:0:", -- Sulfuras, Hand of Ragnaros
 	[17183]="36:7:4:1:1:::1:0:16693,2116,3075,4559,3161", -- Dented Buckler
 	[17184]="36:7:4:1:1:::1:0:16762,4240,3592,1104,16917,1213", -- Small Shield
 	[17185]="260:52:4:1:1:::1:0:16693,3080,16258,4559,2135,3167,3319", -- Round Buckler
@@ -16076,9 +16076,9 @@ Informant.SetDatabase({
 	[18710]=":7224:4:3:1:::1:0:", -- Arena Bracers
 	[18711]=":8700:4:3:1:::1:0:", -- Arena Bands
 	[18712]=":10245:4:3:1:::1:0:", -- Arena Vambraces
-	[18713]=":: Longbow of the Ancient Keepers":4:0::171:1:0:", -- Rhok\'delar, Longbow of the Ancient Keepers
+	[18713]="::2:4:1:::1:0:", -- Rhok\'delar, Longbow of the Ancient Keepers
 	[18714]="::11:4:1:::1:0:", -- Ancient Sinew Wrapped Lamina
-	[18715]=":: Stave of the Ancient Keepers":4:0::171:1:0:", -- Lok\'delar, Stave of the Ancient Keepers
+	[18715]="::2:4:1:::1:0:", -- Lok\'delar, Stave of the Ancient Keepers
 	[18716]=":18015:4:3:1:::1:0:", -- Ash Covered Boots
 	[18717]=":61940:2:3:1:::1:0:", -- Hammer of the Grand Crusader
 	[18718]=":26065:4:3:1:::1:0:", -- Grand Crusader\'s Helm
@@ -16274,7 +16274,7 @@ Informant.SetDatabase({
 	[19016]="::12:5:1:::1:0:", -- Vessel of Rebirth
 	[19017]="::12:1:1:::1:0:", -- Essence of the Firelord
 	[19018]="0:0:12:5:1:::1:0:", -- Dormant Wind Kissed Blade
-	[19019]=":123140: Blessed Blade of the Windseeker":5:123140::171:1:0:", -- Thunderfury, Blessed Blade of the Windseeker
+	[19019]=":123140:2:5:1:::1:0:", -- Thunderfury, Blessed Blade of the Windseeker
 	[19020]="::12:1:1:::1:0:", -- Camp Mojache Zukk\'ash Report
 	[19022]=":28580:2:2:1:::1:0:", -- Nat Pagle\'s Extreme Angler FC-5000
 	[19023]="::12:1:1:::1:0:", -- Katoom\'s Best Lure
@@ -16548,7 +16548,7 @@ Informant.SetDatabase({
 	[19348]=":50969:4:4:1:::1:0:", -- Red Dragonscale Protector
 	[19349]=":52946:4:4:1:::1:0:", -- Elementium Reinforced Bulwark
 	[19350]=":60867:2:4:1:::1:0:", -- Heartstriker
-	[19351]=":81453: Runed Blade of the Black Flight":4:81453::171:1:0:", -- Maladath, Runed Blade of the Black Flight
+	[19351]=":81453:2:4:1:::1:0:", -- Maladath, Runed Blade of the Black Flight
 	[19352]=":85814:2:4:1:::1:0:", -- Chromatically Tempered Sword
 	[19353]=":105206:2:4:1:::1:0:", -- Drake Talon Cleaver
 	[19354]=":91123:2:4:1:::1:0:", -- Draconic Avenger
@@ -16557,10 +16557,10 @@ Informant.SetDatabase({
 	[19357]=":96642:2:4:1:::1:0:", -- Herald of Woe
 	[19358]=":91409:2:4:1:::1:0:", -- Draconic Maul
 	[19360]=":83625:2:4:1:::1:0:", -- Lok\'amir il Romathis
-	[19361]=":60230: Crossbow of Smiting":4:60230::171:1:0:", -- Ashjre\'thul, Crossbow of Smiting
+	[19361]=":60230:2:4:1:::1:0:", -- Ashjre\'thul, Crossbow of Smiting
 	[19362]=":74238:2:4:1:::1:0:", -- Doom\'s Edge
-	[19363]=":84569: Edge of Chaos":4:84569::171:1:0:", -- Crul\'shorukh, Edge of Chaos
-	[19364]=":106097: Greatsword of the Brotherhood":4:106097::171:1:0:", -- Ashkandi, Greatsword of the Brotherhood
+	[19363]=":84569:2:4:1:::1:0:", -- Crul\'shorukh, Edge of Chaos
+	[19364]=":106097:2:4:1:::1:0:", -- Ashkandi, Greatsword of the Brotherhood
 	[19365]=":79672:2:4:1:::1:0:", -- Claw of the Black Drake
 	[19366]=":203059:4:4:1:::1:0:", -- Master Dragonslayer\'s Orb
 	[19367]=":60199:2:4:1:::1:0:", -- Dragon\'s Touch
@@ -16571,7 +16571,7 @@ Informant.SetDatabase({
 	[19372]=":43435:4:4:1:::1:0:", -- Helm of Endless Rage
 	[19373]=":38038:4:4:1:::1:0:", -- Black Brood Pauldrons
 	[19374]=":15284:4:4:1:::1:0:", -- Bracers of Arcane Accuracy
-	[19375]=":25143: Circlet of the Mind Flayer":4:25143::171:1:0:", -- Mish\'undare, Circlet of the Mind Flayer
+	[19375]=":25143:4:4:1:::1:0:", -- Mish\'undare, Circlet of the Mind Flayer
 	[19376]=":111528:4:4:1:::1:0:", -- Archimtiros\' Ring of Reckoning
 	[19377]=":105328:4:4:1:::1:0:", -- Prestor\'s Talisman of Connivery
 	[19378]=":25432:4:4:1:::1:0:", -- Cloak of the Brood Lord
@@ -16872,7 +16872,7 @@ Informant.SetDatabase({
 	[19851]="::12:1:1:::1:0:", -- Grom\'s Tribute
 	[19852]=":73811:2:4:1:::1:0:", -- Ancient Hakkari Manslayer
 	[19853]=":55563:2:4:1:::1:0:", -- Gurubashi Dwarf Destroyer
-	[19854]=":92937: Destroyer of Worlds":4:92937::171:1:0:", -- Zin\'rokh, Destroyer of Worlds
+	[19854]=":92937:2:4:1:::1:0:", -- Zin\'rokh, Destroyer of Worlds
 	[19855]=":52235:4:4:1:::1:0:", -- Bloodsoaked Legplates
 	[19856]=":48628:4:4:1:::1:0:", -- The Eye of Hakkar
 	[19857]=":22550:4:4:1:::1:0:", -- Cloak of Consumption
@@ -18412,7 +18412,7 @@ Informant.SetDatabase({
 	[21853]=":21336:4:2:1:::1:0:", -- Netherweave Boots
 	[21854]=":29267:4:2:1:::1:0:", -- Netherweave Robe
 	[21855]=":30091:4:2:1:::1:0:", -- Netherweave Tunic
-	[21856]=":99282: The Blood Drinker":4:99282::171:1:0:", -- Neretzek, The Blood Drinker
+	[21856]=":99282:2:4:1:::1:0:", -- Neretzek, The Blood Drinker
 	[21858]=":20000:1:3:1:::1:0:", -- Spellfire Bag
 	[21859]=":31883:4:3:1:::1:0:", -- Imbued Netherweave Pants
 	[21860]=":24616:4:3:1:::1:0:", -- Imbued Netherweave Boots
@@ -19047,7 +19047,7 @@ Informant.SetDatabase({
 	[22579]="::12:1:10:::1:0:", -- Plagued Murloc Spine
 	[22580]="::12:1:20:::1:0:", -- Crystallized Mana Essence
 	[22583]="::12:1:1:::1:0:", -- Rathis Tomber\'s Supplies
-	[22589]=":184558: Greatstaff of the Guardian":5:184558::171:1:0:", -- Atiesh, Greatstaff of the Guardian
+	[22589]=":184558:2:5:1:::1:0:", -- Atiesh, Greatstaff of the Guardian
 	[22590]="::12:1:1:::1:0:", -- Night Elf Plans: An\'daroth
 	[22591]="::12:1:1:::1:0:", -- Night Elf Plans: An\'owyn
 	[22592]="::12:1:1:::1:0:", -- Night Elf Plans: Scrying on the Sin\'dorei
@@ -19084,9 +19084,9 @@ Informant.SetDatabase({
 	[22627]="::12:1:1:::1:0:", -- The Lady\'s Necklace
 	[22628]="::12:1:1:::1:0:", -- Renzithen\'s Restorative Draught
 	[22629]="::12:1:1:::1:0:", -- Sealed Sin\'dorei Orders
-	[22630]=":185158: Greatstaff of the Guardian":5:185158::171:1:0:", -- Atiesh, Greatstaff of the Guardian
-	[22631]=":172821: Greatstaff of the Guardian":5:172821::171:1:0:", -- Atiesh, Greatstaff of the Guardian
-	[22632]=":173474: Greatstaff of the Guardian":5:173474::171:1:0:", -- Atiesh, Greatstaff of the Guardian
+	[22630]=":185158:2:5:1:::1:0:", -- Atiesh, Greatstaff of the Guardian
+	[22631]=":172821:2:5:1:::1:0:", -- Atiesh, Greatstaff of the Guardian
+	[22632]=":173474:2:5:1:::1:0:", -- Atiesh, Greatstaff of the Guardian
 	[22633]="::12:1:20:::1:0:", -- Troll Juju
 	[22634]="::12:1:20:::1:0:", -- Underlight Ore
 	[22635]="::0:3:1:::1:0:", -- Savage Guard
@@ -19173,8 +19173,8 @@ Informant.SetDatabase({
 	[22733]="::12:1:1:::1:0:", -- Staff Head of Atiesh
 	[22734]="::12:1:1:::1:0:", -- Base of Atiesh
 	[22735]="::12:1:1:::1:0:", -- Research Notes
-	[22736]="5:0: Reaper of Souls":7:0::171:1:0:", -- "Andonisus
-	[22737]=":: Greatstaff of the Guardian":5:0::171:1:0:", -- Atiesh, Greatstaff of the Guardian
+	[22736]="0:0:2:5:1:::1:0:", -- "Andonisus, Reaper of Souls"
+	[22737]="::15:5:1:::1:0:", -- Atiesh, Greatstaff of the Guardian
 	[22739]=":14750:9:3:1:::1:0:", -- Tome of Polymorph: Turtle
 	[22740]="::4:4:1:::1:0:14754", -- Outrider\'s Leather Pants
 	[22741]="::4:4:1:::1:0:14754", -- Outrider\'s Lizardhide Pants
@@ -19433,7 +19433,7 @@ Informant.SetDatabase({
 	[23011]="::12:1:1:::1:0:", -- Sealed Research Report
 	[23012]="::12:1:1:::1:0:", -- Sealed Research Report
 	[23013]="::12:1:1:::1:0:", -- Sealed Research Report
-	[23014]=":85238: Blade of the Fallen Seraph":4:85238::171:1:0:", -- Iblis, Blade of the Fallen Seraph
+	[23014]=":85238:2:4:1:::1:0:", -- Iblis, Blade of the Fallen Seraph
 	[23015]="::15:1:1:::1:0:", -- Rat Cage
 	[23016]="::12:1:1:::1:0:", -- Sealed Research Report
 	[23017]=":27110:4:4:1:::1:0:", -- Veil of Eclipse
@@ -19469,7 +19469,7 @@ Informant.SetDatabase({
 	[23049]=":72651:4:4:1:::1:0:", -- Sapphiron\'s Left Eye
 	[23050]=":28385:4:4:1:::1:0:", -- Cloak of the Necropolis
 	[23053]=":86443:4:4:1:::1:0:", -- Stormrage\'s Talisman of Seething
-	[23054]=":95047: Dawn of Ruin":4:95047::171:1:0:", -- Gressil, Dawn of Ruin
+	[23054]=":95047:2:4:1:::1:0:", -- Gressil, Dawn of Ruin
 	[23055]="::7:1:10:::1:0:", -- Word of Thawing
 	[23056]=":95737:2:4:1:::1:0:", -- Hammer of the Twisting Nether
 	[23057]=":102777:4:4:1:::1:0:", -- Gem of Trapped Innocents
@@ -24591,7 +24591,7 @@ Informant.SetDatabase({
 	[30448]="288156:72039:4:4:1:::1:0:26300", -- Talon of Al\'ar
 	[30449]="288156:72039:4:4:1:::1:0:26300", -- Void Star Talisman
 	[30450]="288156:72039:4:4:1:::1:0:26300", -- Warp-Spring Coil
-	[30451]=":: Bow of the Torn-heart":1:0::171:1:0:", -- Lohn\'goron, Bow of the Torn-heart
+	[30451]="::12:1:1:::1:0:", -- Lohn\'goron, Bow of the Torn-heart
 	[30453]="::12:1:1:::1:0:", -- Second Fragment of the Cipher of Damnation
 	[30454]="::12:1:1:::1:0:", -- Ar\'tor\'s Lockbox
 	[30457]=":320:0:1:20:::1:0:", -- Gilneas Sparkling Water
@@ -24645,9 +24645,9 @@ Informant.SetDatabase({
 	[30521]=":13930:4:2:1:::1:0:", -- Warpweaver\'s Gloves
 	[30522]=":91772:2:2:1:::1:0:", -- Conjurer\'s Staff
 	[30523]=":55355:2:2:1:::1:0:", -- Hotshot Cattle Prod
-	[30524]="1:0: Chapter 1":0:0::171:1:0:", -- "Ancient Draenei Manuscript
-	[30525]="1:0: Chapter 2":0:0::171:1:0:", -- "Ancient Draenei Manuscript
-	[30526]="1:0: Chapter 3":0:0::171:1:0:", -- "Ancient Draenei Manuscript
+	[30524]="0:0:12:1:1:::1:0:", -- "Ancient Draenei Manuscript, Chapter 1"
+	[30525]="0:0:12:1:1:::1:0:", -- "Ancient Draenei Manuscript, Chapter 2"
+	[30526]="0:0:12:1:1:::1:0:", -- "Ancient Draenei Manuscript, Chapter 3"
 	[30527]="::12:1:1:::1:0:", -- Draenei Tomb Relic
 	[30529]="::12:1:20:::1:0:", -- Plucked Lashh\'an Feather
 	[30530]="::12:1:1:::1:0:", -- Fistful of Feathers
@@ -25146,7 +25146,7 @@ Informant.SetDatabase({
 	[31069]="::4:4:1:::1:0:23381", -- Mantle of Absolution
 	[31070]="::4:4:1:::1:0:23381", -- Shoulderpads of Absolution
 	[31071]=":79665:2:3:1:::1:0:", -- Grom\'tor\'s Charge
-	[31072]=":59981: Bow of the Torn-heart":3:59981::171:1:0:", -- Lohn\'goron, Bow of the Torn-heart
+	[31072]=":59981:2:3:1:::1:0:", -- Lohn\'goron, Bow of the Torn-heart
 	[31073]=":80285:2:3:1:::1:0:", -- Borak\'s Reminder
 	[31074]=":41555:4:3:1:::1:0:", -- Amulet of the Torn-heart
 	[31075]=":41555:4:3:1:::1:0:", -- Evoker\'s Mark of the Redemption
@@ -26246,7 +26246,7 @@ Informant.SetDatabase({
 	[32369]=":145925:2:4:1:::1:0:", -- Blade of Savagery
 	[32370]=":102777:4:4:1:::1:0:", -- Nadina\'s Pendant of Purity
 	[32373]=":72100:4:4:1:::1:0:", -- Helm of the Illidari Shatterer
-	[32374]=":183948: Greatstaff of the Devourer":4:183948::171:1:0:", -- Zhar\'doom, Greatstaff of the Devourer
+	[32374]=":183948:2:4:1:::1:0:", -- Zhar\'doom, Greatstaff of the Devourer
 	[32375]=":94538:4:4:1:::1:0:", -- Bulwark of Azzinoth
 	[32376]=":62618:4:4:1:::1:0:", -- Forest Prowler\'s Helm
 	[32377]=":52373:4:4:1:::1:0:", -- Mantle of Darkness
@@ -26843,7 +26843,7 @@ Informant.SetDatabase({
 	[33163]="::12:1:10:::1:0:", -- Zeppelin Cargo
 	[33164]="::12:1:1:::1:0:", -- Ever-burning Torches
 	[33165]="30000:7500:9:1:1:::1:0:18255", -- Formula: Enchant Weapon - Greater Agility
-	[33166]=":: Extra Strength":1:0::171:1:0:", -- Pagle\'s Fish Paste, Extra Strength
+	[33166]="::12:1:1:::1:0:", -- Pagle\'s Fish Paste, Extra Strength
 	[33173]=":46380:4:3:1:::1:0:", -- Ragesteel Shoulders
 	[33174]=":20000:9:3:1:::1:0:", -- Plans: Ragesteel Shoulders
 	[33175]="::12:1:10:::1:0:", -- Wyrmtail
@@ -27111,7 +27111,7 @@ Informant.SetDatabase({
 	[33474]=":101161:2:4:1:::1:0:", -- Ancient Amani Longbow
 	[33476]=":141544:2:4:1:::1:0:", -- Cleaver of the Unforgiving
 	[33477]="::12:1:1:::1:0:", -- Giant Yeti Meal
-	[33478]=":178195: The Great Apocalypse":4:178195::171:1:0:", -- Jin\'rohk, The Great Apocalypse
+	[33478]=":178195:2:4:1:::1:0:", -- Jin\'rohk, The Great Apocalypse
 	[33479]=":51857:4:4:1:::1:0:", -- Grimgrin Faceguard
 	[33480]=":24892:4:4:1:::1:0:", -- Cord of Braided Troll Hair
 	[33481]=":65461:4:4:1:::1:0:", -- Pauldrons of Stone Resolve
@@ -27728,7 +27728,7 @@ Informant.SetDatabase({
 	[34244]=":61642:4:4:1:::1:0:", -- Duplicitous Guise
 	[34245]=":61861:4:4:1:::1:0:", -- Cover of Ursol the Wise
 	[34246]="::12:1:20:::1:0:", -- Smuggled Mana Cell
-	[34247]=":207710: the Soul-Render":4:207710::171:1:0:", -- Apolyon, the Soul-Render
+	[34247]=":207710:2:4:1:::1:0:", -- Apolyon, the Soul-Render
 	[34248]="::12:1:1:::1:0:", -- Bash\'ir Phasing Device
 	[34249]="1000000:250000:4:1:1::202:1:0:19227", -- Hula Girl Doll
 	[34253]="::12:1:1:::1:0:", -- Sizzling Embers
@@ -27746,7 +27746,7 @@ Informant.SetDatabase({
 	[34331]=":156503:2:4:1:::1:0:", -- Hand of the Deceiver
 	[34332]=":72630:4:4:1:::1:0:", -- Cowl of Gul\'dan
 	[34333]=":72901:4:4:1:::1:0:", -- Coif of Alleria
-	[34334]=":182930: the Stars' Fury":5:182930::171:1:0:", -- Thori\'dal, the Stars\' Fury
+	[34334]=":182930:2:5:1:::1:0:", -- Thori\'dal, the Stars\' Fury
 	[34335]=":163190:2:4:1:::1:0:", -- Hammer of Sanctification
 	[34336]=":163793:2:4:1:::1:0:", -- Sunflare
 	[34337]=":205493:2:4:1:::1:0:", -- Golden Staff of the Sin\'dorei
@@ -28678,7 +28678,7 @@ Informant.SetDatabase({
 	[35477]="150719:30143:4:3:1:::1:0:17657", -- Crusader\'s Scaled Gauntlets
 	[35478]="225219:45043:4:3:1:::1:0:17657", -- Savage Plate Helm
 	[35479]="::12:1:1:::1:0:", -- Interdimensional Refabricator
-	[35481]=":: Factories and Workshops":1:0::171:1:0:", -- Fields, Factories and Workshops
+	[35481]="::12:1:1:::1:0:", -- Fields, Factories and Workshops
 	[35483]="::12:1:5:::1:0:", -- Glacial Splinter
 	[35484]="::12:1:5:::1:0:", -- Magic-Bound Splinter
 	[35486]="::12:1:1:::1:0:", -- Mechazod\'s Head
@@ -34996,7 +34996,7 @@ Informant.SetDatabase({
 	[43438]=":68524:4:3:1:::1:0:", -- Eviscerator\'s Legguards
 	[43439]=":51584:4:3:1:::1:0:", -- Eviscerator\'s Treads
 	[43440]="::12:1:1:::1:0:", -- To King Varian Wrynn of the Alliance
-	[43441]=":: Warchief of the Horde":1:0::171:1:0:", -- To Thrall, Warchief of the Horde
+	[43441]="::12:1:1:::1:0:", -- To Thrall, Warchief of the Horde
 	[43442]=":41723:4:3:1:::1:0:", -- Swiftarrow Belt
 	[43443]=":63093:4:3:1:::1:0:", -- Swiftarrow Boots
 	[43444]=":42025:4:3:1:::1:0:", -- Swiftarrow Bracers
