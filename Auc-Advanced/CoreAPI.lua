@@ -128,6 +128,8 @@ do
                 end
             end
         end
+        
+        -- print("Calculating", itemLink);
 
         -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax, total = 0, #pdfList, 0;

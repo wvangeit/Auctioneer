@@ -97,9 +97,12 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 	if getter("tooltip.marketprice.show") then
 		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
 		--we could just return here, but we want an indication that we don't have any data
-		if not seen then seen = 0 end
-		if not market then market = 0 end
-		if quantity == 1 then
+        -- NB: So we return a value of 0? That sounds stupid to me... -- Shirik
+		-- if not seen then seen = 0 end
+		-- if not market then market = 0 end
+        if not (seen and market) then
+            tooltip:AddLine("Market Price: Not Available");
+		elseif quantity == 1 then
 			tooltip:AddLine("Market Price: (seen "..tostring(seen)..")", market)
 		else
 			tooltip:AddLine("Market Price x"..tostring(quantity)..": (seen "..tostring(seen)..")", market*quantity)
