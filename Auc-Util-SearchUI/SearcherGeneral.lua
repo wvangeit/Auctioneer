@@ -29,11 +29,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
-local lib, parent, private = AucSearchUI.NewSearcher("Parameter")
+local lib, parent, private = AucSearchUI.NewSearcher("General")
 if not lib then return end
 local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
-lib.tabname = "Parameter"
+lib.tabname = "General"
 
 function private.getTypes()
 	if not private.typetable then
@@ -104,16 +104,16 @@ default("general.minbuy", 0)
 default("general.maxbid", 999999999)
 default("general.maxbuy", 999999999)
 
--- This function is automatically called when we need to create our search parameters
+-- This function is automatically called when we need to create our search generals
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Searchers")
 
 	-- Add the help
-	gui:AddSearcher("Parameter", "Search for items by general properties such as name, level etc", 100)
+	gui:AddSearcher("General", "Search for items by general properties such as name, level etc", 100)
 	gui:AddHelp(id, "general searcher",
 		"What does this searcher do?",
-		"This searcher provides the ability to search for specific items that are in the scan database by name, level, type, subtype, seller, price, timeleft and other similar parameters.")
+		"This searcher provides the ability to search for specific items that are in the scan database by name, level, type, subtype, seller, price, timeleft and other similar generals.")
 
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,      "Search criteria")
