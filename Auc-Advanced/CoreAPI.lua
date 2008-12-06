@@ -71,6 +71,7 @@ do
     local EPSILON = 0.000001;
     local IMPROVEMENT_FACTOR = 0.8;
     local CORRECTION_FACTOR = 1000; -- 10 silver per gold, integration steps at tail
+    local FALLBACK_ERROR = 1;       -- 1 silver per gold fallback error max
     local cache = {};
     local pdfList = {};
     local engines = {};
@@ -109,6 +110,8 @@ do
         if cacheTable then
             return cacheTable.value, cacheTable.seen, cacheTable.stats;
         end
+        
+        if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer Advanced missed market pricing cache on item '"..itemLink.."'"); end
 
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
@@ -128,8 +131,18 @@ do
 
         -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax, total = 0, #pdfList, 0;
+        local convergedFallback = nil;
         for _, engine in ipairs(engines) do
             local i, min, max, area = engine.pdf(saneLink, serverKey);
+            
+            if type(i) == 'number' then
+                -- This is a fallback
+                if convergedFallback == nil or (type(convergedFallback) == 'number' and math.abs(convergedFallback - i) < FALLBACK_ERROR * convergedFallback / 10000) then
+                    convergedFallback = i;
+                else
+                    convergedFallback = false;      -- Cannot converge on fallback pricing
+                end
+            end
             
             local priceArray = engine.array(saneLink, serverKey);
 
@@ -137,7 +150,7 @@ do
                 seen = priceArray.seen;
             end
 
-            if i then   -- pdfList[++c] = i;
+            if i and type(i) ~= 'number' then   -- pdfList[++c] = i;
                 total = total + (area or 1);                                -- Add total area, assume 1 if not supplied
                 c = c + 1;
                 pdfList[c] =  i;
@@ -150,6 +163,11 @@ do
         for i = c+1, oldPdfMax do
             pdfList[i] = nil;
         end
+        
+        if #pdfList == 0 and convergedFallback then
+            if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to no available PDFs on item "..itemlink); end
+            return convergedFallback, 1, 1;
+        end            
 
 
         assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
@@ -193,6 +211,13 @@ do
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Unable To Calculate", "A NaN value was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
                 elseif nLog then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
+                end
+                
+                if convergedFallback then
+                    if nLog then
+                        nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to NaN/Zero total for item "..itemLink);
+                    end
+                    return convergedFallback, 1, 1;
                 end
                 return;                 -- Cannot calculate: NaN
             end
