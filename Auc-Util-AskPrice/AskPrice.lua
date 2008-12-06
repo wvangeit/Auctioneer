@@ -279,7 +279,6 @@ function private.onEventHook() --%ToDo% Change the prototype once Blizzard chang
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
 		if (private.whisperList[arg1]) then
 			private.whisperList[arg1] = nil
-			end
 		end
 	end
 end
