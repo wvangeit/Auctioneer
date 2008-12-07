@@ -305,10 +305,16 @@ end
 private.algorithmstack = {}
 function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
-		error("No pricing algorithm supplied")
+		print("AucAdv Error: No pricing algorithm supplied to GetAlgorithmValue")
+		return
+	end
+	if type(itemLink) == "number" then
+		local _
+		_, itemLink = GetItemInfo(itemLink)
 	end
 	if (not itemLink) then
-		error("No itemLink supplied")
+		print("AucAdv Error: No itemLink supplied to GetAlgorithmValue")
+		return
 	end
 
     if reserved then
