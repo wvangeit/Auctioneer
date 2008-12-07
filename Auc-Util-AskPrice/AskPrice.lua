@@ -266,17 +266,13 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	end
 end
 
---Add a ChatFilter if we've activated askrpice
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(arg1)
-	if (private.whisperList[arg1] and not private.getOption('util.askprice.whispers')) then
-		return 1, arg1
-	end
-end);
-
 function private.onEventHook() --%ToDo% Change the prototype once Blizzard changes their functions to use parameters instead of globals.
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
 		if (private.whisperList[arg1]) then
 			private.whisperList[arg1] = nil
+			if (private.getOption('util.askprice.whispers') == false) then
+				return "killorig"
+			end
 		end
 	end
 end
