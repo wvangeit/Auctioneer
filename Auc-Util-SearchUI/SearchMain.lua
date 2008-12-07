@@ -100,8 +100,8 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-	if not additional or additional[0] ~= "AuctionPrices" then
+function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
+	if not additional or additional.event ~= "SetAuctionItem" then
 		--this isn't an auction, so we're not interested
 		return
 	end
@@ -114,9 +114,14 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	if not id then
 		id = button:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame) --without CompactUI
 	end
-	local price = additional[3] --only thing we need from this table, as  minBid and buyout can come from GetAuctionItemInfo
 
 	local name, _, count, _, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
+	local price = minBid
+	if curBid and curBid > 0 then
+		price = curBid + minInc
+	else
+		curBid = 0
+	end
 	local timeleft = GetAuctionItemTimeLeft("list", id)
 	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
 	local _, itemid, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
@@ -146,8 +151,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	ItemTable[Const.ENCHANT]  = enchant
 	ItemTable[Const.SEED]  = seed
 
-	tooltip:SetColor(1,0.7,0.3)
-	tooltip:AddLine("SearchUI:")
+	tooltip:AddLine("SearchUI:", 1, 0.7, 0.3)
 
 	local active = false
 	for name, searcher in pairs(lib.Searchers) do
@@ -156,18 +160,18 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 			local success, returnvalue, value = lib.SearchItem(name, ItemTable, true, true)
 			if success then
 				if value then
-					tooltip:AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue)
-					tooltip:LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue, 1, 0.7, 0.3)
+--					tooltip:LineColor(1,0.7,0.3)
 				elseif returnvalue then
-					tooltip:AddLine("  "..name.." profit:", returnvalue)
-					tooltip:LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." profit:", returnvalue, 1, 0.7, 0.3)
+--					tooltip:LineColor(1,0.7,0.3)
 				else
-					tooltip:AddLine("  "..name.." success")
-					tooltip:LineColor(1,0.7,0.3)
+					tooltip:AddLine("  "..name.." success", 1, 0.7, 0.3)
+--					tooltip:LineColor(1,0.7,0.3)
 				end
 			else
-				tooltip:AddLine("  "..name..":"..returnvalue)
-				tooltip:LineColor(1,0.7,0.3)
+				tooltip:AddLine("  "..name..":"..returnvalue, 1, 0.7, 0.3)
+--				tooltip:LineColor(1,0.7,0.3)
 			end
 		end
 	end
