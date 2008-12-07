@@ -305,7 +305,7 @@ end
 private.algorithmstack = {}
 function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
-		print("AucAdv Error: No pricing algorithm supplied to GetAlgorithmValue")
+        if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
 		return
 	end
 	if type(itemLink) == "number" then
@@ -313,7 +313,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 		_, itemLink = GetItemInfo(itemLink)
 	end
 	if (not itemLink) then
-		print("AucAdv Error: No itemLink supplied to GetAlgorithmValue")
+		if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No itemLink supplied to GetAlgorithmValue") end
 		return
 	end
 
