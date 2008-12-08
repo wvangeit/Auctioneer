@@ -46,6 +46,7 @@ private.sentAskPriceAd = {}
 private.timeToWaitForPrices = 2
 private.timeToWaitForResponse = 5
 private.playerName = UnitName("player")
+local AskPriceSentMessages = {}
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
@@ -72,6 +73,11 @@ function lib.OnLoad(addon)
 	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
 	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(arg1)
+		if (AskPriceSentMessages[arg1] and not private.getOption('util.askprice.whispers')) then
+			return true
+		end
+	end)
 
 	--Setup Configator defaults
 	for config, value in pairs(private.defaults) do
@@ -152,7 +158,7 @@ function private.chatEvent(event, text, player)
 			private.sendAddOnMessage(channel, "QUERY", link, count, player, channel)
 		end
 
-		elseif (channel == "WHISPER") then
+	elseif (channel == "WHISPER") then
 		for i = 1, #items, 2 do
 			local count = items[i]
 			local link = items[i+1]
@@ -270,9 +276,6 @@ function private.onEventHook() --%ToDo% Change the prototype once Blizzard chang
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
 		if (private.whisperList[arg1]) then
 			private.whisperList[arg1] = nil
-			if (private.getOption('util.askprice.whispers') == false) then
-				return "killorig"
-			end
 		end
 	end
 end
@@ -300,6 +303,9 @@ end
 
 function private.sendWhisper(message, player)
 	private.whisperList[message] = true
+	if not private.getOption('util.askprice.whispers') then
+		AskPriceSentMessages[message] = true
+	end
 	ChatThrottleLib:SendChatMessage("ALERT", "AucAdvAskPrice", message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
 end
 
