@@ -1389,6 +1389,16 @@ function lib.MakeGuiConfig()
 	gui:ActivateTab(gui.aboutTab)
 end
 
+-- Single static table for use by searchers and filters
+local auclentable = {
+	{12, "12 hour"},
+	{24, "24 hour"},
+	{48, "48 hour"},
+}
+function lib.AucLengthSelector ()
+	return auclentable
+end
+
 local sideIcon
 local SlideBar = LibStub:GetLibrary("SlideBar", true)
 if SlideBar then

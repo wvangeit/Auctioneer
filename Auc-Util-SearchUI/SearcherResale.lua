@@ -41,6 +41,7 @@ default("resale.seen.check", false)
 default("resale.seen.min", 10)
 default("resale.adjust.brokerage", true)
 default("resale.adjust.deposit", true)
+default("resale.adjust.deplength", 48)
 default("resale.adjust.listings", 3)
 default("resale.allow.bid", true)
 default("resale.allow.buy", true)
@@ -85,31 +86,34 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, private.GetPriceModels, "resale.model", "Pricing model to use to base price on")
 	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
-	
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.deposit", "Subtract deposit")
+	gui:AddControl(id, "Selectbox",			0.42, 1, AucSearchUI.AucLengthSelector, "resale.adjust.deplength", "Length of auction for deposits")
 	gui:AddControl(id, "Slider",            0.42, 1, "resale.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
-	local market, seen, _, curModel, pctstring
+	local market, seen, _, curModel, pctstring, link, count
 
-	if not item[Const.LINK] then
+	link = item[Const.LINK]
+	if not link then
 		return false, "No link"
 	end
 	local model = get("resale.model")
 	if model == "market" then
-		market, seen = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+		market, seen = AucAdvanced.API.GetMarketValue(link)
 	elseif model == "Appraiser" and AucAdvanced.Modules.Util.Appraiser then
-		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK])
+		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(link)
 	else
-		market, seen = AucAdvanced.API.GetAlgorithmValue(model, item[Const.LINK])
+		market, seen = AucAdvanced.API.GetAlgorithmValue(model, link)
 	end
 	if not market then
 		return false, "No appraiser price"
 	end
-	market = market * item[Const.COUNT]
+	count = item[Const.COUNT]
+	market = market * count
 
 	if (get("resale.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("resale.seen.min"))) then
@@ -118,29 +122,21 @@ function lib.Search(item)
 	end
 
 	--adjust for brokerage/deposit costs
-	local deposit = get("resale.adjust.deposit")
-	local brokerage = get("resale.adjust.brokerage")
-
-	if brokerage then
-		market = market * 0.95
+	local cutRate = AucAdvanced.cutRate or 0.05
+	if get("resale.adjust.brokerage") then
+		market = market * (1 - cutRate)
 	end
-	if deposit then
-		local relistings = get("resale.adjust.listings")
-		local rate = AucAdvanced.depositRate or 0.05
+	if get("resale.adjust.deposit") then
 		local newfaction
-		if rate == .25 then newfaction = "neutral" end
-		local amount = GetDepositCost(item[Const.LINK], 12, newfaction, item[Const.COUNT])
-		if not amount then
-			amount = 0
-		else
-			amount = amount * relistings
+		if cutRate ~= 0.05 then newfaction = "neutral" end
+		local amount = GetDepositCost(link, get("resale.adjust.deplength"), newfaction, count)
+		if amount then
+			market = market - amount * get("resale.adjust.listings")
 		end
-		market = market - amount
 	end
 
-	local pct = get("resale.profit.pct")
 	local minprofit = get("resale.profit.min")
-	local value = market * (100-pct) / 100
+	local value = market * (100-get("resale.profit.pct")) / 100
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end

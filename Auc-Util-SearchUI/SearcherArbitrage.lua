@@ -93,6 +93,7 @@ default("arbitrage.seen.check", false)
 default("arbitrage.seen.min", 10)
 default("arbitrage.adjust.brokerage", true)
 default("arbitrage.adjust.deposit", true)
+default("arbitrage.adjust.deplength", 48)
 default("arbitrage.adjust.listings", 3)
 default("arbitrage.allow.bid", true)
 default("arbitrage.allow.buy", true)
@@ -135,6 +136,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.deposit", "Subtract deposit")
+	gui:AddControl(id, "Selectbox",			0.42, 1, AucSearchUI.AucLengthSelector, "arbitrage.adjust.deplength", "Length of auction for deposits")
 	gui:AddControl(id, "Slider",            0.42, 1, "arbitrage.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
@@ -186,32 +188,28 @@ function lib.Search(item)
 	end
 
 	--adjust for brokerage/deposit costs
-	local deposit = get("arbitrage.adjust.deposit")
-	local brokerage = get("arbitrage.adjust.brokerage")
+	--[[ Commented out unused locals
 	local sig = AucAdvanced.Modules.Util.Appraiser.GetSigFromLink(item[Const.LINK])
 	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
+	--]]
 
-	if brokerage then
+	if get("arbitrage.adjust.brokerage") then
 		if string.find(comparefaction, "Neutral") then
 			market = market * .85
 		else
 			market = market * .95
 		end
 	end
-	if deposit then
-		local relistings = get("arbitrage.adjust.listings")
+	if get("arbitrage.adjust.deposit") then
 		--set up correct brokerage/deposit costs for our target AH
 		local newfaction
 		if strsub(comparefaction, (strlen(comparefaction)-6)) == "Neutral" then
 			newfaction = "neutral"
 		end
-		local amount = GetDepositCost(item[Const.LINK], (AucAdvanced.Settings.GetSetting("util.appraiser.duration")/60), newfaction, item[Const.COUNT])
-		if not amount then
-			amount = 0
-		else
-			amount = amount * relistings
+		local amount = GetDepositCost(item[Const.LINK], get("arbitrage.adjust.deplength"), newfaction, item[Const.COUNT])
+		if amount then
+			market = market - amount * get("arbitrage.adjust.listings")
 		end
-		market = market - amount
 	end
 
 	local pct = get("arbitrage.profit.pct")
