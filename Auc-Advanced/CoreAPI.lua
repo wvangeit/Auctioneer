@@ -291,7 +291,7 @@ end
 function lib.IsValidAlgorithm(algorithm, itemLink)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
-	for pos, engineLib in ipairs(modules) do
+	for engine, engineLib in ipairs(modules) do
 		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 			if engineLib.IsValidAlgorithm then
 				return engineLib.IsValidAlgorithm(saneLink)
