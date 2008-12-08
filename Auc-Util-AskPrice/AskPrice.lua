@@ -75,6 +75,7 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(arg1)
 		if (AskPriceSentMessages[arg1] and not private.getOption('util.askprice.whispers')) then
+			AskPriceSentMessages[arg1] = nil
 			return true
 		end
 	end)
