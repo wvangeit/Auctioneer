@@ -1609,7 +1609,7 @@ function private.CreateFrames()
 			buyVal = lib.RoundBuy(itemBuy)
 			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 			if dryRun then
-				print(_TRANS('APPR_Help_PretendingPostStacks'):format(number, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+				print(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 			else
 				print(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
 				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
