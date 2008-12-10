@@ -73,6 +73,13 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 	if buyout > 0 and price > buyout then
 		price = buyout
 	end
+	if get("ShowPurchaseDebug") then
+		if price >= buyout then
+			print("AucAdv: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+		else
+			print("AucAdv: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+		end
+	end
 	table.insert(private.BuyRequests, {link = link, sellername=seller, count=count, minbid=minbid, buyout=buyout, price=price, reason = reason})
 	lib.ScanPage()
 end
@@ -252,6 +259,13 @@ function private.PerformPurchase()
 		AucAdvanced.Scan.SetPaused(false)
 		return
 	end
+	if get("ShowPurchaseDebug") then
+		if private.CurAuction["price"] >= buyout then
+			print("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(private.CurAuction["price"]))
+		else
+			print("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(private.CurAuction["price"]))
+		end
+	end
 	
 	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
 
@@ -284,8 +298,12 @@ function private.removePendingBid()
 	end
 end
 
+--Cancels the current auction
+--Also sends out a Callback with a callback string of "<link>;<price>"
 function private.CancelPurchase()
 	private.Searching = false
+	local CallBackString = string.join(";", tostring(private.CurAuction["link"]), tostring(private.CurAuction["price"]))
+	AucAdvanced.SendProcessorMessage("bidcancelled", CallBackString)
 	private.CurAuction = {}
 	private.Prompt:Hide()
 	AucAdvanced.Scan.SetPaused(false)

@@ -118,7 +118,8 @@ local settingDefaults = {
 	['scancommit.progressbar'] = true,
 	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
-    ['marketvalue.accuracy'] = .08
+    ['marketvalue.accuracy'] = .08,
+	["ShowPurchaseDebug"] = true,
 }
 
 local function getDefault(setting)
@@ -445,6 +446,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
 
+	gui:AddControl(id, "Subhead",     0,     "Purchasing Options")
+	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", "Show Purchase queue info")
+	gui:AddTip(id, "Shows what is added to the purchase queue, and what is being purchased")
 
 	gui:AddTip(id, "This allows you to select which chat window Auctioneer Advanced prints its output to.")
 	gui:AddHelp(id, "what is scandata",
