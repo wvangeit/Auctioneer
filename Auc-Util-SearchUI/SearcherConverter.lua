@@ -66,6 +66,19 @@ local PSHADOW = 22456
 local MSHADOW = 22577
 local PWATER = 21885
 local MWATER = 22578
+--Crystallized/Eternal
+local CAIR = 37700
+local EAIR = 35623
+local CEARTH = 37701
+local EEARTH = 35624
+local CSHADOW = 37703
+local ESHADOW = 35627
+local CLIFE = 37704
+local ELIFE = 35625
+local CFIRE = 37702
+local EFIRE = 36860
+local CWATER = 37705
+local EWATER = 35622
 --Depleted items
 local DCBRACER = 32676 -- Depleted Cloth Bracers
 local DCBRACERTO = 32655 -- Crystalweave Bracers
@@ -94,7 +107,10 @@ local findConvertable = {}
 do
 	-- Temporary tables to help build the working table
 	-- To add new conversions, edit these tables
-	local lesser2greater = {
+	
+	-- TWO WAY Tables
+	
+	local lesser_greater = {
 		[LCOSMIC] = GCOSMIC,
 		[LPLANAR] = GPLANAR,
 		[LETERNAL] = GETERNAL,
@@ -103,15 +119,17 @@ do
 		[LASTRAL] = GASTRAL,
 		[LMAGIC] = GMAGIC,
 	}
-	local greater2lesser = {
-		[GCOSMIC] = LCOSMIC,
-		[GPLANAR] = LPLANAR,
-		[GETERNAL] = LETERNAL,
-		[GNETHER] = LNETHER,
-		[GMYSTIC] = LMYSTIC,
-		[GASTRAL] = LASTRAL,
-		[GMAGIC] = LMAGIC,
+	local crystallized_eternal = {
+		[CAIR] = EAIR,
+		[CEARTH] = EEARTH,
+		[CSHADOW] = ESHADOW,
+		[CLIFE] = ELIFE,
+		[CFIRE] = EFIRE,
+		[CWATER] = EWATER,
 	}
+	
+	-- ONE WAY Tables
+	
 	local mote2primal = {
 		[MAIR] = PAIR,
 		[MEARTH] = PEARTH,
@@ -133,6 +151,7 @@ do
 		[DSWORD] = DSWORDTO,
 		[DTHAXE] = DTHAXETO,
 	}
+	
 	--[[ placeholder for future development - not sure how this will work yet...
 	-- Trade Professions need to be handled differently as yields may vary
 	local smelt = {
@@ -144,22 +163,26 @@ do
 	--]]
 
 	-- Build the table
-	for id, idto in pairs (lesser2greater) do
-		findConvertable[id] = {idto, 1/3, "converter.enableEssence"}
+	-- Two-way
+	for idl, idg in pairs (lesser_greater) do
+		findConvertable[idl] = {idg, 1/3, "converter.enableEssence"}
+		findConvertable[idg] = {idl, 3, "converter.enableEssence"}
 	end
-	for id, idto in pairs (greater2lesser) do
-		findConvertable[id] = {idto, 3, "converter.enableEssence"}
+	for idc, ide in pairs (crystallized_eternal) do
+		findConvertable[idc] = {ide, 0.1, "converter.enableCrystallized"}
+		findConvertable[ide] = {idc, 10, "converter.enableCrystallized"}
 	end
+	-- One-way
 	for id, idto in pairs (mote2primal) do
 		findConvertable[id] = {idto, 0.1, "converter.enableMote"}
 	end
 	for id, idto in pairs (depleted2enhanced) do
-		findConvertable[id] = {idto, 0.1, "converter.enableDepleted"}
+		findConvertable[id] = {idto, 1, "converter.enableDepleted"}
 	end
 
 	-- delete temp tables (actually should not be needed as we're inside a do chunk, but just to be sure...)
-	lesser2greater = nil
-	greater2lesser = nil
+	lesser_greater = nil
+	crystallized_eternal = nil
 	mote2primal = nil
 	depleted2enhanced = nil
 end
@@ -176,7 +199,8 @@ default("converter.matching.check", true)
 default("converter.buyout.check", true)
 default("converter.enableEssence", true)
 default("converter.enableMote", true)
-default("converter.enableDepleted", true)
+default("converter.enableCrystallized", true)
+default("converter.enableDepleted", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -198,8 +222,9 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",           0,   "Include in search")
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableEssence", "Essence: Greater <> Lesser")
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableMote", "Mote > Primal")
+	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableCrystallized", "Crystallized <> Eternal")
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableDepleted", "Depleted Items")
-	gui:AddTip(id, "Warning: if you don't know about depleted items leave off!")
+	gui:AddTip(id, "Warning: if you don't know about depleted items leave this setting off!")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.allow.bid", "Allow Bids")
