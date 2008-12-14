@@ -445,10 +445,13 @@ function private.compactDB(announce)
 					if uniqueID ~= "0" then --ignore the already compacted keys
 						local itemLink = lib.API.getArrayItemLink(itemString)
 						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
-							while index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 do --While the entrys remain 40 days old process
+							local start, last = time(), index[1]
+							while (index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000) and  (time() - start < 10) do--While the entrys remain 40 days old process, after 10s inside anyone table break
 								debugPrint("Compressed", "|H"..itemString, index[1] )
 								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
 								table.remove(index, 1)
+								if time() - start > 1 and index[1] == last then debugPrint("inf loop purge index[1]", index[1]) table.remove(index, 1) end --added to remove bad entries, this should prevent this function from locking Wow
+								last = index[1]
 							end
 						end
 					end
