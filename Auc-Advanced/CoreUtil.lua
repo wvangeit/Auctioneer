@@ -42,7 +42,7 @@ local Babylonian = LibStub("Babylonian")
 assert(Babylonian, "Babylonian is not installed")
 local babylonian = Babylonian(AuctioneerLocalizations)
 function lib.localizations(stringKey, locale)
---locale = "deDE" --left in for testing purposes
+	locale =  lib.Settings.GetSetting("SelectedLocale")--locales are user choosable
 	if (locale) then
 		if (type(locale) == "string") then
 			return babylonian(locale, stringKey) or stringKey
@@ -150,6 +150,19 @@ function lib.Print(...)
 	else
 		DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 	end
+end
+
+--Creates the list of locales to choose from
+function lib.changeLocale()
+	local localizations, default = {}, lib.Settings.GetSetting("SelectedLocale") --get the user choosen locale make it first on the list
+	for i in pairs(AuctioneerLocalizations) do
+		if default == i then  
+			table.insert(localizations,1, {i, i})
+		else
+			table.insert(localizations, {i, i})
+		end
+	end
+	return localizations
 end
 
 function lib.GetFactor(...) return tooltip:GetFactor(...) end

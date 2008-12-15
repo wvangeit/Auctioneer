@@ -118,8 +118,9 @@ local settingDefaults = {
 	['scancommit.progressbar'] = true,
 	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
-    ['marketvalue.accuracy'] = .08,
+	['marketvalue.accuracy'] = .08,
 	["ShowPurchaseDebug"] = true,
+	["SelectedLocale"] = GetLocale(), 
 }
 
 local function getDefault(setting)
@@ -285,7 +286,10 @@ local function setter(setting, value)
 		if db[setting] == value then return end
 		db[setting] = value
 	end
-
+	if setting == "uselocale" then--Stores the last user choosen locale so it can be used next time
+		lib.SetSetting("SelectedLocale", value)
+	end
+	
 	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 end
 
@@ -368,11 +372,10 @@ function lib.MakeGuiConfig()
 	local Configator = LibStub:GetLibrary("Configator")
 	gui = Configator:Create(setter, getter)
 	lib.Gui = gui
-
-  	gui:AddCat("Core Options")
+	gui:AddCat("Core Options")
 
 	id = gui:AddTab("Profiles")
-
+	
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
@@ -406,6 +409,7 @@ function lib.MakeGuiConfig()
 	)
 
 	id = gui:AddTab("General")
+	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
 	gui:AddTip(id, "Enable the display of how many items in the current scan image match this item")
@@ -426,8 +430,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, "Processing priority: %d")
 	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
 
-    gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
-    gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.");
+	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
+	gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.");
 
 
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progress bar")
@@ -445,7 +449,11 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
 	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
-
+	
+	gui:AddControl(id, "Subhead",     0,	"Preferred Language")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.changeLocale(), "uselocale")
+	gui:AddTip(id, "Chooses the Language use by auctioneer. This will require a /console reloadui or restart to take full effect")
+	
 	gui:AddControl(id, "Subhead",     0,     "Purchasing Options")
 	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", "Show Purchase queue info")
 	gui:AddTip(id, "Shows what is added to the purchase queue, and what is being purchased")
@@ -475,7 +483,11 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is preferred output frame",
 		"What is the Preferred Output Frame?",
 		"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer Advanced will print all subsequent output to that window.")
-
+	gui:AddHelp(id, "what is preferred language",
+		"What is the Preferred Language?",
+		"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui")
+		
+		
     gui:AddHelp(id, "what is accuracy",
         "What is Market Pricing error?",
         "Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers).");
