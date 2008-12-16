@@ -361,7 +361,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "how bid calculated?",
 		_TRANS('APPR_Help_HowBidPriceCalculated') ,--How does the bid price get calculated?
-		_TRANS('APPR_Help_HowBidPriceCalculatedAnswer).'):format("|cffffff00","|r", "|cffffff00", "|r", " |cffffff00", "|r" ) )--Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).
+		_TRANS('APPR_Help_HowBidPriceCalculatedAnswer'):format("|cffffff00","|r", "|cffffff00", "|r", " |cffffff00", "|r" ) )--Except for fixed price items, the starting bid price is calculated based off the original buyout price. The bid price calculation options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:  (%s Buyout %s-%s Markdown %s-%s Deposit %s).
 
 	gui:AddHelp(id, "how markdown calculated",
 		_TRANS('APPR_Help_HowMarkdownPctCalculated') ,--How is the markdown percentage calculated?
