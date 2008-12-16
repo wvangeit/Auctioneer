@@ -381,8 +381,8 @@ function private.SetupConfigGui(gui)
 		_TRANS('PURC_Help_HowMovingAverageAnswer') )--Todays Moving Average is ((X-1)*YesterdaysMovingAverage + TodaysAverage) / X, where X is the number of days (3,7, or 14).
 
 	gui:AddHelp(id, "no day saved purchased",
-		_TRANS('PURC_Help_DayDayAverage') ,--So you aren\'t saving a day-to-day average?
-		_TRANS('PURC_Help_DayDayAverageAnswer') )--No, that would not only take up space, but heavy calculations on each auction house scan.
+		_TRANS('PURC_Help_DayAverage') ,--So you aren\'t saving a day-to-day average?
+		_TRANS('PURC_Help_DayAverageAnswer') )--No, that would not only take up space, but heavy calculations on each auction house scan.
 
 	gui:AddHelp(id, "why multiply stack size stddev",
 		_TRANS('PURC_Help_MultiplyStack') ,--Why have the option to multiply stack size?
