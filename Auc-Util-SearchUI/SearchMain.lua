@@ -949,6 +949,14 @@ function lib.MakeGuiConfig()
 	gui.saves.name:SetWidth(200)
 	gui.saves.name:SetHeight(18)
 
+ --displays remaining # of scans queued  
+gui.ScansRemaining = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+gui.ScansRemaining:ClearAllPoints()
+gui.ScansRemaining:SetPoint("RIGHT", gui.saves, "LEFT", -5, 0)
+gui.ScansRemaining:SetTextColor(1, 0.8, 0)
+gui.ScansRemaining:SetText("0")
+gui.ScansRemaining:SetJustifyH("RIGHT")
+  
 	if AucAdvancedData.UtilSearchUiData then
 		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or "" 
 		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
@@ -1676,7 +1684,11 @@ function private.OnUpdate()
 			gui.frame.purchase:SetText("Purchase")
 			gui.frame.purchase:SetScript("OnClick", private.purchase)
 		end
-		
+		if AucAdvanced.Scan.Private.scanStack then
+				gui.ScansRemaining:SetText(#AucAdvanced.Scan.Private.scanStack)
+		else
+				gui.ScansRemaining:SetText("0")
+		end
 	end
 
 	lib.UpdateSave(true)
