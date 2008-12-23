@@ -102,13 +102,12 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not data[faction] then data[faction] = {} end
 	local stats = private.UnpackStats(data[faction][itemSig])
 	if not stats[iLevel] then stats[iLevel] = {} end
-    local skip, sz = 0, #stats[iLevel];
+    local skip, sz = 1, #stats[iLevel];
 	if sz >= KEEP_NUM_POINTS then
-		stats[iLevel][1] = nil;
-        skip = 1;
+        skip = 2;
 	end
 	stats[iLevel][sz+1] = buyout;
-	data[faction][itemSig] = private.PackStats(stats, skip)
+	data[faction][itemSig] = private.PackStats(stats, skip, iLevel)
 end
 
 local BellCurve = AucAdvanced.API.GenerateBellCurve();
@@ -473,14 +472,11 @@ function private.UnpackStats(dataItem)
 	end
 	return data
 end
-function private.PackStats(data, skip)
+function private.PackStats(data, skip, skipKey)
 	local stats = ""
 	local joiner = ""
 	for property, info in pairs(data) do
-        if type(property) == 'number' then
-            property = property - 1;
-        end
-		stats = stats..joiner..property..":"..strjoin(";", unpack(info))
+        stats = stats..joiner..property..":"..strjoin(";", select(property == skipKey and skip or 1, unpack(info)))
 		joiner = ","
 	end
 	return stats
