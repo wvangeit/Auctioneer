@@ -508,7 +508,8 @@ function enchantTooltip(tooltip, name, link, isItem)
 	local craftIndex = nil
 	local tradeIndex = nil
 	local reagentList
-
+	local frame = tooltip:GetFrame()
+	
 	-- if it's an item, try our cache
 	if isItem then
 		reagentList = Enchantrix.Util.GetCraftReagentInfoFromCache(name)
