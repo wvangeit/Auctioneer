@@ -158,13 +158,8 @@ end
 function lib.GetPrice(hyperlink, faction)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-
-	local quality, iLevel, equipPos = private.GetItemDetail(itemId)
-
-	if not equipPos then return end
-	equipPos = tonumber(iTypes[equipPos]) or -1
+	local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
+	if not linkType then return end
 	if quality < 1 then return end
 	if not equipPos then return end
 	if equipPos < 1 then return end
@@ -371,22 +366,15 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.enable", true)
 
-	local _,build = GetBuildInfo()
-	if not data.itemcache or data.itemcache.version ~= build then
-		data.itemcache = { version = build }
-	end 
 end
 
 function lib.ClearItem(hyperlink, faction, realm)
-	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-
-	local quality, iLevel, equipPos = private.GetItemDetail(itemId)
-	if not equipPos then 
+	local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
+	if not linkType then return end
+	if not quality then 
 		print(_TRANS('ILVL_Interface_NoDataHyperlink'):format(hyperlink) )--Stat-iLevel: unable to retrieve data for item: %s
 		return
 	end
-	equipPos = tonumber(iTypes[equipPos]) or -1
 	if quality < 1 then
 		print(_TRANS('ILVL_Interface_ItemNotFound') )--Stat-iLevel: item is not in database
 		return
@@ -418,18 +406,47 @@ end
 
 --[[ Local functions ]]--
 
-function private.GetItemDetail(itemId)
-	if not data.itemcache[itemId] then
-		local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
-		data.itemcache[itemId] = { quality, iLevel, equipPos }
+function private.GetItemDetail(hyperlink)
+	if not private.localcache then private.localcache = {} end
+	local cache = private.localcache[hyperlink]
+	if cache ~= nil then
+		if not cache then return end
+		return unpack(cache)
 	end
-	return unpack(data.itemcache[itemId])
+
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then
+		private.localcache[hyperlink] = false
+		return
+	end
+
+	local _, quality, iLevel, equipPos
+	if data.itemcache[itemId] then
+		quality,iLevel,equipPos = strsplit(":", data.itemcache[itemId])
+		quality,iLevel,equipPos = tonumber(quality), tonumber(iLevel), tonumber(equipPos)
+	else
+		_,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
+		if quality then
+			equipPos = tonumber(iTypes[equipPos]) or -1
+			data.itemcache[itemId] = quality..":"..iLevel..":"..equipPos
+		else 
+			private.localcache[hyperlink] = false
+			return
+		end
+	end
+	cache = { linkType,itemId,property,factor,quality,iLevel,equipPos }
+	private.localcache[hyperlink] = cache
+	return unpack(cache)
 end
 
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-
+	local _,build = GetBuildInfo()
+	local ITEMCACHEVER = 2
+	if not data.itemcache or data.itemcache.version ~= build.."-"..ITEMCACHEVER then
+		data.itemcache = { version = build.."-"..ITEMCACHEVER }
+	end 
 end
 
 function private.UnpackStatIter(data, ...)
