@@ -44,7 +44,8 @@ local tooltip = LibStub("nTipHelper:1")
 function addonLoaded()
 	-- Hook in new tooltip code
 	tooltip:Activate()
-	tooltip:AddCallback(hookTooltip, 400)
+	tooltip:AddCallback( { type = "item", callback = hookItemTooltip }, 400)
+	tooltip:AddCallback( { type = "spell", callback = hookSpellTooltip }, 400)
 end
 
 tooltipFormat = {
@@ -504,7 +505,6 @@ function enchantTooltip(tooltip, name, link, isItem)
 -- TODO - ccox - for items, get the number made!  But what about items with random yield?
 -- TODO - ccox - this really should recursively descend crafted items for true costs not AH prices
 --		most of the time they'll be in the cache, so it won't add a lot of time to the search
-
 	local craftIndex = nil
 	local tradeIndex = nil
 	local reagentList
@@ -604,7 +604,7 @@ function enchantTooltip(tooltip, name, link, isItem)
 		end
 		--tooltip:SetIcon(icon)
 		local hLink = link:match("|H([^|]+)|h")
-		tooltip:AddLine(name)
+		if not hLink then hLink = link end
 		tooltip:AddLine(hLink)
 	end
 	tooltip:AddLine(_ENCH('FrmtSuggestedPrice'), 0.8,0.8,0.2, embed)
@@ -673,18 +673,11 @@ function enchantTooltip(tooltip, name, link, isItem)
 	end
 end
 
-function hookTooltip(tipFrame, item, count, name, link, quality)
-
-	-- nothing to do, if enchantrix is disabled
-	if (not Enchantrix.Settings.GetSetting('all')) then
-		return
-	end
+function hookItemTooltip(tipFrame, item, count, name, link, quality)
+	if (not Enchantrix.Settings.GetSetting('all')) then return end
 	
 	tooltip:SetFrame(tipFrame)
-
-	local itemType, itemId = tooltip:DecodeLink(link)
-
---Enchantrix.Util.DebugPrintQuick("enx tooltip hook called", item, count, name, link, quality, itemType, itemId );
+	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
 
 	if itemType == "item" then
 		name = name or ""
@@ -692,11 +685,23 @@ function hookTooltip(tipFrame, item, count, name, link, quality)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(tooltip, name, link, true)
 		end
-	elseif itemType == "enchant" or itemType == "spell" then
+	end
+	tooltip:ClearFrame(tipFrame)
+end
+
+function hookSpellTooltip(tipFrame, link, name, rank)
+	if (not Enchantrix.Settings.GetSetting('all')) then return end
+	
+	tooltip:SetFrame(tipFrame)
+	if link:sub(0, 8) == "enchant:" or link:sub(0, 6) == "spell:" then
+		link = "|H"..link.."|h|cffffffff["..name.."]|r|h"
+	end
+	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
+
+	if itemType == "enchant" or itemType == "spell" then
 		name = name or ""
 		enchantTooltip(tooltip, name, link, false)
 	end
-
 	tooltip:ClearFrame(tipFrame)
 end
 
