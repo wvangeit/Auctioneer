@@ -105,6 +105,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
     local skip, sz = 0, #stats[iLevel];
 	if sz >= KEEP_NUM_POINTS then
 		stats[iLevel][1] = nil;
+        skip = 1;
 	end
 	stats[iLevel][sz+1] = buyout;
 	data[faction][itemSig] = private.PackStats(stats, skip)
