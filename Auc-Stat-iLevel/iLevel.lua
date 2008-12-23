@@ -161,7 +161,8 @@ function lib.GetPrice(hyperlink, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 
-	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(hyperlink)
+	local quality, iLevel, equipPos = private.GetItemDetail(itemId)
+
 	if not equipPos then return end
 	equipPos = tonumber(iTypes[equipPos]) or -1
 	if quality < 1 then return end
@@ -369,13 +370,18 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.confid", true)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.enable", true)
+
+	local _,build = GetBuildInfo()
+	if not data.itemcache or data.itemcache.version ~= build then
+		data.itemcache = { version = build }
+	end 
 end
 
 function lib.ClearItem(hyperlink, faction, realm)
 	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 
-	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(hyperlink)
+	local quality, iLevel, equipPos = private.GetItemDetail(itemId)
 	if not equipPos then 
 		print(_TRANS('ILVL_Interface_NoDataHyperlink'):format(hyperlink) )--Stat-iLevel: unable to retrieve data for item: %s
 		return
@@ -411,6 +417,14 @@ function lib.ClearItem(hyperlink, faction, realm)
 end
 
 --[[ Local functions ]]--
+
+function private.GetItemDetail(itemId)
+	if not data.itemcache[itemId] then
+		local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
+		data.itemcache[itemId] = { quality, iLevel, equipPos }
+	end
+	return unpack(data.itemcache[itemId])
+end
 
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
