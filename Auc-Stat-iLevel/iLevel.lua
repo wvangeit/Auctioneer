@@ -239,7 +239,7 @@ function lib.GetPrice(hyperlink, faction)
 end
 
 function lib.GetPriceColumns()
-	return "Average", "Mean", false, "Std Deviation", "Variance", "Count"
+	return "Average", "Mean", false, "Std Deviation", "Variance", "Count", "Confidence"
 end
 
 local array = {}
@@ -253,13 +253,14 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = average or mean
-	array.seen = count
+	array.seen = 0
 	array.confidence = confidence
 	-- This is additional data
 	array.normalized = average
 	array.mean = mean
 	array.deviation = stdev
 	array.variance = variance
+	array.processed = count
 
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
