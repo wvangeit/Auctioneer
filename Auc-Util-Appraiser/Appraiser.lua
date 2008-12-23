@@ -285,37 +285,37 @@ function lib.GetPriceArray(link, _, match)
 end
 
 function lib.GetOwnAuctionDetails()
-    local results = {}
-    local counts = {}
-    local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
-    if totalAuctions >0 then
-	for i=1, totalAuctions do
-		local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
-		if name then
-        if not results[name] then
-            results[name] = {}
-            counts[name] = {}
+	local results = {}
+	local counts = {}
+	local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
+	if totalAuctions >0 then
+		for i=1, totalAuctions do
+			local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
+			if name and (count>0) then
+				if not results[name] then
+					results[name] = {}
+					counts[name] = {}
+				end
+				local r = results[name][count]
+				if not r then
+					r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
+					results[name][count] = r
+					tinsert(counts[name], count)
+				end
+				if (minBid or 0)>0 then
+					r.countBid = r.countBid + count
+					r.sumBid = r.sumBid + bidAmount
+				end
+				if (buyoutPrice or 0)>0 then
+					r.countBO = r.countBO + count
+					r.sumBO = r.sumBO + buyoutPrice
+				end
+				r.stackCount = r.stackCount + 1
+			end
 		end
-		local r = results[name][count]
-		if not r then
-			r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
-			results[name][count] = r
-			tinsert(counts[name], count)
-		end
-		if (minBid or 0)>0 then
-			r.countBid = r.countBid + count
-            r.sumBid = r.sumBid + bidAmount
-        end
-        if (buyoutPrice or 0)>0 then
-            r.countBO = r.countBO + count
-            r.sumBO = r.sumBO + buyoutPrice
-        end
-        r.stackCount = r.stackCount + 1
-        end
-    end
-    end
-    lib.ownResults = results
-    lib.ownCounts = counts
+	end
+	lib.ownResults = results
+	lib.ownCounts = counts
 end
 
 
