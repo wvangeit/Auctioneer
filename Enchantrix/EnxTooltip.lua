@@ -37,7 +37,7 @@ local tooltipFormat	-- Enchantrix.Tooltip.Format
 -- Local functions
 local itemTooltip
 local enchantTooltip
-local hookTooltip
+local hookItemTooltip, hookSpellTooltip
 
 local tooltip = LibStub("nTipHelper:1")
 
