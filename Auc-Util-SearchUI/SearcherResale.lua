@@ -75,9 +75,6 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "MoneyFramePinned",  0, 1, "resale.profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "resale.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
-	gui:AddControl(id, "Checkbox",         0, 1, "maxprice.enable", "Enable maximum price:")
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 99999999, "Maximum Price")
-	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 	gui:AddControl(id, "Checkbox",          0, 1, "resale.seen.check", "Check Seen count")
 	gui:AddControl(id, "Slider",            0, 2, "resale.seen.min", 1, 100, 1, "Min seen count: %s")
 

@@ -189,9 +189,6 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 450, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.max", 25, 450, 25, "Maximum skill: %s")
-	gui:AddControl(id, "Checkbox",         0, 1, "maxprice.enable", "Enable maximum price:")
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 99999999, "Maximum Price")
-	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
