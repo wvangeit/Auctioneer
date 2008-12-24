@@ -51,6 +51,7 @@ end
 function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanbutton.enabled", true)
 	AucAdvanced.Settings.SetDefault("util.scanbutton.message", true)
+	AucAdvanced.Settings.SetDefault("util.scanbutton.getall", false)
 end
 
 -- /run local t = AucAdvanced.Modules.Util.ScanButton.Private.buttons.stop.tex t:SetPoint("TOPLEFT", t:GetParent() "TOPLEFT", 3,-3) t:SetPoint("BOTTOMRIGHT", t:GetParent(), "BOTTOMRIGHT", -3,3)
@@ -58,8 +59,8 @@ end
 
 function private.HookAH()
 	private.buttons = CreateFrame("Frame", nil, AuctionFrameBrowse)
-	private.buttons:SetPoint("TOPLEFT", AuctionFrameBrowse, "TOPLEFT", 200,-15)
-	private.buttons:SetWidth(22*3 + 4)
+	private.buttons:SetPoint("TOPLEFT", AuctionFrameBrowse, "TOPLEFT", 180,-15)
+	private.buttons:SetWidth(22*4 + 4)
 	private.buttons:SetHeight(18)
 	private.buttons:SetScript("OnUpdate", private.OnUpdate)
 
@@ -105,6 +106,49 @@ function private.HookAH()
 	private.buttons.pause.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.pause.tex:SetTexCoord(0.5, 0.75, 0, 1)
 	private.buttons.pause.tex:SetVertexColor(1.0, 0.9, 0.1)
+
+	private.buttons.getall = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
+	private.buttons.getall:SetPoint("TOPLEFT", private.buttons.pause, "TOPRIGHT", 2,0)
+	private.buttons.getall:SetWidth(22)
+	private.buttons.getall:SetHeight(18)
+	private.buttons.getall:SetScript("OnClick", private.getall)
+	private.buttons.getall.tex = private.buttons.getall:CreateTexture(nil, "OVERLAY")
+	private.buttons.getall.tex:SetPoint("TOPLEFT", private.buttons.getall, "TOPLEFT", 4,-2)
+	private.buttons.getall.tex:SetPoint("BOTTOMRIGHT", private.buttons.getall, "BOTTOMRIGHT", -4,2)
+	private.buttons.getall.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
+	private.buttons.getall.tex:SetTexCoord(0.75, 1, 0, 1)
+	private.buttons.getall.tex:SetVertexColor(0.3, 0.7, 1.0)
+
+	local msg = CreateFrame("Frame", nil, UIParent)
+	private.message = msg
+	msg:Hide()
+	msg:SetPoint("CENTER", "UIParent", "CENTER")
+	msg:SetFrameStrata("DIALOG")
+	msg:SetHeight(280)
+	msg:SetWidth(500)
+	msg:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 9, right = 9, top = 9, bottom = 9 }
+	})
+	msg:SetBackdropColor(0,0,0, 1)
+
+	msg.Done = CreateFrame("Button", "", msg, "OptionsButtonTemplate")
+	msg.Done:SetText("Done")
+	msg.Done:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -10, 10)
+	msg.Done:SetScript("OnClick", function() msg:Hide() end)
+
+	msg.Text = msg:CreateFontString(nil, "HIGH")
+	msg.Text:SetPoint("TOPLEFT", msg, "TOPLEFT", 20, -20)
+	msg.Text:SetPoint("BOTTOMRIGHT", msg.Done, "TOPRIGHT", -10, 10)
+	msg.Text:SetFont("Fonts\\FRIZQT__.TTF",14)
+	msg.Text:SetJustifyH("LEFT")
+	msg.Text:SetJustifyV("TOP")
+	msg.Text:SetShadowColor(0,0,0)
+	msg.Text:SetShadowOffset(3,-3)
+
+	msg.Text:SetText("|c00ff4400Important note about the GetAll scan option:|r\n\nUtilizing this feature can result in a very fast scan once every 15 minutes, however it requires a fast computer, low latency/ping times to the server, and for the servers to be running in optimum conditions. If any one of these three things are lagging, you may be disconnected from the server during the scan process.\n\nIf you wish to continue click the button again.\n\n|c00444444If you wish, you can disable this warning message via the Scan Button configuration settings.|r")
 
 	private.UpdateScanProgress()
 end
@@ -182,6 +226,21 @@ function private:OnUpdate(delay)
 		private.AuctionFrameFilters_ClearSelection()
 		private.AuctionFrameFilters_ClearHighlight()
 	end
+
+	local canSend, canSendAll = CanSendAuctionQuery()
+	if canSendAll and not AucAdvanced.Scan.IsScanning() and private.buttons.play:IsEnabled() then
+		private.buttons.getall:Enable()
+		if AucAdvanced.Settings.GetSetting("util.scanbutton.getall") or private.warned then
+			private.buttons.getall.tex:SetVertexColor(1.0, 0.9, 0.1)
+			private.buttons.getall.warn = nil
+		else
+			private.buttons.getall.tex:SetVertexColor(0.3, 0.7, 1.0)
+			private.buttons.getall.warn = not private.warned
+		end
+	else
+		private.buttons.getall:Disable()
+		private.buttons.getall.tex:SetVertexColor(0.3,0.3,0.3)
+	end
 end
 
 function private.SetupConfigGui(gui)
@@ -200,6 +259,9 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections have been queued")
 	gui:AddTip(id, "If enabled, this shows the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan.")
+
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.getall", "Don't warn about GetAll scanning.")
+	gui:AddTip(id, "Disable the warning that you get when you click the GetAll button")
 end
 
 function private.ConfigChanged()
@@ -234,6 +296,19 @@ function private.play()
 		else
 			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
 		end
+	end
+	private.UpdateScanProgress()
+end
+
+function private.getall()
+	if not AucAdvanced.Scan.IsScanning() then
+		if (private.buttons.getall.warn) then
+			private.message:Show()
+			private.warned = true
+			return
+		end
+			
+		AucAdvanced.Scan.StartScan(nil, nil, nil, nil, nil, nil, nil, nil, true)
 	end
 	private.UpdateScanProgress()
 end
