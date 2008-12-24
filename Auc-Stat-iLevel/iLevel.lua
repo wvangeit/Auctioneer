@@ -39,10 +39,11 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local iTypes = AucAdvanced.Const.InvTypes
 
-local KEEP_NUM_POINTS = 500
+local KEEP_NUM_POINTS = 250
 
 local data
 local pricecache
+local unpacked, updated = {}, {}
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
@@ -70,6 +71,7 @@ function lib.Processor(callbackType, ...)
 		lib.OnLoad(...)
 	elseif (callbackType == "scanstats") then
 		pricecache = nil
+		private.RepackStats()
 	end
 end
 
@@ -100,14 +102,11 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
-	local stats = private.UnpackStats(data[faction][itemSig])
+	local stats = private.UnpackStats(data[faction], itemSig)
 	if not stats[iLevel] then stats[iLevel] = {} end
-    local skip, sz = 1, #stats[iLevel];
-	if sz >= KEEP_NUM_POINTS then
-        skip = 2;
-	end
-	stats[iLevel][sz+1] = buyout;
-	data[faction][itemSig] = private.PackStats(stats, skip, iLevel)
+    local sz = #stats[iLevel]
+	stats[iLevel][sz+1] = buyout
+	updated[stats] = true
 end
 
 local BellCurve = AucAdvanced.API.GenerateBellCurve();
@@ -419,20 +418,18 @@ function private.GetItemDetail(hyperlink)
 		return
 	end
 
-	local _, quality, iLevel, equipPos
-	if data.itemcache[itemId] then
-		quality,iLevel,equipPos = strsplit(":", data.itemcache[itemId])
-		quality,iLevel,equipPos = tonumber(quality), tonumber(iLevel), tonumber(equipPos)
-	else
-		_,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
-		if quality then
-			equipPos = tonumber(iTypes[equipPos]) or -1
-			data.itemcache[itemId] = quality..":"..iLevel..":"..equipPos
-		else 
+	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
+	if quality then
+		equipPos = tonumber(iTypes[equipPos]) or -1
+		if (equipPos < 1) then
 			private.localcache[hyperlink] = false
 			return
 		end
+	else 
+		private.localcache[hyperlink] = false
+		return
 	end
+
 	cache = { linkType,itemId,property,factor,quality,iLevel,equipPos }
 	private.localcache[hyperlink] = cache
 	return unpack(cache)
@@ -441,11 +438,7 @@ end
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	local _,build = GetBuildInfo()
-	local ITEMCACHEVER = 2
-	if not data.itemcache or data.itemcache.version ~= build.."-"..ITEMCACHEVER then
-		data.itemcache = { version = build.."-"..ITEMCACHEVER }
-	end 
+	data.itemcache = nil
 end
 
 function private.UnpackStatIter(data, ...)
@@ -465,21 +458,33 @@ function private.UnpackStatIter(data, ...)
 		end
 	end
 end
-function private.UnpackStats(dataItem)
-	local data = {}
-	if (dataItem) then
-		private.UnpackStatIter(data, strsplit(",", dataItem))
+function private.UnpackStats(data, item)
+	if (unpacked[item]) then return unpacked[item] end
+	local stats = {}
+	if (data and data[item]) then
+		private.UnpackStatIter(stats, strsplit(",", data[item]))
+		unpacked[item] = stats
 	end
-	return data
+	return stats
 end
-function private.PackStats(data, skip, skipKey)
+function private.PackStats(data)
 	local stats = ""
 	local joiner = ""
 	for property, info in pairs(data) do
-        stats = stats..joiner..property..":"..strjoin(";", select(property == skipKey and skip or 1, unpack(info)))
+		local n = max(1, #info - KEEP_NUM_POINTS)
+        stats = stats..joiner..property..":"..strjoin(";", select(n, unpack(info)))
 		joiner = ","
 	end
 	return stats
+end
+function private.RepackStats()
+	local faction = AucAdvanced.GetFaction()
+	for item, stats in pairs(unpacked) do
+		if updated[stats] then
+			data[faction][item] = private.PackStats(stats)
+		end
+	end
+	updated = {}
 end
 
 function private.makeData()
@@ -488,6 +493,5 @@ function private.makeData()
 	data = AucAdvancedStat_iLevelData
 	private.DataLoaded()
 end
-
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
