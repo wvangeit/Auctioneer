@@ -52,6 +52,7 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
 		private.clearcache()
+		private.UpdatePricing()
 	elseif (callbackType == "postresult") then
 		private.clearcache()
 	end

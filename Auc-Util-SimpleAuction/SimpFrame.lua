@@ -770,6 +770,32 @@ function private.PostAuction()
 	AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
 end
 
+function private.Refresh(background)
+	local link = frame.CurItem.link
+	if not link then return end
+	local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack = GetItemInfo(link)
+	local itemTypeId, itemSubId
+	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
+		if catName == itemType then
+			itemTypeId = catId
+			for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[itemTypeId]) do
+				if subName == itemSubType then
+					itemSubId = subId
+					break
+				end
+			end
+			break
+		end
+	end
+	print(("Refreshing view of {{%s}}"):format(name))--Refreshing view of {{%s}}
+	if background and type(background) == 'boolean' then
+		AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
+	else
+		AucAdvanced.Scan.PushScan()
+		AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
+	end
+end
+
 function private.CreateFrames()
 	if frame then return end
 
@@ -786,6 +812,13 @@ function private.CreateFrames()
 	frame.CurItem = {}
 	frame.detail = {0,0,0,"",""}
 	Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
+
+	frame.SetButtonTooltip = function(text)
+		if text and get("util.appraiser.buttontips") then
+			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetText(text)
+		end
+	end
 
 	frame:SetParent(AuctionFrame)
 	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
@@ -1071,6 +1104,62 @@ function private.CreateFrames()
 	function private.onClick(button, row, index)
 		
 	end
+	
+	private.buyselection = {}
+	function private.onSelect()
+		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
+			frame.imageview.sheet.prevselected = frame.imageview.sheet.selected
+			local selected = frame.imageview.sheet:GetSelection()
+			if (not selected) or (not selected[10]) then
+				private.buyselection = {}
+				frame.buy:Disable()
+				frame.bid:Disable()
+			else
+				private.buyselection.link = selected[10]
+				private.buyselection.seller = selected[1]
+				private.buyselection.stack = selected[3]
+				private.buyselection.minbid = selected[7]
+				private.buyselection.curbid = selected[8]
+				private.buyselection.buyout = selected[9]
+
+				-- Make sure that it's not one of our auctions
+				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
+					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
+						frame.buy:Enable()
+					else
+						frame.buy:Disable()
+					end
+
+					if private.buyselection.minbid then
+						frame.bid:Enable()
+					else
+						frame.bid:Disable()
+					end
+				else
+					frame.buy:Disable()
+					frame.bid:Disable()
+				end
+			end
+		end
+	end
+
+	function private.BuyAuction()
+		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
+		frame.imageview.sheet.selected = nil
+		private.onSelect()
+	end
+
+	function private.BidAuction()
+		local bid = private.buyselection.minbid
+		if private.buyselection.curbid and private.buyselection.curbid > 0 then
+			bid = math.ceil(private.buyselection.curbid*1.05)
+		end
+		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, bid)
+		frame.imageview.sheet.selected = nil
+		private.onSelect()
+	end
+
+
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		{ "Seller", "TEXT", get("util.simpleauc.columnwidth.Seller")}, --89
 		{ "Left",   "INT",  get("util.simpleauc.columnwidth.Left")}, --32
@@ -1082,7 +1171,8 @@ function private.CreateFrames()
 		{ "CurBid", "COIN", get("util.simpleauc.columnwidth.CurBid"), { DESCENDING=true } }, --76
 		{ "Buyout", "COIN", get("util.simpleauc.columnwidth.Buyout"), { DESCENDING=true } }, --80
 		{ "", "TEXT", get("util.simpleauc.columnwidth.BLANK")}, --Hidden column to carry the link --0
-	}, nil, nil, private.onClick, private.onResize, nil)
+	}, nil, nil, private.onClick, private.onResize, private.onSelect)
+	frame.imageview.sheet:EnableSelect(true)
 	
 	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
@@ -1101,6 +1191,26 @@ function private.CreateFrames()
 			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
 		end
 	end)
+
+	frame.refresh = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.refresh:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -167,15)
+	frame.refresh:SetText("Refresh")
+	frame.refresh:SetWidth(80)
+	frame.refresh:SetScript("OnClick", private.Refresh)
+
+	frame.bid = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.bid:SetPoint("TOPLEFT", frame.refresh, "TOPRIGHT", 1, 0)
+	frame.bid:SetWidth(80)
+	frame.bid:SetText("Bid")--Bid
+	frame.bid:SetScript("OnClick", private.BidAuction)
+	frame.bid:Disable()
+
+	frame.buy = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.buy:SetPoint("TOPLEFT", frame.bid, "TOPRIGHT", 1, 0)
+	frame.buy:SetWidth(80)
+	frame.buy:SetText("Buy")--Buy
+	frame.buy:SetScript("OnClick", private.BuyAuction)
+	frame.buy:Disable()
 
 	if get("util.simpleauc.scanbutton") then
 		frame.scanbutton:Show()
