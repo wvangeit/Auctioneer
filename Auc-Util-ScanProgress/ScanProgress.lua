@@ -174,7 +174,7 @@ function private.SetupConfigGui(gui)
 --		"how many pages you have scanned so far, and how many total pages there are.")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.activated", "Show a textual progress indicator when scanning.")
-	gui:AddTip(id, "If enabled, will show the scan progress indicator")
+	gui:AddTip(id, "If enabled, will show the scan progress indicator\n\nNOTE: This setting is also affected by the CompactUI option to prevent other modules from changing the display of the browse tab while scanning.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.leaveshown", "Leave the scan progress text shown after scan completion.")
 	gui:AddTip(id, "If enabled, will leave the scan progress indicator on the screen after scan has completed.\n\nIf disabled will show the last scanned page.")
 end
