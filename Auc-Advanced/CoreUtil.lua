@@ -359,6 +359,7 @@ function lib.NewModule(libType, libName)
 		end
 
 		lib.Modules[libType][libName] = module
+		private.modulecache = {}
 		return module, lib, private
 	end
 end
@@ -427,6 +428,13 @@ function lib.GetAllModules(having, findSystem, findEngine)
 	if findEngine then findEngine = findEngine:lower() end
 	if not findEngine then modules = {} end
 
+	if not having and not findSystem and private.modulecache then
+		for k,v in ipairs(private.modulecache) do
+			modules[k] = v
+		end
+		return modules
+	end
+
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		if not findSystem or system:lower() == findSystem then
 			for engine, engineLib in pairs(systemMods) do
@@ -439,6 +447,13 @@ function lib.GetAllModules(having, findSystem, findEngine)
 					end
 				end
 			end
+		end
+	end
+
+	if not having and not findSystem then
+		if not private.modulecache then private.modulecache = {} end
+		for k,v in ipairs(modules) do
+			private.modulecache[k] = v
 		end
 	end
 	return modules
