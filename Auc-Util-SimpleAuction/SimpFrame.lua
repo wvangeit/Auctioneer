@@ -187,28 +187,7 @@ function private.GetItems(link)
 	return #items, items, uBid, uBuy, lBid, lBuy, aSeen, aveBuy
 end
 
-local GOLD="ffd100"
-local SILVER="e6e6e6"
-local COPPER="c8602c"
-
-local GSC_3 = "|cff%s%d|cff000000.|cff%s%02d|cff000000.|cff%s%02d|r"
-local GSC_2 = "|cff%s%d|cff000000.|cff%s%02d|r"
-local GSC_1 = "|cff%s%d|r"
-
-local function coins(money)
-	money = math.floor(tonumber(money) or 0)
-	local g = math.floor(money / 10000)
-	local s = math.floor(money % 10000 / 100)
-	local c = money % 100
-
-	if g > 0 then
-		return GSC_3:format(GOLD, g, SILVER, s, COPPER, c)
-	elseif s > 0 then
-		return GSC_2:format(SILVER, s, COPPER, c)
-	else
-		return GSC_1:format(COPPER, c)
-	end
-end
+local coins = AucAdvanced.Coins
 private.coins = coins
 
 function private.SetIconCount(itemCount)
@@ -236,6 +215,7 @@ function private.UpdateDisplay()
 	local oStack, oBid, oBuy, oReason, oLink = unpack(frame.detail)
 	local lStack = frame.stacks.size.lastSize or oStack
 	local total = GetItemCount(link) or 0
+	local duration = frame.duration.time.selected
 
 	if (total == 0) then
 		private.LoadItemLink()
@@ -308,6 +288,21 @@ function private.UpdateDisplay()
 		text = string.format("Auctioning %d %s of this item at %s bid/%s buyout each", cNum, lots, coinsBid, coinsBuy)
 	end
 	frame.info:SetText(text)
+
+	local faction = "home"
+	if AucAdvanced.GetFactionGroup() == "Neutral" then
+		faction = "neutral"
+	end
+	local deposit = GetDepositCost(oLink, duration, faction, 1)
+	if deposit <= 0 then
+		frame.fees:SetText("No deposit")
+	elseif cNum > 1 then
+		frame.fees:SetText(("Deposit: %s, %s/stack, %s/ea"):format(coins(deposit*cStack*cNum), coins(deposit*cStack), coins(deposit)))
+	elseif cStack > 1 then
+		frame.fees:SetText(("Deposit: %s/stack, %s/ea"):format(coins(deposit*cStack), coins(deposit)))
+	else
+		frame.fees:SetText(("Deposit: %s"):format(coins(deposit)))
+	end
 	frame.stacks.equals:SetText("= "..(cStack * cNum))
 end
 
@@ -608,6 +603,7 @@ function private.LoadItemLink(itemLink, size)
 		frame.name:SetText("Drop item onto slot")
 	end
 	frame.info:SetText("To auction an item, drag it from your bag.")
+	frame.fees:SetText("")
 	frame.err:SetText("-- No item selected --")
 	frame.stacks.equals:SetText("= 0")
 	private.ClearSetting()
@@ -838,14 +834,24 @@ function private.CreateFrames()
 
 	frame.name = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.name:SetPoint("TOPLEFT", frame.slot, "TOPRIGHT", 10, -2)
+	frame.name:SetJustifyV("TOP")
 	frame.name:SetText("Drop item onto slot")
+
+	frame.fees = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	frame.fees:SetPoint("TOPLEFT", frame.slot, "TOPRIGHT", 10, -2)
+	frame.fees:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+	frame.fees:SetJustifyV("TOP")
+	frame.fees:SetJustifyH("RIGHT")
+	frame.fees:SetText("")
 
 	frame.info = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.info:SetPoint("TOPLEFT", frame.name, "BOTTOMLEFT", 0, -3)
+	frame.info:SetJustifyV("TOP")
 	frame.info:SetText("To auction an item, drag it from your bag.")
 
 	frame.err = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.err:SetPoint("TOPLEFT", frame.info, "BOTTOMLEFT", 0, 0)
+	frame.err:SetJustifyV("TOP")
 	frame.err:SetTextColor(1,0.2,0,1)
 	frame.err:SetText("-- No item selected --")
 
