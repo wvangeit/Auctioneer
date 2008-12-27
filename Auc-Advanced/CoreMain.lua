@@ -80,9 +80,8 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 	end
 	quantity = tonumber(quantity) or 1
 
-	-- Check to see if we need to force load scandata
-	local getter = AucAdvanced.Settings.GetSetting
-	if (getter("scandata.tooltip.display") and getter("scandata.force")) then
+	-- Check to see if we need to load scandata
+	if AucAdvanced.Settings.GetSetting("scandata.tooltip.display") then
 		AucAdvanced.Scan.GetImage()
 	end
 
@@ -94,7 +93,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 
 	local modules = AucAdvanced.GetAllModules()
 
-	if getter("tooltip.marketprice.show") then
+	if AucAdvanced.Settings.GetSetting("tooltip.marketprice.show") then
 		local market, seen = AucAdvanced.API.GetMarketValue(saneLink)
 		--we could just return here, but we want an indication that we don't have any data
         -- NB: So we return a value of 0? That sounds stupid to me... -- Shirik
@@ -208,6 +207,12 @@ function private.OnLoad(addon)
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
 		end
+
+		-- Check to see if we need to load scandata
+		if AucAdvanced.Settings.GetSetting("scandata.force") then
+			AucAdvanced.Scan.GetImage()
+		end
+
 	end
 
 	-- Notify the actual module if it exists

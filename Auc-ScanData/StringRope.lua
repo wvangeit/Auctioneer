@@ -28,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "StringRope"
-local LIBRARY_VERSION_MINOR = 4
+local LIBRARY_VERSION_MINOR = 5
 
 --[[-----------------------------------------------------------------
 
@@ -116,7 +116,7 @@ function lib.kit:Add(text)
 		self:Clear()
 		self:Add(text)
 	end
-	self.len = self.len + text:len()
+	self.len = self.len + tostring(text):len()
 	return tinsert(self.strings, text)
 end
 -- Adds a number of substrings to the StringRope instance

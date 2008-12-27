@@ -415,7 +415,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Enable the display of how many items in the current scan image match this item")
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
 	gui:AddTip(id, "Makes the scan data only display exact matches unless the shift key is held down")
-	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", "Force load scan data")
 	gui:AddTip(id, "Forces the scan data to load when Auctioneer Advanced is first loaded rather than on demand when first needed")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", "Display Market Price in tooltip")
