@@ -28,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "StringRope"
-local LIBRARY_VERSION_MINOR = 4
+local LIBRARY_VERSION_MINOR = 5
 
 --[[-----------------------------------------------------------------
 
