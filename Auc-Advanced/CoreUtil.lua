@@ -472,8 +472,8 @@ function lib.GetTooltip()
 end
 
 -- Turns a copper amount into colorized text
-function lib.Coins(amount)
-	return (tooltip:Coins(amount))
+function lib.Coins(amount, graphic)
+	return (tooltip:Coins(amount, graphic))
 end
 
 -- Creates a new coin object
