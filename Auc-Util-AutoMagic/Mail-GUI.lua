@@ -41,13 +41,13 @@ function lib.makeMailGUI()
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	lib.ammailgui:ClearAllPoints()
 	lib.ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
-		
+	
 	--Dont need to recreate duplicate frames on each mail box open.
 	if lib.ammailgui.Drag then return end 
 	
 	lib.ammailgui:SetFrameStrata("DIALOG")
 	lib.ammailgui:SetHeight(75)
-	lib.ammailgui:SetWidth(240)
+	lib.ammailgui:SetWidth(320)
 	lib.ammailgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -138,14 +138,26 @@ function lib.makeMailGUI()
 	lib.ammailgui.loadgems:SetScript("OnClick", lib.gemAction)
 	lib.ammailgui.loadgems:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadgems, "Add all Gems to the mail.") end)
 	lib.ammailgui.loadgems:SetScript("OnLeave", function() GameTooltip:Hide() end)
-
+	
+	lib.ammailgui.loadherb = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
+	lib.ammailgui.loadherb:SetText(("Herbs"))
+	lib.ammailgui.loadherb:SetPoint("LEFT", lib.ammailgui.loadgems, "RIGHT", 0, 0)
+	lib.ammailgui.loadherb:SetScript("OnClick", lib.herbAction)
+	lib.ammailgui.loadherb:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadherb, "Add all items classified \nas herbs to the mail.") end)
+	lib.ammailgui.loadherb:SetScript("OnLeave", function() GameTooltip:Hide() end)
+		
 	lib.ammailgui.loaddemats = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
 	lib.ammailgui.loaddemats:SetText(("Chant Mats"))
 	lib.ammailgui.loaddemats:SetPoint("TOPLEFT", lib.ammailgui.loadgems, "BOTTOMLEFT", 0, 0)
 	lib.ammailgui.loaddemats:SetScript("OnClick", lib.dematAction)
 	lib.ammailgui.loaddemats:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loaddemats, "Add all Enchanting mats \nto the mail.") end)
 	lib.ammailgui.loaddemats:SetScript("OnLeave", function() GameTooltip:Hide() end)
-
-
+	
+	lib.ammailgui.loadpigment = CreateFrame("Button", "", lib.ammailgui, "OptionsButtonTemplate")
+	lib.ammailgui.loadpigment:SetText(("Pigments"))
+	lib.ammailgui.loadpigment:SetPoint("LEFT", lib.ammailgui.loaddemats, "RIGHT", 0, 0)
+	lib.ammailgui.loadpigment:SetScript("OnClick", lib.pigmentAction)
+	lib.ammailgui.loadpigment:SetScript("OnEnter", function() lib.buttonTooltips( lib.ammailgui.loadpigment, "Add all Pigments \nto the mail.") end)
+	lib.ammailgui.loadpigment:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

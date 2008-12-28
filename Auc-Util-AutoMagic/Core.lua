@@ -115,6 +115,26 @@ local isDEMats =
 	[10940] = true,--Strange Dust
 }
 
+-- This table is validating that each ID within it is a mat from Milling (table from enchantrix)
+local isPigmentMats =
+	{
+	[39151] = true,	-- ALABASTER_PIGMENT
+	[39334] = true,	-- DUSKY_PIGMENT
+	[39338] = true,	-- GOLDEN_PIGMENT
+	[39339] = true,	-- EMERALD_PIGMENT
+	[39340] = true,	-- VIOLET_PIGMENT
+	[39341] = true, 	-- SILVERY_PIGMENT
+	[43103] = true,	-- VERDANT_PIGMENT
+	[43104] = true,	-- BURNT_PIGMENT
+	[43105] = true,	-- INDIGO_PIGMENT
+	[43106] = true,	-- RUBY_PIGMENT
+	[43107] = true, 	-- SAPPHIRE_PIGMENT
+	[39342] = true, 	-- NETHER_PIGMENT
+	[43108] = true, 	-- EBON_PIGMENT
+	[39343] = true, 	-- AZURE_PIGMENT
+	[43109] = true, 	-- ICY_PIGMENT
+}
+
 lib.vendorlist = {}
 function lib.vendorAction()
 	lib.vendorlist = {} --this needs to be cleared and recalcuated on EVERY vendor open. Not just when we confirm a sell
@@ -251,6 +271,50 @@ function lib.dematAction()
 				if isDEMats[ itemID ] then
 					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					end
+					UseContainerItem(bag, slot)
+				end
+			end
+		end
+	end
+end
+
+function lib.pigmentAction()
+	MailFrameTab_OnClick(nil, 2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
+				if isPigmentMats[ itemID ] then
+					if (get("util.automagic.chatspam")) then
+						print("AutoMagic has loaded", itemName, " because it is a pigment used for milling.")
+					end
+					UseContainerItem(bag, slot)
+				end
+			end
+		end
+	end
+end
+
+function lib.herbAction()
+	MailFrameTab_OnClick(nil, 2)
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				if (itemLink == nil) then return end
+				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+				if itemCount == nil then itemCount = 1 end
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, _, itemRarity, _, _, _, itemType, _, _, _ = GetItemInfo(itemLink)
+				if itemType == "Herb" then
+					if (get("util.automagic.chatspam")) then
+						print("AutoMagic has loaded", itemName, " because it is a herb.")
 					end
 					UseContainerItem(bag, slot)
 				end
