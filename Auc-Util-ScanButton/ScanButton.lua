@@ -278,9 +278,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what scanbutton",
 		"What are the scan buttons?",
-		"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the Auction House frame.\n"..
-		"These are the scan buttons for Auctioneer Advanced. If you are also using Auctioneer Classic, "..
-		"you may want to disable these buttons, until you are ready to switch, so as to avoid confusion.")
+		"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the Auction House frame.")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the Auction House")
 	gui:AddTip(id, "If enabled, this shows the Stop/Play/Pause scan buttons in the title bar of the Auction House.")
