@@ -41,6 +41,10 @@ function lib.makeMailGUI()
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	lib.ammailgui:ClearAllPoints()
 	lib.ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
+		
+	--Dont need to recreate duplicate frames on each mail box open.
+	if lib.ammailgui.Drag then return end 
+	
 	lib.ammailgui:SetFrameStrata("DIALOG")
 	lib.ammailgui:SetHeight(75)
 	lib.ammailgui:SetWidth(240)
