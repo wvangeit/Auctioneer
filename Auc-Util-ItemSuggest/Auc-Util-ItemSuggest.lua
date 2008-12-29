@@ -482,7 +482,7 @@ function lib.GetConvertValue (hyperlink, quantity)
 	
 	id = convert[1] -- id of item we can convert to
 	
-	market = GetAprPrice(id, nil, true) or 0
+	local market = GetAprPrice(id, nil, true) or 0
 	market = market * quantity
 	if (get("util.itemsuggest.includebrokerage")) then
 		market = market * (1 - cutRate)
