@@ -80,7 +80,7 @@ end
 
 function private.GetPriceData()
 	if not stattable["count"] then
-		debugPrint("GetPriceData: No stattable", libType.."-"..libName)
+		debugPrint("GetPriceData: No stattable", libType.."-"..libName, "Warning")
 		return
 	end
 	local median = 0
@@ -89,7 +89,7 @@ function private.GetPriceData()
 	local percent40, percent30 = 0, 0
 	local count = stattable["count"]
 	local refactored = false
-	debugPrint("getPricedata: "..tostring(stattable["count"]), libType.."-"..libName)
+	debugPrint("GetPriceData: "..tostring(stattable["count"]), libType.."-"..libName, "Info")
 	local recount = 0
 	--now find the Q1, median, and Q3 values
 	if stattable["min"] == stattable["max"] then
@@ -155,7 +155,7 @@ function lib.GetPrice(link, faction)
 
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
-		debugPrint("GetPrice: No data", libType.."-"..libName)
+		debugPrint("GetPrice: No data", libType.."-"..libName, "Warning")
 		return
 	end
 	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
@@ -709,7 +709,7 @@ function private.UnpackStats(dataItem)
 	if dataItem then
 		local firstvalue, maxvalue, step, count, newdataItem = strsplit(";",dataItem)
 		if not newdataItem then
-			debugPrint("Unpack: dataItem only 4 long", libType.."-"..libName)
+			debugPrint("UnpackStats: dataItem only 4 long", libType.."-"..libName, "Error")
 			return
 		end
 		stattable["min"] = tonumber(firstvalue)
@@ -725,7 +725,7 @@ function private.UnpackStats(dataItem)
 			index = index + 1
 		end
 	else
-		debugPrint("Unpack: No data passed", libType.."-"..libName)
+		debugPrint("UnpackStats: No data passed", libType.."-"..libName, "Error")
 	end
 end
 
