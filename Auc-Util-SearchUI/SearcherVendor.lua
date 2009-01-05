@@ -39,6 +39,8 @@ default("vendor.profit.min", 1)
 default("vendor.profit.pct", 0)
 default("vendor.allow.bid", true)
 default("vendor.allow.buy", true)
+default("vendor.maxprice", 10000000)
+default("vendor.maxprice.enable", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -62,18 +64,31 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "vendor.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "vendor.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "vendor.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Vendor searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "vendor.maxprice", 1, 99999999, "Maximum Price for Vendor")
 end
 
 function lib.Search(item)
 	local market, seen, _, pctstring
 
-	-- Valuate this item
-	local pct = get("vendor.profit.pct")
-	local min = get("vendor.profit.min")
 	if not GetSellValue then
-		return false, "No vendor price"
+		return false, "Vendor pricing not available"
 	end
-	local market = GetSellValue(item[Const.ITEMID]) or 0
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("vendor.maxprice.enable") and get("vendor.maxprice")
+	if buyprice <= 0 or not get("vendor.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("vendor.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
+	local market = GetSellValue(item[Const.ITEMID])
 	-- If there's no price, then we obviously can't sell it, ignore!
 	if not market or market == 0 then
 		return false, "No vendor price"
@@ -87,10 +102,9 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-
-	if get("vendor.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("vendor.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"

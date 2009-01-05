@@ -45,6 +45,8 @@ default("resale.adjust.deplength", 48)
 default("resale.adjust.listings", 3)
 default("resale.allow.bid", true)
 default("resale.allow.buy", true)
+default("resale.maxprice", 10000000)
+default("resale.maxprice.enable", false)
 default("resale.model", "Appraiser")
 
 function private.GetPriceModels()
@@ -82,6 +84,9 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "resale.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Resale searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "resale.maxprice", 1, 99999999, "Maximum Price for Resale")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, private.GetPriceModels, "resale.model", "Pricing model to use to base price on")
@@ -90,7 +95,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",			0.42, 1, AucSearchUI.AucLengthSelector, "resale.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "resale.adjust.deplength", "Length of auction for deposits")
 	gui:AddControl(id, "Slider",            0.42, 1, "resale.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
@@ -101,6 +106,19 @@ function lib.Search(item)
 	if not link then
 		return false, "No link"
 	end
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("resale.maxprice.enable") and get("resale.maxprice")
+	if buyprice <= 0 or not get("resale.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("resale.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
 	local model = get("resale.model")
 	if model == "market" then
 		market, seen = AucAdvanced.API.GetMarketValue(link)
@@ -140,9 +158,9 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if get("resale.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("resale.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"

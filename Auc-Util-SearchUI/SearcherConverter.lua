@@ -35,81 +35,82 @@ local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetMo
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Converter"
 
--- Set our constants
---Essences
-local GCOSMIC = 34055
-local GPLANAR = 22446
-local GETERNAL = 16203
-local GNETHER = 11175
-local GMYSTIC = 11135
-local GASTRAL = 11082
-local GMAGIC = 10939
-local LCOSMIC = 34056
-local LPLANAR = 22447
-local LETERNAL = 16202
-local LNETHER = 11174
-local LMYSTIC = 11134
-local LASTRAL = 10998
-local LMAGIC = 10938
---Motes/Primals
-local PAIR = 22451
-local MAIR = 22572
-local PEARTH= 22452
-local MEARTH = 22573
-local PFIRE = 21884
-local MFIRE = 22574
-local PLIFE = 21886
-local MLIFE = 22575
-local PMANA = 22457
-local MMANA = 22576
-local PSHADOW = 22456
-local MSHADOW = 22577
-local PWATER = 21885
-local MWATER = 22578
---Crystallized/Eternal
-local CAIR = 37700
-local EAIR = 35623
-local CEARTH = 37701
-local EEARTH = 35624
-local CSHADOW = 37703
-local ESHADOW = 35627
-local CLIFE = 37704
-local ELIFE = 35625
-local CFIRE = 37702
-local EFIRE = 36860
-local CWATER = 37705
-local EWATER = 35622
---Depleted items
-local DCBRACER = 32676 -- Depleted Cloth Bracers
-local DCBRACERTO = 32655 -- Crystalweave Bracers
-local DMGAUNTLETS = 32675 -- Depleted Mail Gauntlets
-local DMGAUNTLETSTO = 32656 -- Crystalhide Handwraps
-local DBADGE = 32672 -- Depleted Badge
-local DBADGETO = 32658 -- Badge of Tenacity
-local DCLOAK = 32677 -- Depleted Cloak
-local DCLOAKTO = 32665 -- Crystalweave Cape
-local DDAGGER = 32673 -- Depleted Dagger
-local DDAGGERTO = 32659	-- Crystal-Infused Shiv
-local DMACE = 32671 -- Depleted Mace
-local DMACETO = 32661 -- Apexis Crystal Mace
-local DRING = 32678 -- Depleted Ring
-local DRINGTO = 32664 -- Dreamcrystal Band
-local DSTAFF = 32679 -- Depleted Staff
-local DSTAFFTO = 32662 -- Flaming Quartz Staff
-local DSWORD = 32674 -- Depleted Sword
-local DSWORDTO = 32660 -- Crystalforged Sword
-local DTHAXE = 32670 -- Depleted Two-Handed Axe
-local DTHAXETO = 32663 -- Apexis Cleaver
-
 -- Build a table to do all our work
 -- findConvertable[itemID] = {conversionID, yield, checkstring}
+-- Note: ItemSuggest uses a copy of this code; if you change it here, change it in ItemSuggest as well!
 local findConvertable = {}
 do
+	-- Set our constants
+	--Essences
+	local GCOSMIC = 34055
+	local GPLANAR = 22446
+	local GETERNAL = 16203
+	local GNETHER = 11175
+	local GMYSTIC = 11135
+	local GASTRAL = 11082
+	local GMAGIC = 10939
+	local LCOSMIC = 34056
+	local LPLANAR = 22447
+	local LETERNAL = 16202
+	local LNETHER = 11174
+	local LMYSTIC = 11134
+	local LASTRAL = 10998
+	local LMAGIC = 10938
+	--Motes/Primals
+	local PAIR = 22451
+	local MAIR = 22572
+	local PEARTH= 22452
+	local MEARTH = 22573
+	local PFIRE = 21884
+	local MFIRE = 22574
+	local PLIFE = 21886
+	local MLIFE = 22575
+	local PMANA = 22457
+	local MMANA = 22576
+	local PSHADOW = 22456
+	local MSHADOW = 22577
+	local PWATER = 21885
+	local MWATER = 22578
+	--Crystallized/Eternal
+	local CAIR = 37700
+	local EAIR = 35623
+	local CEARTH = 37701
+	local EEARTH = 35624
+	local CSHADOW = 37703
+	local ESHADOW = 35627
+	local CLIFE = 37704
+	local ELIFE = 35625
+	local CFIRE = 37702
+	local EFIRE = 36860
+	local CWATER = 37705
+	local EWATER = 35622
+	--Depleted items
+	local DCBRACER = 32676 -- Depleted Cloth Bracers
+	local DCBRACERTO = 32655 -- Crystalweave Bracers
+	local DMGAUNTLETS = 32675 -- Depleted Mail Gauntlets
+	local DMGAUNTLETSTO = 32656 -- Crystalhide Handwraps
+	local DBADGE = 32672 -- Depleted Badge
+	local DBADGETO = 32658 -- Badge of Tenacity
+	local DCLOAK = 32677 -- Depleted Cloak
+	local DCLOAKTO = 32665 -- Crystalweave Cape
+	local DDAGGER = 32673 -- Depleted Dagger
+	local DDAGGERTO = 32659	-- Crystal-Infused Shiv
+	local DMACE = 32671 -- Depleted Mace
+	local DMACETO = 32661 -- Apexis Crystal Mace
+	local DRING = 32678 -- Depleted Ring
+	local DRINGTO = 32664 -- Dreamcrystal Band
+	local DSTAFF = 32679 -- Depleted Staff
+	local DSTAFFTO = 32662 -- Flaming Quartz Staff
+	local DSWORD = 32674 -- Depleted Sword
+	local DSWORDTO = 32660 -- Crystalforged Sword
+	local DTHAXE = 32670 -- Depleted Two-Handed Axe
+	local DTHAXETO = 32663 -- Apexis Cleaver
+
 	-- Temporary tables to help build the working table
 	-- To add new conversions, edit these tables
-	
+
 	-- TWO WAY Tables
-	
+
 	local lesser_greater = {
 		[LCOSMIC] = GCOSMIC,
 		[LPLANAR] = GPLANAR,
@@ -127,9 +128,9 @@ do
 		[CFIRE] = EFIRE,
 		[CWATER] = EWATER,
 	}
-	
+
 	-- ONE WAY Tables
-	
+
 	local mote2primal = {
 		[MAIR] = PAIR,
 		[MEARTH] = PEARTH,
@@ -151,7 +152,7 @@ do
 		[DSWORD] = DSWORDTO,
 		[DTHAXE] = DTHAXETO,
 	}
-	
+
 	--[[ placeholder for future development - not sure how this will work yet...
 	-- Trade Professions need to be handled differently as yields may vary
 	local smelt = {
@@ -179,12 +180,6 @@ do
 	for id, idto in pairs (depleted2enhanced) do
 		findConvertable[id] = {idto, 1, "converter.enableDepleted"}
 	end
-
-	-- delete temp tables (actually should not be needed as we're inside a do chunk, but just to be sure...)
-	lesser_greater = nil
-	crystallized_eternal = nil
-	mote2primal = nil
-	depleted2enhanced = nil
 end
 
 default("converter.profit.min", 1)
@@ -195,6 +190,8 @@ default("converter.adjust.deplength", 48)
 default("converter.adjust.listings", 3)
 default("converter.allow.bid", true)
 default("converter.allow.buy", true)
+default("converter.maxprice", 10000000)
+default("converter.maxprice.enable", false)
 default("converter.matching.check", true)
 default("converter.buyout.check", true)
 default("converter.enableEssence", true)
@@ -230,11 +227,14 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1,  "converter.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Converter searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "converter.maxprice", 1, 99999999, "Maximum Price for Converter")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.adjust.deposit", "Subtract deposit cost")
-	gui:AddControl(id, "Selectbox",			0.42, 1, AucSearchUI.AucLengthSelector, "converter.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "converter.adjust.deplength", "Length of auction for deposits")
 	gui:AddControl(id, "Slider",            0.42, 1, "converter.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 
 	gui:AddControl(id, "Subhead",           0.42,  "Appraiser Value Origination")
@@ -249,19 +249,31 @@ function lib.Search (item)
 	if not convert then
 		return false, "Item not convertable"
 	end
-	
+
 	local newID, yield, test = unpack(convert)
 	if not get(test) then
 		return false, "Category disabled"
 	end
-	
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("converter.maxprice.enable") and get("converter.maxprice")
+	if buyprice <= 0 or not get("converter.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("converter.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
 	local market, bid, buy
 	local count = item[Const.COUNT] * yield
-	
+
 	-- todo: add option to use other market models; make Appraiser an optional dependancy, not required
 	buy, bid = AucAdvanced.Modules.Util.Appraiser.GetPrice(newID, nil, get("converter.matching.check"))
 	market = (get("converter.buyout.check") and buy or bid or buy) * count
-	
+
 	-- todo: better Neutral AH detection
 	--adjust for brokerage/deposit costs
 	local cutRate = AucAdvanced.cutRate or 0.05
@@ -277,13 +289,11 @@ function lib.Search (item)
 			market = market - amount * get("converter.adjust.listings")
 		end
 	end
-	
+
 	local value = min (market*(100-get("converter.profit.pct"))/100, market-get("converter.profit.min"))
-	
-	--Return bid or buy if item is below the searchers evaluated value
-	if get("converter.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("converter.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"

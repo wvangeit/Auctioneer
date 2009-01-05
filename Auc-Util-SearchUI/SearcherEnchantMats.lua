@@ -121,6 +121,8 @@ default("enchantmats.level.min", 0)
 default("enchantmats.level.max", 450)
 default("enchantmats.allow.bid", true)
 default("enchantmats.allow.buy", true)
+default("enchantmats.maxprice", 10000000)
+default("enchantmats.maxprice.enable", false)
 
 --Slider variables
 default("enchantmats.PriceAdjust."..GPLANAR, 100)
@@ -185,10 +187,14 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "enchantmats.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the EnchantMats searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "enchantmats.maxprice", 1, 99999999, "Maximum Price for EnchantMats")
 
-	gui:AddControl(id, "Checkbox",         0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
-	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.min", 0, 450, 25, "Minimum skill: %s")
-	gui:AddControl(id, "Slider",           0, 2, "enchantmats.level.max", 25, 450, 25, "Maximum skill: %s")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Checkbox",          0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
+	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.min", 0, 450, 25, "Minimum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.max", 25, 450, 25, "Maximum skill: %s")
 
 	-- aka "what percentage of market value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
@@ -243,10 +249,22 @@ function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage) then
 		return false, "Enchantrix not detected"
 	end
-	
+
 	local itemLink = item[Const.LINK]
 	if (not itemLink) then
 		return false, "No item link"
+	end
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("enchantmats.maxprice.enable") and get("enchantmats.maxprice")
+	if buyprice <= 0 or not get("enchantmats.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("enchantmats.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
 	end
 
 	-- first, is this an enchanting reagent itself?
@@ -333,15 +351,17 @@ function lib.Search(item)
 		return false, "No Price Found"
 	end
 
+	--[[ comment out redundant code: neither enchantmats.seen.check nor enchantmats.seen.min settings exist
 	if (get("enchantmats.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("enchantmats.seen.min"))) then
 			return false, "Seen count too low"
 		end
 	end
+	--]]
 
-	if get("enchantmats.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= market) then
-		return "buy", market --Ishould say what they're buying it for here
-	elseif get("enchantmats.allow.bid") and (item[Const.PRICE] <= market) then
+	if buyprice and buyprice <= market then
+		return "buy", market
+	elseif bidprice and bidprice <= market then
 		return "bid", market
 	end
 	return false, "Not enough profit"

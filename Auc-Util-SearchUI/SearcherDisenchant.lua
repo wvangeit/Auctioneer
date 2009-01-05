@@ -43,6 +43,8 @@ default("disenchant.level.max", 450)
 default("disenchant.adjust.brokerage", true)
 default("disenchant.allow.bid", true)
 default("disenchant.allow.buy", true)
+default("disenchant.maxprice", 10000000)
+default("disenchant.maxprice.enable", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -70,36 +72,48 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0, 1, "disenchant.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.min", 0, 450, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.max", 25, 450, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Subhead",           0, "Note:")
+	gui:AddControl(id, "Note",              0, 1, 290, 30, "The \"Pct\" Column is \% of DE Value")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "disenchant.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Disenchant searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "disenchant.maxprice", 1, 99999999, "Maximum Price for Disenchant")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.brokerage", "Subtract auction fees")
-
-	gui:AddControl(id, "Subhead",           0.42,    "Note:")
-	gui:AddControl(id, "Note",              0.42, 1, 290, 30, "The \"Pct\" Column is \% of DE Value")
 end
 
 function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage) then
 		return false, "Enchantrix not detected"
 	end
-	if (not get("disenchant.allow.bid")) and ((not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0)) then
-		return false, "No buyout"
-	end
+
 	if item[Const.QUALITY] <= 1 then
 		return false, "Item not disenchantable"
 	end
-	
-	local minskill = 0
-	local maxskill = 450
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("disenchant.maxprice.enable") and get("disenchant.maxprice")
+	if buyprice <= 0 or not get("disenchant.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("disenchant.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
+	local minskill, maxskill
 	if get("disenchant.level.custom") then
 		minskill = get("disenchant.level.min")
 		maxskill = get("disenchant.level.max")
 	else
+		minskill = 0
 		maxskill = Enchantrix.Util.GetUserEnchantingSkill()
 	end
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], item[Const.QUALITY])
@@ -123,9 +137,9 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if get("disenchant.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("disenchant.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"

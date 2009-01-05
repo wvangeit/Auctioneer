@@ -43,6 +43,8 @@ default("prospect.level.max", 450)
 default("prospect.adjust.brokerage", true)
 default("prospect.allow.bid", true)
 default("prospect.allow.buy", true)
+default("prospect.maxprice", 10000000)
+default("prospect.maxprice.enable", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -70,29 +72,41 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0, 1, "prospect.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "prospect.level.min", 0, 450, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "prospect.level.max", 25, 450, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Subhead",           0, "Note:")
+	gui:AddControl(id, "Note",              0, 1, 290, 30, "The \"Pct\" Column is \% of Prospect Value")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "prospect.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Prospect searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "prospect.maxprice", 1, 99999999, "Maximum Price for Prospect")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.brokerage", "Subtract auction fees")
-
-	gui:AddControl(id, "Subhead",           0.42,    "Note:")
-	gui:AddControl(id, "Note",              0.42, 1, 290, 30, "The \"Pct\" Column is \% of Prospect Value")
 end
 
 function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemProspectTotals) then
 		return false, "Enchantrix not detected"
 	end
-	if (not get("prospect.allow.bid")) and ((not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0)) then
-		return false, "No buyout"
-	end
 	if item[Const.QUALITY] ~= 1 then -- All prospectable ores are "Common" quality
 		return false, "Item not prospectable"
 	end
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("prospect.maxprice.enable") and get("prospect.maxprice")
+	if buyprice <= 0 or not get("prospect.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("prospect.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
 	-- Give up if it doesn't prospect to anything
 	local prospects = Enchantrix.Storage.GetItemProspects(item[Const.LINK])
 	if not prospects then
@@ -132,9 +146,9 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if get("prospect.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("prospect.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"

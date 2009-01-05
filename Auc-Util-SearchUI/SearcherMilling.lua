@@ -43,6 +43,8 @@ default("milling.level.max", 450)
 default("milling.adjust.brokerage", true)
 default("milling.allow.bid", true)
 default("milling.allow.buy", true)
+default("milling.maxprice", 10000000)
+default("milling.maxprice.enable", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -70,30 +72,41 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0, 1, "milling.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "milling.level.min", 0, 450, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "milling.level.max", 25, 450, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Subhead",           0, "Note:")
+	gui:AddControl(id, "Note",              0, 1, 290, 30, "The \"Pct\" Column is \% of Milling Value")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "milling.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Milling searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "milling.maxprice", 1, 99999999, "Maximum Price for Milling")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.adjust.brokerage", "Subtract auction fees")
-
-	gui:AddControl(id, "Subhead",           0.42,    "Note:")
-	gui:AddControl(id, "Note",              0.42, 1, 290, 30, "The \"Pct\" Column is \% of Milling Value")
 end
 
 function lib.Search(item)
 	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemMillingTotals) then
 		return false, "Enchantrix not detected"
 	end
-	if (not get("milling.allow.bid")) and ((not item[Const.BUYOUT]) or (item[Const.BUYOUT] == 0)) then
-		return false, "No buyout"
-	end
 	if item[Const.QUALITY] ~= 1 then -- All millable herbs are "Common" quality
 		return false, "Item not millable"
 	end
-	
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("milling.maxprice.enable") and get("milling.maxprice")
+	if buyprice <= 0 or not get("milling.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("milling.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
+
 	-- Give up if it doesn't mill to anything
 	local pigments = Enchantrix.Storage.GetItemMilling(item[Const.LINK])
 	if not pigments then
@@ -108,7 +121,7 @@ function lib.Search(item)
 	else
 		maxskill = Enchantrix.Util.GetUserInscriptionSkill()
 	end
-	
+
 	local skillneeded = Enchantrix.Util.InscriptionSkillRequiredForItem(item[Const.LINK])
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to mill"
@@ -134,13 +147,11 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	
-	if get("milling.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("milling.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
-	
 	return false, "Not enough profit"
 end
 

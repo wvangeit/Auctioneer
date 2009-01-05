@@ -39,6 +39,8 @@ lib.Private = private
 
 default("snatch.allow.bid", true)
 default("snatch.allow.buy", true)
+default("snatch.maxprice", 10000000)
+default("snatch.maxprice.enable", false)
 default("snatch.allow.beginerTooltips", true)
 --defaults do not work for tables,  A123456 is still gonna be table A123456  regardless of if it has data or not
 if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
@@ -213,10 +215,13 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.allow.bid", "Allow Bids")
-	gui:AddTip(id, "Allow Snatch searcher to sugest bids")
+	gui:AddTip(id, "Allow Snatch searcher to suggest bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox", 0, 11,  "snatch.allow.buy", "Allow Buyouts")
-	gui:AddTip(id, "Allow Snatch searcher to sugest buyouts")
+	gui:AddTip(id, "Allow Snatch searcher to suggest buyouts")
+	gui:AddControl(id, "Checkbox", 0, 1, "snatch.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Snatch searcher")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "snatch.maxprice", 1, 99999999, "Maximum Price for Snatch")
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox", 0, 1,  "snatch.allow.beginerTooltips", "Display beginner popup help.")
@@ -316,18 +321,28 @@ ItemTable[Const.LINK]    = hyperlink
 --returns if a item meets snatch criteria
 function lib.Search(item)
 	local itemsig = (":"):join(item[Const.ITEMID], item[Const.SUFFIX] , item[Const.ENCHANT])
-	local value = 0
-	local stackSize = item[Const.COUNT] or 1
 
 	if private.snatchList[itemsig] then
-		value =  stackSize * (private.snatchList[itemsig].price or 0)
+		local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+		local maxprice = get("snatch.maxprice.enable") and get("snatch.maxprice")
+		if buyprice <= 0 or not get("snatch.allow.buy") or (maxprice and buyprice > maxprice) then
+			buyprice = nil
+		end
+		if not get("snatch.allow.bid") or (maxprice and bidprice > maxprice) then
+			bidprice = nil
+		end
+		if not (bidprice or buyprice) then
+			return false, "Does not meet bid/buy requirements"
+		end
 
-		if item[Const.BUYOUT] > 0 and item[Const.BUYOUT] <= value and get("snatch.allow.buy") then
+		local value =  (item[Const.COUNT] or 1) * (private.snatchList[itemsig].price or 0)
+
+		if buyprice and buyprice <= value then
 			return "buy", value
-		elseif item[Const.PRICE] <= value and get("snatch.allow.bid") then
+		elseif bidprice and bidprice <= value then
 			return "bid", value
 		else
-			return false, "Price not low enough or bid/buy not checked."
+			return false, "Price not low enough"
 		end
 	end
 	return false, "Not in snatch list"

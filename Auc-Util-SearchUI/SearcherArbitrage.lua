@@ -68,7 +68,7 @@ function private.getRealmList()
 	end
 	local curPlayer = UnitName("player")
 	realms[current] = curPlayer
-	
+
 	for realm,_ in pairs(realms) do
 		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
 			realm = strsub(realm, 1, (strlen(realm)-9))
@@ -97,6 +97,8 @@ default("arbitrage.adjust.deplength", 48)
 default("arbitrage.adjust.listings", 3)
 default("arbitrage.allow.bid", true)
 default("arbitrage.allow.buy", true)
+default("arbitrage.maxprice", 10000000)
+default("arbitrage.maxprice.enable", false)
 default("arbitrage.search.crossrealmfaction", "Alliance")
 default("arbitrage.search.allrealms", {})
 default("arbitrage.search.style", "Cross-Faction")
@@ -132,16 +134,31 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.allow.bid", "Allow Bids")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "arbitrage.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.maxprice.enable", "Enable individual maximum price:")
+	gui:AddTip(id, "Limit the maximum amount you want to spend with the Arbitrage searcher")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "arbitrage.maxprice", 1, 99999999, "Maximum Price for Arbitrage")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",			0.42, 1, AucSearchUI.AucLengthSelector, "arbitrage.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "arbitrage.adjust.deplength", "Length of auction for deposits")
 	gui:AddControl(id, "Slider",            0.42, 1, "arbitrage.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
 	local market, seen, _, curModel, pctstring
+
+	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
+	local maxprice = get("arbitrage.maxprice.enable") and get("arbitrage.maxprice")
+	if buyprice <= 0 or not get("arbitrage.allow.buy") or (maxprice and buyprice > maxprice) then
+		buyprice = nil
+	end
+	if not get("arbitrage.allow.bid") or (maxprice and bidprice > maxprice) then
+		bidprice = nil
+	end
+	if not (bidprice or buyprice) then
+		return false, "Does not meet bid/buy requirements"
+	end
 
 	-- Get correct faction to compare against
 	local comparefaction,_,factionGroup = AucAdvanced.GetFaction()
@@ -218,9 +235,9 @@ function lib.Search(item)
 	if value > (market - minprofit) then
 		value = market - minprofit
 	end
-	if get("arbitrage.allow.buy") and (item[Const.BUYOUT] > 0) and (item[Const.BUYOUT] <= value) then
+	if buyprice and buyprice <= value then
 		return "buy", market
-	elseif get("arbitrage.allow.bid") and (item[Const.PRICE] <= value) then
+	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
 	return false, "Not enough profit"--..":"..tostring(comparefaction)..":"..tostring(market)
