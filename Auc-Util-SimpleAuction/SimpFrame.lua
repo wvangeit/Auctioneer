@@ -145,7 +145,7 @@ function private.GetItems(link)
 		live = true
 		uBid, uBuy = private.GetMyPrice(link, items)
 	end
-	for pos, item in ipairs(matching) do 
+	for pos, item in ipairs(matching) do
 		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.OWNER], item[const.COUNT]
 		stk = stk or 1
 		local bidea, buyea
@@ -294,7 +294,9 @@ function private.UpdateDisplay()
 		faction = "neutral"
 	end
 	local deposit = GetDepositCost(oLink, duration, faction, 1)
-	if deposit <= 0 then
+	if not deposit then
+		frame.fees:SetText("Unknown deposit cost")
+	elseif deposit <= 0 then
 		frame.fees:SetText("No deposit")
 	elseif cNum > 1 then
 		frame.fees:SetText(("Deposit: %s, %s/stack, %s/ea"):format(coins(deposit*cStack*cNum), coins(deposit*cStack), coins(deposit)))
@@ -389,7 +391,7 @@ function private.UpdatePricing()
 	-- We need this out here because it fetches the items from the image
 	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aSeen, aveBuy = private.GetItems(link)
 	private.UpdateCompetition(image)
-	
+
 	--check for fixed price
 	if frame.CurItem.manual then
 		buy = frame.CurItem.buyper
@@ -474,9 +476,9 @@ function private.UpdatePricing()
 	if bid == 0 then
 		bid = 1
 		buy = 0
-		reason = "Unable to calculate price" 
+		reason = "Unable to calculate price"
 	end
-	
+
 	if (stack * num) > total then
 		reason = "Error: You don't have that many"
 	end
@@ -528,7 +530,7 @@ function private.CheckUpdate()
 		private.UpdatePricing()
 	elseif frame.CurItem.match ~= match then
 		frame.CurItem.match = match
-		if match then --turn off other checkboxes 
+		if match then --turn off other checkboxes
 			frame.CurItem.manual = false
 			frame.CurItem.undercut = nil
 			frame.options.undercut:SetChecked(false)
@@ -538,7 +540,7 @@ function private.CheckUpdate()
 		private.UpdatePricing()
 	elseif frame.CurItem.undercut ~= undercut then
 		frame.CurItem.undercut = undercut
-		if undercut then --turn off other checkboxes 
+		if undercut then --turn off other checkboxes
 			frame.CurItem.manual = false
 			frame.CurItem.match = nil
 			frame.options.matchmy:SetChecked(false)
@@ -624,7 +626,7 @@ function private.LoadItemLink(itemLink, size)
 		end
 	end
 
-	
+
 	if itemLink and size then
 		frame.stacks.size:SetNumber(size)
 	end
@@ -904,7 +906,7 @@ function private.CreateFrames()
 	frame.duration.label = frame.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.duration.label:SetPoint("BOTTOMLEFT", frame.duration, "TOPLEFT", 0, 0)
 	frame.duration.label:SetText("Duration:");
-	
+
 	frame.duration.time = {
 		intervals = {12, 24, 48},
 		selected = 48,
@@ -996,7 +998,7 @@ function private.CreateFrames()
 	MoneyInputFrame_SetNextFocus(frame.buyout, frame.stacks.num)
 	private.SetPrevNext(frame.stacks.num, AucAdvSimpFrameBuyoutCopper, frame.stacks.size)
 	private.SetPrevNext(frame.stacks.size, frame.stacks.num, AucAdvSimpFrameStartGold)
-	
+
 	function frame.options:AddOption(option, text)
 		local item = CreateFrame("CheckButton", "AucAdvSimpFrameOption_"..option, self, "OptionsCheckButtonTemplate")
 		if self.last then
@@ -1084,7 +1086,7 @@ function private.CreateFrames()
 		end
 	end
 
-	
+
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -1092,7 +1094,7 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	
+
 	frame.imageview:SetBackdropColor(0, 0, 0, 1)
 	frame.imageview:SetPoint("TOPLEFT", frame, "TOPLEFT", 185, -100)
 	frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
@@ -1108,9 +1110,9 @@ function private.CreateFrames()
 		end
 	end
 	function private.onClick(button, row, index)
-		
+
 	end
-	
+
 	private.buyselection = {}
 	function private.onSelect()
 		if frame.imageview.sheet.prevselected ~= frame.imageview.sheet.selected then
@@ -1179,7 +1181,7 @@ function private.CreateFrames()
 		{ "", "TEXT", get("util.simpleauc.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	}, nil, nil, private.onClick, private.onResize, private.onSelect)
 	frame.imageview.sheet:EnableSelect(true)
-	
+
 	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
 	frame.config:SetText("Configure")
