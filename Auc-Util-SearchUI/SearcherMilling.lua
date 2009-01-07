@@ -41,6 +41,9 @@ default("milling.level.custom", false)
 default("milling.level.min", 0)
 default("milling.level.max", 450)
 default("milling.adjust.brokerage", true)
+default("milling.adjust.deposit", true)
+default("milling.adjust.deplength", 48)
+default("milling.adjust.listings", 3)
 default("milling.allow.bid", true)
 default("milling.allow.buy", true)
 default("milling.maxprice", 10000000)
@@ -85,6 +88,9 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.adjust.brokerage", "Subtract auction fees")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.adjust.deposit", "Subtract deposit")
+	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "milling.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Slider",            0.42, 1, "milling.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
@@ -113,40 +119,50 @@ function lib.Search(item)
 		return false, "Item not millable"
 	end
 
-	local minskill = 0
-	local maxskill = 450
+	local minskill, maxskill
 	if get("milling.level.custom") then
 		minskill = get("milling.level.min")
 		maxskill = get("milling.level.max")
 	else
+		minskill = 0
 		maxskill = Enchantrix.Util.GetUserInscriptionSkill()
 	end
-
 	local skillneeded = Enchantrix.Util.InscriptionSkillRequiredForItem(item[Const.LINK])
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to mill"
 	end
 
-	local _, _, _, market = Enchantrix.Storage.GetItemMillingTotals(item[Const.LINK])
-	if (not market) or (market == 0) then
-		return false, "Item not millable"
+	local market, deposit = 0, 0
+	local cutRate = AucAdvanced.cutRate or 0.05
+	local depositAucLength, depositRelistTimes, depositFaction
+	local includeDeposit = get("milling.adjust.deposit")
+	if includeDeposit then
+		depositAucLength = get("milling.adjust.deplength")
+		depositRelistTimes = get("milling.adjust.listings")
+		if cutRate ~= 0.05 then depositFaction = "neutral" end
 	end
 
-	--adjust for stack size
-	market = market * item[Const.COUNT]
+	for result, yield in pairs(pigments) do
+		-- fetch value of each result from Enchantrix
+		local _, _, _, price = Enchantrix.Util.GetReagentPrice(result)
+		market = market + (price or 0) * yield
 
-	--adjust for brokerage costs
-	local brokerage = get("milling.adjust.brokerage")
+		-- calculate deposit for each result
+		if includeDeposit then
+			local aadvdepcost = GetDepositCost(result, depositAucLength, depositFaction, nil) or 0
+			deposit = deposit + aadvdepcost * yield * depositRelistTimes
+		end
+	end
 
-	if brokerage then
-		market = market * 0.95
+	-- Adjust for fees and costs
+	if get("milling.adjust.brokerage") then
+		market = market * (1 - cutRate)
 	end
-	local pct = get("milling.profit.pct")
-	local minprofit = get("milling.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
+	market = market - deposit
+	
+	-- Adjust for stack size and note that yield is per stack of 5
+	market = market* item[Const.COUNT] / 5
+	local value = min (market*(100-get("milling.profit.pct"))/100, market-get("milling.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then

@@ -41,6 +41,9 @@ default("prospect.level.custom", false)
 default("prospect.level.min", 0)
 default("prospect.level.max", 450)
 default("prospect.adjust.brokerage", true)
+default("prospect.adjust.deposit", true)
+default("prospect.adjust.deplength", 48)
+default("prospect.adjust.listings", 3)
 default("prospect.allow.bid", true)
 default("prospect.allow.buy", true)
 default("prospect.maxprice", 10000000)
@@ -85,6 +88,9 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.brokerage", "Subtract auction fees")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.deposit", "Subtract deposit")
+	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "prospect.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Slider",            0.42, 1, "prospect.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
@@ -113,12 +119,12 @@ function lib.Search(item)
 		return false, "Item not prospectable"
 	end
 
-	local minskill = 0
-	local maxskill = 450
+	local minskill, maxskill
 	if get("prospect.level.custom") then
 		minskill = get("prospect.level.min")
 		maxskill = get("prospect.level.max")
 	else
+		minskill = 0
 		maxskill = Enchantrix.Util.GetUserJewelCraftingSkill()
 	end
 	local skillneeded = Enchantrix.Util.JewelCraftSkillRequiredForItem(item[Const.LINK])
@@ -126,26 +132,37 @@ function lib.Search(item)
 		return false, "Skill not high enough to prospect"
 	end
 
-	local _, _, _, market = Enchantrix.Storage.GetItemProspectTotals(item[Const.LINK])
-	if (not market) or (market == 0) then
-		return false, "Item not prospectable"
+	local market, deposit = 0, 0
+	local cutRate = AucAdvanced.cutRate or 0.05
+	local depositAucLength, depositRelistTimes, depositFaction
+	local includeDeposit = get("prospect.adjust.deposit")
+	if includeDeposit then
+		depositAucLength = get("prospect.adjust.deplength")
+		depositRelistTimes = get("prospect.adjust.listings")
+		if cutRate ~= 0.05 then depositFaction = "neutral" end
 	end
 
-	--adjust for stack size
-	market = market * item[Const.COUNT]
+	for result, yield in pairs(prospects) do
+		-- fetch value of each result from Enchantrix
+		local _, _, _, price = Enchantrix.Util.GetReagentPrice(result)
+		market = market + (price or 0) * yield
 
-	--adjust for brokerage costs
-	local brokerage = get("prospect.adjust.brokerage")
+		-- calculate deposit for each result
+		if includeDeposit then
+			local aadvdepcost = GetDepositCost(result, depositAucLength, depositFaction, nil) or 0
+			deposit = deposit + aadvdepcost * yield * depositRelistTimes
+		end
+	end
 
-	if brokerage then
-		market = market * 0.95
+	-- Adjust for fees and costs
+	if get("prospect.adjust.brokerage") then
+		market = market * (1 - cutRate)
 	end
-	local pct = get("prospect.profit.pct")
-	local minprofit = get("prospect.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
+	market = market - deposit
+	
+	-- Adjust for stack size and note that yield is per stack of 5
+	market = market* item[Const.COUNT] / 5
+	local value = min (market*(100-get("prospect.profit.pct"))/100, market-get("prospect.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then
