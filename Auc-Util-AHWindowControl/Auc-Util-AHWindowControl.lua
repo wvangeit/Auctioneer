@@ -57,7 +57,7 @@ function lib.Processor(callbackType, ...)
 		private.auctionHook() ---When AuctionHouse loads hook the auction function we need
 		private.MoveFrame() --Set position back to previous session if options set
 	elseif callbackType == "configchanged" then
-		private.MoveFrame()
+		private.MoveFrame(...)
 		private.AdjustProtection()
 	elseif callbackType == "config" then
 		private.SetupConfigGui(...)
@@ -78,6 +78,7 @@ function lib.OnLoad(addon)
 	default("util.ahwindowcontrol.auctionscale", 1) --This is the scale of AuctionFrame 1 == default
 	default("util.ahwindowcontrol.compactuiscale", 0) --This is the increase of compactUI scale
 	default("util.ahwindowcontrol.searchuiscale", 1) --This is the default SearchUI scale
+	default("util.ahwindowcontrol.searchuifontscale", 0) --This is the default SearchUI scale
 end
 
 --after Auction House Loads Hook the Window Display event
@@ -91,6 +92,8 @@ function private.SetupConfigGui(gui)
 	--Setup Tab for Mover functions
 	id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
+	private.gui, private.id = gui, id --store refrences to id and gui
+	
 	gui:AddControl(id, "Header",     0,    _TRANS('AHWC_Interface_WindowMovementOptions') ) --"Window Movement Options"
 	gui:AddControl(id, "Checkbox",   0, 1,  "util.mover.activated",  _TRANS('AHWC_Interface_AllowMovable') ) --"Allow the auction frame to be movable?"
 	gui:AddTip(id, _TRANS('AHWC_HelpTooltip_AllowMovable') ) --"Ticking this box will enable the ability to relocate the auction frame"
@@ -135,14 +138,42 @@ function private.SetupConfigGui(gui)
 			_TRANS("AHWC_Help_CompactUIFontScale"), --CompactUI Font Scale?
 			_TRANS("AHWC_Help_CompactUIFontScaleAnswer") ) --The CompactUI Font Scale slider adjusts the text size displayed in AucAdvance CompactUI option in the Browse Tab. The default size is 0.
 	--SearchUI
+	gui:AddControl(id, "Subhead", 0, _TRANS("SearchUI Size Options") ) 
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.searchuiscale",     0.5, 2, 0.1, _TRANS("AHWC_Interface_SearchUIScale") ) --SearchUI Scale
 	gui:AddTip(id, _TRANS("AHWC_HelpTooltip_SearchUIScale") ) --This option allows you to adjust the overall size of the non auction house SearchUI window. The default size is 1.
 	gui:AddHelp(id, "what is SearchUI Scale",
 			_TRANS("AHWC_Help_SearchUIScale"), --SearchUI Scale?
 			_TRANS("AHWC_Help_SearchUIScaleAnswer") ) --The SearchUI scale slider adjusts the overall size of the non auction house SearchUI window. The default size is 1.
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.searchuifontscale",     -5, 5, 0.2, _TRANS("AHWC_Interface_SearchUIScale".." Font") ) --SearchUI Scale
 end
-
-
+local famesAdded = {}
+function private.dynamicGUI(title, frame)
+	if not title or not frame then return end
+	if famesAdded[title] then print("Frame has already been added") return end --if we have addded this title once dont do it again
+		
+	local data = private.START(frame)
+	local B, S, F = false, false, false
+	for i,v in pairs(data) do
+		if v.NAME == "Button" then
+			B = true
+		elseif v.NAME == "ScrollFrame" then
+			S = true
+		elseif v.NAME == "Frame" then
+			F = true
+		end
+	end
+	--if we have nothing return
+	if not B and not S and not F then print("no elements found") return end
+	local gui, id = private.gui, private.id
+	gui:AddControl(id, "Subhead", 0, _TRANS(title) )
+	--store data
+	famesAdded[title] = data
+	
+	if B then gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.dynamicfont."..title..".Button", -5, 5, 1, "Adjust Button Fonts" ) end
+	if S then gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.dynamicfont."..title..".ScrollFrame",  -5, 5, 1,  "Adjust Scrollframe Fonts") end
+	if F then gui:AddControl(id, "NumeriSlider", 0, 1, "util.ahwindowcontrol.dynamicfont."..title..".Frame",  -5, 5, 1,  "Adjust Frame Fonts" ) end
+		
+end
 --[[ Local functions ]]--
 
 --Hooks AH show function. This is fired after all Auction Frame methods have been set by Blizzard
@@ -157,7 +188,7 @@ function private.setupWindowFunctions()
 end
 
 --Enable or Disable the move scripts
-function private.MoveFrame()
+function private.MoveFrame(changed)
 	--AH needs to exist
 	if AuctionFrame then
 		if get("util.mover.activated") then
@@ -194,6 +225,18 @@ function private.MoveFrame()
 	if AucAdvanced.Modules.Util.SearchUI and AucAdvanced.Modules.Util.SearchUI.Private.gui then
 		if get("util.ahwindowcontrol.searchuiscale") then
 			AucAdvanced.Modules.Util.SearchUI.Private.gui:SetScale(get("util.ahwindowcontrol.searchuiscale"))
+		end
+				end
+	--check to see if this was a changed dynamic font slider
+	--these sliders are created on any frame from the function private.dynamicGUI(title, frame)
+	if not changed then return end
+	local _, _, dynamic, title, name = strsplit(".", changed)
+	if dynamic == "dynamicfont" and title and famesAdded[title] then
+		for frame, data in pairs(famesAdded[title]) do
+			if data.NAME == name then
+				local setting = get(changed) or 0
+				frame:SetFont(data.FONT, data.SIZE+setting)
+			end
 		end
 	end
 end
@@ -305,5 +348,40 @@ function lib.ToggleDebug()
 		print("Turned debugging text on.")
 	end
 end
+
+local data, tab = {}, {}
+function private.GETCHILDREN(frame, where)
+	private.GETREGIONS(frame, where)
+	tab = {frame:GetChildren()}
+	for i,v in pairs(tab) do
+		if v:GetObjectType() == "Frame"then
+			if where == "ScrollFrame" then --if we are looking at font instances inside a scrollframe make sure we stay defined as scrollframe
+				private.GETCHILDREN(v, "ScrollFrame")
+			else
+				private.GETCHILDREN(v, "Frame")
+			end
+		elseif v:GetObjectType() == "ScrollFrame" then
+			private.GETCHILDREN(v, "ScrollFrame")
+		elseif v:GetObjectType() == "Button" then
+			private.GETCHILDREN(v, "Button")
+		end
+	end
+	
+end
+function private.GETREGIONS(frame, where)
+	tab = {frame:GetRegions()}
+	for i,v in pairs(tab) do
+		if v:GetObjectType() == "FontString" then
+			local font, size = v:GetFont()
+			data[v] = {["FONT"] = font, ["SIZE"] = floor(size), ["NAME"] = where}
+		end
+	end
+end
+function private.START(frame)
+	data = {}
+	private.GETCHILDREN(frame)
+	return data or {}	
+end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
