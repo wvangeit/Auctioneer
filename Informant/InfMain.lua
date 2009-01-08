@@ -53,6 +53,8 @@ local setDatabase			-- setDatabase(database)
 local setRequirements		-- setRequirements(requirements)
 local setSkills				-- setSkills(skills)
 local setVendors			-- setVendors(vendors)
+local setVenorLocation			-- setVendorLocation(vendors)
+local setZones				--
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
@@ -260,6 +262,7 @@ function getItem(itemID, static)
 			end
 		end
 		local vendList = {}
+		local vendLoc = {}
 		if (merchList) then
 			for pos, merchID in pairs(merchList) do
 				merchID = tonumber(merchID)
@@ -273,11 +276,23 @@ function getItem(itemID, static)
 				end
 				if (vendName) then
 					table.insert(vendList, vendName)
+					local zone,xloc,yloc = strsplit(",",self.vendorLocation[ merchID ])
+					zone = tonumber(zone)
+					if self.infZones[zone] then
+						zone = self.infZones[zone]
+					end
+					local location = zone
+					if xloc and yloc then
+						location = location.." ("..xloc..","..yloc..")"
+					end
+					vendLoc[vendName] = location
+
 				end
 			end
 		end
 		dataItem.merchantList = merchList
 		dataItem.vendors = vendList
+		dataItem.vendLoc = vendLoc
 	else
 		dataItem.merchantList = nil
 		dataItem.vendors = nil
@@ -394,6 +409,15 @@ end
 function setQuestNames(list)
 	self.questNames = list
 	Informant.SetQuestNames = nil -- Set only once
+end
+function setVendorLocation(list)
+	self.vendorLocation = list
+	Informant.SetVendorLocation = nil -- Set only once
+end
+function setZones(zones)
+	self.infZones = zones
+	Informant.zonestest = self.infZones
+	Informant.SetZones = nil -- Set only once
 end
 
 function getLocale()
@@ -525,7 +549,8 @@ local function showItem(itemInfo)
 				addLine("")
 				addLine(_INFM('InfoVendorHeader'):format(vendorCount), "ddff40")
 				for pos, merchant in pairs(itemInfo.vendors) do
-					addLine(" ".._INFM('InfoVendorName'):format(merchant), "eeee40")
+					addLine("-".._INFM('InfoVendorName'):format(merchant), "dede3c")
+					addLine("     ".._INFM('InfoVendorName'):format(itemInfo.vendLoc[merchant]), "ffff86")
 				end
 			end
 		end
@@ -1027,6 +1052,8 @@ Informant = {
 	SetQuestRewards = setQuestRewards,
 	SetQuestRequires = setQuestRequires,
 	SetQuestNames = setQuestNames,
+	SetVendorLocation = setVendorLocation,
+	SetZones = setZones,
 	FrameActive = frameActive,
 	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,

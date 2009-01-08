@@ -21,6 +21,7 @@ InfLocale.lua
 InfMain.lua
 
 Data\InfQuests.lua
+Data\InfVendors.lua
 
 InfCommand.lua
 InfSettings.lua
