@@ -53,7 +53,7 @@ local setDatabase			-- setDatabase(database)
 local setRequirements		-- setRequirements(requirements)
 local setSkills				-- setSkills(skills)
 local setVendors			-- setVendors(vendors)
-local setVenorLocation			-- setVendorLocation(vendors)
+local setVendorLocation			-- setVendorLocation(vendors)
 local setZones				--
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
