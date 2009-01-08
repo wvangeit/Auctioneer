@@ -28,7 +28,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		Many thanks to the folks at http://www.wowhead.com for providing much of this data.
+		Many thanks to the folks at http://www.wowhead.com for providing this data.
 --]]
 -- Numeric Codes and the Skills associated with them.
 Informant.SetSkills({
