@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced - Appraisals and Auction Posting
-	Version: <%version%> (<%codename%>)
+	Version: 5.1.3955 (SnaggleTooth)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -240,44 +240,6 @@ function private:SetVisibility()
 		private.itemFixBuy.textEl:Hide()
 	end
 end
-
--- Configure our defaults
-AucAdvanced.Settings.SetDefault("util.appraiser.enable", false)
-AucAdvanced.Settings.SetDefault("util.appraiser.bidtooltip", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
-AucAdvanced.Settings.SetDefault("util.appraiser.ownauctions", false)
-AucAdvanced.Settings.SetDefault("util.appraiser.altModel", "market")
-AucAdvanced.Settings.SetDefault("util.appraiser.duration", 2880)
-AucAdvanced.Settings.SetDefault("util.appraiser.round.bid", false)
-AucAdvanced.Settings.SetDefault("util.appraiser.round.buy", false)
-AucAdvanced.Settings.SetDefault("util.appraiser.round.method", "unit")
-AucAdvanced.Settings.SetDefault("util.appraiser.round.position", 0.00)
-AucAdvanced.Settings.SetDefault("util.appraiser.round.magstep", 5)
-AucAdvanced.Settings.SetDefault("util.appraiser.bid.markdown", 10)
-AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
-AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.bid.vendor", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.color", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.colordirection","RIGHT")
-AucAdvanced.Settings.SetDefault("util.appraiser.manifest.color", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.tint.color", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.match", "on")
-AucAdvanced.Settings.SetDefault("util.appraiser.stack", "max")
-AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
---AucAdvanced.Settings.SetDefault("util.appraiser.clickhook", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.reselect", true)
-AucAdvanced.Settings.SetDefault("util.appraiser.buttontips", true)
---Default sizes for the scrollframe column widths
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'), 71)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'), 25)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'), 27 )
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea'), 65)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea'), 65)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea'), 65)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid'), 65)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid'), 65)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 68)
-AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0.05)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
