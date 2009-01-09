@@ -64,7 +64,6 @@ function buildCommandMap()
 		[_INFM('CmdDefault')]		=	'default',
 		[_INFM('CmdEmbed')]			=	'embed',
 		[_INFM('ShowIcon')]			=	'show-icon',
-		[_INFM('ShowName')]			=	'show-name',
 		[_INFM('ShowILevel')]		=	'show-ilevel',
 		[_INFM('ShowLink')]			=	'show-link',
 		[_INFM('ShowStack')]		=	'show-stack',
@@ -132,8 +131,7 @@ function commandHandler(command, source)
 		cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
 		cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
 		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon" or
-		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants" or
-		cmd == "show-name"
+		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants"
 	) then
 		genVarSet(cmd, param, chatprint)
 	elseif (cmd == "about") then
@@ -156,7 +154,6 @@ function cmdHelp()
 
 	chatPrint("  |cffffffff/informant ".._INFM('CmdDisable').."|r - " .. _INFM('HelpDisable'))
 
-	chatPrint(lineFormat:format(_INFM('ShowName'), getLocalizedFilterVal('show-name'), _INFM('HelpName')))
 	chatPrint(lineFormat:format(_INFM('ShowVendor'), getLocalizedFilterVal('show-vendor'), _INFM('HelpVendor')))
 	chatPrint(lineFormat:format(_INFM('ShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _INFM('HelpVendorSell')))
 	chatPrint(lineFormat:format(_INFM('ShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _INFM('HelpVendorBuy')))

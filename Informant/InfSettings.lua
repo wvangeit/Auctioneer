@@ -118,7 +118,6 @@ local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
 	['embed'] = false,
-	['show-name'] = true,
 	['show-vendor'] = true,
 	['show-vendor-buy'] = true,
 	['show-vendor-sell'] = true,
@@ -348,9 +347,6 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",   0, 1, "embed", _INFM('GuiEmbed') )
 	gui:AddTip(id, _INFM('HelpEmbed'))
-
-	gui:AddControl(id, "Checkbox",   0, 1, "show-name", _INFM('GuiInfoName'))
-	gui:AddTip(id, _INFM('HelpName'))
 
 	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _INFM('GuiVendor'))
 	gui:AddTip(id, _INFM('HelpVendor'))
