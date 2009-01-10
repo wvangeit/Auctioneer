@@ -276,23 +276,30 @@ function getItem(itemID, static)
 				end
 				if (vendName) then
 					table.insert(vendList, vendName)
-					local zone,xloc,yloc = strsplit(",",self.vendorLocation[ merchID ])
-					zone = tonumber(zone)
-					if self.infZones[zone] then
-						zone = self.infZones[zone]
+					local zone,xloc,yloc
+					if self.vendorLocation[merchID] then
+						zone,xloc,yloc = strsplit(",",self.vendorLocation[merchID])
 					end
-					local location = zone
-					if xloc and yloc then
-						location = location.." ("..xloc..","..yloc..")"
+					if zone then
+						local location
+						zone = tonumber(zone)
+						if self.infZones[zone] then
+							zone = self.infZones[zone]
+						end
+						location = zone
+						if xloc and yloc then
+							location = location.." ("..xloc..","..yloc..")"
+						end
+						vendLoc[vendName] = location
+					else
+						vendLoc[vendName] = "No set location for this vendor"
 					end
-					vendLoc[vendName] = location
-
 				end
 			end
 		end
 		dataItem.merchantList = merchList
 		dataItem.vendors = vendList
-		dataItem.vendLoc = vendLoc
+		dataItem.vendorLoc = vendLoc
 	else
 		dataItem.merchantList = nil
 		dataItem.vendors = nil
@@ -550,7 +557,9 @@ local function showItem(itemInfo)
 				addLine(_INFM('InfoVendorHeader'):format(vendorCount), "ddff40")
 				for pos, merchant in pairs(itemInfo.vendors) do
 					addLine("-".._INFM('InfoVendorName'):format(merchant), "dede3c")
-					addLine("     ".._INFM('InfoVendorName'):format(itemInfo.vendLoc[merchant]), "ffff86")
+					if itemInfo.vendorLoc[merchant] then
+						addLine("     ".._INFM('InfoVendorName'):format(itemInfo.vendorLoc[merchant]), "ffff86")
+					end
 				end
 			end
 		end
