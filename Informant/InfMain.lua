@@ -762,7 +762,7 @@ function onQuit()
 	InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
 end
 
-function lib.slidebarclickhandler(_, button)
+local function slidebarclickhandler(_, button)
 	--if we rightclick open the configuration window for the whole addon
 	Informant.Settings.MakeGuiConfig()
 	local gui = Informant.Settings.Gui
@@ -774,13 +774,13 @@ function lib.slidebarclickhandler(_, button)
 end
 
 local sideIcon
-function lib.slidebar()
+local function slidebar()
 	if LibStub then
 		local SlideBar = LibStub:GetLibrary("SlideBar", true)
 		if SlideBar then
 			sideIcon = SlideBar.AddButton("Informant", "Interface\\AddOns\\Informant\\inficon")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-			sideIcon:SetScript("OnClick", lib.slidebarclickhandler)
+			sideIcon:SetScript("OnClick", slidebarclickhandler)
 			sideIcon.tip = {
 				"Informant Configuration",
 			}
@@ -802,7 +802,7 @@ function onLoad()
 	this:RegisterEvent("MERCHANT_UPDATE");
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
-	lib.slidebar()
+	slidebar()
 end
 
 local function frameLoaded()
