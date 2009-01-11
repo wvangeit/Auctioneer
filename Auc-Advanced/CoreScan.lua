@@ -586,8 +586,8 @@ Commitfunction = function()
 	local dirtyCount = 0
 	local i = 0
 	local lastPause = GetTime()
-	
-	
+
+
 	for pos, data in ipairs(scandata.image) do
 		link = data[Const.LINK]
 		i = i + 1
@@ -1163,6 +1163,23 @@ function private.ClassConvert(cid, sid)
 	return Const.CLASSES[cid]
 end
 
+function private.SafeName (name)
+	-- ADV-397 : code to avoid disconnects because Blizzard's QueryAuctionItems can't handle strings over 63 bytes
+	-- Attempts to duplicate the truncation effect of Blizzard's BrowseName control
+	if type(name) == "string" then -- this gets called via a public API function - be safe
+		if #name > 63 then
+			if name:byte(63) >= 192 then -- UTF-8 multibyte first byte
+				return name:sub(1, 62)
+			elseif name:byte(62) >= 224 then -- UTF-8 triplebyte first byte
+				return name:sub(1, 61)
+			end
+			return name:sub(1, 63)
+		end
+		return name
+	end
+	return ""
+end
+
 private.Hook = {}
 private.Hook.PlaceAuctionBid = PlaceAuctionBid
 function PlaceAuctionBid(type, index, bid)
@@ -1197,7 +1214,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 
 	local isSame = true
 	local query = {}
-	name = name or ""
+	name = private.SafeName (name) 	-- ADV-397 : code to avoid disconnects because Blizzard's QueryAuctionItems can't handle strings over 63 bytes
 	minLevel = tonumber(minLevel) or 0
 	maxLevel = tonumber(maxLevel) or 0
 	classIndex = tonumber(classIndex) or 0
