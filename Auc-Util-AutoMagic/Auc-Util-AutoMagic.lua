@@ -187,7 +187,7 @@ end
 function lib.merchantShow()
 	if (get("util.automagic.autovendor")) then
 		lib.vendorAction()
---~ 		TODO: IMPLEMENT AUTO SELL. Commented out since we do not autosell at this momnet so we can never open vendor
+--~ 		TODO: IMPLEMENT AUTO SELL. Commented out since we do not autosell at this moment so we can never open vendor
 --~ 		A better option is to auto close vendor when user hits confirm button window
 --~ 		if (get("util.automagic.autoclosemerchant")) then
 --~ 			if (get("util.automagic.chatspam")) then

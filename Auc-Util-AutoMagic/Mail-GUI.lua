@@ -42,7 +42,7 @@ function lib.makeMailGUI()
 	lib.ammailgui:ClearAllPoints()
 	lib.ammailgui:SetPoint("CENTER", UIParent, "BOTTOMLEFT", get("util.automagic.ammailguix"), get("util.automagic.ammailguiy"))
 	
-	--Dont need to recreate duplicate frames on each mail box open.
+	--Don't need to recreate duplicate frames on each mail box open.
 	if lib.ammailgui.Drag then return end 
 	
 	lib.ammailgui:SetFrameStrata("DIALOG")
@@ -84,7 +84,7 @@ function lib.makeMailGUI()
 
 
 	lib.mguibtmrules = lib.ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
-	lib.mguibtmrules:SetText("BTM/IS Rule:")
+	lib.mguibtmrules:SetText("SUI/IS Rule:")
 	lib.mguibtmrules:SetJustifyH("LEFT")
 	lib.mguibtmrules:SetWidth(101)
 	lib.mguibtmrules:SetHeight(10)
@@ -108,7 +108,7 @@ function lib.makeMailGUI()
 	--lib.ammailgui.loaddemailto:SetScript("OnTabPressed", silvertocopper)
 
 	lib.mguimailtotxt = lib.ammailgui:CreateFontString(four, "OVERLAY", "NumberFontNormalYellow")
-	lib.mguimailtotxt:SetText("Set Recipiant to:")
+	lib.mguimailtotxt:SetText("Set Recipient to:")
 	lib.mguimailtotxt:SetJustifyH("LEFT")
 	lib.mguimailtotxt:SetWidth(101)
 	lib.mguimailtotxt:SetHeight(10)
