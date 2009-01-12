@@ -95,6 +95,8 @@ function lib.Processor(callbackType, ...)
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.FinishedPage(...)
 		end
+	elseif (callbackType == "bidcancelled") then --bid was cancelled, we need to ignore auction for current session
+		private.bidcancelled(...)
 	elseif (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	end
@@ -608,6 +610,18 @@ function private.ignoreperm()
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, 1)
 	print("SearchUI now ignoring "..private.data.link.." at any price")
 	private.removeline()
+end
+
+--a bid was cancelled, so ignore for session
+function private.bidcancelled(callbackstring)
+	local link, price, count = string.split(";", callbackstring)
+	local sig = AucAdvanced.API.GetSigFromLink(link)
+	local price = math.floor(price/count) - 1
+	if AucSearchUI.Filters.ItemPrice then
+		AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
+		print("SearchUI now ignoring "..link.." at "..AucAdvanced.Coins(price, true).." for the session")
+	end
+	
 end
 
 function private.ignoretemp()
