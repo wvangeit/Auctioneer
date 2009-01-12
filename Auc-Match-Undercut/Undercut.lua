@@ -166,6 +166,7 @@ function private.GetPriceModels()
 end
 
 function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
+	if not link then return end
 	if not get("match.undercut.tooltip") then return end
 	local model = get("match.undercut.model")
 	if not model then return end
@@ -183,6 +184,7 @@ function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, ad
 			market = AucAdvanced.API.GetAlgorithmValue(model, link)
 		end
 		matcharray = lib.GetMatchArray(link, market)
+		if not matcharray then return end
 		if not pricecache then pricecache = {} end
 		pricecache[link] = replicate(matcharray)
 		pricecache[link]["market"] = market
