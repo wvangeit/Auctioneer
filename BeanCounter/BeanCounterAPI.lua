@@ -119,7 +119,7 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 			if date and date > high then high = date end
 			--Sum the trxns	
 			if v[2] == _BC('UiAucSuccessful') then
-				sum = sum + v[5] --sum sale. fee's have already been subtracted
+				sum = sum + v[5] - v[9] --sum sale - deposit. fee's have already been subtracted
 			elseif v[2] == _BC('UiAucExpired') then
 				sum = sum - v[9] --subtract failed deposits
 			elseif v[2] == _BC('UiWononBid') then
