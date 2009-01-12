@@ -302,7 +302,7 @@ end
 --Also sends out a Callback with a callback string of "<link>;<price>"
 function private.CancelPurchase()
 	private.Searching = false
-	local CallBackString = string.join(";", tostring(private.CurAuction["link"]), tostring(private.CurAuction["price"]))
+	local CallBackString = string.join(";", tostring(private.CurAuction["link"]), tostring(private.CurAuction["price"]), tostring(private.CurAuction["count"]))
 	AucAdvanced.SendProcessorMessage("bidcancelled", CallBackString)
 	private.CurAuction = {}
 	private.Prompt:Hide()
