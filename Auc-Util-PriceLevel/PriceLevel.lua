@@ -57,13 +57,11 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	if not additional or additional[0] ~= "AuctionPrices" then return end
-	local buyPrice, bidPrice = additional[1], additional[3]
-
-	local showPerUnit = AucAdvanced.Settings.GetSetting("util.pricelevel.single")
-	if not showPerUnit then return end
-
-	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, bidPrice, buyPrice)
+	if not  get("util.pricelevel.single") then return end
+	
+	if not additional or not additional.buyoutPrice or not additional.minBid then return end
+	
+	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, additional.minBid, additional.buyoutPrice)
 	if (not priceLevel) then return end
 
 	tooltip:AddLine(("Price Level: %d%%"):format(priceLevel), perItem, r,g,b)
