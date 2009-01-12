@@ -99,7 +99,7 @@ function private.LoadAuctionImage()
 end
 
 function lib.GetImage()
-	private.LoadAuctionImage()
+	local image = private.LoadAuctionImage()
 	return image
 end
 
