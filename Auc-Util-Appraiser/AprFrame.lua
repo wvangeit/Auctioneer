@@ -394,11 +394,6 @@ function private.CreateFrames()
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
-		--reset scroll position if new items list is too short to show
-		if  not frame.imageview.sheet.rows[1][1]:IsShown() then
-			frame.imageview.sheet.panel:ScrollToCoords(0,0)
-		end
-
 	end
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
