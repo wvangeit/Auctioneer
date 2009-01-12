@@ -99,7 +99,7 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 	if not item then item = "" end
 	
 	local sum, low, high, date = 0, 9999999999, 0
-	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true}
+	local settings = {["selectbox"] = {"1", player} , ["bid"] = true, ["auction"] = true, ["failedauction"] = true}
 	local tbl = private.startSearch(item, settings, true, 10000000)
 
 	for i,v in pairs(tbl) do
@@ -119,11 +119,13 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 			if date and date > high then high = date end
 			--Sum the trxns	
 			if v[2] == _BC('UiAucSuccessful') then
-				sum = sum+v[5]
+				sum = sum + v[5] --sum sale. fee's have already been subtracted
+			elseif v[2] == _BC('UiAucExpired') then
+				sum = sum - v[9] --subtract failed deposits
 			elseif v[2] == _BC('UiWononBid') then
-				sum = sum-v[3]
+				sum = sum - v[3] --subtract bought items
 			elseif v[2] == _BC('UiWononBuyout') then
-				sum = sum-v[4]
+				sum = sum - v[4]
 			end
 		end
 	end
