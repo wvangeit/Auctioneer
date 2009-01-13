@@ -63,7 +63,7 @@ function lib:MakeGuiConfig(gui)
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
 			gui:AddControl(id, "Checkbox", 0.5, 1, "ignoreitemauctionhistory.filter."..name, name)
-			gui:AddTip(id, "Filter Time-left when searching with "..name)
+			gui:AddTip(id, "Filter Item Auction History when searching with "..name)
 			default("ignoreitemauctionhistory.filter."..name, false)
 		end
 	end

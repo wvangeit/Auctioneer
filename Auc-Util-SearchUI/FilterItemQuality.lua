@@ -71,12 +71,12 @@ function lib:MakeGuiConfig(gui)
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
 			gui:AddControl(id, "Checkbox", 0, 1, "ignoreitemquality.filter."..name, name)
-			gui:AddTip(id, "Filter Time-left when searching with "..name)
+			gui:AddTip(id, "Filter Item Quality when searching with "..name)
 			default("ignoreitemquality.filter."..name, false)
 		end
 	end
 
-	gui:AddControl(id, "Subhead",      0,    "Item Quality by Type")
+	gui:AddControl(id, "Subhead",      0,    "Ignore Item Quality by Type")
 	for i = 0, 6 do
 		local last = gui:GetLast(id)
 		gui:AddControl(id, "Note", i*0.07, 1, 50, 20, qualname[i])
@@ -88,7 +88,7 @@ function lib:MakeGuiConfig(gui)
 		for j = 0, 6 do
 			local last = gui:GetLast(id)
 			gui:AddControl(id, "Checkbox", j*0.07+0.02, 1, "ignoreitemquality."..typename[i].."."..qualname[j], "")
-			gui:AddTip(id, qualname[j].." "..typename[i])
+			gui:AddTip(id, "Ignore "..qualname[j].." "..typename[i])
 			gui:SetLast(id, last)
 		end
 		gui:AddControl(id, "Note", 0.49, 1, 200, 20, typename[i])
