@@ -1158,6 +1158,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 
 
 	gui.sheet:EnableSelect(true)
+	gui.sheet:EnableVerticalScrollReset(false) --tells scrollframes we do NOT want to reset position when rendering a new data table
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
 	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 50)
 	gui.Search:SetText("Search")
