@@ -50,8 +50,8 @@ local private = {}
 lib.Private = private
 
 local Const = AucAdvanced.Const
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-lib.Print = print
+local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+lib.Print = _print
 local GetTime = GetTime
 
 private.isScanning = false
@@ -133,7 +133,7 @@ end
 
 function lib.PushScan()
 	if private.isScanning then
-		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
+		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
 		if not private.scanStack then private.scanStack = {} end
 		table.insert(private.scanStack, {
 			private.scanStartTime,
@@ -178,13 +178,13 @@ function lib.PopScan()
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
 			-- 5 minutes old
-			print("Paused scan is older than 5 minutes, aborting")
+			lib.Print("Paused scan is older than 5 minutes, aborting")
 			lib.Commit(true)
 			return
 		end
 
 		private.totalPaused = private.totalPaused + elapsed
-		print(("Resuming paused scan at page {{%d}}..."):format(private.curPage+1))
+		lib.Print(("Resuming paused scan at page {{%d}}..."):format(private.curPage+1))
 		private.isScanning = true
 		private.sentQuery = false
 		lib.ScanPage(private.curPage)
@@ -1183,6 +1183,16 @@ end
 private.Hook = {}
 private.Hook.PlaceAuctionBid = PlaceAuctionBid
 function PlaceAuctionBid(type, index, bid)
+	local itemData = lib.GetAuctionItem(type, index)
+	if itemData then
+		private.Unpack(itemData, statItem)
+		local modules = AucAdvanced.GetAllModules("ScanProcessors")
+		for pos, engineLib in ipairs(modules) do
+			if engineLib.ScanProcessors["placebid"] then
+				engineLib.ScanProcessors["placebid"]("placebid", statItem, type, index, bid)
+			end
+		end
+	end
 	return private.Hook.PlaceAuctionBid(type, index, bid)
 end
 
@@ -1201,7 +1211,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.warnTaint = nil
 	end
 	if private.CanSend and not private.CanSend() then
-		print("Can't send query just at the moment")
+		lib.Print("Can't send query just at the moment")
 		return
 	end
 
@@ -1366,7 +1376,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
 	if (private.curQuery) then
-		print("Cancelling current scan")
+		lib.Print("Cancelling current scan")
 		lib.Commit(true)
 	end
 	private.ResetAll()
@@ -1386,7 +1396,7 @@ end
 
 function lib.Abort()
 	if (private.curQuery) then
-		print("Aborting current scan")
+		lib.Print("Aborting current scan")
 	end
 	private.ResetAll()
 end
