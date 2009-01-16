@@ -57,9 +57,9 @@ function private.AuctionUI()
 		private.AddTab(frame.ScanTab, frame)
 	end
 
-	function frame.ScanTab.OnClick(_, _, index)
+	function frame.ScanTab.OnClick(self, index)
+		BeanCounterBaseFrame:Hide()
 		if private.frame:GetParent() == BeanCounterBaseFrame then
-			BeanCounterBaseFrame:Hide()
 			private.frame:SetParent(AuctionFrame)
 			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
 			--private.frame:SetWidth(834.
@@ -67,7 +67,7 @@ function private.AuctionUI()
 			private.relevelFrame(frame)--make sure our frame stays in proper order
 		end
 
-		if not index then index = this:GetID() end
+		if not index then index = self:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
 			--Modified Textures
@@ -196,14 +196,6 @@ function private.CreateFrames()
 		end
 	end
 
-	--Beginner Tooltips script display for all UI elements 
-	function private.buttonTooltips(self, text)
-		if get("util.beancounter.displaybeginerTooltips") and text and self then
-			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-			GameTooltip:SetText(text)
-		end
-	end
-
 	--Add Configuration Button for those who dont use sidebar.
 	frame.Config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.Config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -139, -13)
@@ -294,17 +286,17 @@ function private.CreateFrames()
 		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
-	function private.ClickBagHook(_,_,button)
+	function private.ClickBagHook(_, _, self, button)
 		if (frame.searchBox and frame.searchBox:IsVisible()) then
-			local bag = this:GetParent():GetID()
-			local slot = this:GetID()
+			local bag = self:GetParent():GetID()
+			local slot = self:GetID()
 			local link = GetContainerItemLink(bag, slot)
 			if link then
 				local itemID = lib.API.decodeLink(link)
 				local _, itemName = lib.API.getItemString(link)
 				local _, itemTexture = private.getItemInfo(link, "name")
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
-					--debugPrint(itemName, itemID,itemTexture, link)
+					debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
 					private.searchByItemID(itemID, private.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 				end
@@ -313,7 +305,7 @@ function private.CreateFrames()
 	end
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)
 
-	function private.ClickLinkHook(itemString, link, button)
+	function private.ClickLinkHook(self, itemString, link, button)
 			if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
 				local itemID = lib.API.decodeLink(link)
@@ -627,7 +619,7 @@ function private.processTooltip(tip, itemLink, quantity)
 	private.tooltip:SetFrame(tip)
 	local reason, Time, bid, player = lib.API.getBidReason(itemLink, quantity)
 		
-	debugPrint("Add to Tooltip", itemLink, reason)
+	--debugPrint("Add to Tooltip", itemLink, reason)
 	if reason then
 		if reason == "" then reason = "Unknown" end
 		Time = SecondsToTime((time() - Time))
