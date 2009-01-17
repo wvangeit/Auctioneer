@@ -458,8 +458,9 @@ function private.CreateFrames()
 	function private.scrollSheetOnClick(button, row, column)
 		if column ~= 1 then return end
 		local link = frame.resultlist.sheet.rows[row][column]:GetText()
-		local text = GetItemInfo(link)
 		if not link then return end
+		
+		local text = GetItemInfo(link)
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(link)--sends to chat or auction house
 		elseif IsAltKeyDown() then -- Search for the item in BeanCounter
