@@ -454,7 +454,20 @@ function private.CreateFrames()
 			set("columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
-
+	--Allows user to shift click on itemlinks in beacounter to Chat or BeanCounters select box
+	function private.scrollSheetOnClick(button, row, column)
+		if column ~= 1 then return end
+		local link = frame.resultlist.sheet.rows[row][column]:GetText()
+		local text = GetItemInfo(link)
+		if not link then return end
+		if IsShiftKeyDown() then
+			ChatEdit_InsertLink(link)--sends to chat or auction house
+		elseif IsAltKeyDown() then -- Search for the item in BeanCounter
+			frame.searchBox:SetText(text)
+			private.startSearch(text, private.getCheckboxSettings())
+		end
+	end
+	
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ _BC('UiNameHeader'), "TOOLTIP",  get("columnwidth.".._BC('UiNameHeader')) },
@@ -472,7 +485,7 @@ function private.CreateFrames()
 		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) },
 		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) },
 		{ _BC('UiDateHeader'), "text", get("columnwidth.".._BC('UiDateHeader')) },
-	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
+	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, private.scrollSheetOnClick, private.onResize)
 	--Add tooltip help to the scrollframe headers
 	for i = 1, #frame.resultlist.sheet.labels do
 		local self = frame.resultlist.sheet.labels[i].button
