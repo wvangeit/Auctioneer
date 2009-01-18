@@ -25,11 +25,10 @@
 	Note:
 		This AddOn's source code is specifically designed to work with
 		World of Warcraft's interpreted AddOn system.
-		You have an implicit license to use this AddOn with these facilities
+		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-Informant_RegisterRevision("$URL$", "$Rev$")
 
 InformantLocalizations = {
 
@@ -178,6 +177,7 @@ InformantLocalizations = {
 	daDK = {
 
 		-- Section: Commands
+		["about"]	= "Informant data wordt aangeboden door de mensen van http://www.wowhead.com";
 		["CmdClearAll"]	= "alle";
 		["CmdDefault"]	= "Standard";
 		["CmdDisable"]	= "deaktiver";
@@ -198,6 +198,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "vis-koebmand";
 		["ShowVendorBuy"]	= "vis-koebmand-koeb";
 		["ShowVendorSell"]	= "vis-koebmand-salg";
+		["ShowZeroMerchants"]	= "vis-ingen-sælgere";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant er ikke indlæst. Skriv /informant for mere info.";
@@ -315,11 +316,21 @@ InformantLocalizations = {
 		["SkillTailoring"]	= "Syning";
 		["SkillWarlock"]	= "Warlock formular";
 
+		-- Section: User Interface
+		["GuiCreateReplaceProfile"]	= "Opret eller erstat en profil";
+		["GuiDeleteProfileButton"]	= "Slet";
+		["GuiNewProfileName"]	= "Nyt profil navn:";
+		["GuiResetProfileButton"]	= "Nulstil";
+		["GuiSaveProfileButton"]	= "Gem";
+		["GuiTabGeneral"]	= "Generelt";
+		["GuiTabProfiles"]	= "Profiler";
+
 	};
 
 	deDE = {
 
 		-- Section: Commands
+		["about"]	= "Informantdaten werden vom Arsenal und mit der Unterstützung der Leute bei http://www.wowhead.com erstellt";
 		["CmdClearAll"]	= "all";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -331,8 +342,8 @@ InformantLocalizations = {
 		["CmdToggle"]	= "toggle";
 		["OptLocale"]	= "<Sprache>";
 		["ShowIcon"]	= "show-icon";
-		["ShowILevel"]	= "show-ilevel";
-		["ShowLink"]	= "show-link";
+		["ShowILevel"]	= "zeige-ilevel";
+		["ShowLink"]	= "zeige-link";
 		["ShowMerchant"]	= "show-merchant";
 		["ShowQuest"]	= "show-quest";
 		["ShowStack"]	= "show-stack";
@@ -345,34 +356,33 @@ InformantLocalizations = {
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant ist nicht geladen. Geben Sie /informant ein um mehr Informationen zu erhalten.";
 		["StatOff"]	= "Informationen zu Gegenständen werden nicht angezeigt";
-		["StatOn"]	= "Informationen zu Gegenständen werden angezeigt";
-		["Welcome"]	= "|c40ff50ffWillkommen bei Informant|r Da Sie Informant das erste Mal nutzen erscheint diese Nachricht, um Ihnen mitzuteilen, dass sie eine Taste belegen müssen, um dieses Fenster innerhalb der |cffffffffTastaturbelegung|r Sektion des |cffffffffHauptmenü|r anzeigen zu lassen. Um erweiterte Informationen über Gegenstände in ihrem Inventar zu erhalten, müssen sie die Maus über den gewünschten Gegenstand bewegen und die von Ihnen gewählte Taste drücken und es erscheint ein Fenster mit Informationen über diesen Gegenstand. Zum Schliessen des Fensters betätigen sie die Taste erneut oder sie drücken den Schliessen Button dieses Fensters. Zum Fortfahren drücken sie bitte den Schliessen-Button.";
+		["StatOn"]	= "Gewählte Informationen zu Gegenständen werden angezeigt";
+		["Welcome"]	= "|c40ff50ffWillkommen bei Informant|r\n\n Da Sie Informant das erste Mal nutzen erscheint diese Nachricht, um Ihnen mitzuteilen, dass sie eine Taste belegen müssen, um dieses Fenster innerhalb der |cffffffffTastaturbelegung|r Sektion des |cffffffffHauptmenü|r anzeigen zu lassen.\nUm erweiterte Informationen über Gegenstände in ihrem Inventar zu erhalten, müssen sie die Maus über den gewünschten Gegenstand bewegen und die von Ihnen gewählte Taste drücken und es erscheint ein Fenster mit Informationen über diesen Gegenstand. \nZum Schliessen des Fensters betätigen sie die Taste erneut oder sie drücken den Schliessen Button dieses Fensters. \nZum Fortfahren drücken sie bitte den Schliessen-Button.";
 
 		-- Section: Help Text
 		["GuiDefaultAll"]	= "Alle Einstellungen zurücksetzen";
 		["GuiDefaultAllButton"]	= "Alles zurücksetzen";
 		["GuiDefaultAllHelp"]	= "Hier klicken um alle Informant-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT rückgängig gemacht werden.";
 		["GuiDefaultOption"]	= "Diese Einstellung zurücksetzen";
-		["GuiEmbed"]	= "In-Game Tooltip zur Anzeige verwenden";
-		["GuiEmbedHeader"]	= "Art der Anzeige";
+		["GuiEmbed"]	= "Tooltip in der In-Game Anzeige verwenden";
+		["GuiEmbedHeader"]	= "Eingefügt";
 		["GuiInfoHeader"]	= "Zusätzliche Informationen";
 		["GuiInfoHelp"]	= "Steuert welche zusätzlichen Informationen angezeigt werden";
-		["GuiInfoIcon"]	= "Zeige Symbol an";
+		["GuiInfoIcon"]	= "Zeige Inventar Symbol an";
 		["GuiInfoILevel"]	= "Zeige Itemlevel an";
 		["GuiInfoLink"]	= "Zeige Itemlink an";
 		["GuiInfoMerchant"]	= "Zeige Händler";
-		["GuiInfoName"]	= "Zeige Itemname";
-		["GuiInfoQuest"]	= "Zeige die Verwendung bei Quests an";
+		["GuiInfoNoMerchants"]	= "Zeigen wenn keine Händler bekannt sind";
+		["GuiInfoQuest"]	= "Zeigt Quest Informationen an";
 		["GuiInfoStack"]	= "Zeige die Stapelgröße an";
 		["GuiInfoUsage"]	= "Zeige den Verwendungszweck an";
-		["GuiInfoZeroMerchants"]	= "Zeige wenn keine Verkäufer bekannt";
 		["GuiLocale"]	= "Setze die Sprache auf";
 		["GuiMainEnable"]	= "Informant aktivieren";
 		["GuiMainHelp"]	= "Einstellungen für Informant, einem AddOn das detaillierte Informationen über einen Gegenstand (Händlerpreise, Verwendungszweck etc.) anzeigt.";
 		["GuiOtherHeader"]	= "Sonstige Optionen";
 		["GuiOtherHelp"]	= "Sonstige Informant-Optionen";
-		["GuiReloadui"]	= "Benutzeroberfläche neu laden";
-		["GuiReloaduiButton"]	= "Neu laden";
+		["GuiReloadui"]	= "Benutzeriterface neu laden";
+		["GuiReloaduiButton"]	= "Benutzeroberfläche neu laden";
 		["GuiReloaduiFeedback"]	= "WoW-Benutzeroberfläche wird neu geladen";
 		["GuiReloaduiHelp"]	= "Hier klicken um die WoW-Benutzeroberfläche nach einer \nÄnderung des Gebietsschemas neu zu laden, so dass die Sprache des Konfigurationsmenüs diesem entspricht. Hinweis: Dieser Vorgang kann einige Minuten dauern.";
 		["GuiVendor"]	= "Zeige Händlerpreise";
@@ -388,7 +398,6 @@ InformantLocalizations = {
 		["HelpLink"]	= "Schaltet die Anzeige vom Itemlink ein/aus";
 		["HelpLocale"]	= "Ändert die Sprache für alle Auctioneer addons.";
 		["HelpMerchant"]	= "Schaltet die Anzeige von Händlern die den Gegenstand anbieten ein/aus.";
-		["HelpName"]	= "Schaltet die Anzeige des Itemnamen im zweiten Tooltip ein/aus.";
 		["HelpOnoff"]	= "Schaltet die Anzeige der Auktions-Informationen ein/aus.";
 		["HelpQuest"]	= "Schaltet die Anzeige des Verwendungszwecks für Quests ein/aus.";
 		["HelpStack"]	= "Schaltet die Anzeige der Stapelgröße ein/aus.";
@@ -403,7 +412,7 @@ InformantLocalizations = {
 		["BindingTitle"]	= "Informationsfenster ein-/ausschalten";
 
 		-- Section: Tooltip Messages
-		["FrameTitle"]	= "Informant-Informationen zum Gegenstand";
+		["FrameTitle"]	= "Informant Gegenstands-Infos";
 		["FrmtActDefault"]	= "Die Informant-Option %s wurde auf den Standardwert zurückgesetzt.";
 		["FrmtActDefaultall"]	= "Alle Informant-Optionen wurden auf Standardwerte zurückgesetzt.";
 		["FrmtActDisable"]	= "%s wird nicht angezeigt";
@@ -426,7 +435,7 @@ InformantLocalizations = {
 		["FrmtUnknownLocale"]	= "Das angegebene Gebietsschema ('%s') ist unbekannt. Gültige Gebietsschemen sind:";
 		["FrmtWelcome"]	= "Informant v%s geladen";
 		["InfoHeader"]	= "Informationen über |cff%s%s|r";
-		["InfoNoItem"]	= "Bevor die Aktivierungstaste gedrückt wird, muß die Maus über einen Gegenstand bewegt werden";
+		["InfoNoItem"]	= "Bevor die Aktivierungstaste gedrückt wird, muss die Maus über einen Gegenstand bewegt werden";
 		["InfoPlayerMade"]	= "Herstellbar mit Level %d %s";
 		["InfoQuestHeader"]	= "Benötigt für %d Quest(s):";
 		["InfoQuestLine"]	= "Quest: %s";
@@ -434,7 +443,7 @@ InformantLocalizations = {
 		["InfoQuestName"]	= "%d für \"%s\" (Level %d)";
 		["InfoQuestRequiresHeader"]	= "Verwendet für %d Quests:";
 		["InfoQuestRewardsHeader"]	= "Belohnung von %d Quests:";
-		["InfoQuestSource"]	= "Questdaten bezogen von";
+		["InfoQuestSource"]	= "Questdaten bereitgestellt von";
 		["InfoQuestStartsHeader"]	= "Startet eine Quest:";
 		["InfoUntransQuest"]	= "Quest unbekannt: ID #%d";
 		["InfoVendorHeader"]	= "Erhältlich bei %d Händler(n):";
@@ -443,6 +452,7 @@ InformantLocalizations = {
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Alkohol";
 		["AdditBuff"]	= "Buff";
+		["AdditCurrency"]	= "Währung";
 		["AdditDrink"]	= "Getränk";
 		["AdditFirework"]	= "Feuerwerk";
 		["AdditFood"]	= "Nahrung";
@@ -452,29 +462,46 @@ InformantLocalizations = {
 		["AdditPotion"]	= "Trank";
 		["AdditRestorative"]	= "Stärkungstrank";
 		["AdditScroll"]	= "Zauberspruchrolle";
-		["SkillAlchemy"]	= "Alchemie";
-		["SkillBlacksmithing"]	= "Schmieden";
-		["SkillCooking"]	= "Kochen";
+		["SkillAlchemy"]	= "Alchimie";
+		["SkillBlacksmithing"]	= "Schmiedekunst";
+		["SkillCooking"]	= "Kochkunst";
 		["SkillDruid"]	= "Druidenzauber";
-		["SkillEnchanting"]	= "Verzauberungen";
+		["SkillEnchanting"]	= "Verzauberungskunst";
 		["SkillEngineering"]	= "Ingenieurskunst";
 		["SkillFirstAid"]	= "Erste Hilfe";
+		["SkillFishing"]	= "Angeln";
+		["SkillHerbalism"]	= "Kräuterkunde";
+		["SkillInscription"]	= "Inschriftenkunde";
+		["SkillJewelcrafting"]	= "Juwelenschleifen";
 		["SkillLeatherworking"]	= "Lederverarbeitung";
 		["SkillMage"]	= "Magierzauber";
 		["SkillMining"]	= "Bergbau";
 		["SkillPaladin"]	= "Paladinzauber";
 		["SkillPriest"]	= "Priesterzauber";
+		["SkillRiding"]	= "Reiten";
 		["SkillRogue"]	= "Schurkenfertigkeit";
 		["SkillShaman"]	= "Schamanenzauber";
 		["SkillTailoring"]	= "Schneiderei";
 		["SkillWarlock"]	= "Hexerzauber";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Aktivieren Sie ein aktuelles Profil";
+		["GuiConfigProfiles"]	= "Einstellen, konfigurieren und bearbeiten von Profilen";
+		["GuiCreateReplaceProfile"]	= "Erstellen oder ersetzen Sie ein Profil";
+		["GuiDeleteProfileButton"]	= "Löschen";
+		["GuiGeneralOptions"]	= "Allgemeine Informant Einstellungen";
+		["GuiNewProfileName"]	= "Neuer Profil Name:";
+		["GuiResetProfileButton"]	= "Zurücksetzen";
+		["GuiSaveProfileButton"]	= "Sichern";
+		["GuiTabGeneral"]	= "Allgemein";
+		["GuiTabProfiles"]	= "Profile";
 
 	};
 
 	enUS = {
 
 		-- Section: Commands
-		["about"]	= "Informant data is obtained from the Armory and with the assistance of the folks at http://www.wowhead.com";
+		["about"]	= "Informant data is provided by the folks at http://www.wowhead.com";
 		["CmdClearAll"]	= "all";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -516,12 +543,10 @@ InformantLocalizations = {
 		["GuiInfoILevel"]	= "Show item level";
 		["GuiInfoLink"]	= "Show item link";
 		["GuiInfoMerchant"]	= "Show merchants";
-		["GuiInfoName"]	= "Show item name";
 		["GuiInfoNoMerchants"]	= "Show when no merchants are known";
 		["GuiInfoQuest"]	= "Show quest information";
 		["GuiInfoStack"]	= "Show stack sizes";
 		["GuiInfoUsage"]	= "Show usage information";
-		["GuiInfoZeroMerchants"]	= "Show when no known merchants";
 		["GuiLocale"]	= "Set locale to";
 		["GuiMainEnable"]	= "Enable Informant";
 		["GuiMainHelp"]	= "Contains settings for Informant \nan AddOn that displays detailed item information";
@@ -544,7 +569,6 @@ InformantLocalizations = {
 		["HelpLink"]	= "Select whether to show the item's link";
 		["HelpLocale"]	= "Changes the locale that is used to display Informant messages. Note that this affects the locale setting for all Auctioneer addons.";
 		["HelpMerchant"]	= "Select whether to show merchants who supply items";
-		["HelpName"]	= "Select whether to show item's name in secondary tooltip";
 		["HelpOnoff"]	= "Turns the information data display on and off";
 		["HelpQuest"]	= "Select whether to show quest item's usage";
 		["HelpStack"]	= "Select whether to show the item's stackable size";
@@ -599,6 +623,7 @@ InformantLocalizations = {
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Alcohol";
 		["AdditBuff"]	= "Buff";
+		["AdditCurrency"]	= "Currency";
 		["AdditDrink"]	= "Drink";
 		["AdditFirework"]	= "Firework";
 		["AdditFood"]	= "Food";
@@ -647,6 +672,7 @@ InformantLocalizations = {
 	esES = {
 
 		-- Section: Commands
+		["about"]	= "La información de Informant es obtenia desde la Armeria y con la asistencia de otras personas en http://www.wowhead.com.";
 		["CmdClearAll"]	= "todo";
 		["CmdDefault"]	= "por defecto";
 		["CmdDisable"]	= "deshabilitar";
@@ -656,7 +682,7 @@ InformantLocalizations = {
 		["CmdOff"]	= "apagado";
 		["CmdOn"]	= "prendido";
 		["CmdToggle"]	= "invertir";
-		["OptLocale"]	= "<localizacion>";
+		["OptLocale"]	= "<localización>";
 		["ShowIcon"]	= "ver-icono";
 		["ShowILevel"]	= "ver-nivel";
 		["ShowLink"]	= "ver-enlace";
@@ -667,6 +693,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "ver-vendedor";
 		["ShowVendorBuy"]	= "ver-vendedor-compra";
 		["ShowVendorSell"]	= "ver-vendedor-venta";
+		["ShowZeroMerchants"]	= "ver-cero-mercader";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant no está cargado. Escriba /informant para más información.";
@@ -675,18 +702,19 @@ InformantLocalizations = {
 		["Welcome"]	= "|c40ff50ffBienvenido a Informant|r Ya que esta es la primera vez que usas Informant, este mensaje aparece para hacerte saber que debes establecer una tecla para mostrar esta ventana, en la sección |cffffffffConfigurar teclado|r del |cffffffffMenú Principal|r. A partir de entonces, para ver información avanzada acerca de los objetos de tu inventario, mueves simplementeel ratón sobre el objeto del que quieres ver la información y pulsa la tecla que has asignado. Esto abrirá una ventana emergente con la información sobre el objeto. En este punto, simplemente pulsa la tecla de nuevo o haz clic en el botón de cerrar en la ventana. Pulsa el botón de Cerrar para continuar.";
 
 		-- Section: Help Text
-		["GuiDefaultAll"]	= "Reestablecer todas las opciones de Informant";
-		["GuiDefaultAllButton"]	= "Reestablecer Todo";
+		["GuiDefaultAll"]	= "Restablecer todas las opciones de Informant";
+		["GuiDefaultAllButton"]	= "Restablecer Todo";
 		["GuiDefaultAllHelp"]	= "Clic aquí para establecer todas las opciones de Informant a sus valores por defecto. ADVERTENCIA: Esta acción NO es reversible.";
-		["GuiDefaultOption"]	= "Reestablecer esta opción";
+		["GuiDefaultOption"]	= "Restablecer esta opción";
 		["GuiEmbed"]	= "Integrar información en la caja de ayuda";
 		["GuiEmbedHeader"]	= "Integración";
 		["GuiInfoHeader"]	= "Información Adicional";
-		["GuiInfoHelp"]	= "Controla qué información muestra Intormant en las cajas de ayuda";
+		["GuiInfoHelp"]	= "Controla qué información muestra Informant en las cajas de ayuda";
 		["GuiInfoIcon"]	= "Mostrar icono de inventario";
 		["GuiInfoILevel"]	= "Mostrar nivel del objeto";
-		["GuiInfoLink"]	= "Ver enlace";
+		["GuiInfoLink"]	= "Ver enlace de objeto";
 		["GuiInfoMerchant"]	= "Ver mercaderes";
+		["GuiInfoNoMerchants"]	= "Mostrar cuando no se conozca ningún mercader";
 		["GuiInfoQuest"]	= "Mostrar información de misión";
 		["GuiInfoStack"]	= "Mostrar tamaños de paquete";
 		["GuiInfoUsage"]	= "Mostrar información de uso";
@@ -719,6 +747,7 @@ InformantLocalizations = {
 		["HelpVendor"]	= "Determina si se muestran los precios de vendedor para el objeto";
 		["HelpVendorBuy"]	= "Determina si se muestra el precio de compra del objeto de un vendedor (requiere mostrar-vendedor=activado)";
 		["HelpVendorSell"]	= "Determina si se muestra el precio de venta del objeto de un vendedor (requiere mostrar-vendedor=activado)";
+		["HelpZeroMerchants"]	= "Seleccionar para mostrar cuando ningún mercader provee un articulo";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "Informant";
@@ -726,8 +755,8 @@ InformantLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrameTitle"]	= "Información de Informant del Objeto";
-		["FrmtActDefault"]	= "La opción %s de Informant ha sido reestablecida a sus ajustes por defecto";
-		["FrmtActDefaultall"]	= "Todas las opciones de Informant han sido reestablecidas a sus valores por defecto";
+		["FrmtActDefault"]	= "La opción %s de Informant ha sido restablecida a sus ajustes por defecto";
+		["FrmtActDefaultall"]	= "Todas las opciones de Informant han sido restablecidas a sus valores por defecto";
 		["FrmtActDisable"]	= "Ocultando información de objeto: %s ";
 		["FrmtActEnable"]	= "Mostrando información del objeto: %s ";
 		["FrmtActEnabledOn"]	= "Mostrando %s de los objetos usando %s";
@@ -739,6 +768,7 @@ InformantLocalizations = {
 		["FrmtInfoItemLevel"]	= "Nivel del Objeto: %d";
 		["FrmtInfoItemLink"]	= "Enlace: %s";
 		["FrmtInfoMerchants"]	= "Vendido por %d mercaderes";
+		["FrmtInfoNoKnownMerchants"]	= "Vendido por ningún mercader conocido";
 		["FrmtInfoQuest"]	= "Artí­culo usado en %d misiones";
 		["FrmtInfoSell"]	= "Venta en vendedor";
 		["FrmtInfoSellmult"]	= "Vende %d (%s c/u)";
@@ -764,6 +794,7 @@ InformantLocalizations = {
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Alcohol";
 		["AdditBuff"]	= "Mejora";
+		["AdditCurrency"]	= "Moneda";
 		["AdditDrink"]	= "Bebida";
 		["AdditFirework"]	= "Fuegos Artificiales";
 		["AdditFood"]	= "Comida";
@@ -780,21 +811,39 @@ InformantLocalizations = {
 		["SkillEnchanting"]	= "Encantamiento";
 		["SkillEngineering"]	= "Ingenierí­a";
 		["SkillFirstAid"]	= "Primeros Auxilios";
+		["SkillFishing"]	= "Pesca";
+		["SkillHerbalism"]	= "Jardinería";
+		["SkillInscription"]	= "Inscripción";
+		["SkillJewelcrafting"]	= "Joyeria";
 		["SkillLeatherworking"]	= "Peleterí­a";
 		["SkillMage"]	= "Hechizos de Mago";
 		["SkillMining"]	= "Minerí­a";
 		["SkillPaladin"]	= "Hechizos de Paladín";
 		["SkillPriest"]	= "Hechizos de Sacerdote";
+		["SkillRiding"]	= "Montar";
 		["SkillRogue"]	= "Habilidades de Pí­caro";
 		["SkillShaman"]	= "Hechizos de Chamán";
 		["SkillTailoring"]	= "Sastrerí­a";
 		["SkillWarlock"]	= "Hechizos de Brujo";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Activar un perfil recurrente";
+		["GuiConfigProfiles"]	= "Predetermina, configura y edita perfiles";
+		["GuiCreateReplaceProfile"]	= "crear o reemplazar un perfil";
+		["GuiDeleteProfileButton"]	= "eliminar";
+		["GuiGeneralOptions"]	= "Informaciones Generales de Informant";
+		["GuiNewProfileName"]	= "Nombre del Perfil nuevo:";
+		["GuiResetProfileButton"]	= "Reestablecer";
+		["GuiSaveProfileButton"]	= "Salvar";
+		["GuiTabGeneral"]	= "General";
+		["GuiTabProfiles"]	= "Perfiles";
 
 	};
 
 	frFR = {
 
 		-- Section: Commands
+		["about"]	= "Les données d'Informant sont obtenus depuis l'Armurerie et avec l'assistance des gars de http://www.wowhead.com";
 		["CmdClearAll"]	= "tout";
 		["CmdDefault"]	= "par défaut";
 		["CmdDisable"]	= "desactive";
@@ -815,7 +864,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "voir-vendeur";
 		["ShowVendorBuy"]	= "voir-vendeur-achat";
 		["ShowVendorSell"]	= "voir-vendeur-vente";
-		["ShowZeroMerchants"]	= "voir-zero-marchand";
+		["ShowZeroMerchants"]	= "voir-zéro-marchand";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant n'est pas chargé. Tapez /informant pour plus d'informations.";
@@ -836,11 +885,10 @@ InformantLocalizations = {
 		["GuiInfoILevel"]	= "Voir le niveau de l'objet";
 		["GuiInfoLink"]	= "Voir le lien de l'objet";
 		["GuiInfoMerchant"]	= "Afficher les marchands";
-		["GuiInfoName"]	= "Afficher le nom de l'objet";
+		["GuiInfoNoMerchants"]	= "Affiche quand aucun marchant est connu";
 		["GuiInfoQuest"]	= "Afficher les informations de quête";
 		["GuiInfoStack"]	= "Afficher la taille des piles";
 		["GuiInfoUsage"]	= "Afficher le mode d'emploi";
-		["GuiInfoZeroMerchants"]	= "Afficher quand pas de marchands connus";
 		["GuiLocale"]	= "Changer la langue active pour ";
 		["GuiMainEnable"]	= "Activer Informant";
 		["GuiMainHelp"]	= "Contient les réglages d'Informant, un AddOn permettant d'afficher des informations détaillées sur les objets.";
@@ -863,7 +911,6 @@ InformantLocalizations = {
 		["HelpLink"]	= "Choisir d'afficher ou pas le lien des objets";
 		["HelpLocale"]	= "Changer la langue utilisée par les messages d'Informant";
 		["HelpMerchant"]	= "Choisir si l'affichage des marchands qui vendent ces objets doit être activé";
-		["HelpName"]	= "Selectionner si affichage du nom de l'objet dans le second tooltip";
 		["HelpOnoff"]	= "Active/désactive l'affichage des informations";
 		["HelpQuest"]	= "Choisir d'afficher ou pas si l'objet est un objet de quête";
 		["HelpStack"]	= "Choisir si l'affichage du nombre maximum par pile d'objet doit être activé";
@@ -934,21 +981,39 @@ InformantLocalizations = {
 		["SkillEnchanting"]	= "Enchantement";
 		["SkillEngineering"]	= "Ingénierie";
 		["SkillFirstAid"]	= "Premiers Soins";
+		["SkillFishing"]	= "pêche";
+		["SkillHerbalism"]	= "herboristerie";
+		["SkillInscription"]	= "calligraphie";
+		["SkillJewelcrafting"]	= "joaillerie";
 		["SkillLeatherworking"]	= "Travail du Cuir";
 		["SkillMage"]	= "Sorts de Mage";
 		["SkillMining"]	= "Minage";
 		["SkillPaladin"]	= "Sorts de Paladin";
 		["SkillPriest"]	= "Sorts de Prêtre";
+		["SkillRiding"]	= "Monte";
 		["SkillRogue"]	= "Compétences de Voleur";
 		["SkillShaman"]	= "Sorts de Chaman";
 		["SkillTailoring"]	= "Couture";
 		["SkillWarlock"]	= "Sorts de Démoniste";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Activer le profil courant";
+		["GuiConfigProfiles"]	= "Configure et édition des profils";
+		["GuiCreateReplaceProfile"]	= "Crée ou remplace un profil";
+		["GuiDeleteProfileButton"]	= "Supprimer";
+		["GuiGeneralOptions"]	= "Options générale d'Informant";
+		["GuiNewProfileName"]	= "Nouveau nom de profil";
+		["GuiResetProfileButton"]	= "Ré-initialisation";
+		["GuiSaveProfileButton"]	= "Sauvegarde";
+		["GuiTabGeneral"]	= "Général";
+		["GuiTabProfiles"]	= "Profils";
 
 	};
 
 	itIT = {
 
 		-- Section: Commands
+		["about"]	= "I dati di Informant sono stati ottenuti dall'Armeria con l'assistenza degli utenti di http://www.wowhead.com";
 		["CmdClearAll"]	= "tutti";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disabilitare";
@@ -960,6 +1025,8 @@ InformantLocalizations = {
 		["CmdToggle"]	= "toggle(on/off)";
 		["OptLocale"]	= "<localizzazione>";
 		["ShowIcon"]	= "mostra-icona";
+		["ShowILevel"]	= "mostra-livogg";
+		["ShowLink"]	= "mostra-collegamento";
 		["ShowMerchant"]	= "mostra-mercante";
 		["ShowQuest"]	= "mostra-quest";
 		["ShowStack"]	= "mostra-pila";
@@ -977,13 +1044,15 @@ InformantLocalizations = {
 		-- Section: Help Text
 		["GuiDefaultAll"]	= "Resetta tutte le opzioni di Informant";
 		["GuiDefaultAllButton"]	= "Reset generale";
-		["GuiDefaultAllHelp"]	= "Clickare qui per settare tutte le opzioni di Informant ai valori di default. ATTENZIONE: Questa azione NON e' reversibile.";
+		["GuiDefaultAllHelp"]	= "Cliccare quì per reimpostare tutte le opzioni di Informant ai valori di default.\nATTENZIONE: Questa azione NON è reversibile.";
 		["GuiDefaultOption"]	= "Resetta questa opzione";
 		["GuiEmbed"]	= "Informazione integrata nel Tooltip di gioco";
 		["GuiEmbedHeader"]	= "Integrazione";
 		["GuiInfoHeader"]	= "Informazione aggiuntiva";
 		["GuiInfoHelp"]	= "Controlla quale informazione aggiuntiva e' mostrata nel tooltip";
 		["GuiInfoIcon"]	= "Mostra icona inventario";
+		["GuiInfoILevel"]	= "Visualizza livello oggetto";
+		["GuiInfoLink"]	= "Visualizza collegamento oggetto";
 		["GuiInfoMerchant"]	= "Mostra mercanti";
 		["GuiInfoQuest"]	= "Mostra le informazioni della quest";
 		["GuiInfoStack"]	= "Mostra il prezzo della pila";
@@ -994,9 +1063,9 @@ InformantLocalizations = {
 		["GuiOtherHeader"]	= "Altre Opzioni";
 		["GuiOtherHelp"]	= "Opzioni Varie di Informant";
 		["GuiReloadui"]	= "Ricarica la User Interface";
-		["GuiReloaduiButton"]	= "ReloadUI";
-		["GuiReloaduiFeedback"]	= "Caricamento della WoW UI";
-		["GuiReloaduiHelp"]	= "Clicca qui per ricaricare la WoW UI dopo aver cambiato la localizzazione, cosi' che la lingua di questo schermo coincida con quella che hai selezionato. Nota: Questa operazione puo' durare qualche minuto.";
+		["GuiReloaduiButton"]	= "RicaricaUI";
+		["GuiReloaduiFeedback"]	= "Ricaricamento dell'UI di WoW in corso";
+		["GuiReloaduiHelp"]	= "Clicca qui per ricaricare l'UI di WoW dopo aver cambiato la localizzazione, così che la lingua di questo schermo coincida con quella che hai selezionato.\nNota: Questa operazione puo' durare qualche minuto.";
 		["GuiVendor"]	= "Mostra i Prezzi dei Venditori";
 		["GuiVendorBuy"]	= "Mostra i Prezzi d'Acquisto dei Venditori";
 		["GuiVendorHeader"]	= "Prezzi dei Venditori";
@@ -1083,6 +1152,7 @@ InformantLocalizations = {
 	koKR = {
 
 		-- Section: Commands
+		["about"]	= "Informant 정보는 Armory에서 가져옵니다. (도움 주신 분들 : http://www.wowhead.com)";
 		["CmdClearAll"]	= "모두";
 		["CmdDefault"]	= "초기화";
 		["CmdDisable"]	= "비활성화";
@@ -1103,6 +1173,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "상점가";
 		["ShowVendorBuy"]	= "상점판매가";
 		["ShowVendorSell"]	= "상점매입가";
+		["ShowZeroMerchants"]	= "비매품-표시";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant가 로드되지 않았습니다. \"/informant\" 를 입력하여 더 많은 정보를 얻을 수 있습니다.";
@@ -1123,7 +1194,7 @@ InformantLocalizations = {
 		["GuiInfoILevel"]	= "아이템 레벨 보기";
 		["GuiInfoLink"]	= "아이템 링크 보기";
 		["GuiInfoMerchant"]	= "판매상인 표시";
-		["GuiInfoName"]	= "아이템 이름 표시";
+		["GuiInfoNoMerchants"]	= "상인을 모를 때 표시";
 		["GuiInfoQuest"]	= "퀘스트 정보 표시";
 		["GuiInfoStack"]	= "겹쳐놓을 수 있는 최대 개수 표시";
 		["GuiInfoUsage"]	= "사용 정보 표시";
@@ -1156,6 +1227,7 @@ InformantLocalizations = {
 		["HelpVendor"]	= "선택된 아이템의 상점가 표시 여부를 설정합니다.";
 		["HelpVendorBuy"]	= "선택된 아이템의 상점 판매가를 표시합니다. (상점가 표시 설정이 켜져있어야 합니다.)";
 		["HelpVendorSell"]	= "선택된 아이템의 상점 매입가를 표시합니다. (상점가 표시 설정이 켜져있어야 합니다.)";
+		["HelpZeroMerchants"]	= "선택된 아이템을 판매하는 상인이 없을 경우 표시합니다.";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "Informant";
@@ -1176,6 +1248,7 @@ InformantLocalizations = {
 		["FrmtInfoItemLevel"]	= "아이템 레벨: %d";
 		["FrmtInfoItemLink"]	= "아이템 링크: %s";
 		["FrmtInfoMerchants"]	= "%d명의 상인이 판매중";
+		["FrmtInfoNoKnownMerchants"]	= "알 수 없는 상인이 판매중";
 		["FrmtInfoQuest"]	= "%d개 퀘스트의 퀘스트 아이템";
 		["FrmtInfoSell"]	= "상점 매입가";
 		["FrmtInfoSellmult"]	= "상점 매입가 %d (개당 %s)";
@@ -1201,6 +1274,7 @@ InformantLocalizations = {
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "술";
 		["AdditBuff"]	= "버프";
+		["AdditCurrency"]	= "통화";
 		["AdditDrink"]	= "음료수";
 		["AdditFirework"]	= "불꽃";
 		["AdditFood"]	= "음식";
@@ -1215,24 +1289,45 @@ InformantLocalizations = {
 		["SkillCooking"]	= "요리";
 		["SkillDruid"]	= "드루이드 마법";
 		["SkillEnchanting"]	= "마법부여";
-		["SkillEngineering"]	= "기계 공학";
+		["SkillEngineering"]	= "기계공학";
 		["SkillFirstAid"]	= "응급치료";
+		["SkillFishing"]	= "낚시";
+		["SkillHerbalism"]	= "약초채집";
+		["SkillInscription"]	= "주문각인";
+		["SkillJewelcrafting"]	= "보석세공";
 		["SkillLeatherworking"]	= "가죽세공";
 		["SkillMage"]	= "마법사 마법";
 		["SkillMining"]	= "채광";
 		["SkillPaladin"]	= "성기사 마법";
 		["SkillPriest"]	= "사제 마법";
+		["SkillRiding"]	= "타기";
 		["SkillRogue"]	= "도적 스킬";
 		["SkillShaman"]	= "주술사 마법";
 		["SkillTailoring"]	= "재봉술";
 		["SkillWarlock"]	= "흑마법사 마법";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "현재 프로필 활성화";
+		["GuiConfigProfiles"]	= "프로필 설치, 설정 및 편집";
+		["GuiCreateReplaceProfile"]	= "프로필 만들기/바꾸기";
+		["GuiDeleteProfileButton"]	= "삭제";
+		["GuiGeneralOptions"]	= "일반 Informant 옵션";
+		["GuiNewProfileName"]	= "새로운 프로필 이름:";
+		["GuiResetProfileButton"]	= "초기화";
+		["GuiSaveProfileButton"]	= "저장";
+		["GuiTabGeneral"]	= "일반";
+		["GuiTabProfiles"]	= "프로필";
 
 	};
 
 	nlNL = {
 
 		-- Section: Commands
+		["about"]	= "Informant gegevens worden opgehaald van de Armory met de hulp van de mensen van http://www.wowhead.com";
 		["OptLocale"]	= "<taal>";
+		["ShowILevel"]	= "toon-ilevel";
+		["ShowLink"]	= "toon-link";
+		["ShowZeroMerchants"]	= "toon-nul-handelaars";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant is niet geladen. Type /informant voor meer info.";
@@ -1243,14 +1338,17 @@ InformantLocalizations = {
 		-- Section: Help Text
 		["GuiDefaultAll"]	= "Herstel alle Informant opties";
 		["GuiDefaultAllButton"]	= "Herstel alles";
-		["GuiDefaultAllHelp"]	= "Klik hier om alle Informant opties terug te zetten op hun standaard waarden. WAARSCHUWING: Deze aktie is onomkeerbaar!";
+		["GuiDefaultAllHelp"]	= "Klik hier om alle Informant opties terug te zetten op hun standaard waarden. WAARSCHUWING: Deze actie is onomkeerbaar!";
 		["GuiDefaultOption"]	= "Herstel deze instelling";
 		["GuiEmbed"]	= "Integreer gegevens in de in-game tooltip";
 		["GuiEmbedHeader"]	= "Integreer";
 		["GuiInfoHeader"]	= "Extra informatie";
 		["GuiInfoHelp"]	= "Controleert welke extra informatie getoond wordt in tooltips";
 		["GuiInfoIcon"]	= "Toon inventaris ikoon";
+		["GuiInfoILevel"]	= "Toon item level";
+		["GuiInfoLink"]	= "Toon item link";
 		["GuiInfoMerchant"]	= "Toon verkopers";
+		["GuiInfoNoMerchants"]	= "Toon als er geen verkopers bekend zijn";
 		["GuiInfoQuest"]	= "Toon quest informatie";
 		["GuiInfoStack"]	= "Toon stapelgroottes";
 		["GuiInfoUsage"]	= "Toon gebruiksinformatie";
@@ -1272,8 +1370,18 @@ InformantLocalizations = {
 		["HelpDisable"]	= "Stopt het automatisch laden van Informant wanneer je de volgende keer inlogd";
 		["HelpEmbed"]	= "Integreer de tekst in de originele spel tooltip. (Let op: sommige opties zijn uitgeschakeld wanneer dit geselecteerd is)";
 		["HelpIcon"]	= "Kies of het inventaris ikoon van het item getoond wordt";
+		["HelpILevel"]	= "Kies wel of niet tonen van item levels";
+		["HelpLink"]	= "Kies wel of niet tonen van item link";
 		["HelpLocale"]	= "Verander de taal die gebruikt wordt voor informant berichten";
+		["HelpMerchant"]	= "Kies wel of niet tonen van verkopers van items";
 		["HelpOnoff"]	= "Zet het weergeven van informatie aan en uit";
+		["HelpQuest"]	= "Kies wel of niet tonen van quest item gebruik";
+		["HelpStack"]	= "Kies wel of niet tonen van stapelhoogte van een item";
+		["HelpUsage"]	= "Kies wel of niet tonen van het benodigde tradeskill level voor een item";
+		["HelpVendor"]	= "Kies wel of niet tonen van de verkoopprijs bij een verkoper";
+		["HelpVendorBuy"]	= "Kies wel of niet tonen van inkoopprijs van een item bij een verkoper (show-vendor moet aan staan)";
+		["HelpVendorSell"]	= "Kies wel of niet tonen van verkoopprijs van een item bij een verkoper (show-vendor moet aan staan)";
+		["HelpZeroMerchants"]	= "Kies wel of niet tonen van items waar geen verkoper voor bekend is";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "Informant";
@@ -1291,7 +1399,10 @@ InformantLocalizations = {
 		["FrmtInfoBuy"]	= "Koop van winkelier";
 		["FrmtInfoBuymult"]	= "Koop %d (%s ieder)";
 		["FrmtInfoClass"]	= "Klasse: %s";
+		["FrmtInfoItemLevel"]	= "Item Level: %d ";
+		["FrmtInfoItemLink"]	= "Link: %s";
 		["FrmtInfoMerchants"]	= "Verkocht door %d verkopers";
+		["FrmtInfoNoKnownMerchants"]	= "Geen verkopers bekend";
 		["FrmtInfoQuest"]	= "Quest item in %d quests";
 		["FrmtInfoSell"]	= "Verkoop aan winkelier";
 		["FrmtInfoSellmult"]	= "Verkoop %d (%s ieder)";
@@ -1303,19 +1414,26 @@ InformantLocalizations = {
 		["InfoNoItem"]	= "Eerst bewegen over een item, dan de activatie toets indrukken";
 		["InfoPlayerMade"]	= "Gemaakt door level %d %s";
 		["InfoQuestHeader"]	= "Gebruikt in %d quests:";
+		["InfoQuestLine"]	= "Quest: %s";
+		["InfoQuestLineMult"]	= "%d nodig: %s¶";
 		["InfoQuestName"]	= "%d voor \"%s\" (level %d)";
+		["InfoQuestRequiresHeader"]	= "Nodig voor %d questen:";
+		["InfoQuestRewardsHeader"]	= "Beloning van %d questen:";
 		["InfoQuestSource"]	= "Quest gegevens aangeleverd door";
+		["InfoQuestStartsHeader"]	= "Start een quest:";
+		["InfoUntransQuest"]	= "Onbekend quest:ID #%d ";
 		["InfoVendorHeader"]	= "Verkrijgbaar bij %d verkopers:";
 		["InfoVendorName"]	= "%s";
 
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Alcohol";
 		["AdditBuff"]	= "Buff";
+		["AdditCurrency"]	= "Valuta";
 		["AdditDrink"]	= "Drankje";
 		["AdditFirework"]	= "Vuurwerk";
 		["AdditFood"]	= "Etenswaar";
 		["AdditGiftwrap"]	= "Cadeauverpakking";
-		["AdditLure"]	= "Lokkertje";
+		["AdditLure"]	= "Aas";
 		["AdditPoison"]	= "Vergif";
 		["AdditPotion"]	= "Drankje";
 		["AdditRestorative"]	= "Versterkend";
@@ -1325,23 +1443,41 @@ InformantLocalizations = {
 		["SkillCooking"]	= "Koken";
 		["SkillDruid"]	= "Druïde spreuken";
 		["SkillEnchanting"]	= "Betoveren";
-		["SkillEngineering"]	= "Produceren";
+		["SkillEngineering"]	= "Bouwkunde";
 		["SkillFirstAid"]	= "Eerste Hulp";
+		["SkillFishing"]	= "Vissen";
+		["SkillHerbalism"]	= "Kruidenkunde";
+		["SkillInscription"]	= "Graveren";
+		["SkillJewelcrafting"]	= "Edelsmeden";
 		["SkillLeatherworking"]	= "Leerbewerking";
 		["SkillMage"]	= "Tovenaar spreuken";
 		["SkillMining"]	= "Mijnwerken";
 		["SkillPaladin"]	= "Paladijn spreuken";
 		["SkillPriest"]	= "Priester spreuken";
+		["SkillRiding"]	= "Rijden";
 		["SkillRogue"]	= "Rogue vaardigheden";
 		["SkillShaman"]	= "Shaman spreuken";
-		["SkillTailoring"]	= "Kleermaker";
+		["SkillTailoring"]	= "Kleermakerwerk";
 		["SkillWarlock"]	= "Warlock spreuken";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Huidige profiel activeren";
+		["GuiConfigProfiles"]	= "Start, configureer en wijzig profielen";
+		["GuiCreateReplaceProfile"]	= "Maak of vervang een profiel";
+		["GuiDeleteProfileButton"]	= "Verwijder";
+		["GuiGeneralOptions"]	= "Algemene Informant opties";
+		["GuiNewProfileName"]	= "Nieuwe profiel naam:";
+		["GuiResetProfileButton"]	= "Herstel";
+		["GuiSaveProfileButton"]	= "Opslaan";
+		["GuiTabGeneral"]	= "Algemeen";
+		["GuiTabProfiles"]	= "Profielen";
 
 	};
 
 	ptPT = {
 
 		-- Section: Commands
+		["about"]	= "Os dados do Informant são obtidos através do Armory e com a ajuda de todos em http://www.wowhead.com";
 		["CmdClearAll"]	= "todos";
 		["CmdDefault"]	= "padrao";
 		["CmdDisable"]	= "desactivar";
@@ -1353,6 +1489,8 @@ InformantLocalizations = {
 		["CmdToggle"]	= "mudar";
 		["OptLocale"]	= "<local>";
 		["ShowIcon"]	= "mostrar-ícone";
+		["ShowILevel"]	= "mostrar-inivel";
+		["ShowLink"]	= "mostrar-link";
 		["ShowMerchant"]	= "mostrar-comerciante";
 		["ShowQuest"]	= "mostrar-aventura";
 		["ShowStack"]	= "mostra-pilha";
@@ -1360,6 +1498,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "mostrar-vendedor";
 		["ShowVendorBuy"]	= "mostrar-vendedor-compra";
 		["ShowVendorSell"]	= "mostrar-vendedor-venda";
+		["ShowZeroMerchants"]	= "mostrar-zero-mercadores";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "O Informant não está carregado. Escreva /informant para mais info. ";
@@ -1377,7 +1516,10 @@ InformantLocalizations = {
 		["GuiInfoHeader"]	= "Informação adicional";
 		["GuiInfoHelp"]	= "Controla que informação adicional é mostrada nos tooltips";
 		["GuiInfoIcon"]	= "Mostrar ícones do inventário";
+		["GuiInfoILevel"]	= "Mostra o nível do item";
+		["GuiInfoLink"]	= "Mostra o link do item";
 		["GuiInfoMerchant"]	= "Mostrar comerciantes";
+		["GuiInfoNoMerchants"]	= "Mostra quando desconhecer os mercadores";
 		["GuiInfoQuest"]	= "Mostrar informação de missão";
 		["GuiInfoStack"]	= "Mostrar tamanhos de pilha";
 		["GuiInfoUsage"]	= "Mostrar informação de uso";
@@ -1399,6 +1541,8 @@ InformantLocalizations = {
 		["HelpDisable"]	= "Proibe o Informant de se ligar automáticamente da próxima vez que entrar";
 		["HelpEmbed"]	= "Encaixar o texto no tooltip original do jogo (nota: determinadas características são desligadas quando esta for selecionada)";
 		["HelpIcon"]	= "Selecionar se irá mostrar o ícone do objecto no inventário";
+		["HelpILevel"]	= "escolher se mostra o nível do item";
+		["HelpLink"]	= "Escolhe se mostra o link do item";
 		["HelpLocale"]	= "Muda a localização que é usada para mostrar as mensagens do Informant";
 		["HelpMerchant"]	= "Seleccionar se quer ver vendedores que fornecem objectos";
 		["HelpOnoff"]	= "Liga e Desliga a exibição da informação";
@@ -1408,6 +1552,7 @@ InformantLocalizations = {
 		["HelpVendor"]	= "Seleccionar se quer ver o preço de venda dos items no vendedor";
 		["HelpVendorBuy"]	= "Seleccionar se quer ver o preço de compra do vendedor (req mostrar-vendedor=ligado)";
 		["HelpVendorSell"]	= "Seleccionar se quer ver o preço de venda do vendedor (req mostrar-vendedor=ligado)";
+		["HelpZeroMerchants"]	= "Selecciona se mostra mercadores desconhecidos para um item";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "Informant";
@@ -1415,7 +1560,7 @@ InformantLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrameTitle"]	= "Informação do objecto do Informant";
-		["FrmtActDefault"]	= "%s opção do Informant for mudada para Padrão";
+		["FrmtActDefault"]	= "%s opção do Informant foi mudada para a padrão";
 		["FrmtActDefaultall"]	= "Todas as informações do Informant voltaram a Padrão.";
 		["FrmtActDisable"]	= "Não mostrando a %s de data do objecto";
 		["FrmtActEnable"]	= "Mostrando a %s data do objecto";
@@ -1425,7 +1570,10 @@ InformantLocalizations = {
 		["FrmtInfoBuy"]	= "Comprar pelo vendedor";
 		["FrmtInfoBuymult"]	= "Comprar %d (%s cada)";
 		["FrmtInfoClass"]	= "Classe: %s";
+		["FrmtInfoItemLevel"]	= "Nivel do item: %d";
+		["FrmtInfoItemLink"]	= "Link: %s";
 		["FrmtInfoMerchants"]	= "Vendido por %d vendedores";
+		["FrmtInfoNoKnownMerchants"]	= "Não são conhecidos vendedores";
 		["FrmtInfoQuest"]	= "Objecto de Quest em %d Quests";
 		["FrmtInfoSell"]	= "Vender ao vendedor";
 		["FrmtInfoSellmult"]	= "Vender %d (%s cada)";
@@ -1437,15 +1585,21 @@ InformantLocalizations = {
 		["InfoNoItem"]	= "Primeiro tem de mover sobre um item e só depois carregar na tecla de activação";
 		["InfoPlayerMade"]	= "Feito por nível %d %s";
 		["InfoQuestHeader"]	= "Usado em %d Quests";
+		["InfoQuestLine"]	= "Quest: %s";
+		["InfoQuestLineMult"]	= "%d precisos: %s¶";
 		["InfoQuestName"]	= "%d for \"%s\" (Nível %d)";
-		["InfoQuestSource"]	= "Data de Quest fornecida por";
+		["InfoQuestRequiresHeader"]	= "É preciso para %d quests";
+		["InfoQuestRewardsHeader"]	= "Prémio de %d quests";
+		["InfoQuestSource"]	= "Dados da Quest fornecida por";
+		["InfoQuestStartsHeader"]	= "Começa a quest:";
+		["InfoUntransQuest"]	= "Quest desconhecida: ID#%d";
 		["InfoVendorHeader"]	= "Disponível de %d vendedores";
 		["InfoVendorName"]	= "%s";
 
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Alcohol";
 		["AdditBuff"]	= "Buff";
-		["AdditDrink"]	= "Beber";
+		["AdditDrink"]	= "Bebida";
 		["AdditFirework"]	= "Fogo de Artificio";
 		["AdditFood"]	= "Comida";
 		["AdditGiftwrap"]	= "Papel de Embrulho";
@@ -1454,29 +1608,46 @@ InformantLocalizations = {
 		["AdditPotion"]	= "Poção";
 		["AdditRestorative"]	= "Restorativo";
 		["AdditScroll"]	= "Códice";
-		["SkillAlchemy"]	= "Alchimia";
+		["SkillAlchemy"]	= "Alquimia";
 		["SkillBlacksmithing"]	= "Smeltar";
 		["SkillCooking"]	= "Cozinhar";
 		["SkillDruid"]	= "Feitiços de Druid";
 		["SkillEnchanting"]	= "Encantos";
 		["SkillEngineering"]	= "Engenharia";
 		["SkillFirstAid"]	= "Primeiros Socorros";
+		["SkillFishing"]	= "Pesca";
+		["SkillHerbalism"]	= "Herbalismo";
+		["SkillInscription"]	= "Inscrição";
+		["SkillJewelcrafting"]	= "Trabalhos em Jóisas";
 		["SkillLeatherworking"]	= "Trabalhos em Pele";
 		["SkillMage"]	= "Feitiços de Mage";
-		["SkillMining"]	= "Minar";
+		["SkillMining"]	= "Mineiro";
 		["SkillPaladin"]	= "Feitiços de Paladin";
 		["SkillPriest"]	= "Feitiços de Priest";
+		["SkillRiding"]	= "Equitação";
 		["SkillRogue"]	= "Habilidades de Rogue";
 		["SkillShaman"]	= "Feitiços de Shaman";
 		["SkillTailoring"]	= "Alfaiate";
 		["SkillWarlock"]	= "Feitiços de Warlock";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "Activar o perfil actual";
+		["GuiConfigProfiles"]	= "Configurar e editar perfis";
+		["GuiCreateReplaceProfile"]	= "Criar ou substituir um perfil";
+		["GuiDeleteProfileButton"]	= "Apagar";
+		["GuiGeneralOptions"]	= "Opções de informações gerais";
+		["GuiNewProfileName"]	= "Novo nome de perfil";
+		["GuiResetProfileButton"]	= "Reset";
+		["GuiSaveProfileButton"]	= "Salvar";
+		["GuiTabGeneral"]	= "Geral";
+		["GuiTabProfiles"]	= "Perfis";
 
 	};
 
 	ruRU = {
 
 		-- Section: Commands
-		["about"]	= "База данный получена из Оружейной и при содействии команды http://www.wowhead.com";
+		["about"]	= "База данных получена из Оружейной и при содействии команды http://www.wowhead.com";
 		["CmdClearAll"]	= "all";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -1489,7 +1660,7 @@ InformantLocalizations = {
 		["OptLocale"]	= "<locale> ";
 		["ShowIcon"]	= "show-icon";
 		["ShowILevel"]	= "show-ilevel";
-		["ShowLink"]	= "показать ссылку";
+		["ShowLink"]	= "show-link";
 		["ShowMerchant"]	= "show-merchant\n";
 		["ShowQuest"]	= "show-quest";
 		["ShowStack"]	= "show-stack\n";
@@ -1500,142 +1671,146 @@ InformantLocalizations = {
 		["ShowZeroMerchants"]	= "show-zero-merchants";
 
 		-- Section: Generic Messages
-		["MesgNotLoaded"]	= "Информант не загружен. Введите /informant для подробной информации.";
+		["MesgNotLoaded"]	= "Informant не загружен. Введите /informant для подробной информации.";
 		["StatOff"]	= "Информация по предметам не показывается";
 		["StatOn"]	= "Показывается заданная информация по предметам";
-		["Welcome"]	= "|c40ff50ffДбро пожаловать в Информант|r Это сообщение показывается потому что Вы запустили Информант в первый раз. Что бы вызвать это окно в дальнейшем, Вы должны привязать к нему клавишу в |cffffffffGame Menu|r, в разделе |cffffffffKeybindings|r. После этого, что бы увидеть расширенную информацию о предмете из одного из мешков, просто установите курсор мышки над интересующим Вас предметом и нажмите клавишу, которую Вы привязали. Сейчас Вы можете закрыть это окно.";
+		["Welcome"]	= "|c40ff50ffДобро пожаловать в Информант|r\n\nЭто сообщение показано Вам потому, что вы запустили Informant в первый раз. Чтобы вызвать это окно в дальнейшем, привяжите к нему клавишу в |cffffffffИгровом меню|r, в разделе |cffffffffНазначение клавиш|r.\n\nПосле этого, чтобы увидеть расширенную информацию о предмете, просто наведите на него курсор мышки и нажмите клавишу, которую Вы привязали.\n\nНажмите Закрыть для продолжения.";
 
 		-- Section: Help Text
-		["GuiDefaultAll"]	= "Сбросить все настройки Информанта";
+		["GuiDefaultAll"]	= "Сбросить все настройки Informant";
 		["GuiDefaultAllButton"]	= "Сбросить всё";
-		["GuiDefaultAllHelp"]	= "Щелкните для сброса всех настроек Информанта в исходное состояние. ВНИМАНИЕ: Это действие нельзя отменить.";
-		["GuiDefaultOption"]	= "Сбросить это настройку";
-		["GuiEmbed"]	= "Вставлять информацию в стандартную всплывающую подсказку";
-		["GuiEmbedHeader"]	= "Вставлять";
-		["GuiInfoHeader"]	= "Дополнительнаяа информация\n";
+		["GuiDefaultAllHelp"]	= "Щёлкните для сброса всех настроек Informant по умолчанию. \nВНИМАНИЕ: это действие НЕЛЬЗЯ отменить.";
+		["GuiDefaultOption"]	= "Сбросить эту настройку";
+		["GuiEmbed"]	= "Добавить информацию в стандартную всплывающую подсказку";
+		["GuiEmbedHeader"]	= "Встраивать";
+		["GuiInfoHeader"]	= "Дополнительная информация";
 		["GuiInfoHelp"]	= "Определяет какую дополнительную информацию показывать во всплывающих подсказках";
-		["GuiInfoIcon"]	= "Показывать значок предмета во всплывающей подсказке";
+		["GuiInfoIcon"]	= "Показывать значок предмета";
 		["GuiInfoILevel"]	= "Показывать уровень предмета";
-		["GuiInfoLink"]	= "Показывать ссылку предмета";
+		["GuiInfoLink"]	= "Показывать ссылку на предмет";
 		["GuiInfoMerchant"]	= "Показывать продавцов";
-		["GuiInfoName"]	= "Показ названия предмета";
+		["GuiInfoNoMerchants"]	= "Показывать, что продавцы неизвестны";
 		["GuiInfoQuest"]	= "Показывать информацию о заданиях";
-		["GuiInfoStack"]	= "Показывать сколько таких предметов помещаются на одно место";
-		["GuiInfoUsage"]	= "Показывать где такие предметы используются";
-		["GuiInfoZeroMerchants"]	= "Показыть, когда торговцы неизвестны";
-		["GuiLocale"]	= "Поменять язык на\n";
-		["GuiMainEnable"]	= "Включить Информант";
-		["GuiMainHelp"]	= "Содержит настройки для Информанта - AddOn'a, который показывает расширенные данные по предметам\n";
-		["GuiOtherHeader"]	= "Другие настройки\n";
-		["GuiOtherHelp"]	= "Остальные настройки Информанта";
+		["GuiInfoStack"]	= "Показывать сколько предметов помещается в одну ячейку";
+		["GuiInfoUsage"]	= "Показывать области использования предмета";
+		["GuiLocale"]	= "Поменять язык на";
+		["GuiMainEnable"]	= "Включить Informant";
+		["GuiMainHelp"]	= "Содержит настройки для Informant\nаддон, который отображаем детальную информацию о предмете";
+		["GuiOtherHeader"]	= "Другие настройки";
+		["GuiOtherHelp"]	= "Остальные настройки Informant";
 		["GuiReloadui"]	= "Перезагрузить пользовательский интерфейс";
-		["GuiReloaduiButton"]	= "Презагрузить ПИ";
-		["GuiReloaduiFeedback"]	= "Перезагружается ПИ WoW \n";
-		["GuiReloaduiHelp"]	= "Щёлкните тут, что бы перезагрузить пользовательский интерфейс WoW, это необходимо для того что бы загрузить выбранный язык. Примечание: Эта операция может занять несколько минут.";
-		["GuiVendor"]	= "Показывать цену торговцев\n";
-		["GuiVendorBuy"]	= "Показывать цену покупки у торговцев";
-		["GuiVendorHeader"]	= "Цены торговцев\n";
-		["GuiVendorHelp"]	= "Настройки относящиеся к ценам покупки/продажи у торговцев.";
-		["GuiVendorSell"]	= "Показывать цены продажи у торговцев";
-		["HelpDefault"]	= "Установить настройку к её значению по умолчанию. Вы можете указать 'all' что бы установить все настройки к их значению по умолчанию.\n";
-		["HelpDisable"]	= "Не загружать Информант автоматически следующий раз при входе в игру";
-		["HelpEmbed"]	= "Вставлять текст в стандартую всплывающую подсказку игры. (Примечание: некоторые возможности недоступны, когда этот режим разрешён)";
-		["HelpIcon"]	= "Выбрать показывать ли значёк предмета во всплывающей подсказке";
-		["HelpILevel"]	= "Выбрать, как показвать уровень предмета";
-		["HelpLink"]	= "Выбрать, как показывать ссылку на предмет";
-		["HelpLocale"]	= "Поменять язык сообщений Информанта. Заметьте, что это сменит язык для всех аддонов Auctioneer.";
-		["HelpMerchant"]	= "Выбрать показывать ли торговцев которые продают данный предмет";
-		["HelpName"]	= "Выберите кокое название будет показано во вторичной подсказке";
+		["GuiReloaduiButton"]	= "Перезагрузить ПИ";
+		["GuiReloaduiFeedback"]	= "Перезагружается ПИ WoW";
+		["GuiReloaduiHelp"]	= "Щёлкните, чтобы перезагрузить пользовательский интерфейс WoW, это необходимо для загрузки выбранного языка.\nПримечание: эта операция может занять несколько минут.";
+		["GuiVendor"]	= "Показывать цену торговца";
+		["GuiVendorBuy"]	= "Показывать цену покупки у торговца";
+		["GuiVendorHeader"]	= "Цены торговца";
+		["GuiVendorHelp"]	= "Настройки, относящиеся к ценам покупки/продажи у торговцев.";
+		["GuiVendorSell"]	= "Показывать цену продажи у торговца";
+		["HelpDefault"]	= "Установить настройку к её значению по умолчанию. Вы можете указать 'all', чтобы установить все настройки к их значениям по умолчанию.";
+		["HelpDisable"]	= "Не загружать Informant автоматически при следующем входе в игру";
+		["HelpEmbed"]	= "Добавить текст в стандартную всплывающую подсказку игры. (примечание: некоторые функции будут недоступны в этом режиме)";
+		["HelpIcon"]	= "Показывать ли иконку предмета во всплывающей подсказке";
+		["HelpILevel"]	= "Показывать ли уровень предмета";
+		["HelpLink"]	= "Показывать ли ссылку на предмет";
+		["HelpLocale"]	= "Поменять язык сообщений Informant. Заметьте, что это сменит язык для всех аддонов Auctioneer.";
+		["HelpMerchant"]	= "Показывать ли торговцев, продающих данный предмет";
 		["HelpOnoff"]	= "Включить/отключить отображение информационных данных";
-		["HelpQuest"]	= "Выбрать, как показывать использование предмета в квестах";
-		["HelpStack"]	= "Выбрать, как показывать размер кучи";
-		["HelpUsage"]	= "Выбрать показывать ли в каких ремёслах используется данный предмет";
-		["HelpVendor"]	= "Выбрать показываться ли сколько стоит данный предмет у торговца";
-		["HelpVendorBuy"]	= "Выбрать показывать ли цену покупки данного предмета у торговца. Настройка Показ-Торговца при этом должна быть также включена.\n";
-		["HelpVendorSell"]	= "Выбрать показывать ли цену продажи данного предмета у торговца. Настройка Показ-Торговца при этом должна быть также включена.\n";
-		["HelpZeroMerchants"]	= "Выберите показывать ли неизвестных торговцев поставляющие предмет";
+		["HelpQuest"]	= "Показывать ли информацию об использовании предмета в заданиях";
+		["HelpStack"]	= "Показывать ли сколько вещей помещается в одну ячейку";
+		["HelpUsage"]	= "Показывать ли где используется эта вещь";
+		["HelpVendor"]	= "Показывать ли сколько стоит вещь у торговца";
+		["HelpVendorBuy"]	= "Показывать ли цену покупки вещи у торговцев. Настройка show-vendor, должна быть включена.";
+		["HelpVendorSell"]	= "Показывать ли цену продажи вещи у торговца. Настройка show-vendor, должна быть включена.";
+		["HelpZeroMerchants"]	= "Показывать ли уведомление о неизвестных продавцах, продающих этот предмет";
 
 		-- Section: Keybinding Text
-		["BindingHeader"]	= "Информант";
-		["BindingTitle"]	= "Показать/скрыть информационное окно.\n";
+		["BindingHeader"]	= "Informant";
+		["BindingTitle"]	= "Показать/скрыть информационное окно";
 
 		-- Section: Tooltip Messages
-		["FrameTitle"]	= "Информант: Данные по предмету";
-		["FrmtActDefault"]	= "Настройка %s Информанта была сброшена к значению по умолчанию\n";
-		["FrmtActDefaultall"]	= "Все настройки Информанта были сброшены к значениям по умолчанию\n";
-		["FrmtActDisable"]	= "%s показывается";
-		["FrmtActEnable"]	= "%s не показывается";
-		["FrmtActEnabledOn"]	= "Отоброжение предметов %s в %s\n";
+		["FrameTitle"]	= "Informant: Данные по предмету";
+		["FrmtActDefault"]	= "Настройка %s Informant была сброшена к значению по умолчанию";
+		["FrmtActDefaultall"]	= "Все настройки Informant были сброшены к значениям по умолчанию";
+		["FrmtActDisable"]	= "Не отображаются данные %s";
+		["FrmtActEnable"]	= "Отображаются данные %s";
+		["FrmtActEnabledOn"]	= "Отображение предметов %s в %s";
 		["FrmtActSet"]	= "%s установлено в '%s'";
-		["FrmtActUnknown"]	= "Неизвестная комманда: '%s'  ";
+		["FrmtActUnknown"]	= "Неизвестная команда: '%s'  ";
 		["FrmtInfoBuy"]	= "Купить у торговца";
-		["FrmtInfoBuymult"]	= "Купить %d (%s каждое)\n";
+		["FrmtInfoBuymult"]	= "Купить %d (%s каждое)";
 		["FrmtInfoClass"]	= "Класс: %s";
 		["FrmtInfoItemLevel"]	= "Уровень вещи: %d";
 		["FrmtInfoItemLink"]	= "Ссылка: %s";
-		["FrmtInfoMerchants"]	= "Продаётся %d тоговцем(ами)\n";
-		["FrmtInfoNoKnownMerchants"]	= "Продается неизвестным торговцем";
-		["FrmtInfoQuest"]	= "Квестовый предмет в %d заданиях\n";
+		["FrmtInfoMerchants"]	= "Продаётся %d торговцем(ами)\n";
+		["FrmtInfoNoKnownMerchants"]	= "Продаётся неизвестными торговцами";
+		["FrmtInfoQuest"]	= "Квестовый предмет в %d заданиях";
 		["FrmtInfoSell"]	= "Продать торговцу";
-		["FrmtInfoSellmult"]	= "Продать %d (%s каждое)\n";
-		["FrmtInfoStx"]	= "Хранится в пачках по %d\n";
+		["FrmtInfoSellmult"]	= "Продать %d (%s каждое)";
+		["FrmtInfoStx"]	= "Хранится в пачках по %d";
 		["FrmtInfoUse"]	= "Используется для: %s";
-		["FrmtUnknownLocale"]	= "Язык, который Вы задали (' %s') неизвестен. Известны следующие языки:\n";
+		["FrmtUnknownLocale"]	= "Язык, который Вы задали ('%s') неизвестен. Известны следующие языки:";
 		["FrmtWelcome"]	= "Informant v%s загружен";
-		["InfoHeader"]	= "Информация на |cff%s%s|r\n";
+		["InfoHeader"]	= "Информация на |cff%s%s|r";
 		["InfoNoItem"]	= "Сначала наведите курсор мышки на предмет, потом нажмите клавишу активации";
-		["InfoPlayerMade"]	= "Для изготовление требуется %s уровень %d\n";
+		["InfoPlayerMade"]	= "Для изготовления требуется %s уровень %d";
 		["InfoQuestHeader"]	= "Используется в %d заданиях:";
 		["InfoQuestLine"]	= "Задание: %s";
 		["InfoQuestLineMult"]	= "%d нужно: %s";
 		["InfoQuestName"]	= "%d для \"%s\" (уровень %d)";
 		["InfoQuestRequiresHeader"]	= "Нужно для %d заданий:";
-		["InfoQuestRewardsHeader"]	= "Награда за задание %d:";
+		["InfoQuestRewardsHeader"]	= "Награда за задания %d:";
 		["InfoQuestSource"]	= "Данные по заданию предоставлены:";
-		["InfoQuestStartsHeader"]	= "Ничинает задание:";
-		["InfoUntransQuest"]	= "Незвестное задание: ID #%d";
-		["InfoVendorHeader"]	= "Продаётся %d торговцем(ами):\n";
+		["InfoQuestStartsHeader"]	= "Начинает задание:";
+		["InfoUntransQuest"]	= "Неизвестное задание: ID #%d";
+		["InfoVendorHeader"]	= "Продаётся %d торговцем(ами):";
 		["InfoVendorName"]	= "%s";
 
 		-- Section: Type Messages
 		["AdditAlcohol"]	= "Алкоголь";
-		["AdditBuff"]	= "баф";
-		["AdditDrink"]	= "Питье\n";
-		["AdditFirework"]	= "Фейерверк\n";
+		["AdditBuff"]	= "Бафф";
+		["AdditDrink"]	= "Питье";
+		["AdditFirework"]	= "Фейерверк";
 		["AdditFood"]	= "Еда";
-		["AdditGiftwrap"]	= "Подарочная упаковка\n";
+		["AdditGiftwrap"]	= "Подарочная упаковка";
 		["AdditLure"]	= "Приманка";
 		["AdditPoison"]	= "Яд";
-		["AdditPotion"]	= "Зелье\n";
-		["AdditRestorative"]	= "Восстанавливающее\n";
-		["AdditScroll"]	= "Свиток\n";
+		["AdditPotion"]	= "Зелье";
+		["AdditRestorative"]	= "Восстанавливающее";
+		["AdditScroll"]	= "Свиток";
 		["SkillAlchemy"]	= "Алхимия";
 		["SkillBlacksmithing"]	= "Кузнечное дело";
-		["SkillCooking"]	= "Поварское дело";
-		["SkillDruid"]	= "Заклинания Друида(Druid)";
-		["SkillEnchanting"]	= "Зачаровывание";
+		["SkillCooking"]	= "Кулинария";
+		["SkillDruid"]	= "Заклинания друида";
+		["SkillEnchanting"]	= "Наложение чар";
 		["SkillEngineering"]	= "Инженерное дело";
 		["SkillFirstAid"]	= "Первая помощь";
-		["SkillLeatherworking"]	= "Выделка кожи";
-		["SkillMage"]	= "Заклинания Мага(Mage)";
+		["SkillFishing"]	= "Рыболовство";
+		["SkillHerbalism"]	= "Травничество";
+		["SkillInscription"]	= "Начертание";
+		["SkillJewelcrafting"]	= "Ювелирное дело";
+		["SkillLeatherworking"]	= "Кожевничество";
+		["SkillMage"]	= "Заклинания мага";
 		["SkillMining"]	= "Горное дело";
-		["SkillPaladin"]	= "Заклинания Паладина(Paladin)";
-		["SkillPriest"]	= "Заклинания Жреца(Priest)";
-		["SkillRogue"]	= "Заклинания Разбойника(Rogue)";
-		["SkillShaman"]	= "Заклинания Шамана(Shaman)";
-		["SkillTailoring"]	= "Шитьё";
-		["SkillWarlock"]	= "Заклинания Колдуна(Warlock)";
+		["SkillPaladin"]	= "Заклинания паладина";
+		["SkillPriest"]	= "Заклинания жреца";
+		["SkillRiding"]	= "Верховая езда";
+		["SkillRogue"]	= "Заклинания разбойника";
+		["SkillShaman"]	= "Заклинания шамана";
+		["SkillTailoring"]	= "Портняжное дело";
+		["SkillWarlock"]	= "Заклинания чернокнижника";
 
 		-- Section: User Interface
 		["GuiActivateProfile"]	= "Активировать текущий профиль";
-		["GuiConfigProfiles"]	= "Настройка и изменение профиля";
+		["GuiConfigProfiles"]	= "Настройка и изменение профилей";
 		["GuiCreateReplaceProfile"]	= "Создание или перемещение профиля";
 		["GuiDeleteProfileButton"]	= "Удалить";
-		["GuiNewProfileName"]	= "Новое имя для профиля";
-		["GuiResetProfileButton"]	= "Восстановить";
+		["GuiGeneralOptions"]	= "Основные опции Informant";
+		["GuiNewProfileName"]	= "Новое имя профиля:";
+		["GuiResetProfileButton"]	= "Сбросить";
 		["GuiSaveProfileButton"]	= "Сохранить";
 		["GuiTabGeneral"]	= "Основной";
-		["GuiTabProfiles"]	= "Провили";
+		["GuiTabProfiles"]	= "Профили";
 
 	};
 
@@ -1679,6 +1854,7 @@ InformantLocalizations = {
 	zhCN = {
 
 		-- Section: Commands
+		["about"]	= "nformant数据获取于Armory并且获得了http://www.wowhead.com网友们的辅助.";
 		["CmdClearAll"]	= "all全部";
 		["CmdDefault"]	= "default默认";
 		["CmdDisable"]	= "disable禁用";
@@ -1716,15 +1892,14 @@ InformantLocalizations = {
 		["GuiEmbedHeader"]	= "嵌入";
 		["GuiInfoHeader"]	= "补充信息";
 		["GuiInfoHelp"]	= "控制何种补充信息显示在提示中。";
-		["GuiInfoIcon"]	= "显示财目图标。";
+		["GuiInfoIcon"]	= "显示背包图标。";
 		["GuiInfoILevel"]	= "显示物品等级";
 		["GuiInfoLink"]	= "显示物品链接";
 		["GuiInfoMerchant"]	= "显示货商。";
-		["GuiInfoName"]	= "显示物品名称";
+		["GuiInfoNoMerchants"]	= "于无已知货商时显示";
 		["GuiInfoQuest"]	= "显示任务信息。";
 		["GuiInfoStack"]	= "显示堆叠数量。";
 		["GuiInfoUsage"]	= "显示用途信息。";
-		["GuiInfoZeroMerchants"]	= "无已知商人时也显示";
 		["GuiLocale"]	= "设置地域代码为";
 		["GuiMainEnable"]	= "启用Informant。";
 		["GuiMainHelp"]	= "包含插件 - Informant的设置。它用于显示详细物品信息。";
@@ -1747,7 +1922,6 @@ InformantLocalizations = {
 		["HelpLink"]	= "选择是否显示该物品链接";
 		["HelpLocale"]	= "改变用于显示Informant讯息的地域代码。";
 		["HelpMerchant"]	= "选择是否显示供应物品的货商。";
-		["HelpName"]	= "选择是否在第二提示里显示物品名称";
 		["HelpOnoff"]	= "打开/关闭信息数据显示。";
 		["HelpQuest"]	= "选择是否显示任务物品的用途。";
 		["HelpStack"]	= "选择是否显示可堆叠数量。";
@@ -1850,6 +2024,7 @@ InformantLocalizations = {
 	zhTW = {
 
 		-- Section: Commands
+		["about"]	= "Informat的資料已從Armory以及http://www.wowhead.com之使用者的幫助下取得";
 		["CmdClearAll"]	= "all";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -1870,39 +2045,40 @@ InformantLocalizations = {
 		["ShowVendor"]	= "show-vendor";
 		["ShowVendorBuy"]	= "show-vendor-buy";
 		["ShowVendorSell"]	= "show-vendor-sell";
+		["ShowZeroMerchants"]	= "show-zero-merchants ";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant 尚未載入。請輸入 /informant 取得說明。";
 		["StatOff"]	= "不顯示任何物品資訊";
 		["StatOn"]	= "顯示設定好的物品資訊";
-		["Welcome"]	= "|c40ff50ff歡迎使用Informant|r 這是你第一次使用Informant，你必須在|cffffffff遊戲選項|r 中的|cffffffff按鍵設定|r裡設定一個熱鍵才能再次顯示本設定視窗。 現在開始，Informant會在你把滑鼠指到任何一個物品上時，把該物品的進階資訊顯示出來。 若你想要詳細檢視該物品的所有進階資訊，只要同時按下你在|cffffffff按鍵設定|r裡設定的熱鍵即可。 點擊「關閉」以關閉本視窗並繼續遊戲。";
+		["Welcome"]	= "|c40ff50ff歡迎使用Informant|r \n\n這是你第一次使用Informant，你必須在|cffffffff遊戲選項|r 中的|cffffffff按鍵設定|r裡設定一個熱鍵才能再次顯示本設定視窗。\n\n現在開始，Informant會在你把滑鼠指到任何一個物品上時，把該物品的進階資訊顯示出來。\n\n若你想要詳細檢視該物品的所有進階資訊，只要同時按下你在|cffffffff按鍵設定|r裡設定的熱鍵即可。\n\n點擊「關閉」以關閉本視窗並繼續遊戲。";
 
 		-- Section: Help Text
 		["GuiDefaultAll"]	= "重設所有Informant選項";
 		["GuiDefaultAllButton"]	= "重設全部";
-		["GuiDefaultAllHelp"]	= "點這裡把所有informant選項改回預設值。警告: 此操作不能復原！";
+		["GuiDefaultAllHelp"]	= "點這裡把所有informant選項改回預設值。\n警告: 此動作將無法還原！";
 		["GuiDefaultOption"]	= "重設這個設定";
 		["GuiEmbed"]	= "把資料嵌入遊戲內的資訊窗";
 		["GuiEmbedHeader"]	= "嵌入";
 		["GuiInfoHeader"]	= "額外資訊";
 		["GuiInfoHelp"]	= "控制哪個額外的資訊要顯示在提示訊息上";
-		["GuiInfoIcon"]	= "顯示存貨像 ";
+		["GuiInfoIcon"]	= "顯示物品圖像";
 		["GuiInfoILevel"]	= "顯示物品等級";
 		["GuiInfoLink"]	= "顯示物品連結";
-		["GuiInfoMerchant"]	= "顯示商人";
-		["GuiInfoName"]	= "顯示物品名稱";
+		["GuiInfoMerchant"]	= "顯示販賣商人";
+		["GuiInfoNoMerchants"]	= "該物品並沒有已知商人販售時顯示";
 		["GuiInfoQuest"]	= "顯示任務資訊";
 		["GuiInfoStack"]	= "顯示單格容納數量";
 		["GuiInfoUsage"]	= "顯示使用資訊";
 		["GuiLocale"]	= "設定語言為";
 		["GuiMainEnable"]	= "啟用Informant";
-		["GuiMainHelp"]	= "包括Informant的設定，Informant是一個可以顯示物品進階資訊的AddOn。";
+		["GuiMainHelp"]	= "包括Informant的設定，\nInformant是一個可以顯示物品進階資訊的插件。";
 		["GuiOtherHeader"]	= "其他選項";
 		["GuiOtherHelp"]	= "Informant雜項";
-		["GuiReloadui"]	= "重新載入用戶界面";
+		["GuiReloadui"]	= "重新載入使用者界面";
 		["GuiReloaduiButton"]	= "重新載入插件";
 		["GuiReloaduiFeedback"]	= "正在載入WoW UI";
-		["GuiReloaduiHelp"]	= "你可以在改變語系後點擊這裡，重新載入WOW UI。這可能會要多花一點時間。";
+		["GuiReloaduiHelp"]	= "你可以在改變語系後點選這裡，重新載入WOW UI。\n注意：這可能會要多花一點時間。";
 		["GuiVendor"]	= "顯示商店價格";
 		["GuiVendorBuy"]	= "顯示商店購買價";
 		["GuiVendorHeader"]	= "商店價格";
@@ -1911,18 +2087,19 @@ InformantLocalizations = {
 		["HelpDefault"]	= "設定某個informant選項回預設值。用\"all\"來重置全部選項。";
 		["HelpDisable"]	= "使informant不再自動於登入時載入";
 		["HelpEmbed"]	= "將文字嵌入在遊戲基本提示框中(注意：這會使某些功能無法使用)";
-		["HelpIcon"]	= "選擇是否顯示項目的存貨像\n";
+		["HelpIcon"]	= "選擇是否顯示項目的存貨像";
 		["HelpILevel"]	= "選擇是否顯示物品的等級";
 		["HelpLink"]	= "選擇是否顯示物品的連結";
 		["HelpLocale"]	= "改變顯示Informant訊息的語系";
 		["HelpMerchant"]	= "選擇是否顯示賣這項物品的商人";
-		["HelpOnoff"]	= "顯示這個資訊on/off";
+		["HelpOnoff"]	= "顯示物品資訊為開或關";
 		["HelpQuest"]	= "選擇是否顯示任務物品";
 		["HelpStack"]	= "選擇是否顯示此物品最大容納數量";
 		["HelpUsage"]	= "選擇是否顯示交易技能的物品";
 		["HelpVendor"]	= "選擇是否要顯示物品價格";
 		["HelpVendorBuy"]	= "選擇是否顯示物品在商店售出的價格 (需要開啟顯示物品價格) ";
 		["HelpVendorSell"]	= "選擇是否顯示物品在商店收購的價格 (需要開啟顯示物品價格)";
+		["HelpZeroMerchants"]	= "選擇是否要顯示該物品並無任何商人販售";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "物品助手";
@@ -1930,8 +2107,8 @@ InformantLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrameTitle"]	= "Informant 物品資料";
-		["FrmtActDefault"]	= "%s 項設置被回覆成預設值";
-		["FrmtActDefaultall"]	= "所有informant選項已回覆成預設值";
+		["FrmtActDefault"]	= "%s 項設置被回復成預設值";
+		["FrmtActDefaultall"]	= "所有informant選項已回復成預設值";
 		["FrmtActDisable"]	= "不再顯示物品的%s資訊";
 		["FrmtActEnable"]	= "顯示物品的%s資訊";
 		["FrmtActEnabledOn"]	= "顯示物品的%s on %s";
@@ -1943,6 +2120,7 @@ InformantLocalizations = {
 		["FrmtInfoItemLevel"]	= "物品等級: %d";
 		["FrmtInfoItemLink"]	= "連結: %s";
 		["FrmtInfoMerchants"]	= "此物品在 %d 個商店銷售";
+		["FrmtInfoNoKnownMerchants"]	= "沒有已知的販賣商人";
 		["FrmtInfoQuest"]	= "%d 任務的任務物品";
 		["FrmtInfoSell"]	= "商店收購價";
 		["FrmtInfoSellmult"]	= "賣出 %d (單價 %s)";
@@ -1984,15 +2162,32 @@ InformantLocalizations = {
 		["SkillEnchanting"]	= "附魔";
 		["SkillEngineering"]	= "工程學";
 		["SkillFirstAid"]	= "急救";
+		["SkillFishing"]	= "釣魚";
+		["SkillHerbalism"]	= "草藥學";
+		["SkillInscription"]	= "銘文學";
+		["SkillJewelcrafting"]	= "珠寶設計";
 		["SkillLeatherworking"]	= "製皮";
 		["SkillMage"]	= "法師法術";
 		["SkillMining"]	= "採礦";
 		["SkillPaladin"]	= "聖騎法術";
 		["SkillPriest"]	= "牧師法術";
+		["SkillRiding"]	= "坐騎";
 		["SkillRogue"]	= "盜賊技能";
 		["SkillShaman"]	= "薩滿法術";
 		["SkillTailoring"]	= "裁縫";
 		["SkillWarlock"]	= "術士法術";
+
+		-- Section: User Interface
+		["GuiActivateProfile"]	= "啟用目前的設定檔";
+		["GuiConfigProfiles"]	= "設定、編輯設定檔";
+		["GuiCreateReplaceProfile"]	= "建立或替換設定檔";
+		["GuiDeleteProfileButton"]	= "刪除";
+		["GuiGeneralOptions"]	= "Informant 一般性選項";
+		["GuiNewProfileName"]	= "新設定檔名稱:";
+		["GuiResetProfileButton"]	= "重置";
+		["GuiSaveProfileButton"]	= "儲存";
+		["GuiTabGeneral"]	= "一般";
+		["GuiTabProfiles"]	= "設定檔";
 
 	};
 
