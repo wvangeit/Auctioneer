@@ -174,7 +174,7 @@ function lib.GetPrice(hyperlink, faction)
 		return ave, mean, _, stddev, var, cnt, conf
 	end
 	
-	local stats = private.UnpackStats(data[faction][itemSig])
+	local stats = private.UnpackStats(data[faction], itemSig)
 	if not stats[iLevel] then return end
 
 	local count = #stats[iLevel]
@@ -391,7 +391,7 @@ function lib.ClearItem(hyperlink, faction, realm)
 	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
 	if data[faction] and data[faction][itemSig] then
-		local stats = private.UnpackStats(data[faction][itemSig])
+		local stats = private.UnpackStats(data[faction], itemSig)
 		if stats[iLevel] then
 			print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, faction))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
 			stats[iLevel] = nil
