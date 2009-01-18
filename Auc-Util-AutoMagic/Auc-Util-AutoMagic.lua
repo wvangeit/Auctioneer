@@ -43,8 +43,7 @@ local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellf
 local autoselldata = {}
 local autosell = {}
 local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-lib.autoSellList = get("util.automagic.autoSellList") or {} --get sell list or create new
-
+lib.autoSellList = {} -- default empty table in case of no saved data
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
@@ -67,7 +66,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 			if (ttdepcost == nil) then
 				tooltip:AddLine("|cff336699 Unknown deposit cost |r")
 			elseif (ttdepcost == 0) then
-				tooltip:AddLine("|cff336699 No deposit cost |r")				
+				tooltip:AddLine("|cff336699 No deposit cost |r")
 			else
 				tooltip:AddLine("|cffCCFF99"..get("util.automagic.deplength").."hr Deposit : |r" , ttdepcost)
 			end
@@ -91,7 +90,10 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("UI_ERROR_MESSAGE");
 	--frame:RegisterEvent("AUCTION_HOUSE_SHOW");
 
--- Sets defaults
+	-- Read saved variables
+	lib.autoSellList = get("util.automagic.autoSellList") or lib.autoSellList -- will default to empty table if no saved variables
+
+	-- Sets defaults
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 
 	default("util.automagic.autovendor", false) -- DO NOT SET TRUE ALL AUTOMAGIC OPTIONS SHOULD BE TURNED ON MANUALLY BY END USER!!!!!!!
