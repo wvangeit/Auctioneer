@@ -893,7 +893,7 @@ BeanCounterLocalizations = {
 		["MailAuctionWonSubject"]	= "Вы выиграли торги";
 		["MailHordeAuctionHouse"]	= "Аукционный дом Орды";
 		["MailNeutralAuctionHouse"]	= "Аукцион Черной Воды";
-		["MailOutbidOnSubject"]	= "Ставка принята";
+		["MailOutbidOnSubject"]	= "Ваша ставка перебита";
 		["MailSalePendingOnSubject"]	= "Продажа в течение";
 
 		-- Section: Tooltip Messages
@@ -1107,10 +1107,12 @@ BeanCounterLocalizations = {
 		-- Section: Generic Strings
 		["NoRe-Color"]	= "不重新上色";
 		["off"]	= "關閉";
+		["Ok"]	= "確定";
 		["on"]	= "開啟";
 		["Re-ColorIcons"]	= "圖標重新上色";
 		["Re-ColorIconsandText"]	= "圖標和文字重新上色";
 		["Re-ColorText"]	= "文字重新上色";
+		["TooltipFailed"]	= "無法取得訊息窗資訊";
 
 		-- Section: Help Text
 		["HelpGuiItemBox"]	= "將物品丟入格中搜尋";
@@ -1127,6 +1129,7 @@ BeanCounterLocalizations = {
 		["MailAuctionSuccessfulSubject"]	= "拍賣成功";
 		["MailAuctionWonSubject"]	= "得標";
 		["MailHordeAuctionHouse"]	= "部落拍賣場";
+		["MailNeutralAuctionHouse"]	= "中立拍賣場";
 		["MailOutbidOnSubject"]	= "出價失敗";
 		["MailSalePendingOnSubject"]	= "出價等待中";
 
@@ -1137,7 +1140,7 @@ BeanCounterLocalizations = {
 		["TTMailRecolor"]	= "選擇交易拍賣在掃瞄信箱後如何顯示郵件";
 
 		-- Section: User Interface
-		["UiAddonTitle"]	= "拍賣記錄器：拍賣交易歷史資料庫";
+		["UiAddonTitle"]	= "BeanCounter：拍賣交易歷史資料庫";
 		["UiAucExpired"]	= "拍賣逾時";
 		["UiAucSuccessful"]	= "拍賣成功！";
 		["UiAuctions"]	= "拍賣場";
@@ -1154,6 +1157,9 @@ BeanCounterLocalizations = {
 		["UiExactNameSearch"]	= "完整名稱比對";
 		["UiFailedAuctions"]	= "失敗的拍賣";
 		["UiFee"]	= "費用";
+		["UiMailFrameRecording"]	= "BeanCounter 正在紀錄您的信件";
+		["UiMailFrameWait1"]	= "請勿關閉信箱視窗或";
+		["UiMailFrameWait2"]	= "拍賣物品將不會被記錄";
 		["UiNameHeader"]	= "物品";
 		["UiNetHeader"]	= "淨利";
 		["UiNetPerHeader"]	= "單件淨利";
