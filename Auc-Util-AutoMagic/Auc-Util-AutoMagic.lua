@@ -132,13 +132,13 @@ function lib.SetupConfigGui(gui)
 		gui:AddHelp(id, "what is AutoMagic?",
 			"What is AutoMagic?",
 			"AutoMagic is a work-in-progress. Its goal is to automate tasks that auctioneers run into that can be a pain to do, as long as it is within the bounds set by Blizzard.\n\n"..
-			"AutoMagic currently will auto sell any item bought via BottomScan or SearchUI for vendors, any item that is grey (if enabled) or any item on the auto sell list. If enabled, when you open a merchant window you will see a listing of the items to sell.\n\n")
+			"AutoMagic currently will auto-sell any item bought via SearchUI for vendors, any item that is grey (if enabled) or any item on the auto-sell list. If enabled, when you open a merchant window you will see a listing of the items to sell.\n\n")
 		gui:AddHelp(id, "AAMU: vendor options",
-			"AAMU: vendor options?",
-			"AutoMagic will sell items bought for vendoring to the vendor automatically. It also has the option of auto selling all grey items or items on the custom sell list.\n\n")
+			"AAMU: Vendor Options",
+			"AutoMagic will sell items bought for vendoring to the vendor automatically. It also has the option of auto-selling all grey items or items on the custom sell list.\n\n")
 		gui:AddHelp(id, "what is Mail GUI?",
 			"What is the Mail GUI?",
-			"This displays a window when the mailbox is opened that allows for the auto-loading of items into the send mail window based on purchase reasons from BottomScan or SearchUI. It can also use the Item Suggest module reasons instead of the provided BottomScan/SearchUI reasons. Very handy for mass mailing items bought for a profession that another character has.\n\n"..
+			"This displays a window when the mailbox is opened that allows for the auto-loading of items into the send mail window based on purchase reasons from SearchUI. It can also use the ItemSuggest module reasons instead of the provided SearchUI reasons. Very handy for mass mailing items bought for a profession that another character has.\n\n"..
 		"\n")
 
 
@@ -152,17 +152,17 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in the tooltip.")
-		gui:AddTip(id, 'Show selected item deposit costs in the tooltips.')
+		gui:AddTip(id, 'Remove selected item deposit costs from the tooltip.')
 
 		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength", "Base deposits on what length of auction.")
-		gui:AddTip(id, 'Select the auction length deposit cost you want to display in the tooltips.')
+		gui:AddTip(id, 'Select the auction length deposit cost you want to display in the tooltip.')
 
 		gui:AddControl(id, "Header",     0,    " Vendor options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic vendoring (W A R N I N G: READ HELP!). ")
-		gui:AddTip(id, 'Enable the auto vendor options.')
+		gui:AddTip(id, 'Enable the auto-vendor options.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items.")
-		gui:AddTip(id, 'Auto sell grey level items at vendor.')
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto-sell grey items in addition to bought for vendor items.")
+		gui:AddTip(id, 'Auto-sell grey level items at the vendor.')
 
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
@@ -174,8 +174,8 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for additional mail features.")
 		gui:AddTip(id, 'Display the auto mail window at the mail box.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of BTM buy rule for Mail Loader.")
-		gui:AddTip(id, 'Use ItemSuggest module instead of the BTM/SearchUI reason codes when sorting mail.')
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of SearchUI buy rule for Mail Loader.")
+		gui:AddTip(id, "Use the ItemSuggest reasons instead of the SearchUI 'Purchased for' reasons when sorting mail.")
 end
 
 --Beginner Tooltips script display for all UI elements
@@ -285,9 +285,9 @@ function lib.slidebar()
 			sideIcon.OnLeave = lib.sideIconLeave
 			sideIcon:SetScript("OnClick", lib.autosellslidebar)
 			sideIcon.tip = {
-				"AutoMagic: Auto Sell Config",
+				"AutoMagic: Auto-Sell Config",
 				"",
-				"{{Left-Click}} to open the 'Auto Sell' list.",
+				"{{Left-Click}} to open the 'Auto-Sell' list.",
 				"{{Right-Click}} to edit the configuration.",
 			}
 		end
