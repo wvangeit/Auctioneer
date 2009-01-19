@@ -152,16 +152,16 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in the tooltip.")
-		gui:AddTip(id, 'Remove selected item deposit costs from the tooltip.')
+		gui:AddTip(id, 'Remove selected item deposit costs from the tooltip')
 
 		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength", "Base deposits on what length of auction.")
 		gui:AddTip(id, 'Select the auction length deposit cost you want to display in the tooltip.')
 
 		gui:AddControl(id, "Header",     0,    " Vendor options")
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic vendoring (W A R N I N G: READ HELP!). ")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic vendoring (W A R N I N G: READ HELP!) ")
 		gui:AddTip(id, 'Enable the auto-vendor options.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto-sell grey items in addition to bought for vendor items.")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto-sell grey items in addition to bought for vendor items")
 		gui:AddTip(id, 'Auto-sell grey level items at the vendor.')
 
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
@@ -171,10 +171,10 @@ function lib.SetupConfigGui(gui)
 
 
 		gui:AddControl(id, "Header",     0,    " GUI options")
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for additional mail features.")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for additional mail features")
 		gui:AddTip(id, 'Display the auto mail window at the mail box.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of SearchUI buy rule for Mail Loader.")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of SearchUI buy rule for Mail Loader")
 		gui:AddTip(id, "Use the ItemSuggest reasons instead of the SearchUI 'Purchased for' reasons when sorting mail.")
 end
 
