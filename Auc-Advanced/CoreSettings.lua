@@ -1,5 +1,5 @@
---[[
-	Auctioneer Advanced
+﻿--[[
+	Auctioneer
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -69,6 +69,8 @@ local lib = AucAdvanced.Settings
 local private = {}
 local gui
 local Matcherdropdown
+
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
@@ -345,7 +347,6 @@ function lib.GetSetting(setting, default)
 	end
 end
 
-
 function lib.Show()
 	lib.MakeGuiConfig()
 	gui:Show()
@@ -354,6 +355,16 @@ end
 function lib.Hide()
 	if (gui) then
 		gui:Hide()
+	end
+end
+
+function lib.UpdateGuiConfig()
+	if gui then
+		if gui:IsVisible() then
+			gui:Hide()
+		end
+		gui = nil
+		lib.MakeGuiConfig()
 	end
 end
 
@@ -376,21 +387,21 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab("Profiles")
 	
-	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
-	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
+	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_SetupProfile')) --"Setup, Configure and Edit Profiles"
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_ActivateProfile')) --"Activate a current profile"
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
-	gui:AddTip(id, "Select the profile that you wish to use for this character")
+	gui:AddTip(id, _TRANS('ADV_Help_ActivateProfile')) --"Select the profile that you wish to use for this character"
 
-	gui:AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui:AddTip(id, "Deletes the currently selected profile")
+	gui:AddControl(id, "Button",     0, 1, "profile.delete", _TRANS('ADV_Interface_Delete')) --"Delete"
+	gui:AddTip(id, _TRANS('ADV_Help_DeleteProfile')) --"Deletes the currently selected profile"
 
-	gui:AddControl(id, "Subhead",    0,    "Create or replace a profile")
-	gui:AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
-	gui:AddTip(id, "Enter the name of the profile that you wish to create")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_CreateProfile')) --"Create or replace a profile"
+	gui:AddControl(id, "Text",       0, 1, "profile.name", _TRANS('ADV_Interface_ProfileName')) --"New profile name:"
+	gui:AddTip(id, _TRANS('ADV_Help_ProfileName')) --"Enter the name of the profile that you wish to create"
 
-	gui:AddControl(id, "Button",     0, 1, "profile.save", "Save")
-	gui:AddTip(id, "Click this button to create or overwrite the specified profile name")
-
+	gui:AddControl(id, "Button",     0, 1, "profile.save", _TRANS('ADV_Interface_SaveProfile')) --"Save"
+	gui:AddTip(id, _TRANS('ADV_Help_ProfileSave')) --"Click this button to create or overwrite the specified profile name")
+--localize AddHelp for Profiles
 	gui:AddHelp(id, "what is",
 		"What is a profile?",
 		"A profile is used to contain a group of settings, you can use different profiles for different characters, or switch between profiles for the same character when doing different tasks."
@@ -410,87 +421,85 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab("General")
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
-	gui:AddTip(id, "Enable the display of how many items in the current scan image match this item")
-	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
-	gui:AddTip(id, "Makes the scan data only display exact matches unless the shift key is held down")
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", "Force load scan data")
-	gui:AddTip(id, "Forces the scan data to load when Auctioneer Advanced is first loaded rather than on demand when first needed")
+	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", _TRANS('ADV_Interface_ScanDataDisplay')) --"Display scan data tooltip"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataDisplay')) --"Enable the display of how many items in the current scan image match this item"
+	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", _TRANS('ADV_Interface_ScanDataModifier')) --"Only show exact match unless SHIFT is held"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataModifier')) --"Makes the scan data only display exact matches unless the shift key is held down"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
 
-	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", "Display Market Price in tooltip")
-	gui:AddTip(id, "Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice")
+	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
 	
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
-	gui:AddTip(id, "Display the summation of an Auction House scan")
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", _TRANS('ADV_Interface_ScanDataSummary')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummary')) --"Display the summation of an Auction House scan"
 
-	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", "Enable searching click-hooks")
-	gui:AddTip(id, "Enables the click-hooks for searching")
+	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", _TRANS('ADV_Interface_SearchingClickHooks')) --"Enable searching click-hooks"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
 
-	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, "Processing priority: %d")
-	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
+	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
 
-	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, "Market Pricing Error: %5.3f%%");
-	gui:AddTip(id, "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.");
+	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
 
+	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
 
-	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progress bar")
-	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
+	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 
-	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", "See home faction data everywhere unless at a neutral ah.")
-	gui:AddTip(id, "This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data.")
-
-	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
+	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
 	last = gui:GetLast(id)
 	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList(), "matcherdynamiclist")
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.3,1, "matcher.up", "Up")
+	gui:AddControl(id, "Button",     0.3,1, "matcher.up", _TRANS('ADV_Interface_Up')) --"Up"
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
-	gui:AddControl(id, "Subhead",     0,	"Preferred Output Frame")
+	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", _TRANS('ADV_Interface_Down')) --"Down"
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredOutputFrame')) --"Preferred Output Frame"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
 	
-	gui:AddControl(id, "Subhead",     0,	"Preferred Language")
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredLanguage')) --"Preferred Language"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.changeLocale(), "uselocale")
-	gui:AddTip(id, "Chooses the Language use by auctioneer. This will require a /console reloadui or restart to take full effect")
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PreferredLanguage')) --"Chooses the language used by Auctioneer. This will require a /console reloadui or restart to take full effect"
 	
-	gui:AddControl(id, "Subhead",     0,     "Purchasing Options")
-	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", "Show Purchase queue info")
-	gui:AddTip(id, "Shows what is added to the purchase queue, and what is being purchased")
+	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PurchasingOptions')) --"Purchasing Options"
+	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", _TRANS('ADV_Interface_ShowPurchaseDebug')) --"Show purchase queue info"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ShowPurchaseDebug')) --"Shows what is added to the purchase queue, and what is being purchased"
 
-	gui:AddTip(id, "This allows you to select which chat window Auctioneer Advanced prints its output to.")
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ChatOutputFrame')) --"This allows you to select which chat window Auctioneer prints its output to."
 	gui:AddHelp(id, "what is scandata",
-		"What is the scan data tooltip?",
-		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image.")
+		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
+		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
 	gui:AddHelp(id, "what is image",
-		"What is an auction house image?",
-		"As you scan the auction house, Auctioneer Advanced builds up an image of what is at the auction. This is the image. It represents Auctioneer Advanced's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not a recent scan, then the info will not.")
+		_TRANS('ADV_Help_WhatIsImage'), --"What is an auction house image?"
+		_TRANS('ADV_Help_WhatIsImageAnswer')) --"As you scan the auction house, Auctioneer builds up an image of what is at the auction. This is the image. It represents Auctioneer's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not a recent scan, then the info will not."
 	gui:AddHelp(id, "what is exact",
-		"What is an exact match?",
-		"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same.")
+		_TRANS('ADV_Help_WhatExactMatch'), --"What is an exact match?"
+		_TRANS('ADV_Help_WhatExactMatchAnswer')) --"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same."
 	gui:AddHelp(id, "why force load",
-		"Why would you want to force load the scan data?",
-		"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded.")
+		_TRANS('ADV_Help_WhyForceLoad'), --"Why would you want to force load the scan data?"
+		_TRANS('ADV_Help_WhyForceLoadAnswer')) --"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded."
 	gui:AddHelp(id, "why show summation",
-		"What is the post scan summary?",
-		"It displays the number of new, updated, or unchanged auctions gathered from a scan of the auction house.")
+		_TRANS('ADV_Help_WhyShowSummation'), --"What is the post scan summary?",
+		_TRANS('ADV_Help_WhyShowSummationAnswer')) --"It displays the number of new, updated, or unchanged auctions gathered from a scan of the auction house."
 	gui:AddHelp(id, "what is clickhook",
-		"What are the click-hooks?",
-		"The click-hooks let you perform a search for an item either by Alt-right-clicking the item in your bags, or by Alt-clicking an item link in the chat pane.")
+		_TRANS('ADV_Help_WhatClickHooks'), --"What are the click-hooks?",
+		_TRANS('ADV_Help_WhatClickHooksAnswer')) --"The click-hooks let you perform a search for an item either by Alt-right-clicking the item in your bags, or by Alt-clicking an item link in the chat pane.")
 	gui:AddHelp(id, "what is priority",
-		"What is the Processing Priority?",
-		"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete.")
+		_TRANS('ADV_Help_WhatPriority'), --"What is the Processing Priority?",
+		_TRANS('ADV_Help_WhatPriorityAnswer')) --"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete."
 	gui:AddHelp(id, "what is preferred output frame",
-		"What is the Preferred Output Frame?",
-		"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer Advanced prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer Advanced will print all subsequent output to that window.")
+		_TRANS('ADV_Help_WhatPreferredChatFrame'), --"What is the Preferred Output Frame?",
+		_TRANS('ADV_Help_WhatPreferredChatFrameAnswer')) --"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer will print all subsequent output to that window."
 	gui:AddHelp(id, "what is preferred language",
-		"What is the Preferred Language?",
-		"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui")
-		
-		
+		_TRANS('ADV_Help_WhatPreferredLanguage'), --"What is the Preferred Language?",
+		_TRANS('ADV_Help_WhatPreferredLanguageAnswer')) --"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui"
+				
     gui:AddHelp(id, "what is accuracy",
-        "What is Market Pricing error?",
-        "Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers).");
+        _TRANS('ADV_Help_WhatAccuracy'), --"What is Market Pricing error?",
+        _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
 
 
   	gui:AddCat("Stat Modules")
@@ -511,8 +520,8 @@ if LibStub then
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", lib.Toggle)
 		sideIcon.tip = {
-			"Auctioneer Advanced",
-			"Auctioneer Advanced allows you to scan the auction house and collect statistics about prices.",
+			"Auctioneer",
+			"Auctioneer allows you to scan the auction house and collect statistics about prices.",
 			"It also provides a framework for creating auction related addons.",
 			"{{Click}} to edit the configuration.",
 		}
