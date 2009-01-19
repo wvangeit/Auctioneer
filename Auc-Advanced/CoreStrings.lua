@@ -106,6 +106,9 @@ AuctioneerLocalizations = {
 	deDE = {
 
 		-- Section: Help
+		["AAMU_Help_WhatAutoMagic"]	= "was ist automagie";
+		["AAMU_Help_WhatMailGUI"]	= "was ist die post GUI";
+		["ADV_Help_WhatIsImage"]	= "was ist ein Auktion haus bild?";
 		["AHWC_Help_AuctionHouseScale"]	= "Auktionshausfenstergröße?";
 		["AHWC_Help_AuctionHouseScaleAnswer"]	= "Der Auktionsschieberegler verändert die Größe des gesamten Auktionshausfensters. Standard ist 1.";
 		["AHWC_Help_CompactUIFontScale"]	= "KompaktUI Schriftgröße?";
@@ -741,6 +744,12 @@ AuctioneerLocalizations = {
 	enUS = {
 
 		-- Section: Help
+		["AAMU_Help_VendorOptions"]	= "AAMU: Vendor Options";
+		["AAMU_Help_VendorOptionsAnswer"]	= "AutoMagic will sell items bought for vendoring to the vendor automatically. It also has the option of auto-selling all grey items or items on the custom sell list.";
+		["AAMU_Help_WhatAutoMagic"]	= "What is AutoMagic?";
+		["AAMU_Help_WhatAutoMagicAnswer"]	= "AutoMagic is a work-in-progress. Its goal is to automate tasks that auctioneers run into that can be a pain to do, as long as it is within the bounds set by Blizzard. \n\nAutoMagic currently will auto-sell any item bought via SearchUI for vendors, any item that is grey (if enabled) or any item on the auto-sell list. If enabled, when you open a merchant window you will see a listing of the items to sell.";
+		["AAMU_Help_WhatMailGUI"]	= "What is the Mail GUI?";
+		["AAMU_Help_WhatMailGUIAnswer"]	= "This displays a window when the mailbox is opened that allows for the auto-loading of items into the send mail window based on purchase reasons from SearchUI. It can also use the ItemSuggest module reasons instead of the provided SearchUI reasons. Very handy for mass mailing items bought for a profession that another character has.";
 		["ADV_Help_WhatAccuracy"]	= "What is Market Pricing error?";
 		["ADV_Help_WhatAccuracyAnswer"]	= "Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers).";
 		["ADV_Help_WhatClickHooks"]	= "What are the click-hooks?";
@@ -944,6 +953,15 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "Wowecon gives you the option to hide server specific prices if seen fewer than a given number of times.  Even though these prices are hidden from the tooltip, they are still reported to Appraiser.  If you are not using the global price option here, you should check to make sure there isn't a hidden server specific price for your server, with just a small number of seen times.";
 
 		-- Section: HelpTooltip
+		["AAMU_HelpTooltip_AutoSellGrey"]	= "Auto-sell grey quality items at the vendor.";
+		["AAMU_HelpTooltip_AutoSellList"]	= "Check the box to view the Auto-Sell configuration GUI.";
+		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Display the beginner tooltips on mouseover.";
+		["AAMU_HelpTooltip_Chatspam"]	= "Display chat messages from AutoMagic.";
+		["AAMU_HelpTooltip_DepositLength"]	= "Select the auction length deposit cost you want to display in the tooltip.";
+		["AAMU_HelpTooltip_DepositTooltip"]	= "Remove item deposit costs from the tooltip.";
+		["AAMU_HelpTooltip_MailGUI"]	= "Display the auto-mail window at the mail box.";
+		["AAMU_HelpTooltip_OverrideSUIMail"]	= "Use the ItemSuggest reasons instead of the SearchUI 'Purchased for' reasons when sorting mail.";
+		["AAMU_HelpTooltip_Vendoring"]	= "Enable the auto-vendor options.";
 		["ADV_HelpTooltip_AlwaysHomeFaction"]	= "This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data.";
 		["ADV_HelpTooltip_ChatOutputFrame"]	= "This allows you to select which chat window Auctioneer prints its output to.";
 		["ADV_HelpTooltip_MarketValueAccuracy"]	= "Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy.";
@@ -1114,6 +1132,18 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip";
 
 		-- Section: Interface
+		["AAMU_Interface_AutoSellGrey"]	= "Allow AutoMagic to auto-sell grey items in addition to bought for vendor items";
+		["AAMU_Interface_AutoSellList"]	= "Auto-Sell List";
+		["AAMU_Interface_BeginnerTooltip"]	= "Enable AutoMagic beginner tooltips";
+		["AAMU_Interface_Chatspam"]	= "Enable AutoMagic chat spam";
+		["AAMU_Interface_DepositLength"]	= "Base deposits on what length of auction:";
+		["AAMU_Interface_DepositTooltip"]	= "Disable deposit costs in the tooltip";
+		["AAMU_Interface_GeneralOptions"]	= "General Options";
+		["AAMU_Interface_GUIOptions"]	= "GUI Options";
+		["AAMU_Interface_MailGUI"]	= "Enable Mail GUI for additional mail features";
+		["AAMU_Interface_OverrideSUIMail"]	= "Use ItemSuggest values instead of SearchUI's reasons for Mail Loader";
+		["AAMU_Interface_Vendoring"]	= "Enable AutoMagic vendoring (W A R N I N G: READ HELP!)";
+		["AAMU_Interface_VendorOptions"]	= "Vendor Options";
 		["ADV_Interface_ActivateProfile"]	= "Activate a current profile";
 		["ADV_Interface_AlwaysHomeFaction"]	= "See home faction data everywhere, unless at a neutral AH";
 		["ADV_Interface_AucOptions"]	= "Main Auctioneer Options";
