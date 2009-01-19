@@ -274,7 +274,7 @@ end
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
-	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Header",     0,    libName.." Options")
 
 	gui:AddHelp(id, "what scanbutton",
 		"What are the scan buttons?",
@@ -287,7 +287,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "If enabled, this shows the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan.")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.getall", "Don't warn about GetAll scanning")
-	gui:AddTip(id, "Disable the warning that you get when you click the GetAll button")
+	gui:AddTip(id, "Disable the warning that you get when you click the GetAll button.")
 end
 
 function private.ConfigChanged()

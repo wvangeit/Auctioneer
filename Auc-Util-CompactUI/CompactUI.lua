@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -841,22 +841,22 @@ function private.SetupConfigGui(gui)
 		"Due to the fact that it heavily modifies your auction frames, it may cause it to be incompatible with other addons that also modify the auction frames. If this is the case you will have to make a choice between CompactUI and the other addons. You may disable CompactUI easily by unticking the \"Enable use of CompactUI (requires logout)\" option in the settings window.")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout).")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
 	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload.")
 	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading your interface.")
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.tooltiphelp", "Displays the pop up help tooltips")
 	gui:AddTip(id, "This option will display popup help tooltips on the CompactUI display")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when it's zero.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when it's zero")
 	gui:AddTip(id, "This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show the required bid instead of the current bid value.")
-	gui:AddTip(id, "The default interface shows you the current bid, ticking this option changes CompactUI's behaviour to instead show the required bid")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show the required bid instead of the current bid value")
+	gui:AddTip(id, "Toggling this option changes CompactUI's behaviour to show the required bid.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning")
 	gui:AddTip(id, "Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning.")
 
 	gui:AddHelp(id, "what is popup",
 		"What does enabling the popup help do?",
-		"Displays a little popup tooltip over various parts of the CompactUI")
+		"Displays a little popup tooltip over various parts of the CompactUI.")
 
 	gui:AddHelp(id, "what is collapse",
 		"What does removing smaller denomination coins do?",

@@ -102,16 +102,16 @@ function lib.SetupConfigGui(gui)
         "What is the ItemSuggest module?",
         "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill or convert that item.")
 
-	gui:AddControl(id, "Header",     0,    "ItemSuggest")
-	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest Tooltips")
+	gui:AddControl(id, "Header",     0,    "ItemSuggest Options")
+	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
 	gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
 
-    gui:AddControl(id, "Header",     0,    "Set skill usage limits if desired")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 450, 5, "Max Enchanting Skill On Realm. %s")
+    gui:AddControl(id, "Header",     0,    "Skill usage Limits")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 450, 5, "Max Enchanting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 450, 5, "Max JewelCrafting Skill On Realm. %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 450, 5, "Max JewelCrafting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.inscriptionskill", 0, 450, 5, "Max Inscription Skill On Realm. %s")
+	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.inscriptionskill", 0, 450, 5, "Max Inscription Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
 
 	gui:AddControl(id, "Header",     0,    "ItemSuggest Recommendation Bias")
@@ -129,13 +129,13 @@ function lib.SetupConfigGui(gui)
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Conversion higher or lower.")
 
 	gui:AddControl(id, "Header",     0,    "Deposit cost influence")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs?")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
 	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
 	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
 	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
 	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs?")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
 	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
 
 end

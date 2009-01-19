@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -107,12 +107,12 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is pricelevel",
 		"What is PriceLevel?",
-		"PriceLevel is an AuctioneerAdvanced module that analyses the current market position with regard to the calculated value of the item.\n"..
-		"PriceLevel is all about determining if what AuctioneerAdvanced thinks is what the rest of the market currently thinks. It's also about determining if the rest of the market is selling their stuff for crazy prices.\n"..
+		"PriceLevel is an Auctioneer module that analyses the current market position with regard to the calculated value of the item.\n"..
+		"PriceLevel is all about determining if what Auctioneer thinks is what the rest of the market currently thinks. It's also about determining if the rest of the market is selling their stuff for crazy prices.\n"..
 		"What it all comes down to is the color... PriceLevel breaks the current market down into 5 categories: |cff3296ffWay underpriced|r, |cff19ff19Fairly underpriced|r, |cffffff00Just underpriced|r, |cffff9619Reasonable|r, and |cffff0000Overpriced|r. It also has options for adding the calculated level to the tooltip and in the browse window of the Auction House.")
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show the PriceLevel and unit price in the tooltips?")
+	gui:AddControl(id, "Header",     0,    libName.." Options")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show the PriceLevel and unit price in the tooltips")
 	gui:AddTip(id, "Enable this to display the PriceLevel information in the tooltip when you mouse over an item in your inventory")
 
 	gui:AddHelp(id, "what is ahcolor",
@@ -122,7 +122,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House")
 	gui:AddTip(id, "This option changes the color of the items lines in the Auction House so that you may more easily determine whether they are over or under priced prior to purchase")
 	gui:AddControl(id, "Slider",     0, 2, "util.pricelevel.opacity", 1, 100, 1, "Opacity level: %d%%")
-	gui:AddTip(id, "This controls the level of opacity for the colored bars in the Auction Browse window (if enabled)")
+	gui:AddTip(id, "This controls the level of opacity for the colored bars in the Auction Browse window. (if enabled)")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.pricelevel.gradient", "Use a gradient:")
 	gui:AddTip(id, "This causes the colored bars in the Auction Browse window to be drawn with a gradient instead of a solid color (if enabled).")
 	gui:AddControl(id, "Selectbox",  0, 3, {

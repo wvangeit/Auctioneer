@@ -41,7 +41,7 @@ private.Print = AucAdvanced.Print
 function private.CommandHandler(command, subcommand, ...)
 	command = command:lower()
 	if (command == "help") then
-		private.Print("Auctioneer Advanced Help")
+		private.Print("Auctioneer Help")
 		private.Print("  {{/auc help}} - Show this help")
 		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
 		private.Print("  {{/auc getall}} - Download auctionhouse using getall")
@@ -136,7 +136,7 @@ end
 
 function lib.About(all)
 	local rev = AucAdvanced.GetCurrentRevision()
-	private.Print(("Auctioneer Advanced rev.%d loaded"):format(rev))
+	private.Print(("Auctioneer rev.%d loaded"):format(rev))
 
 	if (all) then
 		local revisionsList = AucAdvanced.GetRevisionList()

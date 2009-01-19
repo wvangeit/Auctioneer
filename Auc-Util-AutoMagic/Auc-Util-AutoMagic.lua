@@ -142,16 +142,16 @@ function lib.SetupConfigGui(gui)
 		"\n")
 
 
-		gui:AddControl(id, "Header",     0,    libName.." General options")
+		gui:AddControl(id, "Header",     0,    libName.." General Options")
 		gui:AddControl(id, "Checkbox",		0, 1, "util.automagic.displaybeginerTooltips", "Enable AutoMagic beginner tooltips")
-		gui:AddTip(id, 'Turns on the beginner tooltips which display on mouseover.')
+		gui:AddTip(id, 'Display the beginner tooltips on mouseover.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.chatspam", "Enable AutoMagic Chat Spam")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.chatspam", "Enable AutoMagic chat spam")
 		gui:AddTip(id, 'Display chat messages from AutoMagic.')
 
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in the tooltip.")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", "Disable deposit costs in the tooltip")
 		gui:AddTip(id, 'Remove selected item deposit costs from the tooltip')
 
 		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength", "Base deposits on what length of auction.")
@@ -172,9 +172,9 @@ function lib.SetupConfigGui(gui)
 
 		gui:AddControl(id, "Header",     0,    " GUI options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for additional mail features")
-		gui:AddTip(id, 'Display the auto mail window at the mail box.')
+		gui:AddTip(id, 'Display the auto-mail window at the mail box.')
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of SearchUI buy rule for Mail Loader")
+		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.overidebtmmail", "Use ItemSuggest values instead of SearchUI's reasons for Mail Loader")
 		gui:AddTip(id, "Use the ItemSuggest reasons instead of the SearchUI 'Purchased for' reasons when sorting mail.")
 end
 

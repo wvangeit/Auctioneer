@@ -104,8 +104,8 @@ function private.SetupConfigGui(gui)
 	gui:MakeScrollable(id)
 
 	-- EasyBuyout
-	gui:AddControl(id, "Header",     0,    "EasyBuyout options")
-	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box!")
+	gui:AddControl(id, "Header",     0,    "EasyBuyout Options")
+	gui:AddControl(id, "Subhead",          0,    "Simply right-click an auction to buy it out with no confirmation box.")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.active", "Enable EasyBuyout")
     gui:AddTip(id, "Ticking this box will enable or disable EasyBuyout")
     gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.modifier.active", "Enable key modifier")
@@ -119,8 +119,8 @@ function private.SetupConfigGui(gui)
 
  	-- EasyCancel
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Header",		0,		"EasyCancel options")
-	gui:AddControl(id, "Subhead",		   0,   "Simply right-click an auction to cancel it out with no confirmation box!")
+	gui:AddControl(id, "Header",		0,		"EasyCancel Options")
+	gui:AddControl(id, "Subhead",		   0,   "Simply right-click an auction to cancel it out with no confirmation box.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.active", "Enable EasyCancel")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyCancel")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EC.modifier.active", "Enable key modifier")
@@ -134,15 +134,15 @@ function private.SetupConfigGui(gui)
 
 	-- EasyBid
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Header",		0,		"EasyBid options")
-	gui:AddControl(id, "Subhead",		   0,   "Simply double-click an auction to bid minimum on it!")
+	gui:AddControl(id, "Header",		0,		"EasyBid Options")
+	gui:AddControl(id, "Subhead",		   0,   "Simply double-click an auction to bid minimum on it.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.EBid.active", "Enable EasyBid")
-	gui:AddTip(id, "Ticking this box will enable or disable EasyBid")
+	gui:AddTip(id, "Toggle this box to enable or disable EasyBid")
 
 	-- EasyGoldLimit
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Header", 0, "EasyGoldLimit options")
-	gui:AddControl(id, "Subhead", 0, "Places a limit on EasyBid and EasyBuyout to prevent accidental purchases of expensive auctions")
+	gui:AddControl(id, "Header", 0, "EasyGoldLimit Options")
+	gui:AddControl(id, "Subhead", 0, "Set a limit on EasyBid & EasyBuyout to prevent accidental purchases of expensive auctions.")
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBuy.active", "Enable EasyGoldLimit for EasyBuyout")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBuyout")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBuy.limit", 0, 999999999, "Set EasyBuyout Limit")
