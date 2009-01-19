@@ -47,7 +47,34 @@ if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
 
 private.workingItemLink = nil
 local frame
-
+--[[
+The slash command will take the following input
+<link> 1g 2s 3c   where  g s c are defined  in any combination
+or
+<link> 1gold 2 Silver  3c   where  g s c are defined  in any text form
+or
+<link>  10203   where the price is given in total copper]]
+local tooltip = LibStub("nTipHelper:1")
+function lib.SlashCommand(cmd)
+	local itemlink, GSC, price, extra = cmd:match("(|c%x+|H.+|h%[.*%]|h|r).-((%d+)(.*))") --split command into link and price. check if price is defined as total copper ot as a g s c value
+	--parse for gsc if more data than just a simple value
+	if extra and extra ~= "" and price then
+		local g,s,c
+		g = GSC:lower():match("(%d+)%s-g") or 0
+		s = GSC:lower():match("(%d+)%s-s") or 0
+		c = GSC:lower():match("(%d+)%s-c") or 0
+		price = (g*10000+s*100+c) --sum gsc to total copper value
+	end
+	price = tonumber(price)
+	--pass to snatch		
+	if itemlink and price and price > 0 then
+		lib.AddSnatch(itemlink, price)
+		price = tooltip:Coins(price)--convert to fancy gsc icon format
+		print("Added snatch for", itemlink, "at", price, "or lower")
+	else
+		print("FORMAT: <link>  price in copper or  <link> Xg Xs Xc")
+	end
+end
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
@@ -230,6 +257,10 @@ function lib:MakeGuiConfig(gui)
 
 	lib.refreshData()
 	lib.PopulateBagSheet()
+	
+	
+	SLASH_SNATCH1 = "/snatch";
+	SlashCmdList["SNATCH"] = lib.SlashCommand
 end
 
 --Processor function
@@ -356,6 +387,7 @@ function lib.AddSnatch(itemlink, price, count)
 
 	local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 
+	price, count = tonumber(price), tonumber(count)
 	if price and price<=0 then
 		price=nil
 	end
