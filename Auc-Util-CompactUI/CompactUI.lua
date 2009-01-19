@@ -35,7 +35,7 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "CompactUI"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 local data
 private.cache = {}
@@ -836,47 +836,45 @@ function private.SetupConfigGui(gui)
 	private.guiID = id
 
 	gui:AddHelp(id, "what compactui",
-		"What is CompactUI?",
-		"CompactUI is a space optimized browse interface to replace the default Blizzard auction browse interface.\n"..
-		"Due to the fact that it heavily modifies your auction frames, it may cause it to be incompatible with other addons that also modify the auction frames. If this is the case you will have to make a choice between CompactUI and the other addons. You may disable CompactUI easily by unticking the \"Enable use of CompactUI (requires logout)\" option in the settings window.")
+		_TRANS('COMP_Help_WhatCompactUI'), -- "What is CompactUI?"
+		_TRANS('COMP_Help_WhatCompactUIAnswer')) --"CompactUI is a space optimized browse interface to replace the default Blizzard auction browse interface. \nDue to the fact that it heavily modifies your auction frames, it may cause it to be incompatible with other addons that also modify the auction frames. If this is the case you will have to make a choice between CompactUI and the other addons. You may disable CompactUI easily by unticking the \"Enable use of CompactUI (requires logout)\" option in the settings window."
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
-	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload.")
-	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading your interface.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", _TRANS('COMP_Interface_CompActivated')) --"Enable use of CompactUI (requires logout)"
+	gui:AddTip(id, _TRANS('COMP_HelpTooltip_CompActivated')) --"Ticking this box will enable CompactUI to take over your auction browse window after your next reload.")
+	gui:AddControl(id, "Note",       0, 2, 600, 70, _TRANS('COMP_Interface_CompWarning')) --"Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading your interface."
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.tooltiphelp", "Displays the pop up help tooltips")
-	gui:AddTip(id, "This option will display popup help tooltips on the CompactUI display")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when it's zero")
-	gui:AddTip(id, "This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show the required bid instead of the current bid value")
-	gui:AddTip(id, "Toggling this option changes CompactUI's behaviour to show the required bid.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", "Prevent other modules from changing the display of the browse tab while scanning")
-	gui:AddTip(id, "Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.tooltiphelp", _TRANS('COMP_Interface_CompTooltipHelp')) --"Displays the pop up help tooltips"
+	gui:AddTip(id, _TRANS('COMP_HelpTooltip_CompTooltipHelp')) --"This option will display popup help tooltips on the CompactUI display"
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", _TRANS('COMP_Interface_CompCollapse')) --"Remove smaller denomination coins when it's zero"
+	gui:AddTip(id, _TRANS('COMP_HelpTooltip_CompCollapse')) --"This option will cause lower value coins to be hidden when the hiding would not change the value of the displayed price."
+	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", _TRANS('COMP_Interface_CompBidRequired')) --"Show the required bid instead of the current bid value"
+	gui:AddTip(id, _TRANS('COMP_HelpTooltip_CompBidRequired')) --"Toggling this option changes CompactUI's behaviour to show the required bid."
+	gui:AddControl(id, "Checkbox",   0, 1, "util.browseoverride.activated", _TRANS('COMP_Interface_BrowserOverRide')) --"Prevent other modules from changing the display of the browse tab while scanning"
+	gui:AddTip(id, _TRANS('COMP_HelpTooltip_BrowseOverRide')) --"Enabling this option will allow CompactUI to continue displaying the auction data, even when another module is installed to hide the display of auctions while scanning."
 
 	gui:AddHelp(id, "what is popup",
-		"What does enabling the popup help do?",
-		"Displays a little popup tooltip over various parts of the CompactUI.")
+		_TRANS('COMP_Help_WhatPopup'), --"What does enabling the popup help do?"
+		_TRANS('COMP_Help_WhatPopupAnswer')) --"Displays a little popup tooltip over various parts of the CompactUI."
 
 	gui:AddHelp(id, "what is collapse",
-		"What does removing smaller denomination coins do?",
-		"Removing smaller denomination coins removes coins from the lowest order when the coins are zero and their removal would not affect the accuracy of the price display.\n"..
-		"This has the effect of shortening the length of the displayed prices, however it can cause additional confusion over similar length prices that are of a different order (ie: 1s 55c looks like 1g 55s) and if you're not careful, you may spend more than you meant to.")
+		_TRANS('COMP_Help_WhatCollapse'), --"What does removing smaller denomination coins do?",
+		_TRANS('COMP_Help_WhatCollapseAnswer')) --"Removing smaller denomination coins removes coins from the lowest order when the coins are zero and their removal would not affect the accuracy of the price display. \nThis has the effect of shortening the length of the displayed prices, however it can cause additional confusion over similar length prices that are of a different order (ie: 1s 55c looks like 1g 55s) and if you're not careful, you may spend more than you meant to."
 
 	gui:AddHelp(id, "what is required",
-		"What is the required bid?",
-		"The stock standard interface shows you the current bid. In the case where the current bid is not the minimum (or starting) bid, your actual amount when you bid on this item will be the current bid, plus the minimum increment. Therefore what you pay will be more than what is displayed in the window when you are not the first bidder. By ticking this option, you change CompactUI's behaviour to instead show the required bid that you will need to bid, so that no matter if there is a bid or not, what you see is what you will pay.")
+		_TRANS('COMP_Help_WhatRequied'), --"What is the required bid?",
+		_TRANS('COMP_Help_WhatRequiedAnswered')) --"The stock standard interface shows you the current bid. In the case where the current bid is not the minimum (or starting) bid, your actual amount when you bid on this item will be the current bid, plus the minimum increment. Therefore what you pay will be more than what is displayed in the window when you are not the first bidder. By ticking this option, you change CompactUI's behaviour to instead show the required bid that you will need to bid, so that no matter if there is a bid or not, what you see is what you will pay."
 
 	gui:AddHelp(id, "what is browseoverride",
-		"Why do I want to prevent other modules from changing the Browse window?",
-		"If you have a module such as ScanProgress installed and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead.")
+		_TRANS('COMP_Help_WhatBrowseOverride'), --"Why do I want to prevent other modules from changing the Browse window?"
+		_TRANS('COMP_Help_WhatBrowseOverrideAnswer')) --"If you have a module such as ScanProgress installed and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead."
 
 	gui:AddHelp(id, "what is playerignore",
-		"How to ignore a seller's auctions?",
-		"ALT click on the seller you wish to ignore and select yes in the pop up window. The seller's name will be marked in red and placed in the BASIC FILTER module's ignored list.")
+		_TRANS('COMP_Help_HowToIgnore'), --"How do I ignore a seller's auctions?"
+		_TRANS('COMP_Help_HowToIgnoreAnswer')) --"ALT click on the seller you wish to ignore and select yes in the pop up window. The seller's name will be marked in red and placed in the BASIC FILTER module's ignored list."
 	gui:AddHelp(id, "what is playerunignore",
-		"How to un-ignore a seller's auctions?",
-		"ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list.")
+		_TRANS('COMP_Help_HowToUnignore'), --"How do I un-ignore a seller's auctions?"
+		_TRANS('COMP_Help_HowToUnignoreAnswer')) --"ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list."
 
 end
 

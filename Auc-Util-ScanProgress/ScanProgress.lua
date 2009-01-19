@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "ScanProgress"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "scanprogress") then
@@ -165,18 +165,18 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    libName.." Options")
 
 	gui:AddHelp(id, "what scanprogress",
-		"What is the Scan Progress indicator?",
-		"The Scan Progress indicator is the text that appears while scanning the Auction House. It displays:  the speed of the scan, current auctions and total number of auctions scanned, aswell as the current number of pages and total pages scanned.")
+		_TRANS('SPRG_Help_WhatScanProgress'), --"What is the Scan Progress indicator?"
+		_TRANS('SPRG_Help_WhatScanProgressAnswer')) --"The Scan Progress indicator is the text that appears while scanning the Auction House. It displays:  the speed of the scan, current auctions and total number of auctions scanned, aswell as the current number of pages and total pages scanned."
 
 --	Old answer, incase the new one is too short and/or vague.
 --		"The Scan Progress indicator is the text that appears while scanning the Auction House, indicating "..
 --		"how fast you are scanning, how many auctions you have scanned so far, how many total auctions there are, "..
 --		"how many pages you have scanned so far, and how many total pages there are.")
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.activated", "Show a textual progress indicator when scanning")
-	gui:AddTip(id, "If enabled, will show the scan progress indicator\n\nNOTE: This setting is also affected by the CompactUI option to prevent other modules from changing the display of the browse tab while scanning.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.leaveshown", "Leave the scan progress text shown after scan completion")
-	gui:AddTip(id, "If enabled, will leave the scan progress indicator on the screen after scan has completed.\n\nIf disabled will show the last scanned page.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.activated", _TRANS('SPRG_Interface_Activated')) --"Show a textual progress indicator when scanning"
+	gui:AddTip(id, _TRANS('SPRG_HelpTooltip_Activated')) --"Toggles the display of the scan progress indicator\n\nNOTE: This setting is also affected by the CompactUI option to prevent other modules from changing the display of the browse tab while scanning."
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.leaveshown", _TRANS('SPRG_Interface_LeaveShown')) --"Leave the scan progress text shown after scan completion"
+	gui:AddTip(id, _TRANS('SPRG_HelpTooltip_LeaveShown')) --"If toggled, it will leave the scan progress indicator on the screen after scan has completed.\n\nIf disabled it will show the last scanned page."
 end
 
 function private.ConfigChanged()

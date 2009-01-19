@@ -37,7 +37,7 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "AskPrice"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 private.whisperList = {}
 private.sentRequest = {}
@@ -477,46 +477,42 @@ function private.SetupConfigGui(gui)
 	gui:MakeScrollable(id)
 
 	gui:AddHelp(id, "what askprice",
-		"What is AskPrice and what does it do?",
-		"AskPrice is a module that allows other players to obtain the values of items by sending special messages "..
-		"to various channels, or by sending those messages to you directly, via a whisper.")
+		_TRANS('ASKP_Help_WhatAskPrice'), --"What is AskPrice and what does it do?"
+		_TRANS('ASKP_Help_WhatAskPriceAnswer')) --"AskPrice is a module that allows other players to obtain the values of items by sending special messages to various channels, or by sending those messages to you directly, via a whisper."
 
-	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.activated", "Respond to queries for item market values sent via chat")
-	gui:AddTip(id, "This checkbox will enable or disable the module.")
+	gui:AddControl(id, "Header",     0,    libName.._TRANS('ASKP_Interface_Options')) --" options"
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.activated", _TRANS('ASKP_Interface_Activated')) --"Respond to queries for item market values sent via chat"
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_Activated')) --"This checkbox will enable or disable the module."
 
 	gui:AddHelp(id, "what triggers",
-		"What are these triggers, and how are they used?",
-		"The triggers control how someone needs to ask you for the price.\n"..
-		"The Custom Smartwords allow Auctioneer to respond to natural language queries, while the Trigger Character allows for querying stack sizes\n\n."..
-		"Custom smartwords defaults respond to \"what is [item link] worth?\"\n"..
-		"Trigger character defaults respond to \"? (stack size) [item link]\""
-	)
+		_TRANS('ASKP_Help_WhatTriggers'), --"What are these triggers, and how are they used?"
+		_TRANS('ASKP_Help_WhatTriggersAnswer')) --"The triggers control how someone needs to ask you for the price. \nThe Custom Smartwords allow Auctioneer to respond to natural language queries, while the Trigger Character allows for querying stack sizes \n\nCustom smartwords default respond to \'what is [item link] worth?\' \nTrigger character defaults respond to \'? (stack size) [item link]\'"
+	
+	
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_SimpleTrigger')) --"Simple trigger:"
+	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", _TRANS('ASKP_Interface_TriggerCharacter')) --"Askprice Trigger character"
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_TriggerCharacter')) --"The trigger character allows for simple querying of a price."
 
-	gui:AddControl(id, "Subhead",    0,    "Simple trigger:")
-	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", "Askprice Trigger character")
-	gui:AddTip(id, "The trigger character allows for simple querying of a price.")
-
-	gui:AddControl(id, "Subhead",    0,    "SmartWords:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable SmartWords checking")
-	gui:AddTip(id, "If enabled, this will enable responses to the SmartWords.")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_SmartWords')) --"SmartWords:")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", _TRANS('ASKP_Interface_EnableSmartWords')) --"Enable SmartWords checking")
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_SmartWords')) --"Toggling this will enable responses to the SmartWords."
 	local last = gui:GetLast(id) -- Get the current position so we can return here for the second column
-	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", "Askprice Custom SmartWord #1")
-	gui:AddTip(id, "The SmartWords allow for natural language queries.")
+	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", _TRANS('ASKP_Interface_SmartWordOne')) --"Askprice Custom SmartWord #1"
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_SmartWordOne')) --"The SmartWords allow for natural language queries."
 	gui:SetLast(id, last) -- Return to the saved position
-	gui:AddControl(id, "Text",       0.5, 1, "util.askprice.word2", "Askprice Custom SmartWord #2")
-	gui:AddTip(id, "The SmartWords allow for natural language queries.")
+	gui:AddControl(id, "Text",       0.5, 1, "util.askprice.word2", _TRANS('ASKP_Interface_SmartWordTwo')) --"Askprice Custom SmartWord #2"
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_SmartWordOne')) --"The SmartWords allow for natural language queries."
 	gui:AddControl(id, "Selectbox",  0, 1, {
 		{1, "Either"},
 		{0, "Both"}
 	}, "util.askprice.smartOr", "Either or both SmartWords") --1/0 instead of true/false due to limitations in the Configator API
-	gui:AddTip(id, "Require both SmartWords to be present or just one or the other in order for it to trigger a query.")
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_EitherBoth')) --"Both SmartWords are required to be present for just one or the other in order for it to trigger a query."
 
-	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable sending of tutorial message.")
-	gui:AddTip(id, "If enabled, this will send players who ask for prices a message telling them how to use the trigger character in conjunction with a stack size parameter.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Show outgoing whispers from Askprice")
-	gui:AddTip(id, "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_Miscellaneous')) --"Miscellaneous:")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", _TRANS('ASKP_Interface_TutorialMessage')) --"Enable sending of tutorial message."
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_TutorialMessage')) --"If enabled, this will send players who ask for prices a message telling them how to use the trigger character in conjunction with a stack size parameter."
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", _TRANS('ASKP_Interface_Whisper')) --"Show outgoing whispers from Askprice"
+	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_Whisper')) --"Shows (enabled) or hides (disabled) outgoing whispers from Askprice."
 
 end
 

@@ -1,10 +1,10 @@
 --[[
-	Auctioneer Advanced - Scan Button module
+	Auctioneer - Scan Button module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that adds a textual scan progress
+	This is an Auctioneer module that adds a textual scan progress
 	indicator to the Auction House UI.
 
 	License:
@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "ScanButton"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "scanprogress") then
@@ -274,20 +274,20 @@ end
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
-	gui:AddControl(id, "Header",     0,    libName.." Options")
+	gui:AddControl(id, "Header",     0,    libName.._TRANS('SBTN_Interface_Options')) --" Options"
 
 	gui:AddHelp(id, "what scanbutton",
-		"What are the scan buttons?",
-		"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the Auction House frame.")
+		_TRANS('SBTN_Help_WhatScanButton'), --"What are the scan buttons?
+		_TRANS('SBTN_Help_WhatScanButtonAnswer')) --"The scan buttons are the Stop/Play/Pause buttons in the titlebar of the Auction House frame."
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the Auction House")
-	gui:AddTip(id, "If enabled, this shows the Stop/Play/Pause scan buttons in the title bar of the Auction House.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", _TRANS('SBTN_Interface_Enabled')) --"Show scan buttons in the Auction House"
+	gui:AddTip(id, _TRANS('SBTN_HelpTooltip_Enabled')) --"Toggles the display of the Stop/Play/Pause/Fast Forward scan buttons in the title bar of the Auction House."
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", "Show messages about which category selections have been queued")
-	gui:AddTip(id, "If enabled, this shows the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.message", _TRANS('SBTN_Interface_Message')) --"Show messages about which category selections have been queued"
+	gui:AddTip(id, _TRANS('SBTN_HelpTooltip_Message')) --"Toggles the display of the starting search of filtered messages when using the ctr+click to select specific categories of the AH to scan."
 
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.getall", "Don't warn about GetAll scanning")
-	gui:AddTip(id, "Disable the warning that you get when you click the GetAll button.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.getall", _TRANS('SBTN_Interface_Getall')) --"Don't warn about GetAll scanning"
+	gui:AddTip(id, _TRANS('SBTN_HelpTooltip_Getall')) --"Disable the warning that you get when you click the GetAll button."
 end
 
 function private.ConfigChanged()
