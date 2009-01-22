@@ -299,9 +299,9 @@ function private.UpdateDisplay()
 	elseif deposit <= 0 then
 		frame.fees:SetText("No deposit")
 	elseif cNum > 1 then
-		frame.fees:SetText(("Deposit: %s, %s/stack, %s/ea"):format(coins(deposit*cStack*cNum), coins(deposit*cStack), coins(deposit)))
+		frame.fees:SetText(("Deposit: %s, %s/stack \n%s/ea"):format(coins(deposit*cStack*cNum), coins(deposit*cStack), coins(deposit)))
 	elseif cStack > 1 then
-		frame.fees:SetText(("Deposit: %s/stack, %s/ea"):format(coins(deposit*cStack), coins(deposit)))
+		frame.fees:SetText(("Deposit: %s/stack \n%s/ea"):format(coins(deposit*cStack), coins(deposit)))
 	else
 		frame.fees:SetText(("Deposit: %s"):format(coins(deposit)))
 	end
@@ -834,16 +834,10 @@ function private.CreateFrames()
 	frame.name:SetJustifyV("TOP")
 	frame.name:SetText("Drop item onto slot")
 
-	frame.fees = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	frame.fees:SetPoint("TOPLEFT", frame.slot, "TOPRIGHT", 10, -2)
-	frame.fees:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
-	frame.fees:SetJustifyV("TOP")
-	frame.fees:SetJustifyH("RIGHT")
-	frame.fees:SetText("")
-
 	frame.info = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.info:SetPoint("TOPLEFT", frame.name, "BOTTOMLEFT", 0, -3)
 	frame.info:SetJustifyV("TOP")
+	frame.info:SetTextColor(0.0,1,1)
 	frame.info:SetText("To auction an item, drag it from your bag.")
 
 	frame.err = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -966,9 +960,17 @@ function private.CreateFrames()
 	frame.stacks.equals = frame.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.stacks.equals:SetPoint("BOTTOMLEFT", frame.stacks.size, "BOTTOMRIGHT", 5, 0)
 	frame.stacks.equals:SetText("= 0")
-
+	
+	frame.fees = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.fees:SetPoint("TOP", frame.stacks, "BOTTOM", 10, -2)
+	frame.fees:SetWidth(150)
+	frame.fees:SetJustifyV("TOP")
+	frame.fees:SetJustifyH("CENTER")
+	frame.fees:SetText("")
+	frame.fees:SetTextColor(0,1,1)
+	
 	frame.options = CreateFrame("Frame", "AucAdvSimpFrameOptions", frame)
-	frame.options:SetPoint("TOPLEFT", frame.stacks, "BOTTOMLEFT", 0, -20)
+	frame.options:SetPoint("TOPLEFT", frame.stacks, "BOTTOMLEFT", 0, -40)
 	frame.options:SetWidth(140)
 	frame.options:SetHeight(300)
 	frame.options.label = frame.options:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
