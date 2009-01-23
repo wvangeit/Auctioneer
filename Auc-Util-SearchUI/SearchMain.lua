@@ -178,8 +178,8 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 		end
 	end
 	if not active then --if it hasn't changed, we're not enabled for any searcher
-		tooltip:AddLine("  No debugging enabled")
-		tooltip:LineColor(1,0.7,0.3)
+		tooltip:AddLine("  No debugging enabled", 1, 0.7, 0.3)
+		--tooltip:LineColor(1,0.7,0.3)
 	end
 end
 
