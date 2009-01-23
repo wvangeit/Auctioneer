@@ -222,7 +222,7 @@ function private.AdjustProtection ()
 		AuctionFrame:SetAttribute("UIPanelLayout-enabled", nil)
 	elseif get("util.protectwindow.protectwindow") ~= 1 and get("util.protectwindow.protectwindow") ~=2 then
 		local protectvalue = get("util.protectwidow.protectwindow")
-		tostring(protectvalue)
+		protectvalue = tostring(protectvalue)
 		debugPrint("util.protectwindow.protectwindow="..protectvalue.." an invalid value")
 		set("util.protectwindow.protectwindow", 1)
 		if not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
