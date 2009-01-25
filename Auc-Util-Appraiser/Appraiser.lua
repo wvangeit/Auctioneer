@@ -49,16 +49,19 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
+		local change = ... --get the reason if its a scrollframe color change re-render the window
 		if private.frame then
 			private.frame.salebox.config = true
 		--	private.frame.SetPriceFromModel()
 			private.frame.UpdatePricing()
 			private.frame.UpdateDisplay()
 		--	private.frame.salebox.config = nil
-			local change = ... --get the reason if its a scrollframe color change re-render the window
 			if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
 				private.frame.UpdateImage()
 			end
+		end
+		if change:sub(1, 20) == "util.appraiser.round" then
+			private.updateRoundExample()
 		end
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
@@ -144,8 +147,9 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.round.bid", false)
 	AucAdvanced.Settings.SetDefault("util.appraiser.round.buy", false)
 	AucAdvanced.Settings.SetDefault("util.appraiser.round.method", "unit")
-	AucAdvanced.Settings.SetDefault("util.appraiser.round.position", 0.00)
+	AucAdvanced.Settings.SetDefault("util.appraiser.round.position", 0.10)
 	AucAdvanced.Settings.SetDefault("util.appraiser.round.magstep", 5)
+	AucAdvanced.Settings.SetDefault("util.appraiser.round.subtract", 1)
 	AucAdvanced.Settings.SetDefault("util.appraiser.bid.markdown", 10)
 	AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
 	AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", true)

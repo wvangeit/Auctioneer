@@ -34,6 +34,7 @@ if not AucAdvanced then return end
 local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local print,_,_,_,_,_,get,set,default,_,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local coins = AucAdvanced.Coins
 
 function private.GetPriceModels(itemLink)
 	if not private.scanValueNames then private.scanValueNames = {} end
@@ -75,43 +76,96 @@ function private.sortItems(a,b)
 	return a[1] < b[1]
 end
 
+function private.updateRoundExample()
+	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
+	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
+	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep")) 
+	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
+	if pos == nil then pos = 0.10 end
+	if mag == nil then mag = 5 end
+	if sub == nil then sub = 1 end
+	pos = math.floor(pos * 100)
+
+	local roundname
+	local output = {}
+	local example = "  %s -> %s"
+
+    local a,b, c,d, e,f
+	if method == "unit" then
+		roundname = _TRANS('APPR_Interface_StopValue')
+	elseif method == "div" then
+		roundname = _TRANS('APPR_Interface_Divisions')
+	end
+
+	tinsert(output, _TRANS('APPR_Interface_Examples'):format(roundname))
+	local limit = 12
+
+	local l, i, v, p = 0, 0, 1, 0
+	while i < limit do
+		local r = private.roundValue(v)
+		if r ~= p then
+			tinsert(output, example:format(coins(v,1), coins(r,1)))
+			p = r
+			v = math.max(p, v)
+			i = i + 1
+		end
+		v = v + 1
+		l = l + 1
+		if i == limit - 5 and v < mag*100 then
+			tinsert(output, "  ...")
+			v = (mag * 10000 - pos) + 1
+			i = i + 1
+		end
+		if l > 100000 then i = 8 end
+	end
+	private.roundNote:SetText(strjoin("\n", unpack(output)))
+end
+
+local round = {}
+function round.div(value, pos, mag)
+	local scale
+	if value > mag * 1000000 then scale = 1000000 -- Round at the gold level
+	elseif value > mag * 10000 then scale = 10000 -- Round at the silver level
+	else scale = 100 end -- Round at the copper level
+
+	local base = math.floor(value / scale) * scale -- This is the major amount that will stay
+	local part = value - base -- This is the bit that's left over, we need to round this "up"
+	                          -- to the next "division"
+	local step = pos * scale / 100 -- This is how much the division steps up
+	local divs = math.min(math.ceil(part / step) * step, scale) -- The new rounded up integral divisions
+	return base + divs
+end
+function round.unit(value, pos, mag)
+	local scale
+	if value > mag * 1000000 then scale = 1000000 -- Round at the gold level
+	elseif value > mag * 10000 then scale = 10000 -- Round at the silver level
+	else scale = 100 end -- Round at the copper level
+
+	local base = math.floor(value / scale) * scale -- This is the major amount that will stay
+	local part = value - base -- This is the bit that's left over, we need to round this "up"
+	                          -- to the next "division"
+	local stop = pos * scale / 100 -- This is how much the division steps up
+	local divs = stop
+	if part > stop then
+		divs = stop + scale
+	end
+	return base + divs
+end
+
 -- Function to round a value according to the current rounding method
 function private.roundValue(value)
 	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
-	local pos = math.floor((AucAdvanced.Settings.GetSetting("util.appraiser.round.position") or 0.00) * 100 + 0.5)/100
-	local magstep = AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep") or 5
+	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
+	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep")) 
+	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
+	if pos == nil then pos = 0.10 end
+	if mag == nil then mag = 5 end
+	if sub == nil then sub = 1 end
+	pos = math.floor(pos * 100)
 
-	if method == "div" and pos <= 0.01 then
-		return math.floor(value + 0.5)
-	end
-
-	local magnitude
-	if (value > 10000*magstep) then magnitude = 10000
-	elseif (value > 100*magstep) then magnitude = 100
-	else magnitude = 1 end
-
-	local modulus = math.floor(value / magnitude) * magnitude
-	local fractio = math.floor(value - modulus)
-	if method == "unit" then
-		pos = pos * magnitude
-		if fractio > pos then
-			modulus = modulus + magnitude
-		end
-		fractio = pos
-	elseif method == "div" then
-		pos = pos * magnitude
-		local nextdiv = 0
-		while nextdiv < fractio do
-			nextdiv = nextdiv + pos
-		end
-		if nextdiv > magnitude then
-			nextdiv = 0
-			modulus = modulus + magnitude
-		end
-		fractio = nextdiv
-	end
-	value = modulus + fractio
-	return math.floor(value + 0.5)
+	local new
+	if round[method] then new = round[method](value, pos, mag) end
+	return math.floor(tonumber(new) or tonumber(value) or 1) - 1
 end
 
 function lib.RoundBid(value)
@@ -339,11 +393,18 @@ function private.SetupConfigGui(gui)
 				{"div",_TRANS('APPR_Interface_Divisions') }--Divisions
 				}, "util.appraiser.round.method", _TRANS('APPR_Interface_RoundingMethodUse') )--Rounding method to use
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_RoundingMethodUse') )--You select the rounding algorithm to use for rounding the selected stack prices.
-	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, _TRANS('APPR_Interface_Rounding').." %0.02f" )--Rounding at:
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0.01, 1.00, 0.01, _TRANS('APPR_Interface_Rounding').." %0.02f" )--Rounding at:
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_Rounding') )--This slider allows you to select the position that the rounding algorithm will use to round at
-	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 0, 100, 1, _TRANS('APPR_Interface_StepMagnitude').." %d" )--Step magnitude at:
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 1, 100, 1, _TRANS('APPR_Interface_StepMagnitude').." %d" )--Step magnitude at:
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_StepMagnitude'):format("|cffffff00") )--This slider allows you to select the point at which the rounding will step up to the next unit place %s( copper->silver->gold ).
-	
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.subtract", -99, 99, 1, _TRANS('APPR_Interface_RoundSubtract').." %d" )--Subtract fixed amount:
+	gui:AddTip(id, _TRANS('APPR_HelpTooltip_RoundSubtract'))--This slider allows you to subtract a fixed value from the rounded number to roughen it up (eg: put 1 here to make your "round" 1g25s into 1g24s99c.
+
+	private.roundNote = gui:AddControl(id, "Note",       0, 2, 500, 200, "")
+	local fontFile = private.roundNote:GetFont()
+	private.roundNote:SetFont(fontFile, 15)
+	private.updateRoundExample()
+
 	gui:AddHelp(id, "what is rounding",
 		_TRANS('APPR_Interface_WhatValueRounding') ,--What is value rounding?
 		_TRANS('APPR_HelpTooltip_WhatValueRounding') )--Value rounding is used to cause the auction prices of all listings where the prices are calculated (ie: not fixed price auctions) to be rounded out to neat units. An example of this is if you wanted to always round 1g 42s 15c up to 1g 42s 95c. By using this feature, you can make sure all your auctions will have their prices rounded out.
@@ -366,9 +427,6 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is playerunignore",
 		_TRANS('APPR_Interface_HowUnIgnoreSeller') ,--How to un-ignore a seller's auctions?
 		_TRANS('APPR_HelpTooltip_HowUnIgnoreSeller') )--ALT click on the seller you wish to remove from ignore and select yes in the pop up window. The seller's name will be removed from the BASIC FILTER module's ignored list.
-
-	gui:AddControl(id, "Note",       0, 2, 500, 150,
-_TRANS('APPR_Interface_NoteNumbersRounded') )--If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25). You set the rounding position by setting the slider to the value you want the number to be rounded to. Finally, set the magnitude step position to the place where you want the rounding to step-up to the next place (eg. if this is set to 5, then 4g 72s 15c will round at the copper position, but 5g 72s 15c will round at the silver position).
 
 	--[[
 	gui:AddControl(id, "Subhead",    0,    "Item pricing models")
