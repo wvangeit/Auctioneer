@@ -63,7 +63,7 @@ function lib.SlashCommand(cmd)
 		g = GSC:lower():match("(%d+)%s-g") or 0
 		s = GSC:lower():match("(%d+)%s-s") or 0
 		c = GSC:lower():match("(%d+)%s-c") or 0
-		price = (g*10000+s*100+c) --sum gsc to total copper value
+		price = (g*COPPER_PER_GOLD + s*COPPER_PER_SILVER + c) --sum gsc to total copper value
 	end
 	price = tonumber(price)
 	--pass to snatch		
@@ -473,7 +473,7 @@ function lib.refreshData()
 		--look up the current appraiser valuation to add to display
 		local abid, abuy, appraiser
 		if AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
-			abid, abuy = AucAdvanced.Modules.Util.Appraiser.GetPrice(v.link, nil, true)
+			abuy, abid = AucAdvanced.Modules.Util.Appraiser.GetPrice(v.link, nil, true)
 			appraiser = tonumber(abuy) or tonumber(abid)
 		end
 
@@ -505,7 +505,7 @@ function lib.PopulateBagSheet()
 							0
 						})
 					else
-						local abid,abuy = appraiser.GetPrice(itemLink, nil, true)
+						local abuy, abid = appraiser.GetPrice(itemLink, nil, true)
 						tinsert(bagcontents, {
 							itemLink,
 							tonumber(abuy) or tonumber(abid)
