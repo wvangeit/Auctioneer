@@ -77,7 +77,7 @@ function lib.Processor(callbackType, ...)
 		--private.SetupConfigGui(...)
 		-- We don't have one of these
 	elseif (callbackType == "auctionclose") then
-		if private.isAttached then 
+		if private.isAttached then
 			lib.DetachFromAH()
 		end
 	elseif (callbackType == "auctionui") then
@@ -163,23 +163,18 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 			if success then
 				if value then
 					tooltip:AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue, 1, 0.7, 0.3)
---					tooltip:LineColor(1,0.7,0.3)
 				elseif returnvalue then
 					tooltip:AddLine("  "..name.." profit:", returnvalue, 1, 0.7, 0.3)
---					tooltip:LineColor(1,0.7,0.3)
 				else
 					tooltip:AddLine("  "..name.." success", 1, 0.7, 0.3)
---					tooltip:LineColor(1,0.7,0.3)
 				end
 			else
 				tooltip:AddLine("  "..name..":"..returnvalue, 1, 0.7, 0.3)
---				tooltip:LineColor(1,0.7,0.3)
 			end
 		end
 	end
 	if not active then --if it hasn't changed, we're not enabled for any searcher
 		tooltip:AddLine("  No debugging enabled", 1, 0.7, 0.3)
-		--tooltip:LineColor(1,0.7,0.3)
 	end
 end
 
@@ -198,7 +193,7 @@ local settingDefaults = {
 	["maxprice"] = 10000000,
 	["maxprice.enable"] = false,
 	["tooltiphelp.show"] = true,
-	--Scrollframe defaults 
+	--Scrollframe defaults
 	["columnwidth.Item"] = 120,
 	["columnwidth.Pct"] = 30,
 	["columnwidth.Profit"] = 85,
@@ -621,7 +616,7 @@ function private.bidcancelled(callbackstring)
 		AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
 		print("SearchUI now ignoring "..link.." at "..AucAdvanced.Coins(price, true).." for the session")
 	end
-	
+
 end
 
 function private.ignoretemp()
@@ -703,7 +698,7 @@ function lib.LoadCurrent()
 		lib.LoadSearch()
 		return
 	end
-	
+
 	local existing = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
 	if not existing then
 		hasUnsaved = true
@@ -724,7 +719,7 @@ function lib.LoadSearch()
 		message("SearchUI warning:\nThat search does not exist, please select an available search from the menu.")
 		return
 	end
-	currentSettings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name]) 
+	currentSettings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name])
 	AucAdvancedData.UtilSearchUiData.Current = currentSettings
 	AucAdvancedData.UtilSearchUiData.Selected = name
 	hasUnsaved = nil
@@ -736,7 +731,7 @@ end
 function lib.SaveSearch()
 	initData()
 	local name = gui.saves.name:GetText()
-	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(currentSettings) 
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(currentSettings)
 	AucAdvancedData.UtilSearchUiData.Selected = name
 	hasUnsaved = nil
 	lib.UpdateSave()
@@ -776,7 +771,7 @@ function lib.UpdateSave(inUpdate)
 
 	local name = gui.saves.name:GetText()
 	if inUpdate and curName == name then return end
-		
+
 	if hasUnsaved then
 		local saved = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
 		if saved and isEqual(currentSettings, saved) then
@@ -897,7 +892,7 @@ function lib.CreateAuctionFrames()
 		private.gui:ActivateTab(private.guiId)
 	end)
 ]]
-	
+
 end
 
 function lib.MakeGuiConfig()
@@ -914,7 +909,7 @@ function lib.MakeGuiConfig()
 	gui.expandGap = 25
 	gui.expandOnActivate = true
 	gui.autoScrollTabs = true
-	
+
 	gui.searchers = {}
 	gui.AddSearcher = function (self, searchType, searchDetail, searchPos)
 		lib.AddSearcher(self, searchType, searchDetail, searchPos)
@@ -963,16 +958,16 @@ function lib.MakeGuiConfig()
 	gui.saves.name:SetWidth(200)
 	gui.saves.name:SetHeight(18)
 
- --displays remaining # of scans queued  
+ --displays remaining # of scans queued
 gui.ScansRemaining = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 gui.ScansRemaining:ClearAllPoints()
 gui.ScansRemaining:SetPoint("RIGHT", gui.saves, "LEFT", -5, 0)
 gui.ScansRemaining:SetTextColor(1, 0.8, 0)
 gui.ScansRemaining:SetText("0")
 gui.ScansRemaining:SetJustifyH("RIGHT")
-  
+
 	if AucAdvancedData.UtilSearchUiData then
-		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or "" 
+		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or ""
 		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
 			gui.saves.name:SetText(curSearch)
 		else
@@ -1102,7 +1097,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 			if link and name then
 				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 				AucAdvanced.ShowItemLink(GameTooltip, link, count)
-			end		
+			end
 		end
 	end
 
@@ -1136,8 +1131,8 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 		else
 			lib.SetSetting("columnwidth."..self.labels[column]:GetText(), width)
 		end
-	end	
-	
+	end
+
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", lib.GetSetting("columnwidth.Item") }, --120
 		{ "Pct",    "TEXT", lib.GetSetting("columnwidth.Pct")   }, --30
@@ -1263,7 +1258,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.frame.clear.TooltipText = "Clear results list"
 	gui.frame.clear:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.clear:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	
+
 	gui.frame.cancel = CreateFrame("Button", "AucAdvSearchUICancelButton", gui.frame, "OptionsButtonTemplate")
 	gui.frame.cancel:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 30)
 	gui.frame.cancel:SetWidth(22)
@@ -1304,7 +1299,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.frame.cancel.label:SetTextColor(1, 0.8, 0)
 	gui.frame.cancel.label:SetText("")
 	gui.frame.cancel.label:SetJustifyH("LEFT")
-	
+
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
 	gui.frame.buyout:SetText("Buyout")
@@ -1401,13 +1396,13 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	w=w.."\n"
 	w=w.."In order to begin using the Search UI, you should first setup your filters to exclude the items you don't wish to find, then select a searcher to perform a search.\n"
 	w=w.."\n"
-	w=w.."Here's a quick list of the searchers and filters that you may wish to investigate:\n" 
+	w=w.."Here's a quick list of the searchers and filters that you may wish to investigate:\n"
 	for pos, sdata in keyPairs(gui.searchers) do
 		for searchType, searchDetail in keyPairs(sdata) do
-			w=w..b.."|cffffce00"..searchType.."|r - "..searchDetail.."\n" 
+			w=w..b.."|cffffce00"..searchType.."|r - "..searchDetail.."\n"
 		end
 	end
-	
+
 	gui:AddControl(gui.aboutTab, "Note", 0, 1, nil, nil, w)
 	gui:ActivateTab(gui.aboutTab)
 end
