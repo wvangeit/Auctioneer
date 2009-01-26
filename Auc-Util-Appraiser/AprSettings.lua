@@ -165,7 +165,7 @@ function private.roundValue(value)
 
 	local new
 	if round[method] then new = round[method](value, pos, mag) end
-	return math.floor(tonumber(new) or tonumber(value) or 1) - 1
+	return math.floor(tonumber(new) or tonumber(value) or 1) - sub
 end
 
 function lib.RoundBid(value)
