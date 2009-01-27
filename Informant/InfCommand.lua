@@ -63,7 +63,6 @@ function buildCommandMap()
 		[_INFM('CmdLocale')]		=	'locale',
 		[_INFM('CmdDefault')]		=	'default',
 		[_INFM('CmdEmbed')]			=	'embed',
-		[_INFM('ShowIcon')]			=	'show-icon',
 		[_INFM('ShowILevel')]		=	'show-ilevel',
 		[_INFM('ShowLink')]			=	'show-link',
 		[_INFM('ShowStack')]		=	'show-stack',
@@ -130,8 +129,8 @@ function commandHandler(command, source)
 	elseif (
 		cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
 		cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
-		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon" or
-		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants"
+		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-ilevel" or 
+		cmd == "show-link" or cmd == "show-zero-merchants"
 	) then
 		genVarSet(cmd, param, chatprint)
 	elseif (cmd == "about") then
@@ -162,7 +161,6 @@ function cmdHelp()
 	chatPrint(lineFormat:format(_INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
 	chatPrint(lineFormat:format(_INFM('ShowZeroMerchants'), getLocalizedFilterVal('show-zero-merchants'), _INFM('HelpZeroMerchants')))
 	chatPrint(lineFormat:format(_INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
-	chatPrint(lineFormat:format(_INFM('ShowIcon'), getLocalizedFilterVal('show-icon'), _INFM('HelpIcon')))
 	chatPrint(lineFormat:format(_INFM('ShowILevel'), getLocalizedFilterVal('show-ilevel'), _INFM('HelpILevel')))
 	chatPrint(lineFormat:format(_INFM('ShowLink'), getLocalizedFilterVal('show-link'), _INFM('HelpLink')))
 	chatPrint(lineFormat:format(_INFM('CmdEmbed'), getLocalizedFilterVal('embed'), _INFM('HelpEmbed')))

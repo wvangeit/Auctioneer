@@ -73,8 +73,8 @@ local tooltip = LibStub("nTipHelper:1")
 
 -- GLOBAL VARIABLES
 
-BINDING_HEADER_INFORMANT_HEADER = _INFM('BindingHeader')
-BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('BindingTitle')
+BINDING_HEADER_INFORMANT_HEADER = _TRANS('INF_Interface_BindingHeader')
+BINDING_NAME_INFORMANT_POPUPDOWN = _TRANS('INF_Interface_BindingTitle')
 
 InformantConfig = {}
 
@@ -128,7 +128,7 @@ function skillToName(userSkill)
 	local skillName = self.skills[tonumber(userSkill)]
 	local localized = "Unknown"
 	if (skillName) then
-		localized = _INFM("Skill"..skillName) or "Unknown:"..skillName
+		localized = _TRANS("Skill"..skillName) or "Unknown:"..skillName
 	end
 	return localized, skillName
 end
@@ -201,7 +201,7 @@ function getItem(itemID, static)
 
 	local addition = ""
 	if (additional and additional ~= "") then
-		addition = " - ".._INFM("Addit"..additional)
+		addition = " - ".._TRANS("Addit"..additional)
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
@@ -450,7 +450,7 @@ local function getQuestName(questID)
 	if (self.questNames[questID]) then
 		questName = self.questNames[questID]
 	else
-		questName = _INFM('InfoUntransQuest'):format(questID)
+		questName = _TRANS('INF_Interface_InfWinQuestUnknown'):format(questID)
 	end
 	-- format as just text, looks better
 	return "|cff5599ff"..questName
@@ -462,7 +462,7 @@ end
 
 local function showItem(itemInfo)
 	if (itemInfo) then
-		InformantFrameTitle:SetText(_INFM('FrameTitle'))
+		InformantFrameTitle:SetText(_TRANS('INF_Interface_InfWinTitle'))
 
 		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
 		local quality = itemInfo.itemQuality or itemInfo.quality or 0
@@ -475,7 +475,7 @@ local function showItem(itemInfo)
 		end
 
 		clear()
-		addLine(_INFM('InfoHeader'):format(color, itemInfo.itemName))
+		addLine(_TRANS('INF_Interface_InfWinInfoHeader'):format(color, itemInfo.itemName))
 
 		local buy = itemInfo.itemBuy or itemInfo.buy or 0
 		local sell = itemInfo.itemSell or itemInfo.sell or 0
@@ -489,31 +489,31 @@ local function showItem(itemInfo)
 			if (count and (count > 1)) then
 				local bqgsc = tooltip:Coins(buy*count)
 				local sqgsc = tooltip:Coins(sell*count)
-				addLine(_INFM('FrmtInfoBuymult'):format(count, bgsc)..": "..bqgsc, "ee8822")
-				addLine(_INFM('FrmtInfoSellmult'):format(count, sgsc)..": "..sqgsc, "ee8822")
+				addLine(_TRANS('INF_Interface_InfWinBuyMult'):format(count, bgsc)..": "..bqgsc, "ee8822")
+				addLine(_TRANS('INF_Interface_InfWinSellMult'):format(count, sgsc)..": "..sqgsc, "ee8822")
 			else
-				addLine(_INFM('FrmtInfoBuy'):format()..": "..bgsc, "ee8822")
-				addLine(_INFM('FrmtInfoSell'):format()..": "..sgsc, "ee8822")
+				addLine(_TRANS('INF_Interface_InfWinBuy'):format()..": "..bgsc, "ee8822")
+				addLine(_TRANS('INF_Interface_InfWinSell'):format()..": "..sgsc, "ee8822")
 			end
 		end
 
 		if (itemInfo.stack > 1) then
-			addLine(_INFM('FrmtInfoStx'):format(itemInfo.stack))
+			addLine(_TRANS('INF_Interface_InfWinStack'):format(itemInfo.stack))
 		end
 
 		local reagentInfo = ""
 		if (itemInfo.classText and itemInfo.classText ~= "") then
-			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
+			reagentInfo = _TRANS('INF_Interface_InfWinClass'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.usageText and itemInfo.usageText ~= "") then
-			reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
+			reagentInfo = _TRANS('INF_Interface_InfWinUse'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.isPlayerMade) then
-			addLine(_INFM('InfoPlayerMade'):format(itemInfo.tradeSkillLevel, itemInfo.tradeSkillName), "5060ff")
+			addLine(_TRANS('INF_Interface_InfWinPlayerMade'):format(itemInfo.tradeSkillLevel, itemInfo.tradeSkillName), "5060ff")
 		end
 		
 		local numReq = 0
@@ -527,38 +527,38 @@ local function showItem(itemInfo)
 
 		if (questCount > 0) then
 			addLine("")
-			addLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embed)
+			addLine(_TRANS('INF_Interface_InfWinQuest'):format(questCount), nil, embed)
 
 			if (numSta > 0) then
-				addLine(_INFM('InfoQuestStartsHeader'), "70ee90")
-				addLine("  ".._INFM('InfoQuestLine'):format(getQuestName(itemInfo.startsQuest)), "80ee80")
+				addLine(_TRANS('INF_Interface_InfWinQuestStart'), "70ee90")
+				addLine("  ".._TRANS('INF_Interface_InfWinQuestLine'):format(getQuestName(itemInfo.startsQuest)), "80ee80")
 			end
 			if (numRew > 0) then
-				addLine(_INFM('InfoQuestRewardsHeader'):format(numRew), "70ee90")
+				addLine(_TRANS('INF_Interface_InfWinQuestReward'):format(numRew), "70ee90")
 				for i=1, numRew do
 					quest = itemInfo.rewardFrom[i]
-					addLine("  ".._INFM('InfoQuestLine'):format(getQuestName(quest)), "80ee80")
+					addLine("  ".._TRANS('INF_Interface_InfWinQuestLine'):format(getQuestName(quest)), "80ee80")
 				end
 			end
 			if (numReq > 0) then
-				addLine(_INFM('InfoQuestRequiresHeader'):format(numReq), "70ee90")
+				addLine(_TRANS('INF_Interface_InfWinQuestRequires'):format(numReq), "70ee90")
 				for i=1, numReq do
 					quest = itemInfo.requiredFor[i]
-					addLine("  ".._INFM('InfoQuestLineMult'):format(quest[2], getQuestName(quest[1])), "80ee80")
+					addLine("  ".._TRANS('INF_Interface_InfWinQuestMultiLine'):format(quest[2], getQuestName(quest[1])), "80ee80")
 				end
 			end
-			addLine(_INFM('InfoQuestSource'):format().." WoWHead.com");
+			addLine(_TRANS('INF_Interface_InfWinQuestSource'):format().." WoWHead.com");
 		end
 
 		if (itemInfo.vendors) then
 			local vendorCount = #itemInfo.vendors
 			if (vendorCount > 0) then
 				addLine("")
-				addLine(_INFM('InfoVendorHeader'):format(vendorCount), "ddff40")
+				addLine(_TRANS('INF_Interface_InfWinVendorCount'):format(vendorCount), "ddff40")
 				for pos, merchant in pairs(itemInfo.vendors) do
-					addLine("-".._INFM('InfoVendorName'):format(merchant), "dede3c")
+					addLine("-".._TRANS('INF_Interface_InfWinVendorName'):format(merchant), "dede3c")
 					if itemInfo.vendorLoc[merchant] then
-						addLine("     ".._INFM('InfoVendorName'):format(itemInfo.vendorLoc[merchant]), "ffff86")
+						addLine("     ".._TRANS('INF_Interface_InfWinVendorName'):format(itemInfo.vendorLoc[merchant]), "ffff86")
 					end
 				end
 			end
@@ -566,7 +566,7 @@ local function showItem(itemInfo)
 		InformantFrame:Show()
 	else
 		clear()
-		addLine(_INFM('InfoNoItem'), "ff4010")
+		addLine(_TRANS('INF_Interface_InfWinNoItem'), "ff4010")
 		InformantFrame:Show()
 	end
 end
@@ -801,7 +801,7 @@ function onLoad()
 	this:RegisterEvent("MERCHANT_SHOW");
 	this:RegisterEvent("MERCHANT_UPDATE");
 
-	InformantFrameTitle:SetText(_INFM('FrameTitle'))
+	InformantFrameTitle:SetText(_TRANS('INF_Interface_InfWinTitle'))
 	slidebar()
 end
 
@@ -856,7 +856,7 @@ local function frameLoaded()
 		if (loadType == "always") then
 			LoadAddOn("Informant")
 		else
-			Stubby.Print("]].._INFM('MesgNotLoaded')..[[");
+			Stubby.Print("]].._TRANS('MesgNotLoaded')..[[");
 		end
 	]]);
 end
@@ -866,7 +866,7 @@ function onVariablesLoaded()
 		InformantConfig = {}
 	end
 
-	InformantFrameTitle:SetText(_INFM('FrameTitle'))
+	InformantFrameTitle:SetText(_TRANS('INF_Interface_InfWinTitle'))
 
 	if (InformantConfig.position) then
 		InformantFrame:ClearAllPoints()
@@ -875,7 +875,7 @@ function onVariablesLoaded()
 
 	if (not InformantConfig.welcomed) then
 		clear()
-		addLine(_INFM('Welcome'))
+		addLine(_TRANS('INF_Help_FirstUse'))
 		InformantConfig.welcomed = true
 	end
 

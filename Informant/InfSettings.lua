@@ -126,7 +126,6 @@ local settingDefaults = {
 	['show-merchant'] = true,
 	['show-zero-merchants'] = true,
 	['show-quest'] = true,
-	['show-icon'] = true,
 	['show-ilevel'] = true,
 	['show-link'] = false,
 	['auto-update'] = false,
@@ -203,7 +202,7 @@ local function setter(setting, value)
 				table.sort(profiles)
 			end
 
-			DEFAULT_CHAT_FRAME:AddMessage(_INFM("ChatSavedProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatSavedProfile")..value)
 
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
@@ -233,7 +232,7 @@ local function setter(setting, value)
 					InformantConfig[getUserSig()] = 'Default'
 				end
 
-				DEFAULT_CHAT_FRAME:AddMessage(_INFM("ChatDeletedProfile")..value)
+				DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatDeletedProfile")..value)
 
 			end
 
@@ -246,7 +245,7 @@ local function setter(setting, value)
 			-- Clean it's profile container of values
 			InformantConfig["profile."..value] = {}
 
-			DEFAULT_CHAT_FRAME:AddMessage(_INFM("ChatResetProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatResetProfile")..value)
 
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -255,7 +254,7 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			InformantConfig[getUserSig()] = value
 
-			DEFAULT_CHAT_FRAME:AddMessage(_INFM("ChatUsingProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatUsingProfile")..value)
 
 		end
 
@@ -339,85 +338,81 @@ function lib.MakeGuiConfig()
 
   	gui:AddCat("Informant")	-- TODO - localize me!
 
-	id = gui:AddTab(_INFM("GuiTabGeneral"))
-	gui:AddControl(id, "Header",     0,    _INFM("GuiGeneralOptions"))
+	id = gui:AddTab(_TRANS("GuiTabGeneral"))
+	gui:AddControl(id, "Header",     0,    _TRANS("INF_Interface_GeneralOptions"))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "all", _INFM('GuiMainEnable') )
-	gui:AddTip(id, _INFM('HelpOnoff'))
+	gui:AddControl(id, "Checkbox",   0, 1, "all", _TRANS('INF_Interface_EnableInformant') )
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_EnableInformant'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "embed", _INFM('GuiEmbed') )
-	gui:AddTip(id, _INFM('HelpEmbed'))
+	gui:AddControl(id, "Checkbox",   0, 1, "embed", _TRANS('INF_Interface_Embed') )
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_Embed'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _INFM('GuiVendor'))
-	gui:AddTip(id, _INFM('HelpVendor'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor", _TRANS('INF_Interface_VendorToggle'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_VendorToggle'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-buy", _INFM('GuiVendorBuy'))
-	gui:AddTip(id, _INFM('HelpVendorBuy'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-buy", _TRANS('INF_Interface_ShowVendorBuy'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowVendorBuy'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-sell", _INFM('GuiVendorSell'))
-	gui:AddTip(id, _INFM('HelpVendorSell'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-vendor-sell", _TRANS('INF_Interface_ShowVendorSell'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowVendorSell'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-usage", _INFM('GuiInfoUsage'))
-	gui:AddTip(id, _INFM('HelpUsage'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-usage", _TRANS('INF_Interface_ShowUsage'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowUsage'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-stack", _INFM('GuiInfoStack'))
-	gui:AddTip(id, _INFM('HelpStack'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-stack", _TRANS('INF_Interface_ShowStack'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowStack'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _INFM('GuiInfoMerchant'))
-	gui:AddTip(id, _INFM('HelpMerchant'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-merchant", _TRANS('INF_Interface_ShowMerchant'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowMerchant'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _INFM('GuiInfoNoMerchants'))
-	gui:AddTip(id, _INFM('HelpZeroMerchants'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-zero-merchants", _TRANS('INF_Interface_ShowZeroMerchants'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowZeroMerchants'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _INFM('GuiInfoQuest'))
-	gui:AddTip(id, _INFM('HelpQuest'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-quest", _TRANS('INF_Interface_ShowQuest'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowQuest'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-icon", _INFM('GuiInfoIcon'))
-	gui:AddTip(id, _INFM('HelpIcon'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-ilevel", _TRANS('INF_Interface_ShowIlevel'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowIlevel'))
 
-	gui:AddControl(id, "Checkbox",   0, 1, "show-ilevel", _INFM('GuiInfoILevel'))
-	gui:AddTip(id, _INFM('HelpILevel'))
-
-	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _INFM('GuiInfoLink'))
-	gui:AddTip(id, _INFM('HelpLink'))
+	gui:AddControl(id, "Checkbox",   0, 1, "show-link", _TRANS('INF_Interface_ShowLink'))
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowLink'))
 
 	-- TODO - localize me!
-	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", "Automatically update item information at merchants")
-	gui:AddTip(id, "Allow Informant to scan your bags and merchant inventory for updates")
+	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", _TRANS('INF_Interface_AutoUpdate')) --"Automatically update item information at merchants"
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_AutoUpdate')) --"Allow Informant to scan your bags and merchant inventory for updates"
 
 	-- TODO - localize me!
 	gui:AddHelp(id, "what is",
-		"What is Informant?",
-		"Informant provides extra information about items in tooltips, in an information window, and to other addons."
-	)
+		_TRANS('INF_Help_WhatIs') --"What is Informant?"
+		_TRANS('INF_Help_WhatIsAnswer')) --"Informant provides extra information about items in tooltips, in an information window, and to other addons."
 
 	gui:AddHelp(id, "how to use information window",
-		"How do I use the Information Window?",
-		"You can bind a key to toggle the Informant information window to get more detailed information about items.  To do this, you need to open game options, select \"Key Bindings\" and look for Informant: Toggle Information Window."
-	)
+		_TRANS('INF_Help_HowInfoWin'), --"How do I use the Information Window?"
+		_TRANS('INF_Help_HowInfoWinAnswer')) --"You can bind a key to toggle the Informant information window to get more detailed information about items.  To do this, you need to open game options, select \"Key Bindings\" and look for Informant: Toggle Information Window."
 
+	--Copied from ADV
+	id = gui:AddTab("Profiles")
+	
+	gui:AddControl(id, "Header",     0,    _TRANS('INF_Interface_SetupProfile')) --"Setup, Configure and Edit Profiles"
+	
+	gui:AddControl(id, "Subhead",    0,    _TRANS('INF_Interface_ActivateProfile')) --"Activate a current profile"
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile") --This string isn't shown? 
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ActivateProfile')) --"Select the profile that you wish to use for this character"
 
-	id = gui:AddTab(_INFM("GuiTabProfiles"))
-	gui:AddControl(id, "Header",     0,    _INFM("GuiConfigProfiles"))
+	gui:AddControl(id, "Button",     0, 1, "profile.delete", _TRANS('INF_Interface_Delete')) --"Delete"
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_DeleteProfile')) --"Deletes the currently selected profile"
 
-	gui:AddControl(id, "Subhead",    0,    _INFM("GuiActivateProfile"))
-	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
-	gui:AddTip(id, "Select the profile that you wish to use for this character")	-- TODO - localize me!
+	gui:AddControl(id, "Button",     0, 1, "profile.default", _TRANS('INF_Interface_DefaultProfile'))
+	gui:AddTip(id, _TRANS('INF_Helptooltip_DefaultProfile')) -- Reset all settings for the current profile"
+	
+	gui:AddControl(id, "Subhead",    0,    _TRANS('INF_Interface_CreateProfile')) --"Create or replace a profile"
+	
+	gui:AddControl(id, "Text",       0, 1, "profile.name", _TRANS('INF_Interface_ProfileName')) --"New profile name:"
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ProfileName')) --"Enter the name of the profile that you wish to create"
 
-	gui:AddControl(id, "Button",     0, 1, "profile.delete", _INFM("GuiDeleteProfileButton"))
-	gui:AddTip(id, "Deletes the currently selected profile")	-- TODO - localize me!
-
-	gui:AddControl(id, "Button",     0, 1, "profile.default", _INFM("GuiResetProfileButton"))
-	gui:AddTip(id, "Reset all settings for the current profile")	-- TODO - localize me!
-
-	gui:AddControl(id, "Subhead",    0,    _INFM("GuiCreateReplaceProfile"))
-
-	gui:AddControl(id, "Text",       0, 1, "profile.name", _INFM("GuiNewProfileName"))
-	gui:AddTip(id, "Enter the name of the profile that you wish to create")	-- TODO - localize me!
-
-	gui:AddControl(id, "Button",     0, 1, "profile.save", _INFM("GuiSaveProfileButton"))
-	gui:AddTip(id, "Click this button to create or overwrite the specified profile name")	-- TODO - localize me!
-
+	gui:AddControl(id, "Button",     0, 1, "profile.save", _TRANS('INF_Interface_SaveProfile')) --"Save"
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ProfileSave')) --"Click this button to create or overwrite the specified profile name")
+	
 	-- TODO - localize me!
 	-- these are stolen from EnhTT
 	gui:AddHelp(id, "what is",
