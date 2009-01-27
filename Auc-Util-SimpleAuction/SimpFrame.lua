@@ -158,13 +158,13 @@ function private.GetItems(link)
 
 		if owner and owner == player then
 			if not live then
-				if not uBid then uBid = bidea else uBid = min(uBid, bidea) end
+				if not uBid then uBid = bidea elseif bidea then uBid = min(uBid, bidea) end
 				if not uBuy then uBuy = buyea elseif buyea then uBuy = min(uBuy, buyea) end
 			end
 		else
 			if not lBid then
 				lBid = bidea
-			else
+			elseif bidea then
 				lBid = min(lBid, bidea)
 			end
 			if not lBuy then
