@@ -338,8 +338,8 @@ function lib.MakeGuiConfig()
 
   	gui:AddCat("Informant")	-- TODO - localize me!
 
-	id = gui:AddTab(_TRANS("GuiTabGeneral"))
-	gui:AddControl(id, "Header",     0,    _TRANS("INF_Interface_GeneralOptions"))
+	id = gui:AddTab("General")
+	gui:AddControl(id, "Header",     0,    _TRANS('INF_Interface_GeneralOptions'))
 
 	gui:AddControl(id, "Checkbox",   0, 1, "all", _TRANS('INF_Interface_EnableInformant') )
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_EnableInformant'))
@@ -383,7 +383,7 @@ function lib.MakeGuiConfig()
 
 	-- TODO - localize me!
 	gui:AddHelp(id, "what is",
-		_TRANS('INF_Help_WhatIs') --"What is Informant?"
+		_TRANS('INF_Help_WhatIs'), --"What is Informant?"
 		_TRANS('INF_Help_WhatIsAnswer')) --"Informant provides extra information about items in tooltips, in an information window, and to other addons."
 
 	gui:AddHelp(id, "how to use information window",

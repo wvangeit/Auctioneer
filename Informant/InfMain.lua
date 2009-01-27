@@ -63,6 +63,7 @@ local debugPrintQuick
 local idFromLink
 local OnTooltipAddMoney
 
+
 -- LOCAL VARIABLES
 
 local self = {}

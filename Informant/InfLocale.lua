@@ -39,7 +39,7 @@ local babylonian = Babylonian(InformantLocalizations)
 Informant_CustomLocalizations = {
 }
 
-function _INFM(stringKey, locale)
+function _TRANS(stringKey, locale)
 	if (locale) then
 		if (type(locale) == "string") then
 			return babylonian(locale, stringKey);

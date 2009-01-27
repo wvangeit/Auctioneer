@@ -3,7 +3,7 @@
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://localizer.norganna.org/
 
-	AddOn: Informant II
+	AddOn: Informant
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -30,7 +30,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-Informant IILocalizations = {
+InformantLocalizations = {
 
 	enUS = {
 
@@ -38,6 +38,7 @@ Informant IILocalizations = {
 		["INF_Help_FirstUse"]	= "|c40ff50ffWelcome to Informant|r\n\nSince this is the first time you are using Informant, this message appears to let you know that you must set a key to show this window from within the |cffffffffKeybindings|r section of the |cffffffffGame Menu|r.\n\nFrom then on to view advanced information about items in your inventory, simply move your mouse over the item you want to see information about and press the key that you bound, and this window will popup, filled with information about that item.\n\nAt that point, simply press the key again, or click the close button on this frame.\n\nClick the close button now to continue.";
 		["INF_Help_HowInfoWin"]	= "How do I use the Information Window?";
 		["INF_Help_HowInfoWinAnswer"]	= "You can bind a key to toggle the Informant Information Window to get more detailed information about items. To do this, you need to open the Game Menu, select \"Key Bindings\" and look for Informant: Toggle Information Window.";
+		["INF_Help_Welcome"]	= "Informant v%s loaded";
 		["INF_Help_WhatIs"]	= "What is Informant?";
 		["INF_Help_WhatIsAnswer"]	= "Informant provides extra information about items in the tooltip, an information window, and to other addons.";
 
@@ -71,6 +72,7 @@ Informant IILocalizations = {
 		["INF_Interface_Delete"]	= "Delete";
 		["INF_Interface_Embed"]	= "Embed info into the in-game tooltip";
 		["INF_Interface_EnableInformant"]	= "Enable Informant";
+		["INF_Interface_General"]	= "General";
 		["INF_Interface_GeneralOptions"]	= "General Options";
 		["INF_Interface_InfWinBuy"]	= "Buy from vendor";
 		["INF_Interface_InfWinBuyMult"]	= "Buy %d (%s each)";

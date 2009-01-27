@@ -49,30 +49,30 @@ Informant.InitCommands = function()
 	SLASH_INFORMANT4 = "/inf"
 	SlashCmdList["INFORMANT"] = commandHandler
 
-	chatPrint(_INFM('FrmtWelcome'):format(INFORMANT_VERSION))
+	chatPrint(_TRANS('INF_Help_Welcome'):format(INFORMANT_VERSION))
 end
 
 
 function buildCommandMap()
 	commandMap = {
-		[_INFM('CmdOn')]			=	'on',
-		[_INFM('CmdOff')]			=	'off',
-		[_INFM('CmdHelp')]			=	'help',
-		[_INFM('CmdToggle')]		=	'toggle',
-		[_INFM('CmdDisable')]		=	'disable',
-		[_INFM('CmdLocale')]		=	'locale',
-		[_INFM('CmdDefault')]		=	'default',
-		[_INFM('CmdEmbed')]			=	'embed',
-		[_INFM('ShowILevel')]		=	'show-ilevel',
-		[_INFM('ShowLink')]			=	'show-link',
-		[_INFM('ShowStack')]		=	'show-stack',
-		[_INFM('ShowUsage')]		=	'show-usage',
-		[_INFM('ShowQuest')]		=	'show-quest',
-		[_INFM('ShowMerchant')]		=	'show-merchant',
-		[_INFM('ShowZeroMerchants')] =	'show-zero-merchants',
-		[_INFM('ShowVendor')]		=	'show-vendor',
-		[_INFM('ShowVendorBuy')]	=	'show-vendor-buy',
-		[_INFM('ShowVendorSell')]	=	'show-vendor-sell',
+		[_TRANS('CmdOn')]			=	'on',
+		[_TRANS('CmdOff')]			=	'off',
+		[_TRANS('CmdHelp')]			=	'help',
+		[_TRANS('CmdToggle')]		=	'toggle',
+		[_TRANS('CmdDisable')]		=	'disable',
+		[_TRANS('CmdLocale')]		=	'locale',
+		[_TRANS('CmdDefault')]		=	'default',
+		[_TRANS('CmdEmbed')]			=	'embed',
+		[_TRANS('ShowILevel')]		=	'show-ilevel',
+		[_TRANS('ShowLink')]			=	'show-link',
+		[_TRANS('ShowStack')]		=	'show-stack',
+		[_TRANS('ShowUsage')]		=	'show-usage',
+		[_TRANS('ShowQuest')]		=	'show-quest',
+		[_TRANS('ShowMerchant')]		=	'show-merchant',
+		[_TRANS('ShowZeroMerchants')] =	'show-zero-merchants',
+		[_TRANS('ShowVendor')]		=	'show-vendor',
+		[_TRANS('ShowVendorBuy')]	=	'show-vendor-buy',
+		[_TRANS('ShowVendorSell')]	=	'show-vendor-sell',
 	}
 
 	commandMapRev = {}
@@ -134,10 +134,10 @@ function commandHandler(command, source)
 	) then
 		genVarSet(cmd, param, chatprint)
 	elseif (cmd == "about") then
-		chatPrint(_INFM('about'))
+		chatPrint(_TRANS('about'))
 	else
 		if (chatprint) then
-			chatPrint(_INFM('FrmtActUnknown'):format(cmd))
+			chatPrint(_TRANS('FrmtActUnknown'):format(cmd))
 		end
 	end
 end
@@ -145,31 +145,31 @@ end
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function cmdHelp()
 
-	local onOffToggle = " (".._INFM('CmdOn').."/".._INFM('CmdOff').."/".._INFM('CmdToggle')..")"
+	local onOffToggle = " (".._TRANS('CmdOn').."/".._TRANS('CmdOff').."/".._TRANS('CmdToggle')..")"
 	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
-	chatPrint(_INFM('TextUsage'))
-	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _INFM('HelpOnoff'))
+	chatPrint(_TRANS('TextUsage'))
+	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _TRANS('HelpOnoff'))
 
-	chatPrint("  |cffffffff/informant ".._INFM('CmdDisable').."|r - " .. _INFM('HelpDisable'))
+	chatPrint("  |cffffffff/informant ".._TRANS('CmdDisable').."|r - " .. _TRANS('HelpDisable'))
 
-	chatPrint(lineFormat:format(_INFM('ShowVendor'), getLocalizedFilterVal('show-vendor'), _INFM('HelpVendor')))
-	chatPrint(lineFormat:format(_INFM('ShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _INFM('HelpVendorSell')))
-	chatPrint(lineFormat:format(_INFM('ShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _INFM('HelpVendorBuy')))
-	chatPrint(lineFormat:format(_INFM('ShowUsage'), getLocalizedFilterVal('show-usage'), _INFM('HelpUsage')))
-	chatPrint(lineFormat:format(_INFM('ShowQuest'), getLocalizedFilterVal('show-quest'), _INFM('HelpQuest')))
-	chatPrint(lineFormat:format(_INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
-	chatPrint(lineFormat:format(_INFM('ShowZeroMerchants'), getLocalizedFilterVal('show-zero-merchants'), _INFM('HelpZeroMerchants')))
-	chatPrint(lineFormat:format(_INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
-	chatPrint(lineFormat:format(_INFM('ShowILevel'), getLocalizedFilterVal('show-ilevel'), _INFM('HelpILevel')))
-	chatPrint(lineFormat:format(_INFM('ShowLink'), getLocalizedFilterVal('show-link'), _INFM('HelpLink')))
-	chatPrint(lineFormat:format(_INFM('CmdEmbed'), getLocalizedFilterVal('embed'), _INFM('HelpEmbed')))
+	chatPrint(lineFormat:format(_TRANS('ShowVendor'), getLocalizedFilterVal('show-vendor'), _TRANS('HelpVendor')))
+	chatPrint(lineFormat:format(_TRANS('ShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _TRANS('HelpVendorSell')))
+	chatPrint(lineFormat:format(_TRANS('ShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _TRANS('HelpVendorBuy')))
+	chatPrint(lineFormat:format(_TRANS('ShowUsage'), getLocalizedFilterVal('show-usage'), _TRANS('HelpUsage')))
+	chatPrint(lineFormat:format(_TRANS('ShowQuest'), getLocalizedFilterVal('show-quest'), _TRANS('HelpQuest')))
+	chatPrint(lineFormat:format(_TRANS('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _TRANS('HelpMerchant')))
+	chatPrint(lineFormat:format(_TRANS('ShowZeroMerchants'), getLocalizedFilterVal('show-zero-merchants'), _TRANS('HelpZeroMerchants')))
+	chatPrint(lineFormat:format(_TRANS('ShowStack'), getLocalizedFilterVal('show-stack'), _TRANS('HelpStack')))
+	chatPrint(lineFormat:format(_TRANS('ShowILevel'), getLocalizedFilterVal('show-ilevel'), _TRANS('HelpILevel')))
+	chatPrint(lineFormat:format(_TRANS('ShowLink'), getLocalizedFilterVal('show-link'), _TRANS('HelpLink')))
+	chatPrint(lineFormat:format(_TRANS('CmdEmbed'), getLocalizedFilterVal('embed'), _TRANS('HelpEmbed')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
-	chatPrint(lineFormat:format(_INFM('CmdLocale'), _INFM('OptLocale'), getLocalizedFilterVal('locale'), _INFM('HelpLocale')))
+	chatPrint(lineFormat:format(_TRANS('CmdLocale'), _TRANS('OptLocale'), getLocalizedFilterVal('locale'), _TRANS('HelpLocale')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r - %s"
-	chatPrint(lineFormat:format(_INFM('CmdDefault'), "", _INFM('HelpDefault')))
+	chatPrint(lineFormat:format(_TRANS('CmdDefault'), "", _TRANS('HelpDefault')))
 end
 
 
@@ -205,9 +205,9 @@ function onOff(state, chatprint)
 		state = Informant.Settings.GetSetting('all')
 
 		if (state) then
-			chatPrint(_INFM('StatOn'))
+			chatPrint(_TRANS('StatOn'))
 		else
-			chatPrint(_INFM('StatOff'))
+			chatPrint(_TRANS('StatOff'))
 		end
 	end
 end
@@ -217,7 +217,7 @@ function restoreDefault(param, chatprint)
 
 	if ( (param == nil) or (param == "") ) then
 		return
-	elseif ((param == _INFM('CmdClearAll')) or (param == "all")) then
+	elseif ((param == _TRANS('CmdClearAll')) or (param == "all")) then
 		param = "all"
 		Informant.Settings.RestoreDefaults()
 	else
@@ -228,9 +228,9 @@ function restoreDefault(param, chatprint)
 
 	if (chatprint) then
 		if (param == "all") then
-			chatPrint(_INFM('FrmtActDefaultall'))
+			chatPrint(_TRANS('FrmtActDefaultall'))
 		else
-			chatPrint(_INFM('FrmtActDefault'):format(paramLocalized))
+			chatPrint(_TRANS('FrmtActDefault'):format(paramLocalized))
 		end
 	end
 end
@@ -248,9 +248,9 @@ function genVarSet(variable, param, chatprint)
 
 	if (chatprint) then
 		if (Informant.Settings.GetSetting(variable)) then
-			chatPrint(_INFM('FrmtActEnable'):format(localizeCommand(variable)))
+			chatPrint(_TRANS('FrmtActEnable'):format(localizeCommand(variable)))
 		else
-			chatPrint(_INFM('FrmtActDisable'):format(localizeCommand(variable)))
+			chatPrint(_TRANS('FrmtActDisable'):format(localizeCommand(variable)))
 		end
 	end
 end
@@ -276,14 +276,14 @@ function setLocale(param, chatprint)
 	end
 
 	BINDING_HEADER_INFORMANT_HEADER = "Informant"
-	BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('MesgToggleWindow')
+	BINDING_NAME_INFORMANT_POPUPDOWN = _TRANS('MesgToggleWindow')
 
 	if (chatprint) then
 		if (validLocale) then
-			chatPrint(_INFM('FrmtActSet'):format(_INFM('CmdLocale'), param))
+			chatPrint(_TRANS('FrmtActSet'):format(_TRANS('CmdLocale'), param))
 
 		else
-			chatPrint(_INFM("FrmtUnknownLocale"):format(param))
+			chatPrint(_TRANS("FrmtUnknownLocale"):format(param))
 			local locales = "    "
 			for locale, data in pairs(InformantLocalizations) do
 				locales = locales .. " '" .. locale .. "' "
@@ -307,16 +307,16 @@ end
 --------------------------------------
 
 function delocalizeFilterVal(value)
-	if (value == _INFM('CmdOn')) then
+	if (value == _TRANS('CmdOn')) then
 		return true
 
-	elseif (value == _INFM('CmdOff')) then
+	elseif (value == _TRANS('CmdOff')) then
 		return false
 
-	elseif (value == _INFM('CmdDefault')) then
+	elseif (value == _TRANS('CmdDefault')) then
 		return 'default'
 
-	elseif (value == _INFM('CmdToggle')) then
+	elseif (value == _TRANS('CmdToggle')) then
 		return 'toggle'
 
 	else
@@ -328,16 +328,16 @@ function localizeFilterVal(value)
 	local result
 
 	if (value == 'on' or (type(value) == "boolean" and value == true)) then
-		result = _INFM('CmdOn')
+		result = _TRANS('CmdOn')
 
 	elseif (value == 'off' or (type(value) == "boolean" and value == false)) then
-		result = _INFM('CmdOff')
+		result = _TRANS('CmdOff')
 
 	elseif (value == 'default') then
-		result = _INFM('CmdDefault')
+		result = _TRANS('CmdDefault')
 
 	elseif (value == 'toggle') then
-		result = _INFM('CmdToggle')
+		result = _TRANS('CmdToggle')
 	end
 
 	return result or value
