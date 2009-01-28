@@ -45,6 +45,7 @@ InformantLocalizations = {
 		-- Section: HelpTooltip
 		["INF_HelpTooltip_ActivateProfile"]	= "Select the profile that you wish to use for this character";
 		["INF_HelpTooltip_AutoUpdate"]	= "Allow Informant to scan your bags and merchant inventory for updates";
+		["INF_Helptooltip_DefaultProfile"]	= "Reset all settings for the current profile";
 		["INF_HelpTooltip_DeleteProfile"]	= "Deletes the currently selected profile";
 		["INF_HelpTooltip_Embed"]	= "Embed most of the info in the original game-tooltip (note: the item's link cannot be embedded)";
 		["INF_HelpTooltip_EnableInformant"]	= "Toggles Informant's data display on and off";
@@ -62,7 +63,6 @@ InformantLocalizations = {
 		["INF_HelpTooltip_VendorToggle"]	= "Toggle to show an item's vendor buy/sell pricing";
 
 		-- Section: Interface
-		["INF_Helptooltip_DefaultProfile"]	= "Reset all settings for the current profile";
 		["INF_Interface_ActivateProfile"]	= "Activate a current profile";
 		["INF_Interface_AutoUpdate"]	= "Automatically update item information at merchants";
 		["INF_Interface_BindingHeader"]	= "Informant";
@@ -74,9 +74,6 @@ InformantLocalizations = {
 		["INF_Interface_EnableInformant"]	= "Enable Informant";
 		["INF_Interface_General"]	= "General";
 		["INF_Interface_GeneralOptions"]	= "General Options";
-		["INF_Interface_InfWinBuy"]	= "Buy from vendor";
-		["INF_Interface_InfWinBuyMult"]	= "Buy %d (%s each)";
-		["INF_Interface_InfWinClass"]	= "Class: %s";
 		["INF_Interface_InfWinInfoHeader"]	= "Information for |cff%s%s|r";
 		["INF_Interface_InfWinNoItem"]	= "You must mouse over an item, then press the activation key.";
 		["INF_Interface_InfWinPlayerMade"]	= "Made by level %d %s";
@@ -88,11 +85,7 @@ InformantLocalizations = {
 		["INF_Interface_InfWinQuestSource"]	= "Quest data provided by";
 		["INF_Interface_InfWinQuestStart"]	= "Starts a quest:";
 		["INF_Interface_InfWinQuestUnknown"]	= "Unknown quest: ID #%d";
-		["INF_Interface_InfWinSell"]	= "Sell to vendor";
-		["INF_Interface_InfWinSellMult"]	= "Sell %d (%s each)";
-		["INF_Interface_InfWinStack"]	= "Stacks in lots of %d";
 		["INF_Interface_InfWinTitle"]	= "Informant Item Information";
-		["INF_Interface_InfWinUse"]	= "Used for: %s";
 		["INF_Interface_InfWinVendorCount"]	= "Available from %d merchants:";
 		["INF_Interface_InfWinVendorName"]	= "   %s";
 		["INF_Interface_ProfileName"]	= "New profile name";
@@ -108,6 +101,45 @@ InformantLocalizations = {
 		["INF_Interface_ShowVendorSell"]	= "Show an item's vendor sell price";
 		["INF_Interface_ShowZeroMerchants"]	= "Show a message when no merchants are known";
 		["INF_Interface_VendorToggle"]	= "Show Vendor Buy/Sell Prices";
+
+		-- Section: Tooltip
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Blacksmithing";
+		["INF_HelpTooltip_SkillCooking"]	= "Cooking";
+		["INF_Tooltip_Class"]	= "Class: %s";
+		["INF_Tooltip_Fishing"]	= "Fishing";
+		["INF_Tooltip_ItemLevel"]	= "Item Level: %d";
+		["INF_Tooltip_ItemLink"]	= "Link: %s";
+		["INF_Tooltip_NoKnownMerchants"]	= "Sold by no known merchants";
+		["INF_Tooltip_ShowMerchant"]	= "Sold by %d merchants";
+		["INF_Tooltip_ShowVendorBuy"]	= "Buy from vendor";
+		["INF_Tooltip_ShowVendorBuyMult"]	= "Buy %d (%s each)";
+		["INF_Tooltip_ShowVendorSell"]	= "Sell to vendor";
+		["INF_Tooltip_ShowVendorSellMult"]	= "Sell %d (%s each)";
+		["INF_Tooltip_SkillAlchemy"]	= "Alchemy";
+		["INF_Tooltip_SkillBlacksmithing"]	= "Blacksmithing";
+		["INF_Tooltip_SkillCooking"]	= "Cooking";
+		["INF_Tooltip_SkillDeathKnight"]	= "Death Knight Skills";
+		["INF_Tooltip_SkillDruid"]	= "Druid Spells";
+		["INF_Tooltip_SkillEnchanting"]	= "Enchanting";
+		["INF_Tooltip_SkillEngineering"]	= "Engineering";
+		["INF_Tooltip_SkillFirstAid"]	= "First Aid";
+		["INF_Tooltip_SkillFishing"]	= "Fishing";
+		["INF_Tooltip_SkillHerbalism"]	= "Herbalism";
+		["INF_Tooltip_SkillInscription"]	= "Inscription";
+		["INF_Tooltip_SkillJewelcrafting"]	= "Jewelcrafting";
+		["INF_Tooltip_SkillLeatherworking"]	= "Leatherworking";
+		["INF_Tooltip_SkillMage"]	= "Mage Spells";
+		["INF_Tooltip_SkillMining"]	= "Mining";
+		["INF_Tooltip_SkillPaladin"]	= "Paladin Spells";
+		["INF_Tooltip_SkillPriest"]	= "Priest Spells";
+		["INF_Tooltip_SkillRiding"]	= "Riding";
+		["INF_Tooltip_SkillRogue"]	= "Rogue Skills";
+		["INF_Tooltip_SkillShaman"]	= "Shaman Spells";
+		["INF_Tooltip_SkillTailoring"]	= "Tailoring";
+		["INF_Tooltip_SkillWarlock"]	= "Warlock Spells";
+		["INF_Tooltip_SkillWarrior"]	= "Warrior Skills";
+		["INF_Tooltip_StackSize"]	= "Stacks in lots of %d";
+		["INF_Tooltip_Use"]	= "Used for: %s";
 
 	};
 

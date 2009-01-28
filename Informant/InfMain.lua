@@ -129,7 +129,7 @@ function skillToName(userSkill)
 	local skillName = self.skills[tonumber(userSkill)]
 	local localized = "Unknown"
 	if (skillName) then
-		localized = _TRANS("Skill"..skillName) or "Unknown:"..skillName
+		localized = _TRANS('INF_Tooltip_Skill'..skillName) or "Unknown: "..skillName
 	end
 	return localized, skillName
 end
@@ -490,26 +490,26 @@ local function showItem(itemInfo)
 			if (count and (count > 1)) then
 				local bqgsc = tooltip:Coins(buy*count)
 				local sqgsc = tooltip:Coins(sell*count)
-				addLine(_TRANS('INF_Interface_InfWinBuyMult'):format(count, bgsc)..": "..bqgsc, "ee8822")
-				addLine(_TRANS('INF_Interface_InfWinSellMult'):format(count, sgsc)..": "..sqgsc, "ee8822")
+				addLine(_TRANS('INF_Tooltip_ShowVendorBuyMult'):format(count, bgsc)..": "..bqgsc, "ee8822")
+				addLine(_TRANS('INF_Tooltip_ShowVendorSellMult'):format(count, sgsc)..": "..sqgsc, "ee8822")
 			else
-				addLine(_TRANS('INF_Interface_InfWinBuy'):format()..": "..bgsc, "ee8822")
-				addLine(_TRANS('INF_Interface_InfWinSell'):format()..": "..sgsc, "ee8822")
+				addLine(_TRANS('INF_Tooltip_ShowVendorBuy'):format()..": "..bgsc, "ee8822")
+				addLine(_TRANS('INF_Tooltip_ShowVendorSell'):format()..": "..sgsc, "ee8822")
 			end
 		end
 
 		if (itemInfo.stack > 1) then
-			addLine(_TRANS('INF_Interface_InfWinStack'):format(itemInfo.stack))
+			addLine(_TRANS('INF_Tooltip_StackSize'):format(itemInfo.stack))
 		end
 
 		local reagentInfo = ""
 		if (itemInfo.classText and itemInfo.classText ~= "") then
-			reagentInfo = _TRANS('INF_Interface_InfWinClass'):format(itemInfo.classText)
+			reagentInfo = _TRANS('INF_Tooltip_Class'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.usageText and itemInfo.usageText ~= "") then
-			reagentInfo = _TRANS('INF_Interface_InfWinUse'):format(itemInfo.usageText)
+			reagentInfo = _TRANS('INF_Tooltip_Use'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
