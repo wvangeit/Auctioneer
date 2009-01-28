@@ -202,7 +202,7 @@ local function setter(setting, value)
 				table.sort(profiles)
 			end
 
-			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatSavedProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("INF_Help_ChatProfileSaved")..value)
 
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
@@ -232,7 +232,7 @@ local function setter(setting, value)
 					InformantConfig[getUserSig()] = 'Default'
 				end
 
-				DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatDeletedProfile")..value)
+				DEFAULT_CHAT_FRAME:AddMessage(_TRANS("INF_Help_ChatProfileDeleted")..value)
 
 			end
 
@@ -245,7 +245,7 @@ local function setter(setting, value)
 			-- Clean it's profile container of values
 			InformantConfig["profile."..value] = {}
 
-			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatResetProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("INF_Help_ChatProfileReset")..value)
 
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -254,7 +254,7 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			InformantConfig[getUserSig()] = value
 
-			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("ChatUsingProfile")..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_TRANS("INF_Help_ChatProfileUsing")..value)
 
 		end
 

@@ -202,7 +202,7 @@ function getItem(itemID, static)
 
 	local addition = ""
 	if (additional and additional ~= "") then
-		addition = " - ".._TRANS("Addit"..additional)
+		addition = " - ".._TRANS('INF_Tooltip_Addit'..additional)
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
