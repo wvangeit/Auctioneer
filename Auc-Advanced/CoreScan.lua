@@ -978,8 +978,9 @@ function lib.GetAuctionItem(list, i)
 		local timeLeft = GetAuctionItemTimeLeft(list, i)
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(list, i)
 		local invType = Const.InvTypes[itemEquipLoc]
-		local buyoutPrice = buyoutPrice or 0
+		buyoutPrice = buyoutPrice or 0
 		local nextBid = minBid
+		if not minBid or minBid == 0 then minBid = 0 nextBid = 1 end
 		if bidAmount > 0 then nextBid = bidAmount + minIncrement end
 		if not count or count == 0 then count = 1 end
 		if not highBidder then highBidder = false
