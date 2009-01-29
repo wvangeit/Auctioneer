@@ -261,18 +261,18 @@ BeanCounterLocalizations = {
 		-- Section: Config Text
 		["C_BeanCounterConfig"]	= "BeanCounter Config";
 		["C_BeanCounterDatabaseMaintenance"]	= "BeanCounter Database Maintenance";
-		["C_BeanCounterOptions"]	= "BeanCounter options";
+		["C_BeanCounterOptions"]	= "BeanCounter Options";
 		["C_DataMaintenance"]	= "Data Maintenance";
 		["C_DateString"]	= "Date format to use:";
 		["C_DateStringExample"]	= "Example Date:";
-		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search?";
+		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search";
 		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
 		["C_MailRecolor"]	= "Mail Re-Color Method";
 		["C_Resortascendingtime"]	= "Resort all entries by ascending time";
 		["C_ResortDatabase"]	= "Resort Database";
 		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using.";
-		["C_ShowBeginnerTooltips"]	= "Show beginner tooltips on mouse over.";
-		["C_ShowReasonPurchase"]	= "Show reason for purchase in the games Tooltips.";
+		["C_ShowBeginnerTooltips"]	= "Show beginner tooltips on mouse over";
+		["C_ShowReasonPurchase"]	= "Show reason for purchase in the tooltip";
 		["C_ValidateDatabase"]	= "Validate Database";
 
 		-- Section: Generic Strings
@@ -319,19 +319,20 @@ BeanCounterLocalizations = {
 		["TTMailRecolor"]	= "Choose how mail will appear after BeanCounter has scanned the Mail Box.";
 		["TTOpenconfig"]	= "Opens the BeanCounter configuration window";
 		["TTResort Database"]	= "This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions.";
-		["TTShowBeginnerTooltips"]	= "Turns on the beginner tooltips that display on mouse over.";
+		["TTShowBeginnerTooltips"]	= "Display the beginner tooltips on mouse over.";
 		["TTShowReasonPurchase"]	= "Turns on the SearchUI reason an item was purchased for in the tooltip.";
 		["TTValidateDatabase"]	= "This will scan Beancounter's Data and attempt to correct any errors it may find. Use if you are getting errors on search.";
 		["TT_AuctionCheck"]	= "Display items sold at the Auction House.";
 		["TT_AuctionFailedCheck"]	= "Display items you failed to sell.";
 		["TT_BeanCounterSelectBox"]	= "Filter search results by server, player or faction.";
 		["TT_BidCheck"]	= "Display items bought from the Auction House.";
-		["TT_BidFailedCheck"]	= "Display items you were outbided on.";
+		["TT_BidFailedCheck"]	= "Display items you were outbid on";
 		["TT_ClassicCheck"]	= "Display results from BeanCounter Classic Database.";
-		["TT_ExactCheck"]	= "Only match the Exact text in the search box.";
+		["TT_ExactCheck"]	= "Only match the exact text in the search box";
 		["TT_ItemIconBox"]	= "Drop an item here to start a search for it.\nDisplays current search's icon if possible.";
 		["TT_ScrollHeader"]	= "\nRightclick+Drag to resize\nCTRL+RightClick to reset";
-		["TT_SearchBox'"]	= "Enter search query's here or leave blank to search all.";
+		["TT_SearchBox"]	= "Enter search queries here or leave blank to search all";
+		["TT_SearchBox'"]	= "Enter search query's here or leave blank to search all";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auction History Database";
@@ -413,7 +414,7 @@ BeanCounterLocalizations = {
 		["MailAuctionExpiredSubject"]	= "Subasta terminada";
 		["MailAuctionSuccessfulSubject"]	= "Subasta conseguida";
 		["MailAuctionWonSubject"]	= "Subasta ganada";
-		["MailHordeAuctionHouse"]	= "Casa de subastas de la Horda";
+		["MailHordeAuctionHouse"]	= "Casa de subastas: Horda";
 		["MailOutbidOnSubject"]	= "Puja superada en";
 
 		-- Section: Tooltip Messages
