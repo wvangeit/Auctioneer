@@ -2202,7 +2202,7 @@ function private.CreateFrames()
 	frame.salebox.bid.label = frame.salebox.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
 	frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
-	frame.salebox.bid.label:SetText("Bid per item:")
+	frame.salebox.bid.label:SetText(_TRANS('APPR_Interface_BidPerItem')) --Bid per item:
 	frame.salebox.bid.label:SetJustifyH("RIGHT")
 
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
