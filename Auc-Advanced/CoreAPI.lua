@@ -264,6 +264,7 @@ do
     end
 end
 
+
 function lib.ClearItem(itemLink, serverKey)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules("ClearItem")
@@ -718,6 +719,23 @@ function lib.GenerateBellCurve()
     return setmetatable({mean=0, stddev=1, param1=sqrtpiinv, param2=2}, bellCurveMeta);
 end
 
+-- Dumps out market pricing information for debugging. Only handles bell curves for now.
+function lib.DumpMarketPrice(itemLink, serverKey) 
+	local modules = AucAdvanced.GetAllModules(nil, "Stat");
+	for pos, engineLib in ipairs(modules) do
+		local success, result = pcall(engineLib.GetItemPDF, itemLink, serverKey);
+		if not success then
+			print(engineLib.GetName() .. ": Reported error: " .. tostring(result));
+		else
+			if getmetatable(result) == bellCurveMeta then
+				print(engineLib.GetName() .. ": Mean = " .. result.mean .. ", Standard Deviation = " .. result.stddev);
+			else
+				print(engineLib.GetName() .. ": Non-Standard PDF: " .. tostring(result));
+			end
+		end
+	end
+
+end
 
 --[[===========================================================================
 --|| Deprecation Alert Functions
