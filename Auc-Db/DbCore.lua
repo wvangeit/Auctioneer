@@ -40,12 +40,12 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 if not AucAdvanced then return end
 
-local libType, libName = "Util", "AucDB"
+local libType, libName = "Util", "AucDb"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
-AucDB = lib
+AucDb = lib
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -53,52 +53,47 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-local function getTime()
-	return time()
-end
-
-local rope = LibStub("StringRope"):New()
-local faction, scanid
-function private.process(operation, itemData, oldData)
-	if (faction and scanid) then
-		if not rope:IsEmpty() then rope:Add(";") end
-		rope:AddDelimited(":", itemData.itemId, itemData.itemSuffix, itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
-
-		AucDbData.names[("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,itemData.itemEnchant)] = itemData.itemName;
-	end
-end
-
-if true or lib.Enabled then
-	lib.ScanProcessors = {
-		begin = function ()
-			rope:Clear()
-			scanid = getTime()
-			faction = AucAdvanced.GetFaction()
-			if not AucDbData then AucDbData = {} end
-			if not AucDbData[faction] then AucDbData[faction] = {} end
-		end,
-		create = private.process,
-		update = private.process,
-		complete = function ()
-			AucDbData[faction][scanid] = rope:Get()
-			rope:Clear()
-		end
-	}
-end
-
 lib.LoadTriggers = { ["auc-db"] = true }
 function lib.OnLoad()
-	if not AucDbData then AucDbData = { names = {} } return end
+	if not AucDbData then AucDbData = {} end
+	if not AucDbData.bids then AucDbData.bids = {} end
+	if not AucDbData.sales then AucDbData.sales = {} end
+	if not AucDbData.scans then AucDbData.scans = {} end
 	if not AucDbData.names then AucDbData.names = {} end
+	if not AucDbData.price then AucDbData.price = {} end
+	if not AucDbData.count then AucDbData.count = {} end
 
 	local expires = time() - (86400 * 3) -- 3 day expiry
-	for realm, rData in pairs(AucDbData) do
-		if (realm ~= "names") then
-			for tStamp, tData in pairs(rData) do
-				if tStamp < expires then
-					rData[tStamp] = nil
+	local dExpires = math.floor(time()/86400) - 14 -- 14 day expiry
+	local update = tonumber(lib.UpToDate) or 0
+	if update > expires then expires = update end
+	for section, sData in pairs(AucDbData) do
+		if section == "bids" or section == "sales" or section == "scans" then
+			for realm, rData in pairs(sData) do
+				for tStamp, tData in pairs(rData) do
+					if tStamp <= expires then
+						rData[tStamp] = nil
+					end
 				end
 			end
+		elseif section == "count" then
+			for realm, rData in pairs(sData) do
+				for itemSig, iData in pairs(rData) do
+					local c = 0
+					for dStamp, dData in pairs(iData) do
+						c = c + 1
+						if dStamp <= dExpires then
+							iData[dStamp] = nil
+							c = c - 1
+						end
+					end
+					if c == 0 then
+						rData[itemSig] = nil
+					end
+				end
+			end
+		elseif not (section == "names" or section == "price") then
+			AucDbData[section] = nil
 		end
 	end
 end

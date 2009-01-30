@@ -7,10 +7,11 @@
 ## Dependencies: Auc-Advanced
 ## SavedVariables: AucDbData
 ##
-## Version: <%version%>
-## Revision: $Id$
+## X-Revision: 101
 ## URL: http://auctioneerdb.com/
 ##
 Support\Load.xml
 DbCore.lua
+DbStatus.lua
+DbMain.lua
 DbData.lua
