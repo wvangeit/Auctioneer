@@ -976,7 +976,7 @@ function lib.GetAuctionItem(list, i)
 			4 -- very long time (8 hours+)
 		]]
 		local timeLeft = GetAuctionItemTimeLeft(list, i)
-		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(list, i)
+		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
 		local invType = Const.InvTypes[itemEquipLoc]
 		buyoutPrice = buyoutPrice or 0
 		local nextBid = minBid
@@ -994,6 +994,27 @@ function lib.GetAuctionItem(list, i)
 			minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
 			0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
 		}
+	end
+end
+
+function lib.GetAuctionSellItem(minBid, buyoutPrice, runTime)
+	local itemLink = private.auctionItem
+	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
+
+	if name and itemLink then
+		itemLink = AucAdvanced.SanitizeLink(itemLink)
+		local _,_,_,itemLevel,level,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+		local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)
+		local timeLeft = 4
+		if runTime <= 12*60 then timeLeft = 3 end
+		local curTime = time()
+
+		return {
+			itemLink, itemLevel, itemType, itemSubType, invType, minBid,
+			timeLeft, curTime, name, texture, count, quality, canUse, level,
+			minBid, 0, buyoutPrice, 0, nil, UnitName("player"),
+			0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
+		}, price
 	end
 end
 
@@ -1183,7 +1204,7 @@ end
 
 private.Hook = {}
 private.Hook.PlaceAuctionBid = PlaceAuctionBid
-function PlaceAuctionBid(type, index, bid)
+function PlaceAuctionBid(type, index, bid, ...)
 	local itemData = lib.GetAuctionItem(type, index)
 	if itemData then
 		private.Unpack(itemData, statItem)
@@ -1194,7 +1215,56 @@ function PlaceAuctionBid(type, index, bid)
 			end
 		end
 	end
-	return private.Hook.PlaceAuctionBid(type, index, bid)
+	return private.Hook.PlaceAuctionBid(type, index, bid, ...)
+end
+
+private.Hook.ClickAuctionSellItemButton = ClickAuctionSellItemButton
+function ClickAuctionSellItemButton(...)
+	local ctype, itemID, itemLink = GetCursorInfo()
+	if ctype == "item" then
+		private.auctionItem = itemLink
+	else
+		private.auctionItem = nil
+	end
+	return private.Hook.ClickAuctionSellItemButton(...)
+end
+
+private.Hook.StartAuction = StartAuction
+function StartAuction(minBid, buyoutPrice, runTime, ...)
+	local itemData, price = lib.GetAuctionSellItem(minBid, buyoutPrice, runTime)
+	if itemData then
+		private.Unpack(itemData, statItem)
+		local modules = AucAdvanced.GetAllModules("ScanProcessors")
+		for pos, engineLib in ipairs(modules) do
+			if engineLib.ScanProcessors["newauc"] then
+				engineLib.ScanProcessors["newauc"]("newauc", statItem, minBid, buyoutPrice, runTime, price)
+			end
+		end
+	end
+	return private.Hook.StartAuction(minBid, buyoutPrice, runTime, ...)
+end
+
+private.Hook.TakeInboxMoney = TakeInboxMoney
+function TakeInboxMoney(index, ...)
+	local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(index)
+	if invoiceType then
+		local modules = AucAdvanced.GetAllModules("ScanProcessors")
+		local _,_, sender = GetInboxHeaderInfo(index)
+
+		local faction = "Neutral"
+		if sender:find(FACTION_ALLIANCE) then
+			faction = "Alliance"
+		elseif sender:find(FACTION_HORDE) then
+			faction = "Horde"
+		end
+
+		for pos, engineLib in ipairs(modules) do
+			if engineLib.ScanProcessors["aucsold"] then
+				engineLib.ScanProcessors["aucsold"]("aucsold", faction, itemName, playerName, bid, buyout, deposit, consignment)
+			end
+		end
+	end
+	return private.Hook.TakeInboxMoney(index, ...)
 end
 
 private.Hook.QueryAuctionItems = QueryAuctionItems
