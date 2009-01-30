@@ -1,7 +1,7 @@
 --[[
         Up-to-date list of vendors and locations for informant.
         File courtesy of http://www.wowhead.com/
-        File generated at: 2009-01-29 12:40:51 Z
+        File generated at: 2009-01-30 00:36:08 Z
 --]]
 Informant.SetVendorLocation({
 	[54]="12,41.6,65.8",
