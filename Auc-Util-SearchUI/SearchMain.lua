@@ -1501,7 +1501,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			end
 		end
 
-		local cost = 0
+		local cost
 		if type(buyorbid) == "string" then
 			item["reason"] = searcher.tabname..":"..buyorbid
 			if reason then
@@ -1522,10 +1522,21 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			if not value then
 				value = 0
 			end
-			item["profit"] = value - cost
-		else
+		else --the searcher only returned that it matches the criteria, so assume buyout if possible.
 			item["reason"] = searcher.tabname
+			if item[Const.BUYOUT] and item[Const.BUYOUT] > 0 then
+				cost = item[Const.BUYOUT]
+			elseif item[Const.PRICE] and item[Const.PRICE] > 0 then
+				cost = item[Const.PRICE]
+				if item[Const.AMHIGH] then
+					return false, "Bid blocked: Already high bidder"
+				end
+			end
 		end
+		if not cost then
+			return false, "Bid blocked: No valid price possible"
+		end
+		item["profit"] = value - cost
 		local enablemax = lib.GetSetting("maxprice.enable")
 		local maxprice = lib.GetSetting("maxprice") or 10000000
 		local enableres = lib.GetSetting("reserve.enable")
