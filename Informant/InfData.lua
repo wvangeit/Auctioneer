@@ -3829,7 +3829,7 @@ Informant.SetDatabase({
 	[2099]="0:45040:2:4:1:Gun::1:0:", -- Dwarven Hand Cannon
 	[2100]="0:24540:2:4:1:Gun::1:0:", -- Precisely Calibrated Boomstick
 	[2101]="4:1:11:1:1:Quiver::1:0:1287,4602,7976,16715,16919,17667", -- Light Quiver
-	[2102]="4:1:11:1:1:Ammo Pouch::1:0:2685,6028", -- Small Ammo Pouch
+	[2102]="4:1:11:1:1:AmmoPouch::1:0:2685,6028", -- Small Ammo Pouch
 	[2105]="0:1:4:1:1:Shirt::1:0:", -- Thug Shirt
 	[2108]="0:8:4:1:1:Leather::1:0:", -- Frostmane Leather Vest
 	[2109]="0:14:4:1:1:Mail::1:0:", -- Frostmane Chain Vest
@@ -4221,7 +4221,7 @@ Informant.SetDatabase({
 	[2660]="0:0:12:1:1:::1:0:", -- Golm Fragment
 	[2661]="0:0:12:1:1:::1:0:", -- Neru Fragment
 	[2662]="0:8750:11:2:1:Quiver::1:0:", -- Ribbly's Quiver
-	[2663]="0:8750:11:2:1:Ammo Pouch::1:0:", -- Ribbly's Bandolier
+	[2663]="0:8750:11:2:1:AmmoPouch::1:0:", -- Ribbly's Bandolier
 	[2665]="20:5:7:1:20:Meat:185:1:0:1303", -- Stormwind Seasoning Herbs
 	[2666]="0:0:12:1:1:::1:0:", -- Barrel of Thunder Ale
 	[2667]="0:0:12:1:1:::1:0:", -- MacGrann's Dried Meats
@@ -4879,7 +4879,7 @@ Informant.SetDatabase({
 	[3571]="0:2118:2:2:1:TwoHandMace::1:0:", -- Trogg Beater
 	[3572]="0:972:2:2:1:OneHandSword::1:0:", -- Daryl's Shortsword
 	[3573]="0:212:11:1:1:Quiver::1:0:", -- Hunting Quiver
-	[3574]="0:212:11:1:1:Ammo Pouch::1:0:", -- Hunting Ammo Sack
+	[3574]="0:212:11:1:1:AmmoPouch::1:0:", -- Hunting Ammo Sack
 	[3575]="0:200:7:1:20:MetalStone:171,164,202,755,186:1:0:", -- Iron Bar
 	[3576]="0:35:7:1:20:MetalStone:186:1:0:", -- Tin Bar
 	[3577]="0:600:7:2:20:MetalStone:164,202,755,197:1:0:", -- Gold Bar
@@ -4906,7 +4906,7 @@ Informant.SetDatabase({
 	[3601]="0:0:12:1:1:::1:0:", -- Syndicate Missive
 	[3602]="145:29:4:1:1:Cloth::1:0:74,959,1238,1291,2264,3092,3530,3611,3952,4164,4175,5821,16716,17929", -- Knitted Belt
 	[3603]="146:29:4:1:1:Cloth::1:0:74,959,1238,1291,2264,3092,3530,3611,3952,4164,4175,5821,16716,17929", -- Knitted Bracers
-	[3604]="0:500:11:2:1:Ammo Pouch::1:0:", -- Bandolier of the Night Watch
+	[3604]="0:500:11:2:1:AmmoPouch::1:0:", -- Bandolier of the Night Watch
 	[3605]="0:500:11:2:1:Quiver::1:0:", -- Quiver of the Night Watch
 	[3606]="147:29:4:1:1:Cloth::1:0:3166,3317,3522,4558,16186,16623", -- Woven Belt
 	[3607]="148:29:4:1:1:Cloth::1:0:3166,3317,3522,4558,16186,16623", -- Woven Bracers
@@ -6331,7 +6331,7 @@ Informant.SetDatabase({
 	[5437]="0:0:12:1:20:::1:0:", -- Bathran's Hair
 	[5439]="100:25:11:1:1:Quiver::1:0:228,789,1198,1297,1298,1459,1462,1668,1687,2839,3015,3165,3409,3410,3488,3589,3610,3951,4173,4203,4604,4892,5122,6028,9548,9549,9551,9552,9553,9555,10369,12029,14301,16263,16274,16619,16715,16919,17598,17667,19020,19561,27055,28989", -- Small Quiver
 	[5440]="0:0:12:1:1:::1:0:", -- Bottle of Disease
-	[5441]="1000:250:11:1:1:Ammo Pouch::1:0:1243,1297,1469,1686,2997,3018,3078,3088,3322,3488,4603,5123,5510,7976,9551,16274,16620,16735", -- Small Shot Pouch
+	[5441]="1000:250:11:1:1:AmmoPouch::1:0:1243,1297,1469,1686,2997,3018,3078,3088,3322,3488,4603,5123,5510,7976,9551,16274,16620,16735", -- Small Shot Pouch
 	[5442]="0:0:12:1:1:::1:0:", -- Head of Arugal
 	[5443]="0:1067:4:3:1:Shield::1:0:", -- Gold-plated Buckler
 	[5444]="0:436:4:3:1:Cloak::1:0:", -- Miner's Cape
@@ -7520,7 +7520,7 @@ Informant.SetDatabase({
 	[7276]="0:34:4:1:1:Cloak::1:0:", -- Handstitched Leather Cloak
 	[7277]="0:28:4:1:1:Leather::1:0:", -- Handstitched Leather Bracers
 	[7278]="0:25:11:1:1:Quiver::1:0:", -- Light Leather Quiver
-	[7279]="0:25:11:1:1:Ammo Pouch::1:0:", -- Small Leather Ammo Pouch
+	[7279]="0:25:11:1:1:AmmoPouch::1:0:", -- Small Leather Ammo Pouch
 	[7280]="0:162:4:2:1:Leather::1:0:", -- Rugged Leather Pants
 	[7281]="0:85:4:1:1:Leather::1:0:", -- Light Leather Bracers
 	[7282]="0:599:4:2:1:Leather::1:0:", -- Light Leather Pants
@@ -7589,7 +7589,7 @@ Informant.SetDatabase({
 	[7369]="0:2955:4:2:1:Cloth::1:0:", -- Elder's Robe
 	[7370]="0:1012:4:2:1:Cloth::1:0:", -- Elder's Sash
 	[7371]="2000:500:11:2:1:Quiver::1:0:1287,4602,7976,16715,16919,17667", -- Heavy Quiver
-	[7372]="0:500:11:2:1:Ammo Pouch::1:0:", -- Heavy Leather Ammo Pouch
+	[7372]="0:500:11:2:1:AmmoPouch::1:0:", -- Heavy Leather Ammo Pouch
 	[7373]="0:3097:4:2:1:Leather::1:0:", -- Dusky Leather Leggings
 	[7374]="0:3760:4:2:1:Leather::1:0:", -- Dusky Leather Armor
 	[7375]="0:3774:4:2:1:Leather::1:0:", -- Green Whelp Armor
@@ -8092,7 +8092,7 @@ Informant.SetDatabase({
 	[8215]="0:7213:4:2:1:Cloak::1:0:", -- Wild Leather Cloak
 	[8216]="0:6323:4:2:1:Cloak::1:0:", -- Big Voodoo Cloak
 	[8217]="0:1000:11:2:1:Quiver::1:0:", -- Quickdraw Quiver
-	[8218]="0:1000:11:2:1:Ammo Pouch::1:0:", -- Thick Leather Ammo Pouch
+	[8218]="0:1000:11:2:1:AmmoPouch::1:0:", -- Thick Leather Ammo Pouch
 	[8223]="0:10066:2:3:1:OneHandSword::1:0:", -- Blade of the Basilisk
 	[8224]="0:7655:2:2:1:OneHandSword::1:0:", -- Silithid Ripper
 	[8225]="0:9222:2:3:1:OneHandSword::1:0:", -- Tainted Pierce
@@ -9813,7 +9813,7 @@ Informant.SetDatabase({
 	[11324]="0:6250:1:1:1:Bag::1:0:", -- Explorer's Knapsack
 	[11325]="600:150:0:1:20:Other::1:1:9499", -- Dark Iron Ale Mug
 	[11362]="1000:250:11:1:1:Quiver::1:0:228,789,1198,1287,1297,1298,1459,1462,1668,1687,2839,3015,3165,3409,3410,3488,3589,3610,3951,4173,4203,4602,4604,4892,5122,6028,7976,9548,9549,9551,9552,9553,9555,10369,12029,14301,16263,16274,16619,16715,16919,17598,17667,19020,19561,27055,28989", -- Medium Quiver
-	[11363]="1000:250:11:1:1:Ammo Pouch::1:0:2685,6028", -- Medium Shot Pouch
+	[11363]="1000:250:11:1:1:AmmoPouch::1:0:2685,6028", -- Medium Shot Pouch
 	[11364]="0:0:4:1:1:Tabard::1:0:", -- Tabard of Stormwind
 	[11366]="0:0:12:1:1:::1:0:", -- Helendis Riverhorn's Letter
 	[11367]="0:0:12:1:1:::1:0:", -- Solomon's Plea to Bolvar
@@ -14832,7 +14832,7 @@ Informant.SetDatabase({
 	[19317]="6000:7:6:2:200:Bullet::200:0:13216,13217,13218,13219", -- Ice Threaded Bullet
 	[19318]="5000:250:0:1:20:Consumable::5:0:13216,13217,13218,13219", -- Bottled Alterac Spring Water
 	[19319]="0:0:11:3:1:Quiver::1:0:13216,13217,13218,13219,16709", -- Harpy Hide Quiver
-	[19320]="0:0:11:3:1:Ammo Pouch::1:0:13216,13217,13218,13219,16709", -- Gnoll Skin Bandolier
+	[19320]="0:0:11:3:1:AmmoPouch::1:0:13216,13217,13218,13219,16709", -- Gnoll Skin Bandolier
 	[19321]="0:0:4:4:1:Shield::1:0:13216,13217,13218,13219", -- The Immovable Object
 	[19323]="0:0:2:4:1:TwoHandMace::1:0:13216,13217,13218,13219", -- The Unstoppable Force
 	[19324]="0:0:2:4:1:Dagger::1:0:13216,13217,13218,13219", -- The Lobotomizer
@@ -21858,7 +21858,7 @@ Informant.SetDatabase({
 	[29115]="344063:68812:2:3:1:Gun::1:0:20242,23007", -- Consortium Blaster
 	[29116]="230189:46037:4:3:1:Leather::1:0:20242,23007", -- Nomad's Leggings
 	[29117]="167172:33434:4:3:1:Cloth::1:0:20242,23007", -- Stormspire Vest
-	[29118]="100000:25000:11:3:1:Ammo Pouch::1:0:20242,23007", -- Smuggler's Ammo Pouch
+	[29118]="100000:25000:11:3:1:AmmoPouch::1:0:20242,23007", -- Smuggler's Ammo Pouch
 	[29119]="790112:197528:4:4:1:Amulet::1:0:20242,23007", -- Haramad's Bargain
 	[29121]="1995172:399034:2:4:1:Dagger::1:0:20242,23007", -- Guile of Khoraazi
 	[29122]="627777:125555:4:4:1:Cloth::1:0:20242,23007", -- Nether Runner's Cowl
@@ -25920,12 +25920,12 @@ Informant.SetDatabase({
 	[34090]="0:0:12:1:1:::1:0:", -- Mezhen's Writings
 	[34091]="0:0:12:1:1:::1:0:", -- Mezhen's Writings
 	[34092]="0:0:15:4:1:FlyingMount::1:0:", -- Merciless Nether Drake
-	[34099]="0:22500:11:2:1:Ammo Pouch::1:0:", -- Knothide Ammo Pouch
+	[34099]="0:22500:11:2:1:AmmoPouch::1:0:", -- Knothide Ammo Pouch
 	[34100]="0:22500:11:2:1:Quiver::1:0:", -- Knothide Quiver
 	[34101]="0:0:12:1:10:::1:0:", -- Chimaera Horn
 	[34102]="0:0:12:1:20:::1:0:", -- Fjord Grub
 	[34105]="0:37500:11:3:1:Quiver::1:0:", -- Quiver of a Thousand Feathers
-	[34106]="0:37500:11:3:1:Ammo Pouch::1:0:", -- Netherscale Ammo Pouch
+	[34106]="0:37500:11:3:1:AmmoPouch::1:0:", -- Netherscale Ammo Pouch
 	[34109]="0:625:9:1:1:Book::1:0:", -- Weather-Beaten Journal
 	[34111]="0:0:12:1:1:::1:0:", -- Trained Rock Falcon
 	[34112]="0:0:12:1:5:::1:0:", -- Fjord Turkey
@@ -34127,7 +34127,7 @@ Informant.SetDatabase({
 	[44444]="0:72526:4:3:1:Mail::1:0:", -- Dark Nerubian Chestpiece
 	[44445]="0:56044:4:3:1:Mail::1:0:", -- Scaled Icewalkers
 	[44446]="0:37500:1:3:1:InscriptionBag::1:0:", -- Pack of Endless Pockets
-	[44447]="0:37500:11:3:1:Ammo Pouch::1:0:", -- Dragonscale Ammo Pouch
+	[44447]="0:37500:11:3:1:AmmoPouch::1:0:", -- Dragonscale Ammo Pouch
 	[44448]="0:37500:11:3:1:Quiver::1:0:", -- Nerubian Reinforced Quiver
 	[44449]="0:0:0:1:5:EnhPerm::1:0:", -- Scroll of Enchant Boots - Assault
 	[44450]="0:0:12:1:1:::1:0:", -- Hourglass of Eternity
