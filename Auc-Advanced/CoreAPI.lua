@@ -255,7 +255,6 @@ do
         return oldNewModule(...);   -- Tailcall original function
     end
 
-
     -- Clears the cache for AucAdvanced.API.GetMarketValue()
     function lib.ClearMarketCache()
         for x, _ in pairs(cache) do
@@ -263,7 +262,6 @@ do
         end
     end
 end
-
 
 function lib.ClearItem(itemLink, serverKey)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
@@ -724,17 +722,16 @@ function lib.DumpMarketPrice(itemLink, serverKey)
 	local modules = AucAdvanced.GetAllModules(nil, "Stat");
 	for pos, engineLib in ipairs(modules) do
 		local success, result = pcall(engineLib.GetItemPDF, itemLink, serverKey);
-		if not success then
-			print(engineLib.GetName() .. ": Reported error: " .. tostring(result));
-		else
+		if success then
 			if getmetatable(result) == bellCurveMeta then
 				print(engineLib.GetName() .. ": Mean = " .. result.mean .. ", Standard Deviation = " .. result.stddev);
 			else
 				print(engineLib.GetName() .. ": Non-Standard PDF: " .. tostring(result));
 			end
+		else
+			print(engineLib.GetName() .. ": Reported error: " .. tostring(result));
 		end
 	end
-
 end
 
 --[[===========================================================================
