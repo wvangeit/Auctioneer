@@ -258,6 +258,7 @@ function private.UpdateDisplay()
 		end
 	end
 
+	local flagenable = true
 	local coinsBid, coinsBuy, coinsBidEa, coinsBuyEa
 	if cBid > 0 then
 		coinsBid = coins(cBid)
@@ -266,12 +267,14 @@ function private.UpdateDisplay()
 		coinsBid = "no"
 		coinsBidEa = "no"
 		frame.err:SetText("Error: No bid price set")
+		flagenable = false
 	end
 	if cBuy > 0 then
 		coinsBuy = coins(cBuy)
 		coinsBuyEa = coins(cBuy/cStack)
 		if cBuy < cBid then
 			frame.err:SetText("Error: Buyout cannot be less than bid price")
+			flagenable = false
 		end
 	else
 		coinsBuy = "no"
@@ -306,6 +309,11 @@ function private.UpdateDisplay()
 		frame.fees:SetText(("Deposit: %s"):format(coins(deposit)))
 	end
 	frame.stacks.equals:SetText("= "..(cStack * cNum))
+	if flagenable then
+		frame.create:Enable()
+	else
+		frame.create:Disable()
+	end
 end
 
 function private.UpdateCompetition(image)
@@ -598,6 +606,7 @@ function private.LoadItemLink(itemLink, size)
 		frame.icon:SetNormalTexture(nil)
 		frame.icon.count:SetText("")
 		frame.name:SetText("Drop item onto slot")
+		frame.create:Disable()
 	end
 	frame.info:SetText("To auction an item, drag it from your bag.")
 	frame.fees:SetText("")
@@ -960,7 +969,7 @@ function private.CreateFrames()
 	frame.stacks.equals = frame.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.stacks.equals:SetPoint("BOTTOMLEFT", frame.stacks.size, "BOTTOMRIGHT", 5, 0)
 	frame.stacks.equals:SetText("= 0")
-	
+
 	frame.fees = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.fees:SetPoint("TOP", frame.stacks, "BOTTOM", 10, -2)
 	frame.fees:SetWidth(150)
@@ -968,7 +977,7 @@ function private.CreateFrames()
 	frame.fees:SetJustifyH("CENTER")
 	frame.fees:SetText("")
 	frame.fees:SetTextColor(0,1,1)
-	
+
 	frame.options = CreateFrame("Frame", "AucAdvSimpFrameOptions", frame)
 	frame.options:SetPoint("TOPLEFT", frame.stacks, "BOTTOMLEFT", 0, -40)
 	frame.options:SetWidth(140)
@@ -982,6 +991,7 @@ function private.CreateFrames()
 	frame.create:SetWidth(140)
 	frame.create:SetText("Create Auction")
 	frame.create:SetScript("OnClick", private.PostAuction)
+	frame.create:Disable()
 
 	frame.clear = CreateFrame("Button", "AucAdvSimpFrameRemember", frame, "OptionsButtonTemplate")
 	frame.clear:SetPoint("BOTTOMRIGHT", frame.create, "TOPRIGHT", 0, 5)
