@@ -89,7 +89,6 @@ function private.GetPriceData()
 	local percent40, percent30 = 0, 0
 	local count = stattable["count"]
 	local refactored = false
-	debugPrint("GetPriceData: "..tostring(stattable["count"]), libType.."-"..libName, "Debug")
 	local recount = 0
 	--now find the Q1, median, and Q3 values
 	if stattable["min"] == stattable["max"] then
