@@ -1516,12 +1516,6 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			else
 				cost = item[Const.BUYOUT]
 			end
-			if not value then
-				value = AucAdvanced.API.GetMarketValue(item[Const.LINK])
-			end
-			if not value then
-				value = 0
-			end
 		else --the searcher only returned that it matches the criteria, so assume buyout if possible.
 			item["reason"] = searcher.tabname
 			if item[Const.BUYOUT] and item[Const.BUYOUT] > 0 then
@@ -1532,6 +1526,12 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 					return false, "Bid blocked: Already high bidder"
 				end
 			end
+		end
+		if not value then
+			value = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+		end
+		if not value then
+			value = 0
 		end
 		if not cost then
 			return false, "Bid blocked: No valid price possible"
