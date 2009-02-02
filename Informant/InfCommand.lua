@@ -145,23 +145,23 @@ end
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function cmdHelp()
 
-	local onOffToggle = " (".._TRANS('INF_Help_On').."/".._TRANS('INF_Help_Off').."/".._TRANS('INF_Help_Toggle')..")"
+	local onOffToggle = " (".._TRANS('INF_Help_On').."|".._TRANS('INF_Help_Off').."|".._TRANS('INF_Help_Toggle')..")"
 	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
 	chatPrint(_TRANS('INF_Help_CmdHeader'))
 	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _TRANS('INF_HelpTooltip_EnableInformant'))
 
-	chatPrint("  |cffffffff/informant ".._TRANS('INF_Interface_Disable').."|r - " .. _TRANS('INF_Help_CmdHelpDisable'))
+	chatPrint("  |cffffffff/informant ".._TRANS('INF_Help_CmdDisable').."|r - " .. _TRANS('INF_Help_CmdHelpDisable'))
 
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowVendor'), getLocalizedFilterVal('show-vendor'), _TRANS('INF_HelpTooltip_VendorToggle')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _TRANS('INF_HelpTooltip_ShowVendorSell')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _TRANS('INF_HelpTooltip_ShowVendorBuy')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowUsage'), getLocalizedFilterVal('show-usage'), _TRANS('INF_HelpTooltip_ShowUsage')))
-	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowQuest'), getLocalizedFilterVal('show-quest'), _TRANS('INF_HelpTooltip_ShowQuest')))
-	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowMerchant'), getLocalizedFilterVal('show-merchant'), _TRANS('INF_HelpTooltip_ShowMerchant')))
-	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowZeroMerchants'), getLocalizedFilterVal('show-zero-merchants'), _TRANS('INF_HelpTooltip_ShowZeroMerchants')))
+	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdQuest'), getLocalizedFilterVal('show-quest'), _TRANS('INF_HelpTooltip_ShowQuest')))
+	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdMerchant'), getLocalizedFilterVal('show-merchant'), _TRANS('INF_HelpTooltip_ShowMerchant')))
+	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowZeroMerchant'), getLocalizedFilterVal('show-zero-merchants'), _TRANS('INF_HelpTooltip_ShowZeroMerchants')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowStack'), getLocalizedFilterVal('show-stack'), _TRANS('INF_HelpTooltip_ShowStack')))
-	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowIlevel'), getLocalizedFilterVal('show-ilevel'), _TRANS('INF_HelpTooltip_ShowIlevel')))
+	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowILevel'), getLocalizedFilterVal('show-ilevel'), _TRANS('INF_HelpTooltip_ShowIlevel')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdShowLink'), getLocalizedFilterVal('show-link'), _TRANS('INF_HelpTooltip_ShowLink')))
 	chatPrint(lineFormat:format(_TRANS('INF_Help_CmdEmbed'), getLocalizedFilterVal('embed'), _TRANS('INF_HelpTooltip_Embed')))
 
@@ -250,7 +250,7 @@ function genVarSet(variable, param, chatprint)
 		if (Informant.Settings.GetSetting(variable)) then
 			chatPrint(_TRANS('INF_Interface_EnableInformant'):format(localizeCommand(variable)))
 		else
-			chatPrint(_TRANS('INF_Interface_Disable'):format(localizeCommand(variable)))
+			chatPrint(_TRANS('INF_Help_Disable'):format(localizeCommand(variable)))
 		end
 	end
 end

@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Informant - An addon for World of Warcraft that shows pertinent information about
 	an item in a tooltip when you hover over the item in the game.
 	Version: <%version%> (<%codename%>)
@@ -27,11 +27,11 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-Informant_RegisterRevision("$URL$", "$Rev$")
+Informant_RegisterRevision("$URL$","$Rev$")
 
 INFORMANT_VERSION = "<%version%>"
 if (INFORMANT_VERSION == "<".."%version%>") then
-	INFORMANT_VERSION = "4.1.DEV"
+	INFORMANT_VERSION = "5.2.DEV"
 end
 
 -- LOCAL FUNCTION PROTOTYPES:
@@ -817,9 +817,11 @@ local function frameLoaded()
 	-- Setup the default for stubby to always load (people can override this on a
 	-- per toon basis)
 	Stubby.SetConfig("Informant", "LoadType", "always", true)
-
+	
 	-- Register our temporary command hook with stubby
-	Stubby.RegisterBootCode("Informant", "CommandHandler", [[
+	Stubby.RegisterBootCode("Informant", "CommandHandler", 
+	-- Localize Me! 
+	[[
 		local function cmdHandler(msg)
 			local cmd, param = msg:lower():match("^(%w+)%s*(.*)$")
 			cmd = cmd or msg:lower() or "";
@@ -857,7 +859,7 @@ local function frameLoaded()
 		if (loadType == "always") then
 			LoadAddOn("Informant")
 		else
-			Stubby.Print("]].._TRANS('MesgNotLoaded')..[[");
+			Stubby.Print("]].._TRANS('INF_Help_CmdLoadMsg')..[[");
 		end
 	]]);
 end
