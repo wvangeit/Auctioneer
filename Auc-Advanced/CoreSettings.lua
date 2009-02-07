@@ -122,7 +122,8 @@ local settingDefaults = {
 	['printwindow'] = 1,
 	['marketvalue.accuracy'] = .08,
 	["ShowPurchaseDebug"] = true,
-	["SelectedLocale"] = GetLocale(), 
+	["SelectedLocale"] = GetLocale(),
+	["ModTTShow"] = false,
 }
 
 local function getDefault(setting)
@@ -449,6 +450,8 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
+	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _TRANS('ADV_Interface_ModTTShow'))--"Only show Auctioneer's extra tooltip if Alt is pressed."
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"This option will hide Auctioneer's extra tooltip unless the Alt key is pressed"
 
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
 	last = gui:GetLast(id)

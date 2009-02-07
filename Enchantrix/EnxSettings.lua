@@ -160,6 +160,7 @@ local settingDefaults = {
 	['AutoDisenchantEnable'] = false,	-- off by default - potentially dangerous if you're not expecting it :)
 
 	['export.aucadv'] = true, -- Send our price values to auctioneer advanced as stats
+	['ModTTShow'] = false,
 }
 
 local function getDefault(setting)
@@ -494,6 +495,8 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab(_ENCH("GuiTabGeneral"))
 	gui:AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
+	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _ENCH("ModTTShow"))--Only display our extra tooltip data if Alt is pressed.
+	gui:AddTip(id, _ENCH("ModTTShow_Help"))--Show Enchantrix's extra tooltip only if Alt is pressed.
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
 	gui:AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )

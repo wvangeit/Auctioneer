@@ -35,8 +35,11 @@ local tooltip = LibStub("nTipHelper:1")
 function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	-- nothing to do, if informant is disabled
 	if (not getFilter('all')) then
-		return;
-	end;
+		return
+	end
+	if getFilter('ModTTShow') and not IsAltKeyDown() then
+		return
+	end
 
 	tooltip:SetFrame(frame)
 

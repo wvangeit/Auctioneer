@@ -135,6 +135,7 @@ private.settingDefaults = {
 	["columnwidth.".._BC("UiFee")] = 70,
 	["columnwidth.".._BC('UiReason')] = 70,
 	["columnwidth.".._BC('UiDateHeader')] = 250,
+	["ModTTShow"] = false,
     }
 
 local function getDefault(setting)
@@ -390,7 +391,8 @@ function lib.MakeGuiConfig()
 	id = gui:AddTab(_BC('C_BeanCounterConfig')) --"BeanCounter Config")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
-
+	gui:AddControl(id, "Checkbox", 0 , 1, "ModTTShow", _BC('C_ModTTShow'))--Only show extra tooltip if Alt is pressed.
+	gui:AddTip(id, _BC('TTModTTShow'))--This option will display BeanCounter's extra tooltip only if Alt is pressed.
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.displaybeginerTooltips", _BC('C_ShowBeginnerTooltips'))--"Show beginner tooltips on mouse over"
 	gui:AddTip(id, _BC('TTShowBeginnerTooltips')) --Turns on the beginner tooltips that display on mouse eover
 

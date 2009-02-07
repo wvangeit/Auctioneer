@@ -36,12 +36,7 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Aliancni aukce";
-		["MailAuctionCancelledSubject"]	= "Aukce zrusena";
-		["MailAuctionExpiredSubject"]	= "Platnost aukce vyprsela";
-		["MailAuctionSuccessfulSubject"]	= "Aukce probehla uspesne";
-		["MailAuctionWonSubject"]	= "Vyhral/a jste aukci";
 		["MailHordeAuctionHouse"]	= "Hordacka aukce";
-		["MailOutbidOnSubject"]	= "Prehozen/a na";
 
 		-- Section: User Interface
 		["UiAuctions"]	= "Aukce";
@@ -93,12 +88,7 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auktions Hus";
-		["MailAuctionCancelledSubject"]	= "Auktion afbrudt";
-		["MailAuctionExpiredSubject"]	= "Auktion udløbet";
-		["MailAuctionSuccessfulSubject"]	= "Auktion succesfuld";
-		["MailAuctionWonSubject"]	= "Auktion vundet";
 		["MailHordeAuctionHouse"]	= "Horde Auktions Hus";
-		["MailOutbidOnSubject"]	= "Overbudt på";
 
 		-- Section: User Interface
 		["UiAuctions"]	= "Auktioner";
@@ -173,14 +163,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Auktionshaus der Allianz";
-		["MailAuctionCancelledSubject"]	= "Auktion abgebrochen";
-		["MailAuctionExpiredSubject"]	= "Auktion abgelaufen";
-		["MailAuctionSuccessfulSubject"]	= "Auktion erfolgreich";
-		["MailAuctionWonSubject"]	= "Auktion gewonnen";
 		["MailHordeAuctionHouse"]	= "Auktionshaus der Horde";
 		["MailNeutralAuctionHouse"]	= "Auktionshaus der Schwarzmeerräuber";
-		["MailOutbidOnSubject"]	= "Höheres Gebot für";
-		["MailSalePendingOnSubject"]	= "Ausstehender Verkauf";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Trage das Format ein, wie das Datum dargestellt werden soll. Standard ist %c";
@@ -202,7 +186,7 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "Genaue Textsuche";
 		["TT_ItemIconBox"]	= "Ziehe ein Item hierher für eine Suche.\nZeigt wenn möglich das aktuelle Suchicon";
 		["TT_ScrollHeader"]	= "\nRechtsklick+Ziehen zum verschieben\nSTRG+Rechtsklick zum zurücksetzen";
-		["TT_SearchBox'"]	= "Gib einen Suchbegriff hier ein oder leerlassen um nach allen zu suchen";
+		["TT_SearchBox"]	= "Trage Suchfragen hier ein oder lasse es frei, um alle zu suchen";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auktionsverlaufdatenbank";
@@ -268,6 +252,7 @@ BeanCounterLocalizations = {
 		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search";
 		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
 		["C_MailRecolor"]	= "Mail Re-Color Method";
+		["C_ModTTShow"]	= "Display the extra tooltip only if Alt is pressed.";
 		["C_Resortascendingtime"]	= "Resort all entries by ascending time";
 		["C_ResortDatabase"]	= "Resort Database";
 		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using.";
@@ -302,14 +287,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
-		["MailAuctionCancelledSubject"]	= "Auction cancelled";
-		["MailAuctionExpiredSubject"]	= "Auction expired";
-		["MailAuctionSuccessfulSubject"]	= "Auction successful";
-		["MailAuctionWonSubject"]	= "Auction won";
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
 		["MailNeutralAuctionHouse"]	= "Blackwater Auction House";
-		["MailOutbidOnSubject"]	= "Outbid on";
-		["MailSalePendingOnSubject"]	= "Sale Pending";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Enter the format that you would like your date field to show. Default is %c.";
@@ -317,6 +296,7 @@ BeanCounterLocalizations = {
 		["TTExtenalSearch"]	= "When entering a search in another addon, BeanCounter will also display a search for that item.";
 		["TTMailInvoiceTimeout"]	= "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data. Higher == slower, but improves chances of getting data if the Mail server is extremely busy.";
 		["TTMailRecolor"]	= "Choose how mail will appear after BeanCounter has scanned the Mail Box.";
+		["TTModTTShow"]	= "This option will display BeanCounter's extra tooltip only if Alt is pressed.";
 		["TTOpenconfig"]	= "Opens the BeanCounter configuration window";
 		["TTResort Database"]	= "This will scan Beancounter's Data sort all entries in ascending time order. This helps speed up the database compression functions.";
 		["TTShowBeginnerTooltips"]	= "Display the beginner tooltips on mouse over.";
@@ -332,7 +312,6 @@ BeanCounterLocalizations = {
 		["TT_ItemIconBox"]	= "Drop an item here to start a search for it.\nDisplays current search's icon if possible.";
 		["TT_ScrollHeader"]	= "\nRightclick+Drag to resize\nCTRL+RightClick to reset";
 		["TT_SearchBox"]	= "Enter search queries here or leave blank to search all";
-		["TT_SearchBox'"]	= "Enter search query's here or leave blank to search all";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auction History Database";
@@ -409,18 +388,16 @@ BeanCounterLocalizations = {
 		["TooltipFailed"]	= "No se encuentra informacion";
 
 		-- Section: Mail
-		["MailAllianceAuctionHouse"]	= "Casa de subastas de la Alianza";
-		["MailAuctionCancelledSubject"]	= "Subasta cancelada";
-		["MailAuctionExpiredSubject"]	= "Subasta terminada";
-		["MailAuctionSuccessfulSubject"]	= "Subasta conseguida";
-		["MailAuctionWonSubject"]	= "Subasta ganada";
+		["MailAllianceAuctionHouse"]	= "Casa de subastas: Alianza";
 		["MailHordeAuctionHouse"]	= "Casa de subastas: Horda";
-		["MailOutbidOnSubject"]	= "Puja superada en";
+		["MailNeutralAuctionHouse"]	= "Casa de subastas: Aguasnegras";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Introduzca el formato que desea que su campo de fecha debe mostrar. El valor predeterminado es %c.";
 
 		-- Section: User Interface
+		["UiAucExpired"]	= "Subasta no conseguida";
+		["UiAucSuccessful"]	= "Subasta conseguida";
 		["UiAuctions"]	= "Subastas";
 		["UiAuctionTransaction"]	= "Subasta";
 		["UiBids"]	= "Pujas";
@@ -430,7 +407,10 @@ BeanCounterLocalizations = {
 		["UiData"]	= "Datos";
 		["UiDateHeader"]	= "Fecha";
 		["UiDepositTransaction"]	= "Depósito";
-		["UiExactNameSearch"]	= "Búsqueda de nombre exacto";
+		["UiExactNameSearch"]	= "Solo nombre exacto";
+		["UiMailFrameRecording"]	= "BeanCounter esta registrando tu correo";
+		["UiMailFrameWait1"]	= "Por favor no cierra la ventana del correo o";
+		["UiMailFrameWait2"]	= "los objetos no serán registrados";
 		["UiNameHeader"]	= "Artículo";
 		["UiNetHeader"]	= "Neto";
 		["UiNetPerHeader"]	= "Neto c/u";
@@ -446,6 +426,8 @@ BeanCounterLocalizations = {
 		["UiTransactions"]	= "Transacciones";
 		["UiTransactionsLabel"]	= "Transacciones:";
 		["UiTransactionTypeHeader"]	= "Tipo";
+		["UiWononBid"]	= "Ganado en puja";
+		["UiWononBuyout"]	= "Ganado en compra directa";
 
 	};
 
@@ -495,14 +477,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Hôtel des ventes de l'Alliance";
-		["MailAuctionCancelledSubject"]	= "Vente annulée";
-		["MailAuctionExpiredSubject"]	= "Vente aux enchères terminée";
-		["MailAuctionSuccessfulSubject"]	= "Vente aux enchères réussie";
-		["MailAuctionWonSubject"]	= "Vente gagnée";
 		["MailHordeAuctionHouse"]	= "Hôtel des ventes de la Horde";
 		["MailNeutralAuctionHouse"]	= "Maison des ventes aux-enchères de Blackwater ";
-		["MailOutbidOnSubject"]	= "Augmenter l'offre pour";
-		["MailSalePendingOnSubject"]	= "vente en suspens";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Entrez le format voulu d'affichage de votre date.Par défaut c'est %c";
@@ -524,7 +500,6 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "Affiche uniquement les objets correspondant au texte exact de la recherche.";
 		["TT_ItemIconBox"]	= "Déposez un objet ici pour commencer une recherche dessus.\nAffiche la fenêtre de recherche actuelle si c'est possible.";
 		["TT_ScrollHeader"]	= "maintenir clic droit et bouger la souris pour redimensionner.\nCTRL + Clic droit pour réinitialiser la taille.";
-		["TT_SearchBox'"]	= "Entrer la recherche ici ou laisser en blanc pour tout rechercher";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Historique de vente";
@@ -575,14 +550,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Casa d'aste dell'Alleanza";
-		["MailAuctionCancelledSubject"]	= "Asta annullata";
-		["MailAuctionExpiredSubject"]	= "Asta espirata";
-		["MailAuctionSuccessfulSubject"]	= "Asta riuscita";
-		["MailAuctionWonSubject"]	= "Asta vinta";
 		["MailHordeAuctionHouse"]	= "Casa d'aste dell'Orda";
 		["MailNeutralAuctionHouse"]	= "Casa d'aste di Blackwater";
-		["MailOutbidOnSubject"]	= "Battuto su";
-		["MailSalePendingOnSubject"]	= "Vendita in sospeso";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Entra il formato desiderato per mostrate la data. L'opzione predefinita è %c";
@@ -663,14 +632,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "얼라이언스 경매장";
-		["MailAuctionCancelledSubject"]	= "경매 취소";
-		["MailAuctionExpiredSubject"]	= "경매 만료";
-		["MailAuctionSuccessfulSubject"]	= "경매 완료";
-		["MailAuctionWonSubject"]	= "경매 낙찰";
 		["MailHordeAuctionHouse"]	= "호드 경매장";
 		["MailNeutralAuctionHouse"]	= "중립 경매장";
-		["MailOutbidOnSubject"]	= "보다 높은 가격이 제시됨";
-		["MailSalePendingOnSubject"]	= "판매 예정";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "날짜 부분에 보일 형식을 넣습니다. 기본값은 %c입니다.";
@@ -692,7 +655,7 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "정확히 일치하는 문장만 검색";
 		["TT_ItemIconBox"]	= "아이템을 이곳에 가져다 놓으면 해당 아이템에 대한 검색을 시작합니다.\n가능한 경우 현재 검색중인 아이템의 아이콘을 표시합니다.";
 		["TT_ScrollHeader"]	= "\n마우스 오른버튼을 누르고 끌면 크기 변경\nCTRL+마우스 오른버튼을 누르면 초기화";
-		["TT_SearchBox'"]	= "이곳에 검색 쿼리 입력(전체검색시 공란으로 남겨두세요)";
+		["TT_SearchBox"]	= "검색쿼리를 이곳에 입력하세요(전부검색시 공백)";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "콩순이: 경매결과 데이터베이스";
@@ -747,13 +710,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Veiling";
-		["MailAuctionCancelledSubject"]	= "Veiling geschrapt";
-		["MailAuctionExpiredSubject"]	= "Veiling vervallen";
-		["MailAuctionSuccessfulSubject"]	= "Veiling geslaagd";
-		["MailAuctionWonSubject"]	= "Veiling gewonnen";
 		["MailHordeAuctionHouse"]	= "Horde Veiling";
 		["MailNeutralAuctionHouse"]	= "Blackwater Veiling";
-		["MailOutbidOnSubject"]	= "Outbid on";
 
 		-- Section: User Interface
 		["UiAuctions"]	= "Veilingen";
@@ -807,13 +765,7 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Leilão da Alliance";
-		["MailAuctionCancelledSubject"]	= "Leilão Cancelado";
-		["MailAuctionExpiredSubject"]	= "Leilão Expirou";
-		["MailAuctionSuccessfulSubject"]	= "Leilão Bem Sucedido";
-		["MailAuctionWonSubject"]	= "Leilão Ganho";
 		["MailHordeAuctionHouse"]	= "Leilão da Horde";
-		["MailOutbidOnSubject"]	= "Sobrebidado em";
-		["MailSalePendingOnSubject"]	= "Venda á espera";
 
 		-- Section: User Interface
 		["UiAuctions"]	= "Leilões";
@@ -888,14 +840,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Аукционный дом Альянса";
-		["MailAuctionCancelledSubject"]	= "Аукцион отменен";
-		["MailAuctionExpiredSubject"]	= "Аукцион не состоялся";
-		["MailAuctionSuccessfulSubject"]	= "Аукцион состоялся";
-		["MailAuctionWonSubject"]	= "Вы выиграли торги";
 		["MailHordeAuctionHouse"]	= "Аукционный дом Орды";
 		["MailNeutralAuctionHouse"]	= "Аукцион Черной Воды";
-		["MailOutbidOnSubject"]	= "Ваша ставка перебита";
-		["MailSalePendingOnSubject"]	= "Продажа в течение";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Введите формат, в котором Вы хотели бы видеть отображаемую дату. По умолчанию %c";
@@ -917,7 +863,6 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "Искать только те предметы, название которых в точности совпадает с текстом в строке поиска.";
 		["TT_ItemIconBox"]	= "Перетащите предмет, чтобы начать его поиск.\n Отобразить иконку искомого (если возможно)";
 		["TT_ScrollHeader"]	= "\nПКМ - изменение размера\nCTRL+ПКМ - сброс";
-		["TT_SearchBox'"]	= "Введите строку для поиска или оставьте поле пустым, чтобы отобразить всё.";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Аукционная база данных";
@@ -1010,14 +955,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "联盟拍卖行";
-		["MailAuctionCancelledSubject"]	= "拍卖取消";
-		["MailAuctionExpiredSubject"]	= "拍卖已到期";
-		["MailAuctionSuccessfulSubject"]	= "拍卖成功";
-		["MailAuctionWonSubject"]	= "竞拍获胜";
 		["MailHordeAuctionHouse"]	= "部落拍卖行";
 		["MailNeutralAuctionHouse"]	= "黑水拍卖行";
-		["MailOutbidOnSubject"]	= "出价被压过";
-		["MailSalePendingOnSubject"]	= "竞买等待中";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "键入你期望的日期显示格式.默认为%c";
@@ -1039,7 +978,7 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "精确匹配搜索框中的文本。";
 		["TT_ItemIconBox"]	= "拖入一件物品并搜索该物品。可能\n显示 当前搜索物品图标。";
 		["TT_ScrollHeader"]	= "\n右击拖动 改变尺寸 \nCTRL+右击 重置";
-		["TT_SearchBox'"]	= "在这里输入搜索条件，空白为搜索全部。";
+		["TT_SearchBox"]	= "在这里输入搜索条件或者留空则显示所有记录";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: 拍卖历史数据库";
@@ -1125,14 +1064,8 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "聯盟拍賣場";
-		["MailAuctionCancelledSubject"]	= "拍賣已取消";
-		["MailAuctionExpiredSubject"]	= "拍賣過期";
-		["MailAuctionSuccessfulSubject"]	= "拍賣成功";
-		["MailAuctionWonSubject"]	= "得標";
 		["MailHordeAuctionHouse"]	= "部落拍賣場";
 		["MailNeutralAuctionHouse"]	= "中立拍賣場";
-		["MailOutbidOnSubject"]	= "出價失敗";
-		["MailSalePendingOnSubject"]	= "出價等待中";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "請輸入資料欄位想使用的格式. 預設為 %c";

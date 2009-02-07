@@ -279,7 +279,9 @@ end
 
 
 function itemTooltip(tooltip, name, link, quality, count)
-
+	if Enchantrix.Settings.GetSetting('ModTTShow') and not IsAltKeyDown() then
+		return
+	end
 	-- first, see if this is a prospectable item (short list)
 	local prospect = Enchantrix.Storage.GetItemProspects(link)
 	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then

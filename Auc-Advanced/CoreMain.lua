@@ -58,6 +58,9 @@ local tooltip
 
 function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, rlvl, itype, isubtype, stack, equiploc, texture)
 	if not tip then return end
+	if AucAdvanced.Settings.GetSetting("ModTTShow") and not IsAltKeyDown() then
+		return
+	end
 
 	tooltip:SetFrame(tip)
 

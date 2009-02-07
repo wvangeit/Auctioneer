@@ -628,6 +628,10 @@ end
 --Created SearchUI reason code data into tooltips
 function private.processTooltip(tip, itemLink, quantity)
 	if not itemLink then return end
+	if get("ModTTShow") and not IsAltKeyDown() then
+		return
+	end
+	
 	if not get("util.beancounter.displayReasonCodeTooltip") then return end
 
 	private.tooltip:SetFrame(tip)
