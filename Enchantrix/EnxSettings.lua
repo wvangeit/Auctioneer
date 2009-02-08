@@ -263,6 +263,46 @@ local function setter(setting, value)
 
 			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatSavedProfile")..value)
 
+		elseif (setting == "profile.duplicate") then
+			-- User clicked the Duplicate button, copy the current profile using the new name
+			value = gui.elements["profile"].value
+
+			-- If there's a profile name supplied
+			if (value) then
+				local existingProfile = EnchantConfig["profile."..value]
+				
+				local newName = gui.elements["profile.name"]:GetText()
+
+				if (newName and newName ~= "") then
+					-- copy it under the new name
+					EnchantConfig["profile."..newName] = existingProfile
+					
+					-- Set the current profile to the new profile
+					EnchantConfig[getUserSig()] = newName
+
+					-- Add the new profile to the profiles list
+					local profiles = EnchantConfig["profiles"]
+					if (not profiles) then
+						profiles = { "Default" }
+						EnchantConfig["profiles"] = profiles
+					end
+
+					-- Check to see if it already exists
+					local found = false
+					for pos, name in ipairs(profiles) do
+						if (name == newName) then found = true end
+					end
+
+					-- If not, add it and then sort it
+					if (not found) then
+						table.insert(profiles, newName)
+						table.sort(profiles)
+					end
+
+					DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatDuplicatedProfile")..newName)
+				end
+			end
+
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
@@ -492,6 +532,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiCreateReplaceProfile"))
 	gui:AddControl(id, "Text",       0, 1, "profile.name", _ENCH("GuiNewProfileName"))
 	gui:AddControl(id, "Button",     0, 1, "profile.save", _ENCH("GuiSaveProfileButton"))
+	gui:AddControl(id, "Button",     0, 1, "profile.duplicate", _ENCH("GuiDuplicateProfileButton"))
 
 	id = gui:AddTab(_ENCH("GuiTabGeneral"))
 	gui:AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
