@@ -356,6 +356,13 @@ function itemTooltip(tooltip, name, link, quality, count)
 	else
 		return
 	end
+	
+	-- normally disenchanting deals with single items
+	-- but the appraiser window can show multiple items and wants a value for the group
+	totalHSP = totalHSP * count;
+	totalMed = totalMed * count;
+	totalMkt = totalMkt * count;
+	totalFive = totalFive * count;
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
