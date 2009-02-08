@@ -626,6 +626,8 @@ function lib.MakeGuiConfig()
 		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
 		if (not reagName) then reagName = "item:"..reagId end
 		gui:AddControl(id, "WideSlider", 0, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
+		local reagLink = Enchantrix.Util.GetLinkFromName(reagName)
+		gui:AddLinkTip(id, reagLink)
 	end
 
 	id = gui:AddTab(_ENCH("GuiTabFixed"))
@@ -640,6 +642,8 @@ function lib.MakeGuiConfig()
 		if (not reagName) then reagName = "item:"..reagId end
 		last = gui:GetLast(id)
 		gui:AddControl(id, "Checkbox", 0, 1, "fixed."..reagId, ("%s:"):format(reagName))
+		local reagLink = Enchantrix.Util.GetLinkFromName(reagName)
+		gui:AddLinkTip(id, reagLink)
 		gui:SetLast(id, last)
 		gui:AddControl(id, "MoneyFramePinned", 0.6, 1, "fixed."..reagId..".value", 0, 99999999)
 	end
