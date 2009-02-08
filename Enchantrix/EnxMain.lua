@@ -295,8 +295,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		-- NOTE: we do get the spell name here
 		DisenchantEvent.finished = nil
--- ccox - WOTLK - localize me!
-		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == 'Milling')) then
+		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == _ENCH('ArgSpellMillingName'))) then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
 				DisenchantEvent.spellname = spell;
@@ -346,8 +345,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		-- NOTE: we do get the spell name here
--- ccox - WOTLK - localize me!
-		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == 'Milling')) then
+		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == _ENCH('ArgSpellMillingName'))) then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.sent = true;
 			end
@@ -371,11 +369,9 @@ function onEvent(funcVars, event, player, spell, rank, target)
 					Enchantrix.Util.ChatPrint( _ENCH("FrmtProspectFound"):format(DisenchantEvent.finished))
 				end
 				isProspect = true;
--- ccox - WOTLK - localize me!
-			elseif (DisenchantEvent.spellname == 'Milling') then
+			elseif (DisenchantEvent.spellname == _ENCH('ArgSpellMillingName')) then
 				if (chatPrintYield) then
-					local FrmtMillingFound = "Found that %s mills into:";
-					Enchantrix.Util.ChatPrint( FrmtMillingFound:format(DisenchantEvent.finished))
+					Enchantrix.Util.ChatPrint( _ENCH("FrmtMillingFound"):format(DisenchantEvent.finished))
 				end
 				isMilling = true;
 			end

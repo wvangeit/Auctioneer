@@ -143,16 +143,7 @@ local settingDefaults = {
 
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 
---	['maxBuyoutPrice'] = 800000,
---	['defaultProfitMargin'] = 1000,		 -- default profit margin = 10s
---	['minProfitMargin'] = 100,			 -- min allowed profit margin = 1s (100c)
---	['defaultPercentLessThanHSP'] = 20,	 -- default for percentless scan = 20% under HSP
---	['minPercentLessThanHSP'] = 5,		 -- min for percentless scan = 5% under HSP
---	['defaultProfitPricePercent'] = 10,	 --default for bidbroker scan = 10% under HSP
---	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
---	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
---	['RestrictUnbidded'] = false,		-- should bidbroker only show items that don't have bids?
 
 	['AuctionBalanceEssencePrices'] = false,	-- should we balance the price of essences before doing auction scans?
 	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences

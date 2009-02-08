@@ -186,8 +186,7 @@ local function getDisenchantOrProspectValue(link, count)
 					local value = (hsp or 0) * yield
 					millingValue = millingValue + value
 				end
--- TODO - ccox - localize me!
-				return millingValue, 'Milling'
+				return millingValue, _ENCH('ArgSpellMillingName')
 			end
 		end
 
@@ -273,10 +272,8 @@ local function onEvent(...)
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
 				elseif arg2 == _ENCH('ArgSpellname') then
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
--- TODO - ccox - localize me!
-				elseif arg2 == 'Milling' then
-					local tempFormat = "Milling %s"
-					Enchantrix.Util.ChatPrint(tempFormat:format(prompt.link))
+				elseif arg2 == _ENCH('ArgSpellMillingName') then
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeMilling"):format(prompt.link))
 				end
 			end
 			hidePrompt()
@@ -326,9 +323,8 @@ local function onEvent(...)
 					local spellName = prompt.Yes:GetAttribute("spell")
 					if spellName == _ENCH('ArgSpellProspectingName') then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspectCancelled"))
--- TODO - ccox - localize me!
-					elseif spellName == 'Milling'  then
-						Enchantrix.Util.ChatPrint("Milling cancelled: item not found")
+					elseif spellName == _ENCH('ArgSpellMillingName')  then
+						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeMillingCancelled"))
 					elseif spellName == _ENCH('ArgSpellname')  then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
 					end
@@ -430,9 +426,8 @@ function showPrompt(link, bag, slot, value, spell)
 	if spell == _ENCH('ArgSpellProspectingName') then
 		prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
--- TODO - ccox - localize me!
-	elseif spell == 'Milling' then
-		prompt.Lines[1]:SetText("Do you want to mill:\n")
+	elseif spell == _ENCH('ArgSpellMillingName') then
+		prompt.Lines[1]:SetText(_ENCH("GuiAutoMillingPromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
 	elseif spell == _ENCH('ArgSpellname') then
 		prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
@@ -473,8 +468,7 @@ local function showTooltip()
 		local count = 1
 		local spellName = prompt.Yes:GetAttribute("spell")
 		if spellName == _ENCH('ArgSpellProspectingName')
--- TODO - ccox - localize me!
-			or spellName == 'Milling' then
+			or spellName == _ENCH('ArgSpellMillingName') then
 			count = 5
 		end
 	tooltip:ShowItemLink(GameTooltip, prompt.link, count)

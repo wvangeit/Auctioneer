@@ -186,8 +186,6 @@ end
 -- ccox - TODO WOTLK - change strings to milling, see if this can share code with prospecting!
 -- probably not
 
--- ccox - WOTLK - localize strings!
-
 local function millingTooltip(prospect, tooltip, name, link, quality, count)
 
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
@@ -236,7 +234,7 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 	totalFive = totalFive * groups;
 
 	tooltip:SetColor(0.8,0.8,0.2)
-	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
+	if (Enchantrix.Settings.GetSetting('TooltipMillingMats')) then
 		-- Header
 		local totalText = ""
 		tooltip:AddLine(_ENCH('FrmtMillsInto')..totalText, nil, embed);
@@ -249,7 +247,7 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 	end
 
 
-	if (Enchantrix.Settings.GetSetting('TooltipMillingMats')) then
+	if (Enchantrix.Settings.GetSetting('TooltipMillingLevels')) then
 		local reqSkill = Enchantrix.Util.InscriptionSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserInscriptionSkill();
 		local deText = format(_ENCH("TooltipMillingLevel"), reqSkill );
