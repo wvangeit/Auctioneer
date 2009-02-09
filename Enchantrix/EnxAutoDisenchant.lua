@@ -230,7 +230,15 @@ end
 
 
 function beginScan(bag)
+	hidePrompt()		-- we can't actually hide during combat, so the UI will stay up
 	setState("scan")
+	
+	-- do not scan while in combat
+	if UnitAffectingCombat("player") then
+		debugSpam("aborting scan during combat")
+		return
+	end
+
 	local link, outBag, slot, value, spell
 	if (bag) then
 		link, outBag, slot, value, spell = findItemInOneBag(bag)
@@ -280,17 +288,17 @@ local function onEvent(...)
 			setState("cast")
 		end
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
-		if isState("cast") and arg1 == "player" then
+		if arg1 == "player" then
 			-- interrupted - revert to scanning
 			eventSpam(...)
-			clearPrompt()
+			hidePrompt()
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" then
-		if isState("cast") and arg1 == "player" then
+		if arg1 == "player" then
 			-- failed - revert to scanning
 			eventSpam(...)
-			clearPrompt()
+			hidePrompt()
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
@@ -328,7 +336,7 @@ local function onEvent(...)
 					elseif spellName == _ENCH('ArgSpellname')  then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
 					end
-					clearPrompt()
+					hidePrompt()
 					beginScan()
 				end
 			end
@@ -343,7 +351,7 @@ local function onUpdate(frame, elapsed)
 	-- only handle initialization and settings changes in here, so don't need to
 	-- update often. most of the grunt work happens in the event handler
 
-	local updateEvery = 0.5
+	local updateEvery = 1
 	updatedAgo = updatedAgo + elapsed
 	if updatedAgo < updateEvery then return end
 
@@ -411,18 +419,20 @@ local function getTextGSC(money)
 end
 
 function showPrompt(link, bag, slot, value, spell)
+	clearPrompt()		-- safety
+	
 	debugSpam(link ..",".. bag ..",".. slot ..",".. value ..",".. spell)
 
 	local _, count = GetContainerItemInfo(bag, slot)
 
 	prompt.link, prompt.bag, prompt.slot, prompt.count = link, bag, slot, count
+	prompt.time = GetTime()		-- not yet used
 
 	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(prompt.link)
 	prompt.Item:SetNormalTexture(texture)
 	prompt.Yes:SetAttribute("target-item", itemStringFromLink(prompt.link))
 	prompt.Yes:SetAttribute("spell", spell)
 
-	-- TODO: should refer to prospecting if that's what it's doing
 	if spell == _ENCH('ArgSpellProspectingName') then
 		prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
@@ -444,17 +454,21 @@ end
 
 function clearPrompt()
 	hidePrompt()
-	prompt.link, prompt.bag, prompt.slot, prompt.count = nil, nil, nil, nil, nil
+	prompt.link, prompt.bag, prompt.slot, prompt.count, prompt.time = nil, nil, nil, nil, nil
 end
 
 local function promptNo()
-	ignoreItemSession(prompt.link)
+	if prompt.link then
+		ignoreItemSession(prompt.link)
+	end
 	clearPrompt()
 	beginScan()
 end
 
 local function promptIgnore()
-	ignoreItemPermanent(prompt.link)
+	if prompt.link then
+		ignoreItemPermanent(prompt.link)
+	end
 	clearPrompt()
 	beginScan()
 end
@@ -556,15 +570,8 @@ local function initUI()
 		dest:SetHighlightTexture(source:GetHighlightTexture())
 		dest:SetPushedTexture(source:GetPushedTexture())
 		dest:SetText(source:GetText())
-
-		if select(4, GetBuildInfo() ) >= 30000 then
-			dest:SetNormalFontObject(GameFontNormal);		-- ccox - WoW 3.0
-			dest:SetHighlightFontObject(GameFontHighlight);	-- ccox - WOTLK
-		else
-			dest:SetFont(source:GetFont()) 				-- ccox - API gone in WoW 3.0
-			dest:SetTextColor(source:GetTextColor()) 	-- ccox - API gone in WoW 3.0
-			dest:SetHighlightTextColor(source:GetHighlightTextColor()) -- ccox - API gone in WoW 3.0
-		end
+		dest:SetNormalFontObject(GameFontNormal);
+		dest:SetHighlightFontObject(GameFontHighlight);
 	end
 
 	-- create an invisible "Yes" OptionsButton, then copy its settings
