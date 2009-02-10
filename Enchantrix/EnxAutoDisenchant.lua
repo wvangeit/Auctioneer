@@ -30,17 +30,15 @@
 ]]
 Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
-local ignoreList = {}
-local frame
-local prompt
+local auto_de_session_ignore_list = {}
+local auto_de_frame
+local auto_de_prompt
 
-local setState
-local beginScan
 local showPrompt
 local hidePrompt
 local clearPrompt
 
-local tooltip = LibStub("nTipHelper:1")
+local auto_de_tooltip = LibStub("nTipHelper:1")
 
 --------------------------------------------------------------------------------
 -- Debug stuff
@@ -92,12 +90,12 @@ local function ignoreItemSession(link, silent)
 	if not silent then
 		Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeIgnoreSession"):format(genericLink))
 	end
-	ignoreList[genericLink] = true
+	auto_de_session_ignore_list[genericLink] = true
 end
 
 local function isItemIgnored(link)
 	local genericLink = genericizeItemLink(link)
-	return ignoreList[genericLink] or AutoDisenchantIgnoreList[genericLink]
+	return auto_de_session_ignore_list[genericLink] or AutoDisenchantIgnoreList[genericLink]
 end
 
 local function nameFromIgnoreListItem(item)
@@ -109,14 +107,15 @@ end
 -- Main logic
 
 local moduleState
-function setState(newState)
+local function setState(newState)
 	if newState ~= state then
 		debugSpam("State: " .. newState)
 		moduleState = newState
 	end
 end
 
-function isState(state)
+-- declared local at top
+local function isState(state)
 	return moduleState == state
 end
 
@@ -196,25 +195,25 @@ end
 
 -- check one bag (to save time when we know something moved in just this bag)
 local function findItemInOneBag(bag, findLink)
-   		for slot = 1, GetContainerNumSlots(bag) do
-			local _, count = GetContainerItemInfo(bag, slot)
-	    	local link = GetContainerItemLink(bag, slot)
-			if link and (not findLink or link == findLink) then
-				if not findLink and link == prompt.link and bag == prompt.bag
-					and slot == prompt.slot and count == prompt.count then
-					-- items sometimes linger after they've been disenchanted and looted
-					debugSpam("Skipping zombie item " .. link)
-				else
-					if not isItemIgnored(link) then
-						local value, spell = getDisenchantOrProspectValue(link, count)
-						if value and value > 0 then
-							return link, bag, slot, value, spell
-						end
+	for slot = 1, GetContainerNumSlots(bag) do
+		local _, count = GetContainerItemInfo(bag, slot)
+    	local link = GetContainerItemLink(bag, slot)
+		if link and (not findLink or link == findLink) then
+			if not findLink and link == auto_de_prompt.link and bag == auto_de_prompt.bag
+				and slot == auto_de_prompt.slot and count == auto_de_prompt.count then
+				-- items sometimes linger after they've been disenchanted and looted
+				debugSpam("Skipping zombie item " .. link)
+			else
+				if not isItemIgnored(link) then
+					local value, spell = getDisenchantOrProspectValue(link, count)
+					if value and value > 0 then
+						return link, bag, slot, value, spell
 					end
 				end
 			end
 		end
 	end
+end
 
 
 -- check all bags for disenchantable items
@@ -229,9 +228,9 @@ local function findItemInBags(findLink)
 end
 
 
-function beginScan(bag)
-	hidePrompt()		-- we can't actually hide during combat, so the UI will stay up
+local function beginScan(bag)
 	setState("scan")
+	hidePrompt()		-- we can't actually hide during combat, so the UI will stay up
 	
 	-- do not scan while in combat
 	if UnitAffectingCombat("player") then
@@ -272,16 +271,16 @@ local function onEvent(...)
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SENT" then
-		if isState("prompt") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
+		if isState("prompt") and arg1 == "player" and arg2 == auto_de_prompt.Yes:GetAttribute("spell") then
 			-- disenchant started - wait for completion
 			eventSpam(...)
 			if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
 				if arg2 == _ENCH('ArgSpellProspectingName') then
-					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(auto_de_prompt.link))
 				elseif arg2 == _ENCH('ArgSpellname') then
-					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(auto_de_prompt.link))
 				elseif arg2 == _ENCH('ArgSpellMillingName') then
-					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeMilling"):format(prompt.link))
+					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeMilling"):format(auto_de_prompt.link))
 				end
 			end
 			hidePrompt()
@@ -302,7 +301,7 @@ local function onEvent(...)
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-		if isState("cast") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
+		if isState("cast") and arg1 == "player" and arg2 == auto_de_prompt.Yes:GetAttribute("spell") then
 			-- completed - wait for loot window to come up
 			eventSpam(...)
 			setState("loot_wait")
@@ -312,23 +311,23 @@ local function onEvent(...)
 			-- bag contents changed - rescan bags
 			eventSpam(...)
 			beginScan(arg1)
-		elseif isState("prompt") and arg1 == prompt.bag then
+		elseif isState("prompt") and arg1 == auto_de_prompt.bag then
 			-- verify that our item is still there
-		    local link = GetContainerItemLink(prompt.bag, prompt.slot)
-			if link ~= prompt.link then
+		    local link = GetContainerItemLink(auto_de_prompt.bag, auto_de_prompt.slot)
+			if link ~= auto_de_prompt.link then
 				eventSpam(...)
-				debugSpam(prompt.link, "moved/disappeared")
+				debugSpam(auto_de_prompt.link, "moved/disappeared")
 				hidePrompt()
 
 				local bag, slot, value, spell
-				link, bag, slot, value, spell = findItemInBags(prompt.link)
+				link, bag, slot, value, spell = findItemInBags(auto_de_prompt.link)
 				if link then
 					-- moved
 					debugSpam("  found again at [" .. bag .. "," .. slot .. "]")
 					showPrompt(link, bag, slot, value, spell)
 				else
 					-- sold, traded, banked, destroyed, ...
-					local spellName = prompt.Yes:GetAttribute("spell")
+					local spellName = auto_de_prompt.Yes:GetAttribute("spell")
 					if spellName == _ENCH('ArgSpellProspectingName') then
 						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspectCancelled"))
 					elseif spellName == _ENCH('ArgSpellMillingName')  then
@@ -418,6 +417,8 @@ local function getTextGSC(money)
 	return gsc
 end
 
+
+-- declared local at top
 function showPrompt(link, bag, slot, value, spell)
 	clearPrompt()		-- safety
 	
@@ -425,49 +426,51 @@ function showPrompt(link, bag, slot, value, spell)
 
 	local _, count = GetContainerItemInfo(bag, slot)
 
-	prompt.link, prompt.bag, prompt.slot, prompt.count = link, bag, slot, count
-	prompt.time = GetTime()		-- not yet used
+	auto_de_prompt.link, auto_de_prompt.bag, auto_de_prompt.slot, auto_de_prompt.count = link, bag, slot, count
+	auto_de_prompt.time = GetTime()		-- not yet used
 
-	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(prompt.link)
-	prompt.Item:SetNormalTexture(texture)
-	prompt.Yes:SetAttribute("target-item", itemStringFromLink(prompt.link))
-	prompt.Yes:SetAttribute("spell", spell)
+	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(auto_de_prompt.link)
+	auto_de_prompt.Item:SetNormalTexture(texture)
+	auto_de_prompt.Yes:SetAttribute("target-item", itemStringFromLink(auto_de_prompt.link))
+	auto_de_prompt.Yes:SetAttribute("spell", spell)
 
 	if spell == _ENCH('ArgSpellProspectingName') then
-		prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
-		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
+		auto_de_prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
+		auto_de_prompt.Lines[2]:SetText("  " .. auto_de_prompt.link .. "x5")
 	elseif spell == _ENCH('ArgSpellMillingName') then
-		prompt.Lines[1]:SetText(_ENCH("GuiAutoMillingPromptLine1"))
-		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
+		auto_de_prompt.Lines[1]:SetText(_ENCH("GuiAutoMillingPromptLine1"))
+		auto_de_prompt.Lines[2]:SetText("  " .. auto_de_prompt.link .. "x5")
 	elseif spell == _ENCH('ArgSpellname') then
-		prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
-		prompt.Lines[2]:SetText("  " .. prompt.link)
+		auto_de_prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
+		auto_de_prompt.Lines[2]:SetText("  " .. auto_de_prompt.link)
 	end
-	prompt.Lines[3]:SetText(_ENCH("GuiAutoDePromptLine3"):format(getTextGSC(floor(value))))
+	auto_de_prompt.Lines[3]:SetText(_ENCH("GuiAutoDePromptLine3"):format(getTextGSC(floor(value))))
 
-	prompt:Show()
+	auto_de_prompt:Show()
 end
 
+-- declared local at top
 function hidePrompt()
-	prompt:Hide()
+	auto_de_prompt:Hide()
 end
 
+-- declared local at top
 function clearPrompt()
 	hidePrompt()
-	prompt.link, prompt.bag, prompt.slot, prompt.count, prompt.time = nil, nil, nil, nil, nil
+	auto_de_prompt.link, auto_de_prompt.bag, auto_de_prompt.slot, auto_de_prompt.count, auto_de_prompt.time = nil, nil, nil, nil, nil
 end
 
 local function promptNo()
-	if prompt.link then
-		ignoreItemSession(prompt.link)
+	if auto_de_prompt.link then
+		ignoreItemSession(auto_de_prompt.link)
 	end
 	clearPrompt()
 	beginScan()
 end
 
 local function promptIgnore()
-	if prompt.link then
-		ignoreItemPermanent(prompt.link)
+	if auto_de_prompt.link then
+		ignoreItemPermanent(auto_de_prompt.link)
 	end
 	clearPrompt()
 	beginScan()
@@ -477,19 +480,19 @@ end
 -- Tooltip handling
 
 local function showTooltip()
-	GameTooltip:SetOwner(prompt, "ANCHOR_NONE")
-
-		local count = 1
-		local spellName = prompt.Yes:GetAttribute("spell")
-		if spellName == _ENCH('ArgSpellProspectingName')
-			or spellName == _ENCH('ArgSpellMillingName') then
-			count = 5
-		end
-	tooltip:ShowItemLink(GameTooltip, prompt.link, count)
-
-		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint("TOPRIGHT", "AutoDisenchantPromptItem", "TOPLEFT", -10, -20)
-
+	GameTooltip:SetOwner(auto_de_prompt, "ANCHOR_NONE")
+	
+	local count = 1
+	local spellName = auto_de_prompt.Yes:GetAttribute("spell")
+	if spellName == _ENCH('ArgSpellProspectingName')
+		or spellName == _ENCH('ArgSpellMillingName') then
+		count = 5
+	end
+	
+	auto_de_tooltip:ShowItemLink(GameTooltip, auto_de_prompt.link, count)
+	
+	GameTooltip:ClearAllPoints()
+	GameTooltip:SetPoint("TOPRIGHT", "AutoDisenchantPromptItem", "TOPLEFT", -10, -20)
 	GameTooltip:Show()
 end
 
@@ -502,65 +505,65 @@ end
 
 local function initUI()
 	-- main frame
-	frame = CreateFrame("Frame")
+	auto_de_frame = CreateFrame("Frame")
 
 	-- prompt frame
-	prompt = CreateFrame("Frame", "", UIParent)
-	prompt:Hide()
+	auto_de_prompt = CreateFrame("Frame", "", UIParent)
+	auto_de_prompt:Hide()
 
-	prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
-	prompt:SetFrameStrata("DIALOG")
-	prompt:SetHeight(130)
-	prompt:SetWidth(400)
-	prompt:SetBackdrop({
+	auto_de_prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
+	auto_de_prompt:SetFrameStrata("DIALOG")
+	auto_de_prompt:SetHeight(130)
+	auto_de_prompt:SetWidth(400)
+	auto_de_prompt:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 		tile = true, tileSize = 32, edgeSize = 32,
 		insets = { left = 9, right = 9, top = 9, bottom = 9 }
 	})
-	prompt:SetBackdropColor(0,0,0, 0.8)
-	prompt:EnableMouse(true)
-	prompt:SetMovable(true)
+	auto_de_prompt:SetBackdropColor(0,0,0, 0.8)
+	auto_de_prompt:EnableMouse(true)
+	auto_de_prompt:SetMovable(true)
 
 	-- prompt dragbar
-	prompt.Drag = CreateFrame("Button", "", prompt)
-	prompt.Drag:SetPoint("TOPLEFT", prompt, "TOPLEFT", 10,-5)
-	prompt.Drag:SetPoint("TOPRIGHT", prompt, "TOPRIGHT", -10,-5)
-	prompt.Drag:SetHeight(6)
-	prompt.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-	prompt.Drag:SetScript("OnMouseDown", function() prompt:StartMoving() end)
-	prompt.Drag:SetScript("OnMouseUp", function() prompt:StopMovingOrSizing() end)
+	auto_de_prompt.Drag = CreateFrame("Button", "", auto_de_prompt)
+	auto_de_prompt.Drag:SetPoint("TOPLEFT", auto_de_prompt, "TOPLEFT", 10,-5)
+	auto_de_prompt.Drag:SetPoint("TOPRIGHT", auto_de_prompt, "TOPRIGHT", -10,-5)
+	auto_de_prompt.Drag:SetHeight(6)
+	auto_de_prompt.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+	auto_de_prompt.Drag:SetScript("OnMouseDown", function() auto_de_prompt:StartMoving() end)
+	auto_de_prompt.Drag:SetScript("OnMouseUp", function() auto_de_prompt:StopMovingOrSizing() end)
 
 	-- prompt item icon
-	prompt.Item = CreateFrame("Button", "AutoDisenchantPromptItem", prompt)
-	prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
-	prompt.Item:SetPoint("TOPLEFT", prompt, "TOPLEFT", 15, -15)
-	prompt.Item:SetHeight(37)
-	prompt.Item:SetWidth(37)
-	prompt.Item:SetScript("OnEnter", showTooltip)
-	prompt.Item:SetScript("OnLeave", hideTooltip)
+	auto_de_prompt.Item = CreateFrame("Button", "AutoDisenchantPromptItem", auto_de_prompt)
+	auto_de_prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
+	auto_de_prompt.Item:SetPoint("TOPLEFT", auto_de_prompt, "TOPLEFT", 15, -15)
+	auto_de_prompt.Item:SetHeight(37)
+	auto_de_prompt.Item:SetWidth(37)
+	auto_de_prompt.Item:SetScript("OnEnter", showTooltip)
+	auto_de_prompt.Item:SetScript("OnLeave", hideTooltip)
 
 	-- prompt text
-	prompt.Lines = {}
+	auto_de_prompt.Lines = {}
 	for i = 1, 3 do
-		prompt.Lines[i] = prompt:CreateFontString("AutoDisenchantPromptLine"..i, "HIGH")
+		auto_de_prompt.Lines[i] = auto_de_prompt:CreateFontString("AutoDisenchantPromptLine"..i, "HIGH")
 		if (i == 1) then
-			prompt.Lines[i]:SetPoint("TOPLEFT", prompt.Item, "TOPRIGHT", 5, 5)
-			prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",16)
+			auto_de_prompt.Lines[i]:SetPoint("TOPLEFT", auto_de_prompt.Item, "TOPRIGHT", 5, 5)
+			auto_de_prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",16)
 		else
-			prompt.Lines[i]:SetPoint("TOPLEFT", prompt.Lines[i-1], "BOTTOMLEFT", 0, -5)
-			prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",13)
+			auto_de_prompt.Lines[i]:SetPoint("TOPLEFT", auto_de_prompt.Lines[i-1], "BOTTOMLEFT", 0, -5)
+			auto_de_prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",13)
 		end
-		prompt.Lines[i]:SetWidth(350)
-		prompt.Lines[i]:SetJustifyH("LEFT")
-		prompt.Lines[i]:SetText(" ")
+		auto_de_prompt.Lines[i]:SetWidth(350)
+		auto_de_prompt.Lines[i]:SetJustifyH("LEFT")
+		auto_de_prompt.Lines[i]:SetText(" ")
 	end
 
 	-- prompt buttons
 
 	-- there is no secure version of OptionsButton, so create an invisible
-	-- OptionsButton (prompt.DummyYes) and copy its visual settings across to a
-	-- SecureActionButton (prompt.Yes) to perform the spellcast
+	-- OptionsButton (auto_de_prompt.DummyYes) and copy its visual settings across to a
+	-- SecureActionButton (auto_de_prompt.Yes) to perform the spellcast
 
 	local function copyButtonVisuals(dest, source)
 		dest:ClearAllPoints()
@@ -576,31 +579,31 @@ local function initUI()
 
 	-- create an invisible "Yes" OptionsButton, then copy its settings
 	-- across to the secure button
-	prompt.DummyYes = CreateFrame("Button", "", prompt, "OptionsButtonTemplate")
-	prompt.DummyYes:SetText(_ENCH("GuiYes"))
-	prompt.DummyYes:SetPoint("BOTTOMRIGHT", prompt, "BOTTOMRIGHT", -10, 10)
-	prompt.DummyYes:Hide()
+	auto_de_prompt.DummyYes = CreateFrame("Button", "", auto_de_prompt, "OptionsButtonTemplate")
+	auto_de_prompt.DummyYes:SetText(_ENCH("GuiYes"))
+	auto_de_prompt.DummyYes:SetPoint("BOTTOMRIGHT", auto_de_prompt, "BOTTOMRIGHT", -10, 10)
+	auto_de_prompt.DummyYes:Hide()
 
-	prompt.Yes = CreateFrame("Button", "AutoDEPromptYes", prompt, "SecureActionButtonTemplate")
-	copyButtonVisuals(prompt.Yes, prompt.DummyYes)
-	prompt.Yes:SetAttribute("unit", "none")
-	prompt.Yes:SetAttribute("type", "spell")
+	auto_de_prompt.Yes = CreateFrame("Button", "AutoDEPromptYes", auto_de_prompt, "SecureActionButtonTemplate")
+	copyButtonVisuals(auto_de_prompt.Yes, auto_de_prompt.DummyYes)
+	auto_de_prompt.Yes:SetAttribute("unit", "none")
+	auto_de_prompt.Yes:SetAttribute("type", "spell")
 
-	prompt.No = CreateFrame("Button", "AutoDEPromptNo", prompt, "OptionsButtonTemplate")
-	prompt.No:SetText(_ENCH("GuiNo"))
-	prompt.No:SetPoint("BOTTOMRIGHT", prompt.Yes, "BOTTOMLEFT", -5, 0)
-	prompt.No:SetScript("OnClick", promptNo)
+	auto_de_prompt.No = CreateFrame("Button", "AutoDEPromptNo", auto_de_prompt, "OptionsButtonTemplate")
+	auto_de_prompt.No:SetText(_ENCH("GuiNo"))
+	auto_de_prompt.No:SetPoint("BOTTOMRIGHT", auto_de_prompt.Yes, "BOTTOMLEFT", -5, 0)
+	auto_de_prompt.No:SetScript("OnClick", promptNo)
 
-	prompt.Ignore = CreateFrame("Button", "AutoDEPromptIgnore", prompt, "OptionsButtonTemplate")
-	prompt.Ignore:SetText(_ENCH("GuiIgnore"))
-	prompt.Ignore:SetPoint("BOTTOMRIGHT", prompt.No, "BOTTOMLEFT", -5, 0)
-	prompt.Ignore:SetScript("OnClick", promptIgnore)
+	auto_de_prompt.Ignore = CreateFrame("Button", "AutoDEPromptIgnore", auto_de_prompt, "OptionsButtonTemplate")
+	auto_de_prompt.Ignore:SetText(_ENCH("GuiIgnore"))
+	auto_de_prompt.Ignore:SetPoint("BOTTOMRIGHT", auto_de_prompt.No, "BOTTOMLEFT", -5, 0)
+	auto_de_prompt.Ignore:SetScript("OnClick", promptIgnore)
 end
 
 --------------------------------------------------------------------------------
 -- Global setup
 
-function addonLoaded()
+local function addonLoaded()
 	if not AutoDisenchantIgnoreList then AutoDisenchantIgnoreList = {} end
 
 	setState("init")
@@ -615,7 +618,7 @@ function addonLoaded()
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix.AutoDisenchant", onEvent)
 	Stubby.RegisterEventHook("BAG_UPDATE", "Enchantrix.AutoDisenchant", onEvent)
 
-	frame:SetScript("OnUpdate", onUpdate)
+	auto_de_frame:SetScript("OnUpdate", onUpdate)
 end
 
 
