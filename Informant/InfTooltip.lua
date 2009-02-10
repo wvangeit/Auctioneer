@@ -37,9 +37,6 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	if (not getFilter('all')) then
 		return
 	end
-	if getFilter('ModTTShow') and not IsAltKeyDown() then
-		return
-	end
 
 	tooltip:SetFrame(frame)
 
@@ -89,6 +86,10 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	itemInfo.itemBuy = buy
 	itemInfo.itemSell = sell
 	itemInfo.itemQuant = quant
+
+	if getFilter('ModTTShow') and not IsAltKeyDown() then
+		return
+	end
 
 	local embedded = getFilter('embed')
 
