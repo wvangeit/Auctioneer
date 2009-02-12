@@ -361,20 +361,21 @@ BeanCounterLocalizations = {
 	esES = {
 
 		-- Section: Config Text
-		["C_BeanCounterConfig"]	= "Cofiguracion del BeanCounter";
+		["C_BeanCounterConfig"]	= "Configuración";
 		["C_BeanCounterDatabaseMaintenance"]	= "Mantenimiento de la base de datos del BeanCounter";
 		["C_BeanCounterOptions"]	= "Opciones del BeanCounter";
-		["C_DataMaintenance"]	= "Mantenimiento de los datos";
-		["C_DateString"]	= "Formato de datos a usar:";
+		["C_DataMaintenance"]	= "Base de datos";
+		["C_DateString"]	= "Formato de fecha a usar:";
 		["C_DateStringExample"]	= "Fecha de ejemplo:";
-		["C_ExtenalSearch"]	= "¿Permitir que Addons externos usen la busqueda del BeanCounter?";
+		["C_ExtenalSearch"]	= "¿Permitir que otros Addons activen la busqueda del BeanCounter?";
 		["C_MailInvoiceTimeout"]	= "Tiempo de espera del correo = %d segundos";
 		["C_MailRecolor"]	= "Metodo de recolorear los correos";
-		["C_Resortascendingtime"]	= "Ordenar todas las entradas por tiempo restante";
-		["C_ResortDatabase"]	= "Ordenar base de datos";
-		["C_ScanDatabase"]	= "Buscar errores en la base de datos: Usalo si tienes errores cuando buscas con el BeanCounter. \n salvar los datos anteriores de BeanCounter antes de usarlo.";
-		["C_ShowBeginnerTooltips"]	= "Enseñar los consejos de principiante cuando se pasa el raton por encima.";
-		["C_ShowReasonPurchase"]	= "Enseñar la razon de compra en los consejso del juego.";
+		["C_ModTTShow"]	= "Mostrar el tooltip extra solo si se presiona Alt.";
+		["C_Resortascendingtime"]	= "Reordenar todas las entradas de modo ascendente por la fecha ";
+		["C_ResortDatabase"]	= "Reordenar datos";
+		["C_ScanDatabase"]	= "Escanear la base de datos: Usar si tienes errores al buscar.\nSalva los datos anteriores de BeanCounter antes de usarlo.";
+		["C_ShowBeginnerTooltips"]	= "Mostrar tooltip de ayuda al pasar el ratón por encima de los campos.";
+		["C_ShowReasonPurchase"]	= "Mostrar UIReason en el tooltip.";
 		["C_ValidateDatabase"]	= "Validar base de datos";
 
 		-- Section: Generic Strings
@@ -396,6 +397,7 @@ BeanCounterLocalizations = {
 		["TTDateString"]	= "Introduzca el formato que desea que su campo de fecha debe mostrar. El valor predeterminado es %c.";
 
 		-- Section: User Interface
+		["UiAddonTitle"]	= "BeanCounter: Base de datos con la historia de subastas";
 		["UiAucExpired"]	= "Subasta no conseguida";
 		["UiAucSuccessful"]	= "Subasta conseguida";
 		["UiAuctions"]	= "Subastas";
@@ -407,14 +409,20 @@ BeanCounterLocalizations = {
 		["UiData"]	= "Datos";
 		["UiDateHeader"]	= "Fecha";
 		["UiDepositTransaction"]	= "Depósito";
+		["UiDone"]	= "Cerrar";
 		["UiExactNameSearch"]	= "Solo nombre exacto";
+		["UiFailedAuctions"]	= "Subastas no conseguidas";
+		["UiFee"]	= "Comisión";
 		["UiMailFrameRecording"]	= "BeanCounter esta registrando tu correo";
-		["UiMailFrameWait1"]	= "Por favor no cierra la ventana del correo o";
+		["UiMailFrameWait1"]	= "Por favor no cierre la ventana del correo o";
 		["UiMailFrameWait2"]	= "los objetos no serán registrados";
 		["UiNameHeader"]	= "Artículo";
 		["UiNetHeader"]	= "Neto";
 		["UiNetPerHeader"]	= "Neto c/u";
+		["UiOutbid"]	= "Puja superada";
+		["UiOutbids"]	= "Pujas superadas";
 		["UiPriceHeader"]	= "Precio";
+		["UiPriceper"]	= "Precio ud";
 		["UiPricePerHeader"]	= "Precio c/u";
 		["UiPurchases"]	= "Compras";
 		["UiQuantityHeader"]	= "Ctd";
