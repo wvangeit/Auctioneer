@@ -104,12 +104,10 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -----------------------------------------------------------------------------------
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
-function lib.GetItemPDF(hyperlink, faction, realm)
+function lib.GetItemPDF(hyperlink, faction)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	-- Get the data
-	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm);
-	-- DEFAULT_CHAT_FRAME:AddMessage("-----");
-	-- DevTools_Dump{lib.GetPrice(hyperlink,faction,realm)};
+	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
 
 	if not (average and stddev) or average == 0 or stddev == 0 then
 		return nil;                 -- No data, cannot determine pricing
@@ -145,6 +143,7 @@ function private.GetCfromZ(Z)
 end
 
 function lib.GetPrice(hyperlink, faction)
+	-- note: parameter 'faction' is really a 'serverKey'
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
@@ -218,13 +217,13 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction, realm)
+function lib.GetPriceArray(hyperlink, faction)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
 	-- Get our statistics
-	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm)
+	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = average or mean
@@ -347,14 +346,13 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.stddev.enable", true)
 end
 
-function lib.ClearItem(hyperlink, faction, realm)
+function lib.ClearItem(hyperlink, faction)
 	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then
 		return
 	end
 	if (factor ~= 0) then property = property.."x"..factor end
 	if not faction then faction = AucAdvanced.GetFaction() end
-	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
 	if (data[faction]) then
 		print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, faction))--- StdDev: clearing data for %s for {{%s}}	
