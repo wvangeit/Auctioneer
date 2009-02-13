@@ -245,14 +245,14 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, ahKey, realm)
+function lib.GetPriceArray(hyperlink, ahKey)
 	if not get("stat.classic.enable") then return end --disable classic if desired
 
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
 	-- Get our statistics
-	local median, seen, confidence = lib.GetPrice(hyperlink, ahKey, realm)
+	local median, seen, confidence = lib.GetPrice(hyperlink, ahKey)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = median
@@ -315,7 +315,7 @@ function lib.OnLoad(addon)
 	private.makeData()
 end
 
-function lib.ClearItem(hyperlink, ahKey, realm)
+function lib.ClearItem(hyperlink, ahKey)
 	local linkType, itemID, property, factor, enchant = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then
 		return
@@ -323,7 +323,6 @@ function lib.ClearItem(hyperlink, ahKey, realm)
 	local ItemString = strjoin(":",itemID,property,enchant)
 	if not ahKey then ahKey = AucAdvanced.GetFaction() end
 	ahKey = ahKey:lower()
-	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
 	if (data[ahKey]) then
 		print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..ahKey.."}}")
