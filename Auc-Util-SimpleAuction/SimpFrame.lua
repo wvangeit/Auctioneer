@@ -91,24 +91,28 @@ function private.SigFromLink(link)
 end
 
 function private.GetMyPrice(link, items)
+	if not link then return end
 	local uBid, uBuy
+	local searchname = GetItemInfo (link)
 	local n = GetNumAuctionItems("owner")
 	if n and n > 0 then
 		for i = 1, n do
 			local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
-			if item then
-				if item[const.NAME] == name then
-					if items then table.insert(items, item) end
-					local bid, buy, owner = item[const.MINBID], item[const.BUYOUT], item[const.OWNER]
-					if not uBid then
-						uBid = bid
-					else
-						uBid = min(uBid, bid)
-					end
-					if not uBuy then
-						uBuy = buy
-					elseif buy then
-						uBuy = min(uBuy, buy)
+			if item and item[const.NAME] == searchname then
+				if items then table.insert(items, item) end
+				local stack = item[const.COUNT]
+				if stack and stack > 0 then
+					local bid, buy = item[const.MINBID], item[const.BUYOUT]
+					if bid and bid > 0 then
+						bid = bid / stack
+						uBid = uBid and min(uBid, bid) or bid
+						-- only check buy value if the bid value is valid
+						-- avoids including buy prices for "sold" auctions,
+						-- due to problems with invalid stack counts from Blizzard API
+						if buy and buy > 0 then
+							buy = buy / stack
+							uBuy = uBuy and min(uBuy, buy) or buy
+						end
 					end
 				end
 			end
@@ -127,7 +131,6 @@ end
 --aSeen: number of items in competing auctions
 --aBuy: average price for current competing auctions
 function private.GetItems(link)
-	local name = GetItemInfo(link)
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 	local aSeen, lBid, lBuy, uBid, uBuy, aBuy, aveBuy = 0
 	local player = UnitName("player")
@@ -146,7 +149,7 @@ function private.GetItems(link)
 		uBid, uBuy = private.GetMyPrice(link, items)
 	end
 	for pos, item in ipairs(matching) do
-		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.OWNER], item[const.COUNT]
+		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.SELLER], item[const.COUNT]
 		stk = stk or 1
 		local bidea, buyea
 		if bid and bid > 0 then
@@ -160,6 +163,7 @@ function private.GetItems(link)
 			if not live then
 				if not uBid then uBid = bidea elseif bidea then uBid = min(uBid, bidea) end
 				if not uBuy then uBuy = buyea elseif buyea then uBuy = min(uBuy, buyea) end
+				table.insert(items, item)
 			end
 		else
 			if not lBid then
