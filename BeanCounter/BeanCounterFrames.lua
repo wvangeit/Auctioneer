@@ -436,17 +436,12 @@ function private.CreateFrames()
 			if link and name then
 				GameTooltip:SetHyperlink(link)
 				--private.tooltip:ShowItemLink(GameTooltip, link, 1)
-			else
-				GameTooltip:SetText(_BC('TooltipFailed'), 1.0, 1.0, 1.0) --"Unable to get Tooltip Info"
 			end
 		end
         end
-	function private.scrollSheetOnLeave(button, row, index)
-		GameTooltip:Hide()
-	end
 	--records the column width changes
 	 --store width by header name, that way if column reorginizing is added we apply size to proper column
-	function private.onResize(self, column,  width)
+	function private.onResize(self, column, width)
 		if not width then
 			set("columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
 			self.labels[column].button:SetWidth(get("columnwidth."..self.labels[column]:GetText()))
@@ -463,7 +458,7 @@ function private.CreateFrames()
 		local text = GetItemInfo(link)
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(link)--sends to chat or auction house
-		elseif IsAltKeyDown() then -- Search for the item in BeanCounter
+		elseif IsAltKeyDown() and text then -- Search for the item in BeanCounter
 			frame.searchBox:SetText(text)
 			private.startSearch(text, private.getCheckboxSettings())
 		end
@@ -485,8 +480,25 @@ function private.CreateFrames()
 		{ _BC('UiDepositTransaction'), "COIN", get("columnwidth.".._BC('UiDepositTransaction')) },
 		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) },
 		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) },
-		{ _BC('UiDateHeader'), "text", get("columnwidth.".._BC('UiDateHeader')) },
-	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, private.scrollSheetOnClick, private.onResize)
+		{ _BC('UiDateHeader'), "TEXT", get("columnwidth.".._BC('UiDateHeader')) },
+	} )
+	
+	function frame.resultlist.sheet.Processor(callback, self, button, column, row, order)
+		if (callback == "ColumnOrder") and order then
+			set("columnorder", order)
+		elseif (callback == "ColumnWidthSet") then
+			private.onResize(self, column, button:GetWidth() )
+		elseif (callback == "ColumnWidthReset") then
+			private.onResize(self, column, nil)
+		elseif (callback == "OnEnterCell")  then
+			private.scrollSheetOnEnter(button, row, column)
+		elseif (callback == "OnLeaveCell") then
+			GameTooltip:Hide()
+		elseif (callback == "OnClickCell") then
+			private.scrollSheetOnClick(button, row, column)
+		end
+	end
+
 	--Add tooltip help to the scrollframe headers
 	for i = 1, #frame.resultlist.sheet.labels do
 		local self = frame.resultlist.sheet.labels[i].button
@@ -494,7 +506,11 @@ function private.CreateFrames()
 		self:SetScript("OnEnter", function() private.buttonTooltips( self, text.._BC('TT_ScrollHeader') ) end) --\nRightclick+Drag to resize\nCTRL+RightClick to reset
 		self:SetScript("OnLeave", function() GameTooltip:Hide() end)
 	end
-
+	--If we have a saved order reapply
+	if get("columnorder") then
+		--print("saved order applied")
+		frame.resultlist.sheet:SetOrder(get("columnorder") )
+	end
 
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
