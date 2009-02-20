@@ -110,7 +110,7 @@ do
         if cacheTable then
             return cacheTable.value, cacheTable.seen, cacheTable.stats;
         end
-        
+
         if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer Advanced missed market pricing cache on item '"..itemLink.."'"); end
 
 
@@ -128,7 +128,7 @@ do
                 end
             end
         end
-        
+
         -- print("Calculating", itemLink);
 
         -- Run through all of the stat modules and get the PDFs
@@ -136,7 +136,7 @@ do
         local convergedFallback = nil;
         for _, engine in ipairs(engines) do
             local i, min, max, area = engine.pdf(saneLink, serverKey);
-            
+
             if type(i) == 'number' then
                 -- This is a fallback
                 if convergedFallback == nil or (type(convergedFallback) == 'number' and math.abs(convergedFallback - i) < FALLBACK_ERROR * convergedFallback / 10000) then
@@ -145,7 +145,7 @@ do
                     convergedFallback = false;      -- Cannot converge on fallback pricing
                 end
             end
-            
+
             local priceArray = engine.array(saneLink, serverKey);
 
             if priceArray and (priceArray.seen or 0) > seen then
@@ -165,11 +165,11 @@ do
         for i = c+1, oldPdfMax do
             pdfList[i] = nil;
         end
-        
+
         if #pdfList == 0 and convergedFallback then
             if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to no available PDFs on item "..itemlink); end
             return convergedFallback, 1, 1;
-        end            
+        end
 
 
         assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
@@ -185,14 +185,14 @@ do
 
         local limit = total/2;
         local midpoint, lastMidpoint = 0, 0;
-        
+
         -- Now find the 50% point
         repeat
             lastMidpoint = midpoint;
             total = 0;
 
             assert(delta > 0, "Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink));
-            
+
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
                     local val = pdfList[i](x);
@@ -204,9 +204,9 @@ do
                     break;
                 end
             end
-            
+
             delta = delta * IMPROVEMENT_FACTOR;
-    
+
 
             if midpoint ~= midpoint or midpoint == 0 then
                 if nLog and midpoint ~= midpoint then
@@ -214,7 +214,7 @@ do
                 elseif nLog then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Unable To Calculate", "A zero total was detected while processing the midpoint for PDF of "..(GetItemInfo(itemLink) or itemLink).."... Giving up.");
                 end
-                
+
                 if convergedFallback then
                     if nLog then
                         nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to NaN/Zero total for item "..itemLink);
@@ -228,7 +228,7 @@ do
 
         if midpoint and midpoint > 0 then
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
-            
+
             -- Cache before finishing up
             local cacheTable = {}
             cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
@@ -290,8 +290,8 @@ end
 function lib.IsValidAlgorithm(algorithm, itemLink)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
-	for engine, engineLib in ipairs(modules) do
-		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
+	for pos, engineLib in ipairs(modules) do
+		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 			if engineLib.IsValidAlgorithm then
 				return engineLib.IsValidAlgorithm(saneLink)
 			end
@@ -328,8 +328,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
-		engine = engineLib.GetName()
-		if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
+		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 			if engineLib.IsValidAlgorithm
 			and not engineLib.IsValidAlgorithm(saneLink) then
 				return
@@ -718,7 +717,7 @@ function lib.GenerateBellCurve()
 end
 
 -- Dumps out market pricing information for debugging. Only handles bell curves for now.
-function lib.DumpMarketPrice(itemLink, serverKey) 
+function lib.DumpMarketPrice(itemLink, serverKey)
 	local modules = AucAdvanced.GetAllModules(nil, "Stat");
 	for pos, engineLib in ipairs(modules) do
 		local success, result = pcall(engineLib.GetItemPDF, itemLink, serverKey);
