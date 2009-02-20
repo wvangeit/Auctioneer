@@ -349,18 +349,18 @@ function lib.NewModule(libType, libName)
 
 	if not lib.Modules[libType][libName] then
 		local module = {}
-		local private = {}
+		local modulePrivate = {}
 		module.libType = libType
 		module.libName = libName
-		module.Private = private
+		module.Private = modulePrivate
 		module.GetName = function() return libName end
 		for k,v in pairs(moduleKit) do
 			module[k] = v
 		end
 
 		lib.Modules[libType][libName] = module
-		private.modulecache = {}
-		return module, lib, private
+		private.modulecache = nil
+		return module, lib, modulePrivate
 	end
 end
 
