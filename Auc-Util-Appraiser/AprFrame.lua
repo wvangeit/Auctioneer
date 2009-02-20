@@ -2578,12 +2578,31 @@ function private.CreateFrames()
 		{ _TRANS('APPR_Interface_Buy/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea')), { DESCENDING=true, DEFAULT=true } },
 		{ _TRANS('APPR_Interface_MinBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid')), { DESCENDING=true } },
 		{ _TRANS('APPR_Interface_CurBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid')), { DESCENDING=true } },
-		{ "".._TRANS('APPR_Interface_Buyout'), "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth." .._TRANS('APPR_Interface_Buyout')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_Buyout') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth." .._TRANS('APPR_Interface_Buyout')), { DESCENDING=true } },
 		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
-	}, nil, nil, private.onClick, private.onResize, private.onSelect)
+	})
 
 	frame.imageview.sheet:EnableSelect(true)
+	--callback functions for frame.imageview.sheet events
+	function frame.imageview.sheet.Processor(callback, self, button, column, row, order)
+		if (callback == "OnMouseDownCell")  then
+			private.onSelect()
+		elseif (callback == "OnClickCell") then
+			private.onClick(button, row, column)
+		elseif (callback == "ColumnOrder") then
+			set("util.appraiser.columnorder", order)
+		elseif (callback == "ColumnWidthSet") then
+			private.onResize(self, column, button:GetWidth() )
+		elseif (callback == "ColumnWidthReset") then
+			private.onResize(self, column, nil)
+		end
+	end
+	--If we have a saved column arrangement reapply
+	if get("util.appraiser.columnorder") then
+		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )
+	end
 
+	
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
