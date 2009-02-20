@@ -92,7 +92,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (factor ~= 0) then property = property.."x"..factor end
 
 	local data = private.GetPriceData()
-	if not data.daily then data.daily = { created = time() } end
 	if not data.daily[itemId] then data.daily[itemId] = "" end
 	local stats = private.UnpackStats(data.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 , buyoutper } end
@@ -111,6 +110,7 @@ function lib.GetPrice(hyperlink, serverKey)
 	if (factor ~= 0) then property = property.."x"..factor end
 
 	local data = private.GetPriceData(serverKey)
+	if not data then return end
 
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14, avgmins = 0,0,0,0,0,0
@@ -266,13 +266,14 @@ end
 
 function lib.ClearItem(hyperlink, serverKey)
 	local linkType, itemID = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then
+	if linkType ~= "item" then
 		return
 	end
 	serverKey = serverKey or AucAdvanced.GetFaction ()
 	print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
 
 	local data = private.GetPriceData (serverKey)
+	if not data then return end
 	data.means[itemID] = nil
 	data.daily[itemID] = nil
 end
@@ -492,44 +493,48 @@ function private.PackStats(data)
 	return stats
 end
 
-
 -- The following Functions are the routines used to access the permanent store data
 
 function private.UpgradeDb()
-	if AucAdvancedStatSimpleData.Version == "2.0" then return end
+	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "2.0" then return end
+
 	local newSave = {Version = "2.0", RealmData = {}}
 
-	if AucAdvancedStatSimpleData.Version == "1.0" then
+	-- Will only be run once per user account; however must run smoothly every time
+	-- Can afford to perform extra type-checking for safety
+	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "1.0" then
 		-- perform upgrade from "1.0" to "2.0"
 		for realm, realmData in pairs (AucAdvancedStatSimpleData.RealmData) do
-			-- valid stats will only be stored in serverKeys which match realm
-			local realmPattern = realm.."%-%u%l"
-			for serverKey, data in pairs (realmData) do
-				if strfind (serverKey, realmPattern) then
-					-- found a valid serverKey
-					-- ensure all required subtables are present
-					if not data.means then
-						data.means = {}
+			if type (realm) == "string" and type (realmData) == "table" then
+				-- valid stats will only be stored in serverKeys which match realm
+				local realmPattern = realm.."%-%u%l"
+				for serverKey, data in pairs (realmData) do
+					if type (serverKey) == "string" and type (data) == "table" and strfind (serverKey, realmPattern) then
+						-- found a valid serverKey
+						-- ensure all required subtables are present
+						if type (data.means) ~= "table" then
+							data.means = {}
+						end
+						if type (data.daily) ~= "table" then
+							data.daily = {created = time()}
+						elseif type (data.daily.created) ~= "number" then
+							data.daily.created = time()
+						end
+						newSave.RealmData[serverKey] = data
 					end
-					if not data.daily then
-						data.daily = {created = time()}
-					elseif not data.daily.created then
-						data.daily.created = time()
-					end
-					newSave.RealmData[serverKey] = data
 				end
 			end
 		end
 	end
-
+	private.UpgradeDb = nil
 	AucAdvancedStatSimpleData = newSave
 end
 
 function private.LoadData()
 	if SSRealmData then return end
-	if not AucAdvancedStatSimpleData then AucAdvancedStatSimpleData = {Version="2.0", RealmData = {}} end
 	private.UpgradeDb()
 	SSRealmData = AucAdvancedStatSimpleData.RealmData
+	assert (SSRealmData, "Error loading or creating StatSimple database")
 	private.DataLoaded()
 end
 
@@ -542,9 +547,16 @@ function private.ClearData(serverKey)
 end
 
 function private.GetPriceData(serverKey)
-	serverKey = serverKey or AucAdvanced.GetFaction ()
+	if type (serverKey) ~= "string" then
+		serverKey = AucAdvanced.GetFaction ()
+	end
 	local data = SSRealmData[serverKey]
 	if not data then
+		if not strfind (serverKey, ".%-%u%l") then
+			-- todo: localize after merging into trunk
+			print ("Invalid serverKey passed to Stat-Simple")
+			return
+		end
 		data = {means = {}, daily = {created = time ()}}
 		SSRealmData[serverKey] = data
 	end
@@ -552,7 +564,6 @@ function private.GetPriceData(serverKey)
 end
 
 function private.DataLoaded()
-	assert (SSRealmData, "Error loading or creating StatSimple database")
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
 	for serverKey, data in pairs (SSRealmData) do
@@ -572,6 +583,7 @@ function private.DataLoaded()
 			private.PushStats(serverKey)
 		end
 	end
+	private.DataLoaded = nil
 end
 
 -- Simple function to total all of the values in the tuple
