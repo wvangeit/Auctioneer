@@ -836,7 +836,7 @@ function private.CreateFrames()
 		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
 		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.model:SetText(curModelText)
-		frame.UpdateImage()
+		--frame.UpdateImage()--Why? I dont see a need to recreate the complete scrollsheet. 
 	end
 	
 	--gets called whenever the display needs to be updated.
