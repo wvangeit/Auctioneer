@@ -368,7 +368,7 @@ local function onUpdate(frame, elapsed)
 			end
 		end
 	else
-		if isState("prompt") or isState("scan") then
+		if isState("prompt") or isState("scan") or isState("init") then
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeInactive"))
 			if isState("prompt") then
 				clearPrompt()
