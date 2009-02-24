@@ -393,6 +393,7 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "nie";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Mahlen";
 		["ArgSpellname"]	= "Entzaubern";
 		["ArgSpellProspectingName"]	= "Sondieren";
 		["Enchanting"]	= "Verzauberkunst";
@@ -452,11 +453,13 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "Anzeigen oder verstecken der Einstellungskonsole.";
 		["HelpTerse"]	= "Aktivieren/Deaktivieren des Kurzinfo-Modus, bei dem nur der Entzauberungswert angezeigt wird. Durch drücken der STRG-Taste werden in diesem Modus alle Infos gezeigt.";
 		["HelpValue"]	= "Auswählen ob geschätzte Verkaufspreise aufgrund \nder Anteile an möglichen Entzauberungen angezeigt werden";
+		["ModTTShow_Help"]	= "Diese Option sorgt dafür, dass der extra tooltip von Enchantrix nur gezeigt wird wenn Alt gedrückt wird.";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "Du hast Auctioneer nicht installiert. Auctioneer muss installiert sein um einen Auktionenscan durchzuführen.";
 		["AuctionScanVersionTooOld"]	= "Deine Auctioneerversion ist veraltet, für diese Aktion wird Auctioneer v4.0 oder später benötigt.";
 		["ChatDeletedProfile"]	= "Profil gelöscht:";
+		["ChatDuplicatedProfile"]	= "Dupliziere Profil nach:";
 		["ChatResetProfile"]	= "Einstellungen zurückgesetzt für:";
 		["ChatSavedProfile"]	= "Profil gespeichert:";
 		["ChatUsingProfile"]	= "Aktuell verwendetes Profil:";
@@ -467,6 +470,8 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "Ignoriere %s permanent";
 		["FrmtAutoDeIgnoreSession"]	= "Ignoriere %s für diese Sitzung";
 		["FrmtAutoDeInactive"]	= "Autom. Entzaubern nicht aktiv";
+		["FrmtAutoDeMilling"]	= "Mahlen %s";
+		["FrmtAutoDeMillingCancelled"]	= "Mahlen abgebroch: Gegenstand nicht gefunden.";
 		["FrmtAutoDeProspectCancelled"]	= "Sondieren abgebrochen: item nicht gefunden";
 		["FrmtAutoDeProspecting"]	= "Sondieren von %s";
 		["FrmtBidbrokerCurbid"]	= "aktGeb";
@@ -487,6 +492,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "Mögliche Entzauberung zu:";
 		["FrmtFound"]	= "%s wird entzaubert zu:";
 		["FrmtFoundNotDisenchant"]	= "%s kann nicht entzaubert werden";
+		["FrmtMillingFound"]	= "%s kann gemahlen werden zu:";
 		["FrmtMillingValueAuctHsp"]	= "Mahlwert (HVP)";
 		["FrmtMillingValueAuctMed"]	= "Mahlwert (Median)";
 		["FrmtMillingValueAuctVal"]	= "Mahlwert (AucAdv)";
@@ -504,11 +510,11 @@ EnchantrixLocalizations = {
 		["FrmtValueAuctHsp"]	= "Entzauberungswert (HVP)";
 		["FrmtValueAuctMed"]	= "Entzauberungswert (Median)";
 		["FrmtValueAuctVal"]	= "Entzauberungswert (AucAdv)";
-		["FrmtValueFixedVal"]	= "Entzauberungswert (Fixiert)";
+		["FrmtValueFixedVal"]	= "Entzauberungswert (Fix)";
 		["FrmtValueMarket"]	= "Entzauberungswert (Marktpreis)";
-		["FrmtWarnAuctNotLoaded"]	= "Auktionstool nicht geladen, es werden gespeicherte Preise benutzt";
-		["FrmtWarnNoPrices"]	= "Keine Preise verfügbar";
-		["FrmtWarnPriceUnavail"]	= "Einige Preise nicht verfügbar";
+		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer nicht geladen, es werden gespeicherte Preise benutzt]";
+		["FrmtWarnNoPrices"]	= "[Keine Preise verfügbar]";
+		["FrmtWarnPriceUnavail"]	= "[Einige Preise nicht verfügbar]";
 		["TooltipMillingLevel"]	= "Mahlen erfordert Fertigkeit %d";
 		["TooltipProspectLevel"]	= "Sondieren erfordert Fertigkeit %d";
 		["TooltipShowDisenchantLevel"]	= "Entzaubern erfordert Fertigkeit %d";
@@ -520,6 +526,7 @@ EnchantrixLocalizations = {
 		["GuiAutoDeOptions"]	= "Automatisierung";
 		["GuiAutoDePromptLine1"]	= "Willst Du dies entzaubern:";
 		["GuiAutoDePromptLine3"]	= "Bewertet um %s";
+		["GuiAutoMillingPromptLine1"]	= "Willst du dies mahlen:";
 		["GuiAutoProspectPromptLine1"]	= "Willst Du dies sondieren:";
 		["GuiBBUnbiddedOnly"]	= "Limitiere BidBroker auf Items ohne Gebote";
 		["GuiConfigProfiles"]	= "Erstelle, konfiguriere und editiere Profile";
@@ -528,6 +535,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "Standardprozentwert unter HVP: %d";
 		["GuiDefaultProfitMargin"]	= "Standard Profitgewinn:";
 		["GuiDeleteProfileButton"]	= "Löschen";
+		["GuiDuplicateProfileButton"]	= "Kopiere Profil";
 		["GuiFixedSettings"]	= "Standard Reagenzpreise";
 		["GuiFixedSettingsNote"]	= "Hinweis: Diese Werte werden anstelle vom Auctioneer oder von allen anderen Schätzungsmethoden verwendet, wenn die Checkbox aktiviert wird. Die folgenden Werte werden noch durch die Reagenzgewichtung im vorhergehenden Abschnitt beeinflußt. Um sicher zu stellen, dass die Reagenz genau anhand der unten spezifizierten Menge bewertet wird, muss die Gewichtung im Gewichtungsabschnitt auf 100% eingestellt sein.";
 		["GuiGeneralOptions"]	= "Allgemeine Enchantrix Optionen";
@@ -580,6 +588,7 @@ EnchantrixLocalizations = {
 		["GuiWeighSettingsNote"]	= "Die Gewichtung oben ändert die Schätzung der erhaltenen Reagenz durch die spezifizierte Menge. Im Allgemeinen kann man sie bei 100% lassen, es sei denn, daß sie mehr oder weniger wertvoll sein sollten, wie die Schätzungsmethode die verwendet wird.";
 		["GuiWeightSettings"]	= "Reagenzwunsch bei Entzauberung";
 		["GuiYes"]	= "Ja";
+		["ModTTShow"]	= "Zeige extra tooltip nur wenn Alt gedrückt wird";
 
 	};
 
@@ -1460,8 +1469,9 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "사용안함";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "제분";
 		["ArgSpellname"]	= "마력 추출";
-		["ArgSpellProspectingName"]	= "보석추출";
+		["ArgSpellProspectingName"]	= "보석 추출";
 		["Enchanting"]	= "마법부여";
 		["Inscription"]	= "주문각인";
 		["Jewelcrafting"]	= "보석세공";
@@ -1519,21 +1529,25 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "설정창을 보이거나 숨깁니다.";
 		["HelpTerse"]	= "마력추출 가격만 보이도록하는 간결 모드 사용/사용안함. 컨트롤 키를 눌러서 겹쳐쓸 수 있음.";
 		["HelpValue"]	= "가능한 마력추출 비율에 근거한 아이템의 평가값 보기 여부 선택";
+		["ModTTShow_Help"]	= "이 옵션은 Alt키를 눌렀을 때만 Enchantrix의 별도 툴팁을 보여줍니다.";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "Auctioneer가 설치되어 있지 않습니다. 경매 검색을 수행하려면 Auctioneer가 설치되어 있어야 합니다.";
 		["AuctionScanVersionTooOld"]	= "설치된 Auctioneer의 버젼이 맞지 않습니다. 이 기능을 이용하려면 Auctioneer 4.0 이상이 필요합니다.";
 		["ChatDeletedProfile"]	= "프로파일 삭제 : ";
+		["ChatDuplicatedProfile"]	= "프로필 복제:";
 		["ChatResetProfile"]	= "모든 설정값 삭제 : ";
 		["ChatSavedProfile"]	= "저장된 프로파일 : ";
 		["ChatUsingProfile"]	= "사용중인 프로파일 : ";
 		["FrmtAutoDeActive"]	= "자동 마력추출 활성화";
-		["FrmtAutoDeDisabled"]	= "자동 마력추출 disabled";
+		["FrmtAutoDeDisabled"]	= "자동 마력추출 비활성화";
 		["FrmtAutoDeDisenchantCancelled"]	= "마력추출이 취소되었습니다 : 아이템을 찾을 수 없습니다.";
 		["FrmtAutoDeDisenchanting"]	= "%s를 마력추출합니다.";
 		["FrmtAutoDeIgnorePermanent"]	= "%s를 영원히 무시합니다.";
 		["FrmtAutoDeIgnoreSession"]	= "%s를 이번 접속동안만 무시합니다.";
 		["FrmtAutoDeInactive"]	= "자동 마력추출 비활성화";
+		["FrmtAutoDeMilling"]	= "%s를 제분합니다.";
+		["FrmtAutoDeMillingCancelled"]	= "제분 취소 : 아이템을 찾을 수 없습니다.";
 		["FrmtAutoDeProspectCancelled"]	= "보석추출 취소 : 아이템을 찾을 수 없습니다.";
 		["FrmtAutoDeProspecting"]	= "%s를 보석추출합니다.";
 		["FrmtBidbrokerCurbid"]	= "현재 입찰";
@@ -1554,6 +1568,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "마력 추출:";
 		["FrmtFound"]	= "%s|1이;가; 마력 추출되는 아이템: ";
 		["FrmtFoundNotDisenchant"]	= "%s는 마력 추출이 불가능한 아이템입니다.";
+		["FrmtMillingFound"]	= "%s|1이;가; 제분되는 아이템: ";
 		["FrmtMillingValueAuctHsp"]	= "제분 가격(HSP)";
 		["FrmtMillingValueAuctMed"]	= "제분 가격(중앙값)";
 		["FrmtMillingValueAuctVal"]	= "제분 가격(경매장값)";
@@ -1587,7 +1602,8 @@ EnchantrixLocalizations = {
 		["GuiAutoDeOptions"]	= "자동설정";
 		["GuiAutoDePromptLine1"]	= "마력추출하겠습니까? : ";
 		["GuiAutoDePromptLine3"]	= "가치 : %s";
-		["GuiAutoProspectPromptLine1"]	= "보석추출하겠습니까? : ";
+		["GuiAutoMillingPromptLine1"]	= "제분 하겠습니까:";
+		["GuiAutoProspectPromptLine1"]	= "보석추출하겠습니까: ";
 		["GuiBBUnbiddedOnly"]	= "입찰이 없는 아이템으로 BidBroker를 한정합니다.";
 		["GuiConfigProfiles"]	= "설정 및 프로파일 수정";
 		["GuiCreateReplaceProfile"]	= "프로파일 생성 또는 갱신";
@@ -1595,6 +1611,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "HSP보다 작은 기본%: %d";
 		["GuiDefaultProfitMargin"]	= "기본 이윤: ";
 		["GuiDeleteProfileButton"]	= "삭제";
+		["GuiDuplicateProfileButton"]	= "프로필 복사";
 		["GuiFixedSettings"]	= "고정된 재료 가격";
 		["GuiFixedSettingsNote"]	= "설명: 아래의 값들이 체크 되었을 경우에는 Auctioneer나 다른 가격 결정 요소 대신에 사용됩니다.¶ The following values are still affected by the reagent weights in the previous section, so if you want to make sure that the reagent is valued at exactly the specified amount below, then also make sure that it's weight is set to 100% in the weights section. ";
 		["GuiGeneralOptions"]	= "일반 Enchantrix 설정";
@@ -1647,6 +1664,7 @@ EnchantrixLocalizations = {
 		["GuiWeighSettingsNote"]	= "위의 가중치는 명시된 양만큼 주어진 재료의 가치계산을 변경합니다. 더 혹은 덜 가치있다고 판단하지 않는 한, 일반적으로 100%로 두는 것이 좋습니다.";
 		["GuiWeightSettings"]	= "올바른 재료 마력추출";
 		["GuiYes"]	= "예";
+		["ModTTShow"]	= "Alt 키를 눌렀을 때만 별도의 툴팁을 보여줍니다.";
 
 	};
 
@@ -1955,6 +1973,7 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "никогда";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Зарезервированное";
 		["ArgSpellname"]	= "Распыление";
 		["ArgSpellProspectingName"]	= "Просеивание";
 		["Enchanting"]	= "Наложение чар";
@@ -2014,11 +2033,13 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "Показать или спрятать панель настроек.";
 		["HelpTerse"]	= "Включение/выключение сжатого режима, показывающего только стоимость распыления. Может быть временно отключен путём удержания клавиши \"Ctrl\".";
 		["HelpValue"]	= "Выбирает отображать или нет оценённую стоимость предмета, основанную на соотношениях возможного распыления.";
+		["ModTTShow_Help"]	= "Эта установка покажет экстра-тултип Enchantrix только если нажат ALT";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "Вы не установили Auctioneer. Auctioner должен быть установлен для того, чтобы сканировать аукцион.";
 		["AuctionScanVersionTooOld"]	= "У Вас не установлена правильная версия Auctioneer, эта функция требует Auctioneer версии 4.0 или выше.";
 		["ChatDeletedProfile"]	= "Профиль удалён:";
+		["ChatDuplicatedProfile"]	= "Дублировать профиль в:";
 		["ChatResetProfile"]	= "Сброшены все настройки для:";
 		["ChatSavedProfile"]	= "Профиль сохранён:";
 		["ChatUsingProfile"]	= "Теперь используется профиль:";
@@ -2029,6 +2050,8 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "%s игнорируется постоянно";
 		["FrmtAutoDeIgnoreSession"]	= "%s игнорируется в течение сессии";
 		["FrmtAutoDeInactive"]	= "Автоматическое распыление неактивно";
+		["FrmtAutoDeMilling"]	= "Измельченно %s ";
+		["FrmtAutoDeMillingCancelled"]	= "Измельчение оконченно: предмет не найден";
 		["FrmtAutoDeProspectCancelled"]	= "Просеивание отменено: предмет не найден.";
 		["FrmtAutoDeProspecting"]	= "Просеивание %s";
 		["FrmtBidbrokerCurbid"]	= "текСтавка";
@@ -2049,6 +2072,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "Распыляется в:";
 		["FrmtFound"]	= "Обнаружено, что %s распыляется в:";
 		["FrmtFoundNotDisenchant"]	= "Обнаружено, что %s не распыляется";
+		["FrmtMillingFound"]	= "Найденны эти %s измельчения в:";
 		["FrmtMillingValueAuctHsp"]	= "Цена измельчения (HSP)";
 		["FrmtMillingValueAuctMed"]	= "Цена измельчения (Среднее)";
 		["FrmtMillingValueAuctVal"]	= "Цена измельчения (АукСовет)";
@@ -2080,9 +2104,10 @@ EnchantrixLocalizations = {
 		["GuiActivateProfile"]	= "Активировать выбранный профиль";
 		["GuiAutoDeEnable"]	= "Поиск распыляемых предметов в сумках - ИСПОЛЬЗОВАТЬ С ОСТОРОЖНОСТЬЮ.";
 		["GuiAutoDeOptions"]	= "Автоматизация";
-		["GuiAutoDePromptLine1"]	= "Вы хотите распылить";
+		["GuiAutoDePromptLine1"]	= "Вы хотите распылить:";
 		["GuiAutoDePromptLine3"]	= "Оценено:";
-		["GuiAutoProspectPromptLine1"]	= "Вы хотите просеять";
+		["GuiAutoMillingPromptLine1"]	= "Вы хотите измельчить:";
+		["GuiAutoProspectPromptLine1"]	= "Вы хотите просеять:";
 		["GuiBBUnbiddedOnly"]	= "Ограничить (BidBroker) только на вещи без ставок";
 		["GuiConfigProfiles"]	= "Установка, конфигурация и редактирование профилей";
 		["GuiCreateReplaceProfile"]	= "Создать или заменить профиль";
@@ -2090,6 +2115,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "Процент по умолчанию HSP: %d";
 		["GuiDefaultProfitMargin"]	= "Размер типовой прибыли:";
 		["GuiDeleteProfileButton"]	= "Удалить";
+		["GuiDuplicateProfileButton"]	= "Скопировать профиль";
 		["GuiFixedSettings"]	= "Фиксированные цены реагентов";
 		["GuiFixedSettingsNote"]	= "Примечание: Эти значения будут использоваться вместо Auctioneer-а или любых других методов оценки, если галка включена. На следующие цены все еще воздействует вес реагентов в предыдущей секции, так, если вы хотите убедиться, что реагент оценивается точно в указанном количестве ниже, то также убедитесь, что это - вес устанавливается к 100% в секции веса.";
 		["GuiGeneralOptions"]	= "Главные опции Enchantrix";
@@ -2142,6 +2168,7 @@ EnchantrixLocalizations = {
 		["GuiWeighSettingsNote"]	= "Вес измененой оценки предоставленного реагента указанным количеством. В общем вы захотите их в 100%, если бы знали, что они должны быть приблизительно равны, чем метод оценки, который вы используете.";
 		["GuiWeightSettings"]	= "Желательный реагент при распылении";
 		["GuiYes"]	= "Да";
+		["ModTTShow"]	= "Показывать экстра-тултип только если нажат ALT";
 
 	};
 
@@ -2224,6 +2251,7 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "从不";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "研磨";
 		["ArgSpellname"]	= "分解";
 		["ArgSpellProspectingName"]	= "选矿";
 		["Enchanting"]	= "附魔";
@@ -2283,11 +2311,13 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "显示或隐藏设置面板。";
 		["HelpTerse"]	= "开启/关闭简洁模式，只显示分解价值。能持续忽略控制键。";
 		["HelpValue"]	= "选择是否显示物品基于可能分解几率的预计价值。";
+		["ModTTShow_Help"]	= "启用本选项将会使附魔助手的额外提示窗只在ALT按下时才显示。";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "你没有安装拍卖助手。拍卖助手必须安装并执行一次扫描。";
 		["AuctionScanVersionTooOld"]	= "你没有正确安装拍卖助手。此特性需要拍卖助手4.0以上。";
 		["ChatDeletedProfile"]	= "删除配置：";
+		["ChatDuplicatedProfile"]	= "复制配置到：";
 		["ChatResetProfile"]	= "重置所有设置：";
 		["ChatSavedProfile"]	= "保存配置：";
 		["ChatUsingProfile"]	= "现在使用配置：";
@@ -2298,6 +2328,8 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "忽视 %s 永久";
 		["FrmtAutoDeIgnoreSession"]	= "忽视 %s 本次连接";
 		["FrmtAutoDeInactive"]	= "自动分解-无效";
+		["FrmtAutoDeMilling"]	= "%s 研磨中";
+		["FrmtAutoDeMillingCancelled"]	= "研磨已取消：找不到物品";
 		["FrmtAutoDeProspectCancelled"]	= "预估已取消:物品未发现";
 		["FrmtAutoDeProspecting"]	= "预估%s";
 		["FrmtBidbrokerCurbid"]	= "目前的拍卖价";
@@ -2318,6 +2350,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "可分解为:";
 		["FrmtFound"]	= "发现%s可分解为：";
 		["FrmtFoundNotDisenchant"]	= "发现%s不可分解";
+		["FrmtMillingFound"]	= "%s 可研磨成：";
 		["FrmtMillingValueAuctHsp"]	= "研磨价值(HSP)";
 		["FrmtMillingValueAuctMed"]	= "研磨价值(中位数)";
 		["FrmtMillingValueAuctVal"]	= "研磨价值(AucAdv)";
@@ -2351,6 +2384,7 @@ EnchantrixLocalizations = {
 		["GuiAutoDeOptions"]	= "自动";
 		["GuiAutoDePromptLine1"]	= "确认要分解：";
 		["GuiAutoDePromptLine3"]	= "贵重的%s";
+		["GuiAutoMillingPromptLine1"]	= "您正要研磨：";
 		["GuiAutoProspectPromptLine1"]	= "确认要选矿:";
 		["GuiBBUnbiddedOnly"]	= "仅代理无人出价的物品";
 		["GuiConfigProfiles"]	= "设置或编辑配置";
@@ -2359,6 +2393,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "默认最高售价差额率:%d";
 		["GuiDefaultProfitMargin"]	= "默认利润率：";
 		["GuiDeleteProfileButton"]	= "删除";
+		["GuiDuplicateProfileButton"]	= "复制配置";
 		["GuiFixedSettings"]	= "修复药剂价格";
 		["GuiFixedSettingsNote"]	= "注意:如果选中复选框,如下价格将用来替代Auctioneer或其他估价方法.\n下列价格仍然会被之前的反应物比重所影响,所以如果你想确保反应物被精确标价,确保在比重区将比重设为100%.";
 		["GuiGeneralOptions"]	= "常规附魔助手选项";
@@ -2411,6 +2446,7 @@ EnchantrixLocalizations = {
 		["GuiWeighSettingsNote"]	= "上述比重值根据特定的数量改变该原材料数量。 您通常将想要留下他们在100%，除非您认为他们比您使用应该或多或少是贵重物品的估价方法认为。";
 		["GuiWeightSettings"]	= "分解材料需求度";
 		["GuiYes"]	= "是";
+		["ModTTShow"]	= "只在按下ALT显示额外的提示。";
 
 	};
 
@@ -2475,6 +2511,7 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "never";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "研磨";
 		["ArgSpellname"]	= "分解";
 		["ArgSpellProspectingName"]	= "勘探";
 		["Enchanting"]	= "附魔";
@@ -2534,11 +2571,13 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "顯示或隱藏設置面板。";
 		["HelpTerse"]	= "開啟/關閉 簡略模式，只顯示分解價值。按住Ctrl鍵將無視此設定。";
 		["HelpValue"]	= "選擇是否顯示物品基於可能分解機率的預估價值。";
+		["ModTTShow_Help"]	= "啟用本選項將會使附魔助手的額外提示窗只在ALT按下時才顯示。";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "你沒有安裝拍賣助手(Auctioneer)。拍賣助手必須安裝並執行一次掃描。";
 		["AuctionScanVersionTooOld"]	= "你沒有正確安裝拍賣助手(Auctioneer)。此功能需要拍賣助手4.0(Auctioneer v4.0)版以上。";
 		["ChatDeletedProfile"]	= "刪除使用者設定檔：";
+		["ChatDuplicatedProfile"]	= "複製使用者設定檔到：";
 		["ChatResetProfile"]	= "重置所有設定值：";
 		["ChatSavedProfile"]	= "儲存使用者設定檔：";
 		["ChatUsingProfile"]	= "正在使用者設定檔：";
@@ -2549,6 +2588,8 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "永久忽略 %s";
 		["FrmtAutoDeIgnoreSession"]	= "這一次忽略 %s";
 		["FrmtAutoDeInactive"]	= "暫停自動分解(AutoDisenchant)功能";
+		["FrmtAutoDeMilling"]	= "%s 研磨中";
+		["FrmtAutoDeMillingCancelled"]	= "研磨動作已取消：找不到物品";
 		["FrmtAutoDeProspectCancelled"]	= "探勘動作已取消：找不到物品";
 		["FrmtAutoDeProspecting"]	= "%s 探勘中";
 		["FrmtBidbrokerCurbid"]	= "目前的拍賣價";
@@ -2569,6 +2610,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "分解成：";
 		["FrmtFound"]	= "%s 可分解成：";
 		["FrmtFoundNotDisenchant"]	= "%s 不可分解";
+		["FrmtMillingFound"]	= "%s 可研磨成：";
 		["FrmtMillingValueAuctHsp"]	= "研磨價值(HSP) ";
 		["FrmtMillingValueAuctMed"]	= "研磨價值(Median)";
 		["FrmtMillingValueAuctVal"]	= "研磨價值(AucAdv)";
@@ -2600,9 +2642,10 @@ EnchantrixLocalizations = {
 		["GuiActivateProfile"]	= "啟用目前記錄檔";
 		["GuiAutoDeEnable"]	= "監看背包中可分解的物品 - 小心使用\n";
 		["GuiAutoDeOptions"]	= "自動化";
-		["GuiAutoDePromptLine1"]	= "你正要分解:\n";
+		["GuiAutoDePromptLine1"]	= "您正要分解:\n";
 		["GuiAutoDePromptLine3"]	= "%s 的價格\n";
-		["GuiAutoProspectPromptLine1"]	= "你是否想要勘探:";
+		["GuiAutoMillingPromptLine1"]	= "您正要研磨：";
+		["GuiAutoProspectPromptLine1"]	= "你正要勘探:";
 		["GuiBBUnbiddedOnly"]	= "僅代理無人出價的物品";
 		["GuiConfigProfiles"]	= "設定或編輯記錄檔";
 		["GuiCreateReplaceProfile"]	= "新建或替換記錄檔";
@@ -2610,6 +2653,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "預設最高售價差額率:%d";
 		["GuiDefaultProfitMargin"]	= "預設利潤率：";
 		["GuiDeleteProfileButton"]	= "刪除";
+		["GuiDuplicateProfileButton"]	= "複製設定檔";
 		["GuiFixedSettings"]	= "固定材料價格";
 		["GuiFixedSettingsNote"]	= "注意:如果選中核取方塊,以下價格將用來替代Auctioneer或其他估價方法.\n下列價格仍然會被之前設定的附魔材料比重值所影響,所以如果你想確保附魔材料被精確標價,確保在比重值設定區將比重值設為100%.\n";
 		["GuiGeneralOptions"]	= "一般附魔助手選項";
@@ -2662,6 +2706,7 @@ EnchantrixLocalizations = {
 		["GuiWeighSettingsNote"]	= "此比重值設定將改變各附魔材料物的估計比重。通常您會想要保持在100%，除非您認為它們應該比您目前使用的估價價值來得更多或更少。";
 		["GuiWeightSettings"]	= "分解材料需求度";
 		["GuiYes"]	= "確定";
+		["ModTTShow"]	= "只在按下ALT時顯示額外的提示窗。";
 
 	};
 
