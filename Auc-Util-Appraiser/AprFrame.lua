@@ -1553,6 +1553,21 @@ function private.CreateFrames()
 			local remain = total - fullPop
 
 			if (number < 0) then
+				if (number == -1 and remain > 0) then -- post (smaller) remainder stack first
+					bidVal = lib.RoundBid(itemBid * remain)
+					buyVal = lib.RoundBuy(itemBuy * remain)
+					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
+					if dryRun then
+						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+					else
+						print(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
+						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
+					end
+
+					totalBid = totalBid + bidVal
+					totalBuy = totalBuy + buyVal
+					totalNum = totalNum + remain
+				end
 				if (fullStacks > 0) then
 					bidVal = lib.RoundBid(itemBid * stack)
 					buyVal = lib.RoundBuy(itemBuy * stack)
@@ -1567,21 +1582,6 @@ function private.CreateFrames()
 					totalBid = totalBid + (bidVal * fullStacks)
 					totalBuy = totalBuy + (buyVal * fullStacks)
 					totalNum = totalNum + (stack * fullStacks)
-				end
-				if (number == -1 and remain > 0) then
-					bidVal = lib.RoundBid(itemBid * remain)
-					buyVal = lib.RoundBuy(itemBuy * remain)
-					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
-					if dryRun then
-						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
-					else
-						print(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
-						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
-					end
-
-					totalBid = totalBid + bidVal
-					totalBuy = totalBuy + buyVal
-					totalNum = totalNum + remain
 				end
 			else
 				bidVal = lib.RoundBid(itemBid * stack)
