@@ -17,7 +17,6 @@ CoreManifest.lua
 Libs\Load.xml
 
 CoreStrings.lua
-CoreLocale.lua
 
 CoreMain.lua
 CoreUtil.lua
