@@ -255,7 +255,13 @@ function lib.ScanPage()
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
 			local timeleft = GetAuctionItemTimeLeft("list", i)
 			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-			local price = minBid
+			local price
+			if minBid and minBid > 0 then
+				price = minBid
+			else
+				minBid = 0
+				price = 1
+			end
 			if curBid and curBid > 0 then
 				price = curBid + minInc
 			else
@@ -286,13 +292,12 @@ function lib.ScanPage()
 			private.ItemTable[Const.FACTOR]  = factor
 			private.ItemTable[Const.ENCHANT]  = enchant
 			private.ItemTable[Const.SEED]  = seed
-			
+
 			local skipresults = get("realtime.skipresults")
 			for i, searcher in pairs(private.searchertable) do
 				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false, skipresults) then
 					private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])
 					if skipresults then
-						local price = 0
 						AucAdvanced.Buy.QueueBuy(private.ItemTable[Const.LINK],
 							private.ItemTable[Const.SELLER],
 							private.ItemTable[Const.COUNT],
