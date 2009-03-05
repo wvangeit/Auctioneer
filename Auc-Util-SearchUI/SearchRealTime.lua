@@ -255,17 +255,18 @@ function lib.ScanPage()
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
 			local timeleft = GetAuctionItemTimeLeft("list", i)
 			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+			owner = owner or ""
+
 			local price
-			if minBid and minBid > 0 then
+			if curBid > 0 then
+				price = curBid + minInc
+				if buyout > 0 and price > buyout then
+					price = buyout
+				end
+			elseif minBid > 0 then
 				price = minBid
 			else
-				minBid = 0
 				price = 1
-			end
-			if curBid and curBid > 0 then
-				price = curBid + minInc
-			else
-				curBid = 0
 			end
 
 			-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need

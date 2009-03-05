@@ -223,14 +223,15 @@ function private.PerformPurchase()
 	private.Searching = false
 	--first, do some Sanity Checking
 	local index = private.CurAuction["index"]
-	if type(private.CurAuction["price"])~="number" then
-		AucAdvanced.Print("|cff7f3fCancelling bid: invalid price: "..type(private.CurAuction["price"])..":"..tostring(private.CurAuction["price"]))
+	local price = private.CurAuction["price"]
+	if type(price)~="number" then
+		AucAdvanced.Print("|cff7f3fCancelling bid: invalid price: "..type(price)..":"..tostring(price))
 		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
 		return
 	elseif type(index) ~= "number" then
-		AucAdvanced.Print("|cff7f3fCancelling bid: invalid index: "..type(private.CurAuction["index"])..":"..tostring(private.CurAuction["index"]))
+		AucAdvanced.Print("|cff7f3fCancelling bid: invalid index: "..type(index)..":"..tostring(index))
 		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
@@ -241,18 +242,18 @@ function private.PerformPurchase()
 	local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", index)
 
 	if (private.CurAuction["link"] ~= link) then
-		AucAdvanced.Print("|cffff7f3fCancelling bid: "..tostring(private.CurAuction["index"]).." not found")
+		AucAdvanced.Print("|cffff7f3fCancelling bid: "..tostring(index).." not found")
 		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
 		return
-	elseif (private.CurAuction["price"] < minBid) then
-		AucAdvanced.Print("|cffff7f3fCancelling bid: Bid below minimum bid: "..AucAdvanced.Coins(private.CurAuction["price"]))
+	elseif (price < minBid) then
+		AucAdvanced.Print("|cffff7f3fCancelling bid: Bid below minimum bid: "..AucAdvanced.Coins(price))
 		empty(private.CurAuction)
 		private.Prompt:Hide()
 		AucAdvanced.Scan.SetPaused(false)
 		return
-	elseif (curBid and curBid > 0 and private.CurAuction["price"] < curBid + minIncrement) then
+	elseif (curBid and curBid > 0 and price < curBid + minIncrement and price < buyout) then
 		AucAdvanced.Print("|cffff7f3fCancelling bid: Already higher bidder")
 		empty(private.CurAuction)
 		private.Prompt:Hide()
@@ -260,14 +261,14 @@ function private.PerformPurchase()
 		return
 	end
 	if get("ShowPurchaseDebug") then
-		if private.CurAuction["price"] >= buyout then
-			print("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(private.CurAuction["price"]))
+		if price >= buyout then
+			print("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(price))
 		else
-			print("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(private.CurAuction["price"]))
+			print("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(price))
 		end
 	end
-	
-	PlaceAuctionBid("list", private.CurAuction["index"], private.CurAuction["price"])
+
+	PlaceAuctionBid("list", index, price)
 
 	private.CurAuction["reason"] = private.Prompt.Reason:GetText()
 	--Add bid to list of bids we're watching for

@@ -105,7 +105,7 @@ function private.HookAH()
 		private.MyAuctionFrameUpdate = function() end
 		return
 	end
-		
+
 	AuctionFrameBrowse_Update = private.MyAuctionFrameUpdate
 	local button, lastButton, origButton
 	local line
@@ -115,7 +115,7 @@ function private.HookAH()
 	BrowseDurationSort:Hide()
 	BrowseHighBidderSort:Hide()
 	BrowseCurrentBidSort:Hide()
-	
+
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
 		if (i <= NUM_BROWSE_TO_DISPLAY) then
@@ -400,8 +400,9 @@ function private.HookAH()
 end
 
 function private.SetMoney(me, value, hasBid, highBidder)
-	value = math.floor(tonumber(value) or 0)
-	if (value == 0) then me:Hide() return end
+	value = tonumber (value)
+	if not value then me:Hide() return end
+	value = math.floor (value)
 	local r,g,b
 	if (hasBid == true) then r,g,b = 1,1,1
 	elseif (hasBid == false) then r,g,b = 0.7,0.7,0.7 end
@@ -458,7 +459,6 @@ function private.IconLeave(this)
 	GameTooltip:Hide()
 	ResetCursor()
 end
-
 
 function private.BrowseSort(a, b)
 	local sort = private.headers.sort
@@ -540,15 +540,16 @@ function private.RetrievePage()
 			else timeLeftText = "30m" end
 			if (not count or count < 1) then count = 1 end
 
-			local requiredBid = minBid
-			local showBid = minBid
-			if ( bidAmount > 0 ) then
+			local requiredBid
+			if bidAmount > 0 then
 				requiredBid = bidAmount + minIncrement
-				if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
-					showBid = requiredBid
-				else
-					showBid = bidAmount
+				if buyoutPrice > 0 and requiredBid > buyoutPrice then
+					requiredBid = buyoutPrice
 				end
+			elseif minBid > 0 then
+				requiredBid = minBid
+			else
+				requiredBid = 1
 			end
 
 			if ( requiredBid >= MAXIMUM_BID_PRICE ) then
@@ -624,7 +625,7 @@ function private.SetAuction(button, pos)
 	if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
 		showBid = requiredBid
 	else
-		showBid = bidAmount
+		showBid = max (bidAmount, minBid)
 	end
 
 	if (selected) then
@@ -676,8 +677,8 @@ function private.SetAuction(button, pos)
 	button.iLevel:SetText(itemLevel)
 	button.tLeft:SetText(timeLeftText)
 	button.Owner:SetText(owner)
-	button.Bid:SetMoney(showBid/perUnit, requiredBid ~= minBid, highBidder)
-	button.Buy:SetMoney(buyoutPrice/perUnit)
+	button.Bid:SetMoney(showBid/perUnit, (bidAmount > 0), highBidder)
+	button.Buy:SetMoney((buyoutPrice > 0) and buyoutPrice/perUnit)
 	button:Show()
 end
 
