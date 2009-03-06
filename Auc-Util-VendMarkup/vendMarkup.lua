@@ -38,17 +38,13 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
-function lib.GetPrice(hyperlink, faction, realm)
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-	if (factor ~= 0) then property = property.."x"..factor end
-
-	if (itemId and itemId > 0) and (type(GetSellValue) == "function") then
+function lib.GetPrice(hyperlink, serverKey)
+	local linkType,itemId,property,factor = decode(hyperlink)
+	if linkType == "item" and itemId and itemId > 0 and type(GetSellValue) == "function" then
 		local vendorFor = GetSellValue(itemId)
-		if not vendorFor then return end
-		local multiplier = AucAdvanced.Settings.GetSetting("util.vendmarkup.multiplier") / 100
-		vendorFor = vendorFor * multiplier
-		return vendorFor
+		if vendorFor then
+			return vendorFor * get("util.vendmarkup.multiplier") / 100
+		end
 	end
 end
 
@@ -57,15 +53,11 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction, realm)
-	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+function lib.GetPriceArray(hyperlink, serverKey)
+	-- no need to clean the array; we will overwrite the single entry anyway
 
-	-- Get our statistics
-	local vendorPrice = lib.GetPrice(hyperlink, faction, realm)
-
-	-- These 2 are the ones that most algorithms will look for
-	array.price = vendorPrice
+	-- this module only provides "price"
+	array.price = lib.GetPrice(hyperlink)
 
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
@@ -79,7 +71,7 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("util.vendmarkup.multiplier", 300)
+	default("util.vendmarkup.multiplier", 300)
 end
 
 function private.SetupConfigGui(gui)
@@ -94,7 +86,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Header",     0, libName.." options")
 
-	gui:AddControl(id, "TinyNumber", 0, 1, "util.vendmarkup.multiplier" or 300, 100, 1000, "Vendor markup (in percent)")
+	gui:AddControl(id, "TinyNumber", 0, 1, "util.vendmarkup.multiplier", 100, 1000, "Vendor markup (in percent)")
 
 end
 
