@@ -39,13 +39,14 @@ if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 -- Eliminate some global lookups
-local data
 local select = select;
 local sqrt = sqrt;
 local ipairs = ipairs;
 local unpack = unpack;
 local tinsert = table.insert;
 local assert = assert;
+-- local reference to our saved stats table
+local SSRealmData
 
 function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
@@ -56,7 +57,6 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - ".._TRANS('SIMP_Help_SlashHelp3'):format(myFaction) ) --clear current %s Simple price database
 		print(line, "push}} - ".._TRANS('SIMP_Help_SlashHelp4'):format(myFaction) ) --force the %s Simple daily stats to archive (start a new day)
 	elseif (command == "clear") then
-		print(_TRANS('SIMP_Help_SlashHelp5').." {{", myFaction, "}}") --Clearing Simple stats for
 		private.ClearData()
 	elseif (command == "push") then
 		print(_TRANS('SIMP_Help_SlashHelp6'):format(myFaction) ) --Archiving {{%s}} daily stats and starting a new day
@@ -70,11 +70,8 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
 	end
 end
-
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
@@ -95,7 +92,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (factor ~= 0) then property = property.."x"..factor end
 
 	local data = private.GetPriceData()
-	if not data.daily then data.daily = { created = time() } end
 	if not data.daily[itemId] then data.daily[itemId] = "" end
 	local stats = private.UnpackStats(data.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 , buyoutper } end
@@ -106,17 +102,14 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	data.daily[itemId] = private.PackStats(stats)
 end
 
-function lib.GetPrice(hyperlink, faction, realm)
+function lib.GetPrice(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
-
-	local data = private.GetPriceData(faction, realm)
-    -- DevTools_Dump(data). Yeah, don't do that.
+	local data = private.GetPriceData(serverKey)
 	if not data then return end
 
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
@@ -125,7 +118,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
     local dataset = {}
 
-	if data.daily and data.daily[itemId] then
+	if data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
 		if stats[property] then
 			dayTotal, dayCount, minBuyout = unpack(stats[property])
@@ -136,7 +129,7 @@ function lib.GetPrice(hyperlink, faction, realm)
     		daysUsed = 1
 		end
 	end
-	if data.means and data.means[itemId] then
+	if data.means[itemId] then
 		local stats = private.UnpackStats(data.means[itemId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14, avgmins = unpack(stats[property])
@@ -184,13 +177,13 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction, realm)
+function lib.GetPriceArray(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
 	-- Clean out the old array
 	empty(array)
 
 	-- Get our statistics
-	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
+	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
 
 	--if nothing is returned, return nil
 	if not dayCount then return end
@@ -217,8 +210,6 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	array.daycount = dayCount
 	array.seendays = seenDays
 
-
-
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array
@@ -231,20 +222,18 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- calculations on the daily, 3-day, 7-day, and 14-day averages
 -- stored by SIMP
 -- @param hyperlink The item to generate the PDF curve for
--- @param faction The faction key from which to look up the data
--- @param realm The realm from which to look up the data
+-- @param serverKey The realm-faction key from which to look up the data
 -- @return The PDF for the requested item, or nil if no data is available
 -- @return The lower limit of meaningful data for the PDF (determined
 -- as the mean minus 5 standard deviations)
 -- @return The upper limit of meaningful data for the PDF (determined
 -- as the mean plus 5 standard deviations)
-function lib.GetItemPDF(hyperlink, faction, realm)
+function lib.GetItemPDF(hyperlink, serverKey)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
 
     if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
-    if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
     -- Calculate the SE estimated standard deviation & mean
-	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, faction, realm)
+	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
 
     if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
@@ -270,39 +259,31 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.simple.avgmins", true)
 	AucAdvanced.Settings.SetDefault("stat.simple.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.simple.enable", true)
+	AucAdvanced.Settings.SetDefault("stat.simple.reportsafe", false)
+
+	private.LoadData() -- checks DB and sets local SSRealmData
 end
 
-local AAStatSimpleData
-
-function lib.ClearItem(hyperlink, faction, realm)
-	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then
+function lib.ClearItem(hyperlink, serverKey)
+	local linkType, itemID = AucAdvanced.DecodeLink(hyperlink)
+	if linkType ~= "item" then
 		return
 	end
-	if (factor ~= 0) then property = property.."x"..factor end
-	if not faction then faction = AucAdvanced.GetFaction() end
-	if not realm then
-		realm = GetRealmName()
-	end
-	if (not AAStatSimpleData) then private.LoadData() end
-	print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, faction)) --%s - Simple: clearing data for %s for {{%s}}
-	
-	if (AAStatSimpleData.RealmData[realm] and AAStatSimpleData.RealmData[realm][faction]) then
-		AAStatSimpleData.RealmData[realm][faction]["means"][itemID] = nil
-		AAStatSimpleData.RealmData[realm][faction]["daily"][itemID] = nil
-	end
+	serverKey = serverKey or AucAdvanced.GetFaction ()
+	print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
+
+	local data = private.GetPriceData (serverKey)
+	if not data then return end
+	data.means[itemID] = nil
+	data.daily[itemID] = nil
 end
-
-
-AucAdvanced.Settings.SetDefault("stat.simple.tooltip", true)
-AucAdvanced.Settings.SetDefault("stat.simple.quantmul", true)
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules" )
 
 	gui:AddHelp(id, "what simple stats",
 		_TRANS('SIMP_Help_SimpleStats') ,--What are simple stats?
-		_TRANS('SIMP_Help_SimpleStatsAnswer') 
+		_TRANS('SIMP_Help_SimpleStatsAnswer')
 		)--Simple stats are the numbers that are generated by the Simple module, the Simple module averages all of the prices for items that it sees and provides moving 3, 7, and 14 day averages.  It also provides daily minimum buyout along with a running average minimum buyout within 10% variance.
 
 	gui:AddHelp(id, "what moving day average",
@@ -326,12 +307,12 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "average minimum buyout",
 		_TRANS('SIMP_Help_AverageMinimumBuyout') ,--What's the point in an average minimum buyout?
-		_TRANS('SIMP_Help_AverageMinimumBuyoutAnswer')--This way you know how good a market is dealing.  If the MBO (minimum buyout) is bigger than the average MBO, then it\'s usually a good time to sell, and if the average MBO is greater than the MBO, then it\'s a good time to buy. 
+		_TRANS('SIMP_Help_AverageMinimumBuyoutAnswer')--This way you know how good a market is dealing.  If the MBO (minimum buyout) is bigger than the average MBO, then it\'s usually a good time to sell, and if the average MBO is greater than the MBO, then it\'s a good time to buy.
 		)
 
 	gui:AddHelp(id, "average minimum buyout variance",
 		_TRANS('SIMP_Help_MinimumBuyoutVariance') ,--What\'s the \'10% variance\' mentioned earlier for?
-		_TRANS('SIMP_Help_MinimumBuyoutVarianceAnswer')--If the current MBO is inside a 10% range of the running average, the current MBO is averaged in to the running average at 50% (normal).  If the current MBO is outside the 10% range, the current MBO will only be averaged in at a 12.5% rate. 
+		_TRANS('SIMP_Help_MinimumBuyoutVarianceAnswer')--If the current MBO is inside a 10% range of the running average, the current MBO is averaged in to the running average at 50% (normal).  If the current MBO is outside the 10% range, the current MBO will only be averaged in at a 12.5% rate.
 		)
 
 	gui:AddHelp(id, "why have variance",
@@ -380,7 +361,9 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not AucAdvanced.Settings.GetSetting("stat.simple.quantmul") then quantity = 1 end
-	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
+
+	local serverKey, realm, faction = AucAdvanced.GetFaction () -- realm/faction requested for anticipated changes to add cross-faction tooltips
+	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 	local dispAvg3 = AucAdvanced.Settings.GetSetting("stat.simple.avg3")
 	local dispAvg7 = AucAdvanced.Settings.GetSetting("stat.simple.avg7")
 	local dispAvg14 = AucAdvanced.Settings.GetSetting("stat.simple.avg14")
@@ -394,7 +377,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenNumberDays'):format(seenCount+dayCount, seenDays) ) --Seen {{%s}} over {{%s}} days:
-			
+
 		end
 		if (seenDays > 6) and dispAvg14 then
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_14DayAverage') , avg14*quantity)--  14 day average
@@ -419,13 +402,10 @@ end
 
 -- This is a function which migrates the data from a daily average to the
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
-function private.PushStats(faction, realm)
+function private.PushStats(serverKey)
 	local dailyAvg
 
-	local data = private.GetPriceData(faction, realm)
-	if not data then return end
-	if not data.daily then return end
-	if not data.means then data.means = {} end
+	local data = private.GetPriceData(serverKey)
 
 	local pdata, fdata, temp
 	for itemId, stats in pairs(data.daily) do
@@ -476,8 +456,7 @@ function private.PushStats(faction, realm)
 			data.means[itemId] = private.PackStats(fdata)
 		end
 	end
-	data.daily = {}
-	data.daily.created = time()
+	data.daily = {created = time()}
 end
 
 function private.UnpackStatIter(data, ...)
@@ -514,77 +493,97 @@ function private.PackStats(data)
 	return stats
 end
 
-
 -- The following Functions are the routines used to access the permanent store data
+
 function private.UpgradeDb()
-	if (not AucAdvancedStatSimpleData.Version) then
-		local newData = {Version = "1.0", RealmData = {}}
-		for x, y in pairs(AucAdvancedStatSimpleData) do
-			local t = {strsplit(x, "-")}
-			local realm, faction
-			for _, z in ipairs(t) do
-				if (faction) then
-					if (realm) then realm = realm.."-"..faction
-					else realm = faction end
+	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "2.0" then return end
+
+	local newSave = {Version = "2.0", RealmData = {}}
+
+	-- Will only be run once per user account; however must run smoothly every time
+	-- Can afford to perform extra type-checking for safety
+	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "1.0" then
+		-- perform upgrade from "1.0" to "2.0"
+		for realm, realmData in pairs (AucAdvancedStatSimpleData.RealmData) do
+			if type (realm) == "string" and type (realmData) == "table" then
+				-- valid stats will only be stored in serverKeys which match realm
+				local realmPattern = realm.."%-%u%l"
+				for serverKey, data in pairs (realmData) do
+					if type (serverKey) == "string" and type (data) == "table" and strfind (serverKey, realmPattern) then
+						-- found a valid serverKey
+						-- ensure all required subtables are present
+						if type (data.means) ~= "table" then
+							data.means = {}
+						end
+						if type (data.daily) ~= "table" then
+							data.daily = {created = time()}
+						elseif type (data.daily.created) ~= "number" then
+							data.daily.created = time()
+						end
+						newSave.RealmData[serverKey] = data
+					end
 				end
-				faction = z
 			end
-			if (not newData.RealmData[realm]) then
-				newData.RealmData[realm] = {}
-			end
-			newData.RealmData[realm][faction] = y
 		end
-		AucAdvancedStatSimpleData = newData
 	end
+	private.UpgradeDb = nil
+	AucAdvancedStatSimpleData = newSave
 end
 
-
 function private.LoadData()
-	if (AAStatSimpleData) then return end
-	if (not AucAdvancedStatSimpleData) then AucAdvancedStatSimpleData = {Version='1.0', RealmData = {}} end
+	if SSRealmData then return end
 	private.UpgradeDb()
-	AAStatSimpleData = AucAdvancedStatSimpleData
+	SSRealmData = AucAdvancedStatSimpleData.RealmData
+	assert (SSRealmData, "Error loading or creating StatSimple database")
 	private.DataLoaded()
 end
 
-function private.ClearData(faction, realmName)
-	if (not AAStatSimpleData) then private.LoadData() end
-	faction = faction or AucAdvanced.GetFaction()
-	if (realmName) then
-		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..faction.."}}") --Clearing Simple stats for
-	else
-		realmName = GetRealmName()
-		print(_TRANS('SIMP_Interface_ClearingSimpleStats'):format(faction, realmName) )--Clearing Simple stats for {{%s}} on {{%s}}
-		
+function private.ClearData(serverKey)
+	serverKey = serverKey or AucAdvanced.GetFaction()
+	if SSRealmData[serverKey] then
+		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..serverKey.."}}") --Clearing Simple stats for
 	end
-	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][faction]) then
-		AAStatSimpleData.RealmData[realmName][faction] = nil
-	end
+	SSRealmData[serverKey] = nil
 end
 
-function private.GetPriceData(faction, realm)
-	if (not AAStatSimpleData) then private.LoadData() end
-	faction = faction or AucAdvanced.GetFaction()
-	realm = realm or GetRealmName()
-	if (not AAStatSimpleData.RealmData[realm]) then AAStatSimpleData.RealmData[realm] = {} end
-	if (not AAStatSimpleData.RealmData[realm][faction]) then AAStatSimpleData.RealmData[realm][faction] = {} end
-	return AAStatSimpleData.RealmData[realm][faction]
+function private.GetPriceData(serverKey)
+	if type (serverKey) ~= "string" then
+		serverKey = AucAdvanced.GetFaction ()
+	end
+	local data = SSRealmData[serverKey]
+	if not data then
+		if not strfind (serverKey, ".%-%u%l") then
+			-- todo: localize after merging into trunk
+			print ("Invalid serverKey passed to Stat-Simple")
+			return
+		end
+		data = {means = {}, daily = {created = time ()}}
+		SSRealmData[serverKey] = data
+	end
+	return data
 end
 
 function private.DataLoaded()
-	if (not AAStatSimpleData) then return end
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	for realm, realmdata in pairs(AAStatSimpleData.RealmData) do
-		for faction, stats in pairs(realmdata) do
-			if not stats.daily then stats.daily = { created = time() } end
-			if not stats.means then stats.means = {} end
-			if stats.daily.created and time() - stats.daily.created > 3600*16 then
-				-- This data is more than 16 hours old, we classify this as "yesterday's data"
-				private.PushStats(faction, realm)
-			end
+	for serverKey, data in pairs (SSRealmData) do
+		-- belt-and-braces checks
+		if not data.means then
+			data.means = {}
+		end
+		if not data.daily then
+			data.daily = {created = time()}
+		elseif not data.daily.created then
+			data.daily.created = time()
+		end
+
+		-- database maintenance
+		if time() - data.daily.created > 3600*16 then
+			-- This data is more than 16 hours old, we classify this as "yesterday's data"
+			private.PushStats(serverKey)
 		end
 	end
+	private.DataLoaded = nil
 end
 
 -- Simple function to total all of the values in the tuple
