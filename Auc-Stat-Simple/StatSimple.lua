@@ -496,6 +496,7 @@ end
 -- The following Functions are the routines used to access the permanent store data
 
 function private.UpgradeDb()
+	private.UpgradeDb = nil
 	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "2.0" then return end
 
 	local newSave = {Version = "2.0", RealmData = {}}
@@ -526,7 +527,6 @@ function private.UpgradeDb()
 			end
 		end
 	end
-	private.UpgradeDb = nil
 	AucAdvancedStatSimpleData = newSave
 end
 
