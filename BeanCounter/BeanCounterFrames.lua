@@ -48,7 +48,6 @@ function private.AuctionUI()
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("BeanCounter")
 	frame.ScanTab:Show()
-
 	PanelTemplates_DeselectTab(frame.ScanTab)
 
 	if AucAdvanced then
@@ -57,13 +56,11 @@ function private.AuctionUI()
 		private.AddTab(frame.ScanTab, frame)
 	end
 
-	function frame.ScanTab.OnClick(self, index)
+	function frame.ScanTab.OnClick(self, button, index)
 		BeanCounterBaseFrame:Hide()
 		if private.frame:GetParent() == BeanCounterBaseFrame then
 			private.frame:SetParent(AuctionFrame)
 			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
-			--private.frame:SetWidth(834.
-			--private.frame:SetHeight(450)
 			private.relevelFrame(frame)--make sure our frame stays in proper order
 		end
 
@@ -78,8 +75,6 @@ function private.AuctionUI()
 			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotLeft")
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
-
-			--print(tab:GetName())
 
 			if (AuctionDressUpFrame:IsVisible()) then
 				AuctionDressUpFrame:Hide()
