@@ -57,6 +57,7 @@ function private.AuctionUI()
 	end
 
 	function frame.ScanTab.OnClick(self, button, index)
+		if not self then return end
 		BeanCounterBaseFrame:Hide()
 		if private.frame:GetParent() == BeanCounterBaseFrame then
 			private.frame:SetParent(AuctionFrame)
@@ -479,7 +480,7 @@ function private.CreateFrames()
 	} )
 	
 	function frame.resultlist.sheet.Processor(callback, self, button, column, row, order)
-		if (callback == "ColumnOrder") and order then
+		if (callback == "ColumnOrder") then
 			set("columnorder", order)
 		elseif (callback == "ColumnWidthSet") then
 			private.onResize(self, column, button:GetWidth() )
