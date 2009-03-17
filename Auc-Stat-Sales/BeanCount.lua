@@ -52,10 +52,10 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -----------------------------------------------------------------------------------
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
-function lib.GetItemPDF(hyperlink, faction, realm)
+function lib.GetItemPDF(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
     -- Get the data
-	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, faction, realm)
+	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
 
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
@@ -94,43 +94,36 @@ function private.GetCfromZ(Z)
 	end
 end
 
-function lib.GetSigFromLink(link)
-	local sig
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-	if itype == "item" then
-		if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
-		else
-			sig = tostring(id)
-		end
-	else
-		print("Link is not item")
-	end
-	return sig
-end
+lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink
 
-local settings = nil
-function lib.GetPrice(hyperlink, faction, realm)
+local settings = {["bid"] =true, ["auction"] = true, ["exact"] = true}
+local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}}
+function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
     if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) or not (BeanCounter.getLocals) then return false end
     local _, _, _, _, _BC = BeanCounter.getLocals() --_BC used to access beancounters localization strings
-    if not settings then
-        -- faction seems to be nil when passed in
-        faction = UnitFactionGroup("player"):lower()
-        settings = {["selectbox"] = {"1", faction} , ["bid"] =true, ["auction"] = true, ["exact"] = true}
-    end
-    local sig = lib.GetSigFromLink(hyperlink)
+
+	-- The current version of BeanCounter has some restrictions which prevent full implementation of serverKey
+	--- there is no means to request BeanCounter info for a different server
+	--- BeanCounter can only provide info for "alliance" or "horde", not "neutral"
+	-- The following bit of code should bail out when we detect a serverKey that BeanCounter can't handle
+	local _, realmName, factionName = AucAdvanced.GetFaction ()
+	if serverKey then
+		factionName = strmatch (serverKey, realmName.."%-(%u%l+)$")
+	end
+	local sbox = faction2selectbox[factionName]
+	if not sbox then return end
+	settings["selectbox"] = sbox
+
+    local sig = factionName..lib.GetSigFromLink(hyperlink)
   	if cache[sig] == false then
 		return
 	end
 	if cache[sig] then
 		return unpack(cache[sig])
 	end
-		local tbl = BeanCounter.API.search(hyperlink, settings, true, 99999)
+
+	local tbl = BeanCounter.API.search(hyperlink, settings, true, 99999)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
     local i,v, reason, qty, priceper, thistime
     if tbl then
@@ -227,7 +220,6 @@ function lib.GetPrice(hyperlink, faction, realm)
 		confidence = private.GetCfromZ(confidence)
 	end
 
-
     cache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
     return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
@@ -238,14 +230,13 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction, realm)
+function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
 	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
-    -- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+	-- no need to clean out array; we will just overwrite all entries with new values
 
     -- Get our statistics
-	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, faction, realm)
+	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
     if not bought and not sold then return end
    	-- These are the ones that most algorithms will look for
 	array.price = average or mean
@@ -281,14 +272,14 @@ function lib.ClearItem(hyperlink, faction, realm)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("stat.sales.tooltip", false)
-    AucAdvanced.Settings.SetDefault("stat.sales.avg", true)
-    AucAdvanced.Settings.SetDefault("stat.sales.avg3", false)
-    AucAdvanced.Settings.SetDefault("stat.sales.avg7", false)
-    AucAdvanced.Settings.SetDefault("stat.sales.normal", true)
-    AucAdvanced.Settings.SetDefault("stat.sales.stddev", false)
-    AucAdvanced.Settings.SetDefault("stat.sales.confidence", false)
-   	AucAdvanced.Settings.SetDefault("stat.sales.enable", true)
+	default("stat.sales.tooltip", false)
+    default("stat.sales.avg", true)
+    default("stat.sales.avg3", false)
+    default("stat.sales.avg7", false)
+    default("stat.sales.normal", true)
+    default("stat.sales.stddev", false)
+    default("stat.sales.confidence", false)
+   	default("stat.sales.enable", true)
 end
 
 function lib.Processor(callbackType, ...)
@@ -297,8 +288,6 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
 	end
 end
 
@@ -307,14 +296,14 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 
-	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
+	if not get("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
 
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
     if (boughtseen+soldseen>0) then
 		tooltip:AddLine(_TRANS('ASAL_Tooltip_SalesPrices'))--Sales prices:
 
-        if AucAdvanced.Settings.GetSetting("stat.sales.avg") then
+        if get("stat.sales.avg") then
             if (boughtseen > 0) then
                 tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalBought'):format(boughtqty), bought) --Total Bought {{%s}} at avg each
             end
@@ -322,7 +311,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
                 tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalSold'):format(soldqty), sold) --Total Sold {{%s}} at avg each
             end
         end
-        if AucAdvanced.Settings.GetSetting("stat.sales.avg7") then
+        if get("stat.sales.avg7") then
             if (boughtqty7 > 0) then
                 tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysBought'):format(boughtqty7), bought7) --7 Days Bought {{%s}} at avg each
             end
@@ -330,7 +319,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
                 tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysSold'):format(soldqty7), sold7)--7 Days Sold {{%s}} at avg each
             end
         end
-        if AucAdvanced.Settings.GetSetting("stat.sales.avg3") then
+        if get("stat.sales.avg3") then
             if (boughtqty3 > 0) then
                 tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysBought'):format(boughtqty3), bought3)--3 Days Bought {{%s}} at avg each
             end
@@ -339,20 +328,20 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
             end
         end
         if (average and average > 0) then
-			if AucAdvanced.Settings.GetSetting("stat.sales.normal") then
+			if get("stat.sales.normal") then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_NormalizedStack'), average*quantity)--
 				if (quantity > 1) then
 					tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), average)--(or individually)
 				end
 			end
-			if AucAdvanced.Settings.GetSetting("stat.sales.stdev") then
+			if get("stat.sales.stdev") then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_ StdDeviation'), stdev*quantity)--Std Deviation
 				if (quantity > 1) then
 				    tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), stdev)--(or individually)
 				end
 			end
-			if AucAdvanced.Settings.GetSetting("stat.sales.confid") then
-				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Confidence')..(floor(confidence*1000))/1000)--Confidence: 
+			if get("stat.sales.confid") then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Confidence')..(floor(confidence*1000))/1000)--Confidence:
 			end
 		end
 
