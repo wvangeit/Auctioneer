@@ -177,7 +177,7 @@ function lib.RoundBid(value)
 end
 
 function lib.RoundBuy(value)
-	if AucAdvanced.Settings.GetSetting("util.appraiser.round.buy") then
+	if value ~= 0 and AucAdvanced.Settings.GetSetting("util.appraiser.round.buy") then
 		return private.roundValue(value)
 	else
 		return math.floor(value + 0.5) --We CANNOT allow Decimal values to be passed to hooked modules such as beancounter, even if AH will not throw an error
