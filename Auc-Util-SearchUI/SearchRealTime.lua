@@ -253,6 +253,7 @@ function lib.ScanPage()
 		if link then
 			local name, _, count, quality, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
+			iEquip = Const.InvTypes[iEquip]
 			local timeleft = GetAuctionItemTimeLeft("list", i)
 			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 			owner = owner or ""
