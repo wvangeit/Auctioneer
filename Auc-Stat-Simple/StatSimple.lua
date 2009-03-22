@@ -38,18 +38,23 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
+local GetFaction = AucAdvanced.GetFaction
+
 -- Eliminate some global lookups
-local select = select;
-local sqrt = sqrt;
-local ipairs = ipairs;
-local unpack = unpack;
-local tinsert = table.insert;
-local assert = assert;
+local select = select
+local sqrt = sqrt
+local ipairs = ipairs
+local unpack = unpack
+local tinsert = table.insert
+local assert = assert
+local tonumber = tonumber
+local pairs = pairs
+
 -- local reference to our saved stats table
 local SSRealmData
 
 function lib.CommandHandler(command, ...)
-	local myFaction = AucAdvanced.GetFaction()
+	local myFaction = GetFaction()
 	if (command == "help") then
 		print(_TRANS('SIMP_Help_SlashHelp1') ) --Help for Auctioneer Advanced - Simple
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
@@ -75,7 +80,7 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
-	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+	if not get("stat.simple.enable") then return end
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -103,7 +108,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 end
 
 function lib.GetPrice(hyperlink, serverKey)
-	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+	if not get("stat.simple.enable") then return end
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -178,7 +183,7 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, serverKey)
-	if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+	if not get("stat.simple.enable") then return end
 	-- Clean out the old array
 	empty(array)
 
@@ -189,7 +194,7 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	if not dayCount then return end
 
 	-- If reportsafe is on use the mean of all 14 day samples. Else use the "traditional" Simple values.
-	if not AucAdvanced.Settings.GetSetting("stat.simple.reportsafe") then
+	if not get("stat.simple.reportsafe") then
 	   if (avg3 and seenDays > 3) or dayCount == 0 then
 		  array.price = avg3
 	   elseif dayCount > 0 then
@@ -231,7 +236,7 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 function lib.GetItemPDF(hyperlink, serverKey)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
 
-    if not AucAdvanced.Settings.GetSetting("stat.simple.enable") then return end
+    if not get("stat.simple.enable") then return end
     -- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
 
@@ -251,15 +256,15 @@ function lib.GetItemPDF(hyperlink, serverKey)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("stat.simple.tooltip", false)
-	AucAdvanced.Settings.SetDefault("stat.simple.avg3", false)
-	AucAdvanced.Settings.SetDefault("stat.simple.avg7", false)
-	AucAdvanced.Settings.SetDefault("stat.simple.avg14", false)
-	AucAdvanced.Settings.SetDefault("stat.simple.minbuyout", true)
-	AucAdvanced.Settings.SetDefault("stat.simple.avgmins", true)
-	AucAdvanced.Settings.SetDefault("stat.simple.quantmul", true)
-	AucAdvanced.Settings.SetDefault("stat.simple.enable", true)
-	AucAdvanced.Settings.SetDefault("stat.simple.reportsafe", false)
+	default("stat.simple.tooltip", false)
+	default("stat.simple.avg3", false)
+	default("stat.simple.avg7", false)
+	default("stat.simple.avg14", false)
+	default("stat.simple.minbuyout", true)
+	default("stat.simple.avgmins", true)
+	default("stat.simple.quantmul", true)
+	default("stat.simple.enable", true)
+	default("stat.simple.reportsafe", false)
 
 	private.LoadData() -- checks DB and sets local SSRealmData
 end
@@ -269,7 +274,7 @@ function lib.ClearItem(hyperlink, serverKey)
 	if linkType ~= "item" then
 		return
 	end
-	serverKey = serverKey or AucAdvanced.GetFaction ()
+	serverKey = serverKey or GetFaction ()
 	print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
 
 	local data = private.GetPriceData (serverKey)
@@ -357,18 +362,18 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 
-	if not AucAdvanced.Settings.GetSetting("stat.simple.tooltip") then return end
+	if not get("stat.simple.tooltip") then return end
 
 	if not quantity or quantity < 1 then quantity = 1 end
-	if not AucAdvanced.Settings.GetSetting("stat.simple.quantmul") then quantity = 1 end
+	if not get("stat.simple.quantmul") then quantity = 1 end
 
-	local serverKey, realm, faction = AucAdvanced.GetFaction () -- realm/faction requested for anticipated changes to add cross-faction tooltips
+	local serverKey, realm, faction = GetFaction () -- realm/faction requested for anticipated changes to add cross-faction tooltips
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
-	local dispAvg3 = AucAdvanced.Settings.GetSetting("stat.simple.avg3")
-	local dispAvg7 = AucAdvanced.Settings.GetSetting("stat.simple.avg7")
-	local dispAvg14 = AucAdvanced.Settings.GetSetting("stat.simple.avg14")
-	local dispMinB = AucAdvanced.Settings.GetSetting("stat.simple.minbuyout")
-	local dispAvgMBO = AucAdvanced.Settings.GetSetting("stat.simple.avgmins")
+	local dispAvg3 = get("stat.simple.avg3")
+	local dispAvg7 = get("stat.simple.avg7")
+	local dispAvg14 = get("stat.simple.avg14")
+	local dispMinB = get("stat.simple.minbuyout")
+	local dispAvgMBO = get("stat.simple.avgmins")
 	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then
@@ -539,7 +544,7 @@ function private.LoadData()
 end
 
 function private.ClearData(serverKey)
-	serverKey = serverKey or AucAdvanced.GetFaction()
+	serverKey = serverKey or GetFaction()
 	if SSRealmData[serverKey] then
 		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..serverKey.."}}") --Clearing Simple stats for
 	end
@@ -547,13 +552,11 @@ function private.ClearData(serverKey)
 end
 
 function private.GetPriceData(serverKey)
-	if type (serverKey) ~= "string" then
-		serverKey = AucAdvanced.GetFaction ()
-	end
+	serverKey = serverKey or GetFaction ()
 	local data = SSRealmData[serverKey]
 	if not data then
-		if not strfind (serverKey, ".%-%u%l") then
-			-- todo: localize after merging into trunk
+		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
+			-- todo: localize this string
 			print ("Invalid serverKey passed to Stat-Simple")
 			return
 		end
@@ -566,21 +569,46 @@ end
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	for serverKey, data in pairs (SSRealmData) do
-		-- belt-and-braces checks
-		if not data.means then
-			data.means = {}
-		end
-		if not data.daily then
-			data.daily = {created = time()}
-		elseif not data.daily.created then
-			data.daily.created = time()
-		end
 
-		-- database maintenance
-		if time() - data.daily.created > 3600*16 then
-			-- This data is more than 16 hours old, we classify this as "yesterday's data"
-			private.PushStats(serverKey)
+	-- Note: database errors can occur if user tries to run an older version of StatSimple after the database is upgraded.
+	for serverKey, data in pairs (SSRealmData) do
+		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
+			-- not a valid serverKey - remove it
+			SSRealmData[serverKey] = nil
+		else
+			-- aggressive checks to strip out any data that is the wrong type
+			for key, _ in pairs (data) do
+				if key ~= "means" and key ~= "daily" then
+					data[key] = nil
+				end
+			end
+			if type(data.means) == "table" then
+				for id, packed in pairs (data.means) do
+					if type(id) ~= "number" or type(packed) ~= "string" then
+						data.means[id] = nil
+					end
+				end
+			else
+				data.means = {}
+			end
+			if type(data.daily) == "table" then
+				for id, packed in pairs (data.daily) do
+					if id ~= "created" and (type(id) ~= "number" or type(packed) ~= "string") then
+						data.daily[id] = nil
+					end
+				end
+				if type(data.daily.created) ~= "number" then
+					data.daily.created = time ()
+				end
+			else
+				data.daily = {created = time()}
+			end
+
+			-- database maintenance
+			if time() - data.daily.created > 3600*16 then
+				-- This data is more than 16 hours old, we classify this as "yesterday's data"
+				private.PushStats(serverKey)
+			end
 		end
 	end
 	private.DataLoaded = nil
