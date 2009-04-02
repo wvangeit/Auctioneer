@@ -137,26 +137,28 @@ local isPigmentMats =
 
 lib.vendorlist = {}
 function lib.vendorAction()
-	lib.vendorlist = {} --this needs to be cleared and recalcuated on EVERY vendor open. Not just when we confirm a sell
+	empty(lib.vendorlist) --this needs to be cleared on every vendor open
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
 				local itemLink, itemCount = GetContainerItemLink(bag,slot)
-				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
-				if itemCount == nil then itemCount = 1 end
-				runstop = 0  --Teslek, not sure why you are using this with elseif statements only one branch will be run anyways?
-				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
-				if lib.autoSellList[ itemID ] then
-					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Custom Add"
-					runstop = 1
-				elseif (get("util.automagic.autosellgrey") and itemRarity == 0 and runstop == 0) then
-					lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":Grey"
-					runstop = 1
-				else --look for btmScan or SearchUI reason codes if above fails
-					local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
-					if reason and text then
-						lib.vendorlist[bag..":"..slot] = itemName..":"..itemID..":"..text.."-vendor"
+				if itemLink then
+					if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
+					if itemCount == nil then itemCount = 1 end
+					local _, itemID, _, _, _, _ = decode(itemLink)
+					local itemSig = AucAdvanced.API.GetSigFromLink(itemLink) -- future plan is to use itemSig in place of itemID throughout - to eliminate problems for items with suffixes
+					local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
+					local key = bag..":"..slot -- key needs to be unique, but is not currently used for anything. future: rethink if this can be made useful
+
+					if lib.autoSellList[ itemID ] then
+						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
+					elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
+						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
+					else --look for btmScan or SearchUI reason codes if above fails
+						local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
+						if reason and text then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}
+						end
 					end
 				end
 			end

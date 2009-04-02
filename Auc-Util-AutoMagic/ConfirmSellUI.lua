@@ -37,11 +37,7 @@ local selecteddata = {}
 
 
 function lib.ASCPrompt()
-	local vendorcount = 0
-	for k, v in pairs(lib.vendorlist) do
-		vendorcount = vendorcount + 1
-	end
-	if vendorcount ~= 0 then
+	if next(lib.vendorlist) then
 		lib.confirmsellui:Show()
 		lib.ASCRefreshSheet()
 	end
@@ -50,16 +46,15 @@ end
 ---------------------------------------------------------
 -- Button Functions
 ---------------------------------------------------------
+-- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
 function lib.ASCConfirmContinue()
-	for k, v in pairs(lib.vendorlist) do
-		local bag, slot = strsplit(":", k)
-		local iName, iID, iWhy = strsplit(":", v)
+	for key, itemdata in pairs(lib.vendorlist) do
 		if (get("util.automagic.chatspam")) then
-			print("AutoMagic is selling:", iName, "due to", iWhy)
+			print("AutoMagic is selling:", itemdata[1], "reason:", itemdata[6])
 		end
 
-		UseContainerItem(bag, slot)
-		lib.vendorlist[k] = nil
+		UseContainerItem(itemdata[4], itemdata[5])
+		lib.vendorlist[key] = nil
 	end
 	lib.confirmsellui:Hide()
 end
@@ -79,18 +74,19 @@ end
 ---------------------------------------------------------
 -- ScrollSheet Functions
 ---------------------------------------------------------
-function lib.ASCRefreshSheet()  --- item / vendor / appraiser / why
+-- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
+-- ASCtempstorage[index] = { link, vendorPrice, AppraiserPrice, reason, vendorIgnoreDisplay }
+function lib.ASCRefreshSheet()
 	local ASCtempstorage = {}
 	local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-	for k, v in pairs(ASCtempstorage) do ASCtempstorage[k] = nil; end --Reset table to ensure fresh data.
+	empty(ASCtempstorage) --Reset table to ensure fresh data
 	for k, v in pairs(lib.vendorlist) do
-		local bag, slot = strsplit(":", k)
-		local iName, iID, iWhy = strsplit(":", v)
+		local itemLink, itemSig, count, bag, slot, reason = unpack(v)
+		local _, iID = decode(itemLink)
+		local vendor = GetSellValue and GetSellValue(iID) or 0
+		local abuy, abid = GetPrice(itemLink, nil, true)
 		local vendorignored = "no (will-sell)"
-		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(iID)
-		local	vendor = GetSellValue and GetSellValue(iID) or 0
-		local abid,abuy = GetPrice(itemLink, nil, true)
-		if (get("util.automagic.vidignored"..iID) and get("util.automagic.vidignored"..iID) == true) then
+		if get("util.automagic.vidignored"..iID) == true then
 			local vendorignored = "yes (no-sell)"
 		end
 
@@ -98,7 +94,7 @@ function lib.ASCRefreshSheet()  --- item / vendor / appraiser / why
 			itemLink, --link form for mouseover tooltips to work
 			vendor,
 			tonumber(abuy) or tonumber(abid),
-			iWhy,
+			reason,
 			vendorignored,
 		})
 	end
