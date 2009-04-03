@@ -556,6 +556,7 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
+		frame.salebox.stackentry:SetNumber(curStack)
 
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
@@ -576,7 +577,14 @@ function private.CreateFrames()
 			frame.salebox.number:SetAdjustedRange(range, -1)--make sure the slider can handle the setting before we set it
 		end
 		frame.salebox.number:SetAdjustedValue(curNumber)
-		
+		if curNumber == -2 then
+			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
+		elseif curNumber == -1 then
+			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_All') )--All
+		else
+			frame.salebox.numberentry:SetNumber(curNumber)
+		end
+
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
 		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
 		if curNumberOnly == "on" then
@@ -667,6 +675,9 @@ function private.CreateFrames()
 		frame.updated = nil
 		if not frame.salebox.sig then return end
 		local stack = frame.salebox.stack:GetValue()
+		local stackentry = frame.salebox.stackentry:GetNumber()
+		local number = frame.salebox.number:GetAdjustedValue()
+		local numberentry = frame.salebox.numberentry:GetText()
 		local numberonly = frame.salebox.numberonly:GetChecked()
 		local duration = frame.salebox.duration:GetValue()
 		local matcher = frame.salebox.matcher:GetChecked()
@@ -678,11 +689,53 @@ function private.CreateFrames()
 		
 		if stack ~= frame.valuecache.stack then
 			frame.valuecache.stack = stack
+			frame.valuecache.stackentry = stack
+			frame.salebox.stackentry:SetNumber(stack)
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stack)
+		elseif stackentry ~= frame.valuecache.stackentry then
+			frame.salebox.stack:SetValue(stackentry)
+			stackentry = frame.salebox.stack:GetValue()
+			frame.salebox.stackentry:SetNumber(stackentry)
+			frame.valuecache.stack = stackentry
+			frame.valuecache.stackentry = stackentry
+			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stackentry)
 		end
 		if number ~= frame.valuecache.number then
+			if number >= -2 and number < 0 then
+				if number == -2 then
+					frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
+				else
+					frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_All') )--All
+				end
+			else
+				frame.salebox.numberentry:SetNumber(number)
+			end
 			frame.valuecache.number = number
+			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", number)
+		elseif numberentry ~= frame.valuecache.numberentry then
+			if numberentry:lower() == _TRANS('APPR_Interface_Full') then
+				frame.salebox.number:SetAdjustedValue(-2)
+				numberentry = _TRANS('APPR_Interface_Full')
+				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -2)
+			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then
+				frame.salebox.number:SetAdjustedValue(-1)
+				numberentry = _TRANS('APPR_Interface_All')
+				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -1)
+			elseif tonumber(numberentry) == nil then --we've typed in a partial word.  let them keep typing
+			else
+				numberentry = frame.salebox.numberentry:GetNumber()
+				if numberentry > frame.salebox.number.maxStax then
+					local n = #frame.salebox.number.extra
+					frame.salebox.number.maxStax = numberentry
+					frame.salebox.number:SetMinMaxValues(1, numberentry + n)
+				end
+				frame.salebox.number:SetAdjustedValue(numberentry)
+				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", numberentry)
+			end
+			frame.salebox.numberentry:SetText(numberentry)
+			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
+			frame.valuecache.number = frame.salebox.number:GetAdjustedValue()
 		end
 		if numberonly ~= frame.valuecache.numberonly then
 			frame.valuecache.numberonly = numberonly
@@ -800,6 +853,8 @@ function private.CreateFrames()
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
 			frame.salebox.numberonly:Hide()
+			frame.salebox.stackentry:Hide()
+			frame.salebox.numberentry:Hide()
 			frame.salebox.model:Hide()
 			frame.salebox.matcher:Hide()
 			frame.salebox.bid:Hide()
@@ -845,9 +900,13 @@ function private.CreateFrames()
 		if not frame.selectedPostable then
 			frame.salebox.number:Hide()
 			frame.salebox.stack:Hide()
+			frame.salebox.stackentry:Hide()
+			frame.salebox.numberentry:Hide()
 		else
 			frame.salebox.number:Show()
 			frame.salebox.stack:Show()
+			frame.salebox.stackentry:Show()
+			frame.salebox.numberentry:Show()
 		end
 
 		frame.toggleManifest:Enable()
@@ -2150,6 +2209,13 @@ function private.CreateFrames()
 	})
 	AppraiserSaleboxBuyStackCopper:SetBackdropColor(0,0,0, 0)
 	
+	--sets the tab to next field options
+	MoneyInputFrame_SetNextFocus(frame.salebox.bid.stack, AppraiserSaleboxBuyStackGold)
+	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid.stack, AppraiserSaleboxBuyStackCopper)
+	MoneyInputFrame_SetNextFocus(frame.salebox.buy.stack, AppraiserSaleboxBidStackGold)
+	MoneyInputFrame_SetPreviousFocus(frame.salebox.buy.stack, AppraiserSaleboxBidStackCopper)
+	
+	
 	--Button for Bid  frame  to toggle stack/single mode
 	frame.switchToStack = CreateFrame("Button", nil, frame.salebox, "OptionsButtonTemplate")
 	frame.switchToStack:SetPoint("RIGHT", frame.salebox.bid, "LEFT", -10, 0)
@@ -2616,6 +2682,62 @@ function private.CreateFrames()
 		end
 	end
 
+	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.numberentry:SetPoint("LEFT", frame.salebox.number, "RIGHT", 10, 0)
+	frame.salebox.numberentry:SetNumeric(false)
+	frame.salebox.numberentry:SetHeight(16)
+	frame.salebox.numberentry:SetWidth(30)
+	frame.salebox.numberentry:SetNumber(0)
+	frame.salebox.numberentry:SetAutoFocus(false)
+	frame.salebox.numberentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
+	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
+		frame.salebox.numberentry:ClearFocus()
+		frame.updated = true
+	end)
+	frame.salebox.numberentry:SetScript("OnTabPressed", function()
+		frame.salebox.stackentry:SetFocus()
+		frame.updated = true
+	end)
+	frame.salebox.numberentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.numberentry:GetText():lower()
+		if (text ~= "") then
+			frame.updated = true
+		end
+	end)
+	frame.salebox.numberentry:SetScript("OnEscapePressed", function()
+		frame.salebox.numberentry:ClearFocus()
+	end)
+	frame.salebox.numberentry:Hide()
+
+	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.stackentry:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 10, 0)
+	frame.salebox.stackentry:SetNumeric(true)
+	frame.salebox.stackentry:SetNumber(0)
+	frame.salebox.stackentry:SetHeight(16)
+	frame.salebox.stackentry:SetWidth(30)
+	frame.salebox.stackentry:SetAutoFocus(false)
+	frame.salebox.stackentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
+	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
+		frame.salebox.stackentry:ClearFocus()
+		frame.updated = true
+	end)
+	frame.salebox.stackentry:SetScript("OnTabPressed", function()
+		frame.salebox.numberentry:SetFocus()
+		frame.updated = true
+	end)
+	frame.salebox.stackentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.stackentry:GetText()
+		if text ~= "" then
+			frame.updated = true
+		end
+	end)
+	frame.salebox.stackentry:SetScript("OnEscapePressed", function()
+		frame.salebox.stackentry:ClearFocus()
+	end)
+	frame.salebox.stackentry:Hide()
+		
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
