@@ -392,7 +392,6 @@ function private.CreateFrames()
 			end
 		end
 		frame.refresh:Enable()
-		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
 	end
 
@@ -557,7 +556,6 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
-		frame.salebox.stackentry:SetNumber(curStack)
 
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
@@ -578,14 +576,7 @@ function private.CreateFrames()
 			frame.salebox.number:SetAdjustedRange(range, -1)--make sure the slider can handle the setting before we set it
 		end
 		frame.salebox.number:SetAdjustedValue(curNumber)
-		if curNumber == -2 then
-			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
-		elseif curNumber == -1 then
-			frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_All') )--All
-		else
-			frame.salebox.numberentry:SetNumber(curNumber)
-		end
-
+		
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
 		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
 		if curNumberOnly == "on" then
@@ -676,9 +667,6 @@ function private.CreateFrames()
 		frame.updated = nil
 		if not frame.salebox.sig then return end
 		local stack = frame.salebox.stack:GetValue()
-		local stackentry = frame.salebox.stackentry:GetNumber()
-		local number = frame.salebox.number:GetAdjustedValue()
-		local numberentry = frame.salebox.numberentry:GetText()
 		local numberonly = frame.salebox.numberonly:GetChecked()
 		local duration = frame.salebox.duration:GetValue()
 		local matcher = frame.salebox.matcher:GetChecked()
@@ -690,53 +678,11 @@ function private.CreateFrames()
 		
 		if stack ~= frame.valuecache.stack then
 			frame.valuecache.stack = stack
-			frame.valuecache.stackentry = stack
-			frame.salebox.stackentry:SetNumber(stack)
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stack)
-		elseif stackentry ~= frame.valuecache.stackentry then
-			frame.salebox.stack:SetValue(stackentry)
-			stackentry = frame.salebox.stack:GetValue()
-			frame.salebox.stackentry:SetNumber(stackentry)
-			frame.valuecache.stack = stackentry
-			frame.valuecache.stackentry = stackentry
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stackentry)
 		end
 		if number ~= frame.valuecache.number then
-			if number >= -2 and number < 0 then
-				if number == -2 then
-					frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
-				else
-					frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_All') )--All
-				end
-			else
-				frame.salebox.numberentry:SetNumber(number)
-			end
 			frame.valuecache.number = number
-			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", number)
-		elseif numberentry ~= frame.valuecache.numberentry then
-			if numberentry:lower() == _TRANS('APPR_Interface_Full') then
-				frame.salebox.number:SetAdjustedValue(-2)
-				numberentry = _TRANS('APPR_Interface_Full')
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -2)
-			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then
-				frame.salebox.number:SetAdjustedValue(-1)
-				numberentry = _TRANS('APPR_Interface_All')
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -1)
-			elseif tonumber(numberentry) == nil then --we've typed in a partial word.  let them keep typing
-			else
-				numberentry = frame.salebox.numberentry:GetNumber()
-				if numberentry > frame.salebox.number.maxStax then
-					local n = #frame.salebox.number.extra
-					frame.salebox.number.maxStax = numberentry
-					frame.salebox.number:SetMinMaxValues(1, numberentry + n)
-				end
-				frame.salebox.number:SetAdjustedValue(numberentry)
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", numberentry)
-			end
-			frame.salebox.numberentry:SetText(numberentry)
-			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
-			frame.valuecache.number = frame.salebox.number:GetAdjustedValue()
 		end
 		if numberonly ~= frame.valuecache.numberonly then
 			frame.valuecache.numberonly = numberonly
@@ -831,8 +777,14 @@ function private.CreateFrames()
 		if not MatchString then
 			MatchString = ""
 		end
-		MoneyInputFrame_SetCopper(frame.salebox.buy, buy)
-		MoneyInputFrame_SetCopper(frame.salebox.bid, bid)
+		if get("util.appraiser.classic") then
+			local stack = frame.salebox.stack:GetValue() or 1
+			MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
+			MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
+		else
+			MoneyInputFrame_SetCopper(frame.salebox.buy, buy)
+			MoneyInputFrame_SetCopper(frame.salebox.bid, bid)
+		end
 		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
 		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.model:SetText(curModelText)
@@ -843,15 +795,11 @@ function private.CreateFrames()
 	--except for when selecting or deselecting an item
 	--this function doesn't change any of the controls, merely the display
 	function frame.UpdateDisplay()
-		if (not frame.salebox.sig) or -- nothing selected
-		   (not frame.selectedPostable and not frame.itembox:IsShown()) -- old UI: don't show auctions
-		   then
+		if (not frame.salebox.sig) then -- nothing selected
 			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
-            frame.salebox.numberonly:Hide()
-			frame.salebox.stackentry:Hide()
-			frame.salebox.numberentry:Hide()
+			frame.salebox.numberonly:Hide()
 			frame.salebox.model:Hide()
 			frame.salebox.matcher:Hide()
 			frame.salebox.bid:Hide()
@@ -862,54 +810,52 @@ function private.CreateFrames()
 			frame.toggleManifest:Disable()
 			frame.age:SetText("")
 			frame.go:Disable()
-			frame.salebox.depositcost:SetText("")
-			frame.salebox.totalbid:SetText("")
-			frame.salebox.totalbuyout:SetText("")
 			frame.salebox.ignore:Hide()
-    		frame.salebox.warn:SetText("")
+			frame.salebox.warn:SetText("")
 			frame.salebox.bulk:Hide()
+			frame.switchToStack:Hide()
+			frame.switchToStack2:Hide()
 			return
 		end
 		frame.salebox.icon:SetAlpha(1)
 		frame.salebox.matcher:Show()
-		frame.salebox.bid:Show()
+		--hides/shows the stack price money entry or per item money entry boxes
+		if get("util.appraiser.classic") then
+			frame.salebox.bid.stack:Show()
+			frame.salebox.buy.stack:Show()
+			frame.salebox.bid:Hide()
+			frame.salebox.buy:Hide()
+		else
+			frame.salebox.bid:Show()
+			frame.salebox.buy:Show()
+			frame.salebox.bid.stack:Hide()
+			frame.salebox.buy.stack:Hide()
+		end
+		frame.switchToStack:Show()
+		frame.switchToStack2:Show()
+		
 		frame.salebox.model:Show()
-		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
 		frame.salebox.numberonly:Show()
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
-		if frame.itembox:IsShown() then
-			-- new UI
-			frame.salebox.ignore:Show()
-			frame.salebox.bulk:Show()
-			if not frame.selectedPostable then
-				frame.salebox.number:Hide()
-				frame.salebox.stack:Hide()
-				frame.salebox.stackentry:Hide()
-				frame.salebox.numberentry:Hide()
-			else
-				frame.salebox.number:Show()
-				frame.salebox.stack:Show()
-				frame.salebox.stackentry:Show()
-				frame.salebox.numberentry:Show()
-			end
+		
+		frame.salebox.ignore:Show()
+		frame.salebox.bulk:Show()
+		if not frame.selectedPostable then
+			frame.salebox.number:Hide()
+			frame.salebox.stack:Hide()
 		else
-			-- old UI
-			frame.salebox.stackentry:Show()
-			frame.salebox.stacksoflabel:Show()
-			frame.salebox.numberentry:Show()
-			frame.salebox.depositcost:Show()
-			frame.salebox.totalbid:Show()
-			frame.salebox.totalbuyout:Show()
+			frame.salebox.number:Show()
+			frame.salebox.stack:Show()
 		end
+
 		frame.toggleManifest:Enable()
 		if frame.toggleManifest:GetText() == "Close Sidebar" then
 			frame.manifest:Show()
 		end
 
 		frame.refresh:Enable()
-		frame.switchUI:Enable()
 		local matchers = AucAdvanced.Settings.GetSetting("matcherlist")
 		if not matchers or #matchers == 0 then
 			frame.salebox.matcher:Disable()
@@ -994,10 +940,8 @@ function private.CreateFrames()
 				if (curNumber >= -2 and curNumber < 0) then
 					if (curNumber == -2) then
 						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllFullStacks'):format(maxStax, fullPop))--Number: All full stacks (%d) = %d
-						frame.salebox.totalsize:SetText("("..(fullPop)..")")
 					else
 						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllStacksPlus'):format(maxStax, remain, count))--Number: All stacks (%d) plus %d = %d
-						frame.salebox.totalsize:SetText("("..(count)..")")
 					end
 					if (maxStax > 0) then
 						frame.manifest.lines:Clear()
@@ -1065,7 +1009,6 @@ function private.CreateFrames()
 					end
 				else
 					frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberStacks'):format(curNumber, curNumber*curSize))--Number: %d stacks = %d
-					frame.salebox.totalsize:SetText("("..(curNumber*curSize)..")")
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(curNumber, curSize))--%d lots of %dx stacks:
 					bidVal = lib.RoundBid(curBid * curSize)
@@ -1108,10 +1051,8 @@ function private.CreateFrames()
 				if (curNumber == -1) then
 					curNumber = frame.salebox.count
 					frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllItems'):format(curNumber))--Number: All items = %d
-					frame.salebox.totalsize:SetText("("..(curNumber)..")")
 				else
 					frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberItems'):format(curNumber))--Number: %d items
-					frame.salebox.totalsize:SetText("("..(curNumber)..")")
 				end
 				if curNumber > 0 then
 					frame.manifest.lines:Clear()
@@ -1145,9 +1086,6 @@ function private.CreateFrames()
 			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalBid'), totalBid)--Total Bid:
 			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalBuyout'), totalBuy)--Total Buyout:
 			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalDeposit'), totalDeposit)--Total Deposit:
-			frame.salebox.depositcost:SetText(_TRANS('APPR_Interface_Deposit').."      "..AucAdvanced.Coins(totalDeposit, true))--Deposit:
-			frame.salebox.totalbid:SetText(_TRANS('APPR_Interface_TotalBid').."    "..AucAdvanced.Coins(totalBid, true))--Total Bid:
-			frame.salebox.totalbuyout:SetText(_TRANS('APPR_Interface_TotalBuyout').." "..AucAdvanced.Coins(totalBuy, true))--Total Buyout:
 			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 				local MatchStringList = {strsplit("\n", MatchString)}
 				for i in pairs(MatchStringList) do
@@ -1186,9 +1124,9 @@ function private.CreateFrames()
 			frame.salebox.warn:SetText(_TRANS('APPR_Interface_BuyPriceMustGreater') )--Buy price must be > bid
 			canAuction = false
 		elseif warnvendor == "buyout" then
-            frame.salebox.warn:SetText("|cffff8010".._TRANS('APPR_Interface_NoteBuyoutLessVendor'))--Note: Buyout <= Vendor
-        elseif warnvendor == "bid" then
-            frame.salebox.warn:SetText("|cffeec900".._TRANS('APPR_Interface_NoteMinBidLessVendor'))--Note: Min Bid <= Vendor
+			frame.salebox.warn:SetText("|cffff8010".._TRANS('APPR_Interface_NoteBuyoutLessVendor'))--Note: Buyout <= Vendor
+		elseif warnvendor == "bid" then
+			frame.salebox.warn:SetText("|cffeec900".._TRANS('APPR_Interface_NoteMinBidLessVendor'))--Note: Min Bid <= Vendor
 		else
 			frame.salebox.warn:SetText("")
 		end
@@ -1209,118 +1147,59 @@ function private.CreateFrames()
 	end
 	
 	function frame.ChangeUI()
-		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
-			--hide unecessary elements
-			frame.itembox:Hide()
-			frame.salebox:SetPoint("TOPLEFT", frame, "TOPLEFT", 13, -71)
-			frame.salebox:SetPoint("RIGHT", frame, "LEFT", 253, 0)
-			frame.salebox:SetHeight(340)
-			frame.salebox.stack:Hide()
-			frame.salebox.number:Hide()
-			frame.salebox.numberonly:Hide()
-			frame.switchUI:SetText(_TRANS('APPR_Interface_FullView') )--Full View
-			frame.switchUI.TooltipText = _TRANS('APPR_HelpTooltip_SwitchAdvancedLayout')--Switch to a more advanced layout 
-			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -35)
-			frame.salebox.bid:ClearAllPoints()
-			frame.salebox.bid:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, -30)
-			frame.salebox.bid.label:ClearAllPoints()
-			frame.salebox.bid.label:SetPoint("BOTTOMLEFT", frame.salebox.bid, "TOPLEFT", 0, 2)
-			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0, -20)
-			frame.salebox.buy.label:ClearAllPoints()
-			frame.salebox.buy.label:SetPoint("BOTTOMLEFT", frame.salebox.buy, "TOPLEFT", 0, 2)
-			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.buy, "BOTTOMLEFT", -10, -10)
-			frame.gobatch:Hide()
-			frame.go:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -20, 25)
-			frame.salebox.info:ClearAllPoints()
-			frame.salebox.info:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, 8)
-			--set scrollframe to match clasic ratio
-			frame.imageview:SetBackdropColor(0, 0, 0, 1)
-			frame.imageview:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
-			frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
-			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
+		local stack = frame.salebox.stack:GetValue()
+		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
+		if get("util.appraiser.classic") then
+			--Show per stack
 
-			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0, -5)
-			frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", 0, -5)
-			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
-			frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.stackentry, "BOTTOMRIGHT", 30, -5)
-			if not frame.salebox.sig then
-				frame.salebox.info:SetText(_TRANS('APPR_Interface_Select ItemAuctioning') )--Select an item to begin auctioning...
-			else
-				frame.salebox.stackentry:Show()
-				frame.salebox.stacksoflabel:Show()
-				frame.salebox.numberentry:Show()
-				frame.salebox.numberonly:Show()
-				frame.salebox.totalsize:Show()
-				frame.salebox.depositcost:Show()
-				frame.salebox.totalbid:Show()
-				frame.salebox.totalbuyout:Show()
-			end
-			frame.salebox.name:SetHeight(36)
-			frame.salebox.warn:ClearAllPoints()
-			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox, "BOTTOMLEFT", 10, 10)
-			frame.salebox.ignore:Hide()
-			frame.salebox.bulk:Hide()
+			frame.switchToStack:SetText("Bid per Stack")
+			frame.switchToStack2:SetText("Buy per Stack")
+			
+			frame.salebox.bid.stack:Show()
+			frame.salebox.bid:Hide()
+			
+			frame.salebox.buy.stack:Show()
+			frame.salebox.buy:Hide()
+			
+			frame.salebox:SetBackdropColor(0.1, 0.5, 0.9, 1)
 		else
-			--Show normal elements
-			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 5, 0)
-			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.number, "TOPRIGHT", 5, 0)
-			frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", -15, -5)
-            frame.salebox.stacksoflabel:Hide()
-			frame.salebox.totalsize:Hide()
-			frame.salebox.numberentry:Hide()
-			frame.salebox.numberonly:Hide()
-			frame.switchUI:SetText(_TRANS('APPR_Interface_SimpleView') )--Simple View
-			frame.switchUI.TooltipText = _TRANS('APPR_HelpTooltip_SwitchSimpleLayout')--Switch to a Simple layout
-			frame.salebox.depositcost:Hide()
-			frame.salebox.totalbid:Hide()
-			frame.salebox.totalbuyout:Hide()
-			frame.salebox.ignore:Show()
-			frame.salebox.bulk:Show()
-			frame.itembox:Show()
-			frame.salebox:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3,35)
-			frame.salebox:SetPoint("RIGHT", frame, "RIGHT", -5,0)
-			frame.salebox:SetHeight(170)
-			if frame.salebox.sig then
-				frame.salebox.stack:Show()
-				frame.salebox.stackentry:Show()
-				frame.salebox.numberentry:Show()
-				frame.salebox.number:Show()
-    			frame.salebox.numberonly:Show()
-			else
-				frame.salebox.info:SetText(_TRANS('APPR_Interface_SelectItemLeftAuctioning') )--Select an item to the left to begin auctioning...
-			end
-			frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
-			frame.salebox.bid:ClearAllPoints()
-			frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
-			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
-			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-33)
-
-			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
-			frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
-			frame.salebox.bid.label:ClearAllPoints()
-			frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
-			frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
-			frame.salebox.buy.label:ClearAllPoints()
-			frame.salebox.buy.label:SetPoint("TOPRIGHT", frame.salebox.buy, "TOPLEFT", -5,0)
-			frame.salebox.buy.label:SetPoint("BOTTOMRIGHT", frame.salebox.buy, "BOTTOMLEFT", -5,0)
-			frame.gobatch:Show()
-			frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
-			frame.salebox.info:ClearAllPoints()
-			frame.salebox.info:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5,7)
-			--set scrollframe to match appraiser ratio
-			frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
-			frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
-			frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
-			frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
-
-			frame.salebox.name:SetHeight(20)
-			frame.salebox.warn:ClearAllPoints()
-			frame.salebox.warn:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -10, 10)
+			--Show per each
+			frame.switchToStack:SetText(_TRANS('APPR_Interface_BidPerItem') ) --Bid per item:
+			frame.switchToStack2:SetText(_TRANS('APPR_Interface_BuyPerItem') )--Buy per item:
+			
+			frame.salebox.bid:Show()
+			frame.salebox.bid.stack:Hide()
+			
+			frame.salebox.buy:Show()
+			frame.salebox.buy.stack:Hide()
+			
+			frame.salebox:SetBackdropColor(0, 0, 0, 0.8)
 		end
-
+		
 		frame.UpdateDisplay()
 	end
-
+	--syncs the stack and single item input boxes
+	--fired when a input box changes value code set to prevent looping
+	function frame.SyncMoneyFrame()
+		local stack = frame.salebox.stack:GetValue()
+		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
+		local bidStack = MoneyInputFrame_GetCopper(frame.salebox.bid.stack)
+		local buyStack = MoneyInputFrame_GetCopper(frame.salebox.buy.stack)
+		
+		if get("util.appraiser.classic") and bidStack ~= stack*bid then
+			MoneyInputFrame_SetCopper(frame.salebox.bid, bidStack/stack)
+		elseif bidStack ~= stack*bid then
+			MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
+		end
+		if get("util.appraiser.classic") and buyStack ~= stack*buy then
+			MoneyInputFrame_SetCopper(frame.salebox.buy, buyStack/stack)
+		elseif buyStack ~= stack*buy then
+			MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
+		end
+	end
+	
 	function frame.GetItemByLink(link)
 		local sig = SigFromLink(link)
 		assert(sig, "Item must be a valid link")
@@ -1767,19 +1646,6 @@ function private.CreateFrames()
 		private.gui:ActivateTab(private.guiId)
 	end)
 
-	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	frame.switchUI:SetPoint("TOPRIGHT", frame.config, "TOPLEFT", 2, 0)
-	frame.switchUI:SetText(_TRANS('APPR_Interface_SimpleView') )--Simple View
-	frame.switchUI:SetWidth(100)
-	frame.switchUI:SetScript("OnClick", function()
-		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
-		frame.ChangeUI()
-	end)
-	frame.switchUI.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')--Switch to a Simple layout 
-	frame.switchUI:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
-	frame.switchUI:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.switchUI:Enable()
-
 	frame.itembox = CreateFrame("Frame", nil, frame)
 	frame.itembox:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -1984,7 +1850,7 @@ function private.CreateFrames()
 	frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 
 	frame.salebox.warn = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.warn:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -10,10)
+	frame.salebox.warn:SetPoint("TOPRIGHT", frame.salebox, "TOPRIGHT", -40,-40)
 	frame.salebox.warn:SetHeight(12)
 	frame.salebox.warn:SetTextColor(1, 0.3, 0.06)
 	frame.salebox.warn:SetText("")
@@ -1997,7 +1863,7 @@ function private.CreateFrames()
 	frame.salebox.stack:SetMinMaxValues(1,20)
 	frame.salebox.stack:SetValueStep(1)
 	frame.salebox.stack:SetValue(20)
-	frame.salebox.stack:SetWidth(255)
+	frame.salebox.stack:SetWidth(180)
 	frame.salebox.stack:SetScript("OnValueChanged", function() frame.updated = true end)
 	frame.salebox.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
 	frame.salebox.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
@@ -2023,7 +1889,7 @@ function private.CreateFrames()
 	frame.salebox.number:SetMinMaxValues(1,1)
 	frame.salebox.number:SetValueStep(1)
 	frame.salebox.number:SetValue(1)
-	frame.salebox.number:SetWidth(255)
+	frame.salebox.number:SetWidth(180)
 	frame.salebox.number:SetScript("OnValueChanged", function() frame.updated = true end)
 	frame.salebox.number:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
 	frame.salebox.number:SetScript("OnLeave", function() return GameTooltip:Hide() end)
@@ -2089,7 +1955,7 @@ function private.CreateFrames()
 	frame.salebox.numberonly.label = frame.salebox.numberonly:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.numberonly.label:SetPoint("BOTTOMLEFT", frame.salebox.numberonly, "BOTTOMRIGHT", 0, 4)
 	frame.salebox.numberonly.label:SetText(_TRANS('APPR_Interface_Only') )--Only
-    frame.salebox.numberonly:Hide()
+	frame.salebox.numberonly:Hide()
 
 	frame.salebox.duration = CreateFrame("Slider", "AppraiserSaleboxDuration", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-25)
@@ -2123,18 +1989,18 @@ function private.CreateFrames()
 	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, function() frame.updated = true end, frame.GetLinkPriceModels, "default")
 	frame.salebox.model.button:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SelectPricingModel') ) end)--Select the pricing model to use
 	frame.salebox.model.button:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 120, 5)
+	frame.salebox.model:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", 0, 0)
 	frame.salebox.model.element = "model"
 	frame.salebox.model:Hide()
 
 	frame.salebox.model.label = frame.salebox.model:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 30,0)
+	frame.salebox.model.label:SetPoint("RIGHT", frame.salebox.model, "LEFT", 15, 5)
 	frame.salebox.model.label:SetText(_TRANS('APPR_Interface_PricingModelUse') )--Pricing model to use:
 
 	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "OptionsCheckButtonTemplate")
  	frame.salebox.matcher:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnablesMatchersCalculatingPrices') ) end)--Enables the use of matchers (eg Undercut) when calculating prices
 	frame.salebox.matcher:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.matcher:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 20, 5)
+	frame.salebox.matcher:SetPoint("RIGHT", frame.salebox, "RIGHT", -158, -30)
 	frame.salebox.matcher:SetHeight(20)
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
@@ -2148,7 +2014,7 @@ function private.CreateFrames()
 	frame.salebox.ignore = CreateFrame("CheckButton", "AppraiserSaleboxIgnore", frame.salebox, "OptionsCheckButtonTemplate")
 	frame.salebox.ignore:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RemovesItemListing') ) end)--Removes this item from the item listing
 	frame.salebox.ignore:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.ignore:SetPoint("TOPRIGHT", frame.salebox, "TOPRIGHT", -10, -3)
+	frame.salebox.ignore:SetPoint("TOPRIGHT", frame.salebox, "TOPRIGHT", -160, -3)
 	frame.salebox.ignore:SetHeight(20)
 	frame.salebox.ignore:SetWidth(20)
 	frame.salebox.ignore:SetChecked(false)
@@ -2156,7 +2022,7 @@ function private.CreateFrames()
 	frame.salebox.ignore:Hide()
 
 	frame.salebox.ignore.label = frame.salebox.ignore:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.ignore.label:SetPoint("BOTTOMRIGHT", frame.salebox.ignore, "BOTTOMLEFT", -5, 6)
+	frame.salebox.ignore.label:SetPoint("BOTTOMLEFT", frame.salebox.ignore, "BOTTOMRIGHT", 0, 6)
 	frame.salebox.ignore.label:SetText(_TRANS('APPR_Interface_HideThisItem') )--Hide this item
 
 	frame.salebox.bulk = CreateFrame("CheckButton", "AppraiserSaleboxBulk", frame.salebox, "OptionsCheckButtonTemplate")
@@ -2170,14 +2036,14 @@ function private.CreateFrames()
 	frame.salebox.bulk:Hide()
 
 	frame.salebox.bulk.label = frame.salebox.bulk:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.bulk.label:SetPoint("BOTTOMRIGHT", frame.salebox.bulk, "BOTTOMLEFT", -5, 6)
+	frame.salebox.bulk.label:SetPoint("BOTTOMLEFT", frame.salebox.bulk, "BOTTOMRIGHT", 0, 6)
 	frame.salebox.bulk.label:SetText(_TRANS('APPR_Interface_EnableBatchPosting') )--Enable batch posting
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
-	frame.salebox.bid:SetPoint("TOPRIGHT", frame.salebox.model, "BOTTOMRIGHT", 5,-15)
+	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
 	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
 	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function() frame.updated = true end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function() frame.updated = true frame.SyncMoneyFrame() end)
 	frame.salebox.bid.element = "bid"
 	frame.salebox.bid:Hide()
 	AppraiserSaleboxBidGold:SetBackdrop({
@@ -2199,17 +2065,39 @@ function private.CreateFrames()
 	})
 	AppraiserSaleboxBidCopper:SetBackdropColor(0,0,0, 0)
 
-	frame.salebox.bid.label = frame.salebox.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
-	frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
-	frame.salebox.bid.label:SetText(_TRANS('APPR_Interface_BidPerItem')) --Bid per item:
-	frame.salebox.bid.label:SetJustifyH("RIGHT")
+	
+	frame.salebox.bid.stack = CreateFrame("Frame", "AppraiserSaleboxBidStack", frame.salebox, "MoneyInputFrameTemplate")
+	frame.salebox.bid.stack:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
+	frame.salebox.bid.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
+	frame.salebox.bid.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid.stack, function() frame.updated = true frame.SyncMoneyFrame() end)
+	frame.salebox.bid.stack.element = "bid"
+	frame.salebox.bid.stack:Hide()
+	AppraiserSaleboxBidStackGold:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 3, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidStackGold:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBidStackSilver:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidStackSilver:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBidStackCopper:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidStackCopper:SetBackdropColor(0,0,0, 0)
 
+	
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
-	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
-	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function() frame.updated = true end)
+	frame.salebox.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
+	frame.salebox.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function() frame.updated = true frame.SyncMoneyFrame() end)
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
 	AppraiserSaleboxBuyGold:SetBackdrop({
@@ -2230,18 +2118,73 @@ function private.CreateFrames()
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuyCopper:SetBackdropColor(0,0,0, 0)
-
+	
 	MoneyInputFrame_SetNextFocus(frame.salebox.bid, AppraiserSaleboxBuyGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid, AppraiserSaleboxBuyCopper)
 	MoneyInputFrame_SetNextFocus(frame.salebox.buy, AppraiserSaleboxBidGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.buy, AppraiserSaleboxBidCopper)
 
-	frame.salebox.buy.label = frame.salebox.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.buy.label:SetPoint("TOPRIGHT", frame.salebox.buy, "TOPLEFT", -5,0)
-	frame.salebox.buy.label:SetPoint("BOTTOMRIGHT", frame.salebox.buy, "BOTTOMLEFT", -5,0)
-	frame.salebox.buy.label:SetText(_TRANS('APPR_Interface_BuyPerItem') )--Buy per item:
-	frame.salebox.buy.label:SetJustifyH("RIGHT")
-
+	frame.salebox.buy.stack = CreateFrame("Frame", "AppraiserSaleboxBuyStack", frame.salebox, "MoneyInputFrameTemplate")
+	frame.salebox.buy.stack:SetPoint("TOPLEFT", frame.salebox.bid.stack, "BOTTOMLEFT", 0,-5)
+	frame.salebox.buy.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
+	frame.salebox.buy.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy.stack, function() frame.updated = true frame.SyncMoneyFrame() end)
+	frame.salebox.buy.stack.element = "buy"
+	frame.salebox.buy.stack:Hide()
+	AppraiserSaleboxBuyStackGold:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 3, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuyStackGold:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBuyStackSilver:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuyStackSilver:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBuyStackCopper:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		tile = true, tileSize = 32,
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuyStackCopper:SetBackdropColor(0,0,0, 0)
+	
+	--Button for Bid  frame  to toggle stack/single mode
+	frame.switchToStack = CreateFrame("Button", nil, frame.salebox, "OptionsButtonTemplate")
+	frame.switchToStack:SetPoint("RIGHT", frame.salebox.bid, "LEFT", -10, 0)
+	frame.switchToStack:SetText("")
+	local font = frame.switchToStack:GetNormalFontObject()
+		font:SetTextColor(1, 1, 1, 1)
+	frame.switchToStack:SetNormalFontObject(font)
+	frame.switchToStack:SetWidth(100)
+	frame.switchToStack:SetHeight(16)
+	frame.switchToStack:SetScript("OnClick", function()
+		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
+		frame.ChangeUI()
+	end)
+	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')--Switch to a Simple layout 
+	frame.switchToStack:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
+	frame.switchToStack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.switchToStack:Enable()
+	
+	--Button for Buy  frame to toggle stack/single mode
+	frame.switchToStack2 = CreateFrame("Button", nil, frame.salebox, "OptionsButtonTemplate")
+	frame.switchToStack2:SetPoint("RIGHT", frame.salebox.buy, "LEFT", -10, 0)
+	frame.switchToStack2:SetText("")
+	frame.switchToStack2:SetNormalFontObject(font)
+	frame.switchToStack2:SetWidth(100)
+	frame.switchToStack2:SetHeight(16)
+	frame.switchToStack2:SetScript("OnClick", function()
+		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
+		frame.ChangeUI()
+	end)
+	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')
+	frame.switchToStack2:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
+	frame.switchToStack2:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.switchToStack2:Enable()
+	
+	
 	frame.go = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
 	frame.go:SetText(_TRANS('APPR_Interface_PostItems') )--Post items
@@ -2418,6 +2361,7 @@ function private.CreateFrames()
 		lines[i] = line
 	end
 	frame.manifest.lines = lines
+	
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -2425,10 +2369,9 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	--set scrollframe area to the max height it will need to be (Classic) on creation to allows us to easily resize later.
-	frame.imageview:SetBackdropColor(0, 0, 0, 1)
-	frame.imageview:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
-	frame.imageview:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, 0)
+	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
+	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
+	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 	--records the column width changes
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
@@ -2638,49 +2581,7 @@ function private.CreateFrames()
 	frame.imageview.purchase.bid.price:SetPoint("TOPLEFT", frame.imageview.purchase.bid, "TOPRIGHT")
 	frame.imageview.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.bid, "BOTTOMRIGHT")
 	frame.imageview.purchase.bid.price:SetJustifyV("MIDDLE")
-	--[[Classic UI Style]]--
-	frame.imageviewclassic = CreateFrame("Frame", nil, frame)
-	frame.imageviewclassic:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5}
-	})
-
-	frame.imageviewclassic:Hide()
-
-	frame.imageviewclassic.purchase = CreateFrame("Frame", nil, frame.imageviewclassic)
-	frame.imageviewclassic.purchase:SetPoint("TOPLEFT", frame.imageviewclassic, "BOTTOMLEFT", 0, 4)
-	frame.imageviewclassic.purchase:SetPoint("BOTTOMRIGHT", frame.imageviewclassic, "BOTTOMRIGHT", 0, -16)
-	frame.imageviewclassic.purchase:SetBackdrop({
-		bgFile = "Interface\\QuestFrame\\UI-QuestTitleHighlight"
-	})
-	frame.imageviewclassic.purchase:SetBackdropColor(0.5, 0.5, 0.5, 1)
-
-	frame.imageviewclassic.purchase.buy = CreateFrame("Button", nil, frame.imageviewclassic.purchase, "OptionsButtonTemplate")
-	frame.imageviewclassic.purchase.buy:SetPoint("TOPLEFT", frame.imageviewclassic.purchase, "TOPLEFT", 5, 0)
-	frame.imageviewclassic.purchase.buy:SetWidth(30)
-	frame.imageviewclassic.purchase.buy:SetText(_TRANS('APPR_Interface_Buy') )--Buy
-	frame.imageviewclassic.purchase.buy:SetScript("OnClick", private.BuyAuction)
-	frame.imageviewclassic.purchase.buy:Disable()
-
-	frame.imageviewclassic.purchase.buy.price = frame.imageviewclassic.purchase.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.imageviewclassic.purchase.buy.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPRIGHT")
-	frame.imageviewclassic.purchase.buy.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.buy, "BOTTOMRIGHT")
-	frame.imageviewclassic.purchase.buy.price:SetJustifyV("MIDDLE")
-
-	frame.imageviewclassic.purchase.bid = CreateFrame("Button", nil, frame.imageviewclassic.purchase, "OptionsButtonTemplate")
-	frame.imageviewclassic.purchase.bid:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.buy, "TOPLEFT", 120, 0)
-	frame.imageviewclassic.purchase.bid:SetWidth(30)
-	frame.imageviewclassic.purchase.bid:SetText(_TRANS('APPR_Interface_Bid') )--Bid
-	frame.imageviewclassic.purchase.bid:SetScript("OnClick", private.BidAuction)
-	frame.imageviewclassic.purchase.bid:Disable()
-
-	frame.imageviewclassic.purchase.bid.price = frame.imageviewclassic.purchase.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.imageviewclassic.purchase.bid.price:SetPoint("TOPLEFT", frame.imageviewclassic.purchase.bid, "TOPRIGHT")
-	frame.imageviewclassic.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageviewclassic.purchase.bid, "BOTTOMRIGHT")
-	frame.imageviewclassic.purchase.bid.price:SetJustifyV("MIDDLE")
-
+	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText(_TRANS('APPR_Interface_Appraiser') )--Appraiser
 	frame.ScanTab:Show()
@@ -2714,92 +2615,6 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
-
-	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
-	frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
-	frame.salebox.numberentry:SetNumeric(false)
-	frame.salebox.numberentry:SetHeight(16)
-	frame.salebox.numberentry:SetWidth(30)
-	frame.salebox.numberentry:SetNumber(0)
-	frame.salebox.numberentry:SetAutoFocus(false)
-	frame.salebox.numberentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
-	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
-		frame.salebox.numberentry:ClearFocus()
-		frame.updated = true
-	end)
-	frame.salebox.numberentry:SetScript("OnTabPressed", function()
-		frame.salebox.stackentry:SetFocus()
-		frame.updated = true
-	end)
-	frame.salebox.numberentry:SetScript("OnTextChanged", function()
-		local text = frame.salebox.numberentry:GetText():lower()
-		if (text ~= "") then
-			frame.updated = true
-		end
-	end)
-	frame.salebox.numberentry:SetScript("OnEscapePressed", function()
-		frame.salebox.numberentry:ClearFocus()
-	end)
-	frame.salebox.numberentry:Hide()
-
-	frame.salebox.stacksoflabel = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.stacksoflabel:SetPoint("TOPLEFT", frame.salebox.numberentry, "TOPRIGHT", 5, 0)
-	frame.salebox.stacksoflabel:SetJustifyH("LEFT")
-	frame.salebox.stacksoflabel:SetJustifyV("CENTER")
-	frame.salebox.stacksoflabel:SetText("stacks of")
-	frame.salebox.stacksoflabel:Hide()
-
-	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
-	frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
-	frame.salebox.stackentry:SetNumeric(true)
-	frame.salebox.stackentry:SetNumber(0)
-	frame.salebox.stackentry:SetHeight(16)
-	frame.salebox.stackentry:SetWidth(30)
-	frame.salebox.stackentry:SetAutoFocus(false)
-	frame.salebox.stackentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
-	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
-		frame.salebox.stackentry:ClearFocus()
-		frame.updated = true
-	end)
-	frame.salebox.stackentry:SetScript("OnTabPressed", function()
-		frame.salebox.numberentry:SetFocus()
-		frame.updated = true
-	end)
-	frame.salebox.stackentry:SetScript("OnTextChanged", function()
-		local text = frame.salebox.stackentry:GetText()
-		if text ~= "" then
-			frame.updated = true
-		end
-	end)
-	frame.salebox.stackentry:SetScript("OnEscapePressed", function()
-		frame.salebox.stackentry:ClearFocus()
-	end)
-	frame.salebox.stackentry:Hide()
-
-	frame.salebox.totalsize = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.totalsize:SetPoint("TOPLEFT", frame.salebox.stackentry, "TOPRIGHT", 3, 0)
-	frame.salebox.totalsize:SetJustifyH("LEFT")
-	frame.salebox.totalsize:SetJustifyV("CENTER")
-	frame.salebox.totalsize:SetText("()")
-	frame.salebox.totalsize:Hide()
-
-	frame.salebox.depositcost = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", -15, -5)
-	frame.salebox.depositcost:SetJustifyH("LEFT")
-	frame.salebox.depositcost:SetJustifyV("CENTER")
-	frame.salebox.depositcost:Hide()
-	frame.salebox.totalbid = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.totalbid:SetPoint("TOPLEFT", frame.salebox.depositcost, "BOTTOMLEFT", 0, 0)
-	frame.salebox.totalbid:SetJustifyH("LEFT")
-	frame.salebox.totalbid:SetJustifyV("CENTER")
-	frame.salebox.totalbid:Hide()
-	frame.salebox.totalbuyout = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.totalbuyout:SetPoint("TOPLEFT", frame.salebox.totalbid, "BOTTOMLEFT", 0, 0)
-	frame.salebox.totalbuyout:SetJustifyH("LEFT")
-	frame.salebox.totalbuyout:SetJustifyV("CENTER")
-	frame.salebox.totalbuyout:Hide()
 
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
