@@ -173,7 +173,7 @@ function private.PromptPurchase()
 	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
 	private.Prompt.Reason:SetText(private.CurAuction["reason"] or "")
 	local width = private.Prompt.Value:GetStringWidth() or 0
-	private.Prompt:SetWidth(math.max((width + 70), 400))
+	private.Prompt.Frame:SetWidth(math.max((width + 70), 400))
 end
 
 function lib.ScanPage(startat)
@@ -392,26 +392,35 @@ private.updateFrame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 private.updateFrame:SetScript("OnUpdate", private.OnUpdate)
 private.updateFrame:SetScript("OnEvent", private.OnEvent)
 
+--this is a anchor frame that never changes size
 private.Prompt = CreateFrame("frame", "AucAdvancedBuyPrompt", UIParent)
 private.Prompt:Hide()
 private.Prompt:SetPoint("TOPRIGHT", "UIParent", "TOPRIGHT", -400, -100)
 private.Prompt:SetFrameStrata("DIALOG")
 private.Prompt:SetHeight(120)
 private.Prompt:SetWidth(400)
-private.Prompt:SetBackdrop({
+private.Prompt:SetMovable(true)
+private.Prompt:SetClampedToScreen(true)
+
+--The "graphic" frame and backdrop that we resize. Only thing anchored to it is the item Box
+private.Prompt.Frame = CreateFrame("frame", nil, private.Prompt)
+private.Prompt.Frame:SetPoint("CENTER",private.Prompt, "CENTER" )
+private.Prompt.Frame:SetFrameStrata("HIGH")
+private.Prompt.Frame:SetHeight(120)
+private.Prompt.Frame:SetWidth(400)
+private.PromptFrame:SetClampedToScreen(true)
+private.Prompt.Frame:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 	tile = true, tileSize = 32, edgeSize = 32,
 	insets = { left = 9, right = 9, top = 9, bottom = 9 }
 })
-private.Prompt:SetBackdropColor(0,0,0,0.8)
-private.Prompt:SetMovable(true)
-private.Prompt:SetClampedToScreen(true)
+private.Prompt.Frame:SetBackdropColor(0,0,0,0.8)
 
 private.Prompt.Item = CreateFrame("Button", "AucAdvancedBuyPromptItem", private.Prompt)
 private.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
 private.Prompt.Item:GetNormalTexture():SetTexCoord(0,0.640625, 0, 0.640625)
-private.Prompt.Item:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 15, -15)
+private.Prompt.Item:SetPoint("TOPLEFT", private.Prompt.Frame, "TOPLEFT", 15, -15)
 private.Prompt.Item:SetHeight(37)
 private.Prompt.Item:SetWidth(37)
 private.Prompt.Item:SetScript("OnEnter", private.ShowTooltip)
