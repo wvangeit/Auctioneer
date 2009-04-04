@@ -408,7 +408,7 @@ private.Prompt.Frame:SetPoint("CENTER",private.Prompt, "CENTER" )
 private.Prompt.Frame:SetFrameStrata("HIGH")
 private.Prompt.Frame:SetHeight(120)
 private.Prompt.Frame:SetWidth(400)
-private.PromptFrame:SetClampedToScreen(true)
+private.Prompt.Frame:SetClampedToScreen(true)
 private.Prompt.Frame:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
