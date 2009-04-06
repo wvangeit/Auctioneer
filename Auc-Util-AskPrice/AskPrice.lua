@@ -73,9 +73,10 @@ function lib.OnLoad(addon)
 	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
 	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(arg1)
-		if (AskPriceSentMessages[arg1] and not private.getOption('util.askprice.whispers')) then
-			AskPriceSentMessages[arg1] = nil
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(self,event,...)
+		local message = select(1,...) or arg1
+		if (AskPriceSentMessages[message] and not private.getOption('util.askprice.whispers')) then
+			AskPriceSentMessages[message] = nil
 			return true
 		end
 	end)
