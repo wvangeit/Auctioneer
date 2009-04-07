@@ -104,7 +104,7 @@ if daterange then
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
 				for i, text in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId][key]) do
-					local stack, _, _, _, auctime = strsplit(";", text)
+					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 					auctime, stack = tonumber(auctime), tonumber(stack)
 
 					if (now - auctime) < (numdays) then

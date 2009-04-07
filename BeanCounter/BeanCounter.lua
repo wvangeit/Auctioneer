@@ -44,7 +44,7 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 2.06,
+	version = 2.09,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 
@@ -271,11 +271,15 @@ local String
 	for n = 1, select("#", ...) do
 		local msg = select(n, ...)
 		if msg == nil then
-			msg = "<nil>"
+			msg = ""
 		elseif msg == true then
 			msg = "boolean true"
 		elseif msg == false then
 			msg = "boolean false"
+		elseif msg == "0" then
+			msg = ""
+		elseif msg == "<nil>" then
+			msg = ""
 		end
 		if n == 1 then  --This prevents a seperator from being the first character.  :foo:foo:
 			String = msg
@@ -287,11 +291,20 @@ local String
 end
 --Will split any string and return a table value, replace gsub with tbl compare, slightly faster this way.
 function private.unpackString(text)
-	local tbl = {strsplit(";", text)}
-	for i,v in pairs(tbl) do
-		if v == "<nil>" then tbl[i] = "0" end --0 needs to be a string, we convert to # if its needed in the calling function, and this prevents string/number comparisions if nil is a text place holder
-	end
-	return tbl
+	if not text then return end
+	local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+	if stack == "" then stack = "0" end
+	if money == "" then money = "0" end
+	if deposit == "" then deposit = "0" end
+	if fee == "" then fee = "0" end
+	if buyout == "" then buyout = "0" end
+	if bid == "" then bid = "0" end
+	if buyer == "" then buyer = "0" end
+	if Time == "" then Time = "0" end
+	if reason == "" then reason = "0" end
+	if location == "" then location = "0" end
+	
+	return stack, money, deposit , fee, buyout , bid, buyer, Time, reason, location
 end
 --Add data to DB
 --~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
@@ -320,7 +333,7 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 	end
 	--Insert into the ItemName:ItemID dictionary array
 	if itemID and suffix and itemLink then
-		BeanCounterDB["ItemIDArray"][itemID..":"..suffix] =  itemLink
+		lib.API.storeItemLinkToArray(itemLink)
 	end
 end
 --remove item (for pending bids only atm)
@@ -330,10 +343,10 @@ function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 	local _, suffix = lib.API.decodeLink(itemLink)
 		if private.playerData[key][itemID] and private.playerData[key][itemID][itemString] then
 			for i, v in pairs(private.playerData[key][itemID][itemString]) do
-				local tbl = private.unpackString(v)
-				if tbl and itemID  and NAME then
-					if tbl[3] == NAME and tonumber(tbl[1]) == COUNT then
-						--debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
+				local postCount, postBid, postSeller, isBuyout, postTimeLeft, postTime, postReason = private.unpackString(v)
+				if postSeller and itemID  and NAME then
+					if postSeller == NAME and tonumber(postCount) == COUNT then
+						--debugPrint("Removing entry from postedBids this is a match", itemID, NAME, "vs", postedName, postedCount, "vs",  COUNT)
 						table.remove(private.playerData[key][itemID][itemString], i)--Just remove the key
 							break
 					end
@@ -348,19 +361,19 @@ end
 function private.storeReasonForBid(CallBack)
 	debugPrint("bidplaced", CallBack)
 	if not CallBack then return end
-
+	
 	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
 	
 	if private.playerData.postedBids[itemID] and private.playerData.postedBids[itemID][itemString] then
 		for i, v in pairs(private.playerData.postedBids[itemID][itemString]) do
-			local tbl = private.unpackString(v)
-			if tbl and itemID and price and count then
-				if tbl[1] == count and tbl[2] == price and tbl[7] == "" then
-					local text = v:gsub("(.*)","%1"..reason , 1)
+			local postCount, postBid, postSeller, isBuyout, postTimeLeft, postTime, postReason = private.unpackString(v)
+			if postCount and postBid and itemID and price and count then
+				if postCount == count and postBid == price then
+					local text = private.packString(postCount, postBid, postSeller, isBuyout, postTimeLeft, postTime, reason)
 						debugPrint("before", private.playerData.postedBids[itemID][itemString][i])
-					private.playerData.postedBids[itemID][itemString][i] = text
+						private.playerData.postedBids[itemID][itemString][i] = text
 						debugPrint("after", private.playerData.postedBids[itemID][itemString][i])
 					break
 				end
@@ -423,7 +436,7 @@ function private.refreshItemIDArray(announce)
 							local _, itemLink = private.getItemInfo(itemString, "itemid")
 							if itemLink then
 								debugPrint("Added to array, missing value",  itemLink)
-								BeanCounterDB["ItemIDArray"][key..":"..suffix] = itemLink
+								lib.API.storeItemLinkToArray(itemLink)
 							end
 						end
 					end
@@ -433,6 +446,28 @@ function private.refreshItemIDArray(announce)
 	end
 	if announce then print("Finished refresing ItemName Array") end
 end
+
+--[[ --Possible code to use to purge itemID array links that no longer have transactions
+Will be necessary if I add teh ability to remove older transactions
+local count = 0
+for i, link in pairs(BeanCounterDB["ItemIDArray"]) do
+   count = count+1
+   local  itemID, key = strsplit(":",i)
+   for player, v in pairs(private.serverData)do
+      local found = false
+      for DB,data in pairs(private.serverData[player]) do
+         if DB ~= "mailbox" and type(data) == "table" then
+            if data[itemID] then 
+               --  print(itemID, count)
+               found = true
+            end
+         end
+      end
+   end
+   if found == false then print("Never seen", itemID, key, link) end
+end
+
+]]
 --Moves entrys older than 40 days into compressed( non uniqueID) Storage
 --Array refresh needs to run before this function
 function private.compactDB(announce)
@@ -444,14 +479,16 @@ function private.compactDB(announce)
 					local _, _, uniqueID = lib.API.decodeLink(itemString)
 					if uniqueID ~= "0" then --ignore the already compacted keys
 						local itemLink = lib.API.getArrayItemLink(itemString)
-						if index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000 then --we have an old index entry lets process this array
+						local _, _, _, _, _, _, _, postTime  = private.unpackString(index[1])
+						if index[1] and (time() - postTime) >= 3456000 then --we have an old index entry lets process this array
 							local start, last = time(), index[1]
-							while (index[1] and time() - index[1]:match(".*;(%d-);.-$") >= 3456000) and  (time() - start < 10) do--While the entrys remain 40 days old process, after 10s inside anyone table break
+							while (index[1] and (time() - postTime) >= 3456000) and  (time() - start < 10) do--While the entrys remain 40 days old process, after 10s inside anyone table break
 								debugPrint("Compressed", "|H"..itemString, index[1] )
 								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
 								table.remove(index, 1)
 								if time() - start > 1 and index[1] == last then debugPrint("inf loop purge index[1]", index[1]) table.remove(index, 1) end --added to remove bad entries, this should prevent this function from locking Wow
 								last = index[1]
+								_, _, _, _, _, _, _, postTime = private.unpackString(index[1])
 							end
 						end
 					end
@@ -471,7 +508,10 @@ function private.sortArrayByDate(announce)
 			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
 				for itemID, value in pairs(data) do
 					for itemString, index in pairs(value) do
-						table.sort(index,  function(a,b) return a:match(".*;(%d+);.-") < b:match(".*;(%d+);.-") end)
+						table.sort(index,  function(a,b)
+							local _, _, _, _, _, _, _, postTimeA = private.unpackString(a)
+							local _, _, _, _, _, _, _, postTimeB = private.unpackString(b)
+							return postTimeA < postTimeB end)
 						private.serverData[player][DB][itemID][itemString] = index
 					end
 				end

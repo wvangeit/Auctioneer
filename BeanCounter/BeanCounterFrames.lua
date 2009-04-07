@@ -57,7 +57,8 @@ function private.AuctionUI()
 	end
 
 	function frame.ScanTab.OnClick(self, button, index)
-		if not self then return end
+		if not self then frame:Hide() return end --This should not be necessary in 3.1
+		
 		BeanCounterBaseFrame:Hide()
 		if private.frame:GetParent() == BeanCounterBaseFrame then
 			private.frame:SetParent(AuctionFrame)
@@ -651,7 +652,7 @@ function private.processTooltip(tip, itemLink, quantity)
 		
 	--debugPrint("Add to Tooltip", itemLink, reason)
 	if reason then
-		if reason == "" then reason = "Unknown" end
+		if reason == "0" then reason = "Unknown" end
 		Time = SecondsToTime((time() - Time))
 		local text = ""
 		if player then

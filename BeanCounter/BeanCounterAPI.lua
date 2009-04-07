@@ -61,7 +61,7 @@ function lib.API.search(name, settings, queryReturn, count)
 		if not itemLink then itemName, itemLink = tostring(name) end
 
 		if not settings then
-			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = private.frame.classicCheck:GetChecked(),
+			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false,
 						["bid"] = true, ["outbid"] = private.frame.bidFailedCheck:GetChecked(), ["auction"] = true,
 						["failedauction"] = private.frame.auctionFailedCheck:GetChecked()
 						}
@@ -94,13 +94,14 @@ If no player name is supplied then the entire server profit will be totaled
 if no item name is provided then all items will be returned
 if no date range is supplied then a sufficently large range to cover the entire BeanCounter History will be used.
 ]]
-function lib.API.getAHProfit(player, item, lowDate, highDate)
+function lib.API.getAHProfit(player, item, lowDate, highDate, data)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 	
 	local sum, low, high, date = 0, 9999999999, 0
 	local settings = {["selectbox"] = {"1", player} , ["bid"] = true, ["auction"] = true, ["failedauction"] = true}
-	local tbl = private.startSearch(item, settings, true, 10000000)
+	local tbl 
+	tbl = data or private.startSearch(item, settings, true, 10000000)
 
 	for i,v in pairs(tbl) do
 		date = tonumber(v[12])
@@ -193,17 +194,36 @@ end
 
 --**********************************************************************************************************************
 --ITEMLINK AND STRING API'S USE THESE IN PLACE OF LOCAL :MATCH() CALLS
-
 --[[ Retrives the itemLink from the name array when passed an itemKey
 we store itemKeys with a unique ID but our name array does not
 ]]
 function lib.API.getArrayItemLink(itemString)
 	local itemID, suffix = lib.API.decodeLink(itemString)
-	if BeanCounterDB.ItemIDArray[itemID..":"..suffix] then
-		return BeanCounterDB.ItemIDArray[itemID..":"..suffix]
+	local itemKey = itemID..":"..suffix
+	if BeanCounterDB.ItemIDArray[itemKey] then
+		return lib.API.createItemLinkFromArray(itemKey, BeanCounterDB.ItemIDArray[itemKey])
 	end
 	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
 	return
+end
+
+--[[Converts the compressed link stored in the itemIDArray back to a standard blizzard format]]
+function lib.API.createItemLinkFromArray(itemKey)
+	if BeanCounterDB["ItemIDArray"][itemKey] then 
+		local itemID, suffix = string.split(":", itemKey)
+		local color, name = string.split(";", BeanCounterDB["ItemIDArray"][itemKey])
+		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":0:80|h[", name, "]|h|r")
+	end
+	return
+end
+--[[Convert and store an itemLink into teh compressed format used in teh itemIDArray]]
+function lib.API.storeItemLinkToArray(itemLink)
+	if not itemLink then return end
+	local color, itemID, suffix, name = itemLink:match("|(.-)|Hitem:(.-):.-:.-:.-:.-:.-:(.-):.+|h%[(.-)%]|h|r")
+	
+	if color and itemID and suffix and name then
+		BeanCounterDB["ItemIDArray"][itemID..":"..suffix] =  color..";"..name
+	end
 end
 
 --[[Turns an itemLink into an itemString and extracts the itemName
@@ -256,7 +276,7 @@ function lib.API.getBidReason(itemLink, quantity)
 
 	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
 		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
-			local quan, _, _, _, bid, _, Time, reason = string.split(";", v)
+			local quan, _, _ , _, _, bid, _, Time, reason = private.unpackString(v)
 			if tonumber(quan) == tonumber(quantity) and reason and Time then
 				return reason, Time, tonumber(bid)
 			end
@@ -266,7 +286,7 @@ function lib.API.getBidReason(itemLink, quantity)
 	for player in pairs(private.serverData) do
 		if private.serverData[player]["completedBids/Buyouts"][itemID] and private.serverData[player]["completedBids/Buyouts"][itemID][itemString] then
 			for i,v in pairs(private.serverData[player]["completedBids/Buyouts"][itemID][itemString]) do
-				local quan, _, _, _, bid, _, Time, reason = string.split(";", v)
+				local quan, _, _ , _, _, bid, _, Time, reason = private.unpackString(v)
 				if tonumber(quan) == tonumber(quantity) and reason and Time then
 					return reason, Time, tonumber(bid), player
 				end
