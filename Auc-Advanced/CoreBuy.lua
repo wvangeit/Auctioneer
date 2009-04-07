@@ -436,7 +436,7 @@ private.Prompt.Text:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -15, -20)
 private.Prompt.Text:SetJustifyH("CENTER")
 
 private.Prompt.Value = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-private.Prompt.Value:SetPoint("TOP", private.Prompt.Text, "BOTTOM", -3)
+private.Prompt.Value:SetPoint("CENTER", private.Prompt.Frame, "CENTER", 20, 15)
 
 private.Prompt.Reason = CreateFrame("EditBox", "AucAdvancedBuyPromptReason", private.Prompt, "InputBoxTemplate")
 private.Prompt.Reason:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 150, -55)
