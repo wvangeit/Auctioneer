@@ -416,6 +416,7 @@ function private.CreateFrames()
 		return rDef,gDef,bDef
 	end
 
+	--[[THIS FUNCTION IS NEVER USED? Only call to it is commented out Does it need to be removed?  ]]
 	function frame.SetPriceFromModel(curModel)
 		if not frame.salebox.sig then return end
 		if not curModel then
@@ -830,14 +831,13 @@ function private.CreateFrames()
 		if not MatchString then
 			MatchString = ""
 		end
-		if get("util.appraiser.classic") then
-			local stack = frame.salebox.stack:GetValue() or 1
-			MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
-			MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
-		else
-			MoneyInputFrame_SetCopper(frame.salebox.buy, buy)
-			MoneyInputFrame_SetCopper(frame.salebox.bid, bid)
-		end
+
+		local stack = frame.salebox.stack:GetValue() or 1
+		MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
+		MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
+		MoneyInputFrame_SetCopper(frame.salebox.buy, buy)
+		MoneyInputFrame_SetCopper(frame.salebox.bid, bid)
+
 		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
 		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.model:SetText(curModelText)
@@ -859,6 +859,9 @@ function private.CreateFrames()
 			frame.salebox.matcher:Hide()
 			frame.salebox.bid:Hide()
 			frame.salebox.buy:Hide()
+			--Stack saleboxes
+			frame.salebox.bid.stack:Hide()
+			frame.salebox.buy.stack:Hide()
 			frame.salebox.duration:Hide()
 			frame.manifest.lines:Clear()
 			frame.manifest:Hide()
@@ -958,6 +961,10 @@ function private.CreateFrames()
 		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
 		
+		AppraiserSaleboxBuyStackGold:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBuyStackSilver:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBuyStackCopper:SetBackdropColor(r,g,b, a)
+		
 		r,g,b,a=0,0,0,0
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBid, curBid,  r,g,b)
@@ -966,6 +973,10 @@ function private.CreateFrames()
 		AppraiserSaleboxBidGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidCopper:SetBackdropColor(r,g,b, a)
+		
+		AppraiserSaleboxBidStackGold:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBidStackSilver:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBidStackCopper:SetBackdropColor(r,g,b, a)
 
 		if frame.selectedPostable then
 			local depositMult = curDurationMins / 720
@@ -1206,21 +1217,15 @@ function private.CreateFrames()
 	end
 	
 	function frame.ChangeUI()
-		local stack = frame.salebox.stack:GetValue()
-		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
-		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		if get("util.appraiser.classic") then
 			--Show per stack
-
 			frame.switchToStack:SetText("Bid per Stack")
 			frame.switchToStack2:SetText("Buy per Stack")
 			
-			frame.salebox.bid.stack:Show()
 			frame.salebox.bid:Hide()
-			
-			frame.salebox.buy.stack:Show()
 			frame.salebox.buy:Hide()
-			
+			frame.salebox.bid.stack:Show()
+			frame.salebox.buy.stack:Show()
 			frame.salebox:SetBackdropColor(0.1, 0.5, 0.9, 1)
 		else
 			--Show per each
@@ -1228,35 +1233,36 @@ function private.CreateFrames()
 			frame.switchToStack2:SetText(_TRANS('APPR_Interface_BuyPerItem') )--Buy per item:
 			
 			frame.salebox.bid:Show()
-			frame.salebox.bid.stack:Hide()
-			
 			frame.salebox.buy:Show()
+			frame.salebox.bid.stack:Hide()
 			frame.salebox.buy.stack:Hide()
-			
 			frame.salebox:SetBackdropColor(0, 0, 0, 0.8)
 		end
 		
 		frame.UpdateDisplay()
 	end
-	--syncs the stack and single item input boxes
-	--fired when a input box changes value code set to prevent looping
-	function frame.SyncMoneyFrame()
+	--syncs the stack and single item input boxes, 
+	--only the visible frame fires events
+	function frame.SyncMoneyFrameSingleBid()
+		local stack = frame.salebox.stack:GetValue()
+		local bidStack = MoneyInputFrame_GetCopper(frame.salebox.bid.stack)
+		MoneyInputFrame_SetCopper(frame.salebox.bid, bidStack/stack)
+	end
+	function frame.SyncMoneyFrameSingleBuy()
+		local stack = frame.salebox.stack:GetValue()
+		local buyStack = MoneyInputFrame_GetCopper(frame.salebox.buy.stack)
+		MoneyInputFrame_SetCopper(frame.salebox.buy, buyStack/stack)
+	end
+	--Syncs single frame value changes to stack frame
+	function frame.SyncMoneyFrameStackBid()
 		local stack = frame.salebox.stack:GetValue()
 		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
+	end
+	function frame.SyncMoneyFrameStackBuy()
+		local stack = frame.salebox.stack:GetValue()
 		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
-		local bidStack = MoneyInputFrame_GetCopper(frame.salebox.bid.stack)
-		local buyStack = MoneyInputFrame_GetCopper(frame.salebox.buy.stack)
-		
-		if get("util.appraiser.classic") and bidStack ~= stack*bid then
-			MoneyInputFrame_SetCopper(frame.salebox.bid, bidStack/stack)
-		elseif bidStack ~= stack*bid then
-			MoneyInputFrame_SetCopper(frame.salebox.bid.stack, bid*stack)
-		end
-		if get("util.appraiser.classic") and buyStack ~= stack*buy then
-			MoneyInputFrame_SetCopper(frame.salebox.buy, buyStack/stack)
-		elseif buyStack ~= stack*buy then
-			MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
-		end
+		MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
 	end
 	
 	function frame.GetItemByLink(link)
@@ -2102,7 +2108,7 @@ function private.CreateFrames()
 	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
 	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
 	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function() frame.updated = true frame.SyncMoneyFrame() end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function() frame.SyncMoneyFrameStackBid() frame.updated = true end)
 	frame.salebox.bid.element = "bid"
 	frame.salebox.bid:Hide()
 	AppraiserSaleboxBidGold:SetBackdrop({
@@ -2129,8 +2135,8 @@ function private.CreateFrames()
 	frame.salebox.bid.stack:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
 	frame.salebox.bid.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
 	frame.salebox.bid.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid.stack, function() frame.updated = true frame.SyncMoneyFrame() end)
-	frame.salebox.bid.stack.element = "bid"
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid.stack, function() frame.SyncMoneyFrameSingleBid() frame.updated = true end)
+	frame.salebox.bid.stack.element = "bidStack"
 	frame.salebox.bid.stack:Hide()
 	AppraiserSaleboxBidStackGold:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -2156,7 +2162,7 @@ function private.CreateFrames()
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
 	frame.salebox.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
 	frame.salebox.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function() frame.updated = true frame.SyncMoneyFrame() end)
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function() frame.SyncMoneyFrameStackBuy() frame.updated = true end)
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
 	AppraiserSaleboxBuyGold:SetBackdrop({
@@ -2187,8 +2193,8 @@ function private.CreateFrames()
 	frame.salebox.buy.stack:SetPoint("TOPLEFT", frame.salebox.bid.stack, "BOTTOMLEFT", 0,-5)
 	frame.salebox.buy.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
 	frame.salebox.buy.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy.stack, function() frame.updated = true frame.SyncMoneyFrame() end)
-	frame.salebox.buy.stack.element = "buy"
+	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy.stack, function() frame.SyncMoneyFrameSingleBuy() frame.updated = true end)
+	frame.salebox.buy.stack.element = "buyStack"
 	frame.salebox.buy.stack:Hide()
 	AppraiserSaleboxBuyStackGold:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
