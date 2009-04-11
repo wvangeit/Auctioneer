@@ -58,11 +58,11 @@ local function RealmDesignation(faction, portal)
 	portal = portal:upper()
 
 	if faction then
-		local a,b = strsplit("-", faction)
+		local a,b = strmatch(faction, "(.+)%-(%u%l+)$")
 		if a and b then
 			realm, faction = a, b
-		elseif a then
-			realm, faction = GetRealmName(), a
+		else
+			realm = GetRealmName() 
 		end
 	end
 
@@ -78,7 +78,7 @@ local function RealmDesignation(faction, portal)
 	if not faction then faction = "Unknown" end
 	return portal.."/"..realm.."-"..faction
 end
-
+AucDb.RealmDesignation = RealmDesignation
 
 function private.getLink(itemName)
 	local _, itemLink = GetItemInfo(itemName)
@@ -95,7 +95,6 @@ function private.getLink(itemName)
 	end
 	return itemLink, tonumber(itemId), tonumber(itemSuffix) or 0
 end
-AucDb.RealmDesignation = RealmDesignation
 
 function private.getPrice(itemId)
 	itemId = tonumber(itemId)
