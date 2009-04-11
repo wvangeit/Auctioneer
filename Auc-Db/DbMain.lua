@@ -49,7 +49,36 @@ local function getTime()
 end
 
 local rope = LibStub("StringRope"):New()
-local faction, scanid
+local faction, designation, scanid
+
+local function RealmDesignation(faction, portal)
+	local realm
+
+	if not portal then portal = GetCVar("portal") or "??" end
+	portal = portal:upper()
+
+	if faction then
+		local a,b = strsplit("-", faction)
+		if a and b then
+			realm, faction = a, b
+		elseif a then
+			realm, faction = GetRealmName(), a
+		end
+	end
+
+	if (not realm or not faction) and AucAdvanced and AucAdvanced.GetFaction then
+		local _, a, b = AucAdvanced.GetFaction()
+		if not realm then realm = a end
+		if not faction then faction = b end
+	end
+
+	if not realm then realm = GetRealmName() end
+
+	if not realm then realm = "Unknown" end
+	if not faction then faction = "Unknown" end
+	return portal.."/"..realm.."-"..faction
+end
+
 
 function private.getLink(itemName)
 	local _, itemLink = GetItemInfo(itemName)
@@ -66,6 +95,7 @@ function private.getLink(itemName)
 	end
 	return itemLink, tonumber(itemId), tonumber(itemSuffix) or 0
 end
+AucDb.RealmDesignation = RealmDesignation
 
 function private.getPrice(itemId)
 	itemId = tonumber(itemId)
@@ -99,7 +129,7 @@ function private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
 	local rate = 0.15
 	if faction:lower() == "neutral" then rate = 0.75 end
 
-	local sig = GetRealmName().."-"..faction..":"..itemId..":"..itemSuffix
+	local sig = designation..":"..itemId..":"..itemSuffix
 	if AucDbData.count[sig] then
 		local match
 		for dayidx, details in pairs(AucDbData.count[sig]) do
@@ -114,13 +144,14 @@ function private.begin()
 	rope:Clear()
 	scanid = getTime()
 	faction = AucAdvanced.GetFaction()
+	designation = RealmDesignation(faction)
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.scans then AucDbData.scans = {} end
-	if not AucDbData.scans[faction] then AucDbData.scans[faction] = {} end
+	if not AucDbData.scans[designation] then AucDbData.scans[designation] = {} end
 end
 
 function private.process(operation, itemData, oldData)
-	if (faction and scanid) then
+	if (designation and scanid) then
 		if not rope:IsEmpty() then rope:Add(";") end
 		rope:AddDelimited(":", itemData.itemId, itemData.itemSuffix, itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
 
@@ -128,32 +159,30 @@ function private.process(operation, itemData, oldData)
 	end
 end
 function private.complete()
-	AucDbData.scans[faction][scanid] = rope:Get()
+	AucDbData.scans[designation][scanid] = rope:Get()
 	rope:Clear()
 end
 
 function private.bid(operation, itemData, bidType, index, bid)
 	local prevLine = ""
 	local timeidx = getTime()
-	local faction = AucAdvanced.GetFaction()
 	local line = strjoin(":", itemData.itemId,itemData.itemSuffix,itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft, bidType, bid)
 	print("Accepted bid for", itemData.itemName)
 
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.bids then AucDbData.bids = {} end
 	if not AucDbData.names then AucDbData.names = {} end
-	if not AucDbData.bids[faction] then AucDbData.bids[faction] = {} end
-	if AucDbData.bids[faction][timeidx] then prevLine = AucDbData.bids[faction][timeidx] .. ";" end
+	if not AucDbData.bids[designation] then AucDbData.bids[designation] = {} end
+	if AucDbData.bids[designation][timeidx] then prevLine = AucDbData.bids[designation][timeidx] .. ";" end
 
 	AucDbData.names[("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,0)] = itemData.itemName;
-	AucDbData.bids[faction][timeidx] = prevLine .. line
+	AucDbData.bids[designation][timeidx] = prevLine .. line
 end
 
 function private.start(operation, itemData, minBid, buyoutPrice, runTime, price)
 	local prevLine = ""
 	local timeidx = getTime()
 	local dayidx = math.floor(timeidx / 86400)
-	local faction = AucAdvanced.GetFaction()
 	local line = strjoin(":", itemData.itemId,itemData.itemSuffix,itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
 	print("Started auction for", itemData.itemName)
 
@@ -162,27 +191,25 @@ function private.start(operation, itemData, minBid, buyoutPrice, runTime, price)
 	if not AucDbData.names then AucDbData.names = {} end
 	if not AucDbData.price then AucDbData.price = {} end
 	if not AucDbData.count then AucDbData.count = {} end
-	if not AucDbData.start[faction] then AucDbData.start[faction] = {} end
-	if AucDbData.start[faction][timeidx] then prevLine = AucDbData.start[faction][timeidx] .. ";" end
+	if not AucDbData.start[designation] then AucDbData.start[designation] = {} end
+	if AucDbData.start[designation][timeidx] then prevLine = AucDbData.start[designation][timeidx] .. ";" end
 
 	local sig = ("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,0)
 	AucDbData.names[sig] = itemData.itemName;
 	AucDbData.price[itemData.itemId] = price;
-	AucDbData.start[faction][timeidx] = prevLine .. line
+	AucDbData.start[designation][timeidx] = prevLine .. line
 
 	sig = ("%d:%d"):format(itemData.itemId,itemData.itemSuffix)
-	if not AucDbData.count[faction] then AucDbData.count[faction] = {} end
-	if not AucDbData.count[faction][sig] then AucDbData.count[faction][sig] = {} end
-	if AucDbData.count[faction][sig][dayidx] then prevLine = AucDbData.count[faction][sig][dayidx] .. ";" end
-	AucDbData.count[faction][sig][dayidx] = prevLine .. strjoin(":", itemData.buyoutPrice, itemData.stackSize, runTime)
+	if not AucDbData.count[designation] then AucDbData.count[designation] = {} end
+	if not AucDbData.count[designation][sig] then AucDbData.count[designation][sig] = {} end
+	if AucDbData.count[designation][sig][dayidx] then prevLine = AucDbData.count[designation][sig][dayidx] .. ";" end
+	AucDbData.count[designation][sig][dayidx] = prevLine .. strjoin(":", itemData.buyoutPrice, itemData.stackSize, runTime)
 end
 
 function private.sale(operation, faction, itemName, playerName, bid, buyout, deposit, consignment)
-	local realmName = GetRealmName()
-	faction = realmName .. "-" .. faction
 	local prevLine = ""
 	local timeidx = getTime()
-	local realmfaction = GetRealmName() .. "-" .. faction
+	local designation = RealmDesignation(faction)
 	local itemLink, itemId, itemSuffix = private.getLink(itemName)
 	if not itemLink then return end
 	local count = private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
@@ -193,10 +220,10 @@ function private.sale(operation, faction, itemName, playerName, bid, buyout, dep
 
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.start then AucDbData.start = {} end
-	if not AucDbData.sales[faction] then AucDbData.sales[faction] = {} end
-	if AucDbData.sales[faction][timeidx] then prevLine = AucDbData.sales[faction][timeidx] .. ";" end
+	if not AucDbData.sales[designation] then AucDbData.sales[designation] = {} end
+	if AucDbData.sales[designation][timeidx] then prevLine = AucDbData.sales[designation][timeidx] .. ";" end
 
-	AucDbData.sales[faction][timeidx] = prevLine .. line
+	AucDbData.sales[designation][timeidx] = prevLine .. line
 end
 
 lib.ScanProcessors = {
