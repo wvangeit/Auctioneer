@@ -101,7 +101,7 @@ function private.getPrice(itemId)
 	itemId = tonumber(itemId)
 	if itemId then
 		local price = AucDbData.price[itemId]
-		if not price then
+		if not price and GetSellValue then
 			price = GetSellValue(itemId)
 		end
 		return tonumber(price)
