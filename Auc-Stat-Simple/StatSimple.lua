@@ -36,9 +36,10 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Simple"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local GetFaction = AucAdvanced.GetFaction
+local empty = wipe
 
 -- Eliminate some global lookups
 local select = select
@@ -96,7 +97,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
 	if (factor ~= 0) then property = property.."x"..factor end
 
-	local data = private.GetPriceData()
+	local data = private.GetPriceData(GetFaction())
 	if not data.daily[itemId] then data.daily[itemId] = "" end
 	local stats = private.UnpackStats(data.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 , buyoutper } end
@@ -113,9 +114,8 @@ function lib.GetPrice(hyperlink, serverKey)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
-
+	serverKey = serverKey or GetFaction()
 	local data = private.GetPriceData(serverKey)
-	if not data then return end
 
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14, avgmins = 0,0,0,0,0,0
@@ -256,6 +256,9 @@ function lib.GetItemPDF(hyperlink, serverKey)
 end
 
 function lib.OnLoad(addon)
+	if SSRealmData then return end
+
+	-- Set defaults
 	default("stat.simple.tooltip", false)
 	default("stat.simple.avg3", false)
 	default("stat.simple.avg7", false)
@@ -266,21 +269,43 @@ function lib.OnLoad(addon)
 	default("stat.simple.enable", true)
 	default("stat.simple.reportsafe", false)
 
-	private.LoadData() -- checks DB and sets local SSRealmData
+	-- Load and check data
+	private.InitData()
 end
 
 function lib.ClearItem(hyperlink, serverKey)
-	local linkType, itemID = AucAdvanced.DecodeLink(hyperlink)
+	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
 	if linkType ~= "item" then
 		return
 	end
-	serverKey = serverKey or GetFaction ()
-	print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
+	if (factor ~= 0) then property = property.."x"..factor end
 
+	serverKey = serverKey or GetFaction ()
 	local data = private.GetPriceData (serverKey)
-	if not data then return end
-	data.means[itemID] = nil
-	data.daily[itemID] = nil
+
+	local cleareditem = false
+
+	if data.daily[itemID] then
+		local stats = private.UnpackStats (data.daily[itemID])
+		if stats[property] then
+			stats[property] = nil
+			cleareditem = true
+			data.daily[itemID] = private.PackStats (stats)
+		end
+	end
+
+	if data.means[itemID] then
+		local stats = private.UnpackStats (data.means[itemID])
+		if stats[property] then
+			stats[property] = nil
+			cleareditem = true
+			data.means[itemID] = private.PackStats (stats)
+		end
+	end
+
+	if cleareditem then
+		print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
+	end
 end
 
 function private.SetupConfigGui(gui)
@@ -535,30 +560,19 @@ function private.UpgradeDb()
 	AucAdvancedStatSimpleData = newSave
 end
 
-function private.LoadData()
-	if SSRealmData then return end
-	private.UpgradeDb()
-	SSRealmData = AucAdvancedStatSimpleData.RealmData
-	assert (SSRealmData, "Error loading or creating StatSimple database")
-	private.DataLoaded()
-end
-
 function private.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
 	if SSRealmData[serverKey] then
 		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..serverKey.."}}") --Clearing Simple stats for
+		SSRealmData[serverKey] = nil
 	end
-	SSRealmData[serverKey] = nil
 end
 
 function private.GetPriceData(serverKey)
-	serverKey = serverKey or GetFaction ()
 	local data = SSRealmData[serverKey]
 	if not data then
 		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
-			-- todo: localize this string
-			print ("Invalid serverKey passed to Stat-Simple")
-			return
+			error("Invalid serverKey passed to Stat-Simple")
 		end
 		data = {means = {}, daily = {created = time ()}}
 		SSRealmData[serverKey] = data
@@ -566,9 +580,16 @@ function private.GetPriceData(serverKey)
 	return data
 end
 
-function private.DataLoaded()
-	-- This function gets called when the data is first loaded. You may do any required maintenence
-	-- here before the data gets used.
+function private.InitData()
+	private.InitData = nil
+
+	-- Load data
+	private.UpgradeDb()
+	SSRealmData = AucAdvancedStatSimpleData.RealmData
+	if not SSRealmData then
+		SSRealmData = {} -- dummy value to avoid more errors - will not get saved
+		error(SSRealmData, "Error loading or creating StatSimple database")
+	end
 
 	-- Note: database errors can occur if user tries to run an older version of StatSimple after the database is upgraded.
 	for serverKey, data in pairs (SSRealmData) do
@@ -611,7 +632,6 @@ function private.DataLoaded()
 			end
 		end
 	end
-	private.DataLoaded = nil
 end
 
 -- Simple function to total all of the values in the tuple
