@@ -1,5 +1,5 @@
 ## Title: Auc:Stat:Sales Prices
-## Interface: 30000
+## Interface: 30100
 ## Dependancies: Auc-Advanced BeanCounter
 ##
 ## Version: <%version%> (<%codename%>)

@@ -1,7 +1,7 @@
 ## Title: Auc:Stat:Debug
 ## Notes: Debugging extension for Auctioneer.
 ##
-## Interface: 30000
+## Interface: 30100
 ## LoadOnDemand: 0
 ## Disabled: 1
 ## Dependencies: Auc-Advanced

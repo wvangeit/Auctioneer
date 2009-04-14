@@ -1,5 +1,5 @@
 ## Title: BeanCounter
-## Interface: 30000
+## Interface: 30100
 ## Dependencies: Stubby
 ## OptionalDeps: !nLog, Babylonian, DebugLib, SlideBar, Auc-Advanced, Configator, LibExtraTip, TipHelper
 ## SavedVariables: BeanCounterDB, BeanCounterAccountDB

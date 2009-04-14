@@ -1,5 +1,5 @@
 ## Title: Auc:Util:ItemSuggest
-## Interface: 30000
+## Interface: 30100
 ## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan
 ## Dependancies: Auc-Advanced
 ##

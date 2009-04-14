@@ -1,7 +1,7 @@
 ## Title: Informant
 ## Notes: Displays detailed item information in tooltips, and can produce item reports by binding an information window to a keypress [<%version%>] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 30000
+## Interface: 30100
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
 ## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar, LibExtraTip, TipHelper

@@ -1,7 +1,7 @@
 ## Title: Auc:Filter:Outlier
 ## Notes: Allows filtering of outlier auctions so that they don't contaminate the regular prices.
 ##
-## Interface: 30000
+## Interface: 30100
 ## LoadOnDemand: 0
 ## Disabled: 0
 ## Dependencies: Auc-Advanced

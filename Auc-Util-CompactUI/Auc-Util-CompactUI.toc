@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Compact UI
-## Interface: 30000
+## Interface: 30100
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
