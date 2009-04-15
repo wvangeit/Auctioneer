@@ -715,7 +715,7 @@ EnchantrixBarkerLocalizations = {
 
 		-- Section: Game Constants
 		["AnyWeapon"]	= "Cualquier arma";
-		["BarkerOpening"]	= "Encanto:";
+		["BarkerOpening"]	= "Encantamientos de Venta:";
 		["Boots"]	= "Botas";
 		["Bracer"]	= "Brazal";
 		["Chest"]	= "Pecho";
@@ -749,6 +749,8 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchResFire"]	= "resistencia al fuego";
 		["EnchSearchResShadow"]	= "resistencia a las sombras";
 		["EnchSearchSoulfrost"]	= "hechizos de escarcha y sombras";
+		["EnchSearchSpellPower1"]	= "Daño a Hechizos";
+		["EnchSearchSpellPower2"]	= "Daño a todos los Hechizos";
 		["EnchSearchSpellPower3"]	= "daño de hechizo";
 		["EnchSearchSpellsurge"]	= "restaura [0-9]+ de maná a todos los miembros del grupo";
 		["EnchSearchSpirit"]	= "espíritu";
@@ -799,6 +801,24 @@ EnchantrixBarkerLocalizations = {
 		["NatureRes"]	= "Res nturlza";
 		["ShadowRes"]	= "Res smbras";
 		["ShortAllRes"]	= "tdas res";
+		["ShortArmor"]	= "Armadura";
+		["ShortBattlemaster"]	= "Maestro de Batalla";
+		["ShortBeastslayer"]	= "Bestia";
+		["ShortBoarSpeed"]	= "Velocidad de Oso";
+		["ShortCatSwiftness"]	= "Velocidad de Gato";
+		["ShortHealing"]	= "Curar";
+		["ShortHealth"]	= "Salud";
+		["ShortMana"]	= "Mana";
+		["ShortManaPerFive"]	= "Mana/5seg";
+		["ShortMongoose"]	= "Mangosta";
+		["ShortSoulfrost"]	= "Soulfrost";
+		["ShortSpellPower"]	= "Hechizo";
+		["ShortSpellSurge"]	= "Aumento de Hechizo";
+		["ShortSunfire"]	= "Fuego del Sol";
+		["ShortVitality"]	= "Vitalidad";
+		["SPI"]	= "PER";
+		["STA"]	= "AGU";
+		["STR"]	= "FUE";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Precio de Pregonero (margen de %d%%)";
@@ -808,6 +828,7 @@ EnchantrixBarkerLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer no se ha cargado, usando los precios guardados]";
 		["FrmtWarnNoPrices"]	= "[No hay precios disponibles]";
 		["FrmtWarnPriceUnavail"]	= "[Algunos precios no están disponibles]";
+		["OpenBarkerWindow"]	= "Abre la ventana de comercio.";
 
 		-- Section: User Interface
 		["BarkerOptions2HWeaponPriorityTooltip"]	= "La prioridad de puntuación para los encantamientos de las armas de 2 manos.";
@@ -817,6 +838,7 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsAllResistancesTooltip"]	= "La prioridad de puntuación para los encantamientos que aumentan todas las resistencias.";
 		["BarkerOptionsAllStatsPriority"]	= "Todas las Estadísticas";
 		["BarkerOptionsAllStatsPriorityTooltip"]	= "La prioridad de puntuación";
+		["BarkerOptionsAnyWeaponPriorityTooltip"]	= "La puntuacion prioritaria para encantamientos a cualquier arma.";
 		["BarkerOptionsArmorPriority"]	= "armadura";
 		["BarkerOptionsArmorPriorityTooltip"]	= "La prioridad de puntuación para los encantamientos de armadura.";
 		["BarkerOptionsBootsPriorityTooltip"]	= "La prioridad de puntuación para los encantamientos de botas.";
@@ -867,6 +889,7 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsStaminaPriority"]	= "vigor";
 		["BarkerOptionsStaminaPriorityTooltip"]	= "La prioridad de puntuación para los encantamientos de vigor.";
 		["BarkerOptionsStatsPriority"]	= "Prioridad total de los estados.";
+		["BarkerOptionsStatsPriorityTooltip"]	= "Esto establece la importancia de las estadísticas es la prioridad general de la publicidad.";
 		["BarkerOptionsStrengthPriority"]	= "fuerza";
 		["BarkerOptionsStrengthPriorityTooltip"]	= "La prioridad de puntuación para los encantamientos de fuerza.";
 		["BarkerOptionsTab1Title"]	= "Prioridades de Beneficio y Precio";
@@ -1113,7 +1136,14 @@ EnchantrixBarkerLocalizations = {
 		["ShowValue"]	= "valuta";
 
 		-- Section: Game Constants
-		["BarkerOpening"]	= "Vendita:";
+		["AnyWeapon"]	= "Ogni Arma";
+		["BarkerOpening"]	= "Vendo:";
+		["Boots"]	= "Stivali";
+		["Bracer"]	= "Bracciale";
+		["Chest"]	= "Torace";
+		["Cloak"]	= "Cappa";
+		["Darnassus"]	= "Darnassus";
+		["Enchanting"]	= "Enchanting";
 		["OneLetterGold"]	= "g";
 		["OneLetterSilver"]	= "s";
 		["ShortDarnassus"]	= "Darn.";

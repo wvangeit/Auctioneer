@@ -490,6 +490,7 @@ BeanCounterLocalizations = {
 		["C_ExtenalSearch"]	= "Autorise les Addons Externes à utiliser la recherche BeanCounter?";
 		["C_MailInvoiceTimeout"]	= "Mail de dépassement du temps des encheres = %d secondes";
 		["C_MailRecolor"]	= "Méthode de changement de couleur de mail";
+		["C_ModTTShow"]	= "Afficher la bulle d'aide uniquement si Alt est enfoncé";
 		["C_Resortascendingtime"]	= "Trier les entrées par ordre chronologique ascendant";
 		["C_ResortDatabase"]	= "Trier la base de données";
 		["C_ScanDatabase"]	= "Scanne les erreurs de la base de données: Utiliser si vous avez des erreurs en faisant des recherches avec BeanCounter.\nSauvegarder les \"saved variables\" de BeanCounter avant d'utiliser cette option.";
@@ -533,6 +534,7 @@ BeanCounterLocalizations = {
 		["TTExtenalSearch"]	= "Quand vous entrez une recherche dans un autre addon,BeanCounter affichera aussi une recherche pour cette objet";
 		["TTMailInvoiceTimeout"]	= "Choisit pendant combien de temps BeanCounter attendra l'arrivée d'un message du serveur avant d'abandonner. Bas = plus rapide mais plus de chance de rater une donnée. Haut = plus lent mais augmente les chances d'avoir les données si le serveur de messagerie est extrêmement occupé.";
 		["TTMailRecolor"]	= "Choisissez comment un mail va apparaitre après que BeanCounter\naura scanné la boite au lettre";
+		["TTModTTShow"]	= "Cette option affichera la bulle d'aide de BeanCounter uniquement si Alt est enfoncé";
 		["TTOpenconfig"]	= "Ouvrir la fenêtre de configuration de BeanCounter";
 		["TTResort Database"]	= "Ceci scanne les données de BeanCounter et les trie par date d'arrivée ascendant. Ceci réduit le temps de compression de la base de données.";
 		["TTShowBeginnerTooltips"]	= "Activer les bulles d'aide pour débutant qui s'affichent au survol de la souris.";
@@ -547,6 +549,7 @@ BeanCounterLocalizations = {
 		["TT_ExactCheck"]	= "Affiche uniquement les objets correspondant au texte exact de la recherche.";
 		["TT_ItemIconBox"]	= "Déposez un objet ici pour commencer une recherche dessus.\nAffiche la fenêtre de recherche actuelle si c'est possible.";
 		["TT_ScrollHeader"]	= "maintenir clic droit et bouger la souris pour redimensionner.\nCTRL + Clic droit pour réinitialiser la taille.";
+		["TT_SearchBox"]	= "Entrez les critèresde recherche ici ou laisser vide pour une recherche générale";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Historique de vente";
