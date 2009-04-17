@@ -56,20 +56,24 @@ local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("%%s", "(.+)")
 local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "(.+)")
 ]]
 local registeredAltaholicHook = false
+local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
 		private.updateInboxStart()
 
 	elseif (event == "MAIL_SHOW") then
 		--Since Altoholic has an option to read mail this is a workaround for it. We call our read function before
-		if Altoholic and not registeredAltaholicHook then
+		if Altoholic and not registeredAltaholicHook and Altoholic.Mail.Scan then
 			registeredAltaholicHook = true
-			Stubby.RegisterFunctionHook("Altoholic.UpdatePlayerMail", -10, private.updateInboxStart)
+			Stubby.RegisterFunctionHook("Altoholic.Mail.Scan", -10, private.updateInboxStart)
 		end
-
+		
 		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
-		hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
-		hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
+		if not registeredInboxFrameHook then --make sure we only ever register this hook once
+			registeredInboxFrameHook = true
+			hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
+			hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
+		end
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
 
 	elseif (event == "MAIL_CLOSED") then
