@@ -480,7 +480,7 @@ function private.CreateFrames()
 		{ _BC('UiDateHeader'), "TEXT", get("columnwidth.".._BC('UiDateHeader')) },
 	} )
 	
-	function frame.resultlist.sheet.Processor(callback, self, button, column, row, order)
+	function frame.resultlist.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
 		if (callback == "ColumnOrder") then
 			set("columnorder", order)
 		elseif (callback == "ColumnWidthSet") then
@@ -493,6 +493,9 @@ function private.CreateFrames()
 			GameTooltip:Hide()
 		elseif (callback == "OnClickCell") then
 			private.scrollSheetOnClick(button, row, column)
+		elseif (callback == "ColumnSort") then
+			set("columnsortcurDir", curDir)
+			set("columnsortcurSort", column)
 		end
 	end
 
@@ -508,7 +511,12 @@ function private.CreateFrames()
 		--print("saved order applied")
 		frame.resultlist.sheet:SetOrder(get("columnorder") )
 	end
-
+	--Apply last column sort used
+	if get("columnsortcurSort") then
+		frame.resultlist.sheet.curSort = get("columnsortcurSort") or 1
+		frame.resultlist.sheet.curDir = get("columnsortcurDir") or 1
+		frame.resultlist.sheet:PerformSort()
+	end
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
 		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(),
