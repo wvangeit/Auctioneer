@@ -2599,7 +2599,7 @@ function private.CreateFrames()
 
 	frame.imageview.sheet:EnableSelect(true)
 	--callback functions for frame.imageview.sheet events
-	function frame.imageview.sheet.Processor(callback, self, button, column, row, order)
+	function frame.imageview.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
 		if (callback == "OnMouseDownCell")  then
 			private.onSelect()
 		elseif (callback == "OnClickCell") then
@@ -2610,13 +2610,21 @@ function private.CreateFrames()
 			private.onResize(self, column, button:GetWidth() )
 		elseif (callback == "ColumnWidthReset") then
 			private.onResize(self, column, nil)
+		elseif (callback == "ColumnSort") then
+			set("util.appraiser.columnsortcurDir", curDir)
+			set("util.appraiser.columnsortcurSort", column)
 		end
 	end
 	--If we have a saved column arrangement reapply
 	if get("util.appraiser.columnorder") then
 		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )
 	end
-
+	--Apply last column sort used
+	if get("util.appraiser.columnsortcurSort") then
+		frame.imageview.sheet.curSort = get("util.appraiser.columnsortcurSort") or 1
+		frame.imageview.sheet.curDir = get("util.appraiser.columnsortcurDir") or 1
+		frame.imageview.sheet:PerformSort()
+	end
 	
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
