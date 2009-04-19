@@ -2613,21 +2613,12 @@ function private.CreateFrames()
 		elseif (callback == "ColumnWidthReset") then
 			private.onResize(self, column, nil)
 		elseif (callback == "ColumnSort") then
+			print("APPR", curDir, column)
 			set("util.appraiser.columnsortcurDir", curDir)
 			set("util.appraiser.columnsortcurSort", column)
 		end
 	end
-	--If we have a saved column arrangement reapply
-	if get("util.appraiser.columnorder") then
-		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )
-	end
-	--Apply last column sort used
-	if get("util.appraiser.columnsortcurSort") then
-		frame.imageview.sheet.curSort = get("util.appraiser.columnsortcurSort") or 1
-		frame.imageview.sheet.curDir = get("util.appraiser.columnsortcurDir") or 1
-		frame.imageview.sheet:PerformSort()
-	end
-	
+		
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
@@ -2759,6 +2750,16 @@ function private.CreateFrames()
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
 
+	--If we have a saved column arrangement reapply
+	if get("util.appraiser.columnorder") then
+		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )
+	end
+	--Apply last column sort used
+	if get("util.appraiser.columnsortcurSort") then
+		frame.imageview.sheet.curSort = get("util.appraiser.columnsortcurSort") or 1
+		frame.imageview.sheet.curDir = get("util.appraiser.columnsortcurDir") or 1
+		frame.imageview.sheet:PerformSort()
+	end
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
