@@ -2613,7 +2613,6 @@ function private.CreateFrames()
 		elseif (callback == "ColumnWidthReset") then
 			private.onResize(self, column, nil)
 		elseif (callback == "ColumnSort") then
-			print("APPR", curDir, column)
 			set("util.appraiser.columnsortcurDir", curDir)
 			set("util.appraiser.columnsortcurSort", column)
 		end
