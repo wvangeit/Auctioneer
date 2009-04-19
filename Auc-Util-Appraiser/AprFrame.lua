@@ -1911,7 +1911,7 @@ function private.CreateFrames()
 	frame.salebox.info:SetHeight(20)
 	frame.salebox.info:SetJustifyH("LEFT")
 	frame.salebox.info:SetJustifyV("BOTTOM")
-	frame.salebox.info:SetText("APPR_Interface_SelectItemLeftAuctioning")--Select an item to the left to begin auctioning...
+	frame.salebox.info:SetText(_TRANS('APPR_Interface_SelectItemLeftAuctioning') )--Select an item from the list in the left column or drop an item in the square to begin auctioning.
 	frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 
 	frame.salebox.warn = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2235,7 +2235,7 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
-	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')--Switch between "Per Item" and "Per Stack" Pricing.
+	frame.switchToStack.TooltipText = (_TRANS('APPR_HelpTooltip_PricingMethod') ) end--Switch between Per Item and Per Stack pricing.
 	frame.switchToStack:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack:Enable()
@@ -2251,7 +2251,7 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
-	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')
+	frame.switchToStack2.TooltipText = (_TRANS('APPR_HelpTooltip_PricingMethod') ) end--Switch between 'Per Item' and 'Per Stack' pricing.
 	frame.switchToStack2:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack2:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack2:Enable()
