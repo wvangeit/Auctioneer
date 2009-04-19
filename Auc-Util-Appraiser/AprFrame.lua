@@ -2235,7 +2235,7 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
-	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')--Switch to a Simple layout 
+	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_SimpleView')--Switch between "Per Item" and "Per Stack" Pricing.
 	frame.switchToStack:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack:Enable()
