@@ -100,9 +100,15 @@ function lib.API.getAHProfit(player, item, lowDate, highDate, data)
 	
 	local sum, low, high, date = 0, 9999999999, 0
 	local settings = {["selectbox"] = {"1", player} , ["bid"] = true, ["auction"] = true, ["failedauction"] = true}
-	local tbl 
-	tbl = data or private.startSearch(item, settings, true, 10000000)
-
+	local tbl
+	--allow a already API searched data table to be passed instead of just a text string
+	if type(item) == "string" then
+		tbl = private.startSearch(item, settings, true, 10000000)
+	elseif type(item) == "table" then
+		tbl = item
+	end
+	if not tbl then return end
+		
 	for i,v in pairs(tbl) do
 		date = tonumber(v[12])
 		--if user passes a low and high date to use, filter out any not in the range

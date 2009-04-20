@@ -310,8 +310,8 @@ end
 --~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
 function private.databaseAdd(key, itemID, itemLink, value, compress)
 	if not key or not itemID or not itemLink or not value then 
-		print("BeanCounter database add error: Missing required data") print("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress)
-		return
+		debugPrint("BeanCounter database add error: Missing required data") debugPrint("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress)
+		return false
 	end
 
 	local _, suffix = lib.API.decodeLink(itemLink)
@@ -322,7 +322,7 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 		itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")
 	end
 
-	if private.playerData[key][itemID] then --if ltemID exsists
+	if private.playerData[key][itemID] then --if ltemID exists
 		if private.playerData[key][itemID][itemString] then
 			table.insert(private.playerData[key][itemID][itemString], value)
 		else
@@ -359,7 +359,7 @@ end
 --Store reason Code for BTM/SearchUI
 --tostring(bid["link"]), tostring(bid["sellername"]), tostring(bid["count"]), tostring(bid["buyout"]), tostring(bid["price"]), tostring(bid["reason"]))
 function private.storeReasonForBid(CallBack)
-	debugPrint("bidplaced", CallBack)
+	--debugPrint("bidplaced", CallBack)
 	if not CallBack then return end
 	
 	local itemLink, seller, count, buyout, price, reason = strsplit(";", CallBack)
@@ -372,9 +372,9 @@ function private.storeReasonForBid(CallBack)
 			if postCount and postBid and itemID and price and count then
 				if postCount == count and postBid == price then
 					local text = private.packString(postCount, postBid, postSeller, isBuyout, postTimeLeft, postTime, reason)
-						debugPrint("before", private.playerData.postedBids[itemID][itemString][i])
+						--debugPrint("before", private.playerData.postedBids[itemID][itemString][i])
 						private.playerData.postedBids[itemID][itemString][i] = text
-						debugPrint("after", private.playerData.postedBids[itemID][itemString][i])
+						--debugPrint("after", private.playerData.postedBids[itemID][itemString][i])
 					break
 				end
 			end
@@ -540,18 +540,11 @@ function private.prunePostedDB(announce)
 						private.playerData[DB][itemID][itemString] = nil
 					end
 				end
-			end
-			--after removing the itemStrings look to see if there are itemID's that need removing
-			local empty = true
-			for itemID, value in pairs(data) do
-				for itemString, index in pairs(value) do
-					empty = false
-				end
-				if empty then
-					--debugPrint("Removed empty ItemID tables", itemID)
+				--after removing the itemStrings look to see if there are itemID's that need removing
+				if next (value) == nil then
+					debugPrint("Removed empty itemID:", itemID) 
 					private.playerData[DB][itemID] = nil
 				end
-				empty = true
 			end
 		end
 	end

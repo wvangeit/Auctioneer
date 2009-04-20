@@ -92,7 +92,7 @@ end
 function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic)
 	if not id then return end
 	if not settings then settings = private.getCheckboxSettings() end
-	if not count then count = 500 end --count determines how many results we show or display High # ~to display all
+	if not count then count = get("numberofdisplayedsearchs") end --count determines how many results we show or display High # ~to display all
 
 	tbl = {}
 	if type(id) == "table" then --we can search for a sinlge itemID or an array of itemIDs
@@ -129,7 +129,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			data.temp.failedBids = {}
 		end
 	else
-		local serverName = GetRealmName()
+		serverName = GetRealmName()
 		data = private.searchServerData(serverName, data, tbl, settings)
 		if data then
 			data, style = private.formatServerData(data, style, settings, count)
@@ -138,13 +138,18 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		
 	if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
 		private.frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
-		private.frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
-		private.frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
 		
 		--Adds itemtexture to display box and if possible the gan/loss on teh item
 		if itemTexture then
 			private.frame.icon:SetNormalTexture(itemTexture)
-			local profit, low, high = lib.API.getAHProfit(nil, classic)
+			local profit, low, high
+			--Since a "" or full DB search takes a lot of time just pass teh already compiled data table for 48k trxn this means 0.24sec vs 8.5sec
+			--However this lmits it to ONLY the results displayed in the scrollframe not entire DB
+			if classic == "" then
+				profit, low, high = lib.API.getAHProfit(nil, data) 
+			else
+				profit, low, high = lib.API.getAHProfit(nil, classic)
+			end
 			local change = "|CFF33FF33Gained"
 			if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
 			profit = private.tooltip:Coins(profit)

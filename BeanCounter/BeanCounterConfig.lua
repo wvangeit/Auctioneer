@@ -118,6 +118,9 @@ private.settingDefaults = {
 	--Color gradient
 	["colorizeSearch"] = true,
 	["colorizeSearchopacity"] = 0.2,
+	
+	--Search settings
+	["numberofdisplayedsearchs"] = 500,
 
 	--GUI column default widths
 	["columnwidth.".._BC('UiNameHeader')] = 120,
@@ -417,10 +420,16 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "colorizeSearch", "Add a gradient color to each result in the search window")
 	gui:AddTip(id, "This option changes the color of the items lines in the BeanCounter search window.")
-	--gui:AddControl(id, "Slider",     0, 2, "colorizeSearchopacity", 1, 100, 1, "Opacity level: %d%%")
+
 	gui:AddControl(id, "NumeriSlider", 0, 3, "colorizeSearchopacity",    0, 1, 0.1, "Opacity level")
 	gui:AddTip(id, "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)")
 
+	
+	gui:AddControl(id, "Subhead",     0,    _BC('Search Configuration')) --
+	
+	gui:AddControl(id, "NumeriSlider", 0, 1, "numberofdisplayedsearchs",    500, 5000, 250, "Max displayed search results (from each database)")
+	gui:AddTip(id, "This controls the total number of results displayed in the scroll frame.")
+	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
 		_BC('A_MailInvoiceTimeout') --"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
