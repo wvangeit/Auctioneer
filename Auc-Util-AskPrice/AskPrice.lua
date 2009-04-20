@@ -214,7 +214,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	--If the stack size is grater than one, add the unit price to the message
 	local strMarketOne
 	if (count > 1) then
-		strMarketOne = ("(%s each)"):format(coins(marketPrice))
+		strMarketOne = (_TRANS('ASKP_Interface_Each')):format(coins(marketPrice))--(%s each)
 	else
 		strMarketOne = ""
 	end
@@ -222,14 +222,14 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	if (totalSeenCount > 0) then
 		local averageSeenCount = math.floor(totalSeenCount/answerCount + 0.5)
 		private.sendWhisper(
-			("%s: Seen an average of %d times at auction by %d people using Auctioneer Advanced"):format(
+			(_TRANS('ASKP_Interface_SeenAverageByAuctioneer') ):format( --%s: Seen an average of %d times at auction by %d people using Auctioneer Advanced
 				link,
 				averageSeenCount,
 				answerCount),
 			player
 		)
 		private.sendWhisper(
-			("%sMarket Value: %s%s"):format(
+			(_TRANS('ASKP_Interface_MarketValue') ):format(--%sMarket Value: %s%s
 				"    ",
 				coins(marketPrice * count),
 				strMarketOne),
@@ -237,7 +237,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		)
 	else
 		private.sendWhisper(
-			("%s: Never seen at %s by Auctioneer Advanced"):format(
+			(_TRANS('ASKP_Interface_NeverSeenByAuctioneer') ):format(--%s: Never seen at %s by Auctioneer Advanced
 				link,
 				AucAdvanced.GetFaction()
 			),
@@ -251,13 +251,13 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		local strVendOne
 		--Again if the stack Size is greater than one, add the unit price to the message
 		if (count > 1) then
-			strVendOne = ("(%s each)"):format(coins(vendorPrice))
+			strVendOne = (_TRANS('ASKP_Interface_Each') ):format(coins(vendorPrice))--(%s each)
 		else
 			strVendOne = ""
 		end
 
 		private.sendWhisper(
-			("%sSell to vendor for: %s%s"):format(
+			(_TRANS('ASKP_Interface_SellVendor') ):format(--%sSell to vendor for: %s%s
 				"    ",
 				coins(vendorPrice * count),
 				strVendOne
@@ -269,7 +269,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	if (not (count > 1)) and (private.getOption('util.askprice.ad')) then
 		if (not private.sentAskPriceAd[player]) then --If the player in question has been sent the ad message in this session, don't spam them again.
 			private.sentAskPriceAd[player] = true
-			private.sendWhisper(("Get stack prices with %sCount[ItemLink] (Count = stacksize)"):format(private.getOption('util.askprice.trigger')), player)
+			private.sendWhisper((_TRANS('ASKP_Interface_GetStackPrices') ):format(private.getOption('util.askprice.trigger')), player)--Get stack prices with %sCount[ItemLink] (Count = stacksize)
 		end
 	end
 end
@@ -494,8 +494,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", _TRANS('ASKP_Interface_TriggerCharacter')) --"Askprice Trigger character"
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_TriggerCharacter')) --"The trigger character allows for simple querying of a price."
 
-	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_SmartWords')) --"SmartWords:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", _TRANS('ASKP_Interface_EnableSmartWords')) --"Enable SmartWords checking")
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_SmartWords')) --SmartWords:
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", _TRANS('ASKP_Interface_EnableSmartWords')) --"Enable SmartWords checking"
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_SmartWords')) --"Toggling this will enable responses to the SmartWords."
 	local last = gui:GetLast(id) -- Get the current position so we can return here for the second column
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", _TRANS('ASKP_Interface_SmartWordOne')) --"Askprice Custom SmartWord #1"
