@@ -129,7 +129,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			data.temp.failedBids = {}
 		end
 	else
-		serverName = GetRealmName()
+		local serverName = GetRealmName()
 		data = private.searchServerData(serverName, data, tbl, settings)
 		if data then
 			data, style = private.formatServerData(data, style, settings, count)
