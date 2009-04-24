@@ -104,11 +104,9 @@ end
 
 function lib.ASCOnEnter(button, row, index)
 	if lib.confirmsellui.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link, name
+		local link
 		link = lib.confirmsellui.resultlist.sheet.rows[row][index]:GetText()
-		if not link then return end
-		local name = GetItemInfo(link)
-		if link and name then
+		if link and link:find("\124Hitem:%d") then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			AucAdvanced.ShowItemLink(GameTooltip, link, count)
 			end

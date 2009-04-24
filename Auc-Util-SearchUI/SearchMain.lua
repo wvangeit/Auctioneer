@@ -1087,25 +1087,21 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	end
 
 	function lib.OnEnterSheet(button, row, index)
-		if gui.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-			local link, name, count
+		if gui.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
+			local link, count
 			link = gui.sheet.rows[row][index]:GetText()
-			if not link then
-				return
-			end
-			name = GetItemInfo(link)
-			if gui.sheet.order then
-				for i, label in pairs(gui.sheet.labels) do
-					if  label:GetText() == "Stk" then --need to localize this when we localize the rest of searchUI
-						count = tonumber(gui.sheet.rows[row][i]:GetText())
-						break
+			if link and link:find("\124Hitem:%d") then
+				if gui.sheet.order then
+					for i, label in pairs(gui.sheet.labels) do
+						if  label:GetText() == "Stk" then --need to localize this when we localize the rest of searchUI
+							count = tonumber(gui.sheet.rows[row][i]:GetText())
+							break
+						end
 					end
+				else
+					count = tonumber(gui.sheet.rows[row][4]:GetText() )
 				end
-			else
-				count = tonumber(gui.sheet.rows[row][4]:GetText() )
-			end
-			
-			if link and name then
+
 				GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 				AucAdvanced.ShowItemLink(GameTooltip, link, count)
 			end

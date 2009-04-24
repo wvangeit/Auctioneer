@@ -79,19 +79,13 @@ local ahdeplength = {
 	{48, "48 hour"},
 }
 function lib.OnLoad()
--- Create a dummy frame for catching events
-lib.slidebar()
-local frame = CreateFrame("Frame","")
-	frame:SetScript("OnEvent", lib.onEventDo);
-	frame:RegisterEvent("MERCHANT_SHOW");
-	frame:RegisterEvent("MERCHANT_CLOSED");
-	frame:RegisterEvent("MAIL_SHOW");
-	frame:RegisterEvent("MAIL_CLOSED");
-	frame:RegisterEvent("UI_ERROR_MESSAGE");
-	--frame:RegisterEvent("AUCTION_HOUSE_SHOW");
+	lib.slidebar()
 
 	-- Read saved variables
 	lib.autoSellList = get("util.automagic.autoSellList") or lib.autoSellList -- will default to empty table if no saved variables
+	for id, name in pairs(lib.autoSellList) do
+		lib.ClientItemCacheRefresh("item:"..id)
+	end
 
 	-- Sets defaults
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -362,11 +356,18 @@ local autoselldata = {}; local bagcontents = {}; local bagcontentsnodups = {}
 function lib.populateDataSheet()
 	for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 
-	for id, column2 in pairs(lib.autoSellList) do
+	for id, name in pairs(lib.autoSellList) do
 		if (id == nil) then return end
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(id)
-		local abid,abuy = GetPrice(itemLink, nil, true)
-		local	vendor = GetSellValue and GetSellValue(id) or 0
+		local abid, abuy, vendor
+		if itemLink then
+			abid,abuy = GetPrice(itemLink, nil, true)
+			vendor = GetSellValue and GetSellValue(id) or 0
+		else
+			itemLink = "|cffff0000"..name.."|r" -- item name in red
+			lib.ClientItemCacheRefresh("item:"..id)
+			abid, abuy, vendor = 0, 0, 0
+		end
 		table.insert(autoselldata,{
 			itemLink, --link form for mouseover tooltips to work
 			vendor,
@@ -417,40 +418,50 @@ end
 
 function autosell.OnBagListEnter(button, row, index)
 	if autosellframe.baglist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link, name
+		local link
 		link = autosellframe.baglist.sheet.rows[row][index]:GetText()
-		local name = GetItemInfo(link)
-		if link and name then
+		if link:find("\124Hitem:%d") then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
-			end
 		end
 	end
+end
 
 function autosell.OnEnter(button, row, index)
 	if autosellframe.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link, name
+		local link
 		link = autosellframe.resultlist.sheet.rows[row][index]:GetText()
-		local name = GetItemInfo(link)
-		if link and name then
+		if link:find("\124Hitem:%d") then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
-			end
 		end
 	end
+end
 
 function autosell.OnLeave(button, row, index)
 	GameTooltip:Hide()
 end
 
 function autosell.OnClickAutoSellSheet(button, row, index)
-	local link = autosellframe.resultlist.sheet.rows[row][1]:GetText()
-	lib.setWorkingItem(link)
+	for index = 1, 3 do
+		local link = autosellframe.resultlist.sheet.rows[row][index]:GetText()
+		if link:find("\124Hitem:%d") then
+			lib.setWorkingItem(link)
+			return
+		end
+	end
+	lib.populateDataSheet()
 end
 
 function autosell.OnClickBagSheet(button, row, index)
-	local link = autosellframe.baglist.sheet.rows[row][1]:GetText()
-	lib.setWorkingItem(link)
+	for index = 1, 3 do
+		local link = autosellframe.baglist.sheet.rows[row][index]:GetText()
+		if link:find("\124Hitem:%d") then
+			lib.setWorkingItem(link)
+			return
+		end
+	end
+	lib.populateDataSheet()
 end
 
 function lib.makeautosellgui()
@@ -505,7 +516,7 @@ function lib.makeautosellgui()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
-	autosellframe.slot = autosellframe:CreateTexture(nil, "BORDER")
+	autosellframe.slot = autosellframe:CreateTexture(nil, "ARTWORK")
 	autosellframe.slot:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 23, -50)
 	autosellframe.slot:SetWidth(45)
 	autosellframe.slot:SetHeight(45)
@@ -599,8 +610,54 @@ function lib.makeautosellgui()
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClickBagSheet)
 end
 lib.makeautosellgui()
+
+-- Client item cache refresh system
+-- (Loosely based on similar code in Gatherer)
+
+local tooltip = CreateFrame("GameTooltip")
+local eventframe = CreateFrame("Frame") -- used for Events and for timer (via Update)
+local timercounter = 0
+local refreshlist
+
+eventframe:SetScript("OnEvent", lib.onEventDo)
+eventframe:RegisterEvent("MERCHANT_SHOW")
+eventframe:RegisterEvent("MERCHANT_CLOSED")
+eventframe:RegisterEvent("MAIL_SHOW")
+eventframe:RegisterEvent("MAIL_CLOSED")
+eventframe:RegisterEvent("UI_ERROR_MESSAGE")
+
+local function timerOnUpdate(self, elapsed)
+	timercounter = timercounter - elapsed
+	if timercounter <= 0 then
+		if not refreshlist then -- this is a double-check - should not occur
+			eventframe:SetScript("OnUpdate", nil)
+			return
+		end
+		local link
+		repeat -- iterate refreshlist until we find an uncached item
+			link = next(refreshlist)
+			if not link then -- no more items in list - stop the timer
+				refreshlist = nil
+				eventframe:SetScript("OnUpdate", nil)
+				return
+			end
+			refreshlist[link] = nil
+		until not GetItemInfo(link)
+		tooltip:SetHyperlink(link) -- causes client to download item info from server into cache. todo: consider wrapping in pcall?
+		timercounter = 5 -- 5 seconds throttle between each server request
+	end
+end
+
+-- lib.ClientItemCacheRefresh
+-- link : must be an item link which would work in both GetItemInfo and GameTooltip:SetHyperlink
+-- note: the short form "item:<number>" is permissible
+function lib.ClientItemCacheRefresh(link)
+	if not refreshlist then
+		refreshlist = {}
+		timercounter = 0 -- refresh on next update
+		eventframe:SetScript("OnUpdate", timerOnUpdate)
+	end
+	refreshlist[link] = true
+end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
-
-
-
-
