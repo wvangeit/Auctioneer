@@ -269,6 +269,7 @@ function lib.ClearItem(itemLink, serverKey)
 	for pos, engineLib in ipairs(modules) do
 		engineLib.ClearItem(saneLink, serverKey)
 	end
+	lib.ClearMarketCache()
 end
 
 function lib.GetAlgorithms(itemLink)
