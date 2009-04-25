@@ -38,12 +38,13 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
-local data
+local GetFaction = AucAdvanced.GetFaction
+
+local SSDRealmData
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
-	if (not data) then private.makeData() end
-	local myFaction = AucAdvanced.GetFaction()
+	local myFaction = GetFaction()
 	if (command == "help") then
 		print(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer Advanced - StdDev
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
@@ -51,26 +52,22 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - ".._TRANS('SDEV_Help_SlashHelp3'):format(myFaction) ) --clear current %s StdDev price database
 	elseif (command == "clear") then
 		print(_TRANS('SDEV_Help_SlashHelp4').." {{", myFaction, "}}") --Clearing StdDev stats for
-		data[myFaction] = nil
+		SSDRealmData[myFaction] = nil
 	end
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then private.makeData() end
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
 	end
 end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
-	if (not data) then private.makeData() end
 
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
@@ -89,25 +86,25 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	local faction = AucAdvanced.GetFaction()
-	if not data[faction] then data[faction] = {} end
-	local stats = private.UnpackStats(data[faction][itemId])
+	local serverKey = GetFaction()
+	if not SSDRealmData[serverKey] then SSDRealmData[serverKey] = {} end
+	local stats = private.UnpackStats(SSDRealmData[serverKey][itemId])
 	if not stats[property] then stats[property] = {} end
 	if #stats[property] >= 100 then
 		table.remove(stats[property], 1)
 	end
 	table.insert(stats[property], buyout)
-	data[faction][itemId] = private.PackStats(stats)
+	SSDRealmData[serverKey][itemId] = private.PackStats(stats)
 end
 
 local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -----------------------------------------------------------------------------------
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
-function lib.GetItemPDF(hyperlink, faction)
+function lib.GetItemPDF(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	-- Get the data
-	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
+	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	if not (average and stddev) or average == 0 or stddev == 0 then
 		return nil;                 -- No data, cannot determine pricing
@@ -142,20 +139,18 @@ function private.GetCfromZ(Z)
 	end
 end
 
-function lib.GetPrice(hyperlink, faction)
-	-- note: parameter 'faction' is really a 'serverKey'
+function lib.GetPrice(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
-	if not data[faction] then return end
+	if not serverKey then serverKey = GetFaction() end
+	if not SSDRealmData[serverKey] then return end
+	if not SSDRealmData[serverKey][itemId] then return end
 
-	if not data[faction][itemId] then return end
-
-	local stats = private.UnpackStats(data[faction][itemId])
+	local stats = private.UnpackStats(SSDRealmData[serverKey][itemId])
 	if not stats[property] then return end
 
 	local count = #stats[property]
@@ -217,13 +212,13 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction)
+function lib.GetPriceArray(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
 	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+	empty(array)
 
 	-- Get our statistics
-	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
+	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = average or mean
@@ -239,8 +234,6 @@ function lib.GetPriceArray(hyperlink, faction)
 	-- only valid until this function is called again.
 	return array
 end
-
-AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", true)
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
@@ -329,14 +322,15 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 
 			end
 			if AucAdvanced.Settings.GetSetting("stat.stddev.confid") then
-				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Confidence')..(floor(confidence*1000))/1000)-- Confidence: 
+				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Confidence')..(floor(confidence*1000))/1000)-- Confidence:
 			end
 		end
 	end
 end
 
 function lib.OnLoad(addon)
-	private.makeData()
+	if SSDRealmData then return end
+
 	AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", false)
 	AucAdvanced.Settings.SetDefault("stat.stddev.mean", false)
 	AucAdvanced.Settings.SetDefault("stat.stddev.normal", false)
@@ -344,29 +338,28 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.stddev.confid", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.stddev.enable", true)
+
+	private.InitData()
 end
 
-function lib.ClearItem(hyperlink, faction)
+function lib.ClearItem(hyperlink, serverKey)
 	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then
 		return
 	end
 	if (factor ~= 0) then property = property.."x"..factor end
-	if not faction then faction = AucAdvanced.GetFaction() end
-	if (not data) then private.makeData() end
-	if (data[faction]) then
-		print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, faction))--- StdDev: clearing data for %s for {{%s}}	
-		data[faction][itemID] = nil
+	if not serverKey then serverKey = GetFaction() end
+	if SSDRealmData[serverKey] and SSDRealmData[serverKey][itemID] then
+		local stats = private.UnpackStats(SSDRealmData[serverKey][itemID])
+		if stats[property] then
+			print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, serverKey))--- StdDev: clearing data for %s for {{%s}}
+			stats[property] = nil
+			SSDRealmData[serverKey][itemID] = private.PackStats(stats)
+		end
 	end
 end
 
 --[[ Local functions ]]--
-
-function private.DataLoaded()
-	-- This function gets called when the data is first loaded. You may do any required maintenence
-	-- here before the data gets used.
-
-end
 
 function private.UnpackStatIter(data, ...)
 	local c = select("#", ...)
@@ -402,11 +395,15 @@ function private.PackStats(data)
 	return stats
 end
 
-function private.makeData()
-	if data then return end
-	if (not AucAdvancedStatStdDevData) then AucAdvancedStatStdDevData = {} end
-	data = AucAdvancedStatStdDevData
-	private.DataLoaded()
+function private.InitData()
+	private.InitData = nil
+
+	-- Do any database upgrades here
+	if not AucAdvancedStatStdDevData then AucAdvancedStatStdDevData = {} end
+
+	SSDRealmData = AucAdvancedStatStdDevData
+
+	-- Do any regular database maintenance here
 end
 
 
