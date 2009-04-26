@@ -36,24 +36,46 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Purchased"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
-local data
+-- AucAdvanced locals
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local Const = AucAdvanced.Const
+local GetFaction = AucAdvanced.GetFaction
+
+-- globals -> locals
+local assert = assert
+local tinsert = tinsert
+local sqrt = sqrt
+local select = select
+local unpack = unpack
+local ipairs = ipairs
+local pairs = pairs
+local tonumber = tonumber
+local strsplit = strsplit
+local tconcat = table.concat
+
+-- Internal variables
+local SPRealmData
+
+local pricecache = setmetatable({}, {__mode="v"})
+
+function private.ClearCache()
+	empty(pricecache)
+end
 
 function lib.CommandHandler(command, ...)
-	local myFaction = AucAdvanced.GetFaction()
-	local realm = GetRealmName()
+	local serverKey = GetFaction()
 	if (command == "help") then
 		print(_TRANS('PURC_Help_SlashHelp1') )--Help for Auctioneer Advanced - Purchased
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('PURC_Help_SlashHelp2') ) --this Purchased help
-		print(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(myFaction) ) --clear current {{%s}} Purchased price database
-		print(line, "push}} - ".._TRANS('PURC_Help_SlashHelp4'):format(myFaction) ) --force the {{%s}} Purchased daily stats to archive (start a new day)
+		print(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(serverKey) ) --clear current {{%s}} Purchased price database
+		print(line, "push}} - ".._TRANS('PURC_Help_SlashHelp4'):format(serverKey) ) --force the {{%s}} Purchased daily stats to archive (start a new day)
 	elseif (command == _TRANS('clear') ) then
 		private.ClearData(...)
 	elseif (command == _TRANS('push') ) then
-		print(_TRANS('PURC_Help_SlashHelp5'):format(myFaction) ) --Archiving {{%s}} daily stats and starting a new day
-		private.PushStats(myFaction, realmname)
+		print(_TRANS('PURC_Help_SlashHelp5'):format(serverKey) ) --Archiving {{%s}} daily stats and starting a new day
+		private.PushStats(serverKey)
 	end
 end
 
@@ -63,75 +85,50 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
+	elseif callbackType == "scanstats" then
+		private.ClearCache()
 	end
 end
-
 
 lib.ScanProcessors = {}
-local auctiondata
-function lib.ScanProcessors.begin()
-	auctiondata = private.GetAuctionData()
-end
-function lib.ScanProcessors.complete()
-	auctiondata = nil
-end
-
-function lib.ScanProcessors.suspend(operation, itemData, oldData)
-	if (itemData.buyoutPrice) then
-		if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
-		auctiondata[itemData.id].boughtout = true
-	end
-end
-
-function lib.ScanProcessors.update(operation, itemData, oldData)
-	if (itemData.price ~= oldData.price) then
-		if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
-		auctiondata[itemData.id].bidon = true
-	end
-end
-
 function lib.ScanProcessors.delete(operation, itemData, oldData)
-	if (itemData.buyoutPrice) then
-		local stillpossible = false
-		local auctionmaxtime = AucAdvanced.Const.AucMinTimes[itemData.timeLeft] or 86400
-		if (time() - itemData.seenTime <= auctionmaxtime) then
-			stillpossible = true
-		end
+	local price
 
-		if (stillpossible) then
-			if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
-			auctiondata[itemData.id].boughtout = true
+	local auctionmaxtime = Const.AucMinTimes[itemData.timeLeft] or 86400
+	if (time() - itemData.seenTime <= auctionmaxtime) then
+		-- Auction deleted earlier than expected expiry time
+		local buy = itemData.buyoutPrice
+		if buy and buy > 0 then
+			-- assume bought out
+			price = buy
 		end
+	--[[ disabled code
+	-- bid detection code temporarily disabled
+	-- assumed bids should probably not be treated the same as assumed buyouts with respect to market price
+	-- needs further development
+	else -- Auction deleted later than earliest expected expiry time
+		local bid = itemData.curBid
+		if bid and bid > 0 then
+			-- assume won on last bid we saw
+			price = bid
+		end
+	-- end disabled code]]
 	end
 
-	if (not auctiondata[itemData.id]) then return end
-
-	local pricedata = private.GetPriceData()
-	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
-	if (factor ~= 0) then property = property.."x"..factor end
-	local price = 0
-	if not pricedata.daily then pricedata.daily = { created = time() } end
-	if not pricedata.daily[itemId] then pricedata.daily[itemId] = "" end
-
-	if (auctiondata[itemData.id].boughtout and itemData.buyoutPrice) then
-		price = itemData.buyoutPrice
-	else
-		price = itemData.price
-	end
+	if not price then return end
 
 	price = price / itemData.stackSize
+
+	local pricedata = private.GetPriceData(GetFaction())
+	local itemType, itemId, property, factor = decode(itemData.link)
+	if (factor ~= 0) then property = property.."x"..factor end
+	if not pricedata.daily[itemId] then pricedata.daily[itemId] = "" end
 	local stats = private.UnpackStats(pricedata.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 } end
 	stats[property][1] = stats[property][1] + price
 	stats[property][2] = stats[property][2] + 1
 	pricedata.daily[itemId] = private.PackStats(stats)
-	auctiondata[itemData.id] = nil
 end
-
-lib.Private = private
-
 
 -- Determines the sample estimated standard deviation based on the deviation
 -- of the daily, 3day, 7day, and 14day averages. This is not technically
@@ -140,20 +137,18 @@ lib.Private = private
 -- it provides a good estimation in the presence of lack of data. If you
 -- want to discuss the math behind this estimation, find Shirik
 -- @param hyperlink The item to look up
--- @param faction The faction key from which to look up the data
--- @param realm The realm from which to look up the data
+-- @param serverKey The realm-faction key from which to look up the data
 -- @return The estimated population mean
 -- @return The estimated population standard deviation
 -- @return The number of views found to base the standard deviation upon
-function private.EstimateStandardDeviation(hyperlink, faction, realm)
-    local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	assert(linkType=="item", "Standard deviation estimation requires an item link");
+function private.EstimateStandardDeviation(hyperlink, serverKey)
+	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 
-	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
+	if not seenDays then return end
 
     local dataset = {}
     local count = 0
-    if dayAverage then
+    if dayAverage then --[[dayAverage should never be nil at this point. It may be 0 if item has not been seen today - does that mess up the stats?]]
         tinsert(dataset, dayAverage);
         count = count + 1
     end
@@ -205,19 +200,18 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- calculations on the daily, 3-day, 7-day, and 14-day averages
 -- stored by SIMP
 -- @param hyperlink The item to generate the PDF curve for
--- @param faction The faction key from which to look up the data
--- @param realm The realm from which to look up the data
+-- @param serverKey The realm-faction key from which to look up the data
 -- @return The PDF for the requested item, or nil if no data is available
 -- @return The lower limit of meaningful data for the PDF (determined
 -- as the mean minus 5 standard deviations)
 -- @return The upper limit of meaningful data for the PDF (determined
 -- as the mean plus 5 standard deviations)
-function lib.GetItemPDF(hyperlink, faction, realm)
+function lib.GetItemPDF(hyperlink, serverKey)
     -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
     if not get("stat.purchased.enable") then return end --disable purchased if desired
 
     -- Calculate the SE estimated standard deviation & mean
-    local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, faction, realm);
+    local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, serverKey)
 
     if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
         return;                         -- No available data or cannot estimate
@@ -242,36 +236,39 @@ function lib.GetItemPDF(hyperlink, faction, realm)
     return bellCurve, lower, upper;
 end
 
-function lib.GetPrice(hyperlink, faction, realm)
+function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
+	serverKey = serverKey or GetFaction()
 
-	if (not faction) or (faction == AucAdvanced.GetFaction()) then
-		faction = AucAdvanced.GetFactionGroup()
-	end
-	realm = realm or GetRealmName()
+	local data = private.GetPriceData(serverKey)
 
-	local data = private.GetPriceData(faction, realm)
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	local linkType,itemId,property,factor = decode(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 
-	if not data then return end
+	local cachesig = serverKey..itemId..":"..property
+	if pricecache[cachesig] then
+		local dayAverage, avg3, avg7, avg14, dayTotal, dayCount, seenDays, seenCount = unpack(pricecache[cachesig], 1, 8)
+		return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
+	end
+
 	local dayTotal, dayCount, dayAverage = 0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
 
-	if data.daily and data.daily[itemId] then
+	if data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
 		if stats[property] then
 			dayTotal, dayCount = unpack(stats[property])
 			dayAverage = dayTotal/dayCount
 		end
 	end
-	if data.means and data.means[itemId] then
+	if data.means[itemId] then
 		local stats = private.UnpackStats(data.means[itemId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14 = unpack(stats[property])
 		end
 	end
+	pricecache[cachesig] = {dayAverage, avg3, avg7, avg14, dayTotal, dayCount, seenDays, seenCount}
 	return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
 end
 
@@ -279,90 +276,65 @@ function lib.GetPriceColumns()
 	return "Daily Avg", "3 Day Avg", "7 Day Avg", "14 Day Avg", false, "Daily Total", "Daily Count", "Seen Days", "Seen Count"
 end
 
-
-local cacheFaction = ""
-local cache
-local cacheMeta = {__mode="kv"}	-- weak-everything
-
-local tmpReturn={} -- used to return stuff in
-
-function lib.GetPriceArray(hyperlink, faction, realm)
+local pricearray={} -- used to return stuff in
+function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
+	empty(pricearray)
 
-	if (not faction) or (faction == AucAdvanced.GetFaction()) then
-		faction = AucAdvanced.GetFactionGroup()
-	end
-	realm = realm or GetRealmName()
+	-- Get our statistics
+	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 
-	-- Keep a GCable cache of [hyperlink]={array}
-	-- It's tempting to use a single array for returns, but realize that unpacking our data results in dozens of new substrings and several new subtables!
-	if faction~=cacheFaction then	-- no we don't need to check the realm, that needs a relog!
-		cacheFaction = faction
-		cache = setmetatable({}, cacheMeta)
-	end
-	if not cache[hyperlink] then
-
-		local array = {}
-		cache[hyperlink] = array
-
-		-- Get our statistics
-		local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
-
-		-- array.price and array.seen are the ones that most algorithms will look for
-		array.seen = seenCount
-		if not AucAdvanced.Settings.GetSetting("stat.purchased.reportsafe") then
-			array.price = avg3 or dayAverage
+	-- pricearray.price and pricearray.seen are the ones that most algorithms will look for
+	pricearray.seen = seenCount
+	if not get("stat.purchased.reportsafe") then
+		pricearray.price = avg3 or dayAverage
+	else
+		-- Safe mode: prefer longer-running averages for low-volume items
+		if seenCount>100 and seenCount > seenDays*10 then
+			pricearray.price = avg3 or dayAverage
+			-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
 		else
-			-- Safe mode: prefer longer-running averages for low-volume items
-			if seenCount>100 and seenCount > seenDays*10 then
-				array.price = avg3 or dayAverage
-				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
+			local a3 = avg3 or dayAverage
+			local a7 = avg7 or a3
+			local a14 = avg14 or a7
+			if seenCount >= seenDays*7 then
+				pricearray.price = (a3+a7)/2
+				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
 			else
-				local a3 = avg3 or dayAverage
-				local a7 = avg7 or a3
-				local a14 = avg14 or a7
-				if seenCount >= seenDays*7 then
-					array.price = (a3+a7)/2
-					-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
-				else
-					local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
-					local mix14 = 0.5-mix3
-					local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
-					array.price = a3*mix3 + a7*mix7 + a14*mix14
-					-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
-				end
+				local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
+				local mix14 = 0.5-mix3
+				local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
+				pricearray.price = a3*mix3 + a7*mix7 + a14*mix14
+				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
 			end
 		end
-
-		-- This is additional data
-		array.avgday = dayAverage
-		array.avg3 = avg3
-		array.avg7 = avg7
-		array.avg14 = avg14
-		array.daytotal = dayTotal
-		array.daycount = dayCount
-		array.seendays = seenDays
 	end
 
-	-- now it'd be wonderful to just be able to return it all out...
-	-- but unfortunately some callers mess with the returned array! Nice going!
-	for k,v in pairs(cache[hyperlink]) do
-		tmpReturn[k]=v
-	end
-	return tmpReturn
+	-- This is additional data
+	pricearray.avgday = dayAverage
+	pricearray.avg3 = avg3
+	pricearray.avg7 = avg7
+	pricearray.avg14 = avg14
+	pricearray.daytotal = dayTotal
+	pricearray.daycount = dayCount
+	pricearray.seendays = seenDays
+
+	return pricearray
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", false)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg3", false)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg7", false)
-	AucAdvanced.Settings.SetDefault("stat.purchased.avg14", false)
-	AucAdvanced.Settings.SetDefault("stat.purchased.quantmul", true)
-	AucAdvanced.Settings.SetDefault("stat.purchased.enable", true)
-end
+	if SPRealmData then return end
+	-- set defaults
+	default("stat.purchased.tooltip", false)
+	default("stat.purchased.avg3", false)
+	default("stat.purchased.avg7", false)
+	default("stat.purchased.avg14", false)
+	default("stat.purchased.quantmul", true)
+	default("stat.purchased.enable", true)
+	default("stat.purchased.reportsafe", false)
 
-AucAdvanced.Settings.SetDefault("stat.purchased.tooltip", true)
-AucAdvanced.Settings.SetDefault("stat.purchased.reportsafe", false)
+	private.InitData()
+end
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
@@ -421,21 +393,14 @@ function private.SetupConfigGui(gui)
 
 end
 
-
 --[[ Local functions ]]--
 function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
-	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
-	-- desire. You are passed a hyperlink, and it's up to you to determine what you should
-	-- display in the tooltip.
-	if not AucAdvanced.Settings.GetSetting("stat.purchased.tooltip") then return end
+	if not get("stat.purchased.tooltip") then return end
 
 	if not quantity or quantity < 1 then quantity = 1 end
-	if not AucAdvanced.Settings.GetSetting("stat.purchased.quantmul") then quantity = 1 end
+	if not get("stat.purchased.quantmul") then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 	if (not dayAverage) then return end
-	local dispAvg3 = AucAdvanced.Settings.GetSetting("stat.purchased.avg3")
-	local dispAvg7 = AucAdvanced.Settings.GetSetting("stat.purchased.avg7")
-	local dispAvg14 = AucAdvanced.Settings.GetSetting("stat.purchased.avg14")
 
 	if (seenDays + dayCount > 0) then
 		tooltip:AddLine(_TRANS('PURC_Tooltip_PurchasedPrices'))--Purchased prices:
@@ -444,13 +409,13 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 			if (dayCount>0) then seenDays = seenDays + 1 end
 			tooltip:AddLine("  ".._TRANS('PURC_Tooltip_SeenNumberDays'):format(seenCount+dayCount, seenDays) )--Seen {{%s}} over {{%s}} days:
 		end
-		if (seenDays > 6) and dispAvg14 then
+		if (seenDays > 6) and get("stat.purchased.avg14") then
 			tooltip:AddLine("  ".._TRANS('PURC_Tooltip_14DayAverage'), avg14*quantity)-- 14 day average
 		end
-		if (seenDays > 2) and dispAvg7 then
+		if (seenDays > 2) and get("stat.purchased.avg7") then
 			tooltip:AddLine("  ".._TRANS('PURC_Tooltip_7DayAverage'), avg7*quantity)-- 7 day average
 		end
-		if (seenDays > 0) and dispAvg3 then
+		if (seenDays > 0) and get("stat.purchased.avg3") then
 			tooltip:AddLine("  ".._TRANS('PURC_Tooltip_3DayAverage'), avg3*quantity)-- 3 day average
 		end
 		if (dayCount > 0) then
@@ -461,15 +426,12 @@ end
 
 -- This is a function which migrates the data from a daily average to the
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
-function private.PushStats(faction, realm)
+function private.PushStats(serverKey)
 	local dailyAvg
 
-	local data = private.GetPriceData(faction, realm)
-	if not data then return end
-	if not data.daily then return end
-	if not data.means then data.means = {} end
+	local data = private.GetPriceData(serverKey)
 
-	local pdata
+	local pdata, fdata
 	for itemId, stats in pairs(data.daily) do
 		if (itemId ~= "created") then
 			pdata = private.UnpackStats(stats)
@@ -496,6 +458,7 @@ function private.PushStats(faction, realm)
 		end
 	end
 	data.daily = { created = time() }
+	private.ClearCache()
 end
 
 function private.UnpackStatIter(data, ...)
@@ -516,7 +479,6 @@ function private.UnpackStatIter(data, ...)
 	end
 end
 
-
 function private.UnpackStats(dataItem)
 	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
@@ -533,90 +495,153 @@ function private.PackStats(data)
 		tmp[n+3]=","
 		n=n+4
 	end
-	return table.concat(tmp, "", 1, n-1)   -- n-1 to skip last ","
+	return table.concat(tmp, "", 1, n-2)   -- n-2 to skip last ","
 end
 
 -- The following Functions are the routines used to access the permanent store data
-local AAStatPurchasedData
 
 function private.UpgradeDb()
-	-- Do Nothing
-end
+	private.UpgradeDb = nil
+	if type(AucAdvancedStatPurchasedData) == "table" and AucAdvancedStatPurchasedData.Version == "2.0" then return end
 
-function private.ClearData(faction, realmName)
-	if (not AAStatPurchasedData) then private.LoadData() end
-	faction = faction or AucAdvanced.GetFactionGroup()
-	if (realmName) then
-		print(_TRANS('PURC_Interface_ClearingPurchased').." {{"..faction.."}}")--Clearing Purchased stats for
-	else
-		realmName = GetRealmName()
-		print(_TRANS('PURC_Interface_ClearingPurchasedStats'):format(faction, realmName) )--Clearing Purchased stats for {{%s}} on {{%s}}
-	end
-	if (AAStatPurchasedData.RealmData[realmName] and AAStatPurchasedData.RealmData[realmName][faction]) then
-		AAStatPurchasedData.RealmData[realmName][faction] = nil
-	end
-end
+	local newSave = { Version = "2.0", RealmData = {} }
 
-function lib.ClearItem(hyperlink, faction)
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-	if (factor and factor ~= 0) then property = property.."x"..factor end
-	local realm
-	if faction then
-		realm, faction = strsplit("-", faction)
-	else
-		realm = GetRealmName()
-		faction = AucAdvanced.GetFactionGroup()
-	end
-	if (not AAStatPurchasedData) then private.LoadData() end
-	if (AAStatPurchasedData.RealmData[realm] and AAStatPurchasedData.RealmData[realm][faction]) then
-		if AAStatPurchasedData.RealmData[realm][faction]["stats"] and AAStatPurchasedData.RealmData[realm][faction]["stats"]["means"] then
-			AAStatPurchasedData.RealmData[realm][faction]["stats"]["means"][itemId] = nil
-			print(_TRANS('PURC_Interface_ClearingPurchasedLink'):format(hyperlink, faction) )--Stat - Purchased: clearing data for {{%s}} for {{%s}}
-		end
-	end
-end
-
-function private.GetAuctionData(faction, realm)
-	if (not AAStatPurchasedData) then private.LoadData() end
-	faction = faction or AucAdvanced.GetFactionGroup()
-	realm = realm or GetRealmName()
-	if (not AAStatPurchasedData.RealmData[realm]) then AAStatPurchasedData.RealmData[realm] = {} end
-	if (not AAStatPurchasedData.RealmData[realm][faction]) then AAStatPurchasedData.RealmData[realm][faction] = {auctionData={}, stats={}} end
-	return AAStatPurchasedData.RealmData[realm][faction].auctionData
-end
-
-function private.GetPriceData(faction, realm)
-	if (not AAStatPurchasedData) then private.LoadData() end
-	faction = faction or AucAdvanced.GetFactionGroup()
-	realm = realm or GetRealmName()
-	if (not AAStatPurchasedData.RealmData[realm]) then AAStatPurchasedData.RealmData[realm] = {} end
-	if (not AAStatPurchasedData.RealmData[realm][faction]) then AAStatPurchasedData.RealmData[realm][faction] = {auctionData={}, stats={}} end
-	return AAStatPurchasedData.RealmData[realm][faction].stats
-end
-
-function private.DataLoaded()
-	if (not AAStatPurchasedData) then return end
-	-- This function gets called when the data is first loaded. You may do any required maintenence
-	-- here before the data gets used.
-	for realm, realmdata in pairs(AAStatPurchasedData.RealmData) do
-		for faction, stats in pairs(realmdata) do
-			if not stats.daily then stats.daily = { created = time() } end
-			if not stats.means then stats.means = {} end
-			if stats.daily.created and time() - stats.daily.created > 3600*16 then
-				-- This data is more than 16 hours old, we classify this as "yesterday's data"
-				private.PushStats(faction, realm)
+	if type(AucAdvancedStatPurchasedData) == "table" and AucAdvancedStatPurchasedData.Version == "1.0" then
+		-- convert from type "1.0" database to type "2.0"
+		for realm, realmData in pairs (AucAdvancedStatPurchasedData.RealmData) do
+			if type(realm) == "string" and type(realmData) == "table" then
+				for faction, data in pairs (realmData) do
+					if type(faction) == "string" and type(data) == "table" and strfind(faction, "^%u%l+$") then
+						-- looks like a valid realm/faction combination
+						local serverKey = realm.."-"..faction
+						local stats = data.stats
+						if type(stats) == "table" then
+							if type(data.means) ~= "table" then
+								data.means = {}
+							end
+							if type(data.daily) ~= "table" then
+								data.daily = { created = time () }
+							elseif type(data.daily.created) ~= "number" then
+								data.daily.created = time ()
+							end
+							newSave.RealmData[serverKey] = stats
+						end
+					end
+				end
 			end
 		end
 	end
+
+	AucAdvancedStatPurchasedData = newSave
 end
 
-function private.LoadData()
-	if (AAStatPurchasedData) then return end
-	if (not AucAdvancedStatPurchasedData) then AucAdvancedStatPurchasedData = {Version='1.0', RealmData = {}} end
+function private.ClearData(serverKey)
+	serverKey = serverKey or GetFaction()
+	if SPRealmData[serverKey] then
+		print(_TRANS('PURC_Interface_ClearingPurchased').." {{"..serverKey.."}}")--Clearing Purchased stats for
+		SPRealmData[serverKey] = nil
+		private.ClearCache()
+	end
+end
+
+function lib.ClearItem(hyperlink, serverKey)
+	local linkType,itemID,property,factor = decode(hyperlink)
+	if (linkType ~= "item") then return end
+	if (factor and factor ~= 0) then property = property.."x"..factor end
+
+	serverKey = serverKey or GetFaction ()
+
+	local data = private.GetPriceData(serverKey)
+
+	local cleareditem = false
+
+	if data.daily[itemID] then
+		local stats = private.UnpackStats (data.daily[itemID])
+		if stats[property] then
+			stats[property] = nil
+			cleareditem = true
+			data.daily[itemID] = private.PackStats (stats)
+		end
+	end
+
+	if data.means[itemID] then
+		local stats = private.UnpackStats (data.means[itemID])
+		if stats[property] then
+			stats[property] = nil
+			cleareditem = true
+			data.means[itemID] = private.PackStats (stats)
+		end
+	end
+
+	if cleareditem then
+		print(_TRANS('PURC_Interface_ClearingPurchasedLink'):format(hyperlink, serverKey) )--Stat - Purchased: clearing data for {{%s}} for {{%s}}
+		private.ClearCache()
+	end
+end
+
+function private.GetPriceData(serverKey)
+	local data = SPRealmData[serverKey]
+	if not data then
+		if type(serverKey) ~= "string" or not strfind(serverKey, ".%-%u%l") then
+			error("Invalid serverKey passed to Stat-Purchased")
+		end
+		data = {means = {}, daily = {created = time()}}
+		SPRealmData[serverKey] = data
+	end
+	return data
+end
+
+function private.InitData()
+	private.InitData = nil
+
+	-- Load Data
 	private.UpgradeDb()
-	AAStatPurchasedData = AucAdvancedStatPurchasedData
-	private.DataLoaded()
+	SPRealmData = AucAdvancedStatPurchasedData.RealmData
+	if not SPRealmData then
+		SPRealmData = {} -- dummy table to avoid errors in future events; data will not be saved
+		error("Error loading or creating Stat-Purchased database")
+	end
+
+	-- Data maintenance
+	for serverKey, data in pairs(SPRealmData) do
+		if type(serverKey) ~= "string" or not strfind(serverKey, ".%-%u%l") then
+			-- not a valid serverKey - remove it
+			SPRealmData[serverKey] = nil
+		else
+			-- lots of checks to make sure we ONLY have valid data in this table
+			for key, _ in pairs (data) do
+				if key ~= "means" and key ~= "daily" then
+					data[key] = nil
+				end
+			end
+			if type(data.means) == "table" then
+				for id, packed in pairs(data.means) do
+					if type(id) ~= "number" or type(packed) ~= "string" then
+						data.means[id] = nil
+					end
+				end
+			else
+				data.means = {}
+			end
+			if type(data.daily) == "table" then
+				for id, packed in pairs(data.daily) do
+					if id ~= "created" and (type(id) ~= "number" or type(packed) ~= "string") then
+						data.daily[id] = nil
+					end
+				end
+				if type(data.daily.created) ~= "number" then
+					data.daily.created = time()
+				end
+			else
+				data.daily = {created = time()}
+			end
+
+			if time() - data.daily.created > 3600*16 then
+				-- This data is more than 16 hours old, we classify this as "yesterday's data"
+				private.PushStats(serverKey)
+			end
+		end
+	end
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
