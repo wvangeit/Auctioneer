@@ -1535,7 +1535,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			end
 		end
 		if not value then
-			value = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+			value = item[Const.COUNT]*AucAdvanced.API.GetMarketValue(item[Const.LINK])
 		end
 		if not value then
 			value = 0
@@ -1571,7 +1571,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 				local pctstring = ""
 				if not pct and AucAdvanced.Modules.Util.PriceLevel then
 					local valueper
-					if value then
+					if value and value > 0 then
 						valueper = value/item[Const.COUNT]
 					end
 					if buyorbid == "bid" then
