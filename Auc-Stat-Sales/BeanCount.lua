@@ -122,8 +122,6 @@ do
 		basesettings.servers[1] = keysettings[2]
 		return basesettings
 	end
-	function StatSalesDebug1() return keycache end
-	function StatSalesDebug2() return basesettings end
 end
 
 local Rsn_Success, Rsn_WonBid, Rsn_WonBuy
