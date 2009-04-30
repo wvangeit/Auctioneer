@@ -228,7 +228,7 @@ function private.matchDB(text)
 	local itemID
 	for itemKey, data in pairs(BeanCounterDB.ItemIDArray) do
 		local _, name = strsplit(";", data)
-		if text:find(name, 1, true) then
+		if text == name then
 			itemID = string.split(":", itemKey)
 			--debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
 			local itemLink = lib.API.createItemLinkFromArray(itemKey)
