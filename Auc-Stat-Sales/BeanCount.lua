@@ -33,9 +33,12 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Sales"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local empty = table.wipe
+local GetSigFromLink = AucAdvanced.API.GetSigFromLink
+local GetFaction = AucAdvanced.GetFaction
 
-local cache = {}
+local pricecache = setmetatable({}, {__mode="v"})
 -- don't recalc time every query, that would be ridiculous
 local currenttime = time()
 local day3time = currenttime - 3*86400
@@ -43,8 +46,8 @@ local day7time = currenttime - 7*86400
 
 function private.onEvent(frame, event, arg, ...)
 	if (event == "MAIL_CLOSED") then
-        -- Clear cache
-		cache = {}
+        -- Clear pricecache
+		empty(pricecache)
 	end
 end
 
@@ -94,38 +97,61 @@ function private.GetCfromZ(Z)
 	end
 end
 
-lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink
+do
+	local keycache = {}
+	local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}}
+	local basesettings = {
+		["bid"] =true,
+		["auction"] = true,
+		["exact"] = true,
+		["servers"] = {},
+	}
+	function private.GetBCSearchSettings(serverKey)
+		local keysettings = keycache[serverKey]
+		if not keysettings then
+			-- only split each unique serverKey once, and cache the results
+			local realmName, factionName = strmatch(serverKey, "^(.+)%-(%u%l+)$")
+			local sbox = faction2selectbox[factionName]
+			if not sbox then -- Neutral faction
+				return
+			end
+			keysettings = {sbox, realmName}
+			keycache[serverKey] = keysettings
+		end
+		basesettings["selectbox"] = keysettings[1]
+		basesettings.servers[1] = keysettings[2]
+		return basesettings
+	end
+	function StatSalesDebug1() return keycache end
+	function StatSalesDebug2() return basesettings end
+end
 
-local settings = {["bid"] =true, ["auction"] = true, ["exact"] = true}
-local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}}
+local Rsn_Success, Rsn_WonBid, Rsn_WonBuy
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
-    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) or not (BeanCounter.getLocals) then return false end
-    local _, _, _, _, _BC = BeanCounter.getLocals() --_BC used to access beancounters localization strings
-
-	-- The current version of BeanCounter has some restrictions which prevent full implementation of serverKey
-	--- there is no means to request BeanCounter info for a different server
-	--- BeanCounter can only provide info for "alliance" or "horde", not "neutral"
-	-- The following bit of code should bail out when we detect a serverKey that BeanCounter can't handle
-	local _, realmName, factionName = AucAdvanced.GetFaction ()
-	if serverKey then
-		factionName = strmatch (serverKey, realmName.."%-(%u%l+)$")
+	if not Rsn_Success then
+		if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) or not (BeanCounter.getLocals) then return false end
+		local _, _, _, _, _BC = BeanCounter.getLocals()
+		-- cache BeanCounter translations so we don't have to look them up every time
+		Rsn_Success = _BC('UiAucSuccessful')
+		Rsn_WonBid = _BC('UiWononBid')
+		Rsn_WonBuy = _BC('UiWononBuyout')
 	end
-	local sbox = faction2selectbox[factionName]
-	if not sbox then return end
-	settings["selectbox"] = sbox
 
-    local sig = factionName..lib.GetSigFromLink(hyperlink)
-  	if cache[sig] == false then
+	serverKey = serverKey or GetFaction()
+    local sig = serverKey..GetSigFromLink(hyperlink)
+  	if pricecache[sig] == false then
 		return
 	end
-	if cache[sig] then
-		return unpack(cache[sig])
+	if pricecache[sig] then
+		return unpack(pricecache[sig])
 	end
+	local settings = private.GetBCSearchSettings(serverKey)
+	if not settings then return end
 
 	local tbl = BeanCounter.API.search(hyperlink, settings, true, 99999)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    local i,v, reason, qty, priceper, thistime
+    local reason, qty, priceper, thistime
     if tbl then
         for i,v in pairs(tbl) do
             -- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
@@ -142,10 +168,9 @@ function lib.GetPrice(hyperlink, serverKey)
 --10 0
 --11 10387318
 --12 1198401769
-            reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-            thistime = tonumber(thistime)
+            reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 0
             if priceper and qty and priceper>0 and qty>0 then
-                if reason == _BC('UiWononBuyout')  or reason == _BC('UiWononBid')  then
+                if reason == Rsn_WonBuy  or reason == Rsn_WonBid  then
                     boughtqty = boughtqty + qty
                     bought = bought + priceper*qty
                     boughtseen = boughtseen + 1
@@ -157,7 +182,7 @@ function lib.GetPrice(hyperlink, serverKey)
                         boughtqty7 = boughtqty7 + qty
                         bought7 = bought7 + priceper*qty
                     end
-                elseif reason == _BC('UiAucSuccessful')  then
+                elseif reason == Rsn_Success  then
                     soldqty = soldqty + qty
                     sold = sold + priceper*qty
                     soldseen = soldseen + 1
@@ -179,7 +204,7 @@ function lib.GetPrice(hyperlink, serverKey)
         if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
         if soldqty7>0 then sold7 = sold7 / soldqty7 end
     end
-    if (not sold or sold==0) and (not bought or bought==0) then cache[sig]=false; return end
+    if (not sold or sold==0) and (not bought or bought==0) then pricecache[sig]=false; return end
     -- Start StdDev calculations
     local mean = sold
     -- Calculate Variance
@@ -187,8 +212,8 @@ function lib.GetPrice(hyperlink, serverKey)
     local count = 0
 
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-    	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == _BC('UiAucSuccessful') then
+    	reason, qty, priceper = v[2], v[6], v[7]
+        if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success then
             variance = variance + ((mean - priceper) ^ 2);
             count = count + 1
         end
@@ -202,8 +227,8 @@ function lib.GetPrice(hyperlink, serverKey)
     local number = 0
     local total = 0
     for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-    	reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
-        if priceper and qty and priceper>0 and qty>0 and reason == _BC('UiAucSuccessful')  then
+    	reason, qty, priceper = v[2], v[6], v[7]
+        if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success  then
         	if (math.abs(priceper - mean) < deviation) then
 			    total = total + priceper * qty
 			    number = number + qty
@@ -220,7 +245,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		confidence = private.GetCfromZ(confidence)
 	end
 
-    cache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
+    pricecache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
     return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
