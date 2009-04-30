@@ -78,7 +78,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 		--get the itemTexture for display in the drop box
 		for i, data in pairs(BeanCounterDB.ItemIDArray) do
 			local _, name = strsplit(";", data)
-			if name:lower():find(itemName:lower(), 1, true) then
+			if name:lower() == itemName:lower() then
 				local itemID = strsplit(":", i) or ""
 				itemTexture = select(2, private.getItemInfo(itemID, "name"))
 				break
@@ -177,7 +177,7 @@ function private.searchServerData(serverName, data, tbl, settings)
 	--check servers are at least at current DB format.
 	for _, player in pairs(server) do
 		if player.version ~= private.version then
-			assert(nil, "The data for "..server.." is not at the current BeanCounter DB version of "..private.version.." Please log into this realm to upgrade BeanCounters Data.")
+			assert(nil, "The data for "..serverName.." is not at the current BeanCounter DB version of "..private.version.." Please log into this realm to upgrade BeanCounters Data.")
 			return
 		end
 		break
