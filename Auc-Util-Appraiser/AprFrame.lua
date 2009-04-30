@@ -1696,7 +1696,7 @@ function private.CreateFrames()
 			frame.manifest:Show()
 		end
 	end)
-	frame.toggleManifest:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SidebarAdditionalInfo') ) end)--Open/Close sidebar with additional price info
+	frame.toggleManifest:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SidebarINF_Tooltip_AdditionalInfo') ) end)--Open/Close sidebar with additional price info
 	frame.toggleManifest:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.toggleManifest:SetWidth(120)
 	frame.toggleManifest:SetText("Close Sidebar")
