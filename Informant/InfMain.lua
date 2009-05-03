@@ -349,6 +349,26 @@ function getItem(itemID, static)
 	return dataItem
 end
 
+local function getInformantVendorInfo(id)
+	local isVendored,isLimited,itemCost,toSell,buyStack,maxStack
+	local itemID = tonumber(id)
+	local itemData = getItem(itemID)
+	if itemData.merchantList then
+		isVendored = true
+	else
+		isVendored = false
+	end
+	if itemLimited and tonumber(itemLimited) > 0 then
+		isLimited = true
+	else
+		isLimited = false
+	end
+	itemCost = tonumber(itemData.buy)
+	toSell = tonumber(itemData.sell)
+	buyStack = tonumber(itemData.quantity)
+	maxStack = tonumber(itemData.stack)
+	return isVendored,isLimited,itemCost,toSell,buyStack,maxStack
+end
 
 --Implementation of GetSellValue API proposed by Tekkub at http://www.wowwiki.com/API_GetSellValue
 local origGetSellValue = GetSellValue
@@ -1079,6 +1099,7 @@ Informant = {
 	AddLine = addLine,
 	Clear = clear,
 	ShowHideInfo = showHideInfo,
+	getItemVendorInfo = getInformantVendorInfo,
 
 	-- These functions are only meant for internal use.
 	SetSkills = setSkills,
