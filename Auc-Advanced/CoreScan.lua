@@ -57,8 +57,6 @@ local GetTime = GetTime
 private.isScanning = false
 private.curPage = 0
 private.scanDir = 1
-private.filteredCount = 0
-
 local LclAucScanData = nil
 function private.LoadAuctionImage()
 	if (LclAucScanData) then return LclAucScanData end
@@ -450,7 +448,6 @@ local function processStats(operation, curItem, oldItem)
 		for pos, engineLib in ipairs(modules) do
 			local result=engineLib.AuctionFilter(operation, statItem)
 			if (result) then
-				private.filteredCount = private.filteredCount + 1
 				curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
 				operation = "filter"
 				break
@@ -459,7 +456,9 @@ local function processStats(operation, curItem, oldItem)
 	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 		-- This item is a filtered item
 		operation = "filter"
-		private.filteredCount = private.filteredCount + 1
+	end
+	if operation == "filter" then
+		return false
 	end
 
 	local modules = AucAdvanced.GetAllModules("ScanProcessors")
@@ -471,9 +470,6 @@ local function processStats(operation, curItem, oldItem)
 				engineLib.ScanProcessors[operation](operation, statItem)
 			end
 		end
-	end
-	if operation == "filter" then
-		return false
 	end
 	return true
 end
@@ -624,7 +620,7 @@ Commitfunction = function()
 	local itemPos
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
-	local updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0
+	local filterDeleteCount,filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0,0,0,0
 
 	processStats("begin")
 	for index, data in ipairs(TempcurScan) do
@@ -642,32 +638,38 @@ Commitfunction = function()
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
 			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
-			if not private.IsIdentical(oldItem, data) then
-				if processStats("update", data, oldItem) then
-					updateCount = updateCount + 1
-				end
-				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-					updateRecoveredCount = updateRecoveredCount + 1
-				end
+			if bit.band(data[Const.FLAG], Const.FLAG_FILTER) then
+				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
+				filterOldCount = filterOldCount + 1
 			else
-				if processStats("leave", data) then
-					sameCount = sameCount + 1
-				end
-				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-					sameRecoveredCount = sameRecoveredCount + 1
+				if not private.IsIdentical(oldItem, data) then
+					if processStats("update", data, oldItem) then
+						updateCount = updateCount + 1
+					end
+					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+						updateRecoveredCount = updateRecoveredCount + 1
+					end
+				else
+					if processStats("leave", data) then
+						sameCount = sameCount + 1
+					end
+					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+						sameRecoveredCount = sameRecoveredCount + 1
+					end
 				end
 			end
 			scandata.image[itemPos] = replicate(data)
 		else
 			if (processStats("create", data)) then
-				data[Const.ID] = private.GetNextID(idList)
-				table.insert(scandata.image, replicate(data))
 				newCount = newCount + 1
+			else
+				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
+				filterNewCount = filterNewCount + 1
 			end
+			-- processStats("create", ...) will mark the packed data item as filtered.  Save so we have all items on AH in data.
+			data[Const.ID] = private.GetNextID(idList)
+			table.insert(scandata.image, replicate(data))
 		end
-
--- end of debugging code
-
 	end
 
 	local data, flag
@@ -697,7 +699,11 @@ Commitfunction = function()
 				if (not wasIncomplete) then
 					if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
 						dodelete = true
-						earlyDeleteCount = earlyDeleteCount + 1
+						if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+							filterDeleteCount = filterDeleteCount + 1
+						else
+							earlyDeleteCount = earlyDeleteCount + 1
+						end
 					else
 						data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
 						missedCount = missedCount + 1
@@ -707,11 +713,17 @@ Commitfunction = function()
 				end
 			else
 				dodelete = true
-				expiredDeleteCount = expiredDeleteCount + 1
+				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+					filterDeleteCount = filterDeleteCount + 1
+				else
+					expiredDeleteCount = expiredDeleteCount + 1
+				end
 			end
 			if dodelete then
 				-- Auction Time has expired
-				processStats("delete", data)
+				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+					processStats("delete", data)
+				end
 				table.remove(scandata.image, pos)
 			end
 		elseif not data[Const.LINK] then --if there isn't a link in the data, remove the entry
@@ -722,20 +734,18 @@ Commitfunction = function()
 	lib.ProgressBars(CommitProgressBar, 100, true, "AucAdv: Processing Finished")
 	processStats("complete")
 
-	local filterCount = private.filteredCount
-
 	local currentCount = #scandata.image
-	if (updateCount + sameCount + newCount + filterCount ~= scanCount) then
-		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterCount, scanCount))
+	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount ~= scanCount) then
+		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterOldCount+filterNewCount, scanCount))
 	end
 
 	if numempty > 0 then
 		lib.Print(("Warning: %d entries in scandata without links"):format(numempty)) --this theoretically should never output, but if it does, we need to track it down.
 	end
-
-	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount ~= currentCount) then
-		lib.Print(("Warning, discrepency in current count: {{%d - %d - %d + %d != %d}}"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
-			newCount, currentCount))
+	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
+	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
+		lib.Print(("Warning, discrepency in current count: {{%d - %d - %d + %d + %d - %d != %d}}"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
+			newCount, filterNewCount, filterDeleteCount, currentCount))
 	end
 
 	local now = time()
@@ -783,8 +793,11 @@ Commitfunction = function()
 		if (earlyDeleteCount+expiredDeleteCount > 0) then
 			lib.Print("  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed")
 		end
-		if (filterCount > 0) then
-			lib.Print("  {{"..filterCount.."}} filtered items")
+		if (filterNewCount+filterOldCount > 0) then
+			lib.Print("  {{"..filterNewCount+filterOldCount.."}} filtered items")
+		end
+		if (filterDeleteCount > 0) then
+			lib.Print("  {{"..filterDeleteCount.."}} filtered items removed")
 		end
 		if (missedCount > 0) then
 			lib.Print("  {{"..missedCount.."}} missed items")
@@ -817,8 +830,6 @@ Commitfunction = function()
 	scandata.scanstats[0].query = replicate(TempcurQuery)
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
-
-	private.filteredCount = 0
 
 	AucAdvanced.API.ClearMarketCache();
 	-- Tell everyone that our stats are updated
