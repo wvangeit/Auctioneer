@@ -602,7 +602,7 @@ end
 
 function private.ignoreperm()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
-	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, 1)
+	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, 0)
 	print("SearchUI now ignoring "..private.data.link.." at any price")
 	private.removeline()
 end
