@@ -230,8 +230,8 @@ function private.matchDB(text)
 		local _, name = strsplit(";", data)
 		if text == name then
 			itemID = string.split(":", itemKey)
-			--debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
 			local itemLink = lib.API.createItemLinkFromArray(itemKey)
+			debugPrint("|CFFFFFF00Searching",data,"for",text,"Sucess: link is",itemLink)
 			return itemID, itemLink
 		end
 	end
@@ -249,6 +249,8 @@ function private.sortCompletedAuctions( i )
 			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
 			private.databaseAdd("completedAuctions", itemID, itemLink, value)
 			debugPrint("databaseAdd completedAuctions", itemID, itemLink)
+		else
+			debugPrint("Failure for completedAuctions", itemID, itemLink, value)
 		end
 	end
 	table.remove(private.reconcilePending, i)
@@ -259,20 +261,21 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 
 	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
 	--ItemLink will be used minus its unique ID
-	local itemString = itemLink:match("^.*(item:.+):.-:.-")-- ignore Unique ID
+	local itemString  =  lib.API.getItemString(itemLink)
+	itemString = itemString:match("(item:.+):.-:.-")-- ignore Unique ID
 	
 	for i,v in pairs (private.playerData[key][itemID]) do
 		if i:match(itemString) or i == itemString then
 			for index, text in pairs(v) do
 				if not text:match(".*USED.*") then
 					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
-					postDeposit, postBuy, postTime = tonumber(postDeposit), tonumber(postBuy), tonumber(postTime)
+					 postDeposit, postBuy, postBid, postTime = tonumber(postDeposit), tonumber(postBuy), tonumber(postBid), tonumber(postTime)
 					--if the deposits and buyouts match, check if time range would make this a possible match
-					if postDeposit == soldDeposit and postBuy == soldBuy then
+					 if postDeposit == soldDeposit and postBuy >= soldBuy and postBid <= soldBuy then --We may have sold it on a bid so we need to loosen this search
 						if (soldTime > postTime) and (oldestPossible < postTime) then
 							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Sold"
-							debugPrint("postedAuction removed as sold", itemID, itemLink)
+							--debugPrint("postedAuction removed as sold", itemID, itemLink)
 							return tonumber(postStack), tonumber(postBid)
 						end
 					end
@@ -293,6 +296,8 @@ function private.sortFailedAuctions( i )
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
 			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
 			debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+		else
+			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		end
 	end
 	table.remove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
@@ -312,7 +317,7 @@ function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, e
 						if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 800) then
 							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
-							debugPrint("postedAuction removed as Failed", itemID, itemLink )
+							--debugPrint("postedAuction removed as Failed", itemID, itemLink )
 							return postStack, postBid, postBuy, postDeposit
 						end
 					end
@@ -332,6 +337,8 @@ function private.sortCompletedBidsBuyouts( i )
 		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		private.databaseAdd("completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
 		debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
+	else
+		debugPrint("Failure for completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
 	end
 
 	table.remove(private.reconcilePending,i)
@@ -350,7 +357,7 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
 				if postBid == bid then
 					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
-					debugPrint("posted Bid removed as Won", itemString, index, reason)
+					--debugPrint("posted Bid removed as Won", itemString, index, reason)
 					return reason --return the reason code provided for why we bid/bought item
 				end
 			end
@@ -365,6 +372,8 @@ function private.sortFailedBids( i )
 		local value = private.packString(postStack, "", "", "", "", private.reconcilePending[i]["money"], postSeller, private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		private.databaseAdd("failedBids", itemID, itemLink, value)
 		debugPrint("databaseAdd failedBids", itemID, itemLink, value)
+	else
+		debugPrint("Failure for failedBids", itemID, itemLink, value)
 	end
 	table.remove(private.reconcilePending,i)
 end
