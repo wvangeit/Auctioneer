@@ -54,7 +54,7 @@ function lib.localizations(stringKey, locale)
 	end
 end
 
---The folowing function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
+--The following function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
 function lib.getFrameNames(option)
 	local frames = {}
 	local frameName = ""
@@ -156,13 +156,29 @@ end
 function lib.changeLocale()
 	local localizations, default = {}, lib.Settings.GetSetting("SelectedLocale") --get the user choosen locale make it first on the list
 	for i in pairs(AuctioneerLocalizations) do
-		if default == i then  
+		if default == i then
 			table.insert(localizations,1, {i, i})
 		else
 			table.insert(localizations, {i, i})
 		end
 	end
 	return localizations
+end
+
+-- Creates the list of Auction Durations for use in deposit cost dropdowns
+do
+	local auctionlength
+	function private.createAuctionLength()
+		-- called from OnLoad, as localizations are not valid before that event
+		auctionlength = {
+			{12, lib.localizations("APPR_Interface_12Hours")},
+			{24, lib.localizations("APPR_Interface_24Hours")},
+			{48, lib.localizations("APPR_Interface_48Hours")},
+		}
+	end
+	function lib.selectorAuctionLength()
+		return auctionlength
+	end
 end
 
 function lib.GetFactor(...) return tooltip:GetFactor(...) end
@@ -175,7 +191,6 @@ lib.breakHyperlink = lib.BreakHyperlink
 
 function lib.GetFaction()
 	local realmName = GetRealmName()
-	local currentZone = GetMinimapZoneText()
 	local factionGroup = lib.GetFactionGroup()
 	if not factionGroup then return end
 
@@ -464,6 +479,12 @@ function lib.SendProcessorMessage(...)
 	for pos, engineLib in ipairs(modules) do
 		engineLib.Processor(...)
 	end
+end
+
+-- Called from CoreMain when Auc-Advanced has loaded
+-- Used to initialize data that relies on saved variables
+function lib.utilOnLoad()
+	private.createAuctionLength()
 end
 
 -- Returns the tooltip helper

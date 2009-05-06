@@ -215,6 +215,9 @@ function private.OnLoad(addon)
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
 			AucAdvanced.Scan.GetImage()
 		end
+		
+		-- notify other (non-module) sections of Auc-Advanced
+		AucAdvanced.utilOnLoad() -- CoreUtil.lua
 
 	end
 
