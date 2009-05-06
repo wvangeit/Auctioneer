@@ -367,24 +367,17 @@ end
 
 function GetDepositCost(item, duration, faction, count)
 	-- Die if unable to complete function
-	if not item then return end
+	if not (item and GetSellValue) then return end
 
 	-- Set up function defaults if not specifically provided
-	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 	end
-	if (faction == "neutral") then faction = .75 else faction = .15 end
-	if not count then count = 1 end
+	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 end
+	if faction == "neutral" or faction == "Neutral" then faction = .75 else faction = .15 end
+	count = count or 1
 
-	if (GetSellValue) then
-		local gsv = GetSellValue(item)
-		local deposit
-		if gsv == nil then
-			deposit = 0
-			return deposit
-		else
-			deposit = math.floor(faction * gsv * count) * duration
-			return deposit
-		end
-	return nil end
+	local gsv = GetSellValue(item)
+	if gsv then
+		return math.floor(faction * gsv * count) * duration
+	end
 end
 
 -- lib.GetDepositAmount(sig, count) has been depreciated please use new global GetDepositCost(item, duration, faction, count)
