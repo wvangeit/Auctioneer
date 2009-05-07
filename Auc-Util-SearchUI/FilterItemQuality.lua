@@ -110,6 +110,7 @@ function lib.Filter(item, searcher)
 	local itype = item[Const.ITYPE]
 	local quality = item[Const.QUALITY]
 	quality = qualname[quality]
+	if not quality then return end -- protection against Blizzard returning an unexpected value, e.g. after a patch
 
 	if get("ignoreitemquality."..itype.."."..quality) then
 		return true, quality.." "..itype.." filtered"
