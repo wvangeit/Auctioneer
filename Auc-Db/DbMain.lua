@@ -128,6 +128,8 @@ function private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
 	local rate = 0.15
 	if faction:lower() == "neutral" then rate = 0.75 end
 
+	private.setDesignation()
+
 	local sig = designation..":"..itemId..":"..itemSuffix
 	if AucDbData.count[sig] then
 		local match
@@ -138,19 +140,24 @@ function private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
 	end
 end
 
+function private.setDesignation(force)
+	if not designation or force then
+		faction = AucAdvanced.GetFaction()
+		designation = RealmDesignation(faction)
+	end
+end
 
 function private.begin()
 	rope:Clear()
 	scanid = getTime()
-	faction = AucAdvanced.GetFaction()
-	designation = RealmDesignation(faction)
+	private.setDesignation(true)
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.scans then AucDbData.scans = {} end
 	if not AucDbData.scans[designation] then AucDbData.scans[designation] = {} end
 end
 
 function private.process(operation, itemData, oldData)
-	if (designation and scanid) then
+	if designation and scanid then
 		if not rope:IsEmpty() then rope:Add(";") end
 		rope:AddDelimited(":", itemData.itemId, itemData.itemSuffix, itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
 
@@ -158,8 +165,12 @@ function private.process(operation, itemData, oldData)
 	end
 end
 function private.complete()
-	AucDbData.scans[designation][scanid] = rope:Get()
-	rope:Clear()
+	if (designation and scanid) then
+		AucDbData.scans[designation][scanid] = rope:Get()
+	end
+	if rope then
+		rope:Clear()
+	end
 end
 
 function private.bid(operation, itemData, bidType, index, bid)
@@ -167,6 +178,8 @@ function private.bid(operation, itemData, bidType, index, bid)
 	local timeidx = getTime()
 	local line = strjoin(":", itemData.itemId,itemData.itemSuffix,itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft, bidType, bid)
 	print("Accepted bid for", itemData.itemName)
+
+	private.setDesignation()
 
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.bids then AucDbData.bids = {} end
@@ -184,6 +197,8 @@ function private.start(operation, itemData, minBid, buyoutPrice, runTime, price)
 	local dayidx = math.floor(timeidx / 86400)
 	local line = strjoin(":", itemData.itemId,itemData.itemSuffix,itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
 	print("Started auction for", itemData.itemName)
+
+	private.setDesignation()
 
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.start then AucDbData.start = {} end
