@@ -165,6 +165,27 @@ function lib.changeLocale()
 	return localizations
 end
 
+-- Creates the list of Pricing Models for use in dropdowns
+do
+	local pricemodels
+	function private.resetPriceModels()
+		-- called every time a new module loads
+		pricemodels = nil
+	end
+	function lib.selectorPriceModels()
+		if not pricemodels then
+			-- delay creating table until function is first called, to give all modules a chance to load first
+			pricemodels = {}
+			table.insert(pricemodels,{"market", "Market value"})
+			local algoList = AucAdvanced.API.GetAlgorithms()
+			for pos, name in ipairs(algoList) do
+				table.insert(pricemodels,{name, "Stats: "..name})
+			end
+		end
+		return pricemodels
+	end
+end
+
 -- Creates the list of Auction Durations for use in deposit cost dropdowns
 do
 	local auctionlength
@@ -375,6 +396,7 @@ function lib.NewModule(libType, libName)
 
 		lib.Modules[libType][libName] = module
 		private.modulecache = nil
+		private.resetPriceModels()
 		return module, lib, modulePrivate
 	end
 end

@@ -58,9 +58,9 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 	if not  get("util.pricelevel.single") then return end
-	
+
 	if not additional or not additional.buyoutPrice or not additional.minBid then return end
-	
+
 	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, additional.minBid, additional.buyoutPrice)
 	if (not priceLevel) then return end
 
@@ -68,38 +68,24 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 end
 
 function lib.OnLoad()
-	AucAdvanced.Settings.SetDefault("util.pricelevel.colorize", false)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.single", true)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.model", "market")
-	AucAdvanced.Settings.SetDefault("util.pricelevel.basis", "try")
-	AucAdvanced.Settings.SetDefault("util.pricelevel.blue", 0)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.green", 50)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.yellow", 80)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.orange", 110)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.red", 135)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.opacity", 30)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.gradient", true)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.direction", "LEFT")
+	default("util.pricelevel.colorize", false)
+	default("util.pricelevel.single", true)
+	default("util.pricelevel.model", "market")
+	default("util.pricelevel.basis", "try")
+	default("util.pricelevel.blue", 0)
+	default("util.pricelevel.green", 50)
+	default("util.pricelevel.yellow", 80)
+	default("util.pricelevel.orange", 110)
+	default("util.pricelevel.red", 135)
+	default("util.pricelevel.opacity", 30)
+	default("util.pricelevel.gradient", true)
+	default("util.pricelevel.direction", "LEFT")
 
-	AucAdvanced.Settings.SetSetting("util.pricelevel.blue", nil)
+	set("util.pricelevel.blue", nil) -- blue is a fake slider for display only - always 0
 
 end
 
 --[[ Local functions ]]--
-
-function private.GetPriceModels()
-	if not private.scanValueNames then private.scanValueNames = {} end
-	for i = 1, #private.scanValueNames do
-		private.scanValueNames[i] = nil
-	end
-
-	table.insert(private.scanValueNames,{"market", "Market value"})
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	for pos, name in ipairs(algoList) do
-		table.insert(private.scanValueNames,{name, "Stats: "..name})
-	end
-	return private.scanValueNames
-end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
@@ -133,7 +119,7 @@ function private.SetupConfigGui(gui)
 	}, "util.pricelevel.direction", "Pick the gradient direction")
 	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the Auction Browse window (if enabled).")
 	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
+	gui:AddControl(id, "Selectbox",  0, 1, parent.selectorPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
 	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
 	gui:AddControl(id, "Subhead",    0,    "Price level basis:")
 	gui:AddControl(id, "Selectbox",  0, 1, {
