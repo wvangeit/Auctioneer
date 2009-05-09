@@ -42,7 +42,7 @@ function private.GetPriceModels(itemLink)
 		private.scanValueNames[i] = nil
 	end
 
-	table.insert(private.scanValueNames,{"market", "Market value"})
+	table.insert(private.scanValueNames,{"market", _TRANS("UCUT_Interface_MarketValue")})--Market value (reusing Undercut's translation)
 	local algoList = AucAdvanced.API.GetAlgorithms(itemLink)
 	for pos, name in ipairs(algoList) do
 		if (name ~= lib.libName) then
@@ -79,7 +79,7 @@ end
 function private.updateRoundExample()
 	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
 	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
-	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep")) 
+	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep"))
 	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
 	if pos == nil then pos = 0.10 end
 	if mag == nil then mag = 5 end
@@ -156,7 +156,7 @@ end
 function private.roundValue(value)
 	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
 	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
-	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep")) 
+	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep"))
 	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
 	if pos == nil then pos = 0.10 end
 	if mag == nil then mag = 5 end
@@ -362,7 +362,7 @@ function private.SetupConfigGui(gui)
 		_TRANS('APPR_Help_WhatDefaultPricingAnswer') )--When Appraiser calculates the price to list an item for, it will use either a market price, which is an average of certain other pricing models, or a price returned by a specific AuctioneerAdvanced statistics module. You may select the model that is used for items that have not had a particular model selected.
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_StartingBidCalculation') )--Starting bid calculation
-	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, _TRANS('APPR_Interface_MarkdownBy').." %0.1f%%" )--Markdown by: 
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, _TRANS('APPR_Interface_MarkdownBy').." %0.1f%%" )--Markdown by:
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_MarkdownBy') )--The markdown amount is a percentage amount that an item's calculated value will be reduced by to produce the bid value.
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, _TRANS('APPR_Interface_SubtractAmount') )--Subtract amount:
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_SubtractAmount') )--The subtract amount is a fixed amount that an item's calculated value will have subtracted to produce the bid value.

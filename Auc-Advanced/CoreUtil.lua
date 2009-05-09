@@ -176,10 +176,10 @@ do
 		if not pricemodels then
 			-- delay creating table until function is first called, to give all modules a chance to load first
 			pricemodels = {}
-			table.insert(pricemodels,{"market", "Market value"})
+			table.insert(pricemodels,{"market", lib.localizations("UCUT_Interface_MarketValue")})--Market value {Reusing Undercut's existing localization string}
 			local algoList = AucAdvanced.API.GetAlgorithms()
 			for pos, name in ipairs(algoList) do
-				table.insert(pricemodels,{name, "Stats: "..name})
+				table.insert(pricemodels,{name, lib.localizations("APPR_Interface_Stats").." "..name})--Stats: {Reusing Appraiser's existing localization string}
 			end
 		end
 		return pricemodels

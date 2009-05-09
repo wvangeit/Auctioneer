@@ -136,7 +136,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local matchArray = {}
 	matchArray.value = matchprice
 	if lowest then
-		if matchprice<=lowestBidOnly then     
+		if matchprice<=lowestBidOnly then
 			matchArray.returnstring = _TRANS('UCUT_Interface_UndercutLowestPrice'):format(marketdiff, "\n")--Undercut: %% change: %s%s Undercut: Lowest Price
 		else
 			matchArray.returnstring = _TRANS('UCUT_Interface_UndercutLowestBid'):format(marketdiff, "\n")--Undercut: %% change: %s%s Undercut: Lower bid-only auctions
@@ -151,20 +151,6 @@ end
 
 local array = {}
 
-function private.GetPriceModels()
-	if not private.scanValueNames then private.scanValueNames = {} end
-	for i = 1, #private.scanValueNames do
-		private.scanValueNames[i] = nil
-	end
-
-	table.insert(private.scanValueNames,{"market", _TRANS('UCUT_Interface_MarketValue') })--Market value
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	for pos, name in ipairs(algoList) do
-		table.insert(private.scanValueNames,{name, "Stats: "..name})
-	end
-	return private.scanValueNames
-end
-
 function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
 	if not link then return end
 	if not get("match.undercut.tooltip") then return end
@@ -172,7 +158,7 @@ function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, ad
 	if not model then return end
 	local market
 	local matcharray
-	
+
 	if pricecache and pricecache[link] then
 		matcharray = replicate(pricecache[link])
 		market = matcharray.market
@@ -212,12 +198,12 @@ function lib.OnLoad()
 	--You should also set your Configator defaults here
 
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("match.undercut.enable", true)
-	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -20)
-	AucAdvanced.Settings.SetDefault("match.undermarket.overmarket", 10)
-	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 1)
-	AucAdvanced.Settings.SetDefault("match.undercut.tooltip", true)
-	AucAdvanced.Settings.SetDefault("match.undercut.model", "market")
+	default("match.undercut.enable", true)
+	default("match.undermarket.undermarket", -20)
+	default("match.undermarket.overmarket", 10)
+	default("match.undermarket.undercut", 1)
+	default("match.undercut.tooltip", true)
+	default("match.undercut.model", "market")
 end
 
 --[[ Local functions ]]--
@@ -237,7 +223,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.enable", _TRANS('UCUT_Interface_EnableUndercut') )--Enable Auc-Match-Undercut
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_EnableUndercut') )--Enable this module's functions.
-	
+
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, _TRANS('UCUT_Interface_MaxMarkdown').." %d%%")--Max under market price (markdown):
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_MaxMarkdown') )--This controls how much below the market price you are willing to undercut before giving up. \n If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.
 
@@ -255,8 +241,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip",_TRANS('UCUT_Interface_ShowInTooltip') )--Show undercut status in tooltip
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_ShowInTooltip') )--Add a line to the tooltip showing whether the current competition is undercuttable
 	gui:AddControl(id, "Note",       0, 2, 500, 15, _TRANS('UCUT_Interface_TooltipValuationMethod') )--Tooltip price valuation method
-	gui:AddControl(id, "Selectbox",  0, 2, private.GetPriceModels, "match.undercut.model", _TRANS('UCUT_Interface_PricingModel') )--Pricing model to use
-	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_PricingModel'))--The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else 
+	gui:AddControl(id, "Selectbox",  0, 2, parent.selectorPriceModels, "match.undercut.model", _TRANS('UCUT_Interface_PricingModel') )--Pricing model to use
+	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_PricingModel'))--The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else
 
 end
 

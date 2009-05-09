@@ -125,37 +125,23 @@ function lib.AuctionFilter(operation, itemData)
 end
 
 function lib.OnLoad(addon)
-	AucAdvanced.Settings.SetDefault("filter.outlier.activated", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.model", "market")
-	AucAdvanced.Settings.SetDefault("filter.outlier.minseen", 10)
-	AucAdvanced.Settings.SetDefault("filter.outlier.poor.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.common.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.uncommon.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.rare.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.epic.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.legendary.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.artifact.enabled", true)
-	AucAdvanced.Settings.SetDefault("filter.outlier.poor.level", 200)
-	AucAdvanced.Settings.SetDefault("filter.outlier.common.level", 200)
-	AucAdvanced.Settings.SetDefault("filter.outlier.uncommon.level", 200)
-	AucAdvanced.Settings.SetDefault("filter.outlier.rare.level", 250)
-	AucAdvanced.Settings.SetDefault("filter.outlier.epic.level", 300)
-	AucAdvanced.Settings.SetDefault("filter.outlier.legendary.level", 300)
-	AucAdvanced.Settings.SetDefault("filter.outlier.artifact.level", 300)
-end
-
-function private.GetPriceModels()
-	if not private.scanValueNames then private.scanValueNames = {} end
-	for i = 1, #private.scanValueNames do
-		private.scanValueNames[i] = nil
-	end
-
-	table.insert(private.scanValueNames,{"market", "Market value"})
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	for pos, name in ipairs(algoList) do
-		table.insert(private.scanValueNames,{name, "Stats: "..name})
-	end
-	return private.scanValueNames
+	default("filter.outlier.activated", true)
+	default("filter.outlier.model", "market")
+	default("filter.outlier.minseen", 10)
+	default("filter.outlier.poor.enabled", true)
+	default("filter.outlier.common.enabled", true)
+	default("filter.outlier.uncommon.enabled", true)
+	default("filter.outlier.rare.enabled", true)
+	default("filter.outlier.epic.enabled", true)
+	default("filter.outlier.legendary.enabled", true)
+	default("filter.outlier.artifact.enabled", true)
+	default("filter.outlier.poor.level", 200)
+	default("filter.outlier.common.level", 200)
+	default("filter.outlier.uncommon.level", 200)
+	default("filter.outlier.rare.level", 250)
+	default("filter.outlier.epic.level", 300)
+	default("filter.outlier.legendary.level", 300)
+	default("filter.outlier.artifact.level", 300)
 end
 
 function private.SetupConfigGui(gui)
@@ -175,7 +161,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableOutlierFilter') )--Ticking this box will enable the outlier filter to perform filtering of your auction scans
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('OUTL_Interface_PriceMethod') )--Price valuation method:
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "filter.outlier.model", _TRANS('OUTL_Interface_PricingModel') )--Pricing model to use for the valuation
+	gui:AddControl(id, "Selectbox",  0, 1, parent.selectorPriceModels, "filter.outlier.model", _TRANS('OUTL_Interface_PricingModel') )--Pricing model to use for the valuation
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_PricingModel') )--The pricing model that will be used to determine the base pricing level
 
 	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.minseen", 1, 50, 1, _TRANS('OUTL_Interface_MinimumSeen') )--Minimum seen: %d
