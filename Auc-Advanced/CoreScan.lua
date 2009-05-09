@@ -638,8 +638,7 @@ Commitfunction = function()
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
 			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
-			if bit.band(data[Const.FLAG], Const.FLAG_FILTER) then
-				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
+			if (bit.band(data[Const.FLAG], Const.FLAG_FILTER)==Const.FLAG_FILTER) then
 				filterOldCount = filterOldCount + 1
 			else
 				if not private.IsIdentical(oldItem, data) then
