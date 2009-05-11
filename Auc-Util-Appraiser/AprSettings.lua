@@ -95,6 +95,9 @@ function private.updateRoundExample()
 		roundname = _TRANS('APPR_Interface_StopValue')
 	elseif method == "div" then
 		roundname = _TRANS('APPR_Interface_Divisions')
+	else
+		AucAdvanced.Settings.SetSetting("util.appraiser.round.method", nil) -- saved setting was invalid, so clear it.
+		roundname = _TRANS('APPR_Interface_StopValue')
 	end
 
 	tinsert(output, _TRANS('APPR_Interface_Examples'):format(roundname))
