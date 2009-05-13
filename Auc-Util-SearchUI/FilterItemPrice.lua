@@ -111,14 +111,16 @@ end
 --private.remove()
 --removes the selected item from the ignore list
 function private.remove()
-	local data = private.ignorelistGUI.sheet:GetSelection()
-	if string.find(data[1], "item:") then
-		local sig = AucAdvanced.API.GetSigFromLink(data[1])
-		if sig then
-			lib.AddIgnore(sig) --second var is nil, removing item from list
+	local link = private.ignorelistGUI.sheet:GetSelection()[1]
+	if link then
+		if string.find(link, "item:") then
+			local sig = AucAdvanced.API.GetSigFromLink(link)
+			if sig then
+				lib.AddIgnore(sig) --second var is nil, removes item from list
+			end
+		else
+			lib.AddIgnore(link)
 		end
-	else
-		lib.AddIgnore(data[1])
 	end
 end
 
