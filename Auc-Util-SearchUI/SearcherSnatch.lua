@@ -117,7 +117,7 @@ function lib:MakeGuiConfig(gui)
 	})
 
 	frame.snatchlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	frame.snatchlist:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -55, 2)
+	frame.snatchlist:SetPoint("TOPLEFT", frame, "TOPLEFT", 275, 2) --Anchor to left side. The GUI is resized from the right when we embed in AH
 	frame.snatchlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, -100)
 	frame.snatchlist:SetWidth(380)
 
