@@ -51,10 +51,11 @@ The following functions are part of the module's exposed methods:
 ]]
 
 -- Auto disable if build version is not correct:
-local requiredBuild = 9835
+local requiredBuildLive = 9835
+local requiredBuildPTR = 9901
 local version, build = GetBuildInfo()
-if (tonumber(build) ~= requiredBuild) then
-	print("AucAdvanced: {{"..libType..":"..libName.."}} not loading: Wrong WoW build version! ("..build.." != "..requiredBuild..")")
+if (tonumber(build) ~= requiredBuildLive) and (tonumber(build) ~= requiredBuildPTR) then
+	print("AucAdvanced: {{"..libType..":"..libName.."}} not loading: Build ("..build..") detected.  Requires Live build ("..requiredBuildLive.." or PTR build "..requiredBuildPTR.." )")
 	DisableAddOn("Auc-Util-FixAH")
 	return
 end
