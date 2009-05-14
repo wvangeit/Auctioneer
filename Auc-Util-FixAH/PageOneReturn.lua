@@ -96,7 +96,7 @@ function private.HookAH(...)
 end
 
 function private.SearchButtonClick(...)
-	AuctionFrameBrowse.page = 1
+	AuctionFrameBrowse.page = 0
 	private.RealSearchButtonClick(...)
 end
 
