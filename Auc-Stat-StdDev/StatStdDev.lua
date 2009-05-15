@@ -190,7 +190,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		price = tonumber(price) or 0
 		stack = tonumber(stack) or 1
 		if (stack < 1) then stack = 1 end
-		if (math.abs(price - mean) < deviation) then
+		if (math.abs((price/stack) - mean) < deviation) then
 			total = total + price
 			number = number + stack
 		end
