@@ -145,10 +145,11 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 			local profit, low, high
 			--Since a "" or full DB search takes a lot of time just pass teh already compiled data table for 48k trxn this means 0.24sec vs 8.5sec
 			--However this lmits it to ONLY the results displayed in the scrollframe not entire DB
+			local player = private.frame.SelectBoxSetting[2]
 			if classic == "" then
-				profit, low, high = lib.API.getAHProfit(nil, data) 
+				profit, low, high = lib.API.getAHProfit(player, data) 
 			else
-				profit, low, high = lib.API.getAHProfit(nil, classic)
+				profit, low, high = lib.API.getAHProfit(player, classic)
 			end
 			local change = "|CFF33FF33Gained"
 			if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
