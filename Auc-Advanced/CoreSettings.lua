@@ -292,7 +292,7 @@ local function setter(setting, value)
 	if setting == "uselocale" then--Stores the last user choosen locale so it can be used next time
 		lib.SetSetting("SelectedLocale", value)
 	end
-	
+
 	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 end
 
@@ -387,7 +387,7 @@ function lib.MakeGuiConfig()
 	gui:AddCat("Core Options")
 
 	id = gui:AddTab("Profiles")
-	
+
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_SetupProfile')) --"Setup, Configure and Edit Profiles"
 	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_ActivateProfile')) --"Activate a current profile"
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
@@ -432,7 +432,7 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", _TRANS('ADV_Interface_ScanDataSummary')) --"Enables the display of the post scan summary"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummary')) --"Display the summation of an Auction House scan"
 
@@ -462,16 +462,16 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", _TRANS('ADV_Interface_Down')) --"Down"
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredOutputFrame')) --"Preferred Output Frame"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
-	
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ChatOutputFrame')) --"This allows you to select which chat window Auctioneer prints its output to."
+
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredLanguage')) --"Preferred Language"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.changeLocale(), "uselocale")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PreferredLanguage')) --"Chooses the language used by Auctioneer. This will require a /console reloadui or restart to take full effect"
-	
+
 	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PurchasingOptions')) --"Purchasing Options"
 	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", _TRANS('ADV_Interface_ShowPurchaseDebug')) --"Show purchase queue info"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ShowPurchaseDebug')) --"Shows what is added to the purchase queue, and what is being purchased"
 
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ChatOutputFrame')) --"This allows you to select which chat window Auctioneer prints its output to."
 	gui:AddHelp(id, "what is scandata",
 		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
 		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
@@ -499,7 +499,7 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is preferred language",
 		_TRANS('ADV_Help_WhatPreferredLanguage'), --"What is the Preferred Language?",
 		_TRANS('ADV_Help_WhatPreferredLanguageAnswer')) --"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui"
-				
+
     gui:AddHelp(id, "what is accuracy",
         _TRANS('ADV_Help_WhatAccuracy'), --"What is Market Pricing error?",
         _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
