@@ -687,6 +687,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Miscellaneous Enchantrix Options";
 		["GuiPrintin"]	= "Select the desired message frame";
 		["GuiPrintYieldsInChat"]	= "Show item yields in chat";
+		["GuiShowCraftReagents"]	= "Show crafting reagents in tooltips";
 		["GuiTerse"]	= "Enable terse mode";
 		["GuiValuateAverages"]	= "Valuate with Auctioneer averages";
 		["GuiValuateBaseline"]	= "Valuate with Built-in Data";

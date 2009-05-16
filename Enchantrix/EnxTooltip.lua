@@ -409,27 +409,6 @@ function itemTooltip(tooltip, name, link, quality, count)
 	end
 end
 
--- using the Craft APIs
-local function getReagentsFromCraftFrame(craftIndex)
-	local reagentList = {}
-
-	local getReagentsFunc = GetCraftNumReagents or GetTradeSkillNumReagents;	-- ccox - WoW 3.0
-	local getReagentLinkFunc = GetCraftReagentItemLink or GetTradeSkillReagentItemLink;	 -- ccox - WoW 3.0
-	local getReagentInfoFunc = GetCraftReagentInfo or GetTradeSkillReagentInfo;	-- ccox - WoW 3.0
-
-	local numReagents = getReagentsFunc(craftIndex)
-	for i = 1, numReagents do
-		local link = getReagentLinkFunc(craftIndex, i)
-		if link then
-			local hlink = link:match("|H([^|]+)|h")
-			local reagentName, reagentTexture, reagentCount, playerReagentCount = getReagentInfoFunc(craftIndex, i)
-			table.insert(reagentList, {hlink, reagentCount})
-		end
-	end
-
-	return reagentList
-end
-
 -- using the Trade APIs
 local function getReagentsFromTradeFrame(craftIndex)
 	local reagentList = {}
@@ -505,7 +484,7 @@ end
 
 
 -- this can be used by non enchanters when clicking on an enchant tooltip
--- this is also used inside the enchanting/crafting trade window
+-- this WAS also used inside the enchanting/crafting trade window, but that broke when the new tooltip library was added
 
 function enchantTooltip(tooltip, name, link, isItem)
 
@@ -529,39 +508,22 @@ function enchantTooltip(tooltip, name, link, isItem)
 		name = name:gsub("^%a+:", "")	-- remove crafting type "Enchanting:"
 		name = name:gsub("^%s*", "")	-- remove leading spaces
 		--Enchantrix.Util.DebugPrintQuick("cleaned name is ", name )
-
-		if select(4, GetBuildInfo()) < 30000 then		-- ccox - WoW 3.0 gets rid of GetCraft APIs
-			-- first try craft APIs
-			for i = 1, GetNumCrafts() do
-				local craftName = GetCraftInfo(i)
-				--Enchantrix.Util.DebugPrintQuick("testing craft ", name, " equal to ", craftName )
-				if name == craftName then
-					craftIndex = i
-					break
-				end
+		
+		for i = GetFirstTradeSkill(), GetNumTradeSkills() do
+			local tradeName = GetTradeSkillInfo(i);
+			if name == tradeName then
+				tradeIndex = i
+				break
 			end
 		end
 
-		if craftIndex then
-			reagentList = getReagentsFromCraftFrame(craftIndex)
+		if tradeIndex then
+			reagentList = getReagentsFromTradeFrame(tradeIndex)
 		else
-			-- try trade skill APIs next
-			for i = GetFirstTradeSkill(), GetNumTradeSkills() do
-				local tradeName = GetTradeSkillInfo(i);
-				if name == tradeName then
-					tradeIndex = i
-					break
-				end
-			end
-
-			if tradeIndex then
-				reagentList = getReagentsFromTradeFrame(tradeIndex)
-			else
-				-- if all else fails
-				reagentList = getReagentsFromTooltip(frame)
-			end
+			-- if all else fails
+			reagentList = getReagentsFromTooltip(frame)
 		end
-
+		
 		if not reagentList or (#reagentList < 1) then
 			--Enchantrix.Util.DebugPrintQuick("no reagents found for ", link, " in ", name )
 			return
@@ -602,15 +564,9 @@ function enchantTooltip(tooltip, name, link, isItem)
 	end)
 
 	-- Header
+	tooltip:SetColor(0.7,0.7,0.1)
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip');
 	if not embed and not isItem then
-		local icon
-		if tradeIndex then
-			icon = GetTradeSkillIcon(tradeIndex)
-		else
-			icon = "Interface\\Icons\\Spell_Holy_GreaterHeal"
-		end
-		--tooltip:SetIcon(icon)
 		local hLink = link:match("|H([^|]+)|h")
 		if not hLink then hLink = link end
 		tooltip:AddLine(hLink)
@@ -619,7 +575,6 @@ function enchantTooltip(tooltip, name, link, isItem)
 
 	local price = 0
 	local unknownPrices
-	tooltip:SetColor(0.7,0.7,0.1)
 	-- Add reagent list to tooltip and sum reagent prices
 	for _, reagent in pairs(reagentList) do
 		local line = "  "
@@ -645,26 +600,17 @@ function enchantTooltip(tooltip, name, link, isItem)
 		end
 	end
 
-	-- add barker line, if barker is loaded
-	local margin = 0
-	local profit = 0
-	local barkerPrice = 0
-
-	if (Barker and Barker.Settings.GetSetting('barker')) then
-	-- Barker price
-		margin = Barker.Settings.GetSetting("barker.profit_margin")
-		profit = price * margin * 0.01
-		profit = math.min(profit, Barker.Settings.GetSetting("barker.highest_profit"))
-		barkerPrice = Enchantrix.Util.Round(price + profit)
-	end
-
-
 	-- Totals
 	tooltip:SetColor(0.8,0.8,0.2)
 	if price > 0 then
 		tooltip:AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 
+		-- add barker line, if barker is loaded
 		if (Barker and Barker.Settings.GetSetting('barker')) then
+			local margin = Barker.Settings.GetSetting("barker.profit_margin")
+			local profit = price * margin * 0.01
+			profit = math.min(profit, Barker.Settings.GetSetting("barker.highest_profit"))
+			local barkerPrice = Enchantrix.Util.Round(price + profit)
 			-- "Barker Price (%d%% margin)"
 			tooltip:AddLine(_ENCH('FrmtBarkerPrice'):format(Barker.Util.Round(margin)), barkerPrice, embed)
 		end
@@ -682,7 +628,8 @@ function enchantTooltip(tooltip, name, link, isItem)
 end
 
 function hookItemTooltip(tipFrame, item, count, name, link, quality)
-	if (not Enchantrix.Settings.GetSetting('all')) then return end
+	if ((not Enchantrix.Settings.GetSetting('all'))
+		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
 	
 	tooltip:SetFrame(tipFrame)
 	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
@@ -698,7 +645,8 @@ function hookItemTooltip(tipFrame, item, count, name, link, quality)
 end
 
 function hookSpellTooltip(tipFrame, link, name, rank)
-	if (not Enchantrix.Settings.GetSetting('all')) then return end
+	if ((not Enchantrix.Settings.GetSetting('all'))
+		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
 	
 	tooltip:SetFrame(tipFrame)
 	if link:sub(0, 8) == "enchant:" or link:sub(0, 6) == "spell:" then

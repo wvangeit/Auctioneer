@@ -138,6 +138,8 @@ local settingDefaults = {
 	['TooltipMillingShowAuctValueMedian'] = true,
 	['TooltipMillingShowBaselineValue'] = true,
 	['TooltipMillingShowAuctAdvValue'] = true,
+	
+	['TooltipShowReagents'] = true,		-- show reagents for enchant/spell tooltips
 
 	['ShowAllCraftReagents'] = false,		-- ccox - just an idea I'm testing, doesn't work that well yet
 
@@ -534,6 +536,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
 	gui:AddControl(id, "Checkbox",   0, 1, "chatShowFindings", _ENCH("GuiPrintYieldsInChat") )
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowReagents", _ENCH("GuiShowCraftReagents") )	
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
 	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
