@@ -328,7 +328,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "no day saved",
 		_TRANS('SIMP_Help_NoDaySaved') ,--So you aren't saving a day-to-day average?
-		_TRANS('SIMP_Help_NoDaySaved') )--No, that would not only take up space, but heavy calculations on each auction house scan, and this is only a simple model.
+		_TRANS('SIMP_Help_NoDaySavedAnswer') )--No, that would not only take up space, but heavy calculations on each auction house scan, and this is only a simple model.
 
 	gui:AddHelp(id, "minimum buyout",
 		_TRANS('SIMP_Help_MinimumBuyout') ,--Why do I need to know minimum buyout?
