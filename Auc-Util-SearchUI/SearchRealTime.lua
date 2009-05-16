@@ -257,6 +257,7 @@ function lib.ScanPage()
 			local timeleft = GetAuctionItemTimeLeft("list", i)
 			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 			owner = owner or ""
+			count = count or 1
 
 			local price
 			if curBid > 0 then

@@ -1022,13 +1022,13 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.saves.reset:SetWidth(70)
 	gui.saves.reset:SetHeight(20)
 	gui.saves.reset:SetText("Reset")
-	gui.saves.reset:SetScript("OnClick", function() 
-		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then 
+	gui.saves.reset:SetScript("OnClick", function()
+		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
 			lib.ResetSearch()
 			print("All searchUI settings have been reset.")
 		else
 			print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
-		end 
+		end
 	end)
 
 	function lib.UpdateControls()
@@ -1534,7 +1534,10 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			end
 		end
 		if not value then
-			value = item[Const.COUNT]*AucAdvanced.API.GetMarketValue(item[Const.LINK])
+			local market = AucAdvanced.API.GetMarketValue(item[Const.LINK])
+			if market then -- needs a nil check
+				value = item[Const.COUNT]*market
+			end
 		end
 		if not value then
 			value = 0
