@@ -239,7 +239,7 @@ local function beginScan(bag)
 	end
 
 	local link, outBag, slot, value, spell
-	if (bag) then
+	if (bag and bag >= 0 and bag <= 4) then	-- exclude bank bags, we can't DE from the bank
 		link, outBag, slot, value, spell = findItemInOneBag(bag)
 	else
 		link, outBag, slot, value, spell = findItemInBags()
