@@ -144,20 +144,40 @@ function lib.IsAuctionable(bag, slot)
 	private.tip:SetOwner(UIParent, "ANCHOR_NONE")
 	private.tip:ClearLines()
 	private.tip:SetBagItem(bag, slot)
-	local bind = AppraiserTipTextLeft2:GetText()
+
+	local bind
+	bind = AppraiserTipTextLeft2:GetText()
+	if bind == ITEM_SOULBOUND
+	or bind == ITEM_BIND_QUEST
+	or bind == ITEM_BIND_ON_PICKUP
+	or bind == ITEM_CONJURED
+	or bind == ITEM_ACCOUNTBOUND
+	or bind == ITEM_BIND_TO_ACCOUNT
+	then
+		private.tip:Hide()
+		return false
+	end
+
+	-- bind info may be in line 3 in certain conditions
+	bind = AppraiserTipTextLeft3:GetText()
+	private.tip:Hide()
+	if bind == ITEM_SOULBOUND
+	or bind == ITEM_BIND_QUEST
+	or bind == ITEM_BIND_ON_PICKUP
+	or bind == ITEM_CONJURED
+	or bind == ITEM_ACCOUNTBOUND
+	or bind == ITEM_BIND_TO_ACCOUNT
+	then
+		return false
+	end
+
 	local damage, maxdur = GetContainerItemDurability(bag, slot)
 	if damage then
 		damage = maxdur - damage
 	else damage = 0
 	end
-	private.tip:Hide()
 
-	if bind ~= ITEM_SOULBOUND
-	and bind ~= ITEM_BIND_QUEST
-	and bind ~= ITEM_BIND_ON_PICKUP
-	and bind ~= ITEM_CONJURED
-	and damage == 0
-	then
+	if damage == 0 then
 		return true
 	end
 end
