@@ -32,7 +32,7 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Snatch")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
 lib.tabname = "Snatch"
 lib.Private = private
@@ -42,6 +42,7 @@ default("snatch.allow.buy", true)
 default("snatch.maxprice", 10000000)
 default("snatch.maxprice.enable", false)
 default("snatch.allow.beginerTooltips", true)
+default("snatch.price.model", "market")
 --defaults do not work for tables,  A123456 is still gonna be table A123456  regardless of if it has data or not
 if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
 
@@ -151,20 +152,13 @@ function lib:MakeGuiConfig(gui)
 	frame.slot.help:SetWidth(220)
 	frame.slot.help:SetJustifyH("LEFT")
 
-	if not ( AucAdvanced and AucAdvanced.Modules.Util.Appraiser ) then
-		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
-		{ "Snatching", "TOOLTIP", 170 },
-		{ "%", "NUMBER", 25 },
-		{ "Buy each", "COIN", 70 },
-		}, private.OnEnterSnatch, private.OnLeave, private.OnClickSnatch, private.OnResize)
-	else
-		frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
+	frame.snatchlist.sheet = ScrollSheet:Create(frame.snatchlist, {
 		{ "Snatching", "TOOLTIP", 170 },
 		{ "%", "NUMBER", 25 },
 		{ "Buy each", "COIN", 70},
 		{ "App. value", "COIN", 70 },
 		}, private.OnEnterSnatch, private.OnLeave, private.OnClickSnatch, private.OnResize)
-	end
+
 	
 	frame.money = CreateFrame("Frame", "TEST", frame, "MoneyInputFrameTemplate")
 	frame.money.isMoneyFrame = true
@@ -180,15 +174,13 @@ function lib:MakeGuiConfig(gui)
 	frame.pctBox:SetHeight(32)
 	--Set money frame to % of market. Visual Only Calculated each session
 	frame.pctBox:SetScript("OnTextChanged", function()
-		local appraiser, pct, bid, buy = 0, frame.pctBox:GetNumber()
-		
-		if private.workingItemLink and AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
-			buy, bid = AucAdvanced.Modules.Util.Appraiser.GetPrice(private.workingItemLink, nil, true)
-			appraiser = tonumber(buy) or tonumber(bid)
+		local price, pct = 0, frame.pctBox:GetNumber()
+		if private.workingItemLink then
+			price = private.getPrice(private.workingItemLink)
 		end
 		--this stops us from clearing money when we just reset % after a new selection
 		if pct ~= 0 then
-			MoneyInputFrame_SetCopper(frame.money, appraiser * pct/100) 
+			MoneyInputFrame_SetCopper(frame.money, price * pct/100) 
 		end
 	end)
 		
@@ -258,6 +250,9 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Allow Snatch searcher to suggest buyouts")
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Snatch searcher")
+	
+	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
+	gui:AddControl(id, "Selectbox",  0, 1, private.getPriceModels, "snatch.price.model", "Pricing model to use for evaluation")
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "snatch.maxprice", 1, 99999999, "Maximum Price for Snatch")
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
@@ -279,6 +274,40 @@ if the command is accepted you should see a chat message confirming the item and
 	
 	SLASH_SNATCH1 = "/snatch";
 	SlashCmdList["SNATCH"] = lib.SlashCommand
+end
+--Gets available pricing models from Auctioneer for select box
+--copied from appraisers code and we re-use appr translations
+function private.getPriceModels()
+	if not private.scanValueNames then private.scanValueNames = {} end
+	for i = 1, #private.scanValueNames do
+		private.scanValueNames[i] = nil
+	end
+	
+	local algoList = AucAdvanced.API.GetAlgorithms()
+	local curModel = get("snatch.price.model") or "NO PREV SELECTION"
+	table.insert(private.scanValueNames,{"market", _TRANS("UCUT_Interface_MarketValue")})--Market value (reusing Undercut's translation)
+	for pos, name in ipairs(algoList) do
+		--place last used choice first on the list
+		if (name == curModel) then
+			table.insert(private.scanValueNames, 1, {name,  _TRANS('APPR_Interface_Stats').." "..name})
+		else
+			table.insert(private.scanValueNames,{name, _TRANS('APPR_Interface_Stats').." "..name})
+		end
+	end
+	return private.scanValueNames
+end
+--Gets price for choosen item using current selected pricing model
+function private.getPrice(link)
+	local bid, buy, price
+	local curModel = get("snatch.price.model") or "market"
+	if curModel == "market" then
+		buy, bid = AucAdvanced.API.GetMarketValue(link)
+		price = tonumber(buy) or tonumber(bid)
+	else
+		buy, bid = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+		price = tonumber(buy) or tonumber(bid)
+	end
+	return price or 0
 end
 
 --Processor function
@@ -484,24 +513,20 @@ end
 hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 
 function lib.refreshData()
-	--get appraiser price if possible
+	--get auctioneer price if possible
 	local Data, Style = {}, {}
 	for item, v in pairs(private.snatchList) do
-		--look up the current appraiser valuation to add to display
-		local abid, abuy, appraiser
-		if AucAdvanced and AucAdvanced.Modules.Util.Appraiser then
-			abuy, abid = AucAdvanced.Modules.Util.Appraiser.GetPrice(v.link, nil, true)
-			appraiser = tonumber(abuy) or tonumber(abid)
-		end
+		
+		local price = private.getPrice(v.link)
 		--if we  are buying by % of market price
 		if v.percent then
-			v.price = appraiser * v.percent/100 --set buy price to % of market
+			v.price = price * v.percent/100 --set buy price to % of market
 			
 			Style[#Data+1] = {}
 			Style[#Data+1][1] = {["rowColor"] = {0, 1, 0, 0, 0.2, "Horizontal"}}
 			Style[#Data+1][2] = {["textColor"] = {1,0,0}}
 		end
-		table.insert(Data, {v.link, v.percent, v.price, appraiser or 0})
+		table.insert(Data, {v.link, v.percent, v.price, price or 0})
 	end
 	if frame then
 		frame.snatchlist.sheet:SetData(Data, Style)
