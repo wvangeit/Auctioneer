@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced
+	Auctioneer
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -55,8 +55,6 @@ lib.Print = _print
 local GetTime = GetTime
 
 private.isScanning = false
-private.curPage = 0
-private.scanDir = 1
 local LclAucScanData = nil
 function private.LoadAuctionImage()
 	if (LclAucScanData) then return LclAucScanData end
@@ -131,12 +129,11 @@ end
 
 function lib.PushScan()
 	if private.isScanning then
-		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
+		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.page))
 		if not private.scanStack then private.scanStack = {} end
 		table.insert(private.scanStack, {
 			private.scanStartTime,
 			private.sentQuery,
-			private.curPage,
 			private.curQuery,
 			private.curPages,
 			private.curScan,
@@ -151,7 +148,6 @@ function lib.PushScan()
 		private.curQuery = nil
 		private.curScan = nil
 
-		private.curPage = 0
 		private.curPages = nil
 		private.sentQuery = nil
 		private.isScanning = false
@@ -164,7 +160,6 @@ function lib.PopScan()
 		local now, pauseTime = GetTime()
 		private.scanStartTime,
 		private.sentQuery,
-		private.curPage,
 		private.curQuery,
 		private.curPages,
 		private.curScan,
@@ -176,16 +171,16 @@ function lib.PopScan()
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
 			-- 5 minutes old
-			lib.Print("Paused scan is older than 5 minutes, aborting")
-			lib.Commit(true)
+			lib.Print("Paused scan is older than 5 minutes, commiting what we have and aborting")
+			lib.Commit(true, false) --  Incomplete, non-GetAll Scan
 			return
 		end
 
 		private.totalPaused = private.totalPaused + elapsed
-		lib.Print(("Resuming paused scan at page {{%d}}..."):format(private.curPage+1))
+		lib.Print(("Resuming paused scan at page {{%d}}..."):format(private.curQuery.page+1))
 		private.isScanning = true
 		private.sentQuery = false
-		lib.ScanPage(private.curPage)
+		private.ScanPage(private.curQuery.page+1)
 		private.UpdateScanProgress(true)
 	end
 end
@@ -313,7 +308,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			lib.Commit(true)
+			lib.Commit(true, false)
 		end
 
 		private.isScanning = true
@@ -323,7 +318,6 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
 		AuctionFrameBrowse.page = startPage
-		private.curPage = startPage
 
 		--Show the progress indicator
 		private.UpdateScanProgress(true, totalAuctions)
@@ -690,8 +684,8 @@ Commitfunction = function()
 			end
 			if wasGetAll then
 				stillpossible = false
-			elseif #TempcurScan <= 50 and not wasIncomplete then
-				stillpossible = false
+			--elseif #TempcurScan <= 50 and not wasIncomplete then
+			--	stillpossible = false
 			end
 
 			if (stillpossible) then
@@ -768,7 +762,6 @@ Commitfunction = function()
 		if (wasIncomplete) then
 			lib.Print("AucAdv scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before interruption:")
 		else
-
 			lib.Print("AucAdv finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:")
 		end
 		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end")
@@ -857,7 +850,6 @@ end
 
 function lib.Commit(wasIncomplete, wasGetAll)
 	if not private.curScan then return end
-
 	local Queuelength = #private.CommitQueue
 	private.CommitQueue[Queuelength + 1] = {}
 	private.CommitQueue[Queuelength + 1]["Query"], private.curQuery = private.curQuery, private.CommitQueue[Queuelength + 1]["Query"]
@@ -902,7 +894,7 @@ function private.FinishedPage(nextPage)
 	return true
 end
 
-function lib.ScanPage(nextPage, really)
+function private.ScanPage(nextPage, really)
 	if (private.isScanning) then
 		local CanQuery, CanQueryAll = CanSendAuctionQuery()
 		if not (CanQuery and private.FinishedPage(nextPage) and really) then
@@ -923,7 +915,6 @@ function lib.ScanPage(nextPage, really)
 		private.nextCheck = now + 1 -- Check complete in ?? seconds
 		private.verifyStart = nil
 	end
-	private.curPage = nextPage
 end
 local CoStore
 function private.HasAllData()
@@ -1041,20 +1032,16 @@ end
 
 local Getallstarttime = GetTime()
 StorePageFunction = function()
-	if (private.curPage == -1) then
-		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-		private.curPage = floor(totalAuctions / 50);
-	end
-
 	if (not private.curQuery) or (private.curQuery.name == "Empty Page") then
 		return
 	end
 	local now = GetTime()
 	private.sentQuery = false
+	local page = AuctionFrameBrowse.page
 
 	local EventFramesRegistered = {}
-	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-	local maxPages = ceil(totalAuctions / 50);
+	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
+	local maxPages = ceil(totalAuctions / 50)
 	local isGetAll = false
 	if (numBatchAuctions > 50) then
 		isGetAll = true
@@ -1077,48 +1064,51 @@ StorePageFunction = function()
 	now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
 	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
-	local pageNumber
-	if private.curQuery.page then
-		pageNumber = private.curQuery.page+1
-	else
-		pageNumber = private.curPage
-	end
-
-
+	
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
 
 
 	local storecount = 0
-	for i = 1, numBatchAuctions do
-		if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
-			lib.ProgressBars(GetAllProgressBar, 100*i/numBatchAuctions, true)
-			coroutine.yield()
-		end
+	if (page > private.curQuery.page) then
 
-		local itemData = lib.GetAuctionItem("list", i)
-		if itemData then
-			local legacyScanning = private.legacyScanning
-			if legacyScanning == nil then
-				if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
-					legacyScanning = Auctioneer.ScanManager.IsScanning
-				else
-					legacyScanning = function () return false end
-				end
-				private.legacyScanning = legacyScanning
+		for i = 1, numBatchAuctions do
+			if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+				lib.ProgressBars(GetAllProgressBar, 100*i/numBatchAuctions, true)
+				coroutine.yield()
 			end
 
-			-- We only store one of the same item/owner/price/quantity in the scan
-			-- unless we are doing a forward scan (in which case we can be sure they
-			-- are not duplicate entries.
-			if private.isScanning
-			or totalAuctions <= 50
-			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
-			or legacyScanning() -- Is AucClassic scanning?
-			or private.NoDupes(private.curScan, itemData) then
+			local itemData = lib.GetAuctionItem("list", i)
+			if itemData then
+				local legacyScanning = private.legacyScanning
+				if legacyScanning == nil then
+					if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
+						legacyScanning = Auctioneer.ScanManager.IsScanning
+					else
+						legacyScanning = function () return false end
+					end
+					private.legacyScanning = legacyScanning
+				end
+
+				-- We only store one of the same item/owner/price/quantity in the scan
+				-- unless we are doing a forward scan (in which case we can be sure they
+				-- are not duplicate entries.
+--			if private.isScanning
+--			or totalAuctions <= 50
+--			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
+--			or legacyScanning() -- Is AucClassic scanning?
+--			or private.NoDupes(private.curScan, itemData) then
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
+		end
+
+		if (storecount > 0) then
+			if not private.curPages then
+				private.curPages = {}
+			end
+			private.curQuery.page = page
+			private.curPages[page] = true -- we have pulled this page
 		end
 	end
 	if isGetAll then
@@ -1136,46 +1126,42 @@ StorePageFunction = function()
 		EventFramesRegistered=nil
 	end
 
+	-- Just updated the page if it was a new page, so record it as latest page.
+	if (page > private.curQuery.page) then
+		private.curQuery.page = page
+	end
+	
 	--Send a Processor event to modules letting them know we are done with the page
 	AucAdvanced.SendProcessorMessage("pagefinished", pageNumber)
 
 	-- Send the next page query or finish scanning
-
+	
 	if private.isScanning then
-		if isGetAll and (#(private.curScan) > 0.90 * totalAuctions) then
+		if isGetAll and (#(private.curScan) >= totalAuctions - 100) then
 			private.isScanning = false
 			lib.Commit(false, true)
-		--Check against private.curPage + 1 because the first page in the AH is actually page 0, so if you don't then you end up one page over the max at the end of scan
-		elseif (private.scanDir == 1 and private.curPage + 1 < maxPages) or
-		(private.scanDir == -1 and private.curPage > 0) then
-			lib.ScanPage(private.curPage + private.scanDir)
+		elseif (page+1 < maxPages) then
+			private.ScanPage(page + 1)
 		else
 			local incomplete = false
-			if (#(private.curScan) < 0.90 * totalAuctions) then
+			if (#(private.curScan) < totalAuctions - 10) then -- we just got scan size above, so they should be close.
 				incomplete = true
 			end
 			private.isScanning = false
-			lib.Commit(incomplete)
+			lib.Commit(incomplete, false)
 		end
-	elseif (totalAuctions <= 50) then
-		lib.Commit(false)
-	elseif isGetAll and (#(private.curScan) > 0.90 * totalAuctions) then
-			lib.Commit(false, true)
+	elseif isGetAll and (#(private.curScan) > totalAuctions - 100) then
+		lib.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
-		if not private.curPages then
-			private.curPages = {}
-		end
-		private.curPages[pageNumber] = true
+		-- while #private.curPages == maxPages seems a good effeciency gain, this could be a problem if say page 4 was looked at for a query that returns 2 pages.
 		local incomplete = 0
-		for i = 1, maxPages do
+		for i = 0, maxPages-1 do
 			if not private.curPages[i] then
 				incomplete = incomplete + 1
 			end
 		end
-
-		local pctIncomplete = incomplete/maxPages
-		if (pageNumber == maxPages and incomplete < 2 and pctIncomplete < 0.05) or incomplete == 0 then
-			lib.Commit(true)
+		if (maxPages == page+1) then
+			lib.Commit(incomplete > 0, false)
 		end
 	end
 	BrowseSearchButton:Show()
@@ -1299,7 +1285,7 @@ end
 
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	if private.warnTaint then
-		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
+		lib.Print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
 	end
 	if private.CanSend and not private.CanSend() then
@@ -1336,7 +1322,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.page = page
+	query.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
 	query.isUsable = isUsable
 
 	if (private.curQuery) then
@@ -1349,20 +1335,15 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 
 	if (not isSame or not private.curQuery) then
-		lib.Commit(true)
+		lib.Commit(true, false)
 		private.scanStartTime = time()
 		private.scanStarted = GetTime()
 		private.totalPaused = 0
+		
 		local startPage = 0
-		if (private.scanDir == 1) then
-			private.curPage = 0
-		else
-			private.curPage = -1
-		end
-		private.curPage = startPage
 
 		private.curQuery = query
-
+	
 		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 			query.name or "",
 			query.minUseLevel or "",
@@ -1374,7 +1355,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		)
 	else
 		query = private.curQuery
-		query.page = page
+--		query.page = page
 	end
 
 	private.sentQuery = true
@@ -1396,6 +1377,7 @@ function lib.SetPaused(pause)
 		private.isPaused = false
 	end
 end
+
 private.unexpectedClose = false
 local flipb, flopb = false, false
 function private.OnUpdate(me, dur)
@@ -1444,7 +1426,7 @@ function private.OnUpdate(me, dur)
 		if now > private.scanNext and CanSendAuctionQuery() then
 			local nextPage = private.scanNextPage
 			private.scanNext = nil
-			lib.ScanPage(nextPage, true)
+			private.ScanPage(nextPage, true)
 		end
 		return
 	end
@@ -1469,7 +1451,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 function lib.Cancel()
 	if (private.curQuery) then
 		lib.Print("Cancelling current scan")
-		lib.Commit(true)
+		lib.Commit(true, false)
 	end
 	private.ResetAll()
 end
@@ -1480,7 +1462,7 @@ function lib.Interrupt()
 			private.unexpectedClose = true
 			lib.PushScan()
 		else
-			lib.Commit(true)
+			lib.Commit(true, false)
 			private.sentQuery = false
 		end
 	end
@@ -1497,8 +1479,6 @@ function private.ResetAll()
 	if CommitRunning then
 		private.curQuery = nil
 		private.curScan = nil
-
-		private.curPage = 0
 		private.isPaused = nil
 		private.sentQuery = nil
 		private.isScanning = false
@@ -1516,7 +1496,6 @@ function private.ResetAll()
 	private.curPages = nil
 	private.scanStack = nil
 
-	private.curPage = 0
 	private.isPaused = nil
 	private.Pausing = nil
 	private.sentQuery = nil
