@@ -430,6 +430,7 @@ end
 local statItem = {}
 local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
+	local filtered = false
 	if (curItem) then private.Unpack(curItem, statItem) end
 	if (oldItem) then private.Unpack(oldItem, statItemOld) end
 	if (operation == "create") then
@@ -443,15 +444,15 @@ local function processStats(operation, curItem, oldItem)
 			local result=engineLib.AuctionFilter(operation, statItem)
 			if (result) then
 				curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
-				operation = "filter"
+				filtered = true
 				break
 			end
 		end
 	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 		-- This item is a filtered item
-		operation = "filter"
+		filtered = true
 	end
-	if operation == "filter" then
+	if filtered then
 		return false
 	end
 
@@ -1154,14 +1155,21 @@ StorePageFunction = function()
 		lib.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
 		-- while #private.curPages == maxPages seems a good effeciency gain, this could be a problem if say page 4 was looked at for a query that returns 2 pages.
-		local incomplete = 0
-		for i = 0, maxPages-1 do
-			if not private.curPages[i] then
-				incomplete = incomplete + 1
+		local incomplete = false
+		if not private.curPages then
+			private.curPages = {}
+		end
+		if (private.curPages) then
+			for i = 0, maxPages-1 do
+				if not private.curPages[i] then
+					incomplete = true
+				end
 			end
+		else
+			incomplete = true
 		end
 		if (maxPages == page+1) then
-			lib.Commit(incomplete > 0, false)
+			lib.Commit(incomplete, false)
 		end
 	end
 	BrowseSearchButton:Show()
