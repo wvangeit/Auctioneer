@@ -418,7 +418,7 @@ function private.ButtonClick(me, mouseButton)
 		ChatEdit_InsertLink(GetAuctionItemLink("list", me.id))
 	--Display the ignore player UI
 	elseif (IsAltKeyDown() ) and me.Owner:GetText() then
-		if not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
+		if not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then private.sellerIgnore:Hide() return end
 
 		private.sellerIgnore:ClearAllPoints()	private.sellerIgnore:SetPoint("TOPLEFT", me.Owner,"TOPRIGHT") private.sellerIgnore:Show()
 		--if toon not ignored the ignore
