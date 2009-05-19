@@ -38,7 +38,7 @@
 --]]
 LibStub("LibRevision"):Set("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Db/DbCore.lua $","$Rev: 3583 $","5.1.DEV.", 'auctioneer', 'libs')
 
-if not AucDb or not AucDb.Enabled then return end
+if not AucDb then return end
 local lib = AucDb
 local private = lib.Private
 
@@ -112,11 +112,18 @@ function private.findDeposit(deposit, rate, price, buyout, ...)
 	for i=1, n do
 		local detail = select(i, ...)
 		local detailBuyout, count, runTime = strsplit(":", detail)
+		detailBuyout = tonumber(detailBuyout)
+		count = tonumber(count)
+		runTime = tonumber(runTime)
 		if buyout == detailBuyout then
-			local run = runtime/720
-			if deposit == 0 then return count, run end
+			if deposit == 0 then
+				return count, run
+			end
+			local run = runTime/720
 			local total = math.floor(price * rate * count) * run
-			if total == deposit then return count, run end
+			if total == deposit then
+				return count, run
+			end
 		end
 	end
 end
@@ -130,12 +137,15 @@ function private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
 
 	private.setDesignation()
 
-	local sig = designation..":"..itemId..":"..itemSuffix
-	if AucDbData.count[sig] then
-		local match
-		for dayidx, details in pairs(AucDbData.count[sig]) do
-			local count, run = private.findDeposit(deposit, rate, price, buyout, strsplit(";", details))
-			if match then return count, run, true end
+	if AucDbData.count[designation] then
+		local search = itemId..":"..itemSuffix
+		if AucDbData.count[designation][search] then
+			for dayidx, details in pairs(AucDbData.count[designation][search]) do
+				local count, run = private.findDeposit(deposit, rate, price, buyout, strsplit(";", details))
+				if count and run then
+					return count, run
+				end
+			end
 		end
 	end
 end
@@ -226,7 +236,7 @@ function private.sale(operation, faction, itemName, playerName, bid, buyout, dep
 	local designation = RealmDesignation(faction)
 	local itemLink, itemId, itemSuffix = private.getLink(itemName)
 	if not itemLink then return end
-	local count = private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
+	local count, runTime = private.guessCount(itemId, itemSuffix, faction, deposit, buyout)
 	if not count then return end
 
 	local line = strjoin(":", itemId,itemSuffix,0,0,0,count,UnitName("player"),0,buyout,bid,0)

@@ -63,7 +63,12 @@ function lib.OnLoad()
 	if not AucDbData.price then AucDbData.price = {} end
 	if not AucDbData.count then AucDbData.count = {} end
 
-	local expires = time() - (86400 * 3) -- 3 day expiry
+	local expires
+	if AucDb.Enabled then
+		expires = time() - (86400 * 3) -- 3 day expiry
+	else
+		expires = time() - (86400 * 1) -- 1 day expiry
+	end
 	local dExpires = math.floor(time()/86400) - 14 -- 14 day expiry
 	local update = tonumber(lib.UpToDate) or 0
 	if update > expires then expires = update end
