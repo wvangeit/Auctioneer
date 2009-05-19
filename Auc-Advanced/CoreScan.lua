@@ -49,6 +49,8 @@ local lib = AucAdvanced.Scan
 local private = {}
 lib.Private = private
 
+private.querycount = 0
+
 local Const = AucAdvanced.Const
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 lib.Print = _print
@@ -121,15 +123,15 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.page = 0
+	query.page = -1
 	query.isUsable = isUsable
 	local now = GetTime()
-	table.insert(private.scanStack, {now, false, 0, query, {}, {}, now, 0, now})
+	table.insert(private.scanStack, {now, false, query, {}, {}, now, 0, now})
 end
 
 function lib.PushScan()
 	if private.isScanning then
-		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.page))
+		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.page+1))
 		if not private.scanStack then private.scanStack = {} end
 		table.insert(private.scanStack, {
 			private.scanStartTime,
@@ -535,7 +537,6 @@ private.CommitQueuewasGetAll = {}
 
 local CommitRunning = false
 Commitfunction = function()
-
 	local speed = AucAdvanced.Settings.GetSetting("scancommit.speed")/100
 	speed = speed^2.5
 	local processingTime = speed * 0.1 + 0.015
@@ -1335,10 +1336,10 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 
 	if (private.curQuery) then
 		for x, y in pairs(query) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
+			if (x~="page" and x~="queryid" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 		for x, y in pairs(private.curQuery) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
+			if (x~="page" and x~="queryid" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 	end
 
@@ -1349,6 +1350,9 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.totalPaused = 0
 		
 		local startPage = 0
+
+		query.queryid = private.querycount
+		private.querycount = private.querycount+1
 
 		private.curQuery = query
 	
