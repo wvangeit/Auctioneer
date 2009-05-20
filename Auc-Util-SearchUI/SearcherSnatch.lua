@@ -327,11 +327,11 @@ end
 function private.OnEnterSnatch(button, row, index)
 	if frame.snatchlist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.snatchlist.sheet.rows[row][index]:GetText()
-		local name = GetItemInfo(link)
+		--check is a valid itemlink
+		local name = link:match("Hitem:.+|h%[(.-)%]|h|r")
 		if link and name then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 			GameTooltip:SetHyperlink(link)
-			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
 		end
 	end
 end
@@ -473,8 +473,8 @@ end
 function lib.SetWorkingItem(link)
 	if type(link)~="string" then return end
 
-	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
-	if not name or not texture then return end
+	--check is a valid itemlink
+	if not link:match("Hitem:.+|h%[.-%]|h|r") then return end
 
 	--Get the current saved value if already in snatch list
 	local _, itemid, itemsuffix, itemenchant, _ = AucAdvanced.DecodeLink(link)
