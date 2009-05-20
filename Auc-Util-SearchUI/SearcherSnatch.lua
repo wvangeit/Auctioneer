@@ -517,7 +517,8 @@ function lib.SetWorkingItem(link)
 		end
 	end
 
-	--set edit box texture and name
+	--set edit box texture and name, this may have some issues when server has not seen the item since we will not get a texture
+	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
 	frame.icon:SetNormalTexture(texture) --set icon texture
 	frame.icon:SetScript("OnEnter", function() --set mouseover tooltip
 			GameTooltip:SetOwner(frame.icon, "ANCHOR_BOTTOMRIGHT")
