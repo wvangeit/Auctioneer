@@ -157,8 +157,40 @@ function lib:MakeGuiConfig(gui)
 		{ "%", "NUMBER", 25 },
 		{ "Buy each", "COIN", 70},
 		{ "App. value", "COIN", 70 },
-		}, private.OnEnterSnatch, private.OnLeave, private.OnClickSnatch, private.OnResize)
-
+		})
+	
+	--Processor function for all scrollframe events for this frame
+	function frame.snatchlist.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
+		if (callback == "ColumnOrder") then
+			set("snatch.columnorder", order)
+		elseif (callback == "ColumnWidthSet") then
+			private.OnResize(self, column, button:GetWidth() )
+		elseif (callback == "ColumnWidthReset") then
+			private.onResize(self, column, nil)
+		elseif (callback == "OnEnterCell")  then
+			private.OnEnterSnatch(button, row, column)
+		elseif (callback == "OnLeaveCell") then
+			GameTooltip:Hide()
+		elseif (callback == "OnClickCell") then
+			private.OnClickSnatch(button, row, column)
+		elseif (callback == "ColumnSort") then
+			set("snatch.columnsortcurDir", curDir)
+			set("snatch.columnsortcurSort", column)
+		end
+	end
+	
+	--If we have a saved order reapply
+	if get("snatch.columnorder") then
+		--print("saved order applied")
+		frame.snatchlist.sheet:SetOrder( get("snatch.columnorder") )
+	end
+	--Apply last column sort used
+	if get("snatch.columnsortcurSort") then
+		frame.snatchlist.sheet.curSort = get("snatch.columnsortcurSort") or 1
+		frame.snatchlist.sheet.curDir = get("snatch.columnsortcurDir") or 1
+		frame.snatchlist.sheet:PerformSort()
+	end
+	
 	
 	frame.money = CreateFrame("Frame", "TEST", frame, "MoneyInputFrameTemplate")
 	frame.money.isMoneyFrame = true
@@ -291,7 +323,7 @@ function private.getPriceModels()
 		if (name == curModel) then
 			table.insert(private.scanValueNames, 1, {name,  _TRANS('APPR_Interface_Stats').." "..name})
 		else
-			table.insert(private.scanValueNames,{name, _TRANS('APPR_Interface_Stats').." "..name})
+			table.insert(private.scanValueNames, {name, _TRANS('APPR_Interface_Stats').." "..name})
 		end
 	end
 	return private.scanValueNames
@@ -335,14 +367,9 @@ function private.OnEnterSnatch(button, row, index)
 		end
 	end
 end
-
-
-function private.OnLeave()
-	GameTooltip:Hide()
-end
-
+--lib.SetWorkingItem(link) handles the job of checking that link is valid
 function private.OnClickSnatch(button, row, index)
-	local link = frame.snatchlist.sheet.rows[row][1]:GetText()
+	local link = frame.snatchlist.sheet.rows[row][index]:GetText()
 	lib.SetWorkingItem(link)
 end
 
@@ -518,7 +545,7 @@ function lib.refreshData()
 	for item, v in pairs(private.snatchList) do
 		
 		local price = private.getPrice(v.link)
-		--if we  are buying by % of market price
+		--if we are buying by % of market price
 		if v.percent then
 			v.price = price * v.percent/100 --set buy price to % of market
 			
@@ -526,7 +553,7 @@ function lib.refreshData()
 			Style[#Data+1][1] = {["rowColor"] = {0, 1, 0, 0, 0.2, "Horizontal"}}
 			Style[#Data+1][2] = {["textColor"] = {1,0,0}}
 		end
-		table.insert(Data, {v.link, v.percent, v.price, price or 0})
+		table.insert(Data, {v.link, v.percent or 0, v.price, price or 0})
 	end
 	if frame then
 		frame.snatchlist.sheet:SetData(Data, Style)
