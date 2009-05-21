@@ -166,6 +166,7 @@ function lib.changeLocale()
 end
 
 -- Creates the list of Pricing Models for use in dropdowns
+-- Usage: gui:AddControl(id, "Selectbox",  column, indent, AucAdvanced.selectorPriceModels, "util.modulename.model")
 do
 	local pricemodels
 	function private.resetPriceModels()
@@ -187,6 +188,7 @@ do
 end
 
 -- Creates the list of Auction Durations for use in deposit cost dropdowns
+-- Usage: gui:AddControl(id, "Selectbox",  column, indent, AucAdvanced.selectorAuctionLength, "util.modulename.deplength")
 do
 	local auctionlength
 	function private.createAuctionLength()
