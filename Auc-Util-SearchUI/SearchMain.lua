@@ -34,8 +34,16 @@
 local libType, libName = "Util", "SearchUI"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
+local empty = wipe
+
+-- Our official name:
+AucSearchUI = lib
+
+function lib.GetName()
+	return libName
+end
 
 local Const = AucAdvanced.Const
 local gui
@@ -56,30 +64,146 @@ private.tleft = {
 	"|cff000004|cffe5e5e548h"  --48h
 }
 
--- Our official name:
-AucSearchUI = lib
+lib.CleanTable = wipe -- for compatibility
 
--- lib.CleanTable(temp)
--- used to clean out a table for reuse
--- temp must be a table
-function lib.CleanTable(temp)
-	for i,j in pairs(temp) do
-		temp[i] = nil
+local resources = {}
+lib.Resources = resources
+local flagResourcesUpdateRequired = false
+
+-- Faction Resources
+-- Commonly used values which change depending whether you are at home or neutral Auctionhouse
+-- Modules should expect these to always contain valid values; nil tests should not be required
+resources.Realm = GetRealmName() -- will not change during session
+function private.UpdateFactionResources()
+	local serverKey, _, Faction = AucAdvanced.GetFaction()
+	resources.Faction = Faction
+	resources.faction = Faction:lower()
+	resources.serverKey = serverKey
+	resources.CutRate = AucAdvanced.cutRate
+end
+private.UpdateFactionResources()
+-- todo: we really should update when Zone changes, but there in't a processor event for that
+
+-- Selectbox Resources
+--[[ Usages:
+gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModels, "searcher.model")
+gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModelsEnx, "searcher.model")
+gui:AddControl(id, "Selectbox", column, indent, resources.selectorAuctionLength, "searcher.deplength")
+local price, seen, curModel = resources.lookupPriceModel[model](model, link || itemID [, serverKey]) ~ price, seen or curModel may be nil
+if not resources.isValidPriceModel(get("searcher.model")) then <code to report warning...>
+--]]
+do -- limit scope of locals
+	resources.selectorAuctionLength = AucAdvanced.selectorAuctionLength
+	lib.AucLengthSelector = AucAdvanced.selectorAuctionLength -- for compatibility
+	resources.selectorPriceModels = AucAdvanced.selectorPriceModels
+
+	local pricemodelsenx
+	function resources.selectorPriceModelsEnx()
+		if not pricemodelsenx then
+			pricemodelsenx = replicate(resources.selectorPriceModels())
+			if resources.isEnchantrixLoaded then
+				tinsert(pricemodelsenx, 1, {"Enchantrix", "Enchantrix"})
+			end
+		end
+		return pricemodelsenx
+	end
+	function private.ResetPriceModelEnx()
+		pricemodelsenx = nil
+	end
+
+	function resources.isValidPriceModel(testmodel)
+		local pricemodels = resources.selectorPriceModelsEnx() -- make sure table is up to date
+		local found -- default return value nil
+		for pos, model in ipairs(pricemodels) do
+			if model[1] == testmodel then
+				found = model[2]
+				break
+			end
+		end
+		return found
+	end
+
+	-- lookup functions
+	local function UnknownFunc() end -- return nil
+
+	local function MarketFunc(model, link, serverKey)
+		local price, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
+		return price, seen, model
+	end
+
+	local function AppraiserFunc(model, link, serverKey)
+		local market, bid, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, serverKey)
+		if not market or market == 0 then
+			market = bid -- fallback to bid price if no market
+		end
+		return market, seen, curModel
+	end
+
+	local function EnchantrixFunc(model, link, serverKey)
+		-- GetReagentPrice does not handle serverKey, and it does not return a seen count
+		local extra, mkt, five, _
+		_, extra = Enchantrix.Util.GetPricingModel()
+		_, _, mkt, five = Enchantrix.Util.GetReagentPrice(link, extra)
+		return five or mkt, nil, extra or model
+	end
+
+	local function AlgorithmFunc(model, link, serverKey)
+		local market, seen = AucAdvanced.API.GetAlgorithmValue(model, link, serverKey)
+		return market, seen, model
+	end
+
+	local function indexFunc(lookup, model)
+		local func
+		if model == "Appraiser" and AucAdvanced.Modules.Util.Appraiser then
+			func = AppraiserFunc
+		elseif model == "Enchantrix" and resources.isEnchantrixLoaded then
+			func = EnchantrixFunc
+		elseif AucAdvanced.API.IsValidAlgorithm(model) then
+			func = AlgorithmFunc
+		end
+		if func then
+			rawset(lookup, model, func)
+			return func
+		end
+		return UnknownFunc
+	end
+
+	resources.lookupPriceModel = setmetatable({market = MarketFunc}, {__index = indexFunc})
+end
+
+-- Enchantrix Load detection
+if Enchantrix and Enchantrix.Storage and Enchantrix.Util then
+	resources.isEnchantrixLoaded = true
+else
+	local _, _, _, enabled, loadable = GetAddOnInfo("Enchantrix") -- check it's actually possible to load
+	if enabled and loadable then
+		Stubby.RegisterAddOnHook("Enchantrix", "Auc-Util-SearchUI", function()
+			if Enchantrix and Enchantrix.Storage and Enchantrix.Util then
+				Stubby.UnregisterAddOnHook("Enchantrix", "Auc-Util-SearchUI")
+				resources.isEnchantrixLoaded = true
+				private.ResetPriceModelEnx()
+				lib.NotifyCallbacks("onload", "enchantrix")
+			end
+		end)
 	end
 end
 
-function lib.GetName()
-	return libName
+function lib.OnLoad(addon)
+	-- Notify that SearchUI is fully loaded
+	resources.isSearchUILoaded = true
+	lib.NotifyCallbacks("onload", addon)
 end
 
 function lib.Processor(callbackType, ...)
-	if (callbackType == "config") then
-		--private.SetupConfigGui(...)
-		-- We don't have one of these
+	if callbackType == "load" then
+		private.ResetPriceModelEnx()
 	elseif (callbackType == "auctionclose") then
 		if private.isAttached then
 			lib.DetachFromAH()
 		end
+		flagResourcesUpdateRequired = true
+	elseif callbackType == "auctionopen" then
+		flagResourcesUpdateRequired = true
 	elseif (callbackType == "auctionui") then
 		if lib.Searchers.RealTime then
 			lib.Searchers.RealTime.HookAH()
@@ -178,12 +302,6 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	end
 end
 
-local function cleanse( search )
-	if (search) then
-		search = {}
-	end
-end
-
 -- Default setting values
 local settingDefaults = {
 	["searchspeed"] = 100,
@@ -276,14 +394,7 @@ local function setter(setting, value)
 	hasUnsaved = true
 	lib.UpdateSave()
 
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("configchanged", setting, value)
-			end
-		end
-	end
-
+	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 	lib.NotifyCallbacks('config', 'changed', setting, value)
 end
 
@@ -337,6 +448,7 @@ function lib.Show()
 		lib.MakeGuiConfig()
 	end
 	gui:Show()
+	private.UpdateFactionResources()
 end
 
 function lib.Hide()
@@ -356,9 +468,19 @@ end
 
 private.callbacks = {}
 function lib.AddCallback(name, callback)
+	if private.callbacks[name] then -- prevent overwriting an exisiting callback
+		error("AucSearchUI.AddCallback Error:\nCallback for "..name.." already exists", 2) -- level 2 is calling function
+	end
 	private.callbacks[name] = callback
-	if (gui) then
-		lib.NotifyCallbacks('guiconfig', gui)
+	-- fire certain callbacks, that have already happened, to new callback function
+	if resources.isEnchantrixLoaded then
+		callback("onload", "enchantrix")
+	end
+	if resources.isSearchUILoaded then
+		callback("onload", "auc-util-searchui")
+	end
+	if gui then
+		callback("guiconfig", gui)
 	end
 end
 
@@ -400,7 +522,7 @@ function lib.NotifyCallbacks(msg, ...)
 end
 
 function lib.RemoveCallback(name, callback)
-	if private.callbacks[name] == callback then
+	if callback and private.callbacks[name] == callback then
 		private.callbacks[name] = nil
 		return true
 	end
@@ -445,7 +567,7 @@ function lib.NewFilter(filterName)
 end
 
 function lib.GetSearchLocals()
-	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const
+	return lib.GetSetting, lib.SetSetting, lib.SetDefault, Const, resources
 end
 
 function private.SetButtonTooltip(message)
@@ -475,7 +597,7 @@ function private.removeline()
 end
 
 function private.removeall()
-	lib.CleanTable(private.sheetData)
+	empty(private.sheetData)
 	gui.sheet.selected = nil
 	gui.sheet:SetData(private.sheetData)
 	gui.sheet:Render() --need to redraw, so the selection looks right
@@ -923,6 +1045,17 @@ function lib.MakeGuiConfig()
 		gui:RealSetScale(scale)
 	end
 
+	-- hook ActivateTab to notify callback
+	gui.RealActivateTab = gui.ActivateTab
+	function gui:ActivateTab(...)
+		gui:RealActivateTab(...)
+		local newtab = gui.config.selectedTab
+		if newtab ~= gui.LastActiveTab then
+			gui.LastActiveTab = newtab
+			lib.NotifyCallbacks("selecttab", newtab)
+		end
+	end
+
 	private.gui = gui
 	gui.frame = CreateFrame("Frame", nil, gui)
 	gui.frame:SetPoint("TOP", gui, "TOP", 0, -115)
@@ -1049,7 +1182,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 			selected = gui.sheet.selected
 			local data = gui.sheet:GetSelection()
 			if not data then
-				lib.CleanTable(private.data)
+				empty(private.data)
 			else
 				private.data.link = data[1]
 				private.data.seller = data[8]
@@ -1421,8 +1554,6 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui:ActivateTab(gui.aboutTab)
 end
 
-lib.AucLengthSelector = AucAdvanced.selectorAuctionLength
-
 local sideIcon
 local SlideBar = LibStub:GetLibrary("SlideBar", true)
 if SlideBar then
@@ -1654,6 +1785,7 @@ local PerformSearch = function()
 	private.removeall()
 
 	private.isSearching = true
+	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(scandata.image) do
 		if (i % speed) == 0 then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
@@ -1668,6 +1800,7 @@ local PerformSearch = function()
 	private.isSearching = false
 	empty(SettingCache)
 	gui.frame.progressbar:Hide()
+	lib.NotifyCallbacks("search", "complete", searcherName)
 end
 
 function lib.IsSearching()
@@ -1719,6 +1852,12 @@ function private.OnUpdate()
 		else
 				gui.ScansRemaining:SetText("0")
 		end
+	end
+	if flagResourcesUpdateRequired then
+		-- Update Faction resources following Auctionhouse open or close (to handle Neutral AH)
+		-- Delayed until OnUpdate handler to give GetFaction time to update its own internal settings
+		flagResourcesUpdateRequired = false
+		private.UpdateFactionResources()
 	end
 
 	lib.UpdateSave(true)
