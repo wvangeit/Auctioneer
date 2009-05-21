@@ -76,12 +76,16 @@ local flagResourcesUpdateRequired = false
 resources.Realm = GetRealmName() -- will not change during session
 function private.UpdateFactionResources()
 	local serverKey, _, Faction = AucAdvanced.GetFaction()
-	resources.Faction = Faction
-	resources.faction = Faction:lower()
-	resources.serverKey = serverKey
-	resources.CutRate = AucAdvanced.cutRate
+	if serverKey ~= resources.serverKey then
+		-- store new settings
+		resources.Faction = Faction
+		resources.faction = Faction:lower() -- lowercase for GetDepositCost
+		resources.serverKey = serverKey
+		resources.CutAdjust = 1 - AucAdvanced.cutRate -- multiple price by .CutAdjust to subtract the AH brokerage fees
+		-- notify the change
+		lib.NotifyCallbacks("resources", "faction", serverKey)
+	end
 end
-private.UpdateFactionResources()
 -- todo: we really should update when Zone changes, but there in't a processor event for that
 
 -- Selectbox Resources
@@ -192,6 +196,10 @@ function lib.OnLoad(addon)
 	-- Notify that SearchUI is fully loaded
 	resources.isSearchUILoaded = true
 	lib.NotifyCallbacks("onload", addon)
+
+	-- Initialize
+	private.UpdateFactionResources()
+	assert(resources.faction, "Error: Resources failed to update")
 end
 
 function lib.Processor(callbackType, ...)

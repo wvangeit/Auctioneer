@@ -137,7 +137,7 @@ function lib.Search(item)
 
 	--adjust for brokerage/deposit costs
 	if get("resale.adjust.brokerage") then
-		market = market * (1 - resources.CutRate)
+		market = market * resources.CutAdjust
 	end
 	if get("resale.adjust.deposit") then
 		local amount = GetDepositCost(link, get("resale.adjust.deplength"), resources.faction, count)
