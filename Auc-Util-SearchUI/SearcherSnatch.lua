@@ -221,7 +221,7 @@ function lib:MakeGuiConfig(gui)
 	frame.pctBox.help:SetPoint("LEFT", frame.pctBox, "RIGHT", 0, 0)
 	frame.pctBox.help:SetWidth(130)
 	frame.pctBox.help:SetJustifyH("LEFT")
-	frame.pctBox.help:SetText("Buy as percent of market price")
+	frame.pctBox.help:SetText("Buy as percent of selected statistic")
 	
 	
 	--Add Item to list button
@@ -558,6 +558,9 @@ function lib.refreshData()
 	end
 	if frame then
 		frame.snatchlist.sheet:SetData(Data, Style)
+		
+		--update "help" text to display current 
+		frame.pctBox.help:SetText(format("Buy as percent of %s value", get("snatch.price.model") or "market") )
 	end
 end
 
