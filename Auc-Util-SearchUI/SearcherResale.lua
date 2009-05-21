@@ -31,9 +31,10 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Resale")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals() -- commenting out as unused, re-enable if needed
+local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Resale"
+
 -- Set our defaults
 default("resale.profit.min", 1)
 default("resale.profit.pct", 50)
@@ -47,17 +48,20 @@ default("resale.allow.bid", true)
 default("resale.allow.buy", true)
 default("resale.maxprice", 10000000)
 default("resale.maxprice.enable", false)
-default("resale.model", "Appraiser")
+default("resale.model", "market")
 
-function private.GetPriceModels()
-	if not private.modelNames then private.modelNames = {} end
-	empty(private.modelNames)
-	table.insert(private.modelNames,{"market", "Market value"})
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	for pos, name in ipairs(algoList) do
-		table.insert(private.modelNames,{name, "Stats: "..name})
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+private.validationRequired = true
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.validationRequired then
+			if not resources.isValidPriceModel(get("resale.model")) then
+				message("Resale Searcher Warning!\nCurrent price model setting ("..get("resale.model")..") is not valid. Select a new price model")
+			else
+				private.validationRequired = nil
+			end
+		end
 	end
-	return private.modelNames
 end
 
 -- This function is automatically called when we need to create our search parameters
@@ -89,20 +93,18 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "resale.maxprice", 1, 99999999, "Maximum Price for Resale")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
-	gui:AddControl(id, "Selectbox",         0.42, 1, private.GetPriceModels, "resale.model", "Pricing model to use to base price on")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModels, "resale.model")
 	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "resale.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "resale.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorAuctionLength, "resale.adjust.deplength")
 	gui:AddControl(id, "Slider",            0.42, 1, "resale.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
-	local market, seen, _, curModel, pctstring, link, count
-
-	link = item[Const.LINK]
+	local link = item[Const.LINK]
 	if not link then
 		return false, "No link"
 	end
@@ -120,17 +122,11 @@ function lib.Search(item)
 	end
 
 	local model = get("resale.model")
-	if model == "market" then
-		market, seen = AucAdvanced.API.GetMarketValue(link)
-	elseif model == "Appraiser" and AucAdvanced.Modules.Util.Appraiser then
-		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(link)
-	else
-		market, seen = AucAdvanced.API.GetAlgorithmValue(model, link)
-	end
+	local market, seen, curModel = resources.lookupPriceModel[model](model, link)
 	if not market then
-		return false, "No appraiser price"
+		return false, "No market price"
 	end
-	count = item[Const.COUNT]
+	local count = item[Const.COUNT]
 	market = market * count
 
 	if (get("resale.seen.check")) and curModel ~= "fixed" then
@@ -140,24 +136,17 @@ function lib.Search(item)
 	end
 
 	--adjust for brokerage/deposit costs
-	local cutRate = AucAdvanced.cutRate or 0.05
 	if get("resale.adjust.brokerage") then
-		market = market * (1 - cutRate)
+		market = market * (1 - resources.CutRate)
 	end
 	if get("resale.adjust.deposit") then
-		local newfaction
-		if cutRate ~= 0.05 then newfaction = "neutral" end
-		local amount = GetDepositCost(link, get("resale.adjust.deplength"), newfaction, count)
+		local amount = GetDepositCost(link, get("resale.adjust.deplength"), resources.faction, count)
 		if amount then
 			market = market - amount * get("resale.adjust.listings")
 		end
 	end
 
-	local minprofit = get("resale.profit.min")
-	local value = market * (100-get("resale.profit.pct")) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
+	local value = min(market*(100-get("milling.profit.pct"))/100, market-get("milling.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then
