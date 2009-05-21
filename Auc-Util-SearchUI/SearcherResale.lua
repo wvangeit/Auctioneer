@@ -146,7 +146,7 @@ function lib.Search(item)
 		end
 	end
 
-	local value = min(market*(100-get("milling.profit.pct"))/100, market-get("milling.profit.min"))
+	local value = min(market*(100-get("resale.profit.pct"))/100, market-get("resale.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then
