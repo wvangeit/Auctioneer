@@ -94,7 +94,7 @@ gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModels, "
 gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModelsEnx, "searcher.model")
 gui:AddControl(id, "Selectbox", column, indent, resources.selectorAuctionLength, "searcher.deplength")
 local price, seen, curModel = resources.lookupPriceModel[model](model, link || itemID [, serverKey]) ~ price, seen or curModel may be nil
-local price, seen, curModel = resources.GetPrice(model, link || itemIS [, serverKey]) ~ simplified wrapper function for lookupPriceModel
+local price, seen, curModel = resources.GetPrice(model, link || itemID [, serverKey]) ~ simplified wrapper function for lookupPriceModel
 if not resources.isValidPriceModel(get("searcher.model")) then <code to report warning...>
 --]]
 do -- limit scope of locals
@@ -205,7 +205,6 @@ function lib.OnLoad(addon)
 
 	-- Initialize
 	private.UpdateFactionResources()
-	assert(resources.faction, "Error: Resources failed to update")
 end
 
 function lib.Processor(callbackType, ...)
@@ -1331,7 +1330,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Subhead",    0,    "About the SearchUI")
 
-	gui:AddCat("Searchers")
+	gui:AddCat("Searchers", nil, nil, true)
 	gui:AddCat("Filters")
 
 	gui:AddCat("Options")
