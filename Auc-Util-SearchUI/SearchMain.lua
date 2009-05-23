@@ -81,7 +81,7 @@ function private.UpdateFactionResources()
 		resources.Faction = Faction
 		resources.faction = Faction:lower() -- lowercase for GetDepositCost
 		resources.serverKey = serverKey
-		resources.CutAdjust = 1 - AucAdvanced.cutRate -- multiple price by .CutAdjust to subtract the AH brokerage fees
+		resources.CutAdjust = 1 - AucAdvanced.cutRate -- multiply price by .CutAdjust to subtract the AH brokerage fees
 		-- notify the change
 		lib.NotifyCallbacks("resources", "faction", serverKey)
 	end
@@ -94,6 +94,7 @@ gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModels, "
 gui:AddControl(id, "Selectbox", column, indent, resources.selectorPriceModelsEnx, "searcher.model")
 gui:AddControl(id, "Selectbox", column, indent, resources.selectorAuctionLength, "searcher.deplength")
 local price, seen, curModel = resources.lookupPriceModel[model](model, link || itemID [, serverKey]) ~ price, seen or curModel may be nil
+local price, seen, curModel = resources.GetPrice(model, link || itemIS [, serverKey]) ~ simplified wrapper function for lookupPriceModel
 if not resources.isValidPriceModel(get("searcher.model")) then <code to report warning...>
 --]]
 do -- limit scope of locals
@@ -172,7 +173,12 @@ do -- limit scope of locals
 		return UnknownFunc
 	end
 
-	resources.lookupPriceModel = setmetatable({market = MarketFunc}, {__index = indexFunc})
+	local lookuppricemodel = setmetatable({market = MarketFunc}, {__index = indexFunc})
+
+	resources.lookupPriceModel = lookuppricemodel
+	function resources.GetPrice(model, link, serverKey) -- simplified wrapper
+		return lookuppricemodel[model](model, link, serverKey)
+	end
 end
 
 -- Enchantrix Load detection

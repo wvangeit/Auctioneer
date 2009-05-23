@@ -32,58 +32,66 @@
 local lib, parent, private = AucSearchUI.NewSearcher("Arbitrage")
 if not lib then return end
 local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Arbitrage"
 
-private.Styles = {
+do -- limit scope of locals
+	local styles = {
 			"Neutral",
 			"Cross-Faction",
 			"Cross-Realm",
 		}
-private.Factions = {
+	function private.getStyles()
+		return styles
+	end
+
+	factions = {
 			"Neutral",
 			"Alliance",
 			"Horde",
 		}
-function private.getStyles()
-	return private.Styles
-end
-
-function private.getFactions()
-	return private.Factions
-end
-
-function private.getRealmList()
-	if private.realmlist then
-		return private.realmlist
+	function private.getFactions()
+		return factions
 	end
-	local found = false
-	private.realmlist = {}
-	local _,current,_ = AucAdvanced.GetFaction()
 
-	local realms = AucAdvancedData.AserArbitrageRealms
-	if not realms then
-		realms = {}
-		AucAdvancedData.AserArbitrageRealms = realms
+	local realmlist
+	function private.getRealmList()
+		return realmlist
 	end
-	local curPlayer = UnitName("player")
-	realms[current] = curPlayer
+	function private.createRealmList()
+		-- called from resource change event - this first occurs in OnLoad for Auc-Util-SearchUI
+		-- saved variables are loaded and faction resources are available
+		private.createRealmList = nil
 
-	for realm,_ in pairs(realms) do
-		if strsub(realm, (strlen(realm)-7)) == "Alliance" then
-			realm = strsub(realm, 1, (strlen(realm)-9))
+		realmlist = {}
+
+		local realms = AucAdvancedData.AserArbitrageRealms
+		if not realms then
+			realms = {}
+			AucAdvancedData.AserArbitrageRealms = realms
 		end
-		if strsub(realm, (strlen(realm)-6)) == "Neutral" then
-			realm = strsub(realm, 1, (strlen(realm)-8))
+
+		if not realms[resources.Realm] then
+			realms[resources.Realm] = UnitName("player")
 		end
-		if strsub(realm, (strlen(realm)-4)) == "Horde" then
-			realm = strsub(realm, 1, (strlen(realm)-6))
-		end
-		if current ~= realm then
-			table.insert(private.realmlist, realm)
+
+		for realm, _ in pairs(realms) do
+			-- apparently some serverKeys got into the table in the past
+			-- they shouldn't be there, so strip them out
+			-- eventually this check can be removed altogether
+			local len = #realm
+			if strsub(realm, len-7) == "Alliance"
+			or strsub(realm, len-6) == "Neutral"
+			or strsub(realm, len-4) == "Horde"
+			then
+				realms[realm] = nil
+			end
+
+			-- insert all realms *including* our current realm
+			-- this is a workaround for problems with Selectboxes if the current saved setting is not in the list
+			table.insert(realmlist, realm)
 		end
 	end
-	return private.realmlist
 end
 
 -- Set our defaults
@@ -99,9 +107,96 @@ default("arbitrage.allow.bid", true)
 default("arbitrage.allow.buy", true)
 default("arbitrage.maxprice", 10000000)
 default("arbitrage.maxprice.enable", false)
+default("arbitrage.model", "market")
 default("arbitrage.search.crossrealmfaction", "Alliance")
-default("arbitrage.search.allrealms", {})
 default("arbitrage.search.style", "Cross-Faction")
+
+private.validationRequired = true
+function lib.Processor(event, subevent, ...)
+	if event == "search" and subevent == "complete" and private.factionUpdateRequired then
+		-- something changed during a search - complete the update now the search has finished
+		private.factionUpdateRequired = nil
+		private.SetCurrentFaction()
+	elseif event == "selecttab" then
+		if subevent == lib.tabname and private.validationRequired then
+			if not resources.isValidPriceModel(get("arbitrage.model")) then
+				message("Arbitrage Searcher Warning!\nCurrent price model setting ("..get("arbitrage.model")..") is not valid. Select a new price model")
+			else
+				private.validationRequired = nil
+			end
+			-- add any more validation here
+		end
+	elseif event == "config" then
+		-- update private variables, but only if a relevant setting may have changed
+		if subevent == "changed" then
+			local setting = ...
+			setting = setting and strsplit(".", setting)
+			if setting == "arbitrage" then
+				private.SetCurrentFaction()
+			end
+		elseif subevent == "loaded" or subevent == "reset" then
+			private.SetCurrentFaction()
+		end
+	elseif event == "resources" and subevent == "faction" then
+		-- This event first occurs during OnLoad - saved variables will be loaded but get() will not function at that point in time
+		if private.createRealmList then
+			-- do a run-once initialization function the first time this event occurs
+			private.createRealmList()
+		else
+			-- update our private variables each time *except* the first
+			private.SetCurrentFaction()
+		end
+	end
+end
+
+-- Keep our internal settings up to date with any changes, so that Search can just use the values
+function private.SetCurrentFaction()
+	if parent.IsSearching() then
+		-- cannot update settings until the search finishes - flag it and exit
+		private.factionUpdateRequired = true
+		return
+	end
+
+	local playerFaction = UnitFactionGroup("player")
+	local playerRealm = resources.Realm
+
+	local searchRealm, searchFaction
+	local searchstyle = get("arbitrage.search.style")
+
+	if searchstyle == "Neutral" then
+		-- if at neutral compare to home. if at home, compare to neutral
+		searchFaction = resources.Faction == "Neutral" and playerFaction or "Neutral"
+		searchRealm = playerRealm
+	elseif searchstyle == "Cross-Faction" then
+		-- search opposing faction (even if at neutral AH)
+		searchFaction = playerFaction == "Alliance" and "Horde" or "Alliance"
+		searchRealm = playerRealm
+	elseif searchstyle == "Cross-Realm" then
+		-- search whatever combination is in the two crossrealm* dropdown boxes
+		searchFaction = get("arbitrage.search.crossrealmfaction")
+		searchRealm = get("arbitrage.search.crossrealmrealm")
+
+		-- force there to always be a crossrealmrealm setting, to avoid Selectbox problems
+		-- we cannot set a default as this causes problems using Arbitrage on different servers - which defeats the purpose
+		if not searchRealm then
+			searchRealm = playerRealm
+			set("arbitrage.search.crossrealmrealm", searchRealm)
+		end
+	else
+		-- invalid setting - reset it and bail out - calling set() will cause Processor to call SetCurrentFaction() again
+		set("arbitrage.search.style", nil)
+		return
+	end
+	private.searchKey = searchRealm.."-"..searchFaction -- serverKey
+	private.searchFaction = searchFaction:lower()
+	private.searchAdjust = searchFaction == "Neutral" and 0.85 or 0.95 -- cut rate adjustment
+	private.searchLabel = "|cffffff7fSearching: "..searchRealm.."/"..searchFaction.."|r"
+
+	-- Display our current search destination in the GUI
+	if private.displaySearch then
+		private.displaySearch:SetText(private.searchLabel)
+	end
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -124,11 +219,13 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0, 1, "arbitrage.seen.check", "Check Seen count")
 	gui:AddControl(id, "Slider",            0, 2, "arbitrage.seen.min", 1, 100, 1, "Min seen count: %s")
 
-	gui:AddControl(id, "Subhead",           0,      "Search against")
-	gui:AddControl(id, "Selectbox",         0.01, 1, private.getStyles(), "arbitrage.search.style", "Search against")
-	gui:AddControl(id, "Subhead",           0.01,      "Cross-Realm:")
-	gui:AddControl(id, "Selectbox",         0.02, 1, private.getRealmList(), "arbitrage.search.crossrealmrealm", "Realm")
-	gui:AddControl(id, "Selectbox",         0.02, 1, private.getFactions(), "arbitrage.search.crossrealmfaction", "Faction")
+	gui:AddControl(id, "Subhead",           0, "Search against")
+	private.displaySearch = gui:AddControl(id, "Label", 0, 1, nil, private.searchLabel)
+	gui:AddControl(id, "Label",             0, 1, nil, "Search type:")
+	gui:AddControl(id, "Selectbox",         0, 1, private.getStyles, "arbitrage.search.style")
+	gui:AddControl(id, "Label",             0, 1, nil, "Cross-Realm additional settings:")
+	gui:AddControl(id, "Selectbox",         0, 1, private.getRealmList, "arbitrage.search.crossrealmrealm")
+	gui:AddControl(id, "Selectbox",         0, 1, private.getFactions, "arbitrage.search.crossrealmfaction")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.allow.bid", "Allow Bids")
@@ -138,16 +235,22 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Arbitrage searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "arbitrage.maxprice", 1, 99999999, "Maximum Price for Arbitrage")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModels, "arbitrage.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.brokerage", "Subtract auction fees")
-	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "arbitrage.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "arbitrage.adjust.deposit", "Subtract deposit:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorAuctionLength, "arbitrage.adjust.deplength")
 	gui:AddControl(id, "Slider",            0.42, 1, "arbitrage.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
-	local market, seen, _, curModel, pctstring
-
+	local link = item[Const.LINK]
+	if not link then
+		return false, "No link"
+	end
 	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
 	local maxprice = get("arbitrage.maxprice.enable") and get("arbitrage.maxprice")
 	if buyprice <= 0 or not get("arbitrage.allow.buy") or (maxprice and buyprice > maxprice) then
@@ -160,43 +263,12 @@ function lib.Search(item)
 		return false, "Does not meet bid/buy requirements"
 	end
 
-	-- Get correct faction to compare against
-	local comparefaction,_,factionGroup = AucAdvanced.GetFaction()
-	local searchstyle = get("arbitrage.search.style")
-	if searchstyle == "Neutral" then
-		local unitfaction = UnitFactionGroup("player")
-		if (factionGroup == unitfaction) then
-			comparefaction = GetRealmName().."-Neutral" --If you're at home, compare to neutral
-		else
-			comparefaction = GetRealmName().."-"..unitfaction --if you're at neutral, compare to home
-		end
-	elseif searchstyle == "Cross-Faction" then
-		local unitfaction = UnitFactionGroup("player")
-		if (factionGroup == unitfaction) then
-			local faction = "-Alliance"
-			if unitfaction == "Alliance" then faction = "-Horde" end --no need to check against both.  If it isn't one, then it must be the other
-			comparefaction = GetRealmName()..faction --If you're at home, compare to cross-faction
-		else
-			comparefaction = GetRealmName().."-"..unitfaction --if you're at neutral, compare to home
-		end
-	elseif searchstyle == "Cross-Realm" then
-		local crossrealmrealm = get("arbitrage.search.crossrealmrealm")
-		if crossrealmrealm then
-			local crossrealmfaction = get("arbitrage.search.crossrealmfaction")
-			comparefaction = crossrealmrealm.."-"..crossrealmfaction
-		else
-			comparefaction = AucAdvanced.GetFaction()
-		end
-	else
-		comparefaction = AucAdvanced.GetFaction()
-	end
-
-	market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(item[Const.LINK], comparefaction)
-
+	local market, seen, curModel = resources.GetPrice(get("arbitrage.model"), link, private.searchKey)
 	if not market then
-		return false, "No appraiser price"
+		return false, "No market price"
 	end
-	market = market * item[Const.COUNT]
+	local count = item[Const.COUNT]
+	market = market * count
 
 	if (get("arbitrage.seen.check")) and curModel ~= "fixed" then
 		if ((not seen) or (seen < get("arbitrage.seen.min"))) then
@@ -204,43 +276,24 @@ function lib.Search(item)
 		end
 	end
 
-	--adjust for brokerage/deposit costs
-	--[[ Commented out unused locals
-	local sig = AucAdvanced.Modules.Util.Appraiser.GetSigFromLink(item[Const.LINK])
-	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
-	--]]
-
+	--set up correct brokerage/deposit costs for our target AH
 	if get("arbitrage.adjust.brokerage") then
-		if string.find(comparefaction, "Neutral") then
-			market = market * .85
-		else
-			market = market * .95
-		end
+		market = market * private.searchAdjust
 	end
 	if get("arbitrage.adjust.deposit") then
-		--set up correct brokerage/deposit costs for our target AH
-		local newfaction
-		if strsub(comparefaction, (strlen(comparefaction)-6)) == "Neutral" then
-			newfaction = "neutral"
-		end
-		local amount = GetDepositCost(item[Const.LINK], get("arbitrage.adjust.deplength"), newfaction, item[Const.COUNT])
+		local amount = GetDepositCost(link, get("arbitrage.adjust.deplength"), private.searchFaction, count)
 		if amount then
 			market = market - amount * get("arbitrage.adjust.listings")
 		end
 	end
 
-	local pct = get("arbitrage.profit.pct")
-	local minprofit = get("arbitrage.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
+	local value = min(market*(100-get("arbitrage.profit.pct"))/100, market-get("arbitrage.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then
 		return "bid", market
 	end
-	return false, "Not enough profit"--..":"..tostring(comparefaction)..":"..tostring(market)
+	return false, "Not enough profit"
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
