@@ -31,9 +31,10 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Disenchant")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Disenchant"
+
 -- Set our defaults
 default("disenchant.profit.min", 1)
 default("disenchant.profit.pct", 50)
@@ -45,6 +46,26 @@ default("disenchant.allow.bid", true)
 default("disenchant.allow.buy", true)
 default("disenchant.maxprice", 10000000)
 default("disenchant.maxprice.enable", false)
+default("disenchant.model", "Enchantrix")
+
+function private.doValidation()
+	if not resources.isEnchantrixLoaded then
+		message("Disenchant Searcher Warning!\nEnchantrix not detected\nThis searcher will not function until Enchantrix is loaded")
+	elseif not resources.isValidPriceModel(get("disenchant.model")) then
+		message("Disenchant Searcher Warning!\nCurrent price model setting ("..get("disenchant.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	end
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -56,12 +77,6 @@ function lib:MakeGuiConfig(gui)
 	gui:AddHelp(id, "disenchant searcher",
 		"What does this searcher do?",
 		"This searcher provides the ability to search for items that are able to be disenchanted into reagents that on average will have a greater value than the purchase price of the given item.")
-
-	if not (Enchantrix and Enchantrix.Storage) then
-		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
-		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with Disenchant")
-		return
-	end
 
 	gui:AddControl(id, "Header",     0,      "Disenchant search criteria")
 
@@ -83,17 +98,22 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Disenchant searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "disenchant.maxprice", 1, 99999999, "Maximum Price for Disenchant")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "disenchant.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.brokerage", "Subtract auction fees")
 end
 
 function lib.Search(item)
-	if not (Enchantrix and Enchantrix.Storage) then
+	if not resources.isEnchantrixLoaded then
 		return false, "Enchantrix not detected"
 	end
 
-	if item[Const.QUALITY] <= 1 then
-		return false, "Item not disenchantable"
+	local itemQuality = item[Const.QUALITY]
+	if itemQuality <= 1 then
+		return false, "Item quality too low"
 	end
 
 	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
@@ -116,27 +136,43 @@ function lib.Search(item)
 		minskill = 0
 		maxskill = Enchantrix.Util.GetUserEnchantingSkill()
 	end
-	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], item[Const.QUALITY])
+	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], itemQuality)
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to disenchant"
 	end
-	local _, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(item[Const.LINK])
-	if (not market) or (market == 0) then
-		return false, "Item not disenchantable"
+
+	local data = Enchantrix.Storage.GetItemDisenchants(item[Const.ITEMID])
+	if not data then
+		return false, "Item not Disenchantable"
+	end
+
+	local total = data.total
+	local market = 0
+	if total and total[1] > 0 then
+		local totalNumber, totalQuantity = unpack(total)
+		local model = get("disenchant.model")
+		local GetPrice = resources.lookupPriceModel[model]
+		for result, resData in pairs(data) do
+			if result ~= "total" then
+				local resNumber, resYield = unpack(resData)
+				local price = GetPrice(model, result)
+				if price then
+					market = market + price * resYield / totalNumber
+				end
+			end
+		end
+	end
+	if market <= 0 then
+		return false, "No price found"
 	end
 
 	--adjust for brokerage costs
-	local brokerage = get("disenchant.adjust.brokerage")
+	if get("disenchant.adjust.brokerage") then
+		market = market * resources.CutAdjust
+	end
 
-	if brokerage then
-		market = market * 0.95
-	end
-	local pct = get("disenchant.profit.pct")
-	local minprofit = get("disenchant.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
-	end
+	-- check amount of profit
+	local value = min (market*(100-get("disenchant.profit.pct"))/100, market-get("disenchant.profit.min"))
 	if buyprice and buyprice <= value then
 		return "buy", market
 	elseif bidprice and bidprice <= value then

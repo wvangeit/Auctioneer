@@ -31,8 +31,8 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("EnchantMats")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local get, set ,default ,Const, resources = parent.GetSearchLocals()
 lib.tabname = "EnchantMats"
 
 -- Enchanting reagents, from Enchantrix EnxConstants.lua
@@ -123,6 +123,7 @@ default("enchantmats.allow.bid", true)
 default("enchantmats.allow.buy", true)
 default("enchantmats.maxprice", 10000000)
 default("enchantmats.maxprice.enable", false)
+default("enchantmats.model", "Enchantrix")
 
 --Slider variables
 default("enchantmats.PriceAdjust."..GPLANAR, 100)
@@ -162,6 +163,25 @@ default("enchantmats.PriceAdjust."..GCOSMIC, 100)
 default("enchantmats.PriceAdjust."..LCOSMIC, 100)
 default("enchantmats.PriceAdjust."..ABYSS, 100)
 
+function private.doValidation()
+	if not resources.isEnchantrixLoaded then
+		message("EnchantMats Searcher Warning!\nEnchantrix not detected\nThis searcher will not function until Enchantrix is loaded")
+	elseif not resources.isValidPriceModel(get("enchantmats.model")) then
+		message("EnchantMats Searcher Warning!\nCurrent price model setting ("..get("enchantmats.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	end
+end
+
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls
@@ -174,12 +194,6 @@ function lib:MakeGuiConfig(gui)
 		"What does this searcher do?",
 		"This searcher provides the ability to search for items which will disenchant into the reagents you need to have in order to level your enchanting skill. It is not a searcher meant for profit, but rather least cost for levelling.")
 
-	if not (Enchantrix and Enchantrix.Storage) then
-		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
-		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with EnchantMats")
-		return
-	end
-
 	gui:AddControl(id, "Header",     0,      "EnchantMats search criteria")
 
 	local last = gui:GetLast(id)
@@ -191,12 +205,19 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the EnchantMats searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "enchantmats.maxprice", 1, 99999999, "Maximum Price for EnchantMats")
 
+	gui:AddControl(id, "Label",             0.42, 1, nil, "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "enchantmats.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.min", 0, 450, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.max", 25, 450, 25, "Maximum skill: %s")
 
-	-- aka "what percentage of market value am I willing to pay for this reagent"?
+	-- spacer to allow for all the controls on the right hand side
+	gui:AddControl(id, "Note",              0, 0, nil, 40, "")
+
+	-- aka "what percentage of estimated value am I willing to pay for this reagent"?
 	gui:AddControl(id, "Subhead",          0,    "Reageant Price Modification")
 
 	gui:AddControl(id, "WideSlider", 0, 1, "enchantmats.PriceAdjust."..GCOSMIC, 0, 200, 1, "Greater Cosmic Essence %s%%" )
@@ -243,17 +264,12 @@ function lib:MakeGuiConfig(gui)
 end
 
 function lib.Search(item)
-	local market, seen, _, curModel, pctstring
-
 	-- Can't do anything without Enchantrix
-	if not (Enchantrix and Enchantrix.Storage) then
+	if not resources.isEnchantrixLoaded then
 		return false, "Enchantrix not detected"
 	end
 
-	local itemLink = item[Const.LINK]
-	if (not itemLink) then
-		return false, "No item link"
-	end
+	local itemID = item[Const.ITEMID]
 
 	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
 	local maxprice = get("enchantmats.maxprice.enable") and get("enchantmats.maxprice")
@@ -267,97 +283,68 @@ function lib.Search(item)
 		return false, "Does not meet bid/buy requirements"
 	end
 
-	-- first, is this an enchanting reagent itself?
-	-- if so, just use the value of the reagent
-	if validReagents[ Enchantrix.Util.GetItemIdFromLink(itemLink) ] then
-		market, _, _, seen, curModel = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink)
+	local market
+	if validReagents[itemID] then
+		-- item itself is a reagent; just use item's value
+		market = resources.GetPrice(get("enchantmats.model"), itemID)
 		if not market then
-			return false, "No appraiser price"
+			return false, "No price for item"
 		end
+
 		-- be safe and handle nil results
-		local adjustment = get("enchantmats.PriceAdjust."..Enchantrix.Util.GetItemIdFromLink(itemLink)) or 0
-
+		local adjustment = get("enchantmats.PriceAdjust."..itemID) or 0
 		market = (market * item[Const.COUNT]) * adjustment / 100
-	end
-
-	-- it's not a reagent, figure out what it de's into
-	if (not market or market == 0) then
-
+	else -- it's not a reagent, figure out what it DEs into
+		local itemQuality = item[Const.QUALITY]
 		-- All disenchantable items are "uncommon" quality or higher
 		-- so bail on items that are white or gray
-		if (item[Const.QUALITY] <= 1) then
-			return false, "Item not Disenchantable"
+		if itemQuality <= 1 then
+			return false, "Item quality too low"
 		end
 
-		local minskill = 0
-		local maxskill = 450
+		local minskill, maxskill
 		if get("enchantmats.level.custom") then
 			minskill = get("enchantmats.level.min")
 			maxskill = get("enchantmats.level.max")
 		else
+			minskill = 0
 			maxskill = Enchantrix.Util.GetUserEnchantingSkill()
 		end
 
-		local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItem(itemLink)
+		local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(item[Const.ILEVEL], itemQuality)
 		if (skillneeded < minskill) or (skillneeded > maxskill) then
 			return false, "Skill not high enough to Disenchant"
 		end
 
-
-		-- Give up if it doesn't disenchant to anything
-		local data = Enchantrix.Storage.GetItemDisenchants(itemLink)
-		if not data then
+		local data = Enchantrix.Storage.GetItemDisenchants(itemID)
+		if not data then -- Give up if it doesn't disenchant to anything
 			return false, "Item not Disenchantable"
 		end
 
 		local total = data.total
 
-		if (total and total[1] > 0) then
+		if total and total[1] > 0 then
 			market = 0
 			local totalNumber, totalQuantity = unpack(total)
+			local model = get("enchantmats.model")
+			local GetPrice = resources.lookupPriceModel[model]
 			for result, resData in pairs(data) do
-				if (result ~= "total") then
+				if result ~= "total" then
 					local resNumber, resQuantity = unpack(resData)
-
-					local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(result);
-
-					-- if no Auc4 price, use Auc5 price
-					if (not reagentPrice) then
-						reagentPrice = five
-					end
-
-					-- still nothing, try the baseline (hard coded)
-					if (not reagentPrice) then
-						reagentPrice = baseline
-					end
-
-					local resYield = resQuantity / totalNumber;
-					local resPrice = (reagentPrice or 0) * resYield;
-					--local percentage = resNumber / totalNumber;
-					--local simpleYield = resQuantity/resNumber;
+					local price = GetPrice(model, result)
+					price = (price or 0) * resQuantity / totalNumber
 
 					-- be safe and handle nil results
-					local adjustment = get("enchantmats.PriceAdjust."..result) or 0;
-
-					market = market + resPrice * adjustment / 100;
+					local adjustment = get("enchantmats.PriceAdjust."..result) or 0
+					market = market + price * adjustment / 100
 				end
 			end
 		end
 
 	end
-
-	-- If we don't know what it's worth, then there's not much we can do
-	if( not market or market <= 0) then
+	if not market or market <= 0 then
 		return false, "No Price Found"
 	end
-
-	--[[ comment out redundant code: neither enchantmats.seen.check nor enchantmats.seen.min settings exist
-	if (get("enchantmats.seen.check")) and curModel ~= "fixed" then
-		if ((not seen) or (seen < get("enchantmats.seen.min"))) then
-			return false, "Seen count too low"
-		end
-	end
-	--]]
 
 	if buyprice and buyprice <= market then
 		return "buy", market

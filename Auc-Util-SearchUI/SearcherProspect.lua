@@ -31,8 +31,9 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Prospect")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
+
 lib.tabname = "Prospect"
 -- Set our defaults
 default("prospect.profit.min", 1)
@@ -48,6 +49,26 @@ default("prospect.allow.bid", true)
 default("prospect.allow.buy", true)
 default("prospect.maxprice", 10000000)
 default("prospect.maxprice.enable", false)
+default("prospect.model", "Enchantrix")
+
+function private.doValidation()
+	if not resources.isEnchantrixLoaded then
+		message("Prospect Searcher Warning!\nEnchantrix not detected\nThis searcher will not function until Enchantrix is loaded")
+	elseif not resources.isValidPriceModel(get("prospect.model")) then
+		message("Prospect Searcher Warning!\nCurrent price model setting ("..get("prospect.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	end
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -59,12 +80,6 @@ function lib:MakeGuiConfig(gui)
 	gui:AddHelp(id, "prospect searcher",
 		"What does this searcher do?",
 		"This searcher provides the ability to search for ores which will prospect into gems that on average will have a greater value than the purchase price of the original ore.")
-
-	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemProspectTotals) then
-		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
-		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with Prospect")
-		return
-	end
 
 	gui:AddControl(id, "Header",     0,      "Prospect search criteria")
 
@@ -86,15 +101,19 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Prospect searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "prospect.maxprice", 1, 99999999, "Maximum Price for Prospect")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "milling.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "prospect.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorAuctionLength, "prospect.adjust.deplength")
 	gui:AddControl(id, "Slider",            0.42, 1, "prospect.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
-	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemProspectTotals) then
+	if not resources.isEnchantrixLoaded then
 		return false, "Enchantrix not detected"
 	end
 	if item[Const.QUALITY] ~= 1 then -- All prospectable ores are "Common" quality
@@ -113,8 +132,10 @@ function lib.Search(item)
 		return false, "Does not meet bid/buy requirements"
 	end
 
+	local itemID = item[Const.ITEMID]
+
 	-- Give up if it doesn't prospect to anything
-	local prospects = Enchantrix.Storage.GetItemProspects(item[Const.LINK])
+	local prospects = Enchantrix.Storage.GetItemProspects(itemID)
 	if not prospects then
 		return false, "Item not prospectable"
 	end
@@ -127,25 +148,27 @@ function lib.Search(item)
 		minskill = 0
 		maxskill = Enchantrix.Util.GetUserJewelCraftingSkill()
 	end
-	local skillneeded = Enchantrix.Util.JewelCraftSkillRequiredForItem(item[Const.LINK])
+	local skillneeded = Enchantrix.Util.JewelCraftSkillRequiredForItem(itemID)
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to prospect"
 	end
 
 	local market, deposit = 0, 0
-	local cutRate = AucAdvanced.cutRate or 0.05
+	
+	-- prep locals to speed up access inside the loop
 	local depositAucLength, depositRelistTimes, depositFaction
 	local includeDeposit = get("prospect.adjust.deposit")
 	if includeDeposit then
 		depositAucLength = get("prospect.adjust.deplength")
 		depositRelistTimes = get("prospect.adjust.listings")
-		if cutRate ~= 0.05 then depositFaction = "neutral" end
+		depositFaction = resources.faction
 	end
+	local model = get("prospect.model")
+	local GetPrice = resources.lookupPriceModel[model]
 
 	for result, yield in pairs(prospects) do
-		-- fetch value of each result from Enchantrix
-		local _, _, _, price = Enchantrix.Util.GetReagentPrice(result)
-		market = market + (price or 0) * yield
+		local price = GetPrice(model, result) or 0
+		market = market + price * yield
 
 		-- calculate deposit for each result
 		if includeDeposit then
@@ -156,7 +179,7 @@ function lib.Search(item)
 
 	-- Adjust for fees and costs
 	if get("prospect.adjust.brokerage") then
-		market = market * (1 - cutRate)
+		market = market * resources.CutAdjust
 	end
 	market = market - deposit
 	

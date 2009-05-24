@@ -31,8 +31,9 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Milling")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
+
 lib.tabname = "Milling"
 -- Set our defaults
 default("milling.profit.min", 1)
@@ -48,6 +49,26 @@ default("milling.allow.bid", true)
 default("milling.allow.buy", true)
 default("milling.maxprice", 10000000)
 default("milling.maxprice.enable", false)
+default("milling.model", "Enchantrix")
+
+function private.doValidation()
+	if not resources.isEnchantrixLoaded then
+		message("Milling Searcher Warning!\nEnchantrix not detected\nThis searcher will not function until Enchantrix is loaded")
+	elseif not resources.isValidPriceModel(get("milling.model")) then
+		message("Milling Searcher Warning!\nCurrent price model setting ("..get("milling.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	end
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -59,12 +80,6 @@ function lib:MakeGuiConfig(gui)
 	gui:AddHelp(id, "milling searcher",
 		"What does this searcher do?",
 		"This searcher provides the ability to search for herbs which will mill into pigments that on average will have a greater value than the purchase price of the original herbs.")
-
-	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemMillingTotals) then
-		gui:AddControl(id, "Header",     0,   "Enchantrix not detected")
-		gui:AddControl(id, "Note",    0.3, 1, 290, 30,    "Enchantrix must be enabled to search with Milling")
-		return
-	end
 
 	gui:AddControl(id, "Header",     0,      "Milling search criteria")
 
@@ -86,15 +101,19 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Milling searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "milling.maxprice", 1, 99999999, "Maximum Price for Milling")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "milling.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.adjust.deposit", "Subtract deposit")
-	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "milling.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorAuctionLength, "milling.adjust.deplength")
 	gui:AddControl(id, "Slider",            0.42, 1, "milling.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
-	if not (Enchantrix and Enchantrix.Storage and Enchantrix.Storage.GetItemMillingTotals) then
+	if not resources.isEnchantrixLoaded then
 		return false, "Enchantrix not detected"
 	end
 	if item[Const.QUALITY] ~= 1 then -- All millable herbs are "Common" quality
@@ -112,9 +131,11 @@ function lib.Search(item)
 	if not (bidprice or buyprice) then
 		return false, "Does not meet bid/buy requirements"
 	end
+	
+	local itemID = item[Const.ITEMID]
 
 	-- Give up if it doesn't mill to anything
-	local pigments = Enchantrix.Storage.GetItemMilling(item[Const.LINK])
+	local pigments = Enchantrix.Storage.GetItemMilling(itemID)
 	if not pigments then
 		return false, "Item not millable"
 	end
@@ -127,25 +148,27 @@ function lib.Search(item)
 		minskill = 0
 		maxskill = Enchantrix.Util.GetUserInscriptionSkill()
 	end
-	local skillneeded = Enchantrix.Util.InscriptionSkillRequiredForItem(item[Const.LINK])
+	local skillneeded = Enchantrix.Util.InscriptionSkillRequiredForItem(itemID)
 	if (skillneeded < minskill) or (skillneeded > maxskill) then
 		return false, "Skill not high enough to mill"
 	end
 
 	local market, deposit = 0, 0
-	local cutRate = AucAdvanced.cutRate or 0.05
+	
+	-- prep locals to speed up access inside the loop
 	local depositAucLength, depositRelistTimes, depositFaction
 	local includeDeposit = get("milling.adjust.deposit")
 	if includeDeposit then
 		depositAucLength = get("milling.adjust.deplength")
 		depositRelistTimes = get("milling.adjust.listings")
-		if cutRate ~= 0.05 then depositFaction = "neutral" end
+		depositFaction = resources.faction
 	end
+	local model = get("milling.model")
+	local GetPrice = resources.lookupPriceModel[model]
 
 	for result, yield in pairs(pigments) do
-		-- fetch value of each result from Enchantrix
-		local _, _, _, price = Enchantrix.Util.GetReagentPrice(result)
-		market = market + (price or 0) * yield
+		local price = GetPrice(model, result) or 0
+		market = market + price * yield
 
 		-- calculate deposit for each result
 		if includeDeposit then
@@ -156,7 +179,7 @@ function lib.Search(item)
 
 	-- Adjust for fees and costs
 	if get("milling.adjust.brokerage") then
-		market = market * (1 - cutRate)
+		market = market * resources.CutAdjust
 	end
 	market = market - deposit
 	
