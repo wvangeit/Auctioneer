@@ -230,13 +230,14 @@ end
 
 local function beginScan(bag)
 	setState("scan")
-	hidePrompt()		-- we can't actually hide during combat, so the UI will stay up
 	
 	-- do not scan while in combat
 	if UnitAffectingCombat("player") then
 		debugSpam("aborting scan during combat")
 		return
 	end
+	
+	hidePrompt()		-- we can't hide the UI during combat
 
 	local link, outBag, slot, value, spell
 	if (bag and bag >= 0 and bag <= 4) then	-- exclude bank bags, we can't DE from the bank
@@ -422,6 +423,11 @@ end
 function showPrompt(link, bag, slot, value, spell)
 	clearPrompt()		-- safety
 	
+	-- avoid taint, don't hide or show while in combat
+	if UnitAffectingCombat("player") then
+		return
+	end
+	
 	debugSpam(link ..",".. bag ..",".. slot ..",".. value ..",".. spell)
 
 	local _, count = GetContainerItemInfo(bag, slot)
@@ -451,7 +457,10 @@ end
 
 -- declared local at top
 function hidePrompt()
-	auto_de_prompt:Hide()
+	-- avoid taint, don't hide or show while in combat
+	if not UnitAffectingCombat("player") then
+		auto_de_prompt:Hide()
+	end
 end
 
 -- declared local at top
