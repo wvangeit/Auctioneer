@@ -1104,14 +1104,6 @@ function lib.MakeGuiConfig()
 	gui.saves.name:SetWidth(200)
 	gui.saves.name:SetHeight(18)
 
- --displays remaining # of scans queued
-gui.ScansRemaining = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-gui.ScansRemaining:ClearAllPoints()
-gui.ScansRemaining:SetPoint("RIGHT", gui.saves, "LEFT", -5, 0)
-gui.ScansRemaining:SetTextColor(1, 0.8, 0)
-gui.ScansRemaining:SetText("0")
-gui.ScansRemaining:SetJustifyH("RIGHT")
-
 	if AucAdvancedData.UtilSearchUiData then
 		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or ""
 		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
@@ -1176,6 +1168,28 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 			print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
 		end
 	end)
+
+	 --displays remaining # of scans queued
+	gui.ScansRemaining = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	gui.ScansRemaining:ClearAllPoints()
+	gui.ScansRemaining:SetPoint("RIGHT", gui.saves, "LEFT", -5, 0)
+	gui.ScansRemaining:SetTextColor(1, 0.8, 0)
+	gui.ScansRemaining:SetText("0")
+	gui.ScansRemaining:SetJustifyH("RIGHT")
+	gui.ScansRemaining.last = 0
+	gui.ScansRemaining.updateDisplay = function()
+		local pending = 0
+		if AucAdvanced.Scan.Private.scanStack then
+			pending = #AucAdvanced.Scan.Private.scanStack
+			if AucAdvanced.Scan.IsScanning() then
+				pending = pending + 1
+			end
+		end
+		if pending ~= gui.ScansRemaining.last then
+			gui.ScansRemaining.last = pending
+			gui.ScansRemaining:SetText(pending)
+		end
+	end
 
 	function lib.UpdateControls()
 		if gui.sheet.selected then
@@ -1322,6 +1336,18 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.Search.TooltipText = "Search Snapshot using current Searcher"
 	gui.Search:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.Search:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	gui.Search.updateDisplay = function()
+		if gui.config.selectedCat == "Searchers" then
+			if not gui.Search:IsShown() then
+				gui.Search:Show()
+			end
+		else
+			if gui.Search:IsShown() then
+				gui.Search:Hide()
+			end
+		end
+	end
+
 
 	gui:AddCat("Welcome")
 
@@ -1373,6 +1399,21 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.frame.purchase.TooltipText = "Bid/BuyOut selected auction\nbased on 'reason' column. \nHold CTRL+ALT+SHIFT to purchase all items."
 	gui.frame.purchase:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.frame.purchase:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	gui.frame.purchase.toggleAll = false
+	gui.frame.purchase.updateDisplay = function()
+		local all = IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown()
+		if all ~= gui.frame.purchase.toggleAll then
+			gui.frame.purchase.toggleAll = all
+			if all then
+				gui.frame.purchase:SetText("Purchase All")
+				gui.frame.purchase:SetScript("OnClick", private.purchaseall)
+			else
+				gui.frame.purchase:SetText("Purchase")
+				gui.frame.purchase:SetScript("OnClick", private.purchase)
+			end
+		end
+	end
+
 
 	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 260, 35)
@@ -1431,7 +1472,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	end)
 	gui.frame.cancel.size = 0
 	gui.frame.cancel.value = 0
-	gui.frame.cancel:SetScript("OnUpdate", function()
+	gui.frame.cancel.updateDisplay = function()
 		local queuesize = #AucAdvanced.Buy.Private.BuyRequests
 		if queuesize > 0 and queuesize ~= gui.frame.cancel.size then
 			local value = 0
@@ -1447,7 +1488,7 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 			gui.frame.cancel:Disable()
 			gui.frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
 		end
-	end)
+	end
 	gui.frame.cancel.tex = gui.frame.cancel:CreateTexture(nil, "OVERLAY")
 	gui.frame.cancel.tex:SetPoint("TOPLEFT", gui.frame.cancel, "TOPLEFT", 4, -2)
 	gui.frame.cancel.tex:SetPoint("BOTTOMRIGHT", gui.frame.cancel, "BOTTOMRIGHT", -4, 2)
@@ -1525,6 +1566,21 @@ gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.frame.progressbar.cancel:SetPoint("TOPLEFT", gui.frame.progressbar, "TOPRIGHT", -25, -5)
 	gui.frame.progressbar.cancel:SetText("X")
 	gui.frame.progressbar.cancel:SetScript("OnClick", private.cancelSearch)
+
+	gui.frame.updateThrottle = TOOLTIP_UPDATE_TIME
+	gui.frame:SetScript("OnUpdate", function(self, elapsed)
+		self.updateThrottle = self.updateThrottle - elapsed
+		if self.updateThrottle > 0 then
+			return
+		end
+		self.updateThrottle = TOOLTIP_UPDATE_TIME
+
+		-- display updater functions
+		self.cancel.updateDisplay()
+		self.purchase.updateDisplay()
+		gui.Search.updateDisplay()
+		gui.ScansRemaining.updateDisplay()
+	end)
 
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
@@ -1833,37 +1889,18 @@ function lib.PerformSearch(searcher)
 end
 
 local flip = false
-function private.OnUpdate()
-	if coSearch and coroutine.status(coSearch) ~= "dead" then
-		flip = not flip
-		if flip then
-			local status, result = coroutine.resume(coSearch)
-			if not status and result then
-				error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
+function private.OnUpdate(self, elapsed)
+	if coSearch then
+		if coroutine.status(coSearch) == "suspended" then
+			flip = not flip
+			if flip then
+				local status, result = coroutine.resume(coSearch)
+				if not status and result then
+					error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
+				end
 			end
-		end
-	end
-	if gui and gui:IsShown() then
-		if gui.config.selectedCat == "Searchers" then
-			if not gui.Search:IsShown() then
-				gui.Search:Show()
-			end
-		else
-			if gui.Search:IsShown() then
-				gui.Search:Hide()
-			end
-		end
-		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
-			gui.frame.purchase:SetText("Purchase All")
-			gui.frame.purchase:SetScript("OnClick", private.purchaseall)
-		else
-			gui.frame.purchase:SetText("Purchase")
-			gui.frame.purchase:SetScript("OnClick", private.purchase)
-		end
-		if AucAdvanced.Scan.Private.scanStack then
-				gui.ScansRemaining:SetText(#AucAdvanced.Scan.Private.scanStack)
-		else
-				gui.ScansRemaining:SetText("0")
+		elseif coroutine.status(coSearch) == "dead" then
+			coSearch = nil
 		end
 	end
 	if flagResourcesUpdateRequired then
