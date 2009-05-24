@@ -31,8 +31,8 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Converter")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Converter"
 
 -- Build a table to do all our work
@@ -181,6 +181,8 @@ do
 		findConvertable[id] = {idto, 1, "converter.enableDepleted"}
 	end
 end
+-- export the table for other addons to reference
+resources.SearcherConverterLookupTable = findConvertable
 
 default("converter.profit.min", 1)
 default("converter.profit.pct", 50)
@@ -192,12 +194,31 @@ default("converter.allow.bid", true)
 default("converter.allow.buy", true)
 default("converter.maxprice", 10000000)
 default("converter.maxprice.enable", false)
-default("converter.matching.check", true)
-default("converter.buyout.check", true)
+--default("converter.matching.check", true)
+--default("converter.buyout.check", true)
 default("converter.enableEssence", true)
 default("converter.enableMote", true)
 default("converter.enableCrystallized", true)
 default("converter.enableDepleted", false)
+default("converter.model", "market")
+
+function private.doValidation()
+	if not resources.isValidPriceModel(get("converter.model")) then
+		message("Converter Searcher Warning!\nCurrent price model setting ("..get("converter.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
+-- This function is automatically called from AucSearchUI.NotifyCallbacks
+private.validationRequired = true
+function lib.Processor(event, subevent)
+	if event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	end
+end
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
@@ -221,7 +242,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableMote", "Mote > Primal")
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableCrystallized", "Crystallized <> Eternal")
 	gui:AddControl(id, "Checkbox",          0, 1, "converter.enableDepleted", "Depleted Items")
-	gui:AddTip(id, "Warning: if you don't know about depleted items leave this setting off!")
+	gui:AddTip(id, "Warning: depleted items require Apexis Shards to convert. Apexis Shards can only be obtained from certain locations in Outland.")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.allow.bid", "Allow Bids")
@@ -231,15 +252,19 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Converter searcher")
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "converter.maxprice", 1, 99999999, "Maximum Price for Converter")
 
+	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModels, "converter.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
+
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.adjust.brokerage", "Subtract auction fees")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.adjust.deposit", "Subtract deposit cost")
-	gui:AddControl(id, "Selectbox",         0.42, 1, AucSearchUI.AucLengthSelector, "converter.adjust.deplength", "Length of auction for deposits")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorAuctionLength, "converter.adjust.deplength")
 	gui:AddControl(id, "Slider",            0.42, 1, "converter.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 
-	gui:AddControl(id, "Subhead",           0.42,  "Appraiser Value Origination")
-	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.matching.check", "Use Market Matched")
-	gui:AddControl(id, "Checkbox",          0.42, 1, "converter.buyout.check", "Use buyout not bid")
+	--gui:AddControl(id, "Subhead",           0.42,  "Appraiser Value Origination")
+	--gui:AddControl(id, "Checkbox",          0.42, 1, "converter.matching.check", "Use Market Matched")
+	--gui:AddControl(id, "Checkbox",          0.42, 1, "converter.buyout.check", "Use buyout not bid")
 
 	gui:SetLast(id, last)
 end
@@ -267,24 +292,20 @@ function lib.Search (item)
 		return false, "Does not meet bid/buy requirements"
 	end
 
-	local market, bid, buy
+	local market = resources.GetPrice(get("converter.model"), newID)
+	if not market then
+		return false, "No market price"
+	end
 	local count = item[Const.COUNT] * yield
+	market = market * count
 
-	-- todo: add option to use other market models; make Appraiser an optional dependancy, not required
-	buy, bid = AucAdvanced.Modules.Util.Appraiser.GetPrice(newID, nil, get("converter.matching.check"))
-	market = (get("converter.buyout.check") and buy or bid or buy) * count
-
-	-- todo: better Neutral AH detection
 	--adjust for brokerage/deposit costs
-	local cutRate = AucAdvanced.cutRate or 0.05
 	if get("converter.adjust.brokerage") then
-		market = market * (1 - cutRate)
+		market = market * resources.CutAdjust
 	end
 	if get("converter.adjust.deposit") then
-		local newfaction
-		if cutRate ~= 0.05 then newfaction = "neutral" end
 		-- note: GetDepositCost calls GetSellValue API, which handles numerical itemIDs (prefers them actually)
-		local amount = GetDepositCost(newID, get("converter.adjust.deplength"), newfaction, count)
+		local amount = GetDepositCost(newID, get("converter.adjust.deplength"), resources.faction, count)
 		if amount then
 			market = market - amount * get("converter.adjust.listings")
 		end
