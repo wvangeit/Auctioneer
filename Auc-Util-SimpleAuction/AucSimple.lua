@@ -184,7 +184,7 @@ function private.UpdateConfig()
 		local showing = false
 		if get("util.simpleauc.scanbutton") then
 			showing = true
-			if get("util.simpleauc.scanbutton.disable.wowecon") and IsAddOnLoaded("WowEcon") then
+			if get("util.simpleauc.scanbutton.disable.wowecon") and IsAddOnLoaded("WOWEcon_PriceMod") then
 				showing = false
 			end
 		end
