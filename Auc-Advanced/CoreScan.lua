@@ -374,12 +374,12 @@ lib.UnpackImageItem = private.Unpack
 --The first parameter will be true if we want to show the process indicator, false if we want to hide it. and nil if we only want to update it.
 --The second parameter will be a number that is the max number of items in the scan.
 --The third parameter is the current progress of the scan.
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, queryName, scansQueued)
 	if (not (lib.IsScanning() or (state == false))) then
 		return
 	end
 
-	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime)
+	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, queryName, scansQueued)
 end
 
 function private.IsIdentical(focus, compare)
@@ -1065,7 +1065,15 @@ StorePageFunction = function()
 	--Update the progress indicator
 	now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
-	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
+	--store queued scans to pass along on the callback, used by scanbutton and searchUI etc to display how many scans are still queued
+	local scansQueued
+	if private.scanStack then
+		scansQueued = #private.scanStack
+	else
+		scansQueued = 0
+	end
+	--page, maxpages, name  lets a module know when a "scan" they have queued is actually in progress. scansQueued lets a module know how may scans are left to go
+	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery.name, scansQueued) --page starts at 0 so we need to add +1
 	
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
