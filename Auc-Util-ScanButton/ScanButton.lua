@@ -181,7 +181,7 @@ function private.HookAH()
 	private.UpdateScanProgress()
 end
 
-function private.UpdateScanProgress()
+function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
 	local scanning, paused = false, false
 	if AucAdvanced and AucAdvanced.Scan then
 		scanning, paused = AucAdvanced.Scan.IsScanning(), AucAdvanced.Scan.IsPaused()
@@ -197,15 +197,15 @@ function private.UpdateScanProgress()
 		private.buttons.stop.tex:SetVertexColor(0.3,0.3,0.3)
 	end
 	local pending = 0
-	if AucAdvanced.Scan.Private.scanStack then
-		pending = #AucAdvanced.Scan.Private.scanStack
-		if scanning then
+	if scansQueued then
+		pending = scansQueued
+		if scanning and tonumber(scansQueued) > 0 then
 			pending = pending + 1
 		end
-	end
-	if pending ~= private.lastpending then
-		private.lastpending = pending
-		private.buttons.stop.count:SetText(pending)
+		if pending ~= private.lastpending then
+			private.lastpending = pending
+			private.buttons.stop.count:SetText(pending)
+		end
 	end
 
 	private.blink = nil
@@ -306,11 +306,16 @@ function private.ConfigChanged()
 end
 
 function private.stop()
+	--this just makes the scan queue count decrease by 1 until the next processor event  sets it to a proper # helpfull if user is spamming stop button
+	local count = tonumber(private.buttons.stop.count:GetText() )
+	if count > 0 then	count = count -1 end
+	private.buttons.stop.count:SetText(count)
+	
 	AucAdvanced.Scan.SetPaused(false)
 	AucAdvanced.Scan.Cancel()
 	private.UpdateScanProgress()
 	queue = {}
-	queueFinished = true --Will clear currently selected scan filters with teh Next Onupdate event.
+	queueFinished = true --Will clear currently selected scan filters with the Next Onupdate event.
 end
 
 function private.play()
