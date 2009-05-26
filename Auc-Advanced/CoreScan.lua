@@ -740,7 +740,7 @@ Commitfunction = function()
 			end
 			if dodelete then
 				-- Auction Time has expired
-				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+				if not (bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
 					processStats("delete", data)
 				end
 				table.remove(scandata.image, pos)
