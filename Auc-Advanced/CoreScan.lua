@@ -402,7 +402,7 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elaps
 		return
 	end
 	local scanCount = 0
-	if (private.scanStack) then scanCount=#private.ScanCount end
+	if (private.scanStack) then scanCount=#private.scanStack end
 	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, querySig, scanCount)
 end
 
