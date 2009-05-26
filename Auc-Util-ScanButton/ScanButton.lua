@@ -181,7 +181,7 @@ function private.HookAH()
 	private.UpdateScanProgress()
 end
 
-function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
+function private.UpdateScanProgress(state, _, _, _, _, _, _, scansQueued)
 	local scanning, paused = false, false
 	if AucAdvanced and AucAdvanced.Scan then
 		scanning, paused = AucAdvanced.Scan.IsScanning(), AucAdvanced.Scan.IsPaused()
@@ -199,7 +199,7 @@ function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
 	local pending = 0
 	if scansQueued then
 		pending = scansQueued
-		if scanning and tonumber(scansQueued) > 0 then
+		if scanning then
 			pending = pending + 1
 		end
 		if pending ~= private.lastpending then
@@ -207,7 +207,11 @@ function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
 			private.buttons.stop.count:SetText(pending)
 		end
 	end
-
+	--handle when we are on the last scan and no more queued when that scan completes set remaining to 0
+	if scansQueued == 0 and state == false then
+		private.buttons.stop.count:SetText(pending)
+	end
+	
 	private.blink = nil
 	if scanning and not paused then
 		private.buttons.pause:Enable()
