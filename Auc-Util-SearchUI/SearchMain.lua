@@ -343,14 +343,11 @@ local settingDefaults = {
 }
 
 local function getDefault(setting)
-	local a,b,c = strsplit(".", setting)
-	local result = settingDefaults[setting];
-	return result
+	return settingDefaults[setting]
 end
 
 function lib.GetDefault(setting)
-	local val = getDefault(setting);
-	return val;
+	return getDefault(setting)
 end
 
 function lib.SetDefault(setting, default)
@@ -400,6 +397,13 @@ local function setter(setting, value)
 	end
 
 	if db[setting] == value then
+		if type(value) == "table" then
+			-- same table as before
+			-- call UpdateSave to check if the *contents* of the table have changed
+			-- but don't send Processor message as *setting* is the same (consistent with Core version of 'setter')
+			hasUnsaved = true
+			lib.UpdateSave()
+		end
 		return
 	end
 	db[setting] = value
@@ -899,13 +903,10 @@ function lib.ResetSearch()
 end
 
 local curColor = "white"
-local curName
-function lib.UpdateSave(inUpdate)
-	if not gui then return end
-	if not AucAdvancedData.UtilSearchUiData then return end
+function lib.UpdateSave()
+	if not (gui and AucAdvancedData.UtilSearchUiData) then return end
 
 	local name = gui.saves.name:GetText()
-	if inUpdate and curName == name then return end
 
 	if hasUnsaved then
 		local saved = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
@@ -1103,7 +1104,7 @@ function lib.MakeGuiConfig()
 	gui.saves.name:SetAutoFocus(false)
 	gui.saves.name:SetWidth(200)
 	gui.saves.name:SetHeight(18)
-
+	gui.saves.name:SetScript("OnTextChanged", function() lib.UpdateSave() end)
 	if AucAdvancedData.UtilSearchUiData then
 		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or ""
 		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
@@ -1336,6 +1337,7 @@ function lib.MakeGuiConfig()
 	gui.Search.TooltipText = "Search Snapshot using current Searcher"
 	gui.Search:SetScript("OnEnter", function() return private.SetButtonTooltip(this.TooltipText) end)
 	gui.Search:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	gui.Search:Hide()
 	gui.Search.updateDisplay = function()
 		if gui.config.selectedCat == "Searchers" then
 			if not gui.Search:IsShown() then
@@ -1909,8 +1911,6 @@ function private.OnUpdate(self, elapsed)
 		flagResourcesUpdateRequired = false
 		private.UpdateFactionResources()
 	end
-
-	lib.UpdateSave(true)
 end
 
 private.updater = CreateFrame("Frame", nil, UIParent)
