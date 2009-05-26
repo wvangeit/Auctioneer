@@ -114,7 +114,9 @@ local settingDefaults = {
 	['scandata.tooltip.modifier'] = true,
 	["tooltip.marketprice.show"] = true,
 	['scandata.force'] = false,
-	['scandata.summary'] = true,
+	['scandata.summaryonfull'] = true,
+	['scandata.summaryonmicro'] = false,
+	['scandata.summaryonpartial'] = true,
 	['clickhook.enable'] = true,
 	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
@@ -433,9 +435,14 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
 
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", _TRANS('ADV_Interface_ScanDataSummary')) --"Enables the display of the post scan summary"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummary')) --"Display the summation of an Auction House scan"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonfull", _TRANS('ADV_Interface_ScanDataSummaryFull')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryFull')) --"Display the summation of an Auction House scan"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonpartial", _TRANS('ADV_Interface_ScanDataSummaryPartial')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryPartial')) --"Display the summation of an Auction House scan"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonmicro", _TRANS('ADV_Interface_ScanDataSummaryMicro')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryMicro')) --"Display the summation of an Auction House scan"
 
+	
 	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", _TRANS('ADV_Interface_SearchingClickHooks')) --"Enable searching click-hooks"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
 

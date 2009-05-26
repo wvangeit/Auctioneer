@@ -44,6 +44,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("Auctioneer Help")
 		private.Print("  {{/auc help}} - Show this help")
 		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
+		private.Print("  {{/auc config}} - Opens the configuration page.")
 		private.Print("  {{/auc getall}} - Download auctionhouse using getall")
 		private.Print("  {{/auc pause}} - Pause scanning of the auctionhouse")
 		private.Print("  {{/auc resume||unpause||cont||continue}} - Recommence scanning of the auctionhouse")
@@ -70,6 +71,8 @@ function private.CommandHandler(command, subcommand, ...)
 		AucAdvanced.Scan.SetPaused(false)
 	elseif command == "abort" then
 		AucAdvanced.Scan.Abort()
+	elseif command == "config" then
+		AucAdvanced.Settings.Show()
 	elseif command == "clear" then
 		if ... then
 			subcommand = string.join(" ", subcommand, ...)

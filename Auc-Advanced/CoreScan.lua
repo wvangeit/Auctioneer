@@ -35,8 +35,7 @@
 --[[
 	Auctioneer Scanning Engine.
 
-	If you supply a category, that category will be scanned to completion and then the "image" will be updated.
-	If you do not supply a category, then the whole AH will be scanned and then replace the current "image"
+	Provides a service to walk through an AH Query, reporting changes in the AH to registered utilities and stats modules
 ]]
 if not AucAdvanced then return end
 
@@ -53,7 +52,7 @@ private.querycount = 0
 
 local Const = AucAdvanced.Const
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-lib.Print = _print
+private.Print = _print
 local GetTime = GetTime
 
 private.isScanning = false
@@ -71,21 +70,21 @@ function private.LoadAuctionImage()
 	end
 
 	if (AucAdvancedData.ScanData) then
-		lib.Print("Warning, Overwriting AucScanData with AucAdvancedData.ScanData")
+		private.Print("Warning, Overwriting AucScanData with AucAdvancedData.ScanData")
 		AucScanData = AucAdvancedData.ScanData
 		if (loaded) then AucAdvancedData.ScanData = nil end
 	end
 
 	if (not AucScanData) then
 		LoadAddOn("Auc-Scan-Simple")
-		lib.Print("Warning, Overwriting AucScanData with AucAdvancedScanSimpleData")
+		private.Print("Warning, Overwriting AucScanData with AucAdvancedScanSimpleData")
 		AucScanData = AucAdvancedScanSimpleData
 		AucAdvancedScanSimpleData = nil
 	end
 
 	if AucScanData and (not AucScanData.Version or AucScanData.Version < SCANDATA_VERSION) then
 		AucScanData = nil
-		lib.Print("Note: ScanData format upgrade (to {{v"..SCANDATA_VERSION.."}}), please rescan auction house as soon as possible.")
+		private.Print("Note: ScanData format upgrade (to {{v"..SCANDATA_VERSION.."}}), please rescan auction house as soon as possible.")
 	end
 
 	if not AucScanData then AucScanData = {Version = SCANDATA_VERSION} end
@@ -123,7 +122,23 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.page = -1
+	query.qryinfo = {}
+	query.qryinfo.page = -1;
+	query.qryinfo.id = private.querycount
+	query.qryinfo.sig = ("%s-%s-%s-%s-%s-%s-%s"):format(
+		query.name or "",
+		query.minUseLevel or "",
+		query.maxUseLevel or "",
+		query.class or "",
+		query.subclass or "",
+		query.quality or "",
+		query.invType or "")
+
+	private.querycount = private.querycount+1
+	if (nLog) then
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.sig))
+	end
+
 	query.isUsable = isUsable
 	local now = GetTime()
 	table.insert(private.scanStack, {now, false, query, {}, {}, now, 0, now})
@@ -131,7 +146,10 @@ end
 
 function lib.PushScan()
 	if private.isScanning then
-		lib.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.page+1))
+		if (nLog) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Scan %d (%s) Paused, next page to scan is %d"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.sig, private.curQuery.qryinfo.page+1))
+		end
+		-- private.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.qryinfo.page+1))
 		if not private.scanStack then private.scanStack = {} end
 		table.insert(private.scanStack, {
 			private.scanStartTime,
@@ -146,7 +164,6 @@ function lib.PushScan()
 		private.scanStartTime = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
-		private.curQuerySig = nil
 		private.curQuery = nil
 		private.curScan = nil
 
@@ -173,16 +190,22 @@ function lib.PopScan()
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
 			-- 5 minutes old
-			lib.Print("Paused scan is older than 5 minutes, commiting what we have and aborting")
+			--private.Print("Paused scan is older than 5 minutes, commiting what we have and aborting")
+			if (nLog) then
+				nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("Scan %d Too Old, committing what we have and aborting"):format(private.curQuery.qryinfo.id))
+			end
 			lib.Commit(true, false) --  Incomplete, non-GetAll Scan
 			return
 		end
 
 		private.totalPaused = private.totalPaused + elapsed
-		lib.Print(("Resuming paused scan at page {{%d}}..."):format(private.curQuery.page+1))
+		if (nLog) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Scan %d Resumed, next page to scan is %d"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.page+1))
+		end
+		--private.Print(("Resuming paused scan at page {{%d}}..."):format(private.curQuery.qryinfo.page+1))
 		private.isScanning = true
 		private.sentQuery = false
-		private.ScanPage(private.curQuery.page+1)
+		private.ScanPage(private.curQuery.qryinfo.page+1)
 		private.UpdateScanProgress(true)
 	end
 end
@@ -374,12 +397,13 @@ lib.UnpackImageItem = private.Unpack
 --The first parameter will be true if we want to show the process indicator, false if we want to hide it. and nil if we only want to update it.
 --The second parameter will be a number that is the max number of items in the scan.
 --The third parameter is the current progress of the scan.
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, queryName, scansQueued)
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, querySig)
 	if (not (lib.IsScanning() or (state == false))) then
 		return
 	end
-
-	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, queryName, scansQueued)
+	local scanCount = 0
+	if (private.scanStack) then scanCount=#private.ScanCount end
+	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, querySig, scanCount)
 end
 
 function private.IsIdentical(focus, compare)
@@ -553,7 +577,7 @@ Commitfunction = function()
 	local scanStarted = private.CommitQueue[1]["scanStarted"]
 	local scanStartTime = private.CommitQueue[1]["scanStartTime"]
 	local totalPaused = private.CommitQueue[1]["totalPaused"]
-	local TempcurScan = {}
+	local query = private.CommitQueue[1]["query"]	local TempcurScan = {}
 	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
 	local TempcurQuery = {}
 	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
@@ -731,16 +755,26 @@ Commitfunction = function()
 
 	local currentCount = #scandata.image
 	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount ~= scanCount) then
-		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterOldCount+filterNewCount, scanCount))
+		if nLog then 
+			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Scan Count Discrepency Seen", 
+				("%d updated + %d same + %d new + %d filtered != %d scanned"):format(updateCount, sameCount, 
+					newCount, filterOldCount+filterNewCount, scanCount)) 
+		end
 	end
 
 	if numempty > 0 then
-		lib.Print(("Warning: %d entries in scandata without links"):format(numempty)) --this theoretically should never output, but if it does, we need to track it down.
+		if nLog then 
+			nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "ScanData Missing Links", 
+				("We saw %d entries in scandata without links"):format(numempty)) 
+		end
 	end
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
 	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
-		lib.Print(("Warning, discrepency in current count: {{%d - %d - %d + %d + %d - %d != %d}}"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
-			newCount, filterNewCount, filterDeleteCount, currentCount))
+		if nLog then 
+			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Current Count Discrepency Seen", 
+				("%d - %d - %d + %d + %d - %d != %d"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
+					newCount, filterNewCount, filterDeleteCount, currentCount)) 
+		end
 	end
 
 	local now = time()
@@ -750,8 +784,22 @@ Commitfunction = function()
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
 	--Hides the end of scan summary if user is not interested
-	if private.getOption("scandata.summary") then
+	
+	local printSummary = false
+	if ((not TempcurQuery.class) and (not TempcurQuery.subclass) and (not TempcurQuery.minUseLevel)
+			and (not TempcurQuery.name) and (not TempcurQuery.isUsable) 
+			and (not TempcurQuery.invType) and (not TempcurQuery.quality)) then
+		printSummary = private.getOption("scandata.summaryonfull");
+	elseif (TempcurQuery.name and TempcurQuery.minUseLevel and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
+		printSummary = private.getOption("scandata.summaryonmicro")
+	else
+		printSummary = private.getOption("scandata.summaryonpartial")
+	end
+	
+	if (nLog or printSummary) then
 		local scanTime = "  "
+		local summary = ""
+
 		if (scanTimeHours and scanTimeHours ~= 0) then
 			scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
 		end
@@ -761,41 +809,45 @@ Commitfunction = function()
 		if (scanTimeSecs and scanTimeSecs ~= 0) then
 			scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
 		end
+
 		if (wasIncomplete) then
-			lib.Print("AucAdv scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before interruption:")
+			summary = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before stopping:"
 		else
-			lib.Print("AucAdv finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:")
+			summary = "Auctioneer finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:"
 		end
-		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end")
+		
+		summary = summary.."\n  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end"
 		if (sameCount > 0) then
 			if (sameRecoveredCount > 0) then
-				lib.Print("  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)")
+				summary = summary.."\n  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)"
 			else
-				lib.Print("  {{"..sameCount.."}} unchanged items")
+				summary = summary.."\n  {{"..sameCount.."}} unchanged items"
 			end
 		end
 		if (updateCount > 0) then
 			if (updateRecoveredCount > 0) then
-				lib.Print("  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)")
+				summary = summary.."\n  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)"
 			else
-				lib.Print("  {{"..updateCount.."}} updated items")
+				summary = summary.."\n  {{"..updateCount.."}} updated items"
 			end
 		end
 		if (newCount > 0) then
-			lib.Print("  {{"..newCount.."}} new items")
+			summary = summary.."\n  {{"..newCount.."}} new items"
 		end
 		if (earlyDeleteCount+expiredDeleteCount > 0) then
-			lib.Print("  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed")
+			summary = summary.."\n  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
 		end
 		if (filterNewCount+filterOldCount > 0) then
-			lib.Print("  {{"..filterNewCount+filterOldCount.."}} filtered items")
+			summary = summary.."\n  {{"..filterNewCount+filterOldCount.."}} filtered items"
 		end
 		if (filterDeleteCount > 0) then
-			lib.Print("  {{"..filterDeleteCount.."}} filtered items removed")
+			summary = summary.."\n  {{"..filterDeleteCount.."}} filtered items removed"
 		end
 		if (missedCount > 0) then
-			lib.Print("  {{"..missedCount.."}} missed items")
+			summary = summary.."\n  {{"..missedCount.."}} missed items"
 		end
+		if (printSummary) then private.Print(summary) end
+		if (nLog) then nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed", summary) end
 	end
 
 	if (not scandata.scanstats) then scandata.scanstats = {} end
@@ -827,7 +879,7 @@ Commitfunction = function()
 
 	AucAdvanced.API.ClearMarketCache();
 	-- Tell everyone that our stats are updated
-	AucAdvanced.SendProcessorMessage("scanstats", scandata.scanstats[0])
+	AucAdvanced.SendProcessorMessage("scanstats", replicate(scandata.scanstats[0]))
 	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
 
 	--Hide the progress indicator
@@ -1066,21 +1118,16 @@ StorePageFunction = function()
 	now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
 	--store queued scans to pass along on the callback, used by scanbutton and searchUI etc to display how many scans are still queued
-	local scansQueued
-	if private.scanStack then
-		scansQueued = #private.scanStack
-	else
-		scansQueued = 0
-	end
+
 	--page, maxpages, name  lets a module know when a "scan" they have queued is actually in progress. scansQueued lets a module know how may scans are left to go
-	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery.name, scansQueued) --page starts at 0 so we need to add +1
+	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery.name) --page starts at 0 so we need to add +1
 	
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
 
 
 	local storecount = 0
-	if (page > private.curQuery.page) then
+	if (page > private.curQuery.qryinfo.page) then
 
 		for i = 1, numBatchAuctions do
 			if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
@@ -1090,15 +1137,15 @@ StorePageFunction = function()
 
 			local itemData = lib.GetAuctionItem("list", i)
 			if itemData then
-				local legacyScanning = private.legacyScanning
-				if legacyScanning == nil then
-					if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
-						legacyScanning = Auctioneer.ScanManager.IsScanning
-					else
-						legacyScanning = function () return false end
-					end
-					private.legacyScanning = legacyScanning
-				end
+--				local legacyScanning = private.legacyScanning
+--				if legacyScanning == nil then
+--					if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
+--						legacyScanning = Auctioneer.ScanManager.IsScanning
+--					else
+--						legacyScanning = function () return false end
+--					end
+--					private.legacyScanning = legacyScanning
+--				end
 
 				-- We only store one of the same item/owner/price/quantity in the scan
 				-- unless we are doing a forward scan (in which case we can be sure they
@@ -1117,7 +1164,7 @@ StorePageFunction = function()
 			if not private.curPages then
 				private.curPages = {}
 			end
-			private.curQuery.page = page
+			private.curQuery.qryinfo.page = page
 			private.curPages[page] = true -- we have pulled this page
 		end
 	end
@@ -1137,8 +1184,8 @@ StorePageFunction = function()
 	end
 
 	-- Just updated the page if it was a new page, so record it as latest page.
-	if (page > private.curQuery.page) then
-		private.curQuery.page = page
+	if (page > private.curQuery.qryinfo.page) then
+		private.curQuery.qryinfo.page = page
 	end
 	
 	--Send a Processor event to modules letting them know we are done with the page
@@ -1193,7 +1240,6 @@ end
 --CoStore = coroutine.create(StorePageFunction)
 
 function lib.StorePage()
-
 	if CoStore and coroutine.status(CoStore) ~= "dead" then
 		CoroutineResume(CoStore)
 	else
@@ -1302,11 +1348,11 @@ end
 
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	if private.warnTaint then
-		lib.Print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
+		private.Print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
 	end
 	if private.CanSend and not private.CanSend() then
-		lib.Print("Can't send query just at the moment")
+		private.Print("Can't send query just at the moment")
 		return
 	end
 
@@ -1339,15 +1385,16 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
+	query.qryinfo = {}
+	query.qryinfo.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
 	query.isUsable = isUsable
 
 	if (private.curQuery) then
 		for x, y in pairs(query) do
-			if (x~="page" and x~="queryid" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
+			if (x~="qryinfo" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 		for x, y in pairs(private.curQuery) do
-			if (x~="page" and x~="queryid" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
+			if (x~="qryinfo" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 	end
 
@@ -1358,24 +1405,20 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.totalPaused = 0
 		
 		local startPage = 0
-
-		query.queryid = private.querycount
+		query.qryinfo.id = private.querycount
 		private.querycount = private.querycount+1
-
-		private.curQuery = query
 	
-		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
+		query.qryinfo.sig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 			query.name or "",
 			query.minUseLevel or "",
 			query.maxUseLevel or "",
 			query.class or "",
 			query.subclass or "",
 			query.quality or "",
-			query.invType or ""
-		)
+			query.invType or "")
+		private.curQuery = query
 	else
 		query = private.curQuery
---		query.page = page
 	end
 
 	private.sentQuery = true
@@ -1470,7 +1513,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
 	if (private.curQuery) then
-		lib.Print("Cancelling current scan")
+		private.Print("Cancelling current scan")
 		lib.Commit(true, false)
 	end
 	private.ResetAll()
@@ -1490,7 +1533,7 @@ end
 
 function lib.Abort()
 	if (private.curQuery) then
-		lib.Print("Aborting current scan")
+		private.Print("Aborting current scan")
 	end
 	private.ResetAll()
 end
@@ -1509,7 +1552,6 @@ function private.ResetAll()
 	private.scanStartTime = nil
 	private.scanStarted = nil
 	private.totalPaused = nil
-	private.curQuerySig = nil
 
 	private.curQuery = nil
 	private.curScan = nil
@@ -1672,5 +1714,21 @@ private.itemUsable = ItemUsableCached
 function private.CanUse(link)
 	return private.itemUsable:CanUse(link)
 end
+
+function lib.GetScanCount()
+	local scanCount = 0
+	if (private.scanStack) then scanCount = #private.scanStack end
+	if (private.isScanning) then
+		scanCount = scanCount + 1
+	end
+	return scanCount
+end
+
+function lib.GetStackedScanCount()
+	local scanCount = private.scanStack or 0
+	if (private.scanStack) then scanCount = #private.scanStack end
+	return scanCount
+end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
