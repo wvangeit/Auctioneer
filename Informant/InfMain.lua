@@ -358,6 +358,7 @@ local function getInformantVendorInfo(id)
 	else
 		isVendored = false
 	end
+	local itemLimited = itemData.limited
 	if itemLimited and tonumber(itemLimited) > 0 then
 		isLimited = true
 	else
