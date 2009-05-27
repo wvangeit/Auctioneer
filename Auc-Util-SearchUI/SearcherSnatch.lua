@@ -33,7 +33,7 @@
 local lib, parent, private = AucSearchUI.NewSearcher("Snatch")
 if not lib then return end
 local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
-local get,set,default,Const = AucSearchUI.GetSearchLocals()
+local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Snatch"
 lib.Private = private
 
@@ -44,7 +44,7 @@ default("snatch.maxprice.enable", false)
 default("snatch.allow.beginerTooltips", true)
 default("snatch.price.model", "market")
 --defaults do not work for tables,  A123456 is still gonna be table A123456  regardless of if it has data or not
-if not get("snatch.itemsList") then set("snatch.itemsList", {}) end
+private.snatchList = {}
 
 private.workingItemLink = nil
 local frame
@@ -67,14 +67,14 @@ function lib.SlashCommand(cmd)
 		price = (g*COPPER_PER_GOLD + s*COPPER_PER_SILVER + c) --sum gsc to total copper value
 	end
 	price = tonumber(price)
-	
+
 	--parse for % command  % or percent
 	local pct
 	if extra and extra ~= "" and price == 0 then
 		pct = GSC:lower():match("(%d+)%s-%%") or GSC:lower():match("(%d+)%s-p")
 	end
 	pct = tonumber(pct)
-		
+
 	--pass to snatch
 	if itemlink and price and price > 0 then
 		lib.AddSnatch(itemlink, price)
@@ -99,8 +99,8 @@ function lib:MakeGuiConfig(gui)
 		"What does this searcher do?",
 		"This searcher provides the ability to snap up items which meet your fixed price constraints. It is useful whenever you say \"I always want to buy this when it is cheaper that X/item\".")
 
-	--we add a single invisible element to set the normal gui
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	--we add a single invisible element with height attribute to anchor the normal gui
+	gui:AddControl(id, "Note", 0, 1, nil, 110, " ")
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
@@ -145,6 +145,13 @@ function lib:MakeGuiConfig(gui)
 	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.icon:SetScript("OnClick", frame.IconClicked)
 	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
+	frame.icon:SetScript("OnEnter", function() --set mouseover tooltip
+		if private.workingItemLink then
+				GameTooltip:SetOwner(frame.icon, "ANCHOR_BOTTOMRIGHT")
+				GameTooltip:SetHyperlink(private.workingItemLink)
+			end
+		end)
+	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 0)
@@ -156,9 +163,9 @@ function lib:MakeGuiConfig(gui)
 		{ "Snatching", "TOOLTIP", 170 },
 		{ "%", "NUMBER", 25 },
 		{ "Buy each", "COIN", 70},
-		{ "App. value", "COIN", 70 },
+		{ "Valuation", "COIN", 70 },
 		})
-	
+
 	--Processor function for all scrollframe events for this frame
 	function frame.snatchlist.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
 		if (callback == "ColumnOrder") then
@@ -178,7 +185,7 @@ function lib:MakeGuiConfig(gui)
 			set("snatch.columnsortcurSort", column)
 		end
 	end
-	
+
 	--If we have a saved order reapply
 	if get("snatch.columnorder") then
 		--print("saved order applied")
@@ -190,8 +197,8 @@ function lib:MakeGuiConfig(gui)
 		frame.snatchlist.sheet.curDir = get("snatch.columnsortcurDir") or 1
 		frame.snatchlist.sheet:PerformSort()
 	end
-	
-	
+
+
 	frame.money = CreateFrame("Frame", "TEST", frame, "MoneyInputFrameTemplate")
 	frame.money.isMoneyFrame = true
 	frame.money:SetPoint("LEFT", frame.slot, "BOTTOM", -16, -10)
@@ -212,18 +219,18 @@ function lib:MakeGuiConfig(gui)
 		end
 		--this stops us from clearing money when we just reset % after a new selection
 		if pct ~= 0 then
-			MoneyInputFrame_SetCopper(frame.money, price * pct/100) 
+			MoneyInputFrame_SetCopper(frame.money, price * pct/100)
 		end
 	end)
-		
-	
+
+
 	frame.pctBox.help = frame.pctBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.pctBox.help:SetPoint("LEFT", frame.pctBox, "RIGHT", 0, 0)
 	frame.pctBox.help:SetWidth(130)
 	frame.pctBox.help:SetJustifyH("LEFT")
 	frame.pctBox.help:SetText("Buy as percent of selected statistic")
-	
-	
+
+
 	--Add Item to list button
 	frame.additem = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.additem:SetPoint("LEFT", frame.money, "RIGHT", -10, 0)
@@ -260,99 +267,80 @@ function lib:MakeGuiConfig(gui)
 	frame.resetList:SetScript("OnEnter", function() lib.buttonTooltips( frame.resetList, "Shift+ALT+CTR Click to remove all items from the snatch list") end)
 	frame.resetList:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-	private.snatchList =  get("snatch.itemsList")
-	--if there was no saved snatchList, create an empty table
-	if not private.snatchList then
-		private.snatchList = {}
-		set("snatch.itemsList", private.snatchList)
-	end
-	--Set our "last" frame anchor point this will be the "top" area for normal config GUI elements
-	local last = gui:GetLast(id)
-	local  locationA, Frame, locationB, x, y = last:GetPoint()
-		last:SetPoint(locationA, Frame, locationB, 100, -170)
-	gui:SetLast(id, last)
-
+	-- Normal GUI controls
+	-- Anchored to the hidden "Note" control we added earlier
 	gui:AddControl(id, "Subhead",0, "Snatch search settings:")
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.allow.bid", "Allow Bids")
 	gui:AddTip(id, "Allow Snatch searcher to suggest bids")
 	gui:SetLast(id, last)
-	gui:AddControl(id, "Checkbox", 0, 11,  "snatch.allow.buy", "Allow Buyouts")
+	gui:AddControl(id, "Checkbox", 0, 11, "snatch.allow.buy", "Allow Buyouts")
 	gui:AddTip(id, "Allow Snatch searcher to suggest buyouts")
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Snatch searcher")
-	
-	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
-	gui:AddControl(id, "Selectbox",  0, 1, private.getPriceModels, "snatch.price.model", "Pricing model to use for evaluation")
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "snatch.maxprice", 1, 99999999, "Maximum Price for Snatch")
+
+	gui:AddControl(id, "Subhead", 0, "Price Valuation Method:")
+	gui:AddControl(id, "Selectbox", 0, 1, resources.selectorPriceModels, "snatch.price.model")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox", 0, 1,  "snatch.allow.beginerTooltips", "Display beginner popup help.")
 	gui:AddTip(id, "Display beginner tooltips.")
 
 	gui:AddHelp(id, "what are commands",
-		'How to use slash commands', 
+		'How to use slash commands',
 [[After SearchUI has been opened, you can use the /snatch  slash command.
-You can easily add items via 
-/snatch  <itemlink>  TotalValue in Copper 
+You can easily add items via
+/snatch  <itemlink>  TotalValue in Copper
 or
 /snatch  <itemlink>  xG xS xC
-if the command is accepted you should see a chat message confirming the item and price snatch will buy at.]]		
+if the command is accepted you should see a chat message confirming the item and price snatch will buy at.]]
 		)
 
 	lib.refreshData()
-	
-	
+
+
 	SLASH_SNATCH1 = "/snatch";
 	SlashCmdList["SNATCH"] = lib.SlashCommand
 end
---Gets available pricing models from Auctioneer for select box
---copied from appraisers code and we re-use appr translations
-function private.getPriceModels()
-	if not private.scanValueNames then private.scanValueNames = {} end
-	for i = 1, #private.scanValueNames do
-		private.scanValueNames[i] = nil
-	end
-	
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	local curModel = get("snatch.price.model") or "NO PREV SELECTION"
-	table.insert(private.scanValueNames,{"market", _TRANS("UCUT_Interface_MarketValue")})--Market value (reusing Undercut's translation)
-	for pos, name in ipairs(algoList) do
-		--place last used choice first on the list
-		if (name == curModel) then
-			table.insert(private.scanValueNames, 1, {name,  _TRANS('APPR_Interface_Stats').." "..name})
-		else
-			table.insert(private.scanValueNames, {name, _TRANS('APPR_Interface_Stats').." "..name})
-		end
-	end
-	return private.scanValueNames
-end
+
 --Gets price for choosen item using current selected pricing model
 function private.getPrice(link)
-	local bid, buy, price
-	local curModel = get("snatch.price.model") or "market"
-	if curModel == "market" then
-		buy, bid = AucAdvanced.API.GetMarketValue(link)
-		price = tonumber(buy) or tonumber(bid)
-	else
-		buy, bid = AucAdvanced.API.GetAlgorithmValue(curModel, link)
-		price = tonumber(buy) or tonumber(bid)
-	end
+	local model = get("snatch.price.model")
+	local price = resources.lookupPriceModel[model](model, link)
 	return price or 0
+end
+
+function private.doValidation()
+	if not resources.isValidPriceModel(get("snatch.price.model")) then
+		message("Snatch Searcher Warning!\nCurrent price model setting ("..get("snatch.price.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
 end
 
 --Processor function
 --this handles any notifications that SearchUI core needs to send us
-function lib.Processor(msg, ...)
-	if msg == "config" then --saved search has changed, so reload the ignorelist
-		private.snatchList =  get("snatch.itemsList")
-		--if there was no saved snatchList, create an empty table
-		if not private.snatchList then
-			private.snatchList = {}
-			set("snatch.itemsList", private.snatchList)
+function lib.Processor(event, subevent, setting)
+	if event == "config" then
+		if subevent == "loaded" or subevent == "reset" or subevent == "deleted" then
+			--saved search has changed, so reload our private ignorelist
+			private.snatchList = get("snatch.itemsList")
+			--if there was no saved snatchList, create an empty table
+			if not private.snatchList then
+				private.snatchList = {}
+				set("snatch.itemsList", private.snatchList) -- Caution: this causes a Processor("config", "changed", ...) event
+			end
+			lib.refreshData()
+		elseif subevent == "changed" and setting == "snatch.price.model" then -- this is the only "change" that requires a refresh
+			lib.refreshData()
 		end
-		lib.refreshData()
+	elseif event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
 	end
 end
 
@@ -462,7 +450,7 @@ function lib.AddSnatch(itemlink, price, percent, count)
 	if price and percent then
 		price = nil --it will be calculated as needed
 	end
-	
+
 	--add item to snatch list
 	if price or percent then
 		private.snatchList[itemsig] = {["link"] =  itemlink, ["price"] = price, ["count"] = count, ["percent"] = percent}
@@ -507,7 +495,7 @@ function lib.SetWorkingItem(link)
 	local _, itemid, itemsuffix, itemenchant, _ = AucAdvanced.DecodeLink(link)
 	if itemid then
 		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
-		
+
 		if private.snatchList[itemsig] then
 			frame.pctBox:SetText("")
 			MoneyInputFrame_SetCopper(frame.money, private.snatchList[itemsig].price or 0)
@@ -517,14 +505,8 @@ function lib.SetWorkingItem(link)
 		end
 	end
 
-	--set edit box texture and name, this may have some issues when server has not seen the item since we will not get a texture
-	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
-	frame.icon:SetNormalTexture(texture) --set icon texture
-	frame.icon:SetScript("OnEnter", function() --set mouseover tooltip
-			GameTooltip:SetOwner(frame.icon, "ANCHOR_BOTTOMRIGHT")
-			GameTooltip:SetHyperlink(link)
-		end)
-	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	--set edit box texture and name
+	frame.icon:SetNormalTexture(GetItemIcon(link)) --set icon texture
 	frame.slot.help:SetText(link)
 
 	--set current working item
@@ -544,12 +526,12 @@ function lib.refreshData()
 	--get auctioneer price if possible
 	local Data, Style = {}, {}
 	for item, v in pairs(private.snatchList) do
-		
+
 		local price = private.getPrice(v.link)
 		--if we are buying by % of market price
 		if v.percent then
 			v.price = price * v.percent/100 --set buy price to % of market
-			
+
 			Style[#Data+1] = {}
 			Style[#Data+1][1] = {["rowColor"] = {0, 1, 0, 0, 0.2, "Horizontal"}}
 			Style[#Data+1][2] = {["textColor"] = {1,0,0}}
@@ -558,8 +540,8 @@ function lib.refreshData()
 	end
 	if frame then
 		frame.snatchlist.sheet:SetData(Data, Style)
-		
-		--update "help" text to display current 
+
+		--update "help" text to display current
 		frame.pctBox.help:SetText(format("Buy as percent of %s value", get("snatch.price.model") or "market") )
 	end
 end
