@@ -31,7 +31,7 @@
 -- Create a new instance of our lib with our parent
 local lib, parent, private = AucSearchUI.NewSearcher("Arbitrage")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+--local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Arbitrage"
 
@@ -59,8 +59,8 @@ do -- limit scope of locals
 		return realmlist
 	end
 	function private.createRealmList()
-		-- called from resource change event - this first occurs in OnLoad for Auc-Util-SearchUI
-		-- saved variables are loaded and faction resources are available
+		-- called from onload event for SearchUI
+		-- saved variables are loaded but some resources may not be available
 		private.createRealmList = nil
 
 		realmlist = {}
@@ -71,8 +71,9 @@ do -- limit scope of locals
 			AucAdvancedData.AserArbitrageRealms = realms
 		end
 
-		if not realms[resources.Realm] then
-			realms[resources.Realm] = UnitName("player")
+		local playerRealm = GetRealmName()
+		if not realms[playerRealm] then
+			realms[playerRealm] = UnitName("player")
 		end
 
 		for realm, _ in pairs(realms) do
@@ -111,40 +112,38 @@ default("arbitrage.model", "market")
 default("arbitrage.search.crossrealmfaction", "Alliance")
 default("arbitrage.search.style", "Cross-Faction")
 
-private.validationRequired = true
+function private.doValidation()
+	if not resources.isValidPriceModel(get("arbitrage.model")) then
+		message("Arbitrage Searcher Warning!\nCurrent price model setting ("..get("arbitrage.model")..") is not valid. Select a new price model")
+	else
+		private.doValidation = nil
+	end
+end
+
 function lib.Processor(event, subevent, ...)
 	if event == "search" and subevent == "complete" and private.factionUpdateRequired then
 		-- something changed during a search - complete the update now the search has finished
 		private.factionUpdateRequired = nil
 		private.SetCurrentFaction()
 	elseif event == "selecttab" then
-		if subevent == lib.tabname and private.validationRequired then
-			if not resources.isValidPriceModel(get("arbitrage.model")) then
-				message("Arbitrage Searcher Warning!\nCurrent price model setting ("..get("arbitrage.model")..") is not valid. Select a new price model")
-			else
-				private.validationRequired = nil
-			end
-			-- add any more validation here
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
 		end
 	elseif event == "config" then
 		-- update private variables, but only if a relevant setting may have changed
 		if subevent == "changed" then
 			local setting = ...
-			setting = setting and strsplit(".", setting)
-			if setting == "arbitrage" then
+			if setting and setting:match("^arbitrage") then
 				private.SetCurrentFaction()
 			end
-		elseif subevent == "loaded" or subevent == "reset" then
+		elseif subevent == "loaded" or subevent == "reset" or subevent == "deleted" then
 			private.SetCurrentFaction()
 		end
 	elseif event == "resources" and subevent == "faction" then
-		-- This event first occurs during OnLoad - saved variables will be loaded but get() will not function at that point in time
+		private.SetCurrentFaction()
+	elseif event == "onload" and subevent == "auc-util-searchui" then
 		if private.createRealmList then
-			-- do a run-once initialization function the first time this event occurs
 			private.createRealmList()
-		else
-			-- update our private variables each time *except* the first
-			private.SetCurrentFaction()
 		end
 	end
 end
@@ -183,7 +182,7 @@ function private.SetCurrentFaction()
 			set("arbitrage.search.crossrealmrealm", searchRealm)
 		end
 	else
-		-- invalid setting - reset it and bail out - calling set() will cause Processor to call SetCurrentFaction() again
+		-- invalid setting - clear it and bail out - calling set() will recurse into SetCurrentFaction
 		set("arbitrage.search.style", nil)
 		return
 	end
