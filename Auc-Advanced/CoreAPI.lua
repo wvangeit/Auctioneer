@@ -389,7 +389,7 @@ local weaktablemeta = {__mode="kv"}
 function private.GetSubImageById(itemId, faction, realm)
 	faction = faction or AucAdvanced.GetFactionGroup()
 	realm = realm or GetRealmName()
-	serverKey = realm.."-"..faction
+	local serverKey = realm.."-"..faction
 
 	local indexResults = private.scandataIndex[serverKey]
 	if not indexResults then
