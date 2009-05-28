@@ -100,7 +100,7 @@ function lib.GetImage()
 	return image
 end
 
-function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
+function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
 	if not private.scanStack then private.scanStack = {} end
 	local query = {}
 	name = name or ""
@@ -133,7 +133,9 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 		query.subclass or "",
 		query.quality or "",
 		query.invType or "")
-
+	if (NoSummary) then
+		query.qryinfo.nosummary = true
+	end
 	private.querycount = private.querycount+1
 	if (nLog) then
 		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.sig))
@@ -289,7 +291,7 @@ function lib.ProgressBars(self, value, show, text)
 	end
 end
 
-function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
+function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
 	if AuctionFrame and AuctionFrame:IsVisible() then
 		if private.isPaused then
 			message("Scanning is currently paused")
@@ -343,6 +345,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
 		AuctionFrameBrowse.page = startPage
+		if (NoSummary) then
+			query.qryinfo.nosummary = true
+		end
 
 		--Show the progress indicator
 		private.UpdateScanProgress(true, totalAuctions)
@@ -786,11 +791,13 @@ Commitfunction = function()
 	--Hides the end of scan summary if user is not interested
 	
 	local printSummary = false
-	if ((not TempcurQuery.class) and (not TempcurQuery.subclass) and (not TempcurQuery.minUseLevel)
+	if (TempcurQuery.qryinfo.nusummary) then
+		printSummary = false
+	elseif ((not TempcurQuery.class) and (not TempcurQuery.subclass) and (not TempcurQuery.minUseLevel)
 			and (not TempcurQuery.name) and (not TempcurQuery.isUsable) 
 			and (not TempcurQuery.invType) and (not TempcurQuery.quality)) then
 		printSummary = private.getOption("scandata.summaryonfull");
-	elseif (TempcurQuery.name and TempcurQuery.minUseLevel and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
+	elseif (TempcurQuery.name and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
 		printSummary = private.getOption("scandata.summaryonmicro")
 	else
 		printSummary = private.getOption("scandata.summaryonpartial")
@@ -798,6 +805,7 @@ Commitfunction = function()
 	
 	if (nLog or printSummary) then
 		local scanTime = "  "
+		local summaryLine = ""
 		local summary = ""
 
 		if (scanTimeHours and scanTimeHours ~= 0) then
@@ -811,42 +819,60 @@ Commitfunction = function()
 		end
 
 		if (wasIncomplete) then
-			summary = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before stopping:"
+			summaryLine = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before stopping:"
 		else
-			summary = "Auctioneer finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:"
+			summaryLine = "Auctioneer finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:"
 		end
-		
-		summary = summary.."\n  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end"
+		if (printSummary) then private.Print(summaryLine) end
+		summary = summaryLine
+
+		summaryLine = "  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end"
+		if (printSummary) then private.Print(summaryLine) end
+		summary = summary.."\n"..summaryLine
+
 		if (sameCount > 0) then
 			if (sameRecoveredCount > 0) then
-				summary = summary.."\n  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)"
+				summaryLine = "  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)"
 			else
-				summary = summary.."\n  {{"..sameCount.."}} unchanged items"
+				summaryLine = "  {{"..sameCount.."}} unchanged items"
 			end
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (updateCount > 0) then
 			if (updateRecoveredCount > 0) then
-				summary = summary.."\n  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)"
+				summaryLine = "  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)"
 			else
-				summary = summary.."\n  {{"..updateCount.."}} updated items"
+				summaryLine = "  {{"..updateCount.."}} updated items"
 			end
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (newCount > 0) then
-			summary = summary.."\n  {{"..newCount.."}} new items"
+			summaryLine = "  {{"..newCount.."}} new items"
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (earlyDeleteCount+expiredDeleteCount > 0) then
-			summary = summary.."\n  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
+			summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (filterNewCount+filterOldCount > 0) then
-			summary = summary.."\n  {{"..filterNewCount+filterOldCount.."}} filtered items"
+			summaryLine = "  {{"..filterNewCount+filterOldCount.."}} filtered items"
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (filterDeleteCount > 0) then
-			summary = summary.."\n  {{"..filterDeleteCount.."}} filtered items removed"
+			summaryLine = "  {{"..filterDeleteCount.."}} filtered items removed"
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
 		if (missedCount > 0) then
-			summary = summary.."\n  {{"..missedCount.."}} missed items"
+			summaryLine = "  {{"..missedCount.."}} missed items"
+			if (printSummary) then private.Print(summaryLine) end
+			summary = summary.."\n"..summaryLine
 		end
-		if (printSummary) then private.Print(summary) end
 		if (nLog) then nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed", summary) end
 	end
 
