@@ -196,7 +196,67 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	return tbl.sums, low, high
 end
 
-
+--[[
+Get  Sold / Failed Ratio
+Used by match beancounter, made into an API  to allow other addons easier access to this data
+This returns the Sold/Failed number of auctions and Sold/Failed  number of items
+]]
+function lib.API.getAHSoldFailed(player, link, days)
+	if not link or not player then return end
+	if not private.serverData[player] then return end
+	
+	local itemID = lib.API.decodeLink(link)
+	if not itemID then return end
+		
+	local now = time()
+	local success, failed, sucessStack, failedStack = 0, 0, 0, 0
+	--if we want to filter to a date range then we use this, if we want EVERY trxn uses second lookup
+	--the second lookup is mesurably  faster but not noticable in real use due to not having to expand the DB. 100 trxns may have a  0.0001 sec diffrence
+	if days then
+		days = days * 86400 --days to seconds
+		if private.serverData[player]["completedAuctions"][itemID] then
+			for key in pairs(private.serverData[player]["completedAuctions"][itemID] ) do
+				for i, text in pairs(private.serverData[player]["completedAuctions"][itemID][key]) do
+					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
+					auctime, stack = tonumber(auctime), tonumber(stack)
+					
+					if (now - auctime) < (days) then
+						success = success + 1
+						sucessStack = sucessStack + stack
+					end
+				end
+			end
+		end
+		if private.serverData[player]["failedAuctions"][itemID] then
+			for key in pairs(private.serverData[player]["failedAuctions"][itemID]) do
+				for i, text in pairs(private.serverData[player]["failedAuctions"][itemID][key]) do
+					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
+					auctime, stack = tonumber(auctime), tonumber(stack)
+					
+					if (now - auctime) < (days) then
+						failed = failed + 1
+						failedStack = failedStack + stack
+					end
+				end
+			end
+		end
+	else
+		if BeanCounter and BeanCounter.Private.playerData then
+			if private.serverData[player]["completedAuctions"][itemID]  then
+				for key in pairs(private.serverData[player]["completedAuctions"][itemID] ) do
+					success = success + #private.serverData[player]["completedAuctions"][itemID][key]
+				end
+			end
+			if private.serverData[player]["failedAuctions"][itemID] then
+				for key in pairs(private.serverData[player]["failedAuctions"][itemID]) do
+					failed = failed + #private.serverData[player]["failedAuctions"][itemID][key]
+				end
+			end
+		end
+	end
+	
+	return success, failed, sucessStack, failedStack
+end
 
 --**********************************************************************************************************************
 --ITEMLINK AND STRING API'S USE THESE IN PLACE OF LOCAL :MATCH() CALLS
