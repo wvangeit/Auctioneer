@@ -228,46 +228,29 @@ function lib.GetFaction()
 	return AucAdvanced.curFaction, realmName, factionGroup
 end
 
--- Had to create an event catching frame to allow for disabling // re-enabling use of home faction data everywhere (automagic disable on ah open/ enable on close) ~ this stops neutral ah data from getting in home faction database
-local auctionHouseStatus = 0
-function onEventCatcher(this, event)
-	if event == 'AUCTION_HOUSE_SHOW' then
-		auctionHouseStatus = 1
-	end
-	if event == 'AUCTION_HOUSE_CLOSED' then
-		auctionHouseStatus = 0
-	end
-end
-
-local frame = CreateFrame("Frame","")
-	frame:SetScript("OnEvent", onEventCatcher);
-	frame:RegisterEvent("AUCTION_HOUSE_SHOW");
-	frame:RegisterEvent("AUCTION_HOUSE_CLOSED");
-
+private.PlayerFaction = UnitFactionGroup("player")
+private.factions = {}
 function lib.GetFactionGroup()
-	local currentZone = GetMinimapZoneText()
 	local factionGroup = "Faction" --Save only "Faction" or "Neutral", as non-neutral zones should always display the home faction's data
 
-	if not private.factions then private.factions = {} end
-	if private.factions[currentZone] then
-		factionGroup = private.factions[currentZone]
-	else
-		SetMapToCurrentZone()
-		local map = GetMapInfo()
-		if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
-			factionGroup = "Neutral"
+	if private.isAHOpen or not AucAdvanced.Settings.GetSetting("alwaysHomeFaction") then
+		local currentZone = GetMinimapZoneText()
+		if private.factions[currentZone] then
+			factionGroup = private.factions[currentZone]
+		else
+			SetMapToCurrentZone()
+			local map = GetMapInfo()
+			if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+				factionGroup = "Neutral"
+			end
+			private.factions[currentZone] = factionGroup
 		end
 	end
-	private.factions[currentZone] = factionGroup
-	if auctionHouseStatus == 0 then
-		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = "Faction" end
-	end
 	if factionGroup == "Faction" then
-		factionGroup = UnitFactionGroup("player")
+		factionGroup = private.PlayerFaction
 	end
 	return factionGroup
 end
-
 
 function private.relevelFrame(frame)
 	return private.relevelFrames(frame:GetFrameLevel() + 2, frame:GetChildren())
@@ -498,6 +481,24 @@ function lib.GetAllModules(having, findSystem, findEngine)
 	return modules
 end
 
+-- CoreModule
+-- A dummy module representing the core of Auc-Advanced
+-- Used to catch messages and pass them on to elements of the core
+local coremodule = {
+	libType = "Util",
+	libName = "CoreModule",
+	GetName = function() return "CoreModule" end,
+	}
+lib.Modules.Util.CoreModule = coremodule
+
+-- distribution of CoreModule events is currently hard coded
+-- to be improved on at a later date - but only worth doing when there are more events
+function coremodule.Processor(...)
+	lib.API.Processor(...)
+	private.Processor(...)
+end
+-- end of CoreModule
+
 function lib.SendProcessorMessage(...)
 	local modules = AucAdvanced.GetAllModules("Processor")
 	for pos, engineLib in ipairs(modules) do
@@ -505,10 +506,14 @@ function lib.SendProcessorMessage(...)
 	end
 end
 
--- Called from CoreMain when Auc-Advanced has loaded
--- Used to initialize data that relies on saved variables
-function lib.utilOnLoad()
-	private.createAuctionLength()
+function private.Processor(event, subevent)
+	if event == "load" and subevent == "auc-advanced" then
+		private.createAuctionLength()
+	elseif event == "auctionopen" then
+		private.isAHOpen = true
+	elseif event == "auctionclose" then
+		private.isAHOpen = false
+	end
 end
 
 -- Returns the tooltip helper

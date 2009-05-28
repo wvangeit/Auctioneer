@@ -66,7 +66,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 
 	local extra = tooltip:GetExtra()
 	AucAdvanced.DecodeLink(item, extra)
-	
+
 	if extra.itemType ~= "item" then
 		tooltip:ClearFrame(tip)
 		return -- Auctioneer hooks into item tooltips only
@@ -205,7 +205,7 @@ function private.OnLoad(addon)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 
 		private.HookTT()
-		
+
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
@@ -215,10 +215,6 @@ function private.OnLoad(addon)
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
 			AucAdvanced.Scan.GetImage()
 		end
-		
-		-- notify other (non-module) sections of Auc-Advanced
-		AucAdvanced.utilOnLoad() -- CoreUtil.lua
-
 	end
 
 	-- Notify the actual module if it exists
@@ -241,7 +237,7 @@ function private.OnLoad(addon)
 	end
 
 	-- Notify all processors that an auctioneer addon has loaded
-	if auc == "auc" and sys and eng then
+	if (auc == "auc" and sys and eng) or (addon == "auc-advanced") then
 		AucAdvanced.SendProcessorMessage("load", addon)
 	end
 end

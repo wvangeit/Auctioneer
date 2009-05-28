@@ -40,7 +40,18 @@ local private = {}
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 
-local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdvanced.Fill
+--local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdvanced.Fill
+local empty = wipe
+
+local tinsert = table.insert
+local tremove = table.remove
+local next = next
+local pairs = pairs
+local ipairs = ipairs
+local ceil = math.ceil
+local max = math.max
+local tostring = tostring
+local type = type
 
 --[[
 	The following functions are defined for modules's exposed methods:
@@ -67,6 +78,13 @@ local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdva
 	more complete specification.
 ]]
 
+-- this is actually called from a dummy module in CoreUtil
+function lib.Processor(event, ...)
+	if event == "scanstats" then
+		private.clearCaches(...)
+	end
+end
+
 do
     local EPSILON = 0.000001;
     local IMPROVEMENT_FACTOR = 0.8;
@@ -75,15 +93,11 @@ do
     local cache = {};
     local pdfList = {};
     local engines = {};
-    local tremove = table.remove;
-    local tinsert = table.insert;
     local abs = math.abs;
     local floor = math.floor;
     local ERROR = 0.05;
     local GetSetting = AucAdvanced.Settings.GetSetting;
     local GetItemInfo = GetItemInfo;
-    local type = type;
-    local pairs, ipairs = pairs, ipairs;
     local GetCVar = GetCVar;
     local assert = assert;
     -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
@@ -281,7 +295,7 @@ function lib.GetAlgorithms(itemLink)
 			if not engineLib.IsValidAlgorithm
 			or engineLib.IsValidAlgorithm(saneLink) then
 				local engine = engineLib.GetName()
-				table.insert(engines, engine)
+				tinsert(engines, engine)
 			end
 		end
 	end
@@ -341,14 +355,14 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 					local origAlgo = private.algorithmstack[1]
 					local endSize = #(private.algorithmstack)+1
 					while (#(private.algorithmstack)) do
-						table.remove(private.algorithmstack)
+						tremove(private.algorithmstack)
 					end
 					error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
 				end
 			end
 
 			local price, seen, array
-			table.insert(private.algorithmstack, algosig)
+			tinsert(private.algorithmstack, algosig)
 			if (engineLib.GetPriceArray) then
 				array = engineLib.GetPriceArray(saneLink, serverKey)
 				if (array) then
@@ -358,7 +372,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 			else
 				price = engineLib.GetPrice(saneLink, serverKey)
 			end
-			table.remove(private.algorithmstack, -1)
+			tremove(private.algorithmstack, -1)
 			return price, seen, array
 		end
 	end
@@ -366,44 +380,93 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	return
 end
 
+private.scandataIndex = {}
+-- ensure home and neutral factions for current realm are always present
+-- unlike the tables for other serverKeys, these tables are *not* weak
+private.scandataIndex[GetRealmName().."-"..UnitFactionGroup("player")] = {}
+private.scandataIndex[GetRealmName().."-Neutral"] = {}
+local weaktablemeta = {__mode="kv"}
+function private.GetSubImageById(itemId, faction, realm)
+	faction = faction or AucAdvanced.GetFactionGroup()
+	realm = realm or GetRealmName()
+	serverKey = realm.."-"..faction
 
-private.queryTime = 0
+	local indexResults = private.scandataIndex[serverKey]
+	if not indexResults then
+		indexResults = setmetatable({}, weaktablemeta) -- use weak tables for other serverKeys
+		private.scandataIndex[serverKey] = indexResults
+	end
+
+	local itemResults = indexResults[itemId]
+	if not itemResults then
+		itemResults = {}
+		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
+		for pos, data in ipairs(scandata.image) do
+			if data[Const.ITEMID] == itemId then
+				tinsert(itemResults, data)
+			end
+		end
+		indexResults[itemId] = itemResults
+	end
+
+	return itemResults
+end
+
 private.prevQuery = { empty = true }
 private.curResults = {}
 function lib.QueryImage(query, faction, realm, ...)
-	local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
-
 	local prevQuery = private.prevQuery
 	local curResults = private.curResults
+
+	-- is this the same query as last time?
+	local samequery = true
+	for k,v in pairs(prevQuery) do
+		if k ~= "page" and v ~= query[k] then
+			samequery = false
+			break
+		end
+	end
+	if samequery then
+		for k,v in pairs(query) do
+			if k ~= "page" and v ~= prevQuery[k] then
+				samequery = false
+				break
+			end
+		end
+		if samequery then
+			return curResults
+		end
+	end
+
+	-- reset results and save a copy of query
+	empty(curResults)
+	empty(prevQuery)
+	for k, v in pairs(query) do prevQuery[k] = v end
+
+	-- get image to search - may be the whole snapshot or a subset
+	local image
+	if query.itemId then
+		image = private.GetSubImageById(query.itemId, faction, realm)
+	else
+		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
+		image = scandata.image
+	end
 
 	local saneQueryLink
 	if query.link then
 		saneQueryLink = AucAdvanced.SanitizeLink(query.link)
 	end
 
-	local invalid = false
-	for k,v in pairs(prevQuery) do
-		if k ~= "page" and v ~= query[k] then invalid = true end
-	end
-	for k,v in pairs(query) do
-		if k ~= "page" and v ~= prevQuery[k] then invalid = true end
-	end
-	if (private.queryTime ~= scandata.time) then invalid = true end
-	if not invalid then return curResults end
-
-	local numResults = #curResults
-	for i=1, numResults do curResults[i] = nil end
-	for k,v in pairs(prevQuery) do prevQuery[k] = v end
-
-	local ptr, max = 1, #scandata.image
-	while ptr <= max do
+	-- scan image to build a table of auctions that match query
+	local ptr, finish = 1, #image
+	while ptr <= finish do
 		repeat
-			local data = scandata.image[ptr] ptr = ptr + 1
-			if (not data) then break end
+			local data = image[ptr]
+			ptr = ptr + 1
+			if not data then break end
 			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
 			if query.filter and query.filter(data, ...) then break end
-			if query.link and data[Const.LINK] ~= saneQueryLink then break end
-			if query.itemId and data[Const.ITEMID] ~= query.itemId then break end
+			if saneQueryLink and data[Const.LINK] ~= saneQueryLink then break end
 			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
 			if query.factor and data[Const.FACTOR] ~= query.factor then break end
 			if query.minUseLevel and data[Const.ULEVEL] < query.minUseLevel then break end
@@ -424,8 +487,8 @@ function lib.QueryImage(query, faction, realm, ...)
 			local nextBid = data[Const.PRICE]
 			local buyout = data[Const.BUYOUT]
 			if query.perItem and stack > 1 then
-				nextBid = math.ceil(nextBid / stack)
-				buyout = math.ceil(buyout / stack)
+				nextBid = ceil(nextBid / stack)
+				buyout = ceil(buyout / stack)
 			end
 			if query.minStack and stack < query.minStack then break end
 			if query.maxStack and stack > query.maxStack then break end
@@ -435,12 +498,20 @@ function lib.QueryImage(query, faction, realm, ...)
 			if query.maxBuyout and buyout > query.maxBuyout then break end
 
 			-- If we're still here, then we've got a winner
-			table.insert(curResults, data)
+			tinsert(curResults, data)
 		until true
 	end
 
-	private.queryTime = scandata.time
 	return curResults
+end
+
+function private.clearCaches(scanstats)
+	local serverKey = AucAdvanced.GetFaction()
+	empty(private.scandataIndex[serverKey])
+
+	empty(private.curResults)
+	empty(private.prevQuery)
+	private.prevQuery.empty = true
 end
 
 function lib.UnpackImageItem(item)
@@ -551,7 +622,7 @@ function lib.GetMatchers(itemLink)
 			if not engineLib.IsValidMatcher
 			or engineLib.IsValidMatcher(saneLink) then
 				local engine = engineLib.GetName()
-				table.insert(engines, engine)
+				tinsert(engines, engine)
 			end
 		end
 	end
@@ -567,7 +638,7 @@ function lib.GetMatchers(itemLink)
 			end
 			if not insetting then
 				AucAdvanced.Print("AucAdvanced: New matcher found: "..tostring(matcher))
-				table.insert(private.matcherlist, matcher)
+				tinsert(private.matcherlist, matcher)
 			end
 			insetting = false
 		end
