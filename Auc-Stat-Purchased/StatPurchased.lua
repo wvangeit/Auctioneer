@@ -467,7 +467,7 @@ function private.UnpackStatIter(data, ...)
 	for i = 1, c do
 		v = select(i, ...)
 		local property, info = strsplit(":", v)
-		property = tonumber(property)
+		property = tonumber(property) or property
 		if (property and info) then
 			data[property] = { strsplit(";", info) }
 			local item
