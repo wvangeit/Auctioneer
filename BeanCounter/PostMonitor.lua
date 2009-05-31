@@ -46,8 +46,10 @@ end
 -- Called before StartAuction()
 -------------------------------------------------------------------------------
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
-	debugPrint("Prehook",minBid, buyoutPrice, runTime, GetCursorInfo(), "Info?")
+	
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
+	debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name)
+	
 	if (name and count and price) then
 		local deposit = CalculateAuctionDeposit(runTime)
 		private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
@@ -67,14 +69,12 @@ function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, depos
 	pendingPost.runTime = runTime
 	pendingPost.deposit = deposit
 	table.insert(private.PendingPosts, pendingPost)
-	--debugPrint("private.addPendingPost() - Added pending post")
+	debugPrint("2",minBid, buyoutPrice, "private.addPendingPost() - Added pending post", name)
 
 	-- Register for the response events if this is the first pending post.
 	if (#private.PendingPosts == 1) then
-		--debugPrint("private.addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
-		Stubby.RegisterFunctionHook("AuctionFrameAuctions_Update", 10, private.onAuctionCreated)
-
-		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
+		private.postEventFrame:RegisterEvent("CHAT_MSG_SYSTEM")
+		private.postEventFrame:RegisterEvent("UI_ERROR_MESSAGE")
 	end
 end
 
@@ -86,14 +86,11 @@ function private.removePendingPost()
 		-- Remove the first pending post.
 		local post = private.PendingPosts[1]
 		table.remove(private.PendingPosts, 1)
-		--debugPrint("private.removePendingPost() - Removed pending post")
-
+		
 		-- Unregister for the response events if this is the last pending post.
 		if (#private.PendingPosts == 0) then
-			--debugPrint("private.removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
-			Stubby.UnregisterFunctionHook("AuctionFrameAuctions_Update", private.onAuctionCreated)
-
-			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
+			private.postEventFrame:UnregisterEvent("CHAT_MSG_SYSTEM")
+			private.postEventFrame:UnregisterEvent("UI_ERROR_MESSAGE")
 		end
 
 		return post
@@ -101,19 +98,6 @@ function private.removePendingPost()
 
 	-- No pending post to remove!
 	return nil
-end
-
--------------------------------------------------------------------------------
--- OnEvent handler Auctions. these are unhooked when not needed
--------------------------------------------------------------------------------
-function private.onEventHookPosting(_, event, arg1)
-	if (event == "UI_ERROR_MESSAGE" and arg1) then
-		debugPrint(event)
-		if (arg1) then debugPrint("    "..arg1) end
-		if (arg1 == ERR_NOT_ENOUGH_MONEY) then
-			private.onPostFailed()
-		end
-	end
 end
 
 -------------------------------------------------------------------------------
@@ -136,7 +120,7 @@ function private.onAuctionCreated()
 		end
 		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 		private.databaseAdd("postedAuctions", itemID, itemLink, text)
-		debugPrint("Added", itemLink, "to the postedAuctions DB", post.minBid, post.buyoutPrice)
+		debugPrint("3", post.minBid, post.buyoutPrice, #private.PendingPosts,  "Added", itemLink, "to the postedAuctions DB")
 		--debugPrint(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 	end
 end
@@ -147,3 +131,18 @@ end
 function private.onPostFailed()
 	private.removePendingPost()
 end
+
+-------------------------------------------------------------------------------
+-- Use event scripts instead of function hooks to know when a auction has been accepted
+-- OnEvent handler these are unhooked when not needed
+-------------------------------------------------------------------------------
+function private.postEvent(_, event, message)
+	if event == "CHAT_MSG_SYSTEM" and message == ERR_AUCTION_STARTED and private.PendingPosts then
+		private.onAuctionCreated()
+	elseif event == "UI_ERROR_MESSAGE" and message == ERR_NOT_ENOUGH_MONEY then
+		private.onPostFailed()
+	end
+end
+private.postEventFrame = CreateFrame("Frame")
+private.postEventFrame:SetScript("OnEvent", private.postEvent)
+
