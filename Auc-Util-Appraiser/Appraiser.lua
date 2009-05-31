@@ -34,18 +34,16 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "Appraiser"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local empty = wipe
 
-local data, _
-local ownResults = {}
-local ownCounts = {}
+local GetFaction = AucAdvanced.GetFaction
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "auctionui") then
         private.CreateFrames(...)
-        lib.GetOwnAuctionDetails()
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
@@ -63,6 +61,9 @@ function lib.Processor(callbackType, ...)
 		if change:sub(1, 20) == "util.appraiser.round" then
 			private.updateRoundExample()
 		end
+		if change == "util.appraiser.model" or change == "util.appraiser.altModel" then
+			private.clearCaches()
+		end
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
 			private.frame.GenerateList()
@@ -74,6 +75,7 @@ function lib.Processor(callbackType, ...)
 			private.frame.UpdateImage()
 			private.frame.UpdatePricing()
 		end
+		private.clearCaches()
 	elseif (callbackType == "postresult") then
 		private.frame.Reselect(select(3, ...))
 	end
@@ -83,31 +85,46 @@ end
 lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
 lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;
 
+local pricecache = setmetatable({}, {__mode="v"}) -- cache for GetPrice
+local tooltipcache = {} -- cache for ProcessTooltip
+function private.clearCaches()
+	empty(pricecache)
+	empty(tooltipcache)
+end
 
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
+	local sig = lib.GetSigFromLink(hyperlink)
+	if not sig then return end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
 
-	local value, bid, _, _, curModel = lib.GetPrice(hyperlink)
-		if value then
-			tooltip:AddLine(_TRANS('APPR_Tooltip_AppraiserCurModel'):format(curModel, quantity) , value * quantity)--Appraiser ({{%s}}x{{%s}}
-			if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
-				tooltip:AddLine("  ".._TRANS('APPR_Tooltip_StartingBid'):format(quantity), bid * quantity)--Starting bid x {{%d}}
-			end
+	local value, bid, curModel, _
+
+	if tooltipcache[sig] then
+		value, bid, curModel = unpack(tooltipcache[sig]) -- all values should be non-nil
+	else
+		value, bid, _, curModel = private.GetPriceCore(sig, hyperlink, GetFaction(), true)
+		tooltipcache[sig] = {value, bid, curModel}
+	end
+
+	if value then
+		tooltip:AddLine(_TRANS('APPR_Tooltip_AppraiserCurModel'):format(curModel, quantity) , value * quantity)--Appraiser ({{%s}}x{{%s}}
+		if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
+			tooltip:AddLine("  ".._TRANS('APPR_Tooltip_StartingBid'):format(quantity), bid * quantity)--Starting bid x {{%d}}
 		end
+	end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
         -- Just to make sure it has the data seeing it likes to not load when you first load the auction house currently
-        local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
-        if numBatchAuctions > 0 and totalAuctions > 0 and not lib.ownResults then
+		if not lib.ownResults and AuctionFrame and AuctionFrame:IsVisible() then
             lib.GetOwnAuctionDetails()
         end
         if not lib.ownResults then return end
 
         local itemName = name
 
-        local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
+        local colored = get('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel
 
 		local results = lib.ownResults[itemName]
 		local counts = lib.ownCounts[itemName]
@@ -135,9 +152,67 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
     end
 end
 
+function lib.GetPrice(link, serverKey)
+	local sig = lib.GetSigFromLink(link)
+	if not sig then
+       	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
+	end
+	local match = true
+	local currentKey = GetFaction()
+	if not serverKey then
+		serverKey = currentKey
+	elseif serverKey ~= currentKey then
+		-- Matching API cannot handle serverKey correctly, only works for currentKey
+		match = false
+	end
+	local cacheSig = serverKey..sig
+
+	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
+
+	if pricecache[cacheSig] then
+		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = unpack(pricecache[cacheSig], 1, 8) -- some values may be nil
+	else
+		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, match)
+		pricecache[cacheSig] = {newBuy, newBid, seen, curModelText, MatchString, stack, number, duration}
+	end
+
+	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
+end
+
+function lib.GetPriceUnmatched(link, serverKey)
+	local sig = lib.GetSigFromLink(link)
+	if not sig then
+       	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
+	end
+
+	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
+	newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey)
+	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
+end
+
+function lib.GetPriceColumns()
+	return "Buyout", "Bid", false, "seen", "curModelText", "MatchString", "Stack", "Number", "Duration"
+end
+
+local array = {}
+--returns pricing and posting settings
+function lib.GetPriceArray(link, serverKey)
+	empty(array)
+
+	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = lib.GetPrice(link, serverKey)
+
+	array.price = newBuy
+	array.seen = seen
+
+	array.stack = stack
+	array.number = number
+	array.duration = duration
+
+	return array
+end
+
 function lib.OnLoad()
 	-- Configure our defaults
-	AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
 	AucAdvanced.Settings.SetDefault("util.appraiser.enable", false)
 	AucAdvanced.Settings.SetDefault("util.appraiser.bidtooltip", true)
 	AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
@@ -161,7 +236,7 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.match", "on")
 	AucAdvanced.Settings.SetDefault("util.appraiser.stack", "max")
 	AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
-	--AucAdvanced.Settings.SetDefault("util.appraiser.clickhook", true)
+	AucAdvanced.Settings.SetDefault("util.appraiser.clickhookany", true)
 	AucAdvanced.Settings.SetDefault("util.appraiser.reselect", true)
 	AucAdvanced.Settings.SetDefault("util.appraiser.buttontips", true)
 	--Default sizes for the scrollframe column widths
@@ -181,25 +256,14 @@ function lib.CanSupplyMarket()
 	return false
 end
 
-function lib.GetPrice(link, serverKey, match)
-	local sig = lib.GetSigFromLink(link)
+function private.GetPriceCore(sig, link, serverKey, match)
 	local curModel, curModelText
-
-	if not sig then
-       	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
-	end
 
 	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
 	curModelText = curModel
 	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
 
-	if match then
-		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
-		if match == nil then
-			match = AucAdvanced.Settings.GetSetting("util.appraiser.match")
-		end
-	end
-
+	-- valuation
 	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
@@ -226,6 +290,14 @@ function lib.GetPrice(link, serverKey, match)
 	else
 		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
 	end
+
+	-- matching
+	if match then
+		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
+		if match == nil then
+			match = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+		end
+	end
 	if match then
 		local biddown
 		if curModel == "fixed" then
@@ -238,6 +310,8 @@ function lib.GetPrice(link, serverKey, match)
 			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy, serverKey)
 		end
 	end
+
+	-- generate bid value
 	if curModel ~= "fixed" then
 		if newBuy and not newBid then
 			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
@@ -279,9 +353,13 @@ function lib.GetPrice(link, serverKey, match)
 		end
 	end
 
+	-- pricing: final checks
+	newBid = math.floor((newBid or 0) + 0.5)
+	newBuy = math.floor((newBuy or 0) + 0.5)
+
+	-- other return values
 	local stack = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".stack") or AucAdvanced.Settings.GetSetting("util.appraiser.stack")
 	local number = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".number") or AucAdvanced.Settings.GetSetting("util.appraiser.number")
-
 	if stack == "max" then
 		_, _, _, _, _, _, _, stack = GetItemInfo(link)
 	end
@@ -292,39 +370,12 @@ function lib.GetPrice(link, serverKey, match)
 	end
 	stack = tonumber(stack)
 	number = tonumber(number)
---	if (type(stack) ~= "number") or (type(number) ~= "number") then
---		print("Stack: "..stack.."  Number: "..number)
---		print("Stack: "..type(stack).."  Number: "..type(number))
---	end
-	if not newBuy then
-		newBuy = 0
-	end
-	newBid = math.floor((newBid or 0) + 0.5)
-	newBuy = math.floor((newBuy or 0) + 0.5)
-	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
+
+	-- Caution: this is NOT the same return order as GetPrice
+	return newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 end
 
-function lib.GetPriceColumns()
-	return "Buyout", "Bid", false, "seen", "curModelText", "MatchString", "Stack", "Number", "Duration"
-end
-
-local array = {}
---returns pricing and posting settings
-function lib.GetPriceArray(link, _, match)
-	while (#array > 0) do table.remove(array) end
-
-	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = lib.GetPrice(link, _, match)
-
-	array.price = newBuy
-	array.seen = seen
-
-	array.stack = stack
-	array.number = number
-	array.duration = duration
-
-	return array
-end
-
+-- Called by AprFrame in AUCTION_OWNED_LIST_UPDATE event
 function lib.GetOwnAuctionDetails()
 	local results = {}
 	local counts = {}
@@ -358,7 +409,5 @@ function lib.GetOwnAuctionDetails()
 	lib.ownResults = results
 	lib.ownCounts = counts
 end
-
-
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
