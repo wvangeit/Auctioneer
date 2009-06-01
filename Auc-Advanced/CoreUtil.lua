@@ -83,7 +83,7 @@ function lib.configFramesList()
 	for i=1, 10 do
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i)
 		if (name ~= "") and (docked or shown) then
-			table.insert(configFrames, {i, name})
+			table.insert(configFrames, {i, i.." - ("..name..")"})
 		end
 	end
 	return configFrames
