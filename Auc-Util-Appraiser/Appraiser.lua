@@ -39,6 +39,9 @@ local empty = wipe
 
 local GetFaction = AucAdvanced.GetFaction
 
+local pricecache -- cache for GetPrice; only used in certain circumstances
+local tooltipcache = {} -- cache for ProcessTooltip
+
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
@@ -61,8 +64,8 @@ function lib.Processor(callbackType, ...)
 		if change:sub(1, 20) == "util.appraiser.round" then
 			private.updateRoundExample()
 		end
-		-- clear caches for any changes, as we can't always predict what will change our cached values
-		private.clearCaches()
+		-- clear cache for any changes, as we can't always predict what will change our cached values
+		empty(tooltipcache)
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
 			private.frame.GenerateList()
@@ -74,22 +77,19 @@ function lib.Processor(callbackType, ...)
 			private.frame.UpdateImage()
 			private.frame.UpdatePricing()
 		end
-		private.clearCaches()
+		empty(tooltipcache)
 	elseif (callbackType == "postresult") then
 		private.frame.Reselect(select(3, ...))
+	elseif callbackType == "searchbegin" then
+		pricecache = {} -- use cache when SearchUI is running a search
+	elseif callbackType == "searchcomplete" then
+		pricecache = nil -- stop using cache when search ends
 	end
 end
 
 -- For backwards compatibility, leave these here. This is now a capability of the core API
 lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
 lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;
-
-local pricecache = setmetatable({}, {__mode="v"}) -- cache for GetPrice
-local tooltipcache = {} -- cache for ProcessTooltip
-function private.clearCaches()
-	empty(pricecache)
-	empty(tooltipcache)
-end
 
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
@@ -105,7 +105,9 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 		value, bid, curModel = unpack(tooltipcache[sig]) -- all values should be non-nil
 	else
 		value, bid, _, curModel = private.GetPriceCore(sig, hyperlink, GetFaction(), true)
-		tooltipcache[sig] = {value, bid, curModel}
+		if curModel ~= "Enchantrix" then -- don't cache values based on modules which don't broadcast configchanged
+			tooltipcache[sig] = {value, bid, curModel}
+		end
 	end
 
 	if value then
@@ -164,15 +166,18 @@ function lib.GetPrice(link, serverKey)
 		-- Matching API cannot handle serverKey correctly, only works for currentKey
 		match = false
 	end
-	local cacheSig = serverKey..sig
-
 	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 
-	if pricecache[cacheSig] then
-		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = unpack(pricecache[cacheSig], 1, 8) -- some values may be nil
+	if pricecache then
+		local cacheSig = serverKey..sig
+		if pricecache[cacheSig] then
+			newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = unpack(pricecache[cacheSig], 1, 8) -- some values may be nil
+		else
+			newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, match)
+			pricecache[cacheSig] = {newBuy, newBid, seen, curModelText, MatchString, stack, number, duration}
+		end
 	else
 		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, match)
-		pricecache[cacheSig] = {newBuy, newBid, seen, curModelText, MatchString, stack, number, duration}
 	end
 
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
