@@ -61,9 +61,8 @@ function lib.Processor(callbackType, ...)
 		if change:sub(1, 20) == "util.appraiser.round" then
 			private.updateRoundExample()
 		end
-		if change == "util.appraiser.model" or change == "util.appraiser.altModel" then
-			private.clearCaches()
-		end
+		-- clear caches for any changes, as we can't always predict what will change our cached values
+		private.clearCaches()
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
 			private.frame.GenerateList()
