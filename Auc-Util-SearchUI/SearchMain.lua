@@ -1856,6 +1856,7 @@ local PerformSearch = function()
 	private.removeall()
 
 	private.isSearching = true
+	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(scandata.image) do
 		if (i % speed) == 0 then
@@ -1871,6 +1872,7 @@ local PerformSearch = function()
 	private.isSearching = false
 	empty(SettingCache)
 	gui.frame.progressbar:Hide()
+	AucAdvanced.SendProcessorMessage("searchcomplete", searcherName)
 	lib.NotifyCallbacks("search", "complete", searcherName)
 end
 
