@@ -188,7 +188,7 @@ local function setter(setting, value)
 	
 	--settings for gui
 	elseif (setting ==  "monthstokeepdata") then
-		local text = format("Enable purging transactions older than %s months from the database. \nYou must hold the SHIFT key to check this box since this will DELETE data.", gui.elements.purgedatadate:GetValue()/100 or 48)
+		local text = format("Enable purging transactions older than %s months from the database. \nYou must hold the SHIFT key to check this box since this will DELETE data.", gui.elements.monthstokeepdata:GetValue()/100 or 48)
 		gui.elements.oldDataExpireEnabled.textEl:SetText(text)
 		
 		--Always uncheck and set valure to off when they change the slider value as a safety precaution
@@ -484,7 +484,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTValidateDatabase')) --"This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search"
 
 	gui:AddControl(id, "Subhead",    0,    _BC('C_DatabaseLength')) --"Determines how long BeanCounter will save Auction House Transactions."
-	gui:AddControl(id, "Checkbox",   0, 1, "oldDataExpireEnabled", format("Enable purging transactions older than %s months from the database. This will DELETE data.", get("monthstokeepdata") or 48) )--Enable purging transactions older than %s months from the database. This will DELETE data.
+	gui:AddControl(id, "Checkbox",   0, 1, "oldDataExpireEnabled", format("Enable purging transactions older than %s months from the database. \nYou must hold the SHIFT key to check this box since this will DELETE data.", get("monthstokeepdata") or 48) )--Enable purging transactions older than %s months from the database. This will DELETE data.
 	gui:AddTip(id, _BC('TTDataExpireEnabled'))--Data older than the selected time range will be DELETED
 	gui:AddControl(id, "NumeriSlider", 0, 3, "monthstokeepdata",    6, 48 , 2, "How many months of data to keep?")
 
