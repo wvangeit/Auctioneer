@@ -76,58 +76,16 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local daterange = AucAdvanced.Settings.GetSetting("match.beancount.daterange")
 	--local matchstacksize = AucAdvanced.Settings.GetSetting("match.beancount.matchstacksize") --REMOVED for now, the posible issues arising from buying at last appraiser stack price needs to be resolved
 	local numdays = AucAdvanced.Settings.GetSetting("match.beancount.numdays")
-	numdays = numdays * 86400
+	--nil numdays if we dont care how far back our data goes
+	if not daterange then
+		numdays = nil
+	end
+	
 	increase = (increase / 100) + 1
 	decrease = (decrease / 100) + 1
-	itemId = tostring(itemId)
-
-	local success = 0
-	local failed = 0
-
-if daterange then
-		local now = time()
-		local tempnum = 0
-		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
-			for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
-				for i, text in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId][key]) do
-					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
-					auctime, stack = tonumber(auctime), tonumber(stack)
-
-					if (now - auctime) < (numdays) then
-						tempnum = tempnum + 1
-					end
-				end
-			end
-		end
-		success = tempnum
-		tempnum = 0
-		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
-			for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
-				for i, text in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId][key]) do
-					local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
-					auctime, stack = tonumber(auctime), tonumber(stack)
-
-					if (now - auctime) < (numdays) then
-						tempnum = tempnum + 1
-					end
-				end
-			end
-		end
-		failed = tempnum
-	else
-		if BeanCounter and BeanCounter.Private.playerData then
-			if BeanCounter.Private.playerData["completedAuctions"][itemId] then
-				for key in pairs(BeanCounter.Private.playerData["completedAuctions"][itemId]) do
-					success = success + #BeanCounter.Private.playerData["completedAuctions"][itemId][key]
-				end
-			end
-			if BeanCounter.Private.playerData["failedAuctions"][itemId] then
-				for key in pairs(BeanCounter.Private.playerData["failedAuctions"][itemId]) do
-					failed = failed + #BeanCounter.Private.playerData["failedAuctions"][itemId][key]
-				end
-			end
-		end
-	end
+	
+	local player =  UnitName("player")
+	local success, failed = BeanCounter.API.getAHSoldFailed(player, hyperlink, numdays)
 
 	increase = math.pow(increase, math.pow(success, 0.8))
 	decrease = math.pow(decrease, math.pow(failed, 0.8))
