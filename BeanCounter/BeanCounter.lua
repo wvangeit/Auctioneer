@@ -473,32 +473,44 @@ end
 function private.compactDB(announce)
 	debugPrint("Compressing database entries older than 40 days")
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
-		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
-			for itemID, value in pairs(data) do
-				for itemString, index in pairs(value) do
-					local _, _, uniqueID = lib.API.decodeLink(itemString)
-					if uniqueID ~= "0" then --ignore the already compacted keys
-						local itemLink = lib.API.getArrayItemLink(itemString)
-						local _, _, _, _, _, _, _, postTime  = private.unpackString(index[1])
-						if index[1] and (time() - postTime) >= 3456000 then --we have an old index entry lets process this array
-							local start, last = time(), index[1]
-							while (index[1] and (time() - postTime) >= 3456000) and  (time() - start < 10) do--While the entrys remain 40 days old process, after 10s inside anyone table break
-								debugPrint("Compressed", "|H"..itemString, index[1] )
-								private.databaseAdd(DB, itemID, itemLink, index[1], true) --store using the compress option set to true
-								table.remove(index, 1)
-								if time() - start > 1 and index[1] == last then debugPrint("inf loop purge index[1]", index[1]) table.remove(index, 1) end --added to remove bad entries, this should prevent this function from locking Wow
-								last = index[1]
-								_, _, _, _, _, _, _, postTime = private.unpackString(index[1])
-							end
-						end
-					end
+	if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+		for itemID, value in pairs(data) do
+			for itemString, index in pairs(value) do
+				local _, _, uniqueID = lib.API.decodeLink(itemString)
+				local itemLink = lib.API.getArrayItemLink(itemString)
+				if uniqueID ~= "0" then --ignore the already compacted keys
+					private.removeUniqueID(index, DB, itemID, itemLink, itemString)
+				elseif get("oldDataExpireEnabled") then
+					--for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
+					local months = get("monthstokeepdata")
+					local expire =  time() - (months * 30 * 24 * 60 * 60)
+					--private.removeOldData(index, DB, itemID, itemLink, itemString, expire)
+				end
 				--remove itemStrings that are now empty, all the keys have been moved to compressed format
 				if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end
-				end
 			end
 		end
 	end
+end
 	if announce then print("Finished compressing Databases") end
+end
+function private.removeUniqueID(data, DB, itemID, itemLink, itemString)
+	local _, _, _, _, _, _, _, postTime  = private.unpackString(data[1])
+	if data[1] and (time() - postTime) >= 3456000 then --we have an old data entry lets process this
+		debugPrint("Compressed", "|H"..itemString, data[1] )
+		private.databaseAdd(DB, itemID, itemLink, data[1], true) --store using the compress option set to true
+		table.remove(data, 1)
+		private.removeUniqueID(data, DB, itemID, itemLink, itemString)
+	end
+end
+function private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
+	local _, _, _, _, _, _, _, postTime = private.unpackString(data[1])
+	postTime = tonumber(postTime)
+	if data[1] and (postTime) <= days then --we have an old data entry lets process this
+		debugPrint("Removed", "|H"..itemString, data[1] , date("%c", postTime), "Older than",  date("%c", keep) )
+		table.remove(data, 1)
+		private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
+	end
 end
 --Sort all array entries by Date oldest to newest
 --Helps make compact more efficent needs to run once per week or so
@@ -530,9 +542,16 @@ function private.prunePostedDB(announce)
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
 					--While the entrys remain 40 days old remove entry
-					while index[1] and (time() - index[1]:match(".*;(%d-);.-$")) >= 3456000 do
+					local _, _ ,_ ,_ ,_ ,TIME
+					if index[1] then 
+						_, _ ,_ ,_ ,_ ,TIME = strsplit(";", index[1])
+					end
+					while index[1] and (time() - TIME) >= 3456000 do
 						--debugPrint("Removed Old posted entry", itemString)
 						table.remove(index, 1)
+						if index[1] then 
+							_, _ ,_ ,_ ,_ ,TIME = strsplit(";", index[1])
+						end
 					end
 					-- remove empty itemString tables
 					if #index == 0 then

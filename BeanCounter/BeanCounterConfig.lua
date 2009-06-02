@@ -114,7 +114,10 @@ private.settingDefaults = {
 
 	--["util.beancounter.dateFormat"] = "%c",
 	["dateString"] = "%c",
-
+	
+	--Data storage
+	["monthstokeepdata"] = 48,
+	
 	--Color gradient
 	["colorizeSearch"] = true,
 	["colorizeSearchopacity"] = 0.2,
@@ -182,8 +185,25 @@ local function setter(setting, value)
 	elseif (setting == "database.sort") then
 		private.sortArrayByDate()
 		value = time()
+	
+	--settings for gui
+	elseif (setting ==  "monthstokeepdata") then
+		local text = format("Enable purging transactions older than %s months from the database. \nYou must hold the SHIFT key to check this box since this will DELETE data.", gui.elements.purgedatadate:GetValue()/100 or 48)
+		gui.elements.oldDataExpireEnabled.textEl:SetText(text)
+		
+		--Always uncheck and set valure to off when they change the slider value as a safety precaution
+		local db = getUserProfile()
+		db["oldDataExpireEnabled"] = false
+		gui.elements.oldDataExpireEnabled:SetChecked(false)
+	elseif (setting ==  "oldDataExpireEnabled") and value then
+		if not IsShiftKeyDown() then --We wont allow the user to check this box unless shift key is down
+			print("You will need to hold down the SHIFT key to check this box")
+			lib.SetSetting("oldDataExpireEnabled", false)
+			return
+		end 
 	end
-
+	
+	
 	--This is used to do the DateString
 	local a,b = strsplit(".", setting)
 	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string
@@ -348,11 +368,7 @@ local function getter(setting)
 					table.insert(private.scanValueNames,{"aucadv:stat:"..name, "AucAdv Stat:"..name})
 				end
 			end
-			if Auctioneer then
-				table.insert(private.scanValueNames,{"auc4:hsp", "GuiItemValueAuc4HSP" })
-				table.insert(private.scanValueNames,{"auc4:med", "GuiItemValueAuc4Median" })
-			end
-
+			
 			return private.scanValueNames
 		end
 	end
@@ -467,6 +483,10 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0, 1, "database.validate", _BC('C_ValidateDatabase')) --"Validate Database"
 	gui:AddTip(id, _BC('TTValidateDatabase')) --"This will scan Beancounter's Data and attempt to correct any error it may find. Use if you are getting errors on search"
 
+	gui:AddControl(id, "Subhead",    0,    _BC('C_DatabaseLength')) --"Determines how long BeanCounter will save Auction House Transactions."
+	gui:AddControl(id, "Checkbox",   0, 1, "oldDataExpireEnabled", format("Enable purging transactions older than %s months from the database. This will DELETE data.", get("monthstokeepdata") or 48) )--Enable purging transactions older than %s months from the database. This will DELETE data.
+	gui:AddTip(id, _BC('TTDataExpireEnabled'))--Data older than the selected time range will be DELETED
+	gui:AddControl(id, "NumeriSlider", 0, 3, "monthstokeepdata",    6, 48 , 2, "How many months of data to keep?")
 
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
