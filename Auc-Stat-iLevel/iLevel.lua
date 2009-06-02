@@ -36,39 +36,40 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "iLevel"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local empty = wipe
 local iTypes = AucAdvanced.Const.InvTypes
 
 local KEEP_NUM_POINTS = 250
 
-local data
+local ILRealmData
+--local data
 local pricecache
 local unpacked, updated = {}, {}
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
-	if (not data) then private.makeData() end
-	local myFaction = AucAdvanced.GetFaction()
+	--if (not data) then private.makeData() end
+	local serverKey = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print(_TRANS('ILVL_Help_SlashHelp1') )--Help for Auctioneer Advanced - iLevel
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('ILVL_Help_SlashHelp2') ) -- this iLevel help
-		print(line, "clear}} - ".._TRANS('ILVL_Help_SlashHelp3'):format(myFaction) ) --clear current %s iLevel price database
+		print(line, "clear}} - ".._TRANS('ILVL_Help_SlashHelp3'):format(serverKey) ) --clear current %s iLevel price database
 	elseif (command ==_TRANS( 'clear') ) then
-		print(_TRANS('ILVL_Help_SlashHelp5').." {{", myFaction, "}}") --Clearing iLevel stats for
-		data[myFaction] = nil
+		print(_TRANS('ILVL_Help_SlashHelp5').." {{", serverKey, "}}") --Clearing iLevel stats for
+		private.ClearData(serverKey)
+		--data[serverKey] = nil
 	end
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then private.makeData() end
+	--if (not data) then private.makeData() end
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
 	elseif (callbackType == "scanstats") then
 		pricecache = nil
 		private.RepackStats()
@@ -78,7 +79,7 @@ end
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
-	if (not data) then private.makeData() end
+	--if (not data) then private.makeData() end
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -100,23 +101,24 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if equipPos < 1 then return end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
 
-	local faction = AucAdvanced.GetFaction()
-	if not data[faction] then data[faction] = {} end
-	local stats = private.UnpackStats(data[faction], itemSig)
+	local serverKey = AucAdvanced.GetFaction()
+	--if not data[serverKey] then data[serverKey] = {} end
+	--local stats = private.UnpackStats(data[serverKey], itemSig)
+	local stats = private.GetUnpackedStats(serverKey, itemSig, true) -- read/write
 	if not stats[iLevel] then stats[iLevel] = {} end
     local sz = #stats[iLevel]
 	stats[iLevel][sz+1] = buyout
-	updated[stats] = true
+	--updated[stats] = true
 end
 
 local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -----------------------------------------------------------------------------------
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
-function lib.GetItemPDF(hyperlink, faction)
+function lib.GetItemPDF(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 	-- Get the data
-	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
+	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	if not (average and stddev) or average == 0 or stddev == 0 then
 		return nil;                 -- No data, cannot determine pricing
@@ -151,29 +153,32 @@ function private.GetCfromZ(Z)
 	end
 end
 
-function lib.GetPrice(hyperlink, faction)
-	-- note: parameter 'faction' is really a 'serverKey'
+function lib.GetPrice(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 
-	local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
-	if not linkType then return end
+	local itemSig, iLevel, equipPos, quality = private.GetItemDetail(hyperlink)
+	--local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
+	if not itemSig then return end
+	--[[ Following all done by GetItemDetail
 	if quality < 1 then return end
 	if not equipPos then return end
 	if equipPos < 1 then return end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
-		
-	if not faction then faction = AucAdvanced.GetFaction() end
-	if not data[faction] then return end
+	--]]
 
-	if not data[faction][itemSig] then return end
+	if not serverKey then serverKey = AucAdvanced.GetFaction() end
+	--if not data[serverKey] then return end
 
-	if pricecache and pricecache[faction] and pricecache[faction][itemSig] and pricecache[faction][itemSig][iLevel] then
-		local ave, mean, _, stddev, var, cnt, conf = strsplit(",", pricecache[faction][itemSig][iLevel])
+	--if not data[serverKey][itemSig] then return end
+
+	if pricecache and pricecache[serverKey] and pricecache[serverKey][itemSig] and pricecache[serverKey][itemSig][iLevel] then
+		local ave, mean, _, stddev, var, cnt, conf = strsplit(",", pricecache[serverKey][itemSig][iLevel])
 		ave, mean, stddev, var, cnt, conf = tonumber(ave), tonumber(mean), tonumber(stddev), tonumber(var), tonumber(cnt), tonumber(conf)
 		return ave, mean, _, stddev, var, cnt, conf
 	end
-	
-	local stats = private.UnpackStats(data[faction], itemSig)
+
+	--local stats = private.UnpackStats(data[serverKey], itemSig)
+	local stats = private.GetUnpackedStats(serverKey, itemSig) -- read only
 	if not stats[iLevel] then return end
 
 	local count = #stats[iLevel]
@@ -227,9 +232,9 @@ function lib.GetPrice(hyperlink, faction)
 		confidence = private.GetCfromZ(confidence)
 	end
 	if not pricecache then pricecache = {} end
-	if not pricecache[faction] then pricecache[faction] = {} end
-	if not pricecache[faction][itemSig] then pricecache[faction][itemSig] = {} end
-	pricecache[faction][itemSig][iLevel] = strjoin(",", average or "", mean or "", "false", stdev or "", variance or "", count or "", confidence or "")
+	if not pricecache[serverKey] then pricecache[serverKey] = {} end
+	if not pricecache[serverKey][itemSig] then pricecache[serverKey][itemSig] = {} end
+	pricecache[serverKey][itemSig][iLevel] = strjoin(",", average or "", mean or "", "false", stdev or "", variance or "", count or "", confidence or "")
 	return average, mean, false, stdev, variance, count, confidence
 end
 
@@ -238,13 +243,13 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction)
+function lib.GetPriceArray(hyperlink, serverKey)
 	if not AucAdvanced.Settings.GetSetting("stat.ilevel.enable") then return end
 	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+	empty(array)
 
 	-- Get our statistics
-	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, faction)
+	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = average or mean
@@ -354,7 +359,6 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 end
 
 function lib.OnLoad(addon)
-	private.makeData()
 	AucAdvanced.Settings.SetDefault("stat.ilevel.tooltip", false)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.mean", false)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.normal", false)
@@ -362,13 +366,15 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.confid", true)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.quantmul", true)
 	AucAdvanced.Settings.SetDefault("stat.ilevel.enable", true)
-
+	private.InitData()
 end
 
-function lib.ClearItem(hyperlink, faction)
-	local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
-	if not linkType then return end
-	if not quality then 
+function lib.ClearItem(hyperlink, serverKey)
+	local itemSig, iLevel, equipPos, quality = private.GetItemDetail(hyperlink)
+	--local linkType, itemId, property, factor, quality, iLevel, equipPos = private.GetItemDetail(hyperlink)
+	if not itemSig then return end
+	--[[ The following cases should never happen as GetItemDetail has already handled them
+	if not quality then -- ### this localizaer key is no longer used ###
 		print(_TRANS('ILVL_Interface_NoDataHyperlink'):format(hyperlink) )--Stat-iLevel: unable to retrieve data for item: %s
 		return
 	end
@@ -385,23 +391,41 @@ function lib.ClearItem(hyperlink, faction)
 		return
 	end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
+	--]]
 
-	if not faction then faction = AucAdvanced.GetFaction() end
-	if (not data) then private.makeData() end
-	if data[faction] and data[faction][itemSig] then
-		local stats = private.UnpackStats(data[faction], itemSig)
+	if not serverKey then serverKey = AucAdvanced.GetFaction() end
+	--if (not data) then private.makeData() end
+	if data[serverKey] and data[serverKey][itemSig] then
+		--local stats = private.UnpackStats(data[serverKey], itemSig)
+		local stats = private.GetUnpackedStats(serverKey, itemSig, true)
 		if stats[iLevel] then
-			print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, faction))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
+			print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, serverKey))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
 			stats[iLevel] = nil
-			data[faction][itemSig] = private.PackStats(stats)
+			--data[serverKey][itemSig] = private.PackStats(stats)
+			private.RepackStats()
 			return
 		end
 	end
 	print(_TRANS('ILVL_Interface_ItemNotFound') )--Stat-iLevel: item is not in database
 end
 
---[[ Local functions ]]--
+--[[ Internal functions ]]--
 
+function private.InitData()
+	private.InitData = nil
+	if not AucAdvancedStat_iLevelData then AucAdvancedStat_iLevelData = {} end
+	ILRealmData = AucAdvancedStat_iLevelData
+	
+end
+
+function private.ClearData(serverKey)
+	ILRealmData[serverKey] = nil
+	unpacked[serverKey] = nil
+end
+	
+--[[
+itemSig, iLevel, equipPos, quality = GetItemDetail(hyperlink)
+--]]
 function private.GetItemDetail(hyperlink)
 	if not private.localcache then private.localcache = {} end
 	local cache = private.localcache[hyperlink]
@@ -417,27 +441,74 @@ function private.GetItemDetail(hyperlink)
 	end
 
 	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
-	if quality then
+	if quality and quality > 0 then
 		equipPos = tonumber(iTypes[equipPos]) or -1
 		if (equipPos < 1) then
 			private.localcache[hyperlink] = false
 			return
 		end
-	else 
-		private.localcache[hyperlink] = false
+	else -- nil returns from GetItemInfo - may be temporary so do not update cache
 		return
 	end
+	local itemSig = ("%d:%d"):format(equipPos, quality)
 
-	cache = { linkType,itemId,property,factor,quality,iLevel,equipPos }
+	cache = {itemSig, iLevel, equipPos, quality}
 	private.localcache[hyperlink] = cache
 	return unpack(cache)
 end
 
-function private.DataLoaded()
-	-- This function gets called when the data is first loaded. You may do any required maintenence
-	-- here before the data gets used.
-	data.itemcache = nil
+--[[
+stats = GetUnpackedStats (serverKey, itemSig, writing)
+Obtain a cached data table for itemSig in serverKey's data.
+Set writing to true if you intend to change the data
+Caution: if you set 'writing' to true, RepackStats() must be called before the end of the session to save the changes
+--]]
+function private.GetUnpackedStats(serverKey, itemSig, writing)
+	local stats = unpacked[serverKey] and unpacked[serverKey][itemSig]
+	if stats then
+		if writing then
+			updated[stats] = true
+		end
+		return stats
+	end
+
+	local realmdata = ILRealmData[serverKey]
+	if not realmdata then
+		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
+			error("Invalid serverKey passed to Stat-iLevel")
+		end
+		realmdata = {}
+		ILRealmData[serverKey] = realmdata
+	end
+
+	stats = private.UnpackStats(realmdata, itemSig)
+
+	if not unpacked[serverKey] then unpacked[serverKey] = {} end
+	unpacked[serverKey][itemSig] = stats
+	if writing then
+		updated[stats] = true
+	end
+
+	return stats
 end
+
+--[[
+RepackStats()
+Write any changed tables in the unpacked cache back to ILRealmData
+--]]
+function private.RepackStats()
+	--local serverKey = AucAdvanced.GetFaction()
+	for serverKey, realmData in pairs(unpacked) do
+		for item, stats in pairs(realmData) do
+			if updated[stats] then
+				ILRealmData[serverKey][item] = private.PackStats(stats)
+			end
+		end
+	end
+	updated = {}
+end
+
+--[[ Subfunctions ]]--
 
 function private.UnpackStatIter(data, ...)
 	local c = select("#", ...)
@@ -457,12 +528,12 @@ function private.UnpackStatIter(data, ...)
 	end
 end
 function private.UnpackStats(data, item)
-	if (unpacked[item]) then return unpacked[item] end
+	--if (unpacked[item]) then return unpacked[item] end
 	local stats = {}
 	if (data and data[item]) then
 		private.UnpackStatIter(stats, strsplit(",", data[item]))
-		unpacked[item] = stats
 	end
+	--unpacked[item] = stats
 	return stats
 end
 function private.PackStats(data)
@@ -474,22 +545,6 @@ function private.PackStats(data)
 		joiner = ","
 	end
 	return stats
-end
-function private.RepackStats()
-	local faction = AucAdvanced.GetFaction()
-	for item, stats in pairs(unpacked) do
-		if updated[stats] then
-			data[faction][item] = private.PackStats(stats)
-		end
-	end
-	updated = {}
-end
-
-function private.makeData()
-	if data then return end
-	if (not AucAdvancedStat_iLevelData) then AucAdvancedStat_iLevelData = {} end
-	data = AucAdvancedStat_iLevelData
-	private.DataLoaded()
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
