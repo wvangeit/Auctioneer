@@ -480,9 +480,9 @@ function private.compactDB(announce)
 				local itemLink = lib.API.getArrayItemLink(itemString)
 				if uniqueID ~= "0" then --ignore the already compacted keys
 					private.removeUniqueID(index, DB, itemID, itemLink, itemString)
-				elseif get("oldDataExpireEnabled") then
+				elseif lib.GetSetting("oldDataExpireEnabled") then
 					--for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
-					local months = get("monthstokeepdata")
+					local months = lib.GetSetting("monthstokeepdata")
 					local expire =  time() - (months * 30 * 24 * 60 * 60)
 					--private.removeOldData(index, DB, itemID, itemLink, itemString, expire)
 				end
