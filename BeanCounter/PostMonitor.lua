@@ -48,20 +48,33 @@ end
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
 	
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
-	debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name)
+	--debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name)
 	
 	if (name and count and price) then
+		--Look in the bags find the locked item so we can get the itemlink
+		local itemLink
+		for bagID = 0, 4 do
+			local bagSlots = GetContainerNumSlots(bagID)
+			for  slot = 1, bagSlots do
+				local  _, _, locked, _, _ = GetContainerItemInfo(bagID, slot)
+				if locked then
+					itemLink = GetContainerItemLink(bagID, slot)
+				end
+			end
+		end
+				
 		local deposit = CalculateAuctionDeposit(runTime)
-		private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
+		private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Adds a pending post to the queue.
 -------------------------------------------------------------------------------
-function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
+function private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
 	-- Add a pending post to the queue.
 	local pendingPost = {}
+	pendingPost.itemLink = itemLink
 	pendingPost.name = name
 	pendingPost.count = count
 	pendingPost.minBid = minBid
@@ -69,7 +82,7 @@ function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, depos
 	pendingPost.runTime = runTime
 	pendingPost.deposit = deposit
 	table.insert(private.PendingPosts, pendingPost)
-	debugPrint("2",minBid, buyoutPrice, "private.addPendingPost() - Added pending post", name)
+	--debugPrint("2",minBid, buyoutPrice, "private.addPendingPost() - Added pending post", itemLink)
 
 	-- Register for the response events if this is the first pending post.
 	if (#private.PendingPosts == 1) then
@@ -105,23 +118,17 @@ end
 -------------------------------------------------------------------------------
 function private.onAuctionCreated()
 	local post = private.removePendingPost()
-	if (post) then
-		-- Add to sales database
-		local itemID, itemLink = private.getItemInfo(post.name, "itemid") --"of the" items are not handled well by this
-		--debugPrint("first itemlink lookup", itemLink)
-		local Count = GetNumAuctionItems("owner")
-		Count = Count + 1
-		for i = Count, 1, -1 do
-			if post.name == GetAuctionItemInfo("owner",i) then
-				itemLink = GetAuctionItemLink("owner",i) or itemLink--so we try and replace with a better itemlink
-				--debugPrint("second itemlink lookup", itemLink)
-				break
-			end
-		end
+	-- Add to sales database
+	if post and post.itemLink then
+		local itemID = lib.API.decodeLink(post.itemLink)
 		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
-		private.databaseAdd("postedAuctions", itemID, itemLink, text)
-		debugPrint("3", post.minBid, post.buyoutPrice, #private.PendingPosts,  "Added", itemLink, "to the postedAuctions DB")
-		--debugPrint(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
+		
+		private.databaseAdd("postedAuctions", itemID, post.itemLink, text)
+		
+		--debugPrint("3", post.minBid, post.buyoutPrice, #private.PendingPosts,  "Added", post.itemLink, "to the postedAuctions DB")
+	elseif post and not post.itemLink then
+		debugPrint("ItemLink failure for teh following auction.")
+		debugPrint(post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit)
 	end
 end
 
