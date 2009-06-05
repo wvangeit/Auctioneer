@@ -250,10 +250,9 @@ function private.OnUnload()
 end
 
 private.Schedule = {}
-function private.OnEvent(...)
-	local event, arg = select(2, ...)
+function private.OnEvent(self, event, arg1, arg2, ...)
 	if (event == "ADDON_LOADED") then
-		local addon = string.lower(arg)
+		local addon = string.lower(arg1)
 		if (addon:sub(1,4) == "auc-") then
 			private.OnLoad(addon)
 		end
@@ -266,26 +265,21 @@ function private.OnEvent(...)
 		AucAdvanced.Scan.Commit(true)
 		AucAdvanced.Scan.LogoutCommit()
 		private.OnUnload()
-	elseif event == "UNIT_INVENTORY_CHANGED"
-	or event == "ITEM_LOCK_CHANGED"
-	or event == "CURSOR_UPDATE"
-	or event == "BAG_UPDATE"
-	then
-		private.Schedule["inventory"] = GetTime() + 0.15
+	elseif (event == "ITEM_LOCK_CHANGED" and arg2) or event == "BAG_UPDATE" then
+		if arg1 >= 0 and arg1 <= 4 then
+			private.Schedule["inventory"] = GetTime() + 0.05 -- collect multiple events for same bag change using a slight delay
+		end
 	end
 end
 
 function private.OnUpdate(...)
-	if event == "inventory" then
-		AucAdvanced.Post.AlertBagsChanged()
-	end
-
+	if not next(private.Schedule) then return end
 	local now = GetTime()
-	for event, time in pairs(private.Schedule) do
-		if time > now then
-			AucAdvanced.SendProcessorMessage(event, time)
+	for event, trigger in pairs(private.Schedule) do
+		if now >= trigger then
+			AucAdvanced.SendProcessorMessage(event, trigger)
+			private.Schedule[event] = nil
 		end
-		private.Schedule[event] = nil
 	end
 end
 
@@ -293,9 +287,7 @@ private.Frame = CreateFrame("Frame")
 private.Frame:RegisterEvent("ADDON_LOADED")
 private.Frame:RegisterEvent("AUCTION_HOUSE_SHOW")
 private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
-private.Frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
-private.Frame:RegisterEvent("CURSOR_UPDATE")
 private.Frame:RegisterEvent("BAG_UPDATE")
 private.Frame:RegisterEvent("PLAYER_LOGOUT")
 private.Frame:SetScript("OnEvent", private.OnEvent)
