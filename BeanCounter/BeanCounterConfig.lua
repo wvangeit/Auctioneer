@@ -30,7 +30,7 @@
 ]]
 LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
---Most of this code is from enchantrix
+--Most of this code is from enchantrix by ccox
 local lib = BeanCounter
 local private, print, _, _, _BC = lib.getLocals()
 local gui, settings
@@ -503,5 +503,6 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugFrames", "Frames")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugAPI", "API")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugSearch", "Search")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugTidyUp", "TidyUp")
 
 end

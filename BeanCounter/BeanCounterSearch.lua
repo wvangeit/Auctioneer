@@ -178,7 +178,7 @@ function private.searchServerData(serverName, data, tbl, settings)
 	--check servers are at least at current DB format.
 	for _, player in pairs(server) do
 		if player.version ~= private.version then
-			assert(nil, "The data for "..serverName.." is not at the current BeanCounter DB version of "..private.version.." Please log into this realm to upgrade BeanCounters Data.")
+			print("The data for "..serverName.." is not at the current BeanCounter DB version of "..private.version.." Please log into this realm to upgrade BeanCounters Data.")
 			return
 		end
 		break
