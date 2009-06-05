@@ -152,36 +152,40 @@ function lib.OnLoad(addon)
 end
 
 --Create the database
-function private.initializeDB()
+--server and player are passed by upgrade code when we need to reset a toons DB
+function private.initializeDB(server, player)
+	if not server then server = private.realmName end
+	if not player then player = private.playerName end
+	
 	if not BeanCounterDB  then
 		BeanCounterDB  = {}
 		BeanCounterDB["settings"] = {}
 		BeanCounterDB["ItemIDArray"] = {}
 	end
-	if not BeanCounterDB[private.realmName] then
-		BeanCounterDB[private.realmName] = {}
+	if not BeanCounterDB[server] then
+		BeanCounterDB[server] = {}
 
 	end
-	if not BeanCounterDB[private.realmName][private.playerName] then
-		BeanCounterDB[private.realmName][private.playerName] = {}
-		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
+	if not BeanCounterDB[server][player] then
+		BeanCounterDB[server][player] = {}
+		BeanCounterDB[server][player]["version"] = private.version
 
-		BeanCounterDB[private.realmName][private.playerName]["faction"] = "unknown" --faction is recorded when we get the login event
-		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
+		BeanCounterDB[server][player]["faction"] = "unknown" --faction is recorded when we get the login event
+		BeanCounterDB[server][player]["wealth"] = GetMoney()
 
-		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
-		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
+		BeanCounterDB[server][player]["vendorbuy"] = {}
+		BeanCounterDB[server][player]["vendorsell"] = {}
 
-		BeanCounterDB[private.realmName][private.playerName]["postedAuctions"] = {}
-		BeanCounterDB[private.realmName][private.playerName]["completedAuctions"] = {}
-		BeanCounterDB[private.realmName][private.playerName]["failedAuctions"] = {}
+		BeanCounterDB[server][player]["postedAuctions"] = {}
+		BeanCounterDB[server][player]["completedAuctions"] = {}
+		BeanCounterDB[server][player]["failedAuctions"] = {}
 
-		BeanCounterDB[private.realmName][private.playerName]["postedBids"] = {}
-		--BeanCounterDB[private.realmName][private.playerName]["postedBuyouts"] = {} removed as unneccessary
-		BeanCounterDB[private.realmName][private.playerName]["completedBids/Buyouts"]  = {}
-		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
+		BeanCounterDB[server][player]["postedBids"] = {}
+		--BeanCounterDB[server][player]["postedBuyouts"] = {} removed as unneccessary
+		BeanCounterDB[server][player]["completedBids/Buyouts"]  = {}
+		BeanCounterDB[server][player]["failedBids"]  = {}
 
-		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
+		BeanCounterDB[server][player]["mailbox"] = {}
 	end
 
 
@@ -399,175 +403,6 @@ function private.getItemInfo(link, cmd)
 	elseif itemStackCount and (cmd == "stack") then
 		return itemStackCount
 	end
-end
-
---[[ DATABASE MAINTIANACE FUNCTIONS
-]]
---Sum all entries for display in window  TODO:Add in check for lua key value limitations
-function private.sumDatabase()
-	private.DBSumEntry, private.DBSumItems = 0, 0
-	for player, v in pairs(private.serverData)do
-		for DB, data in pairs(v) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
-				for itemID, value in pairs(data) do
-					for itemString, data in pairs(value) do
-						private.DBSumEntry = private.DBSumEntry +1
-						for index, text in pairs(data) do
-							private.DBSumItems = private.DBSumItems+1
-						end
-					end
-				end
-			end
-		end
-	end
-	private.frame.DBCount:SetText("Items: "..private.DBSumEntry)
-	private.frame.DBItems:SetText("Entries: "..private.DBSumItems)
-end
-
---Recreate/refresh ItemIName to ItemID array
-function private.refreshItemIDArray(announce)
-	for player, v in pairs(private.serverData)do
-		for DB,data in pairs(private.serverData[player]) do
-			if DB ~= "mailbox" and type(data) == "table" then
-				for itemID, value in pairs(data) do
-					for itemString, text in pairs(value) do
-						local key, suffix = lib.API.decodeLink(itemString)
-						if not BeanCounterDB["ItemIDArray"][key..":"..suffix] then
-							local _, itemLink = private.getItemInfo(itemString, "itemid")
-							if itemLink then
-								debugPrint("Added to array, missing value",  itemLink)
-								lib.API.storeItemLinkToArray(itemLink)
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	if announce then print("Finished refresing ItemName Array") end
-end
-
---[[ --Possible code to use to purge itemID array links that no longer have transactions
-Will be necessary if I add teh ability to remove older transactions
-local count = 0
-for i, link in pairs(BeanCounterDB["ItemIDArray"]) do
-   count = count+1
-   local  itemID, key = strsplit(":",i)
-   for player, v in pairs(private.serverData)do
-      local found = false
-      for DB,data in pairs(private.serverData[player]) do
-         if DB ~= "mailbox" and type(data) == "table" then
-            if data[itemID] then 
-               --  print(itemID, count)
-               found = true
-            end
-         end
-      end
-   end
-   if found == false then print("Never seen", itemID, key, link) end
-end
-
-]]
---Moves entrys older than 40 days into compressed( non uniqueID) Storage
---Array refresh needs to run before this function
-function private.compactDB(announce)
-	debugPrint("Compressing database entries older than 40 days")
-	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
-	if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
-		for itemID, value in pairs(data) do
-			for itemString, index in pairs(value) do
-				local _, _, uniqueID = lib.API.decodeLink(itemString)
-				local itemLink = lib.API.getArrayItemLink(itemString)
-				if uniqueID ~= "0" then --ignore the already compacted keys
-					private.removeUniqueID(index, DB, itemID, itemLink, itemString)
-				elseif lib.GetSetting("oldDataExpireEnabled") then
-					--for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
-					local months = lib.GetSetting("monthstokeepdata")
-					local expire =  time() - (months * 30 * 24 * 60 * 60)
-					--private.removeOldData(index, DB, itemID, itemLink, itemString, expire)
-				end
-				--remove itemStrings that are now empty, all the keys have been moved to compressed format
-				if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end
-			end
-		end
-	end
-end
-	if announce then print("Finished compressing Databases") end
-end
-function private.removeUniqueID(data, DB, itemID, itemLink, itemString)
-	local _, _, _, _, _, _, _, postTime  = private.unpackString(data[1])
-	if data[1] and (time() - postTime) >= 3456000 then --we have an old data entry lets process this
-		debugPrint("Compressed", "|H"..itemString, data[1] )
-		private.databaseAdd(DB, itemID, itemLink, data[1], true) --store using the compress option set to true
-		table.remove(data, 1)
-		private.removeUniqueID(data, DB, itemID, itemLink, itemString)
-	end
-end
-function private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
-	local _, _, _, _, _, _, _, postTime = private.unpackString(data[1])
-	postTime = tonumber(postTime)
-	if data[1] and (postTime) <= days then --we have an old data entry lets process this
-		debugPrint("Removed", "|H"..itemString, data[1] , date("%c", postTime), "Older than",  date("%c", keep) )
-		table.remove(data, 1)
-		private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
-	end
-end
---Sort all array entries by Date oldest to newest
---Helps make compact more efficent needs to run once per week or so
-function private.sortArrayByDate(announce)
-	for player, v in pairs(private.serverData)do
-		for DB, data in pairs(private.serverData[player]) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
-				for itemID, value in pairs(data) do
-					for itemString, index in pairs(value) do
-						table.sort(index,  function(a,b)
-							local _, _, _, _, _, _, _, postTimeA = private.unpackString(a)
-							local _, _, _, _, _, _, _, postTimeB = private.unpackString(b)
-							return postTimeA < postTimeB end)
-						private.serverData[player][DB][itemID][itemString] = index
-					end
-				end
-			end
-		end
-	end
-	if announce then print("Finished sorting database") end
-end
---Prune Old keys from postedXXXX tables
---First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
-function private.prunePostedDB(announce)
-	--Used to clean up post DB
-	debugPrint("Cleaning posted Databases")
-	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
-		if  DB == "postedBids" or DB == "postedAuctions"  then
-			for itemID, value in pairs(data) do
-				for itemString, index in pairs(value) do
-					--While the entrys remain 40 days old remove entry
-					local _, _ ,_ ,_ ,_ ,TIME
-					if index[1] then 
-						_, _ ,_ ,_ ,_ ,TIME = strsplit(";", index[1])
-					end
-					while index[1] and (time() - TIME) >= 3456000 do
-						--debugPrint("Removed Old posted entry", itemString)
-						table.remove(index, 1)
-						if index[1] then 
-							_, _ ,_ ,_ ,_ ,TIME = strsplit(";", index[1])
-						end
-					end
-					-- remove empty itemString tables
-					if #index == 0 then
-						--debugPrint("Removed empty itemString table", itemID, itemString)
-						private.playerData[DB][itemID][itemString] = nil
-					end
-				end
-				--after removing the itemStrings look to see if there are itemID's that need removing
-				if next (value) == nil then
-					debugPrint("Removed empty itemID:", itemID) 
-					private.playerData[DB][itemID] = nil
-				end
-			end
-		end
-	end
-	if announce then print("Finished pruning Posted Databases") end
 end
 
 function private.debugPrint(...)
