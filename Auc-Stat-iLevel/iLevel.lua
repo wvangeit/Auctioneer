@@ -39,13 +39,14 @@ if not lib then return end
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local empty = wipe
 local iTypes = AucAdvanced.Const.InvTypes
+local GetFaction = AucAdvanced.GetFaction
 
 local KEEP_NUM_POINTS = 250
 
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
-	local serverKey = AucAdvanced.GetFaction()
+	local serverKey = GetFaction()
 	if (command == "help") then
 		print(_TRANS('ILVL_Help_SlashHelp1') )--Help for Auctioneer Advanced - iLevel
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
@@ -86,15 +87,13 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	end
 
 	-- Get the signature of this item and find it's stats.
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
-	if (linkType ~= "item") then return end
 	local iLevel, quality, equipPos = itemData.itemLevel, itemData.quality, itemData.equipPos
 	if quality < 1 then return end
 	if not equipPos then return end
 	if equipPos < 1 then return end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
 
-	local serverKey = AucAdvanced.GetFaction()
+	local serverKey = GetFaction()
 	local stats = private.GetUnpackedStats(serverKey, itemSig, true) -- read/write
 	if not stats[iLevel] then stats[iLevel] = {} end
     local sz = #stats[iLevel]
@@ -143,33 +142,25 @@ function private.GetCfromZ(Z)
 	end
 end
 
-local pricecache = {}
+local weakmeta = {__mode="kv"}
+local pricecache = setmetatable({}, weakmeta)
 function private.ResetCache()
 	empty(pricecache)
 end
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.ilevel.enable") then return end
-	local itemSig, iLevel, equipPos, quality = private.GetItemDetail(hyperlink)
+	local itemSig, iLevel = private.GetItemDetail(hyperlink)
 	if not itemSig then return end
-	if not serverKey then serverKey = AucAdvanced.GetFaction() end
+	if not serverKey then serverKey = GetFaction() end
 
 	local average, mean, stdev, variance, count, confidence
-	
+
 	local cacheSig = serverKey..itemSig..";"..iLevel
 	if pricecache[cacheSig] then
 		average, mean, stdev, variance, count, confidence = unpack(pricecache[cacheSig], 1, 6)
 		return average, mean, false, stdev, variance, count, confidence
 	end
 
-	--[[
-	if pricecache and pricecache[serverKey] and pricecache[serverKey][itemSig] and pricecache[serverKey][itemSig][iLevel] then
-		local ave, mean, _, stddev, var, cnt, conf = strsplit(",", pricecache[serverKey][itemSig][iLevel])
-		ave, mean, stddev, var, cnt, conf = tonumber(ave), tonumber(mean), tonumber(stddev), tonumber(var), tonumber(cnt), tonumber(conf)
-		return ave, mean, _, stddev, var, cnt, conf
-	end
-	--]]
-
-	--local stats = private.UnpackStats(data[serverKey], itemSig)
 	local stats = private.GetUnpackedStats(serverKey, itemSig) -- read only
 	if not stats[iLevel] then return end
 
@@ -217,18 +208,11 @@ function lib.GetPrice(hyperlink, serverKey)
 	end
 
 	confidence = .01
-	--local average
 	if (number > 0) then
 		average = total / number
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-	--[[
-	if not pricecache then pricecache = {} end
-	if not pricecache[serverKey] then pricecache[serverKey] = {} end
-	if not pricecache[serverKey][itemSig] then pricecache[serverKey][itemSig] = {} end
-	pricecache[serverKey][itemSig][iLevel] = strjoin(",", average or "", mean or "", "false", stdev or "", variance or "", count or "", confidence or "")
-	--]]
 	pricecache[cacheSig] = {average, mean, stdev, variance, count, confidence}
 	return average, mean, false, stdev, variance, count, confidence
 end
@@ -363,7 +347,7 @@ function lib.ClearItem(hyperlink, serverKey)
 	local itemSig, iLevel, equipPos, quality = private.GetItemDetail(hyperlink)
 	if not itemSig then return end
 
-	if not serverKey then serverKey = AucAdvanced.GetFaction() end
+	if not serverKey then serverKey = GetFaction() end
 	local stats = private.GetUnpackedStats(serverKey, itemSig, true)
 	if stats[iLevel] then
 		print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, serverKey))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
@@ -396,37 +380,16 @@ end
 itemSig, iLevel, equipPos, quality = GetItemDetail(hyperlink)
 --]]
 function private.GetItemDetail(hyperlink)
-	-- ### is this function 'slow' enough to actually need caching?
-	if not private.localcache then private.localcache = {} end
-	local cache = private.localcache[hyperlink]
-	if cache ~= nil then
-		if not cache then return end
-		return unpack(cache)
-	end
+	if type(hyperlink) ~= "string" then return end
+	if not hyperlink:match("item:%d") then return end
 
-	-- ### this call only really used to check link is an item
-	-- ### can it be replaced with a quicker test?
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then
-		private.localcache[hyperlink] = false
-		return
-	end
-
-	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(itemId)
-	if quality and quality > 0 then
-		equipPos = tonumber(iTypes[equipPos]) or -1
-		if (equipPos < 1) then
-			private.localcache[hyperlink] = false
-			return
-		end
-	else -- nil returns from GetItemInfo - may be temporary so do not update cache
-		return
-	end
+	local _,_, quality, iLevel, _,_,_,_, equipPos = GetItemInfo(hyperlink)
+	if not quality or quality < 1 then return end
+	equipPos = tonumber(iTypes[equipPos])
+	if not equipPos or equipPos < 1 then return end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
 
-	cache = {itemSig, iLevel, equipPos, quality}
-	private.localcache[hyperlink] = cache
-	return unpack(cache)
+	return itemSig, iLevel, equipPos, quality
 end
 
 --[[
