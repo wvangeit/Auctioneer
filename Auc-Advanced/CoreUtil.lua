@@ -37,6 +37,23 @@ local lib = AucAdvanced
 local private = {}
 local tooltip = LibStub("nTipHelper:1")
 
+-- "Module" functions for CoreUtil
+-- installed in private table, called via CoreModule
+
+function private.OnLoad(addon)
+	if addon == "auc-advanced" then
+		private.createAuctionLength()
+	end
+end
+
+function private.Processor(event, subevent)
+	if event == "auctionopen" then
+		private.isAHOpen = true
+	elseif event == "auctionclose" then
+		private.isAHOpen = false
+	end
+end
+
 --Localization via babylonian
 local Babylonian = LibStub("Babylonian")
 assert(Babylonian, "Babylonian is not installed")
@@ -382,6 +399,7 @@ function lib.NewModule(libType, libName)
 		lib.Modules[libType][libName] = module
 		private.modulecache = nil
 		private.resetPriceModels()
+		lib.SendProcessorMessage("newmodule", libType, libName)
 		return module, lib, modulePrivate
 	end
 end
@@ -481,9 +499,10 @@ function lib.GetAllModules(having, findSystem, findEngine)
 	return modules
 end
 
--- CoreModule
--- A dummy module representing the core of Auc-Advanced
--- Used to catch messages and pass them on to elements of the core
+--[[ CoreModule
+	A dummy module representing the core of Auc-Advanced
+	Used to catch messages and pass them on to elements of the core
+--]]
 local coremodule = {
 	libType = "Util",
 	libName = "CoreModule",
@@ -491,28 +510,91 @@ local coremodule = {
 	}
 lib.Modules.Util.CoreModule = coremodule
 
+function private.MakeCoreModuleFunction(func, newcore, nest)
+	local xname = "_"..func
+	local base
+	if nest then
+		if not coremodule[nest] then
+			coremodule[nest] = {}
+		end
+		base = coremodule[nest]
+	else
+		base = coremodule
+	end
+	if not base[func] then
+		base[func] = function(...)
+			for _, core in ipairs(base[xname]) do
+				core[func](...)
+			end
+		end
+		base[xname] = {}
+	end
+	tinsert(base[xname], newcore)
+end
+
+-- called from CoreMain's private OnLoad function
+function lib.CoreModuleOnLoad(addon)
+	-- work from temporary tables; easy to modify if new core elements or new functions need to be added
+	local cores = {private, lib.API, lib.Buy, lib.Config, lib.Const, lib.Post, lib.Scan, lib.Settings}
+	local funcs = {"OnLoad", "Processor", "CommandHandler"}
+	local nested = {
+		ScanProcessors = {"begin", "update", "leave", "create", "delete", "complete"},
+	}
+	local tables = {"LoadTriggers"}
+
+	-- install the functions and supporting values
+	for _, core in ipairs(cores) do
+		for _, func in ipairs(funcs) do
+			if core[func] then
+				private.MakeCoreModuleFunction(func, core)
+			end
+		end
+		for nest, subfuncs in pairs(nested) do
+			if core[nest] then
+				for _, func in ipairs(subfuncs) do
+					if core[nest][func] then
+						private.MakeCoreModuleFunction(func, core, nest)
+					end
+				end
+			end
+		end
+		for _, tab in ipairs(tables) do
+			if core[tab] then
+				if not coremodule[tab] then
+					coremodule[tab] = {}
+				end
+				for k, v in pairs(core[tab]) do
+					coremodule[tab][k] = v
+				end
+			end
+		end
+	end
+
+	-- do OnLoad function now
+	if coremodule.OnLoad then
+		coremodule.OnLoad(addon)
+	end
+
+	-- delete the initialization code as we only need it once
+	lib.CoreModuleOnLoad = nil
+	private.MakeCoreModuleFunction = nil
+end
+
+--[[
 -- distribution of CoreModule events is currently hard coded
 -- to be improved on at a later date - but only worth doing when there are more events
 function coremodule.Processor(...)
 	lib.API.Processor(...)
 	private.Processor(...)
+	lib.Post.Processor(...)
 end
--- end of CoreModule
+--]]
+--[[ End of CoreModule ]]--
 
 function lib.SendProcessorMessage(...)
 	local modules = AucAdvanced.GetAllModules("Processor")
 	for pos, engineLib in ipairs(modules) do
 		engineLib.Processor(...)
-	end
-end
-
-function private.Processor(event, subevent)
-	if event == "load" and subevent == "auc-advanced" then
-		private.createAuctionLength()
-	elseif event == "auctionopen" then
-		private.isAHOpen = true
-	elseif event == "auctionclose" then
-		private.isAHOpen = false
 	end
 end
 

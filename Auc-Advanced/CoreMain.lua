@@ -215,6 +215,9 @@ function private.OnLoad(addon)
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
 			AucAdvanced.Scan.GetImage()
 		end
+		
+		-- Load the dummy CoreModule
+		AucAdvanced.CoreModuleOnLoad(addon)
 	end
 
 	-- Notify the actual module if it exists
