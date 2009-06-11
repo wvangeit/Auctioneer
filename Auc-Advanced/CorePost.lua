@@ -92,6 +92,7 @@ private.postRequests = {}
 
 -- Items which we have moved and are waiting for the moves to complete.
 private.moveWait = {}
+private.moveEmpty = {}
 
 -- Stores the known bag types so we can work out which bags are for
 -- holding special item classes.
@@ -108,22 +109,11 @@ private.bagInfo = {}
       in order to save time.
 ]]
 function lib.DecodeSig(...)
-	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed
-	local sig = ...
-	if (type(sig) == "string") then
-		matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = strsplit(":", sig)
-		matchId = tonumber(matchId)
-		matchSuffix = tonumber(matchSuffix) or 0
-		matchFactor = tonumber(matchFactor) or 0
-		matchEnchant = tonumber(matchEnchant) or 0
-		matchSeed = tonumber(matchSeed) or 0
+	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = ...
+	if (type(matchId) == "string") then
+		matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = strsplit(":", matchId)
 	end
-	if not matchId or matchId == 0 then matchId = ... end
-	if not matchSuffix or matchSuffix == 0 then matchSuffix = select(2, ...) end
-	if not matchFactor or matchFactor == 0 then matchFactor = select(3, ...) end
-	if not matchEnchant or matchEnchant == 0 then matchEnchant = select(4, ...) end
-	if not matchSeed or matchSeed == 0 then matchSeed = select(5, ...) end
-	matchId = tonumber(matchId)
+	matchId = tonumber(matchId) or 0
 	matchSuffix = tonumber(matchSuffix) or 0
 	matchFactor = tonumber(matchFactor) or 0
 	matchEnchant = tonumber(matchEnchant) or 0
@@ -184,7 +174,7 @@ end
 
 --[[
     FindMatchesInBags(sig)
-    FindMatchesInBags(id, [suffix, [factor, [enchant, [seed] ] ] ])
+    FindMatchesInBags(itemId, [suffix, [factor, [enchant, [seed] ] ] ])
       Returns: { {bag, slot, count}, ... }
 	  Throws: ERROR_NOITEM
 
@@ -197,7 +187,7 @@ function lib.FindMatchesInBags(...)
 	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = lib.DecodeSig(...)
 	local blankBag, blankSlot
 	local specialBlank = false
-	local isLocked = true
+	local isLocked = false
 	local foundLink
 	local total = 0
 
@@ -226,14 +216,14 @@ function lib.FindMatchesInBags(...)
 						isLocked = true
 					end
 
-					local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+					local itype, itemId, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 					if not isMultibag then
 						-- Store info that this bag can contain this item
-						private.bagInfo[bagType][id] = true
+						private.bagInfo[bagType][itemId] = true
 					end
 
 					if itype == "item"
-					and id == matchId
+					and itemId == matchId
 					and suffix == matchSuffix
 					and factor == matchFactor
 					and enchant == matchEnchant
@@ -264,6 +254,11 @@ function lib.FindMatchesInBags(...)
 	return matches, total, blankBag, blankSlot, foundLink, isLocked
 end
 
+-- compare function to use in table.sort within FindOrMakeStack
+function private.sortCompare(a,b)
+	return a[3] < b[3]
+end
+
 --[[
     FindOrMakeStack(sig, size)
       Returns: bag, slot
@@ -279,6 +274,7 @@ end
       until a correctly sized stack is created.
 ]]
 function lib.FindOrMakeStack(sig, size)
+	-- if we were splitting or combining a stack, check that the stack count has changed
 	if private.moveWait[1] then
 		local bag, slot, prev, wait = unpack(private.moveWait)
 		if GetTime() < wait then
@@ -289,17 +285,35 @@ function lib.FindOrMakeStack(sig, size)
 		end
 		private.moveWait[1] = nil
 	end
+	-- if we were moving a stack to an empty slot, check that there is something in that slot now
+	if private.moveEmpty[1] then
+		local bag, slot, wait = unpack(private.moveEmpty)
+		if GetTime() < wait then
+			if not GetContainerItemLink(bag,slot) then
+				return
+			end
+		end
+		private.moveEmpty[1] = nil
+	end
 
-	local itemId, s
-	local id, suffix, factor, enchant, seed = lib.DecodeSig(sig)
-	local _,link,_,_,_,_,_, maxSize = GetItemInfo(id)
+	-- If there is anything on the cursor we can't proceed until it is dropped
+	if GetCursorInfo() or SpellIsTargeting() then
+		return
+	end
+
+	local itemId, suffix, factor, enchant, seed = lib.DecodeSig(sig)
+	local _,link,_,_,_,_,_, maxSize = GetItemInfo(itemId)
 	if not link then return error(ERROR_NOLOCAL) end
 
 	if size > maxSize then
 		return error(ERROR_MAXSIZE)
 	end
 
-	local matches, total, blankBag, blankSlot = lib.FindMatchesInBags(id, suffix, factor, enchant, seed)
+	local matches, total, blankBag, blankSlot, _, locked = lib.FindMatchesInBags(itemId, suffix, factor, enchant, seed)
+
+	if locked then -- at least one of the stacks is locked - wait for it to clear
+		return
+	end
 
 	if #matches == 0 then
 		return error(ERROR_NOTFOUND)
@@ -317,14 +331,9 @@ function lib.FindOrMakeStack(sig, size)
 		end
 	end
 
-	-- We will have to wait for the current process to complete
-	if (CursorHasItem() or SpellIsTargeting()) then
-		return
-	end
-
 	-- Join up smallest to largest stacks to build a larger stack
 	-- or, split a larger stack to the right size (if space available)
-	table.sort(matches, function (a,b) return a[3] < b[3] end)
+	table.sort(matches, private.sortCompare)
 	if (matches[1][3] > size) then
 		-- Our smallest stack is bigger than what we need
 		-- We will need to split it
@@ -335,6 +344,9 @@ function lib.FindOrMakeStack(sig, size)
 
 		SplitContainerItem(matches[1][1], matches[1][2], size)
 		PickupContainerItem(blankBag, blankSlot)
+		private.moveEmpty[1] = blankBag
+		private.moveEmpty[2] = blankSlot
+		private.moveEmpty[3] = GetTime() + 5
 	elseif (matches[1][3] + matches[2][3] > size) then
 		-- The smallest stack + next smallest is > than our needs, do a partial combine
 		SplitContainerItem(matches[2][1], matches[2][2], size - matches[1][3])
@@ -375,7 +387,7 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 		table.insert(private.postRequests, { [0]=postId, sig, size, bid, buyout, duration, 0 })
 		table.insert(postIds, postId)
 	end
-	private.updateFrame.timer = -1
+	private.Wait(0) -- delay until next
 	return postIds
 end
 
@@ -413,32 +425,23 @@ function lib.GetDepositAmount(sig, count)
 end
 
 --[[
-    AlertBagsChanged()
-
-	Alerts the posting processor that the inventory has changed and
-	we should check to see if we need to do anything.
-]]
-function lib.AlertBagsChanged()
-	private.ProcessPosts()
-end
-
---[[
 	PRIVATE: ProcessPosts()
 	This function is responsible for maintaining and processing the post queue.
+	Note:
+	private.postRequests[queuenumber] = { [0]=postId, sig, size, bid, buyout, duration, tries [, postinfo]}
+	postinfo = { bag, slot, uniquelink, expire }
 ]]
-function private.ProcessPosts()
-	if #private.postRequests <= 0
-	or not AuctionFrame
-	or not AuctionFrame:IsVisible()
-	then
-		private.updateFrame.timer = -10
+function private.ProcessPosts(source)
+	if #private.postRequests <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
+		private.Wait() -- put timer to sleep
 		return
 	end
 
 	local request = private.postRequests[1]
 
+	-- use longer delayed and timeouts if connectivity is bad
 	local _,_, lag = GetNetStats()
-	lag = 2.5 * lag / 1000
+	lag = lag * (2.5 / 1000)
 
 	if (request[7]) then
 		-- We're waiting for the item to vanish from the bags
@@ -447,7 +450,7 @@ function private.ProcessPosts()
 		if not link or link ~= origLink then
 			-- Successful Auction!
 			table.remove(private.postRequests, 1)
-			private.updateFrame.timer = -0.1
+			private.Wait(.1)
 
 			-- Send out a message that the post has been successful
 			AucAdvanced.SendProcessorMessage("postresult", true, request[0], request)
@@ -456,18 +459,20 @@ function private.ProcessPosts()
 			request[6] = tries
 			if tries > 5 then
 				-- Can't auction this item!
-				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
-				print(("Error attempting to auction item: %s x%d"):format(link, itemCount))
+				local _, itemCount = GetContainerItemInfo(bag,slot)
+				local msg = ("Error attempting to auction item: %s x%d"):format(link, itemCount)
+				print(msg)
+				message(msg)
 				table.remove(private.postRequests, 1)
-				private.updateFrame.timer = -5
+				private.Wait(1)
 
 				-- Send out a message that the post has failed
 				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
-				private.updateFrame.timer = -1
 				-- Wait for another "lag" interval
 				local expire = GetTime() + lag
 				request[7][4] = expire
+				private.Wait(lag)
 			end
 		end
 		return
@@ -475,7 +480,9 @@ function private.ProcessPosts()
 
 	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
 	if not success then
-		local err = bag:match(": (.*)")
+		local err = bag:match(": (.*)") -- Check for expected "errors"
+		local link, name = AucAdvanced.API.GetLinkFromSig(request[1])
+		local msg
 		if err == ERROR_NOITEM         -- ItemId is empty
 		or err == ERROR_NOLOCAL        -- Item is unknown
 		or err == ERROR_NOBLANK        -- No blank spaces available
@@ -483,22 +490,31 @@ function private.ProcessPosts()
 		or err == ERROR_AHCLOSED       -- AH is not open
 		or err == ERROR_NOTFOUND       -- Item was not found in inventory
 		or err == ERROR_NOTENOUGH then -- Not enough of item available
-			print("Aborting post request: {{", err, "}}")
-			message(err)
+			msg = "Aborting post request for %s x%d: %s"
+			msg:format(link, request[2], err)
+			print(msg)
+			message(msg)
 			table.remove(private.postRequests, 1)
-			private.updateFrame.timer = -0.1
-
-			-- Send out a message that the post has failed
+			private.Wait(1)
 			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, err)
-		else
-			print("Delaying post request: {{", bag, "}}")
-			private.updateFrame.timer = -1
+		else -- Unexpected (probably real) error
+			msg = "Error during post request for %s x%d: %s"
+			msg:format(link, request[2], bag)
+			print(msg)
+			table.remove(private.postRequests, 1)
+			private.Wait(1)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, bag)
+			error(msg)
 		end
 		return
 	end
 
-	if (CursorHasItem() or SpellIsTargeting()) then return end
 	if bag then
+		local tries = request[6]
+		-- if tries > 0 then something went wrong last time - so avoid spamming with triggered events and wait for timer
+		if tries > 0 and source ~= "timer" then
+			return
+		end
 		local link = GetContainerItemLink(bag,slot)
 		PickupContainerItem(bag, slot)
 		ClickAuctionSellItemButton()
@@ -508,19 +524,21 @@ function private.ProcessPosts()
 			-- Put it back in the bags
 			ClearCursor()
 
-			local tries = (request[6] or 0) + 1
+			tries = tries + 1
 			request[6] = tries
-			if tries > 5 then
+			if tries > 3 then
 				-- Can't auction this item!
-				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
-				print(("Error attempting to auction item: %s x%d"):format(link, itemCount))
+				local _, itemCount = GetContainerItemInfo(bag,slot)
+				local msg = ("Error attempting to auction item: %s x%d"):format(link, itemCount)
+				print(msg)
+				message(msg)
 				table.remove(private.postRequests, 1)
-				private.updateFrame.timer = -5
+				private.Wait(1)
 
 				-- Send out a message that the post has failed
 				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
-				private.updateFrame.timer = -1
+				private.Wait(lag)
 			end
 			return
 		end
@@ -528,8 +546,8 @@ function private.ProcessPosts()
 		-- Need to wait for this item to vanish.
 		local expire = GetTime() + lag
 		request[7] = { bag, slot, link, expire }
-		private.updateFrame.timer = -1
 	end
+	private.Wait(lag)
 end
 
 --[[
@@ -539,13 +557,45 @@ end
 ]]
 
 -- Simple timer to keep actions up-to-date even if an event misfires
+--[[
+	PRIVATE: Wait(delay)
+	Used to control the timer
+	Use delay = nil to stop the time
+	Use delay >= 0 to start the timer and set the delay length
+--]]
+function private.Wait(delay)
+	if delay then
+		if not private.updateFrame.timer then
+			private.updateFrame:Show()
+		end
+		private.updateFrame.timer = delay
+	else
+		if private.updateFrame.timer then
+			private.updateFrame:Hide()
+			private.updateFrame.timer = nil
+		end
+	end
+end
+
+function lib.Processor(event, ...)
+	if event == "inventory" then
+		if private.updateFrame.timer then
+			private.ProcessPosts("inventory")
+		end
+	elseif event == "auctionopen" then
+		if #private.postRequests > 0 then
+			private.ProcessPosts("auctionopen")
+		end
+	end
+end
+
 private.updateFrame = CreateFrame("frame", nil, UIParent)
-private.updateFrame.timer = -5
+private.updateFrame:Hide()
 private.updateFrame:SetScript("OnUpdate", function(obj, delay)
-	obj.timer = obj.timer + delay
-	if obj.timer > 0 then
-		obj.timer = -1
-		private.ProcessPosts()
+	obj.timer = obj.timer - delay
+	if obj.timer <= 0 then
+		obj.timer = 1 -- safety value, will be overwritten later
+		private.ProcessPosts("timer")
 	end
 end)
 
