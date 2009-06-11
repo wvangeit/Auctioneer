@@ -317,7 +317,7 @@ end
 
 -- Default setting values
 local settingDefaults = {
-	["searchspeed"] = 100,
+	["processpriority"] = 80,
 	["reserve"] = 0,
 	["reserve.enable"] = false,
 	["global.createtab"] = true,
@@ -1365,7 +1365,7 @@ function lib.MakeGuiConfig()
 	id = gui:AddTab("General Options", "Options")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",           0,    "Setup general options")
-	gui:AddControl(id, "WideSlider",       0, 1, "searchspeed", 10, 500, 10, "Search process priority: %s")
+	gui:AddControl(id, "WideSlider",       0, 1, "processpriority", 10, 100, 10, "Search process priority: %s")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "reserve.enable", "Enable reserve amount:")
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "reserve", 0, 99999999, "Reserve Amount")
@@ -1842,8 +1842,12 @@ local PerformSearch = function()
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
 	local scandata = replicate((AucAdvanced.Scan.GetScanData()))
-	local speed = lib.GetSetting("searchspeed")
-	if not speed then speed = 1000 end
+	local speed = lib.GetSetting("processpriority") or 50
+	speed = (speed / 100)^2.5
+	local processingTime = speed * 0.1 + 0.02
+	local GetTime = GetTime
+	local lastPause = GetTime()
+
 	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
 		print("No valid Searches selected")
@@ -1859,9 +1863,10 @@ local PerformSearch = function()
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(scandata.image) do
-		if (i % speed) == 0 then
+		if GetTime() - lastPause > processingTime then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
 			coroutine.yield()
+			lastPause = GetTime()
 			if private.SearchCancel then
 				private.SearchCancel = nil
 				break
@@ -1892,16 +1897,12 @@ function lib.PerformSearch(searcher)
 	end
 end
 
-local flip = false
 function private.OnUpdate(self, elapsed)
 	if coSearch then
 		if coroutine.status(coSearch) == "suspended" then
-			flip = not flip
-			if flip then
-				local status, result = coroutine.resume(coSearch)
-				if not status and result then
-					error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
-				end
+			local status, result = coroutine.resume(coSearch)
+			if not status and result then
+				error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
 			end
 		elseif coroutine.status(coSearch) == "dead" then
 			coSearch = nil
