@@ -204,6 +204,8 @@ function lib.OnLoad()
 	default("match.undermarket.undercut", 1)
 	default("match.undercut.tooltip", true)
 	default("match.undercut.model", "market")
+	default("match.undercut.usevalue", false)
+	default("match.undercut.value", 1)
 end
 
 --[[ Local functions ]]--
