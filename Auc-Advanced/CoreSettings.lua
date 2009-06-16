@@ -91,20 +91,12 @@ local function getUserProfile()
 			profileName = "Default"
 			AucAdvancedConfig[getUserSig()] = "Default"
 		end
-		if profileName == "Default" then
-			AucAdvancedConfig["profile."..profileName] = {}
+		if not AucAdvancedConfig["profile.Default"] then
+			AucAdvancedConfig["profile.Default"] = {}
 		end
 	end
 	return AucAdvancedConfig["profile."..profileName]
 end
-
-
-local function cleanse( profile )
-	if (profile) then
-		profile = {}
-	end
-end
-
 
 -- Default setting values
 local settingDefaults = {
@@ -184,58 +176,65 @@ local function setter(setting, value)
 
 	local a,b,c = strsplit(".", setting)
 	if (a == "profile") then
-		if (setting == "profile.save") then
+		if setting == "profile.save" or setting == "profile.duplicate" then
+			-- User clicked either the New Profile or Copy Profile button
 			value = gui.elements["profile.name"]:GetText()
 
-			-- Create the new profile
-			AucAdvancedConfig["profile."..value] = {}
+			if value and value ~= "" then
+				-- Create the new profile
+				local newProfile
+				if setting == "profile.duplicate" then
+					local curName = gui.elements["profile"].value
+					local curProfile = AucAdvancedConfig["profile."..curName]
+					if curProfile then
+						newProfile = replicate(curProfile)
+					end
+				end
+				AucAdvancedConfig["profile."..value] = newProfile or {}
 
-			-- Set the current profile to the new profile
-			AucAdvancedConfig[getUserSig()] = value
-			-- Get the new current profile
-			local newProfile = getUserProfile()
+				-- Set the user profile to the new profile
+				AucAdvancedConfig[getUserSig()] = value
 
-			-- Clean it out and then resave all data
-			cleanse(newProfile)
-			gui:Resave()
+				-- Add the new profile to the profiles list:-
 
-			-- Add the new profile to the profiles list
-			local profiles = AucAdvancedConfig["profiles"]
-			if (not profiles) then
-				profiles = { "Default" }
-				AucAdvancedConfig["profiles"] = profiles
+				-- Check/create the profiles list
+				local profiles = AucAdvancedConfig["profiles"]
+				if (not profiles) then
+					profiles = { "Default" }
+					AucAdvancedConfig["profiles"] = profiles
+				end
+
+				-- Check to see if the new profile's name already exists
+				local found = false
+				for pos, name in ipairs(profiles) do
+					if (name == value) then found = true break end
+				end
+
+				-- If not, add it and then sort it
+				if (not found) then
+					table.insert(profiles, value)
+					table.sort(profiles)
+				end
+			else
+				message(_TRANS("ADV_Help_InvalidProfileName")) --"Cannot create new profile: please enter a new profile name first"
+				return
 			end
-
-			-- Check to see if it already exists
-			local found = false
-			for pos, name in ipairs(profiles) do
-				if (name == value) then found = true end
-			end
-
-			-- If not, add it and then sort it
-			if (not found) then
-				table.insert(profiles, value)
-				table.sort(profiles)
-			end
-
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
 
 			-- If there's a profile name supplied
-			if (value) then
-				-- Clean it's profile container of values
-				cleanse(AucAdvancedConfig["profile."..value])
+			if value and value ~= "Default" then -- don't let the user delete the Default profile!
 
-				-- Delete it's profile container
+				-- Delete its profile container
 				AucAdvancedConfig["profile."..value] = nil
 
-				-- Find it's entry in the profiles list
+				-- Find its entry in the profiles list
 				local profiles = AucAdvancedConfig["profiles"]
 				if (profiles) then
 					for pos, name in ipairs(profiles) do
 						-- If this is it, then extract it
-						if (name == value and name ~= "Default") then
+						if name == value then
 							table.remove(profiles, pos)
 						end
 					end
@@ -245,15 +244,17 @@ local function setter(setting, value)
 				if (getUserProfileName() == value) then
 					AucAdvancedConfig[getUserSig()] = 'Default'
 				end
+			else
+				message(_TRANS("ADV_Help_CannotDeleteProfile")) --"The selected profile cannot be deleted"
+				return
 			end
-
 		elseif (setting == "profile.default") then
 			-- User clicked the reset settings button
 
 			-- Get the current profile from the select box
 			value = gui.elements["profile"].value
 
-			-- Clean it's profile container of values
+			-- Overwrite with an empty profile
 			AucAdvancedConfig["profile."..value] = {}
 
 		elseif (setting == "profile") then
@@ -397,13 +398,18 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", _TRANS('ADV_Interface_Delete')) --"Delete"
 	gui:AddTip(id, _TRANS('ADV_Help_DeleteProfile')) --"Deletes the currently selected profile"
+	gui:AddControl(id, "Button",     0, 1, "profile.default", _TRANS("ADV_Interface_ResetProfile")) --"Reset"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ResetProfile')) --"Reset all settings in the current profile to the default values"
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_CreateProfile')) --"Create or replace a profile"
 	gui:AddControl(id, "Text",       0, 1, "profile.name", _TRANS('ADV_Interface_ProfileName')) --"New profile name:"
 	gui:AddTip(id, _TRANS('ADV_Help_ProfileName')) --"Enter the name of the profile that you wish to create"
 
-	gui:AddControl(id, "Button",     0, 1, "profile.save", _TRANS('ADV_Interface_SaveProfile')) --"Save"
-	gui:AddTip(id, _TRANS('ADV_Help_ProfileSave')) --"Click this button to create or overwrite the specified profile name")
+	gui:AddControl(id, "Button",     0, 1, "profile.save", _TRANS('ADV_Interface_NewProfile')) --"New"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_NewProfile')) --"Create or overwrite a profile with the specified profile name. All settings will be reset to the default values."
+	gui:AddControl(id, "Button",     0, 1, "profile.duplicate", _TRANS("ADV_Interface_CopyProfile")) --"Copy"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_CopyProfile')) --"Create or overwrite a profile with the specified profile name. All settings will be copied from the current profile.")
+
 --localize AddHelp for Profiles
 	gui:AddHelp(id, "what is",
 		"What is a profile?",
@@ -411,15 +417,15 @@ function lib.MakeGuiConfig()
 	)
 	gui:AddHelp(id, "how create",
 		"How do I create a new profile?",
-		"You enter the name of the new profile that you wish to create into the text box labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+		"You enter the name of the new profile that you wish to create into the text box labelled \"New profile name\", and then click the \"New\" or \"Copy\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
 	)
 	gui:AddHelp(id, "how delete",
 		"How do I delete a profile?",
-		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button"
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selection box and then click the Delete button. You cannot delete the \"Default\" profile."
 	)
 	gui:AddHelp(id, "why delete",
 		"Why would I want to delete a profile?",
-		"You can delete a profile when you don't want to use it anymore, or when you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
+		"You can delete a profile when you don't want to use it anymore. Deleting a profile will also affect any other characters who are using the profile."
 	)
 
 	id = gui:AddTab("General")
@@ -442,7 +448,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonmicro", _TRANS('ADV_Interface_ScanDataSummaryMicro')) --"Enables the display of the post scan summary"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryMicro')) --"Display the summation of an Auction House scan"
 
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", _TRANS('ADV_Interface_SearchingClickHooks')) --"Enable searching click-hooks"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
 
