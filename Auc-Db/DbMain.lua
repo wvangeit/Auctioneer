@@ -43,6 +43,7 @@ local lib = AucDb
 local private = lib.Private
 
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local _T = lib.localizations
 
 local function getTime()
 	return time()
@@ -50,6 +51,7 @@ end
 
 local rope = LibStub("StringRope"):New()
 local faction, designation, scanid
+local result = {}
 
 local function RealmDesignation(faction, portal)
 	local realm
@@ -76,9 +78,153 @@ local function RealmDesignation(faction, portal)
 
 	if not realm then realm = "Unknown" end
 	if not faction then faction = "Unknown" end
-	return portal.."/"..realm.."-"..faction
+	return portal.."/"..realm.."-"..faction, portal, realm, faction
 end
 AucDb.RealmDesignation = RealmDesignation
+
+function private.SetDefaults()
+	default("aucdb.enable.tooltip", true)
+	default("aucdb.enable.stats", true)
+	default("aucdb.enable.market", true)
+	default("aucdb.prefer", "either")
+	default("aucdb.minseen", 3)
+	default("aucdb.age.warn", 15)
+	default("aucdb.age.expire", 45)
+end
+
+function private.SetupConfigGui(gui)
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules" )
+
+	local function addHelp(section)
+		gui:AddHelp(id, 'help'..section, _T(section.."Help"), _T(section.."Answer"))
+	end
+	local function addCheckbox(setting, trans)
+		gui:AddControl(id, "Checkbox", 0, 1, setting, _T(trans))
+		gui:AddTip(id, _T(trans.."Tip"))
+	end
+	local function addSlider(setting, trans, min,max)
+		gui:AddControl(id, "WideSlider", 0, 1, setting, min, max, 1, _T(trans))
+		gui:AddTip(id, _T(trans.."Tip"))
+	end
+	local function addSelect(setting, trans, menu)
+		gui:AddControl(id, "Selectbox", 0, 1, menu, setting, _T(trans))
+		gui:AddTip(id, _T(trans.."Tip"))
+	end
+
+	addHelp('AuctioneerDb')
+	addHelp('AucDb')
+	addHelp('Updating')
+
+	gui:AddControl(id, "Header", 0, _T('SetupAucDb'))
+
+	addCheckbox('aucdb.enable.stats', 'StatOption')
+	addCheckbox('aucdb.enable.tooltip', 'ShowOption')
+	addCheckbox('aucdb.enable.market', 'MarketOption')
+
+	addSelect('aucdb.prefer', "PreferStat", {
+		{"global", _T('PreferGlobal') },
+		{"realm", _T('PreferRealm') },
+		{"either", _T('PreferEither') },
+	})
+	addSlider('aucdb.minseen', 'MinSeen', 0,20)
+
+	addSlider('aucdb.age.warn', 'WarnAge', 7,90)
+	addSlider('aucdb.age.expire', 'WarnAge', 7,120)
+end
+
+function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
+	if not lib.Base then return end
+	if not get("aucdb.enable.stats") then return end
+	if not get("aucdb.enable.tooltip") then return end
+	if not quantity or quantity < 1 then quantity = 1 end
+
+	local age = math.floor((time() - lib.Base.buildtime)/86400)
+	if age > (tonumber(get("aucdb.age.expire")) or 45) then
+		tooltip:AddLine(_T('OutOfDate', age))
+		return
+	end
+	if age > (tonumber(get("aucdb.age.warn")) or 15) then
+		tooltip:AddLine(_T('GettingOld', age))
+	end
+
+	lib.GetPriceArray(hyperlink)
+	if not result.seen then
+		tooltip:AddLine(_T('AucDbNoseen'))
+	else
+		tooltip:AddLine(_T('AucDbPrices', result.seen))
+		tooltip:AddLine("  ".._T('PriceLabel', _T('Label_'..result.use), _T('Label_average')), result.price)
+		if (result.saleseen > 0) then
+			tooltip:AddLine("  ".._T('SaleLabel', _T('Label_'..result.use), _T('Label_average')), result.saleprice)
+		end
+	end
+end
+
+function lib.GetPriceArray(hyperlink)
+	if not lib.Base then return end
+	if not get("aucdb.enable.stats") then return end
+
+	local linkType,item,suffix,factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then return end
+
+	local age = math.floor((time() - lib.Base.buildtime)/86400)
+	if age > (tonumber(get("aucdb.age.expire")) or 45) then return end
+	local designation, portal, realm, faction = RealmDesignation()
+	faction = faction:lower()
+	
+	local sig = ("%d:%d:%d"):format(item, suffix, factor)
+	if (result.sig == sig) then return result end
+
+	local prefer = get('aucdb.prefer')
+	local minseen = get('aucdb.minseen')
+
+	empty(result)
+	result.use="realm"
+	result.sig=sig
+
+	local base = lib.Base
+	local lots,min,avg,max,std
+	for i,r in ipairs({"realm", "global"}) do
+		for j,f in ipairs({"alliance", "horde", "neutral"}) do
+			for k,t in ipairs({"bid", "buy"}) do
+				lots,min,avg,max,std = 0,0,0,0,0
+				if base[r] and base[r][f] and base[r][f][t] and base[r][f][t][sig] then
+					lots,min,avg,max,std = strsplit(":", base[r][f][t][sig])
+				end
+				
+				result[r..f..t.."seen"]=tonumber(lots) or 0
+				result[r..f..t.."minimum"]=tonumber(min)
+				result[r..f..t.."average"]=tonumber(avg)
+				result[r..f..t.."maximum"]=tonumber(max)
+				result[r..f..t.."deviation"]=tonumber(std)
+			end
+		end
+	end
+
+	if (prefer == 'either' and result["realm"..faction.."buyseen"] < minseen) or prefer == "global" then
+		result.use = "global"
+	end
+
+	result.stddev = result[result.use..faction.."buydeviation"]
+	result.price = result[result.use..faction.."buyaverage"]
+	result.seen = result[result.use..faction.."buyseen"]
+	result.saleprice = result[result.use..faction.."bidaverage"]
+	result.saleseen = result[result.use..faction.."bidseen"]
+end
+
+local bellCurve = AucAdvanced.API.GenerateBellCurve()
+function lib.GetItemPDF(hyperlink)
+	if not lib.Base then return end
+	if not get("aucdb.enable.stats") then return end
+	if not get("aucdb.enable.market") then return end
+
+	lib.GetPriceArray(hyperlink)
+	local seenCount, stddev, mean = result.seen, result.stddev, result.price
+    if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then return end
+    if stddev == 0 then stddev = mean / sqrt(seenCount); end
+    local lower, upper = mean - 3*stddev, mean + 3*stddev
+    bellCurve:SetParameters(mean, stddev)
+    return bellCurve, lower, upper
+end
 
 function private.getLink(itemName)
 	local _, itemLink = GetItemInfo(itemName)
@@ -86,7 +232,7 @@ function private.getLink(itemName)
 	if itemLink then
 		_, itemId, itemSuffix = AucAdvanced.DecodeLink(itemLink)
 	else
-		for sig, name in pairs(AucDbData.names) do
+		for sig, name in pairs(AucDbData.started) do
 			if name == itemName then
 				itemId, itemSuffix = strsplit(":", sig)
 				_, itemLink = GetItemInfo("item:"..itemId..":0:0:0:0:0:"..itemSuffix)
@@ -170,8 +316,6 @@ function private.process(operation, itemData, oldData)
 	if designation and scanid then
 		if not rope:IsEmpty() then rope:Add(";") end
 		rope:AddDelimited(":", itemData.itemId, itemData.itemSuffix, itemData.itemEnchant, itemData.itemFactor, itemData.itemSeed, itemData.stackSize, itemData.sellerName, itemData.minBid, itemData.buyoutPrice, itemData.curBid, itemData.timeLeft)
-
-		AucDbData.names[("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,0)] = itemData.itemName;
 	end
 end
 function private.complete()
@@ -193,11 +337,9 @@ function private.bid(operation, itemData, bidType, index, bid)
 
 	if not AucDbData then AucDbData = {} end
 	if not AucDbData.bids then AucDbData.bids = {} end
-	if not AucDbData.names then AucDbData.names = {} end
 	if not AucDbData.bids[designation] then AucDbData.bids[designation] = {} end
 	if AucDbData.bids[designation][timeidx] then prevLine = AucDbData.bids[designation][timeidx] .. ";" end
 
-	AucDbData.names[("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,0)] = itemData.itemName;
 	AucDbData.bids[designation][timeidx] = prevLine .. line
 end
 
@@ -211,16 +353,16 @@ function private.start(operation, itemData, minBid, buyoutPrice, runTime, price)
 	private.setDesignation()
 
 	if not AucDbData then AucDbData = {} end
-	if not AucDbData.start then AucDbData.start = {} end
-	if not AucDbData.names then AucDbData.names = {} end
 	if not AucDbData.price then AucDbData.price = {} end
 	if not AucDbData.count then AucDbData.count = {} end
+	if not AucDbData.start then AucDbData.start = {} end
+	if not AucDbData.started then AucDbData.started = {} end
 	if not AucDbData.start[designation] then AucDbData.start[designation] = {} end
 	if AucDbData.start[designation][timeidx] then prevLine = AucDbData.start[designation][timeidx] .. ";" end
 
 	local sig = ("%d:%d:%d"):format(itemData.itemId,itemData.itemSuffix,0)
-	AucDbData.names[sig] = itemData.itemName;
-	AucDbData.price[itemData.itemId] = price;
+	AucDbData.started[sig] = itemData.itemName
+	AucDbData.price[itemData.itemId] = price
 	AucDbData.start[designation][timeidx] = prevLine .. line
 
 	sig = ("%d:%d"):format(itemData.itemId,itemData.itemSuffix)

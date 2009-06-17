@@ -40,16 +40,40 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 if not AucAdvanced then return end
 
-local libType, libName = "Util", "AucDb"
+local libType, libName = "Stat", "AucDb"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
+AucDb = lib
+
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
-AucDb = lib
+local Babylonian = LibStub("Babylonian")
+assert(Babylonian, "Babylonian is not installed")
+local babylonian = Babylonian(AucDbLocalizations)
+function lib.localizations(key, ...)
+	local locale =  get("SelectedLocale")--locales are user choosable
+	local fmt
+	if locale then
+		if type(locale) == "string" then
+			fmt = babylonian(locale, key) or key
+		else
+			fmt = babylonian(GetLocale(), key)
+		end
+	else
+		fmt = babylonian[key] or key
+	end
+	if select('#', ...) > 0 then
+		return fmt:format(...)
+	end
+	return fmt
+end
+local _T = lib.localizations
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
-	--	private.ProcessTooltip(...)
+		private.ProcessTooltip(...)
+	elseif (callbackType == "config") then
+		private.SetupConfigGui(...)
 	end
 end
 
@@ -59,9 +83,9 @@ function lib.OnLoad()
 	if not AucDbData.bids then AucDbData.bids = {} end
 	if not AucDbData.sales then AucDbData.sales = {} end
 	if not AucDbData.scans then AucDbData.scans = {} end
-	if not AucDbData.names then AucDbData.names = {} end
 	if not AucDbData.price then AucDbData.price = {} end
 	if not AucDbData.count then AucDbData.count = {} end
+	if not AucDbData.started then AucDbData.started = {} end
 
 	local expires
 	if AucDb.Enabled then
@@ -97,8 +121,11 @@ function lib.OnLoad()
 					end
 				end
 			end
-		elseif not (section == "names" or section == "price") then
+		elseif not (section == "started" or section == "price") then
 			AucDbData[section] = nil
 		end
 	end
+
+	-- Set defaults
+	private.SetDefaults()
 end

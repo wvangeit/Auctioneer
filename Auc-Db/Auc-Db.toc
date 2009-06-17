@@ -11,7 +11,9 @@
 ## URL: http://auctioneerdb.com/
 ##
 Support\Load.xml
+DbStrings.lua
 DbCore.lua
 DbStatus.lua
 DbMain.lua
+DbBase.lua
 DbData.lua
