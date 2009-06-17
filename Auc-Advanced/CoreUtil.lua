@@ -51,6 +51,11 @@ function private.Processor(event, subevent)
 		private.isAHOpen = true
 	elseif event == "auctionclose" then
 		private.isAHOpen = false
+	elseif event == "newmodule" then
+		-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
+		-- as long as they correctly send a "newmodule" message when created
+		private.modulecache = nil
+		private.resetPriceModels()
 	end
 end
 
@@ -397,8 +402,6 @@ function lib.NewModule(libType, libName)
 		end
 
 		lib.Modules[libType][libName] = module
-		private.modulecache = nil
-		private.resetPriceModels()
 		lib.SendProcessorMessage("newmodule", libType, libName)
 		return module, lib, modulePrivate
 	end
@@ -421,7 +424,7 @@ end
 --[[
 
 Usage:
-  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 -- ]]
 function lib.GetModuleLocals()
@@ -570,7 +573,10 @@ function lib.CoreModuleOnLoad(addon)
 		end
 	end
 
-	-- do OnLoad function now
+	-- fake our NewModule message
+	lib.SendProcessorMessage("newmodule", "Util", "CoreModule")
+
+	-- do OnLoad
 	if coremodule.OnLoad then
 		coremodule.OnLoad(addon)
 	end
@@ -580,15 +586,6 @@ function lib.CoreModuleOnLoad(addon)
 	private.MakeCoreModuleFunction = nil
 end
 
---[[
--- distribution of CoreModule events is currently hard coded
--- to be improved on at a later date - but only worth doing when there are more events
-function coremodule.Processor(...)
-	lib.API.Processor(...)
-	private.Processor(...)
-	lib.Post.Processor(...)
-end
---]]
 --[[ End of CoreModule ]]--
 
 function lib.SendProcessorMessage(...)
