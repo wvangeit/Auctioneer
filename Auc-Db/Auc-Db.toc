@@ -7,7 +7,7 @@
 ## Dependencies: Auc-Advanced
 ## SavedVariables: AucDbData
 ##
-## X-Revision: 111
+## X-Revision: 120
 ## URL: http://auctioneerdb.com/
 ##
 Support\Load.xml
