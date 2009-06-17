@@ -56,6 +56,7 @@ lib.Private = private
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local print = lib.Print
+local debugPrint = AucAdvanced.Debug.DebugPrint
 
 --[[
     Errors that may be "thrown" by the below functions.
@@ -70,21 +71,43 @@ local print = lib.Print
 ]]
 local ERROR_NOITEM = "ItemId is empty"
 local ERROR_NOLOCAL = "Item is unknown"
-local ERROR_NOBLANK = "No blank spaces available"
-local ERROR_MAXSIZE = "Item cannot stack that big"
-local ERROR_AHCLOSED = "AH is not open"
+local ERROR_NOBLANK = "No blank bag spaces available"
+local ERROR_MAXSIZE = "Item cannot be stacked that high"
+local ERROR_AHCLOSED = "Auctionhouse is not open"
 local ERROR_NOTFOUND = "Item was not found in inventory"
 local ERROR_NOTENOUGH = "Not enough of item available"
-local ERROR_FAILRETRY = "Failed too many times"
-lib.Const = {
+local ERROR_FAILRETRY = "Posting failed too many times"
+local ERROR_FAILTIMEOUT = "Timeout while waiting for posted item to clear"
+
+local ConstErrors = {
 	ERROR_NOITEM = ERROR_NOITEM,
+	[ERROR_NOITEM] = "ERROR_NOITEM",
 	ERROR_NOLOCAL = ERROR_NOLOCAL,
+	[ERROR_NOLOCAL] = "ERROR_NOLOCAL",
 	ERROR_NOBLANK = ERROR_NOBLANK,
+	[ERROR_NOBLANK] = "ERROR_NOBLANK",
 	ERROR_MAXSIZE = ERROR_MAXSIZE,
+	[ERROR_MAXSIZE] = "ERROR_MAXSIZE",
 	ERROR_AHCLOSED = ERROR_AHCLOSED,
+	[ERROR_AHCLOSED] = "ERROR_AHCLOSED",
 	ERROR_NOTFOUND = ERROR_NOTFOUND,
+	[ERROR_NOTFOUND] = "ERROR_NOTFOUND",
 	ERROR_NOTENOUGH = ERROR_NOTENOUGH,
+	[ERROR_NOTENOUGH] = "ERROR_NOTENOUGH",
 	ERROR_FAILRETRY = ERROR_FAILRETRY,
+	[ERROR_FAILRETRY] = "ERROR_FAILRETRY",
+	ERROR_FAILTIMEOUT = ERROR_FAILTIMEOUT,
+	[ERROR_FAILTIMEOUT] = "ERROR_FAILTIMEOUT",
+}
+lib.Const = ConstErrors
+
+local BindTypes = {
+	[ITEM_SOULBOUND] = "ITEM_SOULBOUND",
+	[ITEM_BIND_QUEST] = "ITEM_BIND_QUEST",
+	[ITEM_BIND_ON_PICKUP] = "ITEM_BIND_ON_PICKUP",
+	[ITEM_CONJURED] = "ITEM_CONJURED",
+	[ITEM_ACCOUNTBOUND] = "ITEM_ACCOUNTBOUND",
+	[ITEM_BIND_TO_ACCOUNT] = "ITEM_BIND_TO_ACCOUNT",
 }
 
 -- Current queue of items to post.
@@ -135,38 +158,19 @@ function lib.IsAuctionable(bag, slot)
 	private.tip:ClearLines()
 	private.tip:SetBagItem(bag, slot)
 
-	local bind
-	bind = AppraiserTipTextLeft2:GetText()
-	if bind == ITEM_SOULBOUND
-	or bind == ITEM_BIND_QUEST
-	or bind == ITEM_BIND_ON_PICKUP
-	or bind == ITEM_CONJURED
-	or bind == ITEM_ACCOUNTBOUND
-	or bind == ITEM_BIND_TO_ACCOUNT
-	then
+	if BindTypes[AppraiserTipTextLeft2:GetText()] or BindTypes[AppraiserTipTextLeft3:GetText()] then
 		private.tip:Hide()
-		return false
-	end
-
-	-- bind info may be in line 3 in certain conditions
-	bind = AppraiserTipTextLeft3:GetText()
-	private.tip:Hide()
-	if bind == ITEM_SOULBOUND
-	or bind == ITEM_BIND_QUEST
-	or bind == ITEM_BIND_ON_PICKUP
-	or bind == ITEM_CONJURED
-	or bind == ITEM_ACCOUNTBOUND
-	or bind == ITEM_BIND_TO_ACCOUNT
-	then
 		return false
 	end
 
 	local damage, maxdur = GetContainerItemDurability(bag, slot)
 	if damage then
 		damage = maxdur - damage
-	else damage = 0
+	else
+		damage = 0
 	end
 
+	private.tip:Hide()
 	if damage == 0 then
 		return true
 	end
@@ -346,7 +350,7 @@ function lib.FindOrMakeStack(sig, size)
 		PickupContainerItem(blankBag, blankSlot)
 		private.moveEmpty[1] = blankBag
 		private.moveEmpty[2] = blankSlot
-		private.moveEmpty[3] = GetTime() + 5
+		private.moveEmpty[3] = GetTime() + 6
 	elseif (matches[1][3] + matches[2][3] > size) then
 		-- The smallest stack + next smallest is > than our needs, do a partial combine
 		SplitContainerItem(matches[2][1], matches[2][2], size - matches[1][3])
@@ -359,7 +363,7 @@ function lib.FindOrMakeStack(sig, size)
 	private.moveWait[1] = matches[1][1]
 	private.moveWait[2] = matches[1][2]
 	private.moveWait[3] = matches[1][3]
-	private.moveWait[4] = GetTime() + 5
+	private.moveWait[4] = GetTime() + 6
 end
 
 --[[
@@ -384,10 +388,10 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 		local postId = (private.lastPostId or 0) + 1
 		private.lastPostId = postId
 
-		table.insert(private.postRequests, { [0]=postId, sig, size, bid, buyout, duration, 0 })
+		table.insert(private.postRequests, { [0]=postId, sig, size, bid, buyout, duration, 0, false, 0, 0 })
 		table.insert(postIds, postId)
 	end
-	private.Wait(0) -- delay until next
+	private.Wait(0) -- delay until next OnUpdate
 	return postIds
 end
 
@@ -428,8 +432,18 @@ end
 	PRIVATE: ProcessPosts()
 	This function is responsible for maintaining and processing the post queue.
 	Note:
-	private.postRequests[queuenumber] = { [0]=postId, sig, size, bid, buyout, duration, tries [, postinfo]}
-	postinfo = { bag, slot, uniquelink, expire }
+	private.postRequests[queuenumber] = {
+		[0]=postId, 
+		[1]=sig, 
+		[2]=size, 
+		[3]=bid, 
+		[4]=buyout, 
+		[5]=duration, 
+		[6]=failure, -- initially 0. used for number of tries to post auction, then for expiry time after posting
+		[7]=uniquelink, -- initially false
+		[8]=bag, 
+		[9]=slot, 
+	}
 ]]
 function private.ProcessPosts(source)
 	if #private.postRequests <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
@@ -439,70 +453,48 @@ function private.ProcessPosts(source)
 
 	local request = private.postRequests[1]
 
-	-- use longer delayed and timeouts if connectivity is bad
+	-- use longer timeout delays if connectivity is bad
 	local _,_, lag = GetNetStats()
-	lag = lag * (2.5 / 1000)
+	lag = max(lag * 0.003, 1)
 
-	if (request[7]) then
+	if request[7] then
 		-- We're waiting for the item to vanish from the bags
-		local bag, slot, origLink, expire = unpack(request[7])
-		local link = GetContainerItemLink(bag,slot)
-		if not link or link ~= origLink then
+		local link = GetContainerItemLink(request[8], request[9])
+		if not link or link ~= request[7] then
 			-- Successful Auction!
-			table.remove(private.postRequests, 1)
-			private.Wait(.1)
-
-			-- Send out a message that the post has been successful
+			tremove(private.postRequests, 1)
+			private.Wait(.1) -- small delay before trying to post next auction
 			AucAdvanced.SendProcessorMessage("postresult", true, request[0], request)
-		elseif GetTime() > expire then
-			local tries = (request[6] or 0) + 1
-			request[6] = tries
-			if tries > 5 then
-				-- Can't auction this item!
-				local _, itemCount = GetContainerItemInfo(bag,slot)
-				local msg = ("Error attempting to auction item: %s x%d"):format(link, itemCount)
-				print(msg)
-				message(msg)
-				table.remove(private.postRequests, 1)
-				private.Wait(1)
-
-				-- Send out a message that the post has failed
-				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
-			else
-				-- Wait for another "lag" interval
-				local expire = GetTime() + lag
-				request[7][4] = expire
-				private.Wait(lag)
-			end
+		elseif GetTime() > request[6] then
+			-- Can't auction this item!
+			local _, itemCount = GetContainerItemInfo(request[8], request[9])
+			local msg = ("Unable to confirm auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILTIMEOUT)
+			debugPrint(msg, "CorePost", "Posting timeout", "Warning")
+			message(msg)
+			tremove(private.postRequests, 1)
+			private.Wait(6) -- wait 6 seconds after an error message
+			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILTIMEOUT)
 		end
 		return
 	end
 
 	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
 	if not success then
-		local err = bag:match(": (.*)") -- Check for expected "errors"
+		local err = bag:match(": (.*)")
 		local link, name = AucAdvanced.API.GetLinkFromSig(request[1])
 		local msg
-		if err == ERROR_NOITEM         -- ItemId is empty
-		or err == ERROR_NOLOCAL        -- Item is unknown
-		or err == ERROR_NOBLANK        -- No blank spaces available
-		or err == ERROR_MAXSIZE        -- Item cannot stack that big
-		or err == ERROR_AHCLOSED       -- AH is not open
-		or err == ERROR_NOTFOUND       -- Item was not found in inventory
-		or err == ERROR_NOTENOUGH then -- Not enough of item available
-			msg = "Aborting post request for %s x%d: %s"
-			msg:format(link, request[2], err)
-			print(msg)
+		if ConstErrors[err] then -- Check for our own special "errors"
+			msg = ("Aborting post request for %s x%d: %s"):format(link, request[2], err)
+			debugPrint(msg, "CorePost", "Post request aborted", "Warning")
 			message(msg)
-			table.remove(private.postRequests, 1)
-			private.Wait(1)
+			tremove(private.postRequests, 1)
+			private.Wait(6) -- wait 6 seconds after an error message
 			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, err)
 		else -- Unexpected (probably real) error
-			msg = "Error during post request for %s x%d: %s"
-			msg:format(link, request[2], bag)
-			print(msg)
-			table.remove(private.postRequests, 1)
-			private.Wait(1)
+			msg = ("Error during post request for %s x%d: %s"):format(link, request[2], bag)
+			debugPrint(msg, "CorePost", "Unexpected error", "Error")
+			tremove(private.postRequests, 1)
+			private.Wait(6) -- wait 6 seconds after an error message
 			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, bag)
 			error(msg)
 		end
@@ -511,7 +503,9 @@ function private.ProcessPosts(source)
 
 	if bag then
 		local tries = request[6]
-		-- if tries > 0 then something went wrong last time - so avoid spamming with triggered events and wait for timer
+		-- if tries > 0 then something went wrong last time
+		-- we want to avoid spamming with the events just triggered by our failed attempt
+		-- so we will wait for the timer
 		if tries > 0 and source ~= "timer" then
 			return
 		end
@@ -526,28 +520,32 @@ function private.ProcessPosts(source)
 
 			tries = tries + 1
 			request[6] = tries
-			if tries > 3 then
+			if tries >= 3 then -- up to 3 attempts
 				-- Can't auction this item!
 				local _, itemCount = GetContainerItemInfo(bag,slot)
-				local msg = ("Error attempting to auction item: %s x%d"):format(link, itemCount)
-				print(msg)
+				local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILRETRY)
+				debugPrint(msg, "CorePost", "Posting Failure", "Warning")
 				message(msg)
-				table.remove(private.postRequests, 1)
-				private.Wait(1)
-
-				-- Send out a message that the post has failed
+				tremove(private.postRequests, 1)
+				private.Wait(6) -- wait 6 seconds after an error message
 				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
-				private.Wait(lag)
+				-- If we reach this point something has gone wrong, possibly because we are trying to post too fast
+				-- we want to avoid spamming this 'posting' section; we will use a larger delay value in case 'lag' is too small
+				-- up to 3 attempts at least 3 seconds apart = 6 second minimum timeout
+				private.Wait(lag * 3)
 			end
 			return
+		else -- Successful post
+			-- Need to wait for this item to vanish
+			-- timeout at least 6 seconds
+			request[6] = GetTime() + lag * 6
+			request[7] = link
+			request[8] = bag
+			request[9] = slot
 		end
-
-		-- Need to wait for this item to vanish.
-		local expire = GetTime() + lag
-		request[7] = { bag, slot, link, expire }
 	end
-	private.Wait(lag)
+	private.Wait(lag) -- waiting for an event
 end
 
 --[[
@@ -594,7 +592,7 @@ private.updateFrame:Hide()
 private.updateFrame:SetScript("OnUpdate", function(obj, delay)
 	obj.timer = obj.timer - delay
 	if obj.timer <= 0 then
-		obj.timer = 1 -- safety value, will be overwritten later
+		obj.timer = 6 -- safety value, will be overwritten later
 		private.ProcessPosts("timer")
 	end
 end)
