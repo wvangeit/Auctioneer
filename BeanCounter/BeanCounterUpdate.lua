@@ -42,7 +42,7 @@ local function debugPrint(...)
     end
 end
 
-local performedUpdate = true
+local performedUpdate = false
 function private.UpgradeDatabaseVersion()
 	--Recreate the itemID array if for some reason user lacks it.
 	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} private.refreshItemIDArray() end
