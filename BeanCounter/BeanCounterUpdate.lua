@@ -42,6 +42,7 @@ local function debugPrint(...)
     end
 end
 
+local performedUpdate = true
 function private.UpgradeDatabaseVersion()
 	--Recreate the itemID array if for some reason user lacks it.
 	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} private.refreshItemIDArray() end
@@ -51,8 +52,10 @@ function private.UpgradeDatabaseVersion()
 			for player, playerData in pairs(serverData) do
 				private.startPlayerUpgrade(server, player, playerData)
 			end
-		--validate the DB for this server after all upgrades have completed
-		private.integrityCheck(true, server)
+			--validate the DB for this server after all upgrades have completed
+			if performedUpdate then --only id we actually had to update
+				private.integrityCheck(true, server)
+			end
 		end
 	end
 end
@@ -61,33 +64,43 @@ function private.startPlayerUpgrade(server, player, playerData)
 	if playerData["version"] < 2.0 then --Delete and start fresh
 		BeanCounterDB[server][player] = nil
 		private.initializeDB(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.01 then --removes old "Wealth entry to make room for reason codes
 		private.update._2_01(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.02 then --bump version # only, the fix it implemented is merged into later updates
 		private.update._2_02(server, player)
+		performedUpdate = true
 	end
 	if  playerData["version"] < 2.03 then--if not upgraded yet then upgrade
 		private.update._2_03(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.04 then --bump version # only, the fix it implemented is merged into later updates
 		private.update._2_04(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.05 then --bump version # only, the fix it implemented is merged into later updates
 		private.update._2_05(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.06 then --bump version # only 2.09 nukes the itemIDArray no need to wast time "updating" it
 		private.update._2_06(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.07 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
 		private.update._2_07(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.08 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
 		private.update._2_08(server, player)
+		performedUpdate = true
 	end
 	if playerData["version"] < 2.09 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
 		private.update._2_09(server, player)
+		performedUpdate = true
 	end
 end
 
