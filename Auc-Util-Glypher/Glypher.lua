@@ -34,7 +34,7 @@ function lib.OnLoad()
 		if SlideBar then
 			sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp") --What type of click you want to respond to
-			sideIcon:SetScript("OnClick", privateSlideBarClick) --same function that the addons current minimap button calls
+			sideIcon:SetScript("OnClick", private.SlideBarClick) --same function that the addons current minimap button calls
 			sideIcon.tip = {
 			"BUTTON MOUSEOVER NAME",
 			"BUTTON MOUSEOVER DISCRIPTION",
@@ -46,7 +46,7 @@ function lib.OnLoad()
 	private.sideIcon = sideIcon
 end
 
-function privateSlideBarClick(_, button)
+function private.SlideBarClick(_, button)
 	if private.gui and private.gui:IsShown() then
 		AucAdvanced.Settings.Hide()
 	else
@@ -65,7 +65,7 @@ function private.SetupConfigGui(gui)
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 	--Add Drag slot / Item icon
-	frame = gui.tabs[id].content
+	local frame = gui.tabs[id].content
 	private.gui = gui
 	private.id = id
 	private.frame = frame
