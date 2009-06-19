@@ -346,7 +346,7 @@ function private.CreateFrames()
 		else
 			frame.age:SetText(_TRANS('APPR_Interface_Data48HoursOld') )--Data is > 48 hours old
 		end
-		
+
 		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 
 		local data = {}
@@ -416,7 +416,7 @@ function private.CreateFrames()
 		return rDef,gDef,bDef
 	end
 
-	--[[THIS FUNCTION IS NEVER USED? Only call to it is commented out Does it need to be removed?  ]]
+	--[[THIS FUNCTION IS NEVER USED? Only call to it is commented out Does it need to be removed?
 	function frame.SetPriceFromModel(curModel)
 		if not frame.salebox.sig then return end
 		if not curModel then
@@ -528,6 +528,7 @@ function private.CreateFrames()
 		frame.salebox.bid.modelvalue = newBid
 		frame.salebox.buy.modelvalue = newBuy
 	end
+	--]]
 
 	function frame.InitControls()
 		frame.valuecache = {}
@@ -610,7 +611,7 @@ function private.CreateFrames()
 			frame.salebox.matcher:SetChecked(curMatch)
 		end
 		frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
-		
+
 		local ignore = AucAdvanced.Settings.GetSetting("util.appraiser.item."..frame.salebox.sig..".ignore") or false
 		frame.salebox.ignore:SetChecked(ignore)
 		frame.valuecache.bulk = frame.salebox.ignore:GetChecked()
@@ -661,10 +662,17 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+
 	function frame.OnUpdate()
 		if frame.updated then
 			frame.CheckUpdates()
+		end
+		if frame.scanstatsEvent then
+			frame.scanstatsEvent = false
+			frame.GenerateList()
+			frame.UpdatePricing()
+			frame.UpdateDisplay()
+			frame.UpdateImage()
 		end
 	end
 
@@ -687,7 +695,7 @@ function private.CreateFrames()
 		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
 		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		local model = frame.salebox.model.value
-		
+
 		if stack ~= frame.valuecache.stack then
 			frame.valuecache.stack = stack
 			frame.valuecache.stackentry = stack
@@ -820,7 +828,7 @@ function private.CreateFrames()
 		end
 		frame.UpdateDisplay()
 	end
-	
+
 	--Runs whenever the Pricing needs updating
 	--frame.UpdateDisplay() should be called after calling this function
 	function frame.UpdatePricing()
@@ -841,9 +849,9 @@ function private.CreateFrames()
 		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
 		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		frame.salebox.model:SetText(curModelText)
-		--frame.UpdateImage()--Why? I dont see a need to recreate the complete scrollsheet. 
+		--frame.UpdateImage()--Why? I dont see a need to recreate the complete scrollsheet.
 	end
-	
+
 	--gets called whenever the display needs to be updated.
 	--except for when selecting or deselecting an item
 	--this function doesn't change any of the controls, merely the display
@@ -891,13 +899,13 @@ function private.CreateFrames()
 		end
 		frame.switchToStack:Show()
 		frame.switchToStack2:Show()
-		
+
 		frame.salebox.model:Show()
 		frame.salebox.duration:Show()
 		frame.salebox.numberonly:Show()
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
-		
+
 		frame.salebox.ignore:Show()
 		frame.salebox.bulk:Show()
 		if not frame.selectedPostable then
@@ -926,7 +934,7 @@ function private.CreateFrames()
 			frame.salebox.matcher:Enable()
 			frame.salebox.matcher.label:SetTextColor(1, 1, 1)
 		end
-		
+
 		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
@@ -941,15 +949,15 @@ function private.CreateFrames()
 
 		local curIgnore = frame.salebox.ignore:GetChecked()
 		frame.salebox.icon:GetNormalTexture():SetDesaturated(curIgnore)
-		
+
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		local curBid = MoneyInputFrame_GetCopper(frame.salebox.bid) or 0
 		local curBuy = MoneyInputFrame_GetCopper(frame.salebox.buy) or 0
-		
+
 		local sig = frame.salebox.sig
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
-		
+
 		local r,g,b,a = 0,0,0,0
 		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
 		local tinted = AucAdvanced.Settings.GetSetting('util.appraiser.tint.color')
@@ -960,11 +968,11 @@ function private.CreateFrames()
 		AppraiserSaleboxBuyGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
-		
+
 		AppraiserSaleboxBuyStackGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyStackSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyStackCopper:SetBackdropColor(r,g,b, a)
-		
+
 		r,g,b,a=0,0,0,0
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBid, curBid,  r,g,b)
@@ -973,7 +981,7 @@ function private.CreateFrames()
 		AppraiserSaleboxBidGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidCopper:SetBackdropColor(r,g,b, a)
-		
+
 		AppraiserSaleboxBidStackGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidStackSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidStackCopper:SetBackdropColor(r,g,b, a)
@@ -981,10 +989,10 @@ function private.CreateFrames()
 		if frame.selectedPostable then
 			local depositMult = curDurationMins / 720
 			local curNumber = frame.salebox.number:GetAdjustedValue()
-			
+
 			if frame.salebox.stacksize > 1 then
 				local count = frame.salebox.count
-				
+
 				local curSize = frame.salebox.stack:GetValue()
 				local extra = ""
 				local maxStax = math.floor(count / curSize)
@@ -995,7 +1003,7 @@ function private.CreateFrames()
 				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
 					maxStax = SavedNumber
 				end
-				
+
 				if (curSize > count) then
 					extra = "  |cffffaa40" .. _TRANS('APPR_Interface_StackGreaterAvailable') --(Stack > Available)
 				elseif ((curSize * maxStax) > count) then
@@ -1168,7 +1176,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(_TRANS('APPR_Interface_NoteNoAuctionableItems') )--Note: No auctionable items
 			end
 		end
-		
+
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
 		frame.salebox.warn:SetText("")
@@ -1185,7 +1193,7 @@ function private.CreateFrames()
                	end
 			end
 		end
-		
+
 		local canAuction = true
 		if curModel == "fixed" and curBid <= 0 then
 			frame.salebox.warn:SetText(_TRANS('APPR_Interface_BidPriceMustGreater') )--Bid price must be > 0
@@ -1215,13 +1223,13 @@ function private.CreateFrames()
 			frame.go:Disable()
 		end
 	end
-	
+
 	function frame.ChangeUI()
 		if get("util.appraiser.classic") then
 			--Show per stack
 			frame.switchToStack:SetText("Bid per Stack")
 			frame.switchToStack2:SetText("Buy per Stack")
-			
+
 			frame.salebox.bid:Hide()
 			frame.salebox.buy:Hide()
 			frame.salebox.bid.stack:Show()
@@ -1231,17 +1239,17 @@ function private.CreateFrames()
 			--Show per each
 			frame.switchToStack:SetText(_TRANS('APPR_Interface_BidPerItem') ) --Bid per item:
 			frame.switchToStack2:SetText(_TRANS('APPR_Interface_BuyPerItem') )--Buy per item:
-			
+
 			frame.salebox.bid:Show()
 			frame.salebox.buy:Show()
 			frame.salebox.bid.stack:Hide()
 			frame.salebox.buy.stack:Hide()
 			frame.salebox:SetBackdropColor(0, 0, 0, 0.8)
 		end
-		
+
 		frame.UpdateDisplay()
 	end
-	--syncs the stack and single item input boxes, 
+	--syncs the stack and single item input boxes,
 	--only the visible frame fires events
 	function frame.SyncMoneyFrameSingleBid()
 		local stack = frame.salebox.stack:GetValue()
@@ -1264,7 +1272,7 @@ function private.CreateFrames()
 		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
 		MoneyInputFrame_SetCopper(frame.salebox.buy.stack, buy*stack)
 	end
-	
+
 	function frame.GetItemByLink(link)
 		local sig = SigFromLink(link)
 		assert(sig, "Item must be a valid link")
@@ -1394,7 +1402,7 @@ function private.CreateFrames()
 			end
 
 			if mode == "list" then
-				print(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted: 
+				print(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted:
 			end
 
 			local bg = false
@@ -2052,7 +2060,7 @@ function private.CreateFrames()
 	function frame.GetLinkPriceModels()
 		return private.GetExtraPriceModels(frame.salebox.link)
 	end
-	
+
 	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, function() frame.updated = true end, frame.GetLinkPriceModels, "default")
 	frame.salebox.model.button:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SelectPricingModel') ) end)--Select the pricing model to use
 	frame.salebox.model.button:SetScript("OnLeave", function() return GameTooltip:Hide() end)
@@ -2132,7 +2140,7 @@ function private.CreateFrames()
 	})
 	AppraiserSaleboxBidCopper:SetBackdropColor(0,0,0, 0)
 
-	
+
 	frame.salebox.bid.stack = CreateFrame("Frame", "AppraiserSaleboxBidStack", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid.stack:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
 	frame.salebox.bid.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
@@ -2159,7 +2167,7 @@ function private.CreateFrames()
 	})
 	AppraiserSaleboxBidStackCopper:SetBackdropColor(0,0,0, 0)
 
-	
+
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
 	frame.salebox.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
@@ -2185,7 +2193,7 @@ function private.CreateFrames()
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuyCopper:SetBackdropColor(0,0,0, 0)
-	
+
 	MoneyInputFrame_SetNextFocus(frame.salebox.bid, AppraiserSaleboxBuyGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid, AppraiserSaleboxBuyCopper)
 	MoneyInputFrame_SetNextFocus(frame.salebox.buy, AppraiserSaleboxBidGold)
@@ -2216,14 +2224,14 @@ function private.CreateFrames()
 		insets = { left = -2, right = 12, top = 4, bottom = 2}
 	})
 	AppraiserSaleboxBuyStackCopper:SetBackdropColor(0,0,0, 0)
-	
+
 	--sets the tab to next field options
 	MoneyInputFrame_SetNextFocus(frame.salebox.bid.stack, AppraiserSaleboxBuyStackGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid.stack, AppraiserSaleboxBuyStackCopper)
 	MoneyInputFrame_SetNextFocus(frame.salebox.buy.stack, AppraiserSaleboxBidStackGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.buy.stack, AppraiserSaleboxBidStackCopper)
-	
-	
+
+
 	--Button for Bid  frame  to toggle stack/single mode
 	frame.switchToStack = CreateFrame("Button", nil, frame.salebox, "OptionsButtonTemplate")
 	frame.switchToStack:SetPoint("RIGHT", frame.salebox.bid, "LEFT", -10, 0)
@@ -2241,7 +2249,7 @@ function private.CreateFrames()
 	frame.switchToStack:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack:Enable()
-	
+
 	--Button for Buy  frame to toggle stack/single mode
 	frame.switchToStack2 = CreateFrame("Button", nil, frame.salebox, "OptionsButtonTemplate")
 	frame.switchToStack2:SetPoint("RIGHT", frame.salebox.buy, "LEFT", -10, 0)
@@ -2257,8 +2265,8 @@ function private.CreateFrames()
 	frame.switchToStack2:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack2:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack2:Enable()
-	
-	
+
+
 	frame.go = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
 	frame.go:SetText(_TRANS('APPR_Interface_PostItems') )--Post items
@@ -2435,7 +2443,7 @@ function private.CreateFrames()
 		lines[i] = line
 	end
 	frame.manifest.lines = lines
-	
+
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -2590,8 +2598,8 @@ function private.CreateFrames()
 		{ _TRANS('APPR_Interface_Seller') , "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'))},
 		{ _TRANS('APPR_Interface_Left') ,   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'))},
 		{ _TRANS('APPR_Interface_Stk') ,    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'))},
-		{ _TRANS('APPR_Interface_Min/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea')), { DESCENDING=true } }, 
-		{ _TRANS('APPR_Interface_Cur/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea')), { DESCENDING=true } }, 
+		{ _TRANS('APPR_Interface_Min/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_Cur/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea')), { DESCENDING=true } },
 		{ _TRANS('APPR_Interface_Buy/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea')), { DESCENDING=true, DEFAULT=true } },
 		{ _TRANS('APPR_Interface_MinBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid')), { DESCENDING=true } },
 		{ _TRANS('APPR_Interface_CurBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid')), { DESCENDING=true } },
@@ -2617,7 +2625,7 @@ function private.CreateFrames()
 			set("util.appraiser.columnsortcurSort", column)
 		end
 	end
-		
+
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
@@ -2653,7 +2661,7 @@ function private.CreateFrames()
 	frame.imageview.purchase.bid.price:SetPoint("TOPLEFT", frame.imageview.purchase.bid, "TOPRIGHT")
 	frame.imageview.purchase.bid.price:SetPoint("BOTTOMLEFT", frame.imageview.purchase.bid, "BOTTOMRIGHT")
 	frame.imageview.purchase.bid.price:SetJustifyV("MIDDLE")
-	
+
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText(_TRANS('APPR_Interface_Appraiser') )--Appraiser
 	frame.ScanTab:Show()
@@ -2743,7 +2751,7 @@ function private.CreateFrames()
 		frame.salebox.stackentry:ClearFocus()
 	end)
 	frame.salebox.stackentry:Hide()
-		
+
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 

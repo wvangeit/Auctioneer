@@ -73,9 +73,9 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "scanstats") then
 		if private.frame then
 			private.frame.cache = {}
-			private.frame.GenerateList()
-			private.frame.UpdateImage()
-			private.frame.UpdatePricing()
+			-- caution: other modules may not yet have flushed their caches
+			-- flag to update our display next OnUpdate
+			private.frame.scanstatsEvent = true
 		end
 		empty(tooltipcache)
 	elseif (callbackType == "postresult") then
