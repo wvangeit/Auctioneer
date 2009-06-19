@@ -259,7 +259,7 @@ function lib:MakeGuiConfig(gui)
 								if ( IsAltKeyDown() and IsShiftKeyDown() and IsControlKeyDown() )then
 									private.snatchList = {}
 									set("snatch.itemsList", private.snatchList)
-									lib.refreshData()
+									private.refreshDisplay()
 								else
 									print("This will clear the snatch list permanently. To use hold ALT+CTR+SHIFT while clicking this button")
 								end
@@ -299,7 +299,7 @@ or
 if the command is accepted you should see a chat message confirming the item and price snatch will buy at.]]
 		)
 
-	lib.refreshData()
+	private.refreshDisplay()
 
 
 	SLASH_SNATCH1 = "/snatch";
@@ -333,14 +333,17 @@ function lib.Processor(event, subevent, setting)
 				private.snatchList = {}
 				set("snatch.itemsList", private.snatchList) -- Caution: this causes a Processor("config", "changed", ...) event
 			end
-			lib.refreshData()
+			private.refreshDisplay()
 		elseif subevent == "changed" and setting == "snatch.price.model" then -- this is the only "change" that requires a refresh
-			lib.refreshData()
+			private.refreshDisplay()
 		end
-	elseif event == "selecttab" then
-		if subevent == lib.tabname and private.doValidation then
+	elseif event == "selecttab" and subevent == lib.tabname then
+		if private.doValidation then
 			private.doValidation()
 		end
+		private.refreshDisplay() -- redraw whenever tab is selected
+	elseif event == "postscanupdate" then
+		private.refreshDisplay() -- redraw whenever valuations may have changed
 	end
 end
 
@@ -399,8 +402,9 @@ ItemTable[Const.LINK]    = hyperlink
 --returns if a item meets snatch criteria
 function lib.Search(item)
 	local itemsig = (":"):join(item[Const.ITEMID], item[Const.SUFFIX] , item[Const.ENCHANT])
+	local snatch = private.snatchList[itemsig]
 
-	if private.snatchList[itemsig] then
+	if snatch then
 		local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
 		local maxprice = get("snatch.maxprice.enable") and get("snatch.maxprice")
 		if buyprice <= 0 or not get("snatch.allow.buy") or (maxprice and buyprice > maxprice) then
@@ -413,7 +417,13 @@ function lib.Search(item)
 			return false, "Does not meet bid/buy requirements"
 		end
 
-		local value =  (item[Const.COUNT] or 1) * (private.snatchList[itemsig].price or 0)
+		local value
+		if snatch.percent then
+			value = private.getPrice(snatch.link) * snatch.percent / 100
+		else
+			value = snatch.price
+		end
+		value = value * (item[Const.COUNT] or 1)
 
 		if buyprice and buyprice <= value then
 			return "buy", value
@@ -482,7 +492,7 @@ function lib.finishedItem()
 	--reset current working item
 	private.workingItemLink = nil
 	--refresh displays
-	lib.refreshData()
+	private.refreshDisplay()
 end
 --get the current item we may want to add or remove
 function lib.SetWorkingItem(link)
@@ -522,21 +532,26 @@ function lib.ClickLinkHook(_, _, link, button)
 end
 hooksecurefunc("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 
-function lib.refreshData()
+function private.refreshDisplay()
+	if not (frame and frame:IsVisible()) then
+		return -- only redraw if Snatch is visible
+	end
 	--get auctioneer price if possible
 	local Data, Style = {}, {}
 	for item, v in pairs(private.snatchList) do
-
-		local price = private.getPrice(v.link)
+		local price
+		local market = private.getPrice(v.link)
 		--if we are buying by % of market price
 		if v.percent then
-			v.price = price * v.percent/100 --set buy price to % of market
+			price = market * v.percent/100 --set buy price to % of market
 
 			Style[#Data+1] = {}
 			Style[#Data+1][1] = {["rowColor"] = {0, 1, 0, 0, 0.2, "Horizontal"}}
 			Style[#Data+1][2] = {["textColor"] = {1,0,0}}
+		else
+			price = v.price
 		end
-		table.insert(Data, {v.link, v.percent or 0, v.price, price or 0})
+		table.insert(Data, {v.link, v.percent or 0, price, market})
 	end
 	if frame then
 		frame.snatchlist.sheet:SetData(Data, Style)

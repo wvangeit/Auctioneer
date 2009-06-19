@@ -69,6 +69,7 @@ lib.CleanTable = wipe -- for compatibility
 local resources = {}
 lib.Resources = resources
 local flagResourcesUpdateRequired = false
+local flagScanStats = false
 
 -- Faction Resources
 -- Commonly used values which change depending whether you are at home or neutral Auctionhouse
@@ -236,6 +237,9 @@ function lib.Processor(callbackType, ...)
 		private.bidcancelled(...)
 	elseif (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
+	elseif callbackType == "scanstats" then
+		--lib.NotifyCallbacks("scanstats") -- pass the message on
+		flagScanStats = true
 	end
 end
 
@@ -511,9 +515,8 @@ function lib.NotifyCallbacks(msg, ...)
 		if processor then
 			local pType = type(processor)
 			if pType == "table" then
-				processor = pType[msg]
-				pType = type(processor)
-				if processor and pType == "function" then
+				processor = processor[msg]
+				if type(processor) == "function" then
 					processor(...)
 				end
 			elseif pType == "function" then
@@ -526,9 +529,8 @@ function lib.NotifyCallbacks(msg, ...)
 		if processor then
 			local pType = type(processor)
 			if pType == "table" then
-				processor = pType[msg]
-				pType = type(processor)
-				if processor and pType == "function" then
+				processor = processor[msg]
+				if type(processor) == "function" then
 					processor(...)
 				end
 			elseif pType == "function" then
@@ -1913,6 +1915,10 @@ function private.OnUpdate(self, elapsed)
 		-- Delayed until OnUpdate handler to give GetFaction time to update its own internal settings
 		flagResourcesUpdateRequired = false
 		private.UpdateFactionResources()
+	end
+	if flagScanStats then
+		flagScanStats = false
+		lib.NotifyCallbacks("postscanupdate")
 	end
 end
 
