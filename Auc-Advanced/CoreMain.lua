@@ -139,7 +139,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 	tooltip:ClearFrame(tip)
 end
 
-function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
+function private.ClickBagHook(hookParams, returnValue, self, button, ignoreShift)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
 
@@ -155,6 +155,8 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 				if (itemType and itemType == "item" and itemID) then
 					local itemName = GetItemInfo(tostring(itemID))
 					if (itemName) then
+						AuctionFrameBrowse_Reset(BrowseResetButton)
+						AuctionFrameBrowse.page = 0
 						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
 						BrowseName:SetText(itemName)
 					end
@@ -164,20 +166,16 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 	end
 end
 
-function private.ClickLinkHook(item, link, button)
-	--if click-hooks are disabled, do nothing
-	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-
-	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
-		if link then
-			if (button == "LeftButton") and (IsAltKeyDown()) then
-				local itemType, itemID = AucAdvanced.DecodeLink(link)
-				if (itemType and itemType == "item" and itemID) then
-					local itemName = GetItemInfo(tostring(itemID))
-					if itemName then
-						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
-						BrowseName:SetText(itemName)
-					end
+function private.ClickLinkHook(self, item, link, button)
+	if button == "RightButton" and IsAltKeyDown() and AucAdvanced.Settings.GetSetting("clickhook.enable") then
+		if AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible() then
+			if link:match("item:%d") then
+				local itemName = GetItemInfo(link)
+				if itemName then
+					AuctionFrameBrowse_Reset(BrowseResetButton)
+					AuctionFrameBrowse.page = 0
+					QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
+					BrowseName:SetText(itemName)
 				end
 			end
 		end
@@ -215,7 +213,7 @@ function private.OnLoad(addon)
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
 			AucAdvanced.Scan.GetImage()
 		end
-		
+
 		-- Load the dummy CoreModule
 		AucAdvanced.CoreModuleOnLoad(addon)
 	end
