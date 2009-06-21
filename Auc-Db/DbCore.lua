@@ -74,6 +74,12 @@ function lib.Processor(callbackType, ...)
 		private.ProcessTooltip(...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
+	elseif (callbackType == "configchanged") then
+		local setting, value = ...
+		if setting == "aucdb.enabled.market"
+		or setting == "aucdb.enabled.stats" then
+			AucAdvanced.API.ClearMarketCache()
+		end
 	end
 end
 
