@@ -537,7 +537,7 @@ function lib.SetWorkingItem(link)
 		end
 	else
 		frame.pctBox:SetText("")
-		private.SetMoneyFrame()
+		private.setMoneyFrame()
 	end
 
 	--set edit box texture and name
