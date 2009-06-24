@@ -79,10 +79,10 @@ function lib.API.search(name, settings, queryReturn, count)
 			if settings.suffix == 0 then settings.suffix = nil end
 			--cache search request
 			local data = private.searchByItemID(itemName, settings, queryReturn, count)
-			--private.addSearchCache(name, data, count, serverName)
+			private.addSearchCache(name, data, count, serverName)--this needs to be removed when I figure out how to get a API and search "name" to be consistant
 		else
 			local data = private.startSearch(itemName, settings, queryReturn, count)
-			--private.addSearchCache(name, data, count, serverName)
+			private.addSearchCache(name, data, count, serverName)
 		end
 		--return data or displayItemName in select box
 		if queryReturn then
