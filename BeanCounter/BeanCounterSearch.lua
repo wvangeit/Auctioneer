@@ -225,7 +225,6 @@ end
 
 function private.formatServerData(data, settings, queryReturn, count)
 	--Format Data for display via scroll private.frame
-	local dateString = get("dateString") or "%c"
 	for i,v in pairs(data) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
@@ -262,6 +261,7 @@ end
 end
 function private.styleServerData(data)
 	--create style data for entries that are going to be displayed, created seperatly to allow us to reduce the data table entries
+	local dateString = get("dateString") or "%c"
 	for i,v in pairs(data) do
 		local database = v[2]
 		local r, g, b = styleColors(database)
