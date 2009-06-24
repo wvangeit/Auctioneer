@@ -44,49 +44,74 @@ end
 Can be item Name or Link or itemID
 If itemID or Link search will be faster than a plain text lookup
 ]]
-local SearchRequest = {}
 function lib.API.search(name, settings, queryReturn, count)
 	if get("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
-		--lets create a cache of the last search
-		if SearchRequest[name] then
-			debugPrint("Cached search results returned", name, time())
-			return(SearchRequest[1])
+		--check for blank search request
+		if name == "" and not queryReturn then return end
+		if not count then count = get("numberofdisplayedsearchs") end --count set by private.searchByItemID as well, this is used as our cache value so need it here as well
+		
+		local serverName
+		if settings and settings.servers and settings.servers[1] then
+			serverName = settings.servers[1]
 		else
-			SearchRequest = {}
-			SearchRequest[name] = 0
+			serverName = GetRealmName()
 		end
-
+		local cached = private.checkSearchCache(name, count, serverName) 
+		--return cached search
+		if queryReturn and cached then
+			--print("cached used", name )
+			return cached
+		end
+				
 		--the function getItemInfo will return a plain text name on itemID or itemLink searches and nil if a plain text search is passed
 		local itemName, itemLink = private.getItemInfo(name, "itemid")
 		if not itemLink then itemName, itemLink = tostring(name) end
-
+		
 		if not settings then
-			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false,
-						["bid"] = true, ["outbid"] = private.frame.bidFailedCheck:GetChecked(), ["auction"] = true,
-						["failedauction"] = private.frame.auctionFailedCheck:GetChecked()
-						}
+			settings = {["selectbox"] = {"1", "server"}, ["exact"] = false, ["bid"] = true, ["auction"] = true}
 		end
+		
 		--search data
 		if itemLink then
 			--itemKey is used to filter results if exact is used. We need the key to remove of the XXX style items from returns
 			local _
 			_, settings.suffix = lib.API.decodeLink(itemLink)
 			if settings.suffix == 0 then settings.suffix = nil end
-			SearchRequest[1] = private.searchByItemID(itemName, settings, queryReturn, count)
+			--cache search request
+			local data = private.searchByItemID(itemName, settings, queryReturn, count)
+			--private.addSearchCache(name, data, count, serverName)
 		else
-			SearchRequest[1] = private.startSearch(itemName, settings, queryReturn, count)
+			local data = private.startSearch(itemName, settings, queryReturn, count)
+			--private.addSearchCache(name, data, count, serverName)
 		end
 		--return data or displayItemName in select box
 		if queryReturn then
-			return(SearchRequest[1])
+			return private.checkSearchCache(name, count, serverName)
 		else
-			if itemLink then
-				private.frame.searchBox:SetText(itemLink:match("^|c%x+|H.+|h%[(.+)%]"))
-			else
-				private.frame.searchBox:SetText(itemName)
-			end
+			private.frame.searchBox:SetText(itemName)
 		end
 	end
+end
+--Cache system for searches
+function private.checkSearchCache(name, count, serverName)
+	count = count or ""
+	--return cached search
+	if private.SearchCache[name..count..serverName] then
+		debugPrint("cached used", name )
+		return private.SearchCache[name..count..serverName]
+	end
+end
+function private.addSearchCache(name, data, count, serverName)
+	--remove oldest cache entry, only save 5 searches
+	if #private.SearchCache >= 10 then
+		--debugPrint("removing",  private.SearchCache[1] )
+		private.SearchCache[ private.SearchCache[1] ] = nil
+		table.remove(private.SearchCache, 1)
+	end
+	--store cache of the request
+	count = count or ""
+	private.SearchCache[name..count..serverName] = data
+	private.SearchCache[#private.SearchCache + 1] = name..count..serverName
 end
 
 --[[ Returns the Sum of all AH sold vs AH buys along with the date range

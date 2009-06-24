@@ -47,6 +47,8 @@ local private = {
 	version = 2.09,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
+	--cache for the searchAPI
+	SearchCache = {},
 
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -95,7 +97,11 @@ if AucAdvanced and AucAdvanced.NewModule then
 	function private.AucModule.Processor(callbackType, ...)
 		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
 			local item = ...
-			if item.name then lib.API.search(item.name) end
+			if item.name then
+				if item.name ~= "" then
+					lib.API.search(item.name)
+				end
+			end
 		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
 			private.storeReasonForBid(...)
 		end

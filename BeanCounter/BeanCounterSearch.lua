@@ -45,6 +45,7 @@ local style = {}
 local temp ={}
 local tbl = {}
 
+
 --This is all handled by ITEMIDS need to remove/rename this to be a utility to convert text searches to itemID searches
 function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 	--Run the compression function once per session, use first search as trigger
@@ -105,72 +106,65 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	
 	data = {}
 	style = {}
-	data.temp = {}
-	data.temp.completedAuctions = {}
-	data.temp["completedBids/Buyouts"] = {}
-	data.temp.failedAuctions = {}
-	data.temp.failedBids = {}
-		
-	if settings.servers then
-		for index, serverName in ipairs(settings.servers)do		
-			data = private.searchServerData(serverName, data, tbl, settings)
-			if data then
-				data, style = private.formatServerData(data, style, settings, count)
-				data.temp = nil --remove the temp
-			end
-			
-			settings.servers[index] = data
-			--clear refrence to stored data --really needs to be cleaner
-			data = {}
-			data.temp = {}
-			data.temp.completedAuctions = {}
-			data.temp["completedBids/Buyouts"] = {}
-			data.temp.failedAuctions = {}
-			data.temp.failedBids = {}
-		end
+	
+	local profit, low, high, serverName
+	if settings.servers and settings.servers[1] then
+		serverName = settings.servers[1]
 	else
-		local serverName = GetRealmName()
+		serverName = GetRealmName()
+	end
+	
+	--check if we have a cache of this search
+	local cached = private.checkSearchCache(classic or tbl[1], count, serverName)
+	if  cached then
+		data = cached
+	else
 		data = private.searchServerData(serverName, data, tbl, settings)
-		if data then
-			data, style = private.formatServerData(data, style, settings, count)
-		end
+		--format raw into displayed data, the cached version is already in this format	
+		data = private.formatServerData(data, settings, queryReturn, count) 
 	end
 		
-	if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-		private.frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
-		
-		--Adds itemtexture to display box and if possible the gan/loss on teh item
-		if itemTexture then
-			private.frame.icon:SetNormalTexture(itemTexture)
-			local profit, low, high
-			--Since a "" or full DB search takes a lot of time just pass teh already compiled data table for 48k trxn this means 0.24sec vs 8.5sec
-			--However this lmits it to ONLY the results displayed in the scrollframe not entire DB
-			local player = private.frame.SelectBoxSetting[2]
-			if classic == "" then
-				profit, low, high = lib.API.getAHProfit(player, data) 
-			else
-				profit, low, high = lib.API.getAHProfit(player, classic)
-			end
-			local change = "|CFF33FF33Gained"
-			if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
-			profit = private.tooltip:Coins(profit)
-			private.frame.slot.help:SetTextColor(.8, .5, 1)
-			private.frame.slot.help:SetText(change..(" %s from %s to %s"):format(profit or "", date("%x", low) or "", date("%x", high) or ""))
-		else
-			private.frame.icon:SetNormalTexture(nil)
-			private.frame.slot.help:SetTextColor(1, 0.8, 0)
-			private.frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
-		end
-		
-		return data, style
-	else --If Query return is true but not == to "none" then we return a formated table
-		if settings.servers then
-			return settings.servers[1], settings.servers[2], settings.servers[3], settings.servers[4]
-		else
-			return data
-		end
+	--store profit for this item, need to do this before we reduce number of results for display
+	local player = private.frame.SelectBoxSetting[2]
+	profit, low, high = lib.API.getAHProfit(player, data)
+	
+	--reduce results to the latest XXXX ammount based on how many user wants returned or displayed
+	if #data > count then
+		data = private.reduceSize(data, count)
 	end
+	
+	--add item to cache
+	if not cached then
+		private.addSearchCache(classic or tbl[1], data, count, serverName)
+	end
+	
+	--If query return
+	if queryReturn then --this lets us know it was not an external addon asking for beancounter data
+		return data
+	end
+	
+	style = private.styleServerData(data) --create a style sheet for this data
+
+	--if it wasnt a query return  display data and profit
+	--Adds itemtexture to display box and if possible the gan/loss on the item
+	if itemTexture and profit then
+		private.frame.icon:SetNormalTexture(itemTexture)
+						
+		local change = "|CFF33FF33Gained"
+		if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
+		profit = private.tooltip:Coins(profit)
+		private.frame.slot.help:SetTextColor(.8, .5, 1)
+		private.frame.slot.help:SetText(change..(" %s from %s to %s"):format(profit or "", date("%x", low) or "", date("%x", high) or ""))
+	else
+		private.frame.icon:SetNormalTexture(nil)
+		private.frame.slot.help:SetTextColor(1, 0.8, 0)
+		private.frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
+	end
+	
+	private.frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
+	return data, style
 end
+
 --Helper functions for the Search
 function private.searchServerData(serverName, data, tbl, settings)
 	local server = BeanCounterDB[serverName]
@@ -198,30 +192,29 @@ function private.searchServerData(serverName, data, tbl, settings)
 				if settings.auction and server[i]["completedAuctions"][id] then
 					for index, itemKey in pairs(server[i]["completedAuctions"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data.temp.completedAuctions, {i, id, index,text})
+							table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
 						end
 					end
 				end
 				if settings.failedauction and server[i]["failedAuctions"][id] then
 					for index, itemKey in pairs(server[i]["failedAuctions"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data.temp["failedAuctions"], {i, id, index,text})
+							table.insert(data, {"FAILEDAUCTIONS", id, index, text})
 						end
 					end
 				end
 				if settings.bid and server[i]["completedBids/Buyouts"][id] then
 					for index, itemKey in pairs(server[i]["completedBids/Buyouts"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data.temp["completedBids/Buyouts"], {i, id, index,text})
+							table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
 						end
 					end
 				end
 				if settings.failedbid and server[i]["failedBids"][id] then
 					for index, itemKey in pairs(server[i]["failedBids"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data.temp.failedBids, {i, id, index,text})
+							table.insert(data, {"FAILEDBIDS", id, index, text})
 						end
-
 					end
 				end
 			end
@@ -229,69 +222,11 @@ function private.searchServerData(serverName, data, tbl, settings)
 	end
 	return data
 end
---take collected data and format
-function private.formatServerData(data, style, settings, count)
-	--reduce results to the latest XXXX ammount based on how many user wants returned or displayed
-	if #data.temp.completedAuctions > count then
-		data.temp.completedAuctions = private.reduceSize(data.temp.completedAuctions, count)
-	end
-	if #data.temp.failedAuctions > count then
-		data.temp.failedAuctions = private.reduceSize(data.temp.failedAuctions, count)
-	end
-	if #data.temp["completedBids/Buyouts"] > count then
-		data.temp["completedBids/Buyouts"] = private.reduceSize(data.temp["completedBids/Buyouts"], count)
-	end
-	if #data.temp.failedBids > count then
-		data.temp.failedBids = private.reduceSize(data.temp.failedBids, count)
-	end
 
-	--Format Data for display via scroll private.frame or if requesting addon wants formated data
+function private.formatServerData(data, settings, queryReturn, count)
+	--Format Data for display via scroll private.frame
 	local dateString = get("dateString") or "%c"
-	for i,v in pairs(data.temp.completedAuctions) do
-		local match = true
-		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.suffix then
-			if v[3]:match(".*:("..settings.suffix.."):.-") then
-				-- do nothing and add item to data table
-			else
-				match = false --we want exact matches and this is not one
-			end
-		end
-
-		if match then
-			table.insert(data, private.COMPLETEDAUCTIONS(v[2], v[3], v[4], settings))
-			if not queryReturn then --do not create style tables if this data is being returned to an addon
-				style[#data] = {}
-				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {0.3, 0.9, 0.8, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
-				style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
-			end
-		end
-	end
-	for i,v in pairs(data.temp.failedAuctions) do
-		local match = true
-		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.suffix then
-			if v[3]:match(".*:("..settings.suffix.."):.-") then
-				-- do nothing and add item to data table
-			else
-				match = false --we want exact matches and this is not one
-			end
-		end
-
-		if match then
-			table.insert(data, private.FAILEDAUCTIONS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 0, 0, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,0,0}}
-				style[#data][8] ={["textColor"] = {1,0,0}}
-			end
-		end
-	end
-	for i,v in pairs(data.temp["completedBids/Buyouts"]) do
+	for i,v in pairs(data) do
 		local match = true
 		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
 		if settings.exact and settings.suffix then
@@ -299,50 +234,51 @@ function private.formatServerData(data, style, settings, count)
 			if suffix == settings.suffix then
 				-- do nothing and add item to data table
 			else
-				match = false
-			end
-		end
-
-		if match then
-			table.insert(data, private.COMPLETEDBIDSBUYOUTS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 1, 0, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,1,0}}
-				style[#data][8] ={["textColor"] = {1,1,0}}
-			end
-		end
-	end
-	for i,v in pairs(data.temp.failedBids) do
-		local match = true
-		--to provide exact match filtering for of the tems we compare names to the itemKey on API searches
-		if settings.exact and settings.suffix then
-			if v[3]:match(".*:("..settings.suffix.."):.-") then
-				-- do nothing and add item to data table
-			else
 				match = false --we want exact matches and this is not one
 			end
 		end
-
-		if match then
-			table.insert(data, private.FAILEDBIDS(v[2], v[3], v[4]))
-			if not queryReturn then
-				style[#data] = {}
-				if get("colorizeSearch") then style[#data][1] = {["rowColor"] = {1, 1, 1, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
-				style[#data][12] = {["date"] = dateString}
-				style[#data][2] = {["textColor"] = {1,1,1}}
-				style[#data][8] ={["textColor"] = {1,1,1}}
-			end
+		if match and v[1] then
+			local database = v[1]
+			--just a wrapper to call the correct function for the database we are wanting to format. Example function private.FAILEDBIDS(...)  ==  private["FAILEDBIDS"](...)
+			local store = private[database] 
+			data[i] = store(v[2], v[3], v[4], settings)
 		end
 	end
-	
-	return data, style
+
+	return data
+end
+--take collected data and format
+ local  function styleColors(database) --helper takes formated data table and looks to what colors we use for style
+	-- style colors for the various databases
+	if database == _BC('UiAucSuccessful') then
+		return 0.3, 0.9, 0.8
+	elseif database == _BC('UiAucExpired') then
+		return 1, 0, 0
+	elseif database == _BC('UiWononBuyout') or database == _BC('UiWononBid') then
+		return 1, 1, 0
+	elseif database == _BC('UiOutbid') then
+		return 1, 1, 1
+	end
+end
+function private.styleServerData(data)
+	--create style data for entries that are going to be displayed, created seperatly to allow us to reduce the data table entries
+	for i,v in pairs(data) do
+		local database = v[2]
+		local r, g, b = styleColors(database)
+		style[i] = {}
+		if get("colorizeSearch") then style[i][1] = {["rowColor"] = {r, g, b, 0, get("colorizeSearchopacity") or 0, "Horizontal"}} end
+		style[i][12] = {["date"] = dateString}
+		style[i][2] = {["textColor"] = {r, g, b}}
+		style[i][8] ={["textColor"] = {r, g, b}}
+	end
+	return style
 end
 
 function private.reduceSize(tbl, count)
 	--The data provided is from multiple toons tables, so we need to resort the merged data back into sequential time order
-	table.sort(tbl, function(a,b) return a[4]:match(".*;(%d+);.-") > b[4]:match(".*;(%d+);.-") end)
+	table.sort(tbl, function(a, b)
+			 return a[12] > b[12]
+			end)
 	tbl.sort = {}
 	for i = 1, count do
 		table.insert(tbl.sort, tbl[i])
@@ -351,7 +287,7 @@ function private.reduceSize(tbl, count)
 end
 
 --To simplify having two seperate search routines, the Data creation of each table has been made a local function
-	function private.COMPLETEDAUCTIONS(id, itemKey, text) --this passes the player, itemID and text as string or as an already seperated table
+	function private.COMPLETEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			local pricePer = 0
 			local stack = tonumber(uStack) or 0
