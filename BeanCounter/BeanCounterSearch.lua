@@ -121,7 +121,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	else
 		data = private.searchServerData(serverName, data, tbl, settings)
 		--format raw into displayed data, the cached version is already in this format	
-		data = private.formatServerData(data, settings, queryReturn, count)
+		data = private.formatServerData(data, settings)
 	end
 	
 	--add item to cache
@@ -223,7 +223,8 @@ function private.searchServerData(serverName, data, tbl, settings)
 	return data
 end
 
-function private.formatServerData(data, settings, queryReturn, count)
+function private.formatServerData(data, settings)
+	local formatedData = {}
 	--Format Data for display via scroll private.frame
 	for i,v in pairs(data) do
 		local match = true
@@ -239,15 +240,16 @@ function private.formatServerData(data, settings, queryReturn, count)
 		if match and v[1] then
 			local database = v[1]
 			--just a wrapper to call the correct function for the database we are wanting to format. Example function private.FAILEDBIDS(...)  ==  private["FAILEDBIDS"](...)
-			local store = private[database] 
-			data[i] = store(v[2], v[3], v[4], settings)
+			local store = private[database]
+			local entry = store(v[2], v[3], v[4], settings)
+			table.insert(formatedData, entry)
 		end
 	end
-
-	return data
+	
+	return formatedData
 end
 --take collected data and format
- local  function styleColors(database) --helper takes formated data table and looks to what colors we use for style
+local  function styleColors(database) --helper takes formated data table and looks to what colors we use for style
 	-- style colors for the various databases
 	if database == _BC('UiAucSuccessful') then
 		return 0.3, 0.9, 0.8

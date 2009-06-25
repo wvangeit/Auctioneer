@@ -456,6 +456,7 @@ function private.CreateFrames()
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(link)--sends to chat or auction house
 		elseif IsAltKeyDown() and text then -- Search for the item in BeanCounter
+			private.SearchCache = {} --clear cache
 			frame.searchBox:SetText(text)
 			private.startSearch(text, private.getCheckboxSettings())
 		end
