@@ -49,7 +49,7 @@ function private.sumDatabase()
 					for itemString, data in pairs(value) do
 						private.DBSumEntry = private.DBSumEntry +1
 						for index, text in pairs(data) do
-							private.DBSumItems = private.DBSumItems+1
+							private.DBSumItems = private.DBSumItems + 1
 						end
 					end
 				end
@@ -112,7 +112,7 @@ function private.pruneItemNameArray()
 	end
 end
 
---Moves entrys older than 40 days into compressed( non uniqueID) Storage
+--Moves entries older than 40 days into compressed( non uniqueID) Storage
 --Removes data older than X  months from the DB
 --Array refresh needs to run before this function
 function private.compactDB(announce)

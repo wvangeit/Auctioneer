@@ -118,6 +118,7 @@ function private.updateInboxStart()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
+		private.SearchCache = {} --clear the search cache, we are updating data so it is now outdated
 	end
 	private.mailBoxColorStart()
 end

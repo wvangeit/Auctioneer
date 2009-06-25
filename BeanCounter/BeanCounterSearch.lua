@@ -115,32 +115,32 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	end
 	
 	--check if we have a cache of this search
-	local cached = private.checkSearchCache(classic or tbl[1], count, serverName)
+	local cached = private.checkSearchCache(classic or tbl[1], serverName)
 	if  cached then
 		data = cached
 	else
 		data = private.searchServerData(serverName, data, tbl, settings)
 		--format raw into displayed data, the cached version is already in this format	
-		data = private.formatServerData(data, settings, queryReturn, count) 
-	end
-		
-	--store profit for this item, need to do this before we reduce number of results for display
-	local player = private.frame.SelectBoxSetting[2]
-	profit, low, high = lib.API.getAHProfit(player, data)
-	
-	--reduce results to the latest XXXX ammount based on how many user wants returned or displayed
-	if #data > count then
-		data = private.reduceSize(data, count)
+		data = private.formatServerData(data, settings, queryReturn, count)
 	end
 	
 	--add item to cache
 	if not cached then
-		private.addSearchCache(classic or tbl[1], data, count, serverName)
+		private.addSearchCache(classic or tbl[1], data, serverName)
 	end
 	
 	--If query return
 	if queryReturn then --this lets us know it was not an external addon asking for beancounter data
-		return data
+		return data --All results are now returned, calling addons can filter
+	end
+	
+	--store profit for this item, need to do this before we reduce number of results for display
+	local player = private.frame.SelectBoxSetting[2]
+	profit, low, high = lib.API.getAHProfit(player, data)
+	
+	--reduce results to the latest XXXX ammount based on how many user wants displayed
+	if #data > count then
+		data = private.reduceSize(data, count)
 	end
 	
 	style = private.styleServerData(data) --create a style sheet for this data
