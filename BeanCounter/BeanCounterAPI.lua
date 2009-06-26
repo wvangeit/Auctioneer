@@ -68,12 +68,11 @@ function lib.API.search(name, settings, queryReturn)
 			_, itemName =  lib.API.getItemString(itemLink)
 		end
 		
-		local cached = private.checkSearchCache(name, serverName) 
+		local cached = private.checkSearchCache(itemName, serverName)
 		--return cached search
 		if queryReturn and cached then
 			return cached
 		end
-		
 		
 		if not settings then
 			settings = {["selectbox"] = {"1", "server"}, ["exact"] = false, ["bid"] = true, ["auction"] = true}
