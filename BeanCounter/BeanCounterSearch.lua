@@ -281,11 +281,11 @@ function private.reduceSize(tbl, count)
 	table.sort(tbl, function(a, b)
 			 return a[12] > b[12]
 			end)
-	tbl.sort = {}
+	local data = {} -- this will be a new table, this prevents chages from being propagated back to the cached "data" refrence
 	for i = 1, count do
-		table.insert(tbl.sort, tbl[i])
+		table.insert(data, tbl[i])
 	end
-	return tbl.sort
+	return data
 end
 
 --To simplify having two seperate search routines, the Data creation of each table has been made a local function
