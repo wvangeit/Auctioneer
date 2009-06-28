@@ -144,19 +144,22 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	end
 	
 	style = private.styleServerData(data) --create a style sheet for this data
-
-	--if it wasnt a query return  display data and profit
+	
 	--Adds itemtexture to display box and if possible the gan/loss on the item
-	if itemTexture and profit then
+	if itemTexture then
 		private.frame.icon:SetNormalTexture(itemTexture)
-						
+	else
+		private.frame.icon:SetNormalTexture(nil)
+	end
+	
+	--display profit for the search term
+	if profit then
 		local change = "|CFF33FF33Gained"
 		if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
 		profit = private.tooltip:Coins(profit)
 		private.frame.slot.help:SetTextColor(.8, .5, 1)
 		private.frame.slot.help:SetText(change..(" %s from %s to %s"):format(profit or "", date("%x", low) or "", date("%x", high) or ""))
 	else
-		private.frame.icon:SetNormalTexture(nil)
 		private.frame.slot.help:SetTextColor(1, 0.8, 0)
 		private.frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
 	end
