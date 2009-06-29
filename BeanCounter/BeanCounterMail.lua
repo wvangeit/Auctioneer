@@ -127,7 +127,7 @@ function private.getInvoice(n, sender, subject)
 	if sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse')) then
 		if subject:match(successLocale) or subject:match(wonLocale) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
-			if  invoiceType and bid and bid > 0 then --Silly name throttling lead to missed invoice lookups
+			if invoiceType and playerName and playerName ~= "" and bid and bid > 0 then --Silly name throttling lead to missed invoice lookups
 				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes", time()
 			else
@@ -166,7 +166,7 @@ local total = #private.inboxStart
 			--debugPrint("data.retrieved == yes")
 
 		elseif  time() - data.startTime > get("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
-			debugPrint("time to retrieve invoice exceeded")
+			debugPrint("time to retrieve invoice exceeded, most likely waiting on players name..", tbl["Seller/buyer"])
 			tbl["retrieved"] = "failed" --time to get invoice exceded
 		else
 			--debugPrint("Invoice retieve attempt",tbl["subject"])
