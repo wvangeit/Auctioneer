@@ -36,10 +36,10 @@ function lib.OnLoad()
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp") --What type of click you want to respond to
 			sideIcon:SetScript("OnClick", private.SlideBarClick) --same function that the addons current minimap button calls
 			sideIcon.tip = {
-			"BUTTON MOUSEOVER NAME",
-			"BUTTON MOUSEOVER DISCRIPTION",
-			"{{Click}} BUTTON MOUSEOVER CLICK DESCRIPTION IF WANTED",
-			"{{Right-Click}} BUTTON MOUSEOVER CLICK DESCRIPTION IF WANTED",--remove lines if not wanted
+			"Auc-Util-Glypher",
+			"Open the glypher gui",
+			--"{{Click}} Open the glypher gui",
+			--"{{Right-Click}} BUTTON MOUSEOVER CLICK DESCRIPTION IF WANTED",--remove lines if not wanted
 			}
 		end
 	end
@@ -143,12 +143,12 @@ end
 
 function private.sheetOnEnter(button, row, column)
 	local link, name, _
-	link = frame.glypher.sheet.rows[row][column]:GetText() or "FAILED LINK"
+	link = private.frame.glypher.sheet.rows[row][column]:GetText() or "FAILED LINK"
 	if link:match("^(|c%x+|H.+|h%[.+%])") then
 		name = GetItemInfo(link)
 	end
 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-	if frame.glypher.sheet.rows[row][column]:IsShown()then --Hide tooltip for hidden cells
+	if private.frame.glypher.sheet.rows[row][column]:IsShown()then --Hide tooltip for hidden cells
 		if link and name then
 			GameTooltip:SetHyperlink(link)
 		end
@@ -156,14 +156,14 @@ function private.sheetOnEnter(button, row, column)
 end
 
 function private.ConfigChanged(setting, value, ...)
-	if setting == "util.glypher.craft" and value then
-		private.addtoCraft()
-		set("util.glypher.craft", nil) --for some reason teh button will not toggle a setting http://jira.norganna.org/browse/CNFG-89
-	
-	elseif setting == "util.glypher.getglyphs" and value then
-		private.findGlyphs()
-		set("util.glypher.getglyphs", nil)
-	end
+-- 	if setting == "util.glypher.craft" and value then
+-- 		private.addtoCraft()
+-- 		set("util.glypher.craft", nil) --for some reason teh button will not toggle a setting http://jira.norganna.org/browse/CNFG-89
+-- 	
+-- 	elseif setting == "util.glypher.getglyphs" and value then
+-- 		private.findGlyphs()
+-- 		set("util.glypher.getglyphs", nil)
+-- 	end
 end
 
 function private.findGlyphs()
@@ -202,7 +202,7 @@ function private.findGlyphs()
 				sold, failed = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) --history == days to go back
 			end
 			local reagentCost = 0
-			--Sum the cost of the mats to craft this item, parchment is not considered its realy too cheap to matter
+			--Sum the cost of the mats to craft this item, parchment is not considered its really too cheap to matter
 			local inkMatch = false --only match inks choosen by user
 			for i = 1 ,GetTradeSkillNumReagents(ID) do
 				local inkName, _, count = GetTradeSkillReagentInfo(ID, 1)
@@ -248,7 +248,7 @@ function private.findGlyphs()
 		end
 	end
 	
-	frame.glypher.sheet:SetData(private.Display, Style)
+	private.frame.glypher.sheet:SetData(private.Display, Style)
 end
 --store the players current auctions
 function private.storeCurrentAuctions()
