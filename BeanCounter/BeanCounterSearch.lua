@@ -107,15 +107,21 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	data = {}
 	style = {}
 	
-	local profit, low, high, serverName
+	local profit, low, high, serverName, playerName
+	--serverName and playerName are used as part of our cache ID string
 	if settings.servers and settings.servers[1] then
 		serverName = settings.servers[1]
 	else
 		serverName = GetRealmName()
 	end
+	if settings.selectbox and settings.selectbox[2] then
+		playerName = settings.selectbox[2]
+	else
+		playerName = "server"
+	end
 	
 	--check if we have a cache of this search
-	local cached = private.checkSearchCache(classic or tbl[1], serverName)
+	local cached = private.checkSearchCache(classic or tbl[1], serverName, playerName)
 	if  cached then
 		data = cached
 	else
@@ -126,7 +132,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	
 	--add item to cache
 	if not cached then
-		private.addSearchCache(classic or tbl[1], data, serverName)
+		private.addSearchCache(classic or tbl[1], data, serverName, playerName)
 	end
 	
 	--If query return
@@ -294,6 +300,8 @@ end
 --To simplify having two seperate search routines, the Data creation of each table has been made a local function
 	function private.COMPLETEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			if uSeller == "0" then uSeller = "..." end
+			
 			local pricePer = 0
 			local stack = tonumber(uStack) or 0
 			if stack > 0 then pricePer =  (uMoney - uDeposit + uFee)/stack end
@@ -324,6 +332,7 @@ end
 	--STACK; BUY; BID; DEPOSIT; TIME; DATE; WEALTH
 	function private.FAILEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			if uSeller == "0" then uSeller = "..." end
 			
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
@@ -339,7 +348,7 @@ end
 				tonumber(uStack) or 0,
 				0, --Profit/per
 
-				"...",  --seller/buyer
+				uSeller,  --seller/buyer
 
 				tonumber(uDeposit) or 0, --deposit
 				0, --fee
@@ -351,7 +360,7 @@ end
 			--local value = "stack"], "money"], p"fee"], buyout"], "bid"], p"Seller/buyer"], ["time"], reason)
 		
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
-			
+			if uSeller == "0" then uSeller = "..." end
 			--print("S=", uStack, "M=",uMoney, "D=",uDeposit , "F=",uFee, "Buy=",uBuyout , "Bid=",uBid, "Sell=",uSeller, "T=",uTime, "R=",uReason)
 			
 			local pricePer, stack, text = 0, tonumber(uStack), _BC('UiWononBuyout')
@@ -388,11 +397,12 @@ end
 	function private.FAILEDBIDS(id, itemKey, text)
 			
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			if uSeller == "0" then uSeller = "..." end
 			
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
-
+			
 			return({
 				itemLink, --itemname
 				_BC('UiOutbid'), --status

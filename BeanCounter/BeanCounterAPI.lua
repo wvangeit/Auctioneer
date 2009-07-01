@@ -58,7 +58,15 @@ function lib.API.search(name, settings, queryReturn)
 		else
 			serverName = GetRealmName()
 		end
-			
+		
+		--playerName is also used as part of our cache ID string
+		local playerName
+		if settings and settings.selectbox and settings.selectbox[2] then
+			playerName = settings.selectbox[2]
+		else
+			playerName = "server"
+		end
+
 		--the function getItemInfo will return a plain text name on itemID or itemLink searches and nil if a plain text search is passed
 		local itemID, itemLink, itemName		
 		itemID, itemLink = private.getItemInfo(name, "itemid")
@@ -68,7 +76,7 @@ function lib.API.search(name, settings, queryReturn)
 			_, itemName =  lib.API.getItemString(itemLink)
 		end
 		
-		local cached = private.checkSearchCache(itemName, serverName)
+		local cached = private.checkSearchCache(itemName, serverName, playerName)
 		--return cached search
 		if queryReturn and cached then
 			return cached
@@ -90,7 +98,7 @@ function lib.API.search(name, settings, queryReturn)
 		end
 		--return data or displayItemName in select box
 		if queryReturn then
-			return private.checkSearchCache(itemName, serverName)
+			return private.checkSearchCache(itemName, serverName, playerName)
 		else
 			private.frame.searchBox:SetText(itemName)
 		end
@@ -98,16 +106,16 @@ function lib.API.search(name, settings, queryReturn)
 end
 --Cache system for searches
 
-function private.checkSearchCache(name, serverName)
+function private.checkSearchCache(name, serverName, playerName)
 	local SearchCache = private.SearchCache
 	--return cached search
 	name = name:lower() --lower case names for better matching
-	if SearchCache[name..serverName] then
-		debugPrint("cached used", name )
-		return SearchCache[name..serverName]
+	if SearchCache[name..serverName..playerName] then
+		debugPrint("cached used", name, serverName, playerName  )
+		return SearchCache[name..serverName..playerName]
 	end
 end
-function private.addSearchCache(name, data, serverName)
+function private.addSearchCache(name, data, serverName, playerName)
 	local SearchCache = private.SearchCache
 	--remove oldest cache entry, only save 5 searches
 	if #SearchCache >= 10 then
@@ -117,8 +125,8 @@ function private.addSearchCache(name, data, serverName)
 	end
 	--store cache of the request
 	name = name:lower() -- store as lower case for better matching
-	SearchCache[name..serverName] = data
-	SearchCache[#SearchCache + 1] = name..serverName
+	SearchCache[name..serverName..playerName] = data
+	SearchCache[#SearchCache + 1] = name..serverName..playerName
 end
 
 --[[ Returns the Sum of all AH sold vs AH buys along with the date range
