@@ -955,7 +955,8 @@ function private.CreateFrames()
 		local curBuy = MoneyInputFrame_GetCopper(frame.salebox.buy) or 0
 
 		local sig = frame.salebox.sig
-		local totalBid, totalBuy, totalDeposit = 0,0,0
+		local totalBid, totalBuy = 0,0
+		local totalDeposit
 		local bidVal, buyVal, depositVal
 
 		local r,g,b,a = 0,0,0,0
@@ -987,8 +988,11 @@ function private.CreateFrames()
 		AppraiserSaleboxBidStackCopper:SetBackdropColor(r,g,b, a)
 
 		if frame.selectedPostable then
-			local depositMult = curDurationMins / 720
 			local curNumber = frame.salebox.number:GetAdjustedValue()
+			-- used in GetDepositCost calls:
+			local depositHours = curDurationMins / 60 
+			local depositFaction
+			if AucAdvanced.depositRate == .25 then depositFaction = "neutral" end
 
 			if frame.salebox.stacksize > 1 then
 				local count = frame.salebox.count
@@ -1026,16 +1030,7 @@ function private.CreateFrames()
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(maxStax, curSize))--%d lots of %dx stacks:
 						bidVal = lib.RoundBid(curBid * curSize)
 						buyVal = lib.RoundBuy(curBuy * curSize)
-
-						local rate = AucAdvanced.depositRate or 0.05
-						local newfaction
-						if rate == .25 then newfaction = "neutral" end
-						depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, curSize)
-						if depositVal then
-							depositVal = depositVal * depositMult
-						else
-							depositVal = 0
-						end
+						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
 
 						r,g,b=nil,nil,nil
 						if colored then
@@ -1047,27 +1042,18 @@ function private.CreateFrames()
 							r,g,b = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
 						end
 						frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_BuyoutForX'):format(curSize), buyVal, r,g,b)--Buyout for %dx
-						frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_DepositForX'):format(curSize), depositVal)--Deposit for %dx
-
+						if depositVal then
+							frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_DepositForX'):format(curSize), depositVal)--Deposit for %dx
+							totalDeposit = depositVal * maxStax
+						end
 						totalBid = totalBid + (bidVal * maxStax)
 						totalBuy = totalBuy + (buyVal * maxStax)
-						totalDeposit = totalDeposit + (depositVal * maxStax)
 					end
 					if curNumber == -1 and remain > 0 then
 						bidVal = lib.RoundBid(curBid * remain)
 						buyVal = lib.RoundBuy(curBuy * remain)
+						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, remain)
 
-						local rate = AucAdvanced.depositRate or 0.05
-						local newfaction
-						if rate == .25 then newfaction = "neutral" end
-						depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, remain)
-						if depositVal then
-							depositVal = depositVal * depositMult
-						else
-							depositVal = 0
-						end
-
-						--frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks') :format(1, remain))--%d lots of %dx stacks:
 						r,g,b=nil,nil,nil
 						if colored then
@@ -1079,11 +1065,12 @@ function private.CreateFrames()
 							r,g,b = frame.SetPriceColor(itemKey, remain, buyVal, buyVal)
 						end
 						frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_BuyoutForX'):format(remain), buyVal, r,g,b)--Buyout for %dx
-						frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_DepositForX'):format(remain), depositVal)--Deposit for %dx
-
+						if depositVal then
+							frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_DepositForX'):format(remain), depositVal)--Deposit for %dx
+							totalDeposit = (totalDeposit or 0) + depositVal
+						end
 						totalBid = totalBid + bidVal
 						totalBuy = totalBuy + buyVal
-						totalDeposit = totalDeposit + depositVal
 					end
 				else
 					frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberStacks'):format(curNumber, curNumber*curSize))--Number: %d stacks = %d
@@ -1091,16 +1078,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(curNumber, curSize))--%d lots of %dx stacks:
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-
-					local rate = AucAdvanced.depositRate or 0.05
-					local newfaction
-					if rate == .25 then newfaction = "neutral" end
-					depositVal = GetDepositCost(frame.salebox.link, 12, newfaction, curSize)
-					if depositVal then
-						depositVal = depositVal * depositMult
-					else
-						depositVal = 0
-					end
+					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
 
 					r,g,b=nil,nil,nil
 					if colored then
@@ -1112,11 +1090,12 @@ function private.CreateFrames()
 						r,g,b = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
 					end
 					frame.manifest.lines:Add(("  ".._TRANS('APPR_Interface_BuyoutForX')):format(curSize), buyVal, r,g,b)--Buyout for %dx
-					frame.manifest.lines:Add(("  ".._TRANS('APPR_Interface_DepositForX')):format(curSize), depositVal)--Deposit for %dx
-
+					if depositVal then
+						frame.manifest.lines:Add(("  ".._TRANS('APPR_Interface_DepositForX')):format(curSize), depositVal)--Deposit for %dx
+						totalDeposit = depositVal * curNumber
+					end
 					totalBid = totalBid + (bidVal * curNumber)
 					totalBuy = totalBuy + (buyVal * curNumber)
-					totalDeposit = totalDeposit + (depositVal * curNumber)
 				end
 			else -- non-stackable
 				frame.salebox.stack.label:SetText(_TRANS('APPR_Interface_NotStackable')) --Item is not stackable
@@ -1137,13 +1116,8 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_Items'):format(curNumber))--%d items
 					bidVal = lib.RoundBid(curBid)
 					buyVal = lib.RoundBuy(curBuy)
+					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction)
 
-					local rate = AucAdvanced.depositRate or 0.05
-					local newfaction
-					if rate == .25 then newfaction = "neutral" end
-					local baseDeposit = GetDepositCost(frame.salebox.link, 12, newfaction) or 0
-
-					depositVal = baseDeposit * depositMult
 					r,g,b=nil,nil,nil
 					if colored then
 						r,g,b = frame.SetPriceColor(itemKey, 1, bidVal, bidVal)
@@ -1154,16 +1128,22 @@ function private.CreateFrames()
 						r,g,b = frame.SetPriceColor(itemKey, 1, buyVal, buyVal)
 					end
 					frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_Buyout/item'), buyVal, r,g,b)--Buyout /item
-					frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_Deposit/item'), depositVal)--Deposit /item
+					if depositVal then
+						frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_Deposit/item'), depositVal)--Deposit /item
+						totalDeposit = depositVal * curNumber
+					end
 					totalBid = totalBid + (bidVal * curNumber)
 					totalBuy = totalBuy + (buyVal * curNumber)
-					totalDeposit = totalDeposit + (depositVal * curNumber)
 				end
 			end
 			frame.manifest.lines:Add(_TRANS('APPR_Interface_Totals') )--Totals:
 			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalBid'), totalBid)--Total Bid:
 			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalBuyout'), totalBuy)--Total Buyout:
-			frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalDeposit'), totalDeposit)--Total Deposit:
+			if totalDeposit then
+				frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_TotalDeposit'), totalDeposit)--Total Deposit:
+			else
+				frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_UnknownDeposit'))--Unknown deposit cost
+			end
 			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 				local MatchStringList = {strsplit("\n", MatchString)}
 				for i in pairs(MatchStringList) do
