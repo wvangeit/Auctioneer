@@ -370,19 +370,13 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what disadvantage",
 		_TRANS('SHTG_Help_WhatDisadvantagesHistogram') ,--What disadvantages does Histogram have?
 		_TRANS('SHTG_Help_WhatDisadvantagesHistogramAnswer') )--Histogram rounds prices slightly to help store them, so there is a slight precision loss. However, it is precise to 1/250th of market price. (an item with market price 250g will have prices stored to the nearest 1g)
-	gui:AddHelp(id, "what median",
-		_TRANS('SHTG_Help_WhatMedian') ,--What is the median?
-		_TRANS('SHTG_Help_WhatMedianAnswer') )--The median value is the value where half of the prices seen are above, and half are below.
-	gui:AddHelp(id, "what IQR",
-		_TRANS('SHTG_Help_WhatIQR') ,--What is the IQR?
-		_TRANS('SHTG_Help_WhatIQRAnswer') )--The IQR is a measure of spread.  The middle half of the prices seen is confined with the range of IQR. An item with median 100g, and IQR 10g, has very consistent data.  If the IQR was 100g, the prices are all over the place.
-
+	
 	frame = gui.tabs[id].content
 	private.frame = frame
 	
 	frame.slot = frame:CreateTexture(nil, "BORDER")
 	frame.slot:SetDrawLayer("Artwork") -- or the border shades it
-	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -200)
+	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -100)
 	frame.slot:SetWidth(45)
 	frame.slot:SetHeight(45)
 	frame.slot:SetTexCoord(0.17, 0.83, 0.17, 0.83)
@@ -424,8 +418,8 @@ function private.SetupConfigGui(gui)
 	frame.name:SetTextColor(0.5, 0.5, 0.7)
 
 	frame.bargraph = CreateFrame("Frame", nil, frame)
-	frame.bargraph:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -250)
-	frame.bargraph:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -30, -250)
+	frame.bargraph:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -150)
+	frame.bargraph:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -30, -150)
 	frame.bargraph:SetHeight(300)
 	frame.bargraph:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -482,25 +476,39 @@ function private.SetupConfigGui(gui)
 	frame.max:SetPoint("TOPRIGHT", frame.bargraph, "BOTTOMRIGHT", 0, -10)
 	frame.max:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMRIGHT", -150, -25)
 	
+	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
+	--replace id with tooltipID  to add to this frame
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID or id
+	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(tooltipID, "Header",     0,    _TRANS('SHTG_Interface_HistogramOptions') )--Histogram options
+	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
 	
+	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.histogram.tooltip", _TRANS('SHTG_Interface_ShowHistogramTooltips') )--Show Histogram stats in the tooltips?
+	gui:AddTip(tooltipID, _TRANS('SHTG_HelpTooltip_ShowHistogramTooltips') )--Toggle display of stats from the Histogram module on or off
+	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.histogram.median", _TRANS('SHTG_Interface_DisplayMedian') )--Display Median
+	gui:AddTip(tooltipID, _TRANS('SHTG_HelpTooltip_DisplayMedian') )--Toggle display of \'Median\' calculation in tooltips on or off
+	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.histogram.iqr", _TRANS('SHTG_Interface_DisplayIQR') )--Display IQR
+	gui:AddTip(tooltipID, _TRANS('SHTG_HelpTooltip_DisplayIQR') )--Toggle display of \'IQR\' calculation in tooltips on or off.  See help for further explanation.
+	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.histogram.precision", _TRANS('SHTG_Interface_DisplayPrecision') )--Display Precision
+	gui:AddTip(tooltipID, _TRANS('SHTG_HelpTooltip_DisplayPrecision') )--Toggle display of \'precision\' calculation in tooltips on or off
+	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.histogram.quantmul", _TRANS('SHTG_Interface_MultiplyStack') )--Multiply by Stack Size
+	gui:AddTip(tooltipID, _TRANS('SHTG_HelpTooltip_MultiplyStack') )--Multiplies by current Stack Size if on
+	
+	gui:AddHelp(tooltipID, "what median",
+		_TRANS('SHTG_Help_WhatMedian') ,--What is the median?
+		_TRANS('SHTG_Help_WhatMedianAnswer') )--The median value is the value where half of the prices seen are above, and half are below.
+	gui:AddHelp(tooltipID, "what IQR",
+		_TRANS('SHTG_Help_WhatIQR') ,--What is the IQR?
+		_TRANS('SHTG_Help_WhatIQRAnswer') )--The IQR is a measure of spread.  The middle half of the prices seen is confined with the range of IQR. An item with median 100g, and IQR 10g, has very consistent data.  If the IQR was 100g, the prices are all over the place.
+	
+		
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _TRANS('SHTG_Interface_HistogramOptions') )--Histogram options
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.enable", _TRANS('SHTG_Interface_EnableHistogram') )--Enable Histogram Stats
 	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_EnableHistogram') )--Allow Histogram to gather and return price data
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.tooltip", _TRANS('SHTG_Interface_ShowHistogramTooltips') )--Show Histogram stats in the tooltips?
-	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_ShowHistogramTooltips') )--Toggle display of stats from the Histogram module on or off
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.median", _TRANS('SHTG_Interface_DisplayMedian') )--Display Median
-	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_DisplayMedian') )--Toggle display of \'Median\' calculation in tooltips on or off
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.iqr", _TRANS('SHTG_Interface_DisplayIQR') )--Display IQR
-	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_DisplayIQR') )--Toggle display of \'IQR\' calculation in tooltips on or off.  See help for further explanation.
-	gui:AddControl(id, "Checkbox",   0, 2, "stat.histogram.precision", _TRANS('SHTG_Interface_DisplayPrecision') )--Display Precision
-	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_DisplayPrecision') )--Toggle display of \'precision\' calculation in tooltips on or off
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.quantmul", _TRANS('SHTG_Interface_MultiplyStack') )--Multiply by Stack Size
-	gui:AddTip(id, _TRANS('SHTG_HelpTooltip_MultiplyStack') )--Multiplies by current Stack Size if on
-	
+		
 	gui:AddControl(id, "Subhead",    0,    _TRANS('SHTG_Interface_ItemDataViewer') )--Item Data Viewer
 	
 end
