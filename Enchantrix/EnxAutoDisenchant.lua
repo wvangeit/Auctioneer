@@ -255,7 +255,7 @@ end
 local function onEvent(...)
 	if isState("sleep") or isState("disabled") then return end
 
-	local event, arg1, arg2, arg3, arg4 = select(2, ...)
+	local _, _, event, arg1, arg2, arg3, arg4 = ...;
 	if event == "LOOT_OPENED" then
 		if isState("loot_wait") then
 			-- loot window opened - grab the spoils
