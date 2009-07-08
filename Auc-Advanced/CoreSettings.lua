@@ -510,6 +510,10 @@ function lib.MakeGuiConfig()
 		_TRANS('ADV_Help_WhatTooltipTab'), --What is the tooltip tab?
 		_TRANS('ADV_Help_WhatTooltipTabAnswer')) --This tab allows you to adjust what data gets displayed in the tooltips added by auctioneer. It provides a single point for any module to add settings that are related to tooltip functionality.
 	
+	gui:AddControl(id, "Header",   0,    _TRANS('ADV_Interface_TooltipDisplayOptionsOptions') ) --Tooltip Display Options
+	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_ControlsShowHideTooltip') ) --Controls to show or hide tooltip information. To activate or deactivate a module completely, please use that modules configuration.
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", _TRANS('ADV_Interface_ScanDataDisplay')) --"Display scan data tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataDisplay')) --"Enable the display of how many items in the current scan image match this item"
