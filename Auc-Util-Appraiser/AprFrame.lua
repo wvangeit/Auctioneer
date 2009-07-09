@@ -991,8 +991,7 @@ function private.CreateFrames()
 			local curNumber = frame.salebox.number:GetAdjustedValue()
 			-- used in GetDepositCost calls:
 			local depositHours = curDurationMins / 60 
-			local depositFaction
-			if AucAdvanced.depositRate == .25 then depositFaction = "neutral" end
+			local depositFaction = AucAdvanced.GetFactionGroup()
 
 			if frame.salebox.stacksize > 1 then
 				local count = frame.salebox.count
