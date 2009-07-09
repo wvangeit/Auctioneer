@@ -159,17 +159,28 @@ function private.SetupConfigGui(gui)
 		_TRANS('WECN_Help_WhyWOWEconAnswer') --The pricing data that Appraiser uses for the items may be different to the price data that WOWEcon displays by default, since WOWEcon can get very specific with the data that it returns. Enabling this option will let you see the exact price that this module is reporting for the current item.
 		)
 
-	gui:AddControl(id, "Header",     0,    _TRANS('WECN_Interface_WOWEconOptions') )--WOWEcon options
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('WECN_Interface_EnableWOWEconStats') )--Enable WOWEcon Stats
-	gui:AddTip(id, _TRANS('WECN_HelpTooltip_EnableWOWEconStats') )--Allow WOWEcon to gather and return price data
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", _TRANS('WECN_Interface_AlwaysGlobalPrice') )--Always use global price, not server price
-	gui:AddTip(id, _TRANS('WECN_HelpTooltip_AlwaysGlobalPrice') )--Toggle use of server specific Wowecon price stats, if they exist
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", _TRANS('WECN_Interface_SanitizeWOWEcon') )--Sanitize links before sending to WOWEcon API
-	gui:AddTip(id, _TRANS('WECN_HelpTooltip_SanitizeWOWEcon') )--Removes ultra-specific item data from links before issuing the price request
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", _TRANS('WECN_Interface_ShowWOWEconTooltip') )--Show WOWEcon value in tooltip (see note)
-	gui:AddTip(id, _TRANS('WECN_HelpTooltip_ShowWOWEconTooltip') )--Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip
+	--all options in here will be duplicated in the tooltip frame
+	function private.addTooltipControls(id)
+		gui:AddControl(id, "Header",     0,    _TRANS('WECN_Interface_WOWEconOptions') )--WOWEcon options
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('WECN_Interface_EnableWOWEconStats') )--Enable WOWEcon Stats
+		gui:AddTip(id, _TRANS('WECN_HelpTooltip_EnableWOWEconStats') )--Allow WOWEcon to gather and return price data
+
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", _TRANS('WECN_Interface_AlwaysGlobalPrice') )--Always use global price, not server price
+		gui:AddTip(id, _TRANS('WECN_HelpTooltip_AlwaysGlobalPrice') )--Toggle use of server specific Wowecon price stats, if they exist
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.sanitize", _TRANS('WECN_Interface_SanitizeWOWEcon') )--Sanitize links before sending to WOWEcon API
+		gui:AddTip(id, _TRANS('WECN_HelpTooltip_SanitizeWOWEcon') )--Removes ultra-specific item data from links before issuing the price request
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.tooltip", _TRANS('WECN_Interface_ShowWOWEconTooltip') )--Show WOWEcon value in tooltip (see note)
+		gui:AddTip(id, _TRANS('WECN_HelpTooltip_ShowWOWEconTooltip') )--Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	end
+	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
+	
+	--now we create a duplicate of these in the tooltip frame
+	private.addTooltipControls(id)
+	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
 function lib.OnLoad(addon)
