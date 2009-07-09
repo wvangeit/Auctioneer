@@ -260,8 +260,7 @@ function private.SetupConfigGui(gui)
 		_TRANS('ILVL_Help_WhatFilteredAnswer') )--Items outside a (1.5*Standard) variance are ignored and assumed to be wrongly priced when calculating the deviation.
 	
 	--all options in here will be duplicated in the tooltip frame
-	local function duplicate( id ) 
-		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	function private.addTooltipControls(id)
 		gui:AddHelp(id, "what standard deviation",
 			_TRANS('ILVL_Help_WhatStdDev') ,--What is a Standard Deviation calculation?
 			_TRANS('ILVL_Help_WhatStdDevAnswer') )--In short terms, it is a distance to mean average calculation.
@@ -282,26 +281,29 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 		gui:AddControl(id, "Checkbox",   0, 1, "stat.ilevel.enable", _TRANS('ILVL_Interface_EnableILevelStats') )--Enable iLevel Stats
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_EnableILevelStats') )--Allow iLevel to gather and return price data
-		gui:AddControl(id, "Checkbox",   0, 1, "stat.ilevel.tooltip", _TRANS('ILVL_Interface_ShowiLevel') )--Show iLevel stats in the tooltips?
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+			
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.ilevel.tooltip", _TRANS('ILVL_Interface_ShowiLevel') )--Show iLevel stats in the tooltips?
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_ShowiLevel') )--Toggle display of stats from the iLevel module on or off
-		gui:AddControl(id, "Checkbox",   0, 2, "stat.ilevel.mean", _TRANS('ILVL_Interface_DisplayMean') )--Display Mean
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.ilevel.mean", _TRANS('ILVL_Interface_DisplayMean') )--Display Mean
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_DisplayMean') )--Toggle display of 'Mean' calculation in tooltips on or off
-		gui:AddControl(id, "Checkbox",   0, 2, "stat.ilevel.normal", _TRANS('ILVL_Interface_DisplayNormalized') )--Display Normalized'
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.ilevel.normal", _TRANS('ILVL_Interface_DisplayNormalized') )--Display Normalized'
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_DisplayNormalized') )--Toggle display of \'Normalized\' calculation in tooltips on or off
-		gui:AddControl(id, "Checkbox",   0, 2, "stat.ilevel.stdev", _TRANS('ILVL_Interface_DisplayStdDeviation') )--Display Standard Deviation
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.ilevel.stdev", _TRANS('ILVL_Interface_DisplayStdDeviation') )--Display Standard Deviation
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_DisplayStdDeviation') )--Toggle display of \'Standard Deviation\' calculation in tooltips on or off
-		gui:AddControl(id, "Checkbox",   0, 2, "stat.ilevel.confid", _TRANS('ILVL_Interface_DisplayConfidence') )--Display Confidence
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.ilevel.confid", _TRANS('ILVL_Interface_DisplayConfidence') )--Display Confidence
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_DisplayConfidence') )--Toggle display of \'Confidence\' calculation in tooltips on or off
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		gui:AddControl(id, "Checkbox",   0, 1, "stat.ilevel.quantmul", _TRANS('ILVL_Interface_MultiplyStack') )--Multiply by Stack Size
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.ilevel.quantmul", _TRANS('ILVL_Interface_MultiplyStack') )--Multiply by Stack Size
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_MultiplyStack') )--Multiplies by current stack size if on
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	end
 	--This is the Tooltip tab provided by aucadvanced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID or id
 	
 	--now we create a duplicate of these in the tooltip frame
-	duplicate(id)
-	duplicate(tooltipID) 
+	private.addTooltipControls(id)
+	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
