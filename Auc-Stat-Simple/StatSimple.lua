@@ -1,35 +1,35 @@
 --[[
-	Auctioneer Advanced - StatSimple
-	Version: <%version%> (<%codename%>)
-	Revision: $Id$
-	URL: http://auctioneeraddon.com/
+Auctioneer Advanced - StatSimple
+Version: <%version%> (<%codename%>)
+Revision: $Id$
+URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
-	when the auction is scanned, so that you can easily determine what price
-	you will be able to sell an item for at auction or at a vendor whenever you
-	mouse-over an item in the game
+This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
+when the auction is scanned, so that you can easily determine what price
+you will be able to sell an item for at auction or at a vendor whenever you
+mouse-over an item in the game
 
-	License:
-		This program is free software; you can redistribute it and/or
-		modify it under the terms of the GNU General Public License
-		as published by the Free Software Foundation; either version 2
-		of the License, or (at your option) any later version.
+License:
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
-		This program is distributed in the hope that it will be useful,
-		but WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-		GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-		You should have received a copy of the GNU General Public License
-		along with this program(see GPL.txt); if not, write to the Free Software
-		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You should have received a copy of the GNU General Public License
+along with this program(see GPL.txt); if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-	Note:
-		This AddOn's source code is specifically designed to work with
-		World of Warcraft's interpreted AddOn system.
-		You have an implicit license to use this AddOn with these facilities
-		since that is its designated purpose as per:
-		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
+Note:
+This AddOn's source code is specifically designed to work with
+World of Warcraft's interpreted AddOn system.
+You have an implicit license to use this AddOn with these facilities
+since that is its designated purpose as per:
+http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 if not AucAdvanced then return end
 
@@ -86,17 +86,17 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
 	-- function returns.
-
+	
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
 	local buyoutper = ceil(buyout/itemData.stackSize)
-
+	
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
 	if (factor ~= 0) then property = property.."x"..factor end
-
+	
 	local data = private.GetPriceData(GetFaction())
 	if not data.daily[itemId] then data.daily[itemId] = "" end
 	local stats = private.UnpackStats(data.daily[itemId])
@@ -110,19 +110,19 @@ end
 
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.simple.enable") then return end
-
+	
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 	serverKey = serverKey or GetFaction()
 	local data = private.GetPriceData(serverKey)
-
+	
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14, avgmins = 0,0,0,0,0,0
-    -- Stddev calculations for market price
-    local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
-    local dataset = {}
-
+	-- Stddev calculations for market price
+	local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
+	local dataset = {}
+	
 	if data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
 		if stats[property] then
@@ -130,8 +130,8 @@ function lib.GetPrice(hyperlink, serverKey)
 			dayAverage = dayTotal/dayCount
 			if not minBuyout then minBuyout = 0 end
 			-- Stddev calculations for market price
-    		tinsert(dataset,dayAverage)
-    		daysUsed = 1
+			tinsert(dataset,dayAverage)
+			daysUsed = 1
 		end
 	end
 	if data.means[itemId] then
@@ -140,40 +140,40 @@ function lib.GetPrice(hyperlink, serverKey)
 			seenDays, seenCount, avg3, avg7, avg14, avgmins = unpack(stats[property])
 			if not avgmins then avgmins = 0 end
 			-- Stddev calculations for market price
-            if seenDays >= 3 then
-                for count = 1, 3-daysUsed do
-                    tinsert(dataset, avg3);
-                end
-                daysUsed = 3
-            end
-            if seenDays >= 7 then
-                for count = 1, 7-daysUsed do
-                    tinsert(dataset, avg7);
-                end
-                daysUsed = 7
-            end
-            if seenDays >= 14 then
-                for count = 1, 14-daysUsed do
-                    tinsert(dataset, avg14);
-                end
-                daysUsed = 14
-            end
-        end
+			if seenDays >= 3 then
+				for count = 1, 3-daysUsed do
+					tinsert(dataset, avg3);
+				end
+				daysUsed = 3
+			end
+			if seenDays >= 7 then
+				for count = 1, 7-daysUsed do
+					tinsert(dataset, avg7);
+				end
+				daysUsed = 7
+			end
+			if seenDays >= 14 then
+				for count = 1, 14-daysUsed do
+					tinsert(dataset, avg14);
+				end
+				daysUsed = 14
+			end
+		end
 	end
-    local mean = 0
+	local mean = 0
 	if dataset and #dataset > 0 then
 		mean = private.sum(unpack(dataset))/#dataset;
 	end
-    local variance = 0;
-    for k,v in ipairs(dataset) do
-        variance = variance + (mean - v)^2;
-    end
-    if #dataset == 1 then
-        variance = 0
-    else
-        variance = variance/(#dataset-1)
-    end
-
+	local variance = 0;
+	for k,v in ipairs(dataset) do
+		variance = variance + (mean - v)^2;
+	end
+	if #dataset == 1 then
+		variance = 0
+	else
+		variance = variance/(#dataset-1)
+	end
+	
 	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, sqrt(variance)
 end
 
@@ -186,22 +186,22 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.simple.enable") then return end
 	-- Clean out the old array
 	empty(array)
-
+	
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
-
+	
 	--if nothing is returned, return nil
 	if not dayCount then return end
-
+	
 	-- If reportsafe is on use the mean of all 14 day samples. Else use the "traditional" Simple values.
 	if not get("stat.simple.reportsafe") then
-	   if (avg3 and seenDays > 3) or dayCount == 0 then
-		  array.price = avg3
-	   elseif dayCount > 0 then
-		  array.price = dayAverage
-	   end
+		if (avg3 and seenDays > 3) or dayCount == 0 then
+			array.price = avg3
+		elseif dayCount > 0 then
+			array.price = dayAverage
+		end
 	else
-	   array.price = mean
+		array.price = mean
 	end
 	array.stddev = stddev
 	array.seen = seenCount
@@ -214,7 +214,7 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	array.daytotal = dayTotal
 	array.daycount = dayCount
 	array.seendays = seenDays
-
+	
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array
@@ -234,30 +234,30 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- @return The upper limit of meaningful data for the PDF (determined
 -- as the mean plus 5 standard deviations)
 function lib.GetItemPDF(hyperlink, serverKey)
-    -- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
-
-    if not get("stat.simple.enable") then return end
-    -- Calculate the SE estimated standard deviation & mean
+	-- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
+	
+	if not get("stat.simple.enable") then return end
+	-- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
-
-    if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
-        return;                         -- No available data or cannot estimate
-    end
-
-    -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
-    -- the std dev is 100% of the mean divided by square root of number of views
-    if stddev == 0 then stddev = mean / sqrt(seenCount); end
-
-    -- Calculate the lower and upper bounds as +/- 3 standard deviations
-    local lower, upper = mean - 3*stddev, mean + 3*stddev;
-
-    bellCurve:SetParameters(mean, stddev);
-    return bellCurve, lower, upper;
+	
+	if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
+		return;                         -- No available data or cannot estimate
+	end
+	
+	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
+	-- the std dev is 100% of the mean divided by square root of number of views
+	if stddev == 0 then stddev = mean / sqrt(seenCount); end
+	
+	-- Calculate the lower and upper bounds as +/- 3 standard deviations
+	local lower, upper = mean - 3*stddev, mean + 3*stddev;
+	
+	bellCurve:SetParameters(mean, stddev);
+	return bellCurve, lower, upper;
 end
 
 function lib.OnLoad(addon)
 	if SSRealmData then return end
-
+	
 	-- Set defaults
 	default("stat.simple.tooltip", false)
 	default("stat.simple.avg3", false)
@@ -268,7 +268,7 @@ function lib.OnLoad(addon)
 	default("stat.simple.quantmul", true)
 	default("stat.simple.enable", true)
 	default("stat.simple.reportsafe", false)
-
+	
 	-- Load and check data
 	private.InitData()
 end
@@ -279,12 +279,12 @@ function lib.ClearItem(hyperlink, serverKey)
 		return
 	end
 	if (factor ~= 0) then property = property.."x"..factor end
-
+	
 	serverKey = serverKey or GetFaction ()
 	local data = private.GetPriceData (serverKey)
-
+	
 	local cleareditem = false
-
+	
 	if data.daily[itemID] then
 		local stats = private.UnpackStats (data.daily[itemID])
 		if stats[property] then
@@ -293,7 +293,7 @@ function lib.ClearItem(hyperlink, serverKey)
 			data.daily[itemID] = private.PackStats (stats)
 		end
 	end
-
+	
 	if data.means[itemID] then
 		local stats = private.UnpackStats (data.means[itemID])
 		if stats[property] then
@@ -302,7 +302,7 @@ function lib.ClearItem(hyperlink, serverKey)
 			data.means[itemID] = private.PackStats (stats)
 		end
 	end
-
+	
 	if cleareditem then
 		print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
 	end
@@ -310,81 +310,84 @@ end
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules" )
-
+	
 	gui:AddHelp(id, "what simple stats",
-		_TRANS('SIMP_Help_SimpleStats') ,--What are simple stats?
-		_TRANS('SIMP_Help_SimpleStatsAnswer')
-		)--Simple stats are the numbers that are generated by the Simple module, the Simple module averages all of the prices for items that it sees and provides moving 3, 7, and 14 day averages.  It also provides daily minimum buyout along with a running average minimum buyout within 10% variance.
-
-	gui:AddControl(id, "Header",     0,    _TRANS('SIMP_Interface_SimpleOptions') )--Simple options'
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.enable", _TRANS('SIMP_Interface_EnableSimpleStats') )--Enable Simple Stats
-	gui:AddTip(id, _TRANS('SIMP_HelpTooltip_EnableSimpleStats') )--Allow Simple Stats to gather and return price data
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	_TRANS('SIMP_Help_SimpleStats') ,--What are simple stats?
+	_TRANS('SIMP_Help_SimpleStatsAnswer')
+	)--Simple stats are the numbers that are generated by the Simple module, the Simple module averages all of the prices for items that it sees and provides moving 3, 7, and 14 day averages.  It also provides daily minimum buyout along with a running average minimum buyout within 10% variance.
 		
-	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
-	--replace id with tooltipID  to add to this frame
-	local tooltipID = AucAdvanced.Settings.Gui.tooltipID or id
-	gui:AddHelp(tooltipID, "what moving day average",
+	--all options in here will be duplicated in the tooltip frame
+	function private.addTooltipControls(id)
+		gui:AddHelp(id, "what moving day average",
 		_TRANS('SIMP_Help_MovingAverage') , --What does \'moving day average\' mean?
 		_TRANS('SIMP_Help_MovingAverageAnswer') --Moving average means that it places more value on yesterday\'s moving averagethan today\'s average.  The determined amount is then used for tomorrow\'s moving average calculation.
 		)
-
-	gui:AddHelp(tooltipID, "how day average calculated",
+		
+		gui:AddHelp(id, "how day average calculated",
 		_TRANS('SIMP_Help_HowAveragesCalculated') , --How is the moving day averages calculated exactly?
 		_TRANS('SIMP_Help_HowAveragesCalculatedAnswer') --Todays Moving Average is ((X-1)*YesterdaysMovingAverage + TodaysAverage) / X, where X is the number of days (3,7, or 14).
 		)
-
-	gui:AddHelp(tooltipID, "no day saved",
+		
+		gui:AddHelp(id, "no day saved",
 		_TRANS('SIMP_Help_NoDaySaved') ,--So you aren't saving a day-to-day average?
 		_TRANS('SIMP_Help_NoDaySavedAnswer') )--No, that would not only take up space, but heavy calculations on each auction house scan, and this is only a simple model.
-
-	gui:AddHelp(tooltipID, "minimum buyout",
+		
+		gui:AddHelp(id, "minimum buyout",
 		_TRANS('SIMP_Help_MinimumBuyout') ,--Why do I need to know minimum buyout?
 		_TRANS('SIMP_Help_MinimumBuyoutAnswer')--While some items will sell very well at average within 2 days, others may sell only if it is the lowest price listed.  This was an easy calculation to do, so it was put in this module.
 		)
-
-	gui:AddHelp(tooltipID, "average minimum buyout",
+		
+		gui:AddHelp(id, "average minimum buyout",
 		_TRANS('SIMP_Help_AverageMinimumBuyout') ,--What's the point in an average minimum buyout?
 		_TRANS('SIMP_Help_AverageMinimumBuyoutAnswer')--This way you know how good a market is dealing.  If the MBO (minimum buyout) is bigger than the average MBO, then it\'s usually a good time to sell, and if the average MBO is greater than the MBO, then it\'s a good time to buy.
 		)
-
-	gui:AddHelp(tooltipID, "average minimum buyout variance",
+		
+		gui:AddHelp(id, "average minimum buyout variance",
 		_TRANS('SIMP_Help_MinimumBuyoutVariance') ,--What\'s the \'10% variance\' mentioned earlier for?
 		_TRANS('SIMP_Help_MinimumBuyoutVarianceAnswer')--If the current MBO is inside a 10% range of the running average, the current MBO is averaged in to the running average at 50% (normal).  If the current MBO is outside the 10% range, the current MBO will only be averaged in at a 12.5% rate.
 		)
-
-	gui:AddHelp(tooltipID, "why have variance",
+		
+		gui:AddHelp(id, "why have variance",
 		_TRANS('SIMP_Help_WhyVariance') ,--What\'s the point of a variance on minimum buyout?
 		_TRANS('SIMP_Help_WhyVarianceAnswer') --Because some people put their items on the market for rediculous price (too low or too high), so this helps keep the average from getting out of hand.
 		)
-
-	gui:AddHelp(tooltipID, "why multiply stack size simple",
+		
+		gui:AddHelp(id, "why multiply stack size simple",
 		_TRANS('SIMP_Help_WhyMultiplyStack') ,--Why have the option to multiply stack size?
 		_TRANS('SIMP_Help_WhyMultiplyStackAnswer') --The original Stat-Simple multiplied by the stack size of the item, but some like dealing on a per-item basis.
 		)
+				
+		gui:AddControl(id, "Header",     0,    _TRANS('SIMP_Interface_SimpleOptions') )--Simple options'
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.enable", _TRANS('SIMP_Interface_EnableSimpleStats') )--Enable Simple Stats
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_EnableSimpleStats') )--Allow Simple Stats to gather and return price data
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.simple.tooltip", _TRANS('SIMP_Interface_Show') )--Show simple stats in the tooltips?
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_Show') )--Toggle display of stats from the Simple module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.simple.avg3", _TRANS('SIMP_Interface_Toggle3Day') )--Display Moving 3 Day Average
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_Toggle3Day') )--Toggle display of 3-Day average from the Simple module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.simple.avg7", _TRANS('SIMP_Interface_Toggle7Day') )--Display Moving 7 Day Average
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_Toggle7Day') )--Toggle display of 7-Day average from the Simple module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.simple.avg14", _TRANS('SIMP_Interface_Toggle14Day') )--Display Moving 14 Day Average
+		gui:AddTip(id,_TRANS( 'SIMP_HelpTooltip_Toggle14Day') )--Toggle display of 14-Day average from the Simple module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.simple.minbuyout", _TRANS('SIMP_Interface_MinBuyout') )--Display Daily Minimum Buyout
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_MinBuyout') )--Toggle display of Minimum Buyout from the Simple module on or offMultiplies by current stack size if on
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.simple.avgmins", _TRANS('SIMP_Interface_MinBuyoutAverage') )--Display Average of Daily Minimum Buyouts
+		gui:AddTip(id,_TRANS( 'SIMP_HelpTooltip_MinBuyoutAverage') )--Toggle display of Minimum Buyout average from the Simple module on or off
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.simple.quantmul", _TRANS('SIMP_Interface_MultiplyStack') )--Multiply by stack size
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_MultiplyStack') )--Multiplies by current stack size if on
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.simple.reportsafe", _TRANS('SIMP_Interface_LongerAverage') )--Report safer prices for low volume items
+		gui:AddTip(id, _TRANS('SIMP_HelpTooltip_LongerAverage') )--Returns longer averages (7-day, or even 14-day) for low-volume items
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	end
+	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
 	
-	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")	
-	gui:AddControl(tooltipID, "Header",     0,    _TRANS('SIMP_Interface_SimpleOptions') )--Simple options'
-	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
-	
-	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.simple.tooltip", _TRANS('SIMP_Interface_Show') )--Show simple stats in the tooltips?
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_Show') )--Toggle display of stats from the Simple module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.simple.avg3", _TRANS('SIMP_Interface_Toggle3Day') )--Display Moving 3 Day Average
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_Toggle3Day') )--Toggle display of 3-Day average from the Simple module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.simple.avg7", _TRANS('SIMP_Interface_Toggle7Day') )--Display Moving 7 Day Average
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_Toggle7Day') )--Toggle display of 7-Day average from the Simple module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.simple.avg14", _TRANS('SIMP_Interface_Toggle14Day') )--Display Moving 14 Day Average
-	gui:AddTip(tooltipID,_TRANS( 'SIMP_HelpTooltip_Toggle14Day') )--Toggle display of 14-Day average from the Simple module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.simple.minbuyout", _TRANS('SIMP_Interface_MinBuyout') )--Display Daily Minimum Buyout
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_MinBuyout') )--Toggle display of Minimum Buyout from the Simple module on or offMultiplies by current stack size if on
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.simple.avgmins", _TRANS('SIMP_Interface_MinBuyoutAverage') )--Display Average of Daily Minimum Buyouts
-	gui:AddTip(tooltipID,_TRANS( 'SIMP_HelpTooltip_MinBuyoutAverage') )--Toggle display of Minimum Buyout average from the Simple module on or off
-	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.simple.quantmul", _TRANS('SIMP_Interface_MultiplyStack') )--Multiply by stack size
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_MultiplyStack') )--Multiplies by current stack size if on
-	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.simple.reportsafe", _TRANS('SIMP_Interface_LongerAverage') )--Report safer prices for low volume items
-	gui:AddTip(tooltipID, _TRANS('SIMP_HelpTooltip_LongerAverage') )--Returns longer averages (7-day, or even 14-day) for low-volume items
+	--now we create a duplicate of these in the tooltip frame
+	private.addTooltipControls(id)
+	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
 --[[ Local functions ]]--
@@ -393,12 +396,12 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-
+	
 	if not get("stat.simple.tooltip") then return end
-
+	
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not get("stat.simple.quantmul") then quantity = 1 end
-
+	
 	local serverKey, realm, faction = GetFaction () -- realm/faction requested for anticipated changes to add cross-faction tooltips
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 	local dispAvg3 = get("stat.simple.avg3")
@@ -407,14 +410,14 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	local dispMinB = get("stat.simple.minbuyout")
 	local dispAvgMBO = get("stat.simple.avgmins")
 	if (not dayAverage) then return end
-
+	
 	if (seenDays + dayCount > 0) then
 		tooltip:AddLine(_TRANS('SIMP_Tooltip_SimplePrices') )--Simple prices:
-
+		
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_SeenNumberDays'):format(seenCount+dayCount, seenDays) ) --Seen {{%s}} over {{%s}} days:
-
+			
 		end
 		if (seenDays > 6) and dispAvg14 then
 			tooltip:AddLine("  ".._TRANS('SIMP_Tooltip_14DayAverage') , avg14*quantity)--  14 day average
@@ -441,9 +444,9 @@ end
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
 function private.PushStats(serverKey)
 	local dailyAvg
-
+	
 	local data = private.GetPriceData(serverKey)
-
+	
 	local pdata, fdata, temp
 	for itemId, stats in pairs(data.daily) do
 		if (itemId ~= "created") then
@@ -454,12 +457,12 @@ function private.PushStats(serverKey)
 				if not info[3] then info[3] = 0 end
 				if not fdata[property] then
 					fdata[property] = {
-						1,
-						info[2],
-						("%0.01f"):format(dailyAvg),
-						("%0.01f"):format(dailyAvg),
-						("%0.01f"):format(dailyAvg),
-						("%0.01f"):format(info[3])
+					1,
+					info[2],
+					("%0.01f"):format(dailyAvg),
+					("%0.01f"):format(dailyAvg),
+					("%0.01f"):format(dailyAvg),
+					("%0.01f"):format(info[3])
 					}
 				else
 					fdata[property][1] = fdata[property][1] + 1
@@ -535,9 +538,9 @@ end
 function private.UpgradeDb()
 	private.UpgradeDb = nil
 	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "2.0" then return end
-
+	
 	local newSave = {Version = "2.0", RealmData = {}}
-
+	
 	-- Will only be run once per user account; however must run smoothly every time
 	-- Can afford to perform extra type-checking for safety
 	if type(AucAdvancedStatSimpleData) == "table" and AucAdvancedStatSimpleData.Version == "1.0" then
@@ -589,7 +592,7 @@ end
 
 function private.InitData()
 	private.InitData = nil
-
+	
 	-- Load data
 	private.UpgradeDb()
 	SSRealmData = AucAdvancedStatSimpleData.RealmData
@@ -597,7 +600,7 @@ function private.InitData()
 		SSRealmData = {} -- dummy value to avoid more errors - will not get saved
 		error(SSRealmData, "Error loading or creating StatSimple database")
 	end
-
+	
 	-- Note: database errors can occur if user tries to run an older version of StatSimple after the database is upgraded.
 	for serverKey, data in pairs (SSRealmData) do
 		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
@@ -631,7 +634,7 @@ function private.InitData()
 			else
 				data.daily = {created = time()}
 			end
-
+			
 			-- database maintenance
 			if time() - data.daily.created > 3600*16 then
 				-- This data is more than 16 hours old, we classify this as "yesterday's data"
@@ -647,12 +650,12 @@ end
 -- This may result in silent failures.
 -- @return The sum of all of the values passed in
 function private.sum(...)
-    local total = 0;
-    for x = 1, select('#', ...) do
-        total = total + select(x, ...);
-    end
-
-    return total;
+	local total = 0;
+	for x = 1, select('#', ...) do
+		total = total + select(x, ...);
+	end
+	
+	return total;
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
