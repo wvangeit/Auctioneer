@@ -663,6 +663,9 @@ Commitfunction = function()
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
 			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			if data[Const.SELLER] == "" then -- unknown seller name in new data; copy the old name if it exists
+				data[Const.SELLER] = oldItem[Const.SELLER]
+			end
 			if (bit.band(data[Const.FLAG], Const.FLAG_FILTER)==Const.FLAG_FILTER) then
 				filterOldCount = filterOldCount + 1
 			else
