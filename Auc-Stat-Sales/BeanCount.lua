@@ -46,7 +46,7 @@ local day7time = currenttime - 7*86400
 
 function private.onEvent(frame, event, arg, ...)
 	if (event == "MAIL_CLOSED") then
-        -- Clear pricecache
+		-- Clear pricecache
 		empty(pricecache)
 	end
 end
@@ -57,22 +57,22 @@ local BellCurve = AucAdvanced.API.GenerateBellCurve();
 -----------------------------------------------------------------------------------
 function lib.GetItemPDF(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
-    -- Get the data
+	-- Get the data
 	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
-
-    -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
-    -- the std dev is 100% of the mean divided by square root of number of views
- 	if stddev == 0 then stddev = mean / sqrt(soldqty); end
-
-    if not (mean and stddev) or mean == 0 or stddev == 0 then
-        return nil;                 -- No data, cannot determine pricing
-    end
-
-    local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
-
-    -- Build the PDF based on standard deviation & mean
-    BellCurve:SetParameters(mean, stddev);
-    return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
+	
+	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
+	-- the std dev is 100% of the mean divided by square root of number of views
+	if stddev == 0 then stddev = mean / sqrt(soldqty); end
+	
+	if not (mean and stddev) or mean == 0 or stddev == 0 then
+		return nil;                 -- No data, cannot determine pricing
+	end
+	
+	local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
+	
+	-- Build the PDF based on standard deviation & mean
+	BellCurve:SetParameters(mean, stddev);
+	return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
 end
 
 -----------------------------------------------------------------------------------
@@ -101,10 +101,10 @@ do
 	local keycache = {}
 	local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}}
 	local basesettings = {
-		["bid"] =true,
-		["auction"] = true,
-		["exact"] = true,
-		["servers"] = {},
+	["bid"] =true,
+	["auction"] = true,
+	["exact"] = true,
+	["servers"] = {},
 	}
 	function private.GetBCSearchSettings(serverKey)
 		local keysettings = keycache[serverKey]
@@ -135,10 +135,10 @@ function lib.GetPrice(hyperlink, serverKey)
 		Rsn_WonBid = _BC('UiWononBid')
 		Rsn_WonBuy = _BC('UiWononBuyout')
 	end
-
+	
 	serverKey = serverKey or GetFaction()
-    local sig = serverKey..GetSigFromLink(hyperlink)
-  	if pricecache[sig] == false then
+	local sig = serverKey..GetSigFromLink(hyperlink)
+	if pricecache[sig] == false then
 		return
 	end
 	if pricecache[sig] then
@@ -146,109 +146,109 @@ function lib.GetPrice(hyperlink, serverKey)
 	end
 	local settings = private.GetBCSearchSettings(serverKey)
 	if not settings then return end
-
+	
 	local tbl = BeanCounter.API.search(hyperlink, settings, true, 99999)
-    local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    local reason, qty, priceper, thistime
-    if tbl then
-        for i,v in pairs(tbl) do
-            -- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
-            -- true price per = (net+fee-deposit)/Qty
---1 [Void Crystal]
---2 Won on Buyout
---3 1650000
---4 1650000
---5 0
---6 20
---7 82500
---8 Yyzer
---9 0
---10 0
---11 10387318
---12 1198401769
-            reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 0
-            if priceper and qty and priceper>0 and qty>0 then
-                if reason == Rsn_WonBuy  or reason == Rsn_WonBid  then
-                    boughtqty = boughtqty + qty
-                    bought = bought + priceper*qty
-                    boughtseen = boughtseen + 1
-                    if thistime >= day3time then
-                        boughtqty3 = boughtqty3 + qty
-                        bought3 = bought3 + priceper*qty
-                    end
-                    if thistime >= day7time then
-                        boughtqty7 = boughtqty7 + qty
-                        bought7 = bought7 + priceper*qty
-                    end
-                elseif reason == Rsn_Success  then
-                    soldqty = soldqty + qty
-                    sold = sold + priceper*qty
-                    soldseen = soldseen + 1
-                    if thistime >= day3time then
-                        soldqty3 = soldqty3 + qty
-                        sold3 = sold3 + priceper*qty
-                    end
-                    if thistime >= day7time then
-                        soldqty7 = soldqty7 + qty
-                        sold7 = sold7 + priceper*qty
-                    end
-                end
-            end
-        end
-        if boughtqty>0 then bought = bought / boughtqty end
-        if soldqty>0 then sold = sold / soldqty end
-        if boughtqty3>0 then bought3 = bought3 / boughtqty3 end
-        if soldqty3>0 then sold3 = sold3 / soldqty3 end
-        if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
-        if soldqty7>0 then sold7 = sold7 / soldqty7 end
-    end
-    if (not sold or sold==0) and (not bought or bought==0) then pricecache[sig]=false; return end
-    -- Start StdDev calculations
-    local mean = sold
-    -- Calculate Variance
-    local variance = 0
-    local count = 0
-
-    for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-    	reason, qty, priceper = v[2], v[6], v[7]
-        if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success then
-            variance = variance + ((mean - priceper) ^ 2);
-            count = count + 1
-        end
+	local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	local reason, qty, priceper, thistime
+	if tbl then
+		for i,v in pairs(tbl) do
+			-- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
+			-- true price per = (net+fee-deposit)/Qty
+			--1 [Void Crystal]
+			--2 Won on Buyout
+			--3 1650000
+			--4 1650000
+			--5 0
+			--6 20
+			--7 82500
+			--8 Yyzer
+			--9 0
+			--10 0
+			--11 10387318
+			--12 1198401769
+			reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 0
+			if priceper and qty and priceper>0 and qty>0 then
+				if reason == Rsn_WonBuy  or reason == Rsn_WonBid  then
+					boughtqty = boughtqty + qty
+					bought = bought + priceper*qty
+					boughtseen = boughtseen + 1
+					if thistime >= day3time then
+						boughtqty3 = boughtqty3 + qty
+						bought3 = bought3 + priceper*qty
+					end
+					if thistime >= day7time then
+						boughtqty7 = boughtqty7 + qty
+						bought7 = bought7 + priceper*qty
+					end
+				elseif reason == Rsn_Success  then
+					soldqty = soldqty + qty
+					sold = sold + priceper*qty
+					soldseen = soldseen + 1
+					if thistime >= day3time then
+						soldqty3 = soldqty3 + qty
+						sold3 = sold3 + priceper*qty
+					end
+					if thistime >= day7time then
+						soldqty7 = soldqty7 + qty
+						sold7 = sold7 + priceper*qty
+					end
+				end
+			end
+		end
+		if boughtqty>0 then bought = bought / boughtqty end
+		if soldqty>0 then sold = sold / soldqty end
+		if boughtqty3>0 then bought3 = bought3 / boughtqty3 end
+		if soldqty3>0 then sold3 = sold3 / soldqty3 end
+		if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
+		if soldqty7>0 then sold7 = sold7 / soldqty7 end
+	end
+	if (not sold or sold==0) and (not bought or bought==0) then pricecache[sig]=false; return end
+	-- Start StdDev calculations
+	local mean = sold
+	-- Calculate Variance
+	local variance = 0
+	local count = 0
+	
+	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
+		reason, qty, priceper = v[2], v[6], v[7]
+		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success then
+			variance = variance + ((mean - priceper) ^ 2);
+			count = count + 1
+		end
 	end
 	variance = variance / count;
 	local stdev = variance ^ 0.5
-
+	
 	local deviation = 1.5 * stdev
-
+	
 	-- Trim down to those within 1.5 stddev
-    local number = 0
-    local total = 0
-    for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-    	reason, qty, priceper = v[2], v[6], v[7]
-        if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success  then
-        	if (math.abs(priceper - mean) < deviation) then
-			    total = total + priceper * qty
-			    number = number + qty
-		    end
+	local number = 0
+	local total = 0
+	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
+		reason, qty, priceper = v[2], v[6], v[7]
+		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success  then
+			if (math.abs(priceper - mean) < deviation) then
+				total = total + priceper * qty
+				number = number + qty
+			end
 		end
 	end
-
+	
 	local confidence = .01
-
+	
 	local average
 	if (number > 0) then
 		average = total / number
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-
-    pricecache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
-    return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
+	
+	pricecache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
+	return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
 function lib.GetPriceColumns()
-    if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
+	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
 	return "Average", "Mean","Std Deviation", "Variance", "Confidence", "Bought Price", "Sold Price", "Bought Quantity", "Sold Quantity", "Bought Times", "Sold Times", "3day Bought Price", "3day Sold Price", "3day Bought Quantity", "3day Sold Quantity", "7day Bought Price", "7day Sold Price", "7day Bought Quantity", "7day Sold Quantity"
 end
 
@@ -257,11 +257,11 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
 	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
 	-- no need to clean out array; we will just overwrite all entries with new values
-
-    -- Get our statistics
+	
+	-- Get our statistics
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
-    if not bought and not sold then return end
-   	-- These are the ones that most algorithms will look for
+	if not bought and not sold then return end
+	-- These are the ones that most algorithms will look for
 	array.price = average or mean
 	array.confidence = confidence
 	-- This is additional data
@@ -269,24 +269,24 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	array.mean = mean
 	array.deviation = stdev
 	array.variance = variance
-
-    array.boughtseen = boughtseen
-    array.soldseen = soldseen
-    array.bought = bought
+	
+	array.boughtseen = boughtseen
+	array.soldseen = soldseen
+	array.bought = bought
 	array.sold = sold
-    array.boughtqty = boughtqty
-    array.soldqty = soldqty
-    array.seen = boughtseen
-    if soldseen then array.seen = array.seen+soldseen end
-    array.bought3 = bought3
+	array.boughtqty = boughtqty
+	array.soldqty = soldqty
+	array.seen = boughtseen
+	if soldseen then array.seen = array.seen+soldseen end
+	array.bought3 = bought3
 	array.sold3 = sold3
-    array.boughtqty3 = boughtqty3
-    array.soldqty3 = soldqty3
-    array.bought7 = bought7
+	array.boughtqty3 = boughtqty3
+	array.soldqty3 = soldqty3
+	array.bought7 = bought7
 	array.sold7 = sold7
-    array.boughtqty7 = boughtqty7
-    array.soldqty7 = soldqty7
-
+	array.boughtqty7 = boughtqty7
+	array.soldqty7 = soldqty7
+	
 	return array
 end
 
@@ -296,13 +296,13 @@ end
 
 function lib.OnLoad(addon)
 	default("stat.sales.tooltip", false)
-    default("stat.sales.avg", true)
-    default("stat.sales.avg3", false)
-    default("stat.sales.avg7", false)
-    default("stat.sales.normal", true)
-    default("stat.sales.stddev", false)
-    default("stat.sales.confidence", false)
-   	default("stat.sales.enable", true)
+	default("stat.sales.avg", true)
+	default("stat.sales.avg3", false)
+	default("stat.sales.avg7", false)
+	default("stat.sales.normal", true)
+	default("stat.sales.stddev", false)
+	default("stat.sales.confidence", false)
+	default("stat.sales.enable", true)
 end
 
 function lib.Processor(callbackType, ...)
@@ -318,39 +318,39 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-
+	
 	if not get("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
-
+	
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
-    if (boughtseen+soldseen>0) then
+	if (boughtseen+soldseen>0) then
 		tooltip:AddLine(_TRANS('ASAL_Tooltip_SalesPrices'))--Sales prices:
-
-        if get("stat.sales.avg") then
-            if (boughtseen > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalBought'):format(boughtqty), bought) --Total Bought {{%s}} at avg each
-            end
-            if (soldseen > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalSold'):format(soldqty), sold) --Total Sold {{%s}} at avg each
-            end
-        end
-        if get("stat.sales.avg7") then
-            if (boughtqty7 > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysBought'):format(boughtqty7), bought7) --7 Days Bought {{%s}} at avg each
-            end
-            if (soldqty7 > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysSold'):format(soldqty7), sold7)--7 Days Sold {{%s}} at avg each
-            end
-        end
-        if get("stat.sales.avg3") then
-            if (boughtqty3 > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysBought'):format(boughtqty3), bought3)--3 Days Bought {{%s}} at avg each
-            end
-            if (soldqty3 > 0) then
-                tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysSold'):format(soldqty3), sold3)--3 Days Sold {{%s}} at avg each
-            end
-        end
-        if (average and average > 0) then
+		
+		if get("stat.sales.avg") then
+			if (boughtseen > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalBought'):format(boughtqty), bought) --Total Bought {{%s}} at avg each
+			end
+			if (soldseen > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalSold'):format(soldqty), sold) --Total Sold {{%s}} at avg each
+			end
+		end
+		if get("stat.sales.avg7") then
+			if (boughtqty7 > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysBought'):format(boughtqty7), bought7) --7 Days Bought {{%s}} at avg each
+			end
+			if (soldqty7 > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_7DaysSold'):format(soldqty7), sold7)--7 Days Sold {{%s}} at avg each
+			end
+		end
+		if get("stat.sales.avg3") then
+			if (boughtqty3 > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysBought'):format(boughtqty3), bought3)--3 Days Bought {{%s}} at avg each
+			end
+			if (soldqty3 > 0) then
+				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_3DaysSold'):format(soldqty3), sold3)--3 Days Sold {{%s}} at avg each
+			end
+		end
+		if (average and average > 0) then
 			if get("stat.sales.normal") then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_NormalizedStack'), average*quantity)--
 				if (quantity > 1) then
@@ -360,14 +360,14 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 			if get("stat.sales.stdev") then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_ StdDeviation'), stdev*quantity)--Std Deviation
 				if (quantity > 1) then
-				    tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), stdev)--(or individually)
+					tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Individually'), stdev)--(or individually)
 				end
 			end
 			if get("stat.sales.confid") then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Confidence')..(floor(confidence*1000))/1000)--Confidence:
 			end
 		end
-
+		
 	end
 end
 
@@ -377,35 +377,38 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what sales stats",
 	_TRANS('ASAL_Help_StatSales') ,--What are sales stats?'
 	_TRANS('ASAL_Help_StatSalesAnswer') )--Sales stats are the numbers that are generated by the sales module from the BeanCounter database. It averages all of the prices for items that you have sold
-	
-	gui:AddControl(id, "Header",     0,    _TRANS('ASAL_Interface_SalesOptions') )--Sales options
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('ASAL_Interface_EnableSalesStats') )--Enable Sales Stats
-	gui:AddTip(id, _TRANS('ASAL_HelpTooltip_EnableSalesStats') )--Allow Sales to contribute to Market Price.
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 		
+	--all options in here will be duplicated in the tooltip frame
+	function private.addTooltipControls(id)
+		gui:AddControl(id, "Header",     0,    _TRANS('ASAL_Interface_SalesOptions') )--Sales options
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		
+		gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('ASAL_Interface_EnableSalesStats') )--Enable Sales Stats
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_EnableSalesStats') )--Allow Sales to contribute to Market Price.
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		
+		gui:AddControl(id, "Checkbox",   0, 4, "stat.sales.tooltip", _TRANS('ASAL_Interface_ShowSalesStat') )--Show sales stats in the tooltips?
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_ShowSalesStat') )--Toggle display of stats from the Sales module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.avg3", _TRANS('ASAL_Interface_Display3DayMean') )--Display Moving 3 Day Mean
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_Display3DayMean') )--Toggle display of 3-Day mean from the Sales module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.avg7", _TRANS('ASAL_Interface_Display7DayMean') )--Display Moving 7 Day Mean
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_Display7DayMean') )--Toggle display of 7-Day mean from the Sales module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.avg", _TRANS('ASAL_Interface_DisplayOverallMean') )--Display Overall Mean
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayOverallMean') )--Toggle display of Permanent mean from the Sales module on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.normal", _TRANS('ASAL_Interface_DisplayNormalized') )--Display Normalized
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayNormalized') )--Toggle display of \'Normalized\' calculation in tooltips on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.stdev", _TRANS('ASAL_Interface_DisplayStdDeviation') )--Display Standard Deviation
+		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_DisplayStdDeviation') )--Toggle display of \'Standard Deviation\' calculation in tooltips on or off
+		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.confid", _TRANS('ASAL_Interface_DisplayConfidence') )--Display Confidence
+		gui:AddTip(id,_TRANS('ASAL_HelpTooltip_DisplayConfidence') )--Toggle display of \'Confidence\' calculation in tooltips on or off
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	end
 	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
-	--replace id with tooltipID  to add to this frame
-	local tooltipID = AucAdvanced.Settings.Gui.tooltipID or id
-	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(tooltipID, "Header",     0,    _TRANS('ASAL_Interface_SalesOptions') )--Sales options
-	gui:AddControl(tooltipID, "Note",       0, 1, nil, nil, " ")
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
 	
-	gui:AddControl(tooltipID, "Checkbox",   0, 1, "stat.sales.tooltip", _TRANS('ASAL_Interface_ShowSalesStat') )--Show sales stats in the tooltips?
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_ShowSalesStat') )--Toggle display of stats from the Sales module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.avg3", _TRANS('ASAL_Interface_Display3DayMean') )--Display Moving 3 Day Mean
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_Display3DayMean') )--Toggle display of 3-Day mean from the Sales module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.avg7", _TRANS('ASAL_Interface_Display7DayMean') )--Display Moving 7 Day Mean
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_Display7DayMean') )--Toggle display of 7-Day mean from the Sales module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.avg", _TRANS('ASAL_Interface_DisplayOverallMean') )--Display Overall Mean
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_DisplayOverallMean') )--Toggle display of Permanent mean from the Sales module on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.normal", _TRANS('ASAL_Interface_DisplayNormalized') )--Display Normalized
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_DisplayNormalized') )--Toggle display of \'Normalized\' calculation in tooltips on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.stdev", _TRANS('ASAL_Interface_DisplayStdDeviation') )--Display Standard Deviation
-	gui:AddTip(tooltipID, _TRANS('ASAL_HelpTooltip_DisplayStdDeviation') )--Toggle display of \'Standard Deviation\' calculation in tooltips on or off
-	gui:AddControl(tooltipID, "Checkbox",   0, 2, "stat.sales.confid", _TRANS('ASAL_Interface_DisplayConfidence') )--Display Confidence
-	gui:AddTip(tooltipID,_TRANS('ASAL_HelpTooltip_DisplayConfidence') )--Toggle display of \'Confidence\' calculation in tooltips on or off
+	--now we create a duplicate of these in the tooltip frame
+	private.addTooltipControls(id)
+	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
 --[[Bootstrap Code]]
