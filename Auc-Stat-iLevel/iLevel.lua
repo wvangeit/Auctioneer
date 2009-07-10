@@ -299,7 +299,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	end
 	--This is the Tooltip tab provided by aucadvanced so all tooltip configuration is in one place
-	local tooltipID = AucAdvanced.Settings.Gui.tooltipID or id
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
 	
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
