@@ -197,32 +197,65 @@ function private.searchServerData(serverName, data, tbl, settings)
 			--If we are not doing a whole server search and the chosen search player is not "i" then we fall into this null
 			--otherwise we search the server or toon as normal
 		else
+		--flag to filter neutral AH from results, this will remove neutral AH when alliance, horde filter is used. This is temporary we need to change teh DB layout to better manage neutral AH
+		local filterNeutral
+		if settings.selectbox[2] == "alliance" or settings.selectbox[2] == "horde" then filterNeutral = true end
 			for _, id in pairs(tbl) do
 				if settings.auction and server[i]["completedAuctions"][id] then
 					for index, itemKey in pairs(server[i]["completedAuctions"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
+							if filterNeutral then
+								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+								if location ~= "N" then
+									table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
+								end
+							else
+								table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
+							end
 						end
 					end
 				end
 				if settings.failedauction and server[i]["failedAuctions"][id] then
 					for index, itemKey in pairs(server[i]["failedAuctions"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data, {"FAILEDAUCTIONS", id, index, text})
+							if filterNeutral then
+								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+								if location ~= "N" then
+									table.insert(data, {"FAILEDAUCTIONS", id, index, text})
+								end					
+							else
+								table.insert(data, {"FAILEDAUCTIONS", id, index, text})
+							end
+							
 						end
 					end
 				end
 				if settings.bid and server[i]["completedBids/Buyouts"][id] then
 					for index, itemKey in pairs(server[i]["completedBids/Buyouts"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
+							if filterNeutral then
+								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+								if location ~= "N" then
+									table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
+								end
+							else
+								table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
+							end
 						end
 					end
 				end
 				if settings.failedbid and server[i]["failedBids"][id] then
 					for index, itemKey in pairs(server[i]["failedBids"][id]) do
 						for _, text in ipairs(itemKey) do
-							table.insert(data, {"FAILEDBIDS", id, index, text})
+							if filterNeutral then
+								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+								if location ~= "N" then
+									table.insert(data, {"FAILEDBIDS", id, index, text})
+								end
+							else
+								table.insert(data, {"FAILEDBIDS", id, index, text})
+							end
+							
 						end
 					end
 				end
@@ -301,6 +334,7 @@ end
 	function private.COMPLETEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
+			if uReason == "0" then uReason = "..." end
 			
 			local pricePer = 0
 			local stack = tonumber(uStack) or 0
@@ -333,6 +367,7 @@ end
 	function private.FAILEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
+			if uReason == "0" then uReason = "..." end
 			
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
@@ -361,6 +396,7 @@ end
 		
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
+			if uReason == "0" then uReason = "..." end
 			--print("S=", uStack, "M=",uMoney, "D=",uDeposit , "F=",uFee, "Buy=",uBuyout , "Bid=",uBid, "Sell=",uSeller, "T=",uTime, "R=",uReason)
 			
 			local pricePer, stack, text = 0, tonumber(uStack), _BC('UiWononBuyout')
@@ -398,6 +434,7 @@ end
 			
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
+			if uReason == "0" then uReason = "..." end
 			
 			local itemID, suffix = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
