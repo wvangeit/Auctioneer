@@ -158,9 +158,9 @@ local function prospectTooltip(prospect, tooltip, name, link, quality, count)
 		local userSkill = Enchantrix.Util.GetUserJewelCraftingSkill();
 		local deText = format(_ENCH("TooltipProspectLevel"), reqSkill );
 		if (userSkill < reqSkill) then
-			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, 0.8,0.1,0.1, embed);		-- reddish
 		else
-			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, 0.1,0.8,0.1, embed);		-- greenish
 		end
 	end
 
@@ -252,9 +252,9 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 		local userSkill = Enchantrix.Util.GetUserInscriptionSkill();
 		local deText = format(_ENCH("TooltipMillingLevel"), reqSkill );
 		if (userSkill < reqSkill) then
-			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, 0.8,0.1,0.1, embed);		-- reddish
 		else
-			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, 0.1,0.8,0.1, embed);		-- greenish
 		end
 	end
 
@@ -382,9 +382,9 @@ function itemTooltip(tooltip, name, link, quality, count)
 		local userSkill = Enchantrix.Util.GetUserEnchantingSkill();
 		local deText = format(_ENCH("TooltipShowDisenchantLevel"), reqSkill );
 		if (userSkill < reqSkill) then
-			tooltip:AddLine(deText, nil, embed, 0.8,0.1,0.1);		-- reddish
+			tooltip:AddLine(deText, nil, 0.8,0.1,0.1, embed);		-- reddish
 		else
-			tooltip:AddLine(deText, nil, embed, 0.1,0.8,0.1);		-- greenish
+			tooltip:AddLine(deText, nil, 0.1,0.8,0.1, embed);		-- greenish
 		end
 	end
 
@@ -616,14 +616,14 @@ function enchantTooltip(tooltip, name, link, isItem)
 		end
 
 		if not Enchantrix.State.Auctioneer_Loaded then
-			tooltip:AddLine(_ENCH('FrmtWarnAuctNotLoaded'), 0.6,0.6,0.1)
+			tooltip:AddLine(_ENCH('FrmtWarnAuctNotLoaded'), 0.6,0.6,0.1, embed)
 		end
 
 		if unknownPrices then
-			tooltip:AddLine(_ENCH('FrmtWarnPriceUnavail'), 0.6,0.6,0.1)
+			tooltip:AddLine(_ENCH('FrmtWarnPriceUnavail'), 0.6,0.6,0.1, embed)
 		end
 	else
-		tooltip:AddLine(_ENCH('FrmtWarnNoPrices'), 0.6,0.6,0.1)
+		tooltip:AddLine(_ENCH('FrmtWarnNoPrices'), 0.6,0.6,0.1, embed)
 	end
 end
 
