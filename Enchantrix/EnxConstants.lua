@@ -213,6 +213,13 @@ const.StaticPrices = {
 	[36930] =  600000, 	-- Monarch Topaz
 	[36924] =  180000, 	-- Sky Sapphire
 	[36921] =  520000, 	-- Autumn's Glow
+	
+	[36925] =  400000, 	-- MAJESTICZIRCON
+	[36931] =  400000, 	-- AMETRINE
+	[36922] =  400000, 	-- KINGSAMBER
+	[36928] =  400000, 	-- DREADSTONE
+	[36919] =  400000, 	-- CARDINALRUBY
+	[36934] =  400000, 	-- EYEOFZUL
 
 }
 
@@ -361,7 +368,7 @@ local EPIC = 4
 
 -- disenchanting level bracket upper bounds
 -- e.g. an ilevel 52 item goes into bracket 55
-const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 250 }
+const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 275 }
 
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
@@ -440,7 +447,8 @@ const.baseDisenchantTable = {
    [120] = { { LPRISMATIC , 0.05, 1.0 }, { VOID , 0.01, 1.0 }, },
    [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
    [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
+   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [275] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
   },
   [const.ARMOR] = {
    [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
@@ -463,7 +471,8 @@ const.baseDisenchantTable = {
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
    [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
+   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
+   [275] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
   },
  },
  [EPIC] = {
@@ -484,7 +493,7 @@ const.baseDisenchantTable = {
    [151] = { { VOID      , 1.00, 1.5 }, },
    [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
    [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [250] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 226, so far
+   [275] = { { ABYSS     , 1.00, 1.0 }, },	-- highest level LK epic is 258, so far - where is the break to 1.5 shards?
   },
   [const.ARMOR] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
@@ -503,7 +512,7 @@ const.baseDisenchantTable = {
    [151] = { { VOID      , 1.00, 1.5 }, },
    [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
    [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [250] = { { ABYSS     , 1.00, 1.5 }, },	-- highest level LK epic is 226, so far
+   [275] = { { ABYSS     , 1.00, 1.0 }, },	-- highest level LK epic is 258, so far
   },
  },
 }
@@ -519,6 +528,7 @@ local FEL_IRON_ORE = 23424
 local ADAMANTITE_ORE = 23425
 local COBALT_ORE = 36909
 local SARONITE_ORE = 36912
+local TITANIUM_ORE = 36910
 
 local COPPERPOWDER = 24186
 local TINPOWDER = 24188
@@ -527,6 +537,7 @@ local MITHRILPOWDER = 24234
 local THORIUMPOWDER = 24235
 local FELIRONPOWDER = 24242
 local ADAMANTITEPOWDER = 24243
+local TITANIUMPOWDER = 46849
 
 local TIGERSEYE = 818
 local MALACHITE = 774
@@ -568,11 +579,16 @@ local MONARCHTOPAZ = 36930
 local SKYSAPPHIRE = 36924
 local AUTMNSGLOW = 36921
 
+local MAJESTICZIRCON = 36925
+local AMETRINE = 36931
+local KINGSAMBER = 36922
+local DREADSTONE = 36928
+local CARDINALRUBY = 36919
+local EYEOFZUL = 36934
+
 
 --[[
 	Prospectable ores
-	percentages from Wowhead
-	last updated Aug 24, 2008
 ]]
 
 const.ProspectMinLevels = {
@@ -585,6 +601,7 @@ const.ProspectMinLevels = {
 	[ADAMANTITE_ORE] = 325,
 	[COBALT_ORE] = 350,
 	[SARONITE_ORE] = 400,
+	[TITANIUM_ORE] = 450,
 }
 
 
@@ -705,6 +722,32 @@ const.ProspectableItems = {
 			[SKYSAPPHIRE] = 0.04,
 			[TWILIGHTOPAL] = 0.04,
 			[AUTMNSGLOW] = 0.04,
+			},
+
+	[TITANIUM_ORE] = {				-- PLACEHOLDER, we don't know the yields yet
+			[TITANIUMPOWDER] = 0.65,
+			
+			[CHALCEDONY] = 0.25,
+			[SHADOWCRYSTAL] = 0.25,
+			[DARKJADE] = 0.25,
+			[HUGECITRINE] = 0.25,
+			[BLOODSTONE] = 0.25,
+			[SUNCRYSTAL] = 0.25,
+			
+			[FORESTEMERALD] = 0.04,
+			[SCARLETRUBY] = 0.04,
+			[MONARCHTOPAZ] = 0.04,
+			[SKYSAPPHIRE] = 0.04,
+			[TWILIGHTOPAL] = 0.04,
+			[AUTMNSGLOW] = 0.04,
+			
+			[MAJESTICZIRCON] = 0.04,
+			[AMETRINE] = 0.04,
+			[KINGSAMBER] = 0.04,
+			[DREADSTONE] = 0.04,
+			[CARDINALRUBY] = 0.04,
+			[EYEOFZUL] = 0.04,
+			
 			},
 
 }
@@ -1157,5 +1200,15 @@ const.BackupReagentItemInfo = {
 	[43108] = "Ebon Pigment#|cff1eff00|Hitem:43108:0:0:0:0:0:0:0:70|h[Ebon Pigment]|h|r#2#70#0#Trade Goods#Other#20##Interface\\Icons\\INV_Inscription_Pigment_Ebon",
 	[43109] = "Icy Pigment#|cff1eff00|Hitem:43109:0:0:0:0:0:0:0:70|h[Icy Pigment]|h|r#2#80#0#Trade Goods#Other#20##Interface\\Icons\\INV_Inscription_Pigment_Icy",
 	[43116] = "Lion's Ink#|cffffffff|Hitem:43116:0:0:0:0:0:0:0:70|h[Lion's Ink]|h|r#1#20#0#Trade Goods#Parts#20##Interface\\Icons\\INV_Inscription_InkYellow02",
+
+-- new in 3.2
+	[36934] = "Eye of Zul#|cffa335ee|Hitem:36934:0:0:0:0:0:0:0:80|h[Eye of Zul]|h|r#4#85#0#Gem#Green#20##Interface\\Icons\\inv_jewelcrafting_gem_34",
+	[36919] = "Cardinal Ruby#|cffa335ee|Hitem:36919:0:0:0:0:0:0:0:80|h[Cardinal Ruby]|h|r#4#85#0#Gem#Red#20##Interface\\Icons\\inv_jewelcrafting_gem_36",
+	[36931] = "Ametrine#|cffa335ee|Hitem:36931:0:0:0:0:0:0:0:80|h[Ametrine]|h|r#4#85#0#Gem#Orange#20##Interface\\Icons\\inv_jewelcrafting_gem_33",
+	[23439] = "Noble Topaz#|cff0070dd|Hitem:23439:0:0:0:0:0:0:0:80|h[Noble Topaz]|h|r#3#70#0#Gem#Orange#20##Interface\\Icons\\INV_Jewelcrafting_NobleTopaz_02",
+	[36925] = "Majestic Zircon#|cffa335ee|Hitem:36925:0:0:0:0:0:0:0:80|h[Majestic Zircon]|h|r#4#85#0#Gem#Blue#20##Interface\\Icons\\inv_jewelcrafting_gem_35",
+	[36928] = "Dreadstone#|cffa335ee|Hitem:36928:0:0:0:0:0:0:0:80|h[Dreadstone]|h|r#4#85#0#Gem#Purple#20##Interface\\Icons\\inv_jewelcrafting_gem_31",
+	[36922] = "King's Amber#|cffa335ee|Hitem:36922:0:0:0:0:0:0:0:80|h[King's Amber]|h|r#4#85#0#Gem#Yellow#20##Interface\\Icons\\inv_jewelcrafting_gem_36",
+	[46849] = "Titanium Powder#|cff1eff00|Hitem:46849:0:0:0:0:0:0:0:80|h[Titanium Powder]|h|r#2#80#0#Trade Goods#Enchanting#20##Interface\\Icons\\INV_Misc_Dust_03",
 }
 

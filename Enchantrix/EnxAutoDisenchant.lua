@@ -140,7 +140,11 @@ local function getDisenchantOrProspectValue(link, count)
 				return hsp, _ENCH('ArgSpellname')
 			end
 		end
-	elseif count >= 5 then
+	end
+	
+	-- some quality 2 ores are now prospectable
+	
+	if count >= 5 then
 
 -- TODO - ccox - these could share some code
 		local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
