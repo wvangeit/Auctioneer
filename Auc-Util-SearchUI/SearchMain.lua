@@ -716,6 +716,7 @@ function private.purchaseall()
 		end
 		if ((balance-price) > reserve or not enableres) then
 			AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
+			gui.frame.cancel.updateDisplay() -- force update of gui.frame.cancel.value
 		else
 			print("Purchase cancelled: Reserve reached")
 		end
