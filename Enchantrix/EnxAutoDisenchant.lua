@@ -98,6 +98,22 @@ local function isItemIgnored(link)
 	return auto_de_session_ignore_list[genericLink] or AutoDisenchantIgnoreList[genericLink]
 end
 
+
+-- currently tests for item quality, will be made to test for more in the future
+local function isAutoDisenchantAllowed(link)
+	local _, _, quality, _ = GetItemInfo(link)
+
+	if (quality == 3) and (not Enchantrix.Settings.GetSetting('AutoDeRareItems')) then
+		return false
+	end
+	
+	if (quality == 4) and (not Enchantrix.Settings.GetSetting('AutoDeEpicItems')) then
+		return false
+	end
+	
+	return true
+end
+
 local function nameFromIgnoreListItem(item)
 	local _, _, name = string.find(item, "%[(.+)%]")
 	return name
@@ -208,7 +224,7 @@ local function findItemInOneBag(bag, findLink)
 				-- items sometimes linger after they've been disenchanted and looted
 				debugSpam("Skipping zombie item " .. link)
 			else
-				if not isItemIgnored(link) then
+				if (not isItemIgnored(link)) and isAutoDisenchantAllowed(link) then
 					local value, spell = getDisenchantOrProspectValue(link, count)
 					if value and value > 0 then
 						return link, bag, slot, value, spell
@@ -471,6 +487,8 @@ end
 function clearPrompt()
 	hidePrompt()
 	auto_de_prompt.link, auto_de_prompt.bag, auto_de_prompt.slot, auto_de_prompt.count, auto_de_prompt.time = nil, nil, nil, nil, nil
+	-- clear the button target so macro junkies don't get a surprise
+	auto_de_prompt.Yes:SetAttribute("target-item", nil)
 end
 
 local function promptNo()
