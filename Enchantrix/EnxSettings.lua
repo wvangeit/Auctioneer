@@ -153,6 +153,7 @@ local settingDefaults = {
 	['AutoDisenchantEnable'] = false,	-- off by default - potentially dangerous if you're not expecting it :)
 	['AutoDeRareItems'] = true,			-- on by default for backwards compatibility
 	['AutoDeEpicItems'] = true, 		-- on by default for backwards compatibility
+	['AutoDeOnlyIfBoughtForDE'] = false, 	-- off by default for backwards compatibility, checks with BeanCounter for purchase reason
 
 	['export.aucadv'] = true, -- Send our price values to auctioneer advanced as stats
 	['ModTTShow'] = false,
@@ -569,6 +570,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
 	gui:AddControl(id, "Checkbox",   0, 2, "AutoDeRareItems", _ENCH("GuiAutoDeRareItems"))
 	gui:AddControl(id, "Checkbox",   0, 2, "AutoDeEpicItems", _ENCH("GuiAutoDeEpicItems"))
+	gui:AddControl(id, "Checkbox",   0, 2, "AutoDeOnlyIfBoughtForDE", _ENCH("GuiAutoDeBoughtForDE"))
 	
 	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
 	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", "this string isn't shown but needs to be long for layout")

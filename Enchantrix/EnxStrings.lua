@@ -226,6 +226,7 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "aldrig";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Milling";
 		["ArgSpellname"]	= "Disenchant";
 		["ArgSpellProspectingName"]	= "Prospecting";
 		["Enchanting"]	= "Enchanting";
@@ -280,11 +281,28 @@ EnchantrixLocalizations = {
 		["HelpLocale"]	= "Ændrer sproget som bruges til at vises Enchantrix meddelelser";
 		["HelpOnoff"]	= "Skifter mellem om enchant data vises eller ej.";
 		["HelpPrintin"]	= "Vælg hvilken ramme Enchantrix viser sine meddelelser i.\nDu kan enten angive navnet eller nummeret.";
+		["HelpShowDELevels"]	= "Vælg om det skal vises i tooltip hvilket skill der kræves for at disenchante tingen.";
+		["HelpShowDEMaterials"]	= "Vælg om det skal vises i tooltip hvilke materialer man kan få ved at disenchante tingen.";
 		["HelpShowUI"]	= "Vis eller gem redigerings panelet.";
 		["HelpTerse"]	= "Aktiver/deaktiver kortfattet indstilling. Viser kun disenchant værdi. Kan tilsidesættes ved at holde control-tasten nede.";
 		["HelpValue"]	= "Vælg om tingens værdi baseret pÃ udfaldet af mulige disenchants skal vises.";
+		["ModTTShow_Help"]	= "Denne indstilling vil kun vise Enchantrix's ekstra tooltip hvis ALT er trykket ned.";
 
 		-- Section: Report Messages
+		["AuctionScanAuctNotInstalled"]	= "Du har ikke installeret Auctioneer. Auctioneer skal være installeret for at udføre en auktions skan.";
+		["AuctionScanVersionTooOld"]	= "Du har ikke den korrekte version af Auctioneer installeret. Denne funktion kræver Auctioneer 4.0 eller nyere.";
+		["ChatDeletedProfile"]	= "Slettet profil:";
+		["ChatDuplicatedProfile"]	= "Kopieret profil til:";
+		["ChatResetProfile"]	= "Nulstil alle indstillinger for:";
+		["ChatSavedProfile"]	= "Gemt profil:";
+		["ChatUsingProfile"]	= "Aktuel profil:";
+		["FrmtAutoDeActive"]	= "AutoDisenchant aktiveret";
+		["FrmtAutoDeDisabled"]	= "AutoDisenchant inaktiveret";
+		["FrmtAutoDeDisenchanting"]	= "Disenchanter %s";
+		["FrmtAutoDeIgnorePermanent"]	= "Ignorerer %s permanent";
+		["FrmtAutoDeInactive"]	= "AutoDisenchant inaktiv";
+		["FrmtAutoDeMilling"]	= "Miller %s";
+		["FrmtAutoDeProspecting"]	= "Prospecter %s";
 		["FrmtBidbrokerCurbid"]	= "BudNu";
 		["FrmtBidbrokerDone"]	= "Gennemløb for lave priser udført.";
 		["FrmtBidbrokerHeader"]	= "Auktioner som har %s sølv besparelse baseret på gennemsnitlig disenchant værdi. (min %%mindre = %d): ";
@@ -300,7 +318,12 @@ EnchantrixLocalizations = {
 		["FrmtBarkerPrice"]	= "Udråbspris (%d%% margen)";
 		["FrmtDisinto"]	= "Disenchants til:";
 		["FrmtFound"]	= "Fandt at %s disenchants til:";
+		["FrmtFoundNotDisenchant"]	= "Registrerede at %s ikke kan disenchantes";
+		["FrmtMillingFound"]	= "Registrerede at %s milles til:";
+		["FrmtMillsInto"]	= "Milles til:";
 		["FrmtPriceEach"]	= "(%s/stk.)";
+		["FrmtProspectFound"]	= "Registrerede at %s prospectes til:";
+		["FrmtProspectInto"]	= "Prospectes til:";
 		["FrmtSuggestedPrice"]	= "Anbefalet pris:";
 		["FrmtTotal"]	= "I alt";
 		["FrmtValueAuctHsp"]	= "Disenchant værdi (HSP)";
@@ -308,27 +331,48 @@ EnchantrixLocalizations = {
 		["FrmtValueMarket"]	= "Disenchant værdi (Base)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer ikke indlæst, bruger priser fra cachen]";
 		["FrmtWarnNoPrices"]	= "[Ingen priser er tilgængelige]";
-		["FrmtWarnPriceUnavail"]	= "[Nogen af priserne er ikke tilgængelige]";
+		["FrmtWarnPriceUnavail"]	= "[Nogle af priserne er ikke tilgængelige]";
+		["TooltipMillingLevel"]	= "Milling kræver skill %d";
+		["TooltipProspectLevel"]	= "Prospecting kræver skill %d";
+		["TooltipShowDisenchantLevel"]	= "Disenchanting kræver skill %d";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "Eksporter Enchantrix priser til Auctioneer Advanced";
 		["GuiActivateProfile"]	= "Aktiver en aktuel profil";
 		["GuiAutoDeOptions"]	= "Automatisering\n";
 		["GuiAutoDePromptLine1"]	= "Vil du disenchante:\n";
 		["GuiAutoDePromptLine3"]	= "Vurderet til %s\n";
+		["GuiAutoMillingPromptLine1"]	= "Ønsker du at mille:";
+		["GuiAutoProspectPromptLine1"]	= "Ønsker du at prospecte:";
+		["GuiBBUnbiddedOnly"]	= "Begræns BidBroker til ting der ikke er budt på";
 		["GuiCreateReplaceProfile"]	= "Opret eller erstat en profil";
 		["GuiDeleteProfileButton"]	= "Slet";
+		["GuiDuplicateProfileButton"]	= "Kopier profil";
+		["GuiFixedSettings"]	= "Faste ingrediens priser";
+		["GuiGeneralOptions"]	= "Generelle Enchantrix indstillinger";
 		["GuiIgnore"]	= "Ignorer\n";
 		["GuiItemValueAverage"]	= "Gennemsnit (standard)";
 		["GuiMaxBuyout"]	= "Maksimal udkøbspris:";
+		["GuiMillingOptions"]	= "Milling indstillinger";
 		["GuiMinimapButtonDist"]	= "Distance: %d";
+		["GuiMinimapOptions"]	= "Minimap visnings indstillinger";
 		["GuiMinimapShowButton"]	= "Vis minimap knap";
 		["GuiNewProfileName"]	= "Nyt profil navn:";
 		["GuiNo"]	= "Nej\n";
+		["GuiPLBBOnlyBelowDESkill"]	= "Vis kun ting der kan disenchantes på nuværende skill";
+		["GuiPLBBSettings"]	= "Percentless og Bidbroker indstillinger";
+		["GuiProspectingLevels"]	= "Vis krav til prospecting level i tooltip";
+		["GuiProspectingOptions"]	= "Prospecting indstillinger";
+		["GuiResetProfileButton"]	= "Nulstil";
 		["GuiSaveProfileButton"]	= "Gem";
 		["GuiTabAuctions"]	= "Auktioner";
+		["GuiTabFixed"]	= "Fast pris";
 		["GuiTabGeneral"]	= "Generelt";
+		["GuiTabMilling"]	= "Milling";
 		["GuiTabProfiles"]	= "Profiler";
+		["GuiTabProspecting"]	= "Prospecting";
 		["GuiYes"]	= "Ja";
+		["ModTTShow"]	= "Vis kun ekstra tooltip hvis Alt er trykket ned";
 
 	};
 
@@ -427,6 +471,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Sonstige Enchantrix-Optionen";
 		["GuiPrintin"]	= "Fenster für Meldungen auswählen";
 		["GuiPrintYieldsInChat"]	= "Zeige Itemerträge im Chat";
+		["GuiShowCraftReagents"]	= "Zeige Handwerksreagenzien in den Tooltips";
 		["GuiTerse"]	= "Kurzinfo-Modus aktivieren";
 		["GuiValuateAverages"]	= "Verkaufspreis anzeigen (Auctioneer Durchschnittswerte)";
 		["GuiValuateBaseline"]	= "Verkaufspreis anzeigen (Interne Preisliste)";
@@ -781,14 +826,16 @@ EnchantrixLocalizations = {
 		["TooltipShowDisenchantLevel"]	= "Disenchanting requires skill %d";
 
 		-- Section: User Interface
+		["BeanCounterRequired"]	= "BeanCounter is required to determine purchase reason. Disabling AutoDE limit until BeanCounter is installed.";
 		["ExportPriceAucAdv"]	= "Export Enchantrix prices to Auctioneer Advanced";
 		["GuiActivateProfile"]	= "Activate a current profile";
+		["GuiAutoDeBoughtForDE"]	= "Only items purchased for disenchanting";
 		["GuiAutoDeEnable"]	= "Watch bags for disenchantable items - USE WITH CARE\n";
+		["GuiAutoDeEpicItems"]	= "Auto Disenchant epic (purple) items";
 		["GuiAutoDeOptions"]	= "Automation\n";
-		["GuiAutoDeRareItems"] = "Auto DE rare items";
-		["GuiAutoDeEpicItems"] = "Auto DE epic items";
 		["GuiAutoDePromptLine1"]	= "Do you want to disenchant:\n";
 		["GuiAutoDePromptLine3"]	= "  Valued at %s\n";
+		["GuiAutoDeRareItems"]	= "Auto Disenchant rare (blue) items";
 		["GuiAutoMillingPromptLine1"]	= "Do you want to mill:";
 		["GuiAutoProspectPromptLine1"]	= "Do you want to prospect:\n";
 		["GuiBBUnbiddedOnly"]	= "Restrict BidBroker to unbidded items only";
@@ -950,6 +997,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Otras Opciones de Enchantrix";
 		["GuiPrintin"]	= "Selecciona la ventana deseada";
 		["GuiPrintYieldsInChat"]	= "Mostrar rendimientos de los items en el chat";
+		["GuiShowCraftReagents"]	= "Mostrar creaciones reactivas en ventanas";
 		["GuiTerse"]	= "Activa el modo conciso";
 		["GuiValuateAverages"]	= "Valora con Promedios de Auctioneer";
 		["GuiValuateBaseline"]	= "Valora con la información integrada";
@@ -1115,6 +1163,61 @@ EnchantrixLocalizations = {
 
 	};
 
+	esMX = {
+
+		-- Section: Command Messages
+		["FrmtActClearall"]	= "Borrando toda la información de encantamientos.";
+		["FrmtActClearFail"]	= "Imposible encontrar el item: %s";
+		["FrmtActClearOk"]	= "Borrada la información del item: %s";
+		["FrmtActDefault"]	= "La opción %s de Enchantrix fue devuelta a su valor original.";
+		["FrmtActDefaultAll"]	= "Todas las opciones de Enchantrix fueron devueltas a sus valores originales.";
+		["FrmtActDisable"]	= "No se mostrará la información del item %s";
+		["FrmtActEnable"]	= "Se mostrará la información del item %s";
+		["FrmtActSet"]	= "%s establecido a '%s'";
+		["FrmtActUnknown"]	= "No se reconoce el commando: '%s'";
+		["FrmtActUnknownLocale"]	= "La localización que se especificó ('%s') no es conocida. Las localizaciones validas son:";
+		["FrmtPrintin"]	= "Los mensajes de Enchantrix ahora se mostraran en la ventana de chat \"%s\"";
+		["FrmtUsage"]	= "Uso:";
+		["MesgDisable"]	= "Desabilitando la carga automática de Enchantrix";
+		["MesgNotloaded"]	= "Enchantrix no se encuentra cargado. Escriba /enchantrix para mas información.";
+
+		-- Section: Command Options
+		["OptFindBidauct"]	= "<plata>";
+		["OptFindBuyauct"]	= "<porcentaje>";
+		["OptLocale"]	= "<localización>";
+		["OptPrintin"]	= "(<indiceDeVentana>[Número]|<nombreDeVentana>[SerieDeCaracteres]";
+
+		-- Section: Commands
+		["ConfigUI"]	= "config";
+		["ShowDELevels"]	= "levels";
+		["ShowDEMaterials"]	= "materiales";
+		["ShowGuessAuctioneerVal"]	= "valorizar-valor";
+		["ShowTerse"]	= "conciso";
+		["ShowUI"]	= "mostrar";
+		["StatOff"]	= "No se mostrará la información de encantamientos";
+		["StatOn"]	= "Se mostrará la información de encantamientos configurada";
+
+		-- Section: Config Text
+		["GuiLoad"]	= "Cargar Enchantrix";
+		["GuiLoad_Always"]	= "siempre";
+		["GuiLoad_Never"]	= "nunca";
+
+		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Moler";
+		["ArgSpellname"]	= "Desencantar";
+		["ArgSpellProspectingName"]	= "Prospectar";
+		["Enchanting"]	= "Encantar";
+		["Inscription"]	= "Inscrición";
+		["Jewelcrafting"]	= "Joyería";
+		["PatReagents"]	= "Reagentes: (.+)";
+		["TextCombat"]	= "Combate";
+		["TextGeneral"]	= "General";
+
+		-- Section: Generic Messages
+		["FrmtCredit"]	= "(dirigete a http://enchantrix.org/ para compartir tu información)";
+
+	};
+
 	frFR = {
 
 		-- Section: Command Messages
@@ -1210,6 +1313,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Options diverses d'Enchantrix";
 		["GuiPrintin"]	= "Choisir la fenêtre de message souhaitée";
 		["GuiPrintYieldsInChat"]	= "Afficher les rendements d'objets dans le chat";
+		["GuiShowCraftReagents"]	= "Afficher les composants de craft dans la bulle d'aide";
 		["GuiTerse"]	= "Active le mode concis";
 		["GuiValuateAverages"]	= "Evaluer avec les moyennes d'Auctioneer";
 		["GuiValuateBaseline"]	= "Evaluer avec les données intégrées.";
@@ -1444,7 +1548,7 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix richiede Auctioneer versione 3.4 o superiore. Alcune funzionalità non saranno disponibili finché Auctioneer non verrà aggiornato.";
 
 		-- Section: Help Text
-		["GuiClearall"]	= "Cancella tutti i dati di Enchantrix";
+		["GuiClearall"]	= "Soul dust\n";
 		["GuiClearallButton"]	= "Cancella tutto";
 		["GuiClearallHelp"]	= "Clicca qui per eliminare tutti i dati di Enchantrix per il server/realm corrente";
 		["GuiClearallNote"]	= "per il corrente server/fazione";
@@ -1608,6 +1712,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "기타 Enchantrix 설정";
 		["GuiPrintin"]	= "원하는 메시지 프레임을 선택";
 		["GuiPrintYieldsInChat"]	= "이득을 채팅창에 표시";
+		["GuiShowCraftReagents"]	= "툴팁에 제작 재료 보이기";
 		["GuiTerse"]	= "간결 모드 사용";
 		["GuiValuateAverages"]	= "Auctioneer 평균으로 평가";
 		["GuiValuateBaseline"]	= "내장된 자료를 이용해 평가";
@@ -1868,6 +1973,24 @@ EnchantrixLocalizations = {
 
 	};
 
+	plPL = {
+
+		-- Section: Command Messages
+		["FrmtActClearall"]	= "Limpando todos os dados sobre encantamento";
+		["FrmtActClearFail"]	= "Incapaz de localizar o item: %s";
+		["FrmtActClearOk"]	= "Limpando os dados para o item: %s";
+		["FrmtActDefault"]	= "A opção %s Enchantrix foi resetada para as configuraçaõ padrão";
+		["FrmtActDefaultAll"]	= "Todas as opções do Enchantrix foram resetadas para as opções padrões";
+		["FrmtActDisable"]	= "Não indicando os dados do item %s";
+		["FrmtActEnable"]	= "Indicando os dados do item %s";
+		["FrmtActSet"]	= "Por %s para '%s'";
+		["FrmtActUnknown"]	= "Comando desconhecido :'%s' ";
+		["FrmtActUnknownLocale"]	= "O local que voce especificou ('%s') ´s desconhecida. Os locais validos são:";
+		["FrmtPrintin"]	= "As mensagens do Enchantrix serão mostradas no \"%s\" do quadro do chat";
+		["FrmtUsage"]	= "Uso:";
+
+	};
+
 	ptPT = {
 
 		-- Section: Command Messages
@@ -1924,10 +2047,11 @@ EnchantrixLocalizations = {
 		["GuiLoad_Never"]	= "nunca";
 
 		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Maceração";
 		["ArgSpellname"]	= "Desencantar";
 		["ArgSpellProspectingName"]	= "Pesquisador";
 		["Enchanting"]	= "Encantar";
-		["Inscription"]	= "Inscrever";
+		["Inscription"]	= "Inscrição";
 		["Jewelcrafting"]	= "Joalharia";
 		["PatReagents"]	= "Reagentes: (.+)";
 		["TextCombat"]	= "Combate";
@@ -1945,7 +2069,7 @@ EnchantrixLocalizations = {
 		["GuiClearallNote"]	= "para o servidor/facção actual";
 		["GuiDefaultAll"]	= "Limpar todas as opções do Enchantrix";
 		["GuiDefaultAllButton"]	= "Limpar tudo";
-		["GuiDefaultAllHelp"]	= "Carrega aqui para voltar às definições padrão do Enchantrix. ATENÇÃO: Esta acção NÃO é reversível.";
+		["GuiDefaultAllHelp"]	= "Clique aqui para voltar às definições padrão do Enchantrix. ATENÇÃO: Esta acção NÃO é reversível.";
 		["GuiDefaultOption"]	= "Limpar esta definição";
 		["GuiDELevels"]	= "Mostrar requerimentos de nivel na janela de ajuda.";
 		["GuiDEMaterials"]	= "Mostrar informação dos materiais na janela de ajuda.";
@@ -1957,6 +2081,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Outras Opções do Enchantrix";
 		["GuiPrintin"]	= "Seleccionar a expressão desejada da mensagem";
 		["GuiPrintYieldsInChat"]	= "Mostrar ganhos dos objectos no chat.";
+		["GuiShowCraftReagents"]	= "Mostar reagentes de profissão in dicas";
 		["GuiTerse"]	= "Ligar modo breve";
 		["GuiValuateAverages"]	= "Validar com as médias Auctioneer";
 		["GuiValuateBaseline"]	= "Validar com a Data Padrão";
@@ -1983,11 +2108,13 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "Mostrar ou esconder o painel de configuração.";
 		["HelpTerse"]	= "Ligar/Desligar o modo breve, mostrando somente o valor de desencantamento. Pode ser forçado segurando na tecla Ctrl.";
 		["HelpValue"]	= "Seleccionar se quer ver os valores estimados baseados em proporções dos possiveis desencantos.";
+		["ModTTShow_Help"]	= "Esta opção vai mostar dicas extras no Enchantrix somente se ALT tiver sido pressionado.";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "O Auctioneer não está instalado. Para efectuar a pesquisa dos leilões o Auctioneer tem que ser instalado.";
 		["AuctionScanVersionTooOld"]	= "Versão incorrecta do Auctioneer instalado, esta funcionalidade requer o Auctioneer v4.0 or superior.";
 		["ChatDeletedProfile"]	= "Perfil apagado:";
+		["ChatDuplicatedProfile"]	= "Duplicar perfil para:";
 		["ChatResetProfile"]	= "Limpar todas as configurações para:";
 		["ChatSavedProfile"]	= "Perfil guardado:";
 		["ChatUsingProfile"]	= "Utilizando o perfil:";
@@ -1998,6 +2125,9 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "Ignorando %s permanentemente";
 		["FrmtAutoDeIgnoreSession"]	= "Ignorando %s esta sessão";
 		["FrmtAutoDeInactive"]	= "Desencantamento automático inactivo";
+		["FrmtAutoDeMilling"]	= "Maceração %s";
+		["FrmtAutoDeMillingCancelled"]	= "Maceração cancelada: item não encontrado";
+		["FrmtAutoDeProspectCancelled"]	= "Pesquisa cancelada: item não encontrado";
 		["FrmtBidbrokerCurbid"]	= "Ofcur";
 		["FrmtBidbrokerDone"]	= "Oferta do corrector feita";
 		["FrmtBidbrokerHeader"]	= "As ofertas que têm as economias de prata de %s na média do valor disencanto:";
@@ -2650,6 +2780,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "其他 Enchantrix 雜項設定";
 		["GuiPrintin"]	= "選擇嵌入的訊息框架";
 		["GuiPrintYieldsInChat"]	= "在聊天視窗顯示物品產出的結果";
+		["GuiShowCraftReagents"]	= "在提示窗顯示製作時所需要的道具";
 		["GuiTerse"]	= "啟用精簡模式";
 		["GuiValuateAverages"]	= "拍賣評估";
 		["GuiValuateBaseline"]	= "嵌入拍賣資料";
@@ -2670,7 +2801,7 @@ EnchantrixLocalizations = {
 		["HelpLoad"]	= "改變附魔助手的載入設置。";
 		["HelpLocale"]	= "改變用來顯示Enchantrix訊息的語言";
 		["HelpOnoff"]	= "附魔資料開啟或關閉";
-		["HelpPrintin"]	= "選擇Enchantrix訊息顯示的框架。你可以輸入框架名字或者是index。";
+		["HelpPrintin"]	= "選擇Enchantrix訊息顯示的框架。你可以輸入框架名字或者是框架索引值。";
 		["HelpShowDELevels"]	= "在提示中選擇是否顯示分解物品需要的附魔技能等級。";
 		["HelpShowDEMaterials"]	= "在提示中選擇否是顯示分解物品產生材料資訊。";
 		["HelpShowUI"]	= "顯示或隱藏設置面板。";

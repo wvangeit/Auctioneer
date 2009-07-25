@@ -99,8 +99,8 @@ local function isItemIgnored(link)
 end
 
 
--- currently tests for item quality, will be made to test for more in the future
-local function isAutoDisenchantAllowed(link)
+-- check item quality and reason for purchase (if BeanCounter is installed)
+local function isAutoDisenchantAllowed(link, count)
 	local _, _, quality, _ = GetItemInfo(link)
 
 	if (quality == 3) and (not Enchantrix.Settings.GetSetting('AutoDeRareItems')) then
@@ -109,6 +109,23 @@ local function isAutoDisenchantAllowed(link)
 	
 	if (quality == 4) and (not Enchantrix.Settings.GetSetting('AutoDeEpicItems')) then
 		return false
+	end
+	
+	-- this WILL NOT WORK for milling or prospecting
+	-- because changing the stack size in any way will change the reason returned by beancounter
+	if Enchantrix.Settings.GetSetting('AutoDeOnlyIfBoughtForDE') then
+		if (BeanCounter and BeanCounter.API) then
+			local reason = BeanCounter.API.getBidReason(link, count)
+			if (reason == "Disenchant" or reason == "EnchantMats") then
+				return true;
+			else
+				return false;
+			end
+		else
+			-- tell the user that beancounter is required
+			Enchantrix.Util.ChatPrint(_ENCH("BeanCounterRequired"))
+			Enchantrix.Settings.SetSetting('AutoDeOnlyIfBoughtForDE', false)
+		end
 	end
 	
 	return true
@@ -224,7 +241,7 @@ local function findItemInOneBag(bag, findLink)
 				-- items sometimes linger after they've been disenchanted and looted
 				debugSpam("Skipping zombie item " .. link)
 			else
-				if (not isItemIgnored(link)) and isAutoDisenchantAllowed(link) then
+				if (not isItemIgnored(link)) and isAutoDisenchantAllowed(link, count) then
 					local value, spell = getDisenchantOrProspectValue(link, count)
 					if value and value > 0 then
 						return link, bag, slot, value, spell
