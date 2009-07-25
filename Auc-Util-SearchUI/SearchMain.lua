@@ -240,6 +240,8 @@ function lib.Processor(callbackType, ...)
 	elseif callbackType == "scanstats" then
 		--lib.NotifyCallbacks("scanstats") -- pass the message on
 		flagScanStats = true
+	elseif callbackType == "scanprogress" and private.UpdateScanProgress then
+		private.UpdateScanProgress(...)
 	end
 end
 
@@ -1181,17 +1183,13 @@ function lib.MakeGuiConfig()
 	gui.ScansRemaining:SetText("0")
 	gui.ScansRemaining:SetJustifyH("RIGHT")
 	gui.ScansRemaining.last = 0
-	gui.ScansRemaining.updateDisplay = function()
-		local pending = 0
-		if AucAdvanced.Scan.Private.scanStack then
-			pending = #AucAdvanced.Scan.Private.scanStack
-			if AucAdvanced.Scan.IsScanning() then
-				pending = pending + 1
-			end
+	function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
+		if AucAdvanced.Scan.IsScanning() then
+			scansQueued = scansQueued + 1
 		end
-		if pending ~= gui.ScansRemaining.last then
-			gui.ScansRemaining.last = pending
-			gui.ScansRemaining:SetText(pending)
+		if scansQueued ~= gui.ScansRemaining.last then
+			gui.ScansRemaining.last = scansQueued
+			gui.ScansRemaining:SetText(scansQueued)
 		end
 	end
 
@@ -1584,7 +1582,6 @@ function lib.MakeGuiConfig()
 		self.cancel.updateDisplay()
 		self.purchase.updateDisplay()
 		gui.Search.updateDisplay()
-		gui.ScansRemaining.updateDisplay()
 	end)
 
 	-- Alert our searchers?
