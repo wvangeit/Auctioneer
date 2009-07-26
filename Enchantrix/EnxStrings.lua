@@ -795,6 +795,7 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker Price (%d%% margin)";
+		["FrmtDEItemLevels"]	= "Disenchantable from item levels %d to %d.";
 		["FrmtDisinto"]	= "Disenchants into:";
 		["FrmtFound"]	= "Found that %s disenchants into:";
 		["FrmtFoundNotDisenchant"]	= "Found that %s is not disenchantable";
@@ -806,6 +807,7 @@ EnchantrixLocalizations = {
 		["FrmtMillsInto"]	= "Mills into:";
 		["FrmtPriceEach"]	= "(%s ea)";
 		["FrmtProspectFound"]	= "Found that %s prospects into:";
+		["FrmtProspectFrom"]	= "Prospectable from %s.";
 		["FrmtProspectInto"]	= "Prospects into:";
 		["FrmtProspectValueAuctHsp"]	= "Prospect value (HSP)";
 		["FrmtProspectValueAuctMed"]	= "Prospect value (Median)";
@@ -879,6 +881,7 @@ EnchantrixLocalizations = {
 		["GuiProspectingValues"]	= "Show estimated prospecting values";
 		["GuiResetProfileButton"]	= "Reset";
 		["GuiSaveProfileButton"]	= "Save";
+		["GuiShowMatSources"]	= "Show source material for items obtained by disenchanting, prospecting and milling.";
 		["GuiShowMilling"]	= "Show Milling data for herbs";
 		["GuiShowProspecting"]	= "Show Prospecting data for ores";
 		["GuiTabAuctions"]	= "Auctions";

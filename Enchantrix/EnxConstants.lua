@@ -517,6 +517,56 @@ const.baseDisenchantTable = {
  },
 }
 
+-- map reagents to item levels they are obtainable from
+-- ignoring the 1% chance for rare drops
+
+-- manually copied from baseDisenchantTable
+
+const.ReverseDisenchantLevelList = {
+	
+	[34057] = { 165, 275 }, -- Abyss Crystal
+	[22450] = {  95, 164 }, -- Void Crystal
+	[20725] = {  56,  94 }, -- Nexus Crystal
+	
+	[34052] = { 165, 275 }, -- Dream Shard
+	[22449] = { 100, 120 }, -- Large Prismatic Shard
+	[14344] = {  56,  65 }, -- Large Brilliant Shard
+	[11178] = {  46,  50 }, -- Large Radiant Shard
+	[11139] = {  36,  40 }, -- Large Glowing Shard
+	[11084] = {  26,  30 }, -- Large Glimmering Shard
+	
+	[34053] = { 121, 164 }, -- Small Dream Shard
+	[22448] = {  66,  99 }, -- Small Prismatic Shard
+	[14343] = {  51,  55 }, -- Small Brilliant Shard
+	[11177] = {  41,  45 }, -- Small Radiant Shard
+	[11138] = {  31,  35 }, -- Small Glowing Shard
+	[10978] = {  1,   25 }, -- Small Glimmering Shard
+	
+	[34055] = { 152, 200 }, -- Greater Cosmic Essence
+	[22446] = { 100, 120 }, -- Greater Planar Essence
+	[16203] = {  56,  65 }, -- Greater Eternal Essence
+	[11175] = {  46,  50 }, -- Greater Nether Essence
+	[11135] = {  36,  40 }, -- Greater Mystic Essence
+	[11082] = {  26,  30 }, -- Greater Astral Essence
+	[10939] = {  16,  20 }, -- Greater Magic Essence
+	
+	[34056] = { 121, 151 }, -- Lesser Cosmic Essence
+	[22447] = {  66,  99 }, -- Lesser Planar Essence
+	[16202] = {  51,  55 }, -- Lesser Eternal Essence
+	[11174] = {  41,  45 }, -- Lesser Nether Essence
+	[11134] = {  31,  35 }, -- Lesser Mystic Essence
+	[10998] = {  21,  25 }, -- Lesser Astral Essence
+	[10938] = {   1,  15 }, -- Lesser Magic Essence
+	
+	[34054] = { 121, 200 }, -- Infinite Dust
+	[22445] = {  66, 120 }, -- Arcane Dust
+	[16204] = {  56,  65 }, -- Illusion Dust
+	[11176] = {  46,  55 }, -- Dream Dust
+	[11137] = {  36,  45 }, -- Vision Dust
+	[11083] = {  26,  35 }, -- Soul Dust
+	[10940] = {   1,  25 }, -- Strange Dust
+
+}
 
 
 local COPPER_ORE = 2770
@@ -752,6 +802,64 @@ const.ProspectableItems = {
 
 }
 
+
+-- list of ores from which each item could be prospected
+-- copied from ProspectableItems
+
+const.ReverseProspectingSources = {
+	
+	[TIGERSEYE] = { COPPER_ORE },
+	[MALACHITE] = { COPPER_ORE },
+	[SHADOWGEM] = { TIN_ORE, COPPER_ORE },
+	
+	[LESSERMOONSTONE] = { IRON_ORE, TIN_ORE },
+	[MOSSAGATE] = { TIN_ORE },
+	[CITRINE] = { MITHRIL_ORE, IRON_ORE, TIN_ORE },
+	[JADE] = { IRON_ORE, TIN_ORE },
+	[AQUAMARINE] = { MITHRIL_ORE, IRON_ORE, TIN_ORE },
+	[STARRUBY] = { THORIUM_ORE, MITHRIL_ORE, IRON_ORE },
+	
+	[AZEROTHIANDIAMOND] = { THORIUM_ORE, MITHRIL_ORE },
+	[BLUESAPPHIRE] = { THORIUM_ORE, MITHRIL_ORE },
+	[LARGEOPAL] = { THORIUM_ORE, MITHRIL_ORE },
+	[HUGEEMERALD] = { THORIUM_ORE, MITHRIL_ORE },
+	
+	[BLOODGARNET] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	[FLAMESPESSARITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	[GOLDENDRAENITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	[DEEPPERIDOT] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	[AZUREMOONSTONE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	[SHADOWDRAENITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
+	
+	[LIVINGRUBY] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	[NOBLETOPAZ] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	[DAWNSTONE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	[TALASITE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	[STAROFELUNE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	[NIGHTSEYE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
+	
+	[CHALCEDONY] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[HUGECITRINE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[BLOODSTONE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[SHADOWCRYSTAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[SUNCRYSTAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[DARKJADE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	
+	[TWILIGHTOPAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[FORESTEMERALD] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[SCARLETRUBY] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[MONARCHTOPAZ] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[SKYSAPPHIRE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	[AUTMNSGLOW] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
+	
+	[MAJESTICZIRCON] = { TITANIUM_ORE },
+	[AMETRINE] = { TITANIUM_ORE },
+	[KINGSAMBER] = { TITANIUM_ORE },
+	[DREADSTONE] = { TITANIUM_ORE },
+	[CARDINALRUBY] = { TITANIUM_ORE },
+	[EYEOFZUL] = { TITANIUM_ORE },
+
+}
 
 
 local ALABASTER_PIGMENT = 39151

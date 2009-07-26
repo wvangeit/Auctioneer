@@ -276,10 +276,42 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 end
 
 
-function itemTooltip(tooltip, name, link, quality, count)
+function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 	if Enchantrix.Settings.GetSetting('ModTTShow') and not IsAltKeyDown() then
 		return
 	end
+	
+	-- see if this is a simple reagent produced from disenchanting, prospecting or milling
+	if ( Enchantrix.Settings.GetSetting('TooltipShowMatSources') ) then
+		local deReagent = Enchantrix.Constants.ReverseDisenchantLevelList[ itemId ]
+		if (deReagent) then
+			local lowest = deReagent[1]
+			local highest = deReagent[2]
+			if (lowest and highest) then
+				local deText = format( _ENCH('FrmtDEItemLevels'), lowest, highest )
+				tooltip:AddLine(deText, nil, embed)
+				return
+			end
+		end
+		
+		local prospectGem = Enchantrix.Constants.ReverseProspectingSources[ itemId ]
+		if (prospectGem) then
+			local oreCount = #prospectGem
+			local oreString = Enchantrix.Util.GetReagentInfo( prospectGem[1] )
+			for index = 2, oreCount, 1 do
+				oreString = oreString..", "..Enchantrix.Util.GetReagentInfo( prospectGem[ index ] )
+			end
+			local prospectText = format( _ENCH('FrmtProspectFrom'), oreString )
+			tooltip:AddLine( prospectText, nil, embed)
+			return
+		end
+		
+		-- check for milling reagent/material
+		-- TODO - ccox - write me!
+	
+	end
+	
+	
 	-- first, see if this is a prospectable item (short list)
 	local prospect = Enchantrix.Storage.GetItemProspects(link)
 	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then
@@ -632,11 +664,11 @@ function hookItemTooltip(tipFrame, item, count, name, link, quality)
 		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
 	
 	tooltip:SetFrame(tipFrame)
-	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
-
+	local itemType, itemId = tooltip:DecodeLink(link)
+	
 	if itemType == "item" then
 		name = name or ""
-		itemTooltip(tooltip, name, link, quality, count or 1)
+		itemTooltip(tooltip, name, link, itemType, itemId, quality, count or 1)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(tooltip, name, link, true)
 		end
@@ -652,8 +684,8 @@ function hookSpellTooltip(tipFrame, link, name, rank)
 	if link:sub(0, 8) == "enchant:" or link:sub(0, 6) == "spell:" then
 		link = "|H"..link.."|h|cffffffff["..name.."]|r|h"
 	end
-	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
-
+	local itemType, itemId = tooltip:DecodeLink(link)
+	
 	if itemType == "enchant" or itemType == "spell" then
 		name = name or ""
 		enchantTooltip(tooltip, name, link, false)

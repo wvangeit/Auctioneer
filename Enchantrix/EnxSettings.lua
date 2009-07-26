@@ -120,6 +120,7 @@ local settingDefaults = {
 	['TooltipShowAuctAdvValue'] = true,
 	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
 	['TooltipShowDisenchantMats'] = true,	-- should the item tooltip show what it disenchants into? (for those who are just greedy)
+	['TooltipShowMatSources'] = true,		-- should we show the source for enchant mats, gems, and inks?
 
 	['TooltipShowProspecting'] = true,		-- should the tooltip show any prospecting data?
 	['TooltipProspectLevels'] = true,		-- should the tooltip show skill level needed to prospect?
@@ -540,6 +541,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
 	gui:AddControl(id, "Checkbox",   0, 1, "chatShowFindings", _ENCH("GuiPrintYieldsInChat") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowReagents", _ENCH("GuiShowCraftReagents") )	
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowMatSources", _ENCH("GuiShowMatSources") )
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
 	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
