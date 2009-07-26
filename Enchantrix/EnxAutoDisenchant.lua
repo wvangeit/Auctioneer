@@ -489,6 +489,25 @@ function showPrompt(link, bag, slot, value, spell)
 	end
 	auto_de_prompt.Lines[3]:SetText(_ENCH("GuiAutoDePromptLine3"):format(getTextGSC(floor(value))))
 
+	-- clear the lines, just in case
+	auto_de_prompt.Lines[4]:SetText( nil );
+	auto_de_prompt.Lines[5]:SetText( nil );
+	
+	if (BeanCounter and BeanCounter.API) then
+		local reason = BeanCounter.API.getBidReason(link, count)
+		if (reason) then
+			auto_de_prompt.Lines[4]:SetText( format( _ENCH("GuiAutoDEPurchaseReason"), reason ) );
+		end
+	end
+	
+	if (AucAdvanced and AucAdvanced.Modules and AucAdvanced.Modules.Util
+		and AucAdvanced.Modules.Util.ItemSuggest) then
+		local suggestion = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest( link, count )
+		if (suggestion) then
+			auto_de_prompt.Lines[5]:SetText( format( _ENCH("GuiAutoDESuggestion"), suggestion)  );
+		end
+	end
+	
 	auto_de_prompt:Show()
 end
 
@@ -561,7 +580,7 @@ local function initUI()
 
 	auto_de_prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
 	auto_de_prompt:SetFrameStrata("DIALOG")
-	auto_de_prompt:SetHeight(130)
+	auto_de_prompt:SetHeight(170)
 	auto_de_prompt:SetWidth(400)
 	auto_de_prompt:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -593,7 +612,7 @@ local function initUI()
 
 	-- prompt text
 	auto_de_prompt.Lines = {}
-	for i = 1, 3 do
+	for i = 1, 5 do
 		auto_de_prompt.Lines[i] = auto_de_prompt:CreateFontString("AutoDisenchantPromptLine"..i, "HIGH")
 		if (i == 1) then
 			auto_de_prompt.Lines[i]:SetPoint("TOPLEFT", auto_de_prompt.Item, "TOPRIGHT", 5, 5)
