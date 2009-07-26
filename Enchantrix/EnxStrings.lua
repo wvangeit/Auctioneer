@@ -799,6 +799,7 @@ EnchantrixLocalizations = {
 		["FrmtDisinto"]	= "Disenchants into:";
 		["FrmtFound"]	= "Found that %s disenchants into:";
 		["FrmtFoundNotDisenchant"]	= "Found that %s is not disenchantable";
+		["FrmtInkFrom"]	= "Made from %s";
 		["FrmtMillingFound"]	= "Found that %s mills into:";
 		["FrmtMillingValueAuctHsp"]	= "Milling value (HSP)";
 		["FrmtMillingValueAuctMed"]	= "Milling value (Median)";

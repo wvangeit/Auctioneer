@@ -283,12 +283,14 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 	
 	-- see if this is a simple reagent produced from disenchanting, prospecting or milling
 	if ( Enchantrix.Settings.GetSetting('TooltipShowMatSources') ) then
+		
 		local deReagent = Enchantrix.Constants.ReverseDisenchantLevelList[ itemId ]
 		if (deReagent) then
 			local lowest = deReagent[1]
 			local highest = deReagent[2]
 			if (lowest and highest) then
 				local deText = format( _ENCH('FrmtDEItemLevels'), lowest, highest )
+				tooltip:SetColor(0.8,0.8,0.2);
 				tooltip:AddLine(deText, nil, embed)
 				return
 			end
@@ -302,12 +304,19 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 				oreString = oreString..", "..Enchantrix.Util.GetReagentInfo( prospectGem[ index ] )
 			end
 			local prospectText = format( _ENCH('FrmtProspectFrom'), oreString )
+			tooltip:SetColor(0.8,0.8,0.2);
 			tooltip:AddLine( prospectText, nil, embed)
 			return
 		end
 		
-		-- check for milling reagent/material
-		-- TODO - ccox - write me!
+		local inkList = Enchantrix.Constants.ReverseInkList[ itemId ]
+		if (inkList) then
+			local pigmentString = Enchantrix.Util.GetReagentInfo( inkList[1] )
+			local inkText = format( _ENCH('FrmtInkFrom'), pigmentString )
+			tooltip:SetColor(0.8,0.8,0.2);
+			tooltip:AddLine(inkText, nil, embed)
+			return
+		end
 	
 	end
 	
