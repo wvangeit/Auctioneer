@@ -52,7 +52,7 @@ The following functions are part of the module's exposed methods:
 
 -- Auto disable if build version is not correct:
 local requiredBuildLive = 9947
-local requiredBuildPTR = 9901
+local requiredBuildPTR = 10147
 local version, build = GetBuildInfo()
 if (tonumber(build) ~= requiredBuildLive) and (tonumber(build) ~= requiredBuildPTR) then
 	print("AucAdvanced: {{"..libType..":"..libName.."}} not loading: Build ("..build..") detected.  Requires Live build ("..requiredBuildLive.." or PTR build "..requiredBuildPTR.." )")
