@@ -209,11 +209,6 @@ function private.OnLoad(addon)
 			private.OnLoad(module)
 		end
 
-		-- Check to see if we need to load scandata
-		if AucAdvanced.Settings.GetSetting("scandata.force") then
-			AucAdvanced.Scan.GetImage()
-		end
-
 		-- Load the dummy CoreModule
 		AucAdvanced.CoreModuleOnLoad(addon)
 	end
@@ -257,6 +252,12 @@ function private.OnEvent(self, event, arg1, arg2, ...)
 		if (addon:sub(1,4) == "auc-") then
 			private.OnLoad(addon)
 		end
+	--used as an alternative to "ADDON_LOADED", to delay loading scandata. as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event
+	elseif (event == "PLAYER_LOGIN") then 
+		-- Check to see if we need to load scandata
+		if AucAdvanced.Settings.GetSetting("scandata.force") then
+			AucAdvanced.Scan.GetImage()
+		end
 	elseif (event == "AUCTION_HOUSE_SHOW") then
 		AucAdvanced.SendProcessorMessage("auctionopen")
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
@@ -291,6 +292,7 @@ private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
 private.Frame:RegisterEvent("BAG_UPDATE")
 private.Frame:RegisterEvent("PLAYER_LOGOUT")
+private.Frame:RegisterEvent("PLAYER_LOGIN")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
 
