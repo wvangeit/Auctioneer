@@ -56,7 +56,7 @@ local function SigFromLink(link)
 end
 
 function private.CreateFrames()
-	if frame then return end
+	private.CreateFrames = nil
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
@@ -990,7 +990,7 @@ function private.CreateFrames()
 		if frame.selectedPostable then
 			local curNumber = frame.salebox.number:GetAdjustedValue()
 			-- used in GetDepositCost calls:
-			local depositHours = curDurationMins / 60 
+			local depositHours = curDurationMins / 60
 			local depositFaction = AucAdvanced.GetFactionGroup()
 
 			if frame.salebox.stacksize > 1 then
@@ -1406,27 +1406,24 @@ function private.CreateFrames()
 					end
 				end
 			end
-
 		end
 	end
 
 	function frame.PostBySig(sig, dryRun)
-		local generallink, itemName = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
-		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(generallink, nil, true)
-		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
-		local numberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".numberonly")
-
-		if success==false then
+		local link, itemName = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
+		local total, _, unpostable = AucAdvanced.Post.CountAvailableItems(sig)
+		if not (link and total) then
 			UIErrorsFrame:AddMessage(_TRANS('APPR_Interface_UnablePostAuctions') )--Unable to post auctions at this time
-			print(_TRANS('APPR_Help_CannotPostAuctions') , errortext)--Cannot post auctions:
+			print(_TRANS('APPR_Help_CannotPostAuctions'), "Invalid item sig")--Cannot post auctions:
 			return
 		end
+		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, nil, true)
+		local numberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".numberonly")
+
 
 		-- Just a quick bit of sanity checking first
-		if not link then
-			print(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(generallink) )--Skipping %s: no auctionable item in bags.  May need to repair item
-			return
-		elseif not (stack and stack >= 1) then
+
+		if not (stack and stack >= 1) then
 			print(_TRANS('APPR_Help_SkippingNoStackSize'):format(link) )--Skipping %s: no stack size set
 			return
 		elseif (not number) or number < -2 or number == 0 then
@@ -1441,7 +1438,15 @@ function private.CreateFrames()
 		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
 			print(_TRANS('APPR_Help_SkippingInvalidDuration'):format(link).." "..tostring(duration) )--Skipping %s: invalid duration:
 			return
-		elseif (not (total and total > 0) or (number > 0 and number * stack > total)) and not numberOnly then
+		elseif total == 0 then
+			if unpostable > 0 then
+				print(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(link) )--Skipping %s: no auctionable item in bags.  May need to repair item
+				return
+			else
+				print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
+				return
+			end
+		elseif (number > 0 and number * stack > total) and not numberOnly then
 			print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 			return
 		elseif (number == -2) and (stack > total) then
@@ -2287,13 +2292,24 @@ function private.CreateFrames()
 	frame.cancel:SetHeight(18)
 	frame.cancel:Disable()
 	frame.cancel:SetScript("OnClick", function()
-		AucAdvanced.Post.Private.postRequests = {}
+		AucAdvanced.Post.CancelPostQueue()
+		frame.cancel:Disable()
+		frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 	end)
 	frame.cancel:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_ClearsPostQueue') ) end)--Clears post queue
 	frame.cancel:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.cancel:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
-	frame.cancel:SetScript("OnUpdate", function()
-		local postnum = #AucAdvanced.Post.Private.postRequests
+	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
+	frame.cancel.tex:SetPoint("TOPLEFT", frame.cancel, "TOPLEFT", 4, -2)
+	frame.cancel.tex:SetPoint("BOTTOMRIGHT", frame.cancel, "BOTTOMRIGHT", -4, 2)
+	frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
+	frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
+	frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
+	frame.cancel.label = frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.cancel.label:SetPoint("LEFT", frame.cancel, "RIGHT", 5, 0)
+	frame.cancel.label:SetTextColor(1, 0.8, 0)
+	frame.cancel.label:SetText("")
+	frame.cancel.label:SetJustifyH("LEFT")
+	function private.UpdatePostQueueProgress(postnum)
 		frame.cancel.label:SetText(tostring(postnum))
 		if (postnum > 0) and (frame.cancel:IsEnabled() == 0) then
 			frame.cancel:Enable()
@@ -2302,22 +2318,7 @@ function private.CreateFrames()
 			frame.cancel:Disable()
 			frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 		end
-	end)
-	frame.cancel:SetScript("OnEvent", function()
-        AucAdvanced.Modules.Util.Appraiser.GetOwnAuctionDetails()
-	end)
-	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
-	frame.cancel.tex:SetPoint("TOPLEFT", frame.cancel, "TOPLEFT", 4, -2)
-	frame.cancel.tex:SetPoint("BOTTOMRIGHT", frame.cancel, "BOTTOMRIGHT", -4, 2)
-	frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
-	frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
-	frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
-
-	frame.cancel.label = frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.cancel.label:SetPoint("LEFT", frame.cancel, "RIGHT", 5, 0)
-	frame.cancel.label:SetTextColor(1, 0.8, 0)
-	frame.cancel.label:SetText("")
-	frame.cancel.label:SetJustifyH("LEFT")
+	end
 
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
@@ -2735,6 +2736,12 @@ function private.CreateFrames()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+
+	frame:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	frame:SetScript("OnEvent", function()
+        AucAdvanced.Modules.Util.Appraiser.GetOwnAuctionDetails()
+	end)
+
 
 	--If we have a saved column arrangement reapply
 	if get("util.appraiser.columnorder") then

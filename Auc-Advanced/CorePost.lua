@@ -57,6 +57,7 @@ lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local print = lib.Print
 local debugPrint = AucAdvanced.Debug.DebugPrint
+local DecodeSig -- to be filled with AucAdvanced.API.DecodeSig when it has loaded
 
 --[[
     Errors that may be "thrown" by the below functions.
@@ -110,39 +111,128 @@ local BindTypes = {
 	[ITEM_BIND_TO_ACCOUNT] = "ITEM_BIND_TO_ACCOUNT",
 }
 
--- Current queue of items to post.
+-- local constants to index the posting 'request' tables
+local REQ_ID = 0
+local REQ_SIG = 1
+local REQ_COUNT = 2
+local REQ_BID = 3
+local REQ_BUYOUT = 4
+local REQ_DURATION = 5
+local REQ_FAILCOUNT = 6
+local REQ_POSTLINK = 7
+local REQ_BAG = 8
+local REQ_SLOT = 9
+
+--[[
+	Functions to safely handle the Post Request queue
+	Direct access of private.postRequests is deprecated
+]]
 private.postRequests = {}
+private.lastReported = 0
+private.reportLock = 0
+function private.QueueReport()
+	if private.reportLock ~= 0 then return end
+	local queuelength = #private.postRequests
+	if private.lastReported ~= queuelength then
+		private.lastReported = queuelength
+		AucAdvanced.SendProcessorMessage("postqueue", queuelength)
+	end
+end
+function private.SetQueueReports(activate)
+	if activate then
+		if private.reportLock > 0 then
+			private.reportLock = private.reportLock - 1
+		end
+		private.QueueReport()
+	else
+		private.reportLock = private.reportLock + 1
+	end
+end
+function private.QueueInsert(request)
+	tinsert(private.postRequests, request)
+	private.QueueReport()
+end
+function private.QueueRemove(index)
+	index = index or 1
+	if private.postRequests[index] then
+		tremove(private.postRequests, index)
+		private.QueueReport()
+	end
+end
 
--- Items which we have moved and are waiting for the moves to complete.
-private.moveWait = {}
-private.moveEmpty = {}
+--[[ GetQueueStatus
+	(proposed: expand this function later with any other useful values)
+--
+function lib.GetQueueStatus()
+	return #private.postRequests
+end
+]]
 
--- Stores the known bag types so we can work out which bags are for
--- holding special item classes.
-private.bagTypes = { GetAuctionItemSubClasses(3) }
-private.bagInfo = {}
+--[[ CancelPostQueue()
+	Safely removes all possible Post requests from the Post queue
+	If we are in the process of posting an auction, that request cannot be removed
+--]]
+function lib.CancelPostQueue()
+	if #private.postRequests > 0 then
+		local request = private.postRequests[1] -- save the first request
+		wipe(private.postRequests)
+		if request[REQ_POSTLINK] then -- if 'request' is currently being posted, put it back in the queue until the posting resolves
+			tinsert(private.postRequests, request)
+		end
+		private.QueueReport()
+	end
+end
+
+--[[
+    PostAuction(sig, size, bid, buyout, duration, [multiple])
+	Throws: ERROR_AHCLOSED
+
+	Places the request to post a stack of the "sig" item, "size" high
+	into the auction house for "bid" minimum bid, and "buy" buyout and
+	posted for "duration" minutes. The request will be posted
+	"multiple" number of times.
+]]
+private.lastPostId = 0
+function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
+	if not AuctionFrame
+	or not AuctionFrame:IsVisible()
+	then
+		return error(ERROR_AHCLOSED)
+	end
+
+	local postIds = {}
+	if not multiple then multiple = 1 end
+	private.SetQueueReports(false)
+	for i = 1, multiple do
+		local postId = private.lastPostId + 1
+		private.lastPostId = postId
+
+		private.QueueInsert({[0]=postId, sig, size, bid, buyout, duration, 0, false, 0, 0})
+		tinsert(postIds, postId)
+	end
+	private.SetQueueReports(true)
+	private.Wait(0) -- delay until next OnUpdate
+	return postIds
+end
 
 --[[
     DecodeSig(sig)
     DecodeSig(itemid, suffix, factor, enchant, seed)
-      Returns: itemid, suffix, factor, enchant, seed
-      Throws: ERROR_NOITEM
-
-      This function can take either an encoded sig or predecoded values
-      in order to save time.
+    Returns: itemid, suffix, factor, enchant, seed
+	Retained for library compatibility
+	Real function moved to AucAdvanced.API, with the other sig functions
 ]]
-function lib.DecodeSig(...)
-	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = ...
+function lib.DecodeSig(matchId, matchSuffix, matchFactor, matchEnchant, matchSeed)
 	if (type(matchId) == "string") then
-		matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = strsplit(":", matchId)
+		return DecodeSig(matchId)
 	end
-	matchId = tonumber(matchId) or 0
+	matchId = tonumber(matchId)
+	if not matchId or matchId == 0 then return end
 	matchSuffix = tonumber(matchSuffix) or 0
 	matchFactor = tonumber(matchFactor) or 0
 	matchEnchant = tonumber(matchEnchant) or 0
 	matchSeed = tonumber(matchSeed) or 0
 
-	if matchId == 0 then return error(ERROR_NOITEM) end
 	return matchId, matchSuffix, matchFactor, matchEnchant, matchSeed
 end
 
@@ -154,41 +244,84 @@ end
       then the item is definately not auctionable.
 ]]
 function lib.IsAuctionable(bag, slot)
-	private.tip:SetOwner(UIParent, "ANCHOR_NONE")
-	private.tip:ClearLines()
-	private.tip:SetBagItem(bag, slot)
-
-	if BindTypes[AppraiserTipTextLeft2:GetText()] or BindTypes[AppraiserTipTextLeft3:GetText()] then
-		private.tip:Hide()
+	local damage, maxdur = GetContainerItemDurability(bag, slot)
+	if damage and damage ~= maxdur then
 		return false
 	end
 
-	local damage, maxdur = GetContainerItemDurability(bag, slot)
-	if damage then
-		damage = maxdur - damage
-	else
-		damage = 0
+	private.tip:SetOwner(UIParent, "ANCHOR_NONE")
+	private.tip:ClearLines()
+	private.tip:SetBagItem(bag, slot)
+	local test = BindTypes[AppraiserTipTextLeft2:GetText()] or BindTypes[AppraiserTipTextLeft3:GetText()]
+	private.tip:Hide()
+	if test then
+		return false
 	end
 
-	private.tip:Hide()
-	if damage == 0 then
-		return true
+	return true
+end
+
+--[[
+	CountAvailableItems(sig)
+	Returns: availableCount, totalCount, unpostableCount, queuedCount
+	The Posting modules need to know how many items are available to be posted;
+	this is not the same as the number of items currently in the bags
+--]]
+function lib.CountAvailableItems(sig)
+	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = DecodeSig(sig)
+	if not matchId then return end
+	local totalCount, unpostableCount, queuedCount = 0, 0, 0
+
+	for bag = 0, NUM_BAG_FRAMES do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local link = GetContainerItemLink(bag, slot)
+			if link then
+				local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(link)
+				if itemId == matchId
+				and itemSuffix == matchSuffix
+				and itemFactor == matchFactor
+				and itemEnchant == matchEnchant
+				and (matchSeed == 0 or itemSeed == matchSeed) then
+					local _, count = GetContainerItemInfo(bag, slot)
+					if not count or count < 1 then count = 1 end
+					totalCount = totalCount + count
+					if not lib.IsAuctionable(bag, slot) then
+						unpostableCount = unpostableCount + count
+					end
+				end
+			end
+		end
 	end
+
+	for _, request in ipairs(private.postRequests) do
+		local itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = DecodeSig(request[1])
+		if itemId == matchId
+		and itemSuffix == matchSuffix
+		and itemFactor == matchFactor
+		and itemEnchant == matchEnchant
+		and (matchSeed == 0 or itemSeed == matchSeed) then
+			queuedCount = queuedCount + request[2]
+		end
+	end
+
+	return (totalCount - unpostableCount - queuedCount), totalCount, unpostableCount, queuedCount
 end
 
 --[[
     FindMatchesInBags(sig)
     FindMatchesInBags(itemId, [suffix, [factor, [enchant, [seed] ] ] ])
-      Returns: { {bag, slot, count}, ... }
-	  Throws: ERROR_NOITEM
-
-      The table is expanded as needed to hold all the matches in all the
-      inventory bags that the user has. Does not include bank or other
-      special bags, which are not searched at all.
+    Returns: { {bag, slot, count}, ... }, itemCount, blankBagId, blankSlotNumber, foundLink, foundLocked
+	Library wrapper for the internal version, to check parameters (and to support anticipated future changes)
 ]]
 function lib.FindMatchesInBags(...)
+	return private.FindMatchesInBags(lib.DecodeSig(...))
+end
+private.bagTypes = { GetAuctionItemSubClasses(3) }
+private.bagInfo = {}
+-- Internal implementation of FindMatchesInBags
+function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEnchant, matchSeed)
+	if not matchId then return end
 	local matches = {}
-	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = lib.DecodeSig(...)
 	local blankBag, blankSlot
 	local specialBlank = false
 	local isLocked = false
@@ -235,7 +368,7 @@ function lib.FindMatchesInBags(...)
 					then
 						if lib.IsAuctionable(bag, slot) then
 							if not itemCount or itemCount < 0 then itemCount = 1 end
-							table.insert(matches, {bag, slot, itemCount})
+							tinsert(matches, {bag, slot, itemCount})
 							total = total + itemCount
 							foundLink = link
 						end
@@ -277,6 +410,8 @@ end
       Next, stacks will be split or combined from the smallest stacks first
       until a correctly sized stack is created.
 ]]
+private.moveWait = {}
+private.moveEmpty = {}
 function lib.FindOrMakeStack(sig, size)
 	-- if we were splitting or combining a stack, check that the stack count has changed
 	if private.moveWait[1] then
@@ -305,7 +440,7 @@ function lib.FindOrMakeStack(sig, size)
 		return
 	end
 
-	local itemId, suffix, factor, enchant, seed = lib.DecodeSig(sig)
+	local itemId, suffix, factor, enchant, seed = DecodeSig(sig)
 	local _,link,_,_,_,_,_, maxSize = GetItemInfo(itemId)
 	if not link then return error(ERROR_NOLOCAL) end
 
@@ -313,7 +448,7 @@ function lib.FindOrMakeStack(sig, size)
 		return error(ERROR_MAXSIZE)
 	end
 
-	local matches, total, blankBag, blankSlot, _, locked = lib.FindMatchesInBags(itemId, suffix, factor, enchant, seed)
+	local matches, total, blankBag, blankSlot, _, locked = private.FindMatchesInBags(itemId, suffix, factor, enchant, seed)
 
 	if locked then -- at least one of the stacks is locked - wait for it to clear
 		return
@@ -367,40 +502,10 @@ function lib.FindOrMakeStack(sig, size)
 end
 
 --[[
-    PostAuction(sig, size, bid, buyout, duration, [multiple])
-	Throws: ERROR_AHCLOSED
-
-	Places the request to post a stack of the "sig" item, "size" high
-	into the auction house for "bid" minimum bid, and "buy" buyout and
-	posted for "duration" minutes. The request will be posted
-	"multiple" number of times.
-]]
-function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
-	if not AuctionFrame
-	or not AuctionFrame:IsVisible()
-	then
-		return error(ERROR_AHCLOSED)
-	end
-
-	local postIds = {}
-	if not multiple then multiple = 1 end
-	for i = 1, multiple do
-		local postId = (private.lastPostId or 0) + 1
-		private.lastPostId = postId
-
-		table.insert(private.postRequests, { [0]=postId, sig, size, bid, buyout, duration, 0, false, 0, 0 })
-		table.insert(postIds, postId)
-	end
-	private.Wait(0) -- delay until next OnUpdate
-	return postIds
-end
-
---[[
-    GetDepositAmount(sig, [count]) has been depreciated in favor of GetDepositCost(item, duration, faction, count)
+    GetDepositCost(item, duration, faction, count)
     You must pass item where item is -- itemID or "itemString" or "itemName" or "itemLink" --but faction duration(12, 24, or 48)[defaults to 24], faction("home" or "neutral")[defaults to home]
     and count(stacksize)[defaults to 1] are optional
 ]]
-
 function GetDepositCost(item, duration, faction, count)
 	-- Die if unable to complete function
 	if not (item and GetSellValue) then return end
@@ -416,35 +521,28 @@ function GetDepositCost(item, duration, faction, count)
 	end
 end
 
--- lib.GetDepositAmount(sig, count) has been depreciated please use new global GetDepositCost(item, duration, faction, count)
-function lib.GetDepositAmount(sig, count)
-	AucAdvanced.API.ShowDeprecationAlert("GetDepositCost(item, duration, faction, count)", "item must be itemID or \"itemString\" or \"itemName\" or \"itemLink\" instead. Item sig will no longer be supported.");
-
-    local itemid = strsplit(":", sig)
-	local rate = AucAdvanced.depositRate
-	local newfaction
-	if rate == .25 then newfaction = "neutral" end
-	local deposit = GetDepositCost(itemid, 12, newfaction, count)
-	return deposit, rate, true
-end
-
 --[[
 	PRIVATE: ProcessPosts()
 	This function is responsible for maintaining and processing the post queue.
 	Note:
 	private.postRequests[queuenumber] = {
-		[0]=postId, 
-		[1]=sig, 
-		[2]=size, 
-		[3]=bid, 
-		[4]=buyout, 
-		[5]=duration, 
-		[6]=failure, -- initially 0. used for number of tries to post auction, then for expiry time after posting
-		[7]=uniquelink, -- initially false
-		[8]=bag, 
-		[9]=slot, 
+		[0]=postId, -- REQ_ID
+		[1]=sig, -- REQ_SIG
+		[2]=stackcount, -- REQ_COUNT
+		[3]=bid, -- REQ_BID
+		[4]=buyout, -- REQ_BUYOUT
+		[5]=duration, -- REQ_DURATION
+		[6]=failure, -- REQ_FAILCOUNT: initially 0. used for number of tries to post auction, then for expiry time after posting
+		[7]=uniquelink, -- REQ_POSTLINK: initially false; serves as a flag for successful StartAuction and holds unique item link
+		[8]=bag, -- REQ_BAG
+		[9]=slot, -- REQ_SLOT
 	}
 ]]
+local LAG_ADJUST = (3 / 1000)
+local POST_TIMEOUT = 6 -- seconds general timeout
+local POST_ERROR_PAUSE = 6 -- seconds pause after error
+local POST_RETRYS = 2 -- Numer of retrys after the original failed attempt. Must never exceed value of POST_TIMEOUT
+local POST_THROTTLE = 0.1 -- time before starting to post the next item in the queue
 function private.ProcessPosts(source)
 	if #private.postRequests <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
 		private.Wait() -- put timer to sleep
@@ -453,56 +551,56 @@ function private.ProcessPosts(source)
 
 	local request = private.postRequests[1]
 
-	-- use longer timeout delays if connectivity is bad
+	-- use longer timeout delays if connectivity is bad, but always at least 1 second
 	local _,_, lag = GetNetStats()
-	lag = max(lag * 0.003, 1)
+	lag = max(lag * LAG_ADJUST, 1)
 
-	if request[7] then
+	if request[REQ_POSTLINK] then
 		-- We're waiting for the item to vanish from the bags
-		local link = GetContainerItemLink(request[8], request[9])
-		if not link or link ~= request[7] then
+		local link = GetContainerItemLink(request[REQ_BAG], request[REQ_SLOT])
+		if not link or link ~= request[REQ_POSTLINK] then
 			-- Successful Auction!
-			tremove(private.postRequests, 1)
-			private.Wait(.1) -- small delay before trying to post next auction
-			AucAdvanced.SendProcessorMessage("postresult", true, request[0], request)
-		elseif GetTime() > request[6] then
+			private.QueueRemove()
+			private.Wait(POST_THROTTLE)
+			AucAdvanced.SendProcessorMessage("postresult", true, request[REQ_ID], request)
+		elseif GetTime() > request[REQ_FAILCOUNT] then
 			-- Can't auction this item!
-			local _, itemCount = GetContainerItemInfo(request[8], request[9])
+			local _, itemCount = GetContainerItemInfo(request[REQ_BAG], request[REQ_SLOT])
 			local msg = ("Unable to confirm auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILTIMEOUT)
 			debugPrint(msg, "CorePost", "Posting timeout", "Warning")
+			private.QueueRemove()
+			private.Wait(POST_ERROR_PAUSE)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, ERROR_FAILTIMEOUT)
 			message(msg)
-			tremove(private.postRequests, 1)
-			private.Wait(6) -- wait 6 seconds after an error message
-			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILTIMEOUT)
 		end
 		return
 	end
 
-	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
+	local success, bag, slot = pcall(lib.FindOrMakeStack, request[REQ_SIG], request[REQ_COUNT])
 	if not success then
 		local err = bag:match(": (.*)")
-		local link, name = AucAdvanced.API.GetLinkFromSig(request[1])
+		local link, name = AucAdvanced.API.GetLinkFromSig(request[REQ_SIG])
 		local msg
 		if ConstErrors[err] then -- Check for our own special "errors"
-			msg = ("Aborting post request for %s x%d: %s"):format(link, request[2], err)
+			msg = ("Aborting post request for %s x%d: %s"):format(link, request[REQ_COUNT], err)
 			debugPrint(msg, "CorePost", "Post request aborted", "Warning")
+			private.QueueRemove()
+			private.Wait(POST_ERROR_PAUSE)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, err)
 			message(msg)
-			tremove(private.postRequests, 1)
-			private.Wait(6) -- wait 6 seconds after an error message
-			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, err)
 		else -- Unexpected (probably real) error
-			msg = ("Error during post request for %s x%d: %s"):format(link, request[2], bag)
+			msg = ("Error during post request for %s x%d: %s"):format(link, request[REQ_COUNT], bag)
 			debugPrint(msg, "CorePost", "Unexpected error", "Error")
-			tremove(private.postRequests, 1)
-			private.Wait(6) -- wait 6 seconds after an error message
-			AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, bag)
+			private.QueueRemove()
+			private.Wait(POST_ERROR_PAUSE)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, bag)
 			error(msg)
 		end
 		return
 	end
 
 	if bag then
-		local tries = request[6]
+		local tries = request[REQ_FAILCOUNT]
 		-- if tries > 0 then something went wrong last time
 		-- we want to avoid spamming with the events just triggered by our failed attempt
 		-- so we will wait for the timer
@@ -512,40 +610,37 @@ function private.ProcessPosts(source)
 		local link = GetContainerItemLink(bag,slot)
 		PickupContainerItem(bag, slot)
 		ClickAuctionSellItemButton()
-		StartAuction(request[3], request[4], request[5])
+		StartAuction(request[REQ_BID], request[REQ_BUYOUT], request[REQ_DURATION])
 		ClickAuctionSellItemButton()
 		if (CursorHasItem()) then -- Didn't auction successfully
-			-- Put it back in the bags
-			ClearCursor()
+			ClearCursor() -- Put it back in the bags
 
 			tries = tries + 1
-			request[6] = tries
-			if tries >= 3 then -- up to 3 attempts
+			request[REQ_FAILCOUNT] = tries
+			if tries > POST_RETRYS then
 				-- Can't auction this item!
 				local _, itemCount = GetContainerItemInfo(bag,slot)
 				local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILRETRY)
 				debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+				private.QueueRemove()
+				private.Wait(POST_ERROR_PAUSE)
+				AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, ERROR_FAILRETRY)
 				message(msg)
-				tremove(private.postRequests, 1)
-				private.Wait(6) -- wait 6 seconds after an error message
-				AucAdvanced.SendProcessorMessage("postresult", false, request[0], request, ERROR_FAILRETRY)
 			else
 				-- If we reach this point something has gone wrong, possibly because we are trying to post too fast
 				-- we want to avoid spamming this 'posting' section; we will use a larger delay value in case 'lag' is too small
-				-- up to 3 attempts at least 3 seconds apart = 6 second minimum timeout
-				private.Wait(lag * 3)
+				-- Original plus POST_RETRYS attempts, at least (POST_TIMEOUT/POST_RETRYS) seconds apart = POST_TIMEOUT minimum timeout
+				private.Wait(lag * POST_TIMEOUT / POST_RETRYS)
 			end
 			return
-		else -- Successful post
-			-- Need to wait for this item to vanish
-			-- timeout at least 6 seconds
-			request[6] = GetTime() + lag * 6
-			request[7] = link
-			request[8] = bag
-			request[9] = slot
+		else -- Successful post - wait for this item to vanish
+			request[REQ_FAILCOUNT] = GetTime() + lag * POST_TIMEOUT
+			request[REQ_POSTLINK] = link
+			request[REQ_BAG] = bag
+			request[REQ_SLOT] = slot
 		end
 	end
-	private.Wait(lag) -- waiting for an event
+	private.Wait(lag)
 end
 
 --[[
@@ -558,7 +653,7 @@ end
 --[[
 	PRIVATE: Wait(delay)
 	Used to control the timer
-	Use delay = nil to stop the time
+	Use delay = nil to stop the timer
 	Use delay >= 0 to start the timer and set the delay length
 --]]
 function private.Wait(delay)
@@ -578,12 +673,18 @@ end
 function lib.Processor(event, ...)
 	if event == "inventory" then
 		if private.updateFrame.timer then
-			private.ProcessPosts("inventory")
+			private.ProcessPosts(event)
 		end
 	elseif event == "auctionopen" then
 		if #private.postRequests > 0 then
-			private.ProcessPosts("auctionopen")
+			private.ProcessPosts(event)
 		end
+	end
+end
+
+function lib.OnLoad(addon)
+	if addon == "auc-advanced" then
+		DecodeSig = AucAdvanced.API.DecodeSig
 	end
 end
 

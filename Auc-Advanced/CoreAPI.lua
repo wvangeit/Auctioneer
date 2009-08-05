@@ -736,6 +736,18 @@ function lib.GetLinkFromSig(sig)
 	return link, name -- name is ignored by most calls
 end
 
+-- Decodes an AucAdvanced signature into numerical values
+-- Can be compared to the return values from DecodeLink
+function lib.DecodeSig(sig)
+	local id, suffix, factor, enchant, seed = strsplit(":", sig)
+	id = tonumber(id)
+	if not id or id == 0 then return end
+	suffix = tonumber(suffix) or 0
+	factor = tonumber(factor) or 0
+	enchant = tonumber(enchant) or 0
+	seed = tonumber(seed) or 0
+	return id, suffix, factor, enchant, seed
+end
 
 -------------------------------------------------------------------------------
 -- Statistical devices created by Matthew 'Shirik' Del Buono

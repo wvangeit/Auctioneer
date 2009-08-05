@@ -46,7 +46,7 @@ function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "auctionui") then
-        private.CreateFrames(...)
+        if private.CreateFrames then private.CreateFrames(...) end
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
@@ -80,6 +80,8 @@ function lib.Processor(callbackType, ...)
 		empty(tooltipcache)
 	elseif (callbackType == "postresult") then
 		private.frame.Reselect(select(3, ...))
+	elseif callbackType == "postqueue" then
+		if private.UpdatePostQueueProgress then private.UpdatePostQueueProgress(...) end
 	elseif callbackType == "searchbegin" then
 		pricecache = {} -- use cache when SearchUI is running a search
 	elseif callbackType == "searchcomplete" then
