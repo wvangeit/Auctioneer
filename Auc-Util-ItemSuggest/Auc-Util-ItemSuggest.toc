@@ -1,11 +1,13 @@
 ## Title: Auc:Util:ItemSuggest
-## Interface: 30100
-## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan
+## Interface: 30200
+## OptionalDependencies: Auc-Util-Appraiser Enchantrix
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
+## Author: Norganna's AddOns
+## X-Part-Of: Auctioneer
 ##
 ## SavedVariables: Auc-Util-ItemSuggest.lua
 

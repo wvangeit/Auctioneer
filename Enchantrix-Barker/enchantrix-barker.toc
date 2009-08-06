@@ -1,14 +1,16 @@
 ## Title: EnchantrixBarker
-## Notes: Print Enchant price lists to chat [<%version%>] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
+## Notes: Sends a price list of Enchants that a user has available for sale to the Trade channel. [<%version%>] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 30100
+## Interface: 30200
 ## Dependencies: Stubby
-## OptionalDeps: Khaos, Enchantrix, !nLog, DebugLib, Babylonian, LibExtraTip, TipHelper
+## OptionalDeps: Enchantrix, !nLog, DebugLib, Babylonian, LibExtraTip, TipHelper
 ## SavedVariables: EnchantrixBarkerConfig
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
-## URL: http://enchantrix.org
+## URL: http://auctioneeraddon.com/
+## Author: Norganna's AddOns
+## X-Part-Of: Auctioneer
 ##
 Support\Load.xml
 BarkerManifest.lua

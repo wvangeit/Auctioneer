@@ -1,7 +1,10 @@
 ## Title: Auc:Util:AutoMagic
-## Interface: 30100
+## Interface: 30200
 ## Dependancies: Auc-Advanced
-## OptionalDependencies: Auc-Util-Appraiser Enchantrix BtmScan Auc-Util-ItemSuggest
+## OptionalDependencies: Auc-Util-Appraiser Enchantrix Auc-Util-ItemSuggest
 ##
 ## Version: <%version%> (<%codename%>)
+## URL: http://auctioneeraddon.com/
+## Author: Norganna's AddOns
+## X-Part-Of: Auctioneer
 Embed.xml
