@@ -49,24 +49,24 @@ InformantLocalizations = {
 		-- Section: Help
 		["INF_Help_ChatProfileDeleted"]	= "Gelöschtes Profil:";
 		["INF_Help_ChatProfileReset"]	= "Zurückgesetztes Profil:";
-		["INF_Help_ChatProfileSaved"]	= "Gesichertes Profil:";
+		["INF_Help_ChatProfileSaved"]	= "Gespeichertes Profil:";
 		["INF_Help_ChatProfileUsing"]	= "Benutztes Profil:";
 		["INF_Help_CmdClearAll"]	= "alles";
 		["INF_Help_CmdDefault"]	= "Grundeinstellung";
 		["INF_Help_CmdDefaultAll"]	= "Alle Informant Optionen wurden auf die Grundeinstellungen zurückgesetzt";
-		["INF_Help_CmdDefaultSingle"]	= "Informant´s %s Optionen wurden auf die Grundeinstellungen zurückgesetzt";
+		["INF_Help_CmdDefaultSingle"]	= "Informants %s Option wurdn auf die Grundeinstellung zurückgesetzt";
 		["INF_Help_CmdDisable"]	= "Ausschalten";
 		["INF_Help_CmdEmbed"]	= "einbinden";
-		["INF_Help_CmdHeader"]	= "Informant´s Kommandos:";
+		["INF_Help_CmdHeader"]	= "Informants Kommandos:";
 		["INF_Help_CmdHelp"]	= "Hilfe";
-		["INF_Help_CmdHelpDisable"]	= "Verhindert das Informant automatisch beim nächsten Einlogen geladen wird";
+		["INF_Help_CmdHelpDisable"]	= "Verhindert, dass Informant automatisch beim nächsten Einloggen geladen wird";
 		["INF_Help_CmdInformant"]	= "Informant";
-		["INF_Help_CmdLoadMsg"]	= "Informant ist nicht geladen. Gib /informant für mehr Informationen ein.";
+		["INF_Help_CmdLoadMsg"]	= "Informant ist nicht geladen. Tippe /informant für mehr Informationen.";
 		["INF_Help_CmdLocale"]	= "Sprache";
 		["INF_Help_CmdMerchant"]	= "zeige Händler";
 		["INF_Help_CmdQuest"]	= "zeige Quest";
-		["INF_Help_CmdSetLocale"]	= "Setze %s auf %s";
-		["INF_Help_CmdShowILevel"]	= "zeige ILevel";
+		["INF_Help_CmdSetLocale"]	= "Setze %s auf %s'";
+		["INF_Help_CmdShowILevel"]	= "zeige ItemLevel";
 		["INF_Help_CmdShowLink"]	= "zeige Link";
 		["INF_Help_CmdShowStack"]	= "zeige Stapel";
 		["INF_Help_CmdShowUsage"]	= "zeige Auslastung";
@@ -88,7 +88,7 @@ InformantLocalizations = {
 		["INF_Help_Toggle"]	= "Umschalten";
 		["INF_Help_Welcome"]	= "Informant V%s geladen";
 		["INF_Help_WhatIs"]	= "Was ist Informant?";
-		["INF_Help_WhatIsAnswer"]	= "Informant stellt zusätzliche Informationen über Items im Tooltip, in einem Informationsfenster und zu anderen Addons bereit.";
+		["INF_Help_WhatIsAnswer"]	= "Informant stellt zusätzliche Informationen über Gegenstände im Tooltip, in einem Informationsfenster und anderen Addons bereit.";
 
 		-- Section: HelpTooltip
 		["INF_HelpTooltip_ActivateProfile"]	= "Wähle das Profil das Du für diesen Charackter benutzen willst";
@@ -806,6 +806,50 @@ InformantLocalizations = {
 
 	};
 
+	esMX = {
+
+		-- Section: Interface
+		["INF_Interface_ActivateProfile"]	= "Activa el perfil actual";
+		["INF_Interface_AutoUpdate"]	= "Actualizar automaticamente la informacion del item en mercaderes";
+		["INF_Interface_BindingHeader"]	= "Informante";
+		["INF_Interface_BindingTitle"]	= "Mostrar información de ventana";
+		["INF_Interface_CreateProfile"]	= "Crear o reemplazar un perfil";
+		["INF_Interface_DefaultProfile"]	= "Por defecto";
+		["INF_Interface_Delete"]	= "Eliminar";
+		["INF_Interface_EnableInformant"]	= "Activar informante";
+		["INF_Interface_General"]	= "General";
+		["INF_Interface_GeneralOptions"]	= "Opciones Generales";
+		["INF_Interface_InfWinInfoHeader"]	= "Información para |cff%s%s|r ";
+		["INF_Interface_InfWinNoItem"]	= "Debes desplazar el mouse sobre un item, y luego presionar la tecla de activación.";
+		["INF_Interface_InfWinPlayerMade"]	= "Hecho por nivel %d %s";
+		["INF_Interface_InfWinQuest"]	= "Item de misión para %d misión";
+		["INF_Interface_InfWinQuestLine"]	= "Misión %s";
+		["INF_Interface_InfWinQuestMultiLine"]	= "%d necesitado: %s ";
+		["INF_Interface_InfWinQuestRequires"]	= "Requerido para %d misiones:";
+		["INF_Interface_InfWinQuestReward"]	= "Recompensa de %d misiones:";
+		["INF_Interface_InfWinQuestSource"]	= "Información de misión provista por ";
+		["INF_Interface_InfWinQuestStart"]	= "Inicia una misión: ";
+		["INF_Interface_InfWinQuestUnknown"]	= "Misión desconocida: ID #%d ";
+		["INF_Interface_InfWinTitle"]	= "Información de item de Informante";
+		["INF_Interface_InfWinVendorCount"]	= "Disponible en %d mercaderes: ";
+		["INF_Interface_InfWinVendorName"]	= "%s";
+		["INF_Interface_ModTTShow"]	= "Solamente mostrar información extra si Alt está presionado. ";
+		["INF_Interface_ProfileName"]	= "Nuevo nombre de perfil ";
+		["INF_Interface_SaveProfile"]	= "Guardar";
+		["INF_Interface_SetupProfiles"]	= "Instalar, configurar y editar perfiles";
+		["INF_Interface_ShowIlevel"]	= "Mostrar el nivel de un item";
+		["INF_Interface_ShowLink"]	= "Mostrar el vínculo de un item";
+		["INF_Interface_ShowMerchant"]	= "Mostrar información de mercader en la ventana de información";
+		["INF_Interface_ShowQuest"]	= "Mostar información de mision en la ventana de información del Informante";
+		["INF_Interface_ShowStack"]	= "Mostrar la cantidad de items apilados";
+		["INF_Interface_ShowUsage"]	= "Mostrar el uso de un item";
+		["INF_Interface_ShowVendorBuy"]	= "Mostrar el precio de compra a un mercader";
+		["INF_Interface_ShowVendorSell"]	= "Mostrar el precio de compra a un mercader";
+		["INF_Interface_ShowZeroMerchants"]	= "Mostrar un mensaje cuando no se conoce ningun mercader";
+		["INF_Interface_VendorToggle"]	= "Mostrar precios de compra/venta de mercaderes";
+
+	};
+
 	frFR = {
 
 		-- Section: Help
@@ -815,13 +859,13 @@ InformantLocalizations = {
 		["INF_Help_ChatProfileUsing"]	= "Utilisé le Profil:";
 		["INF_Help_CmdClearAll"]	= "Tout";
 		["INF_Help_CmdDefault"]	= "Par Défaut";
-		["INF_Help_CmdDefaultAll"]	= "Toutes les options d'Informant ont été remis sur les paramètres par défaut";
-		["INF_Help_CmdDefaultSingle"]	= "l'option informan's %s a été réinitialisé à ses paramètres par défaut";
+		["INF_Help_CmdDefaultAll"]	= "Toutes les options d'Informant ont été remises sur les paramètres par défaut";
+		["INF_Help_CmdDefaultSingle"]	= "l'option informan's %s a été réinitialisée à ses paramètres par défaut";
 		["INF_Help_CmdDisable"]	= "Désactive";
 		["INF_Help_CmdEmbed"]	= "Intégrer";
 		["INF_Help_CmdHeader"]	= "Commandes d'informant:";
 		["INF_Help_CmdHelp"]	= "Aide";
-		["INF_Help_CmdHelpDisable"]	= "Empêcher le chargement automatique d'Informant lors de la prochaîne connexion";
+		["INF_Help_CmdHelpDisable"]	= "Empêcher le chargement automatique d'Informant lors de la prochaine connexion";
 		["INF_Help_CmdInformant"]	= "Informant";
 		["INF_Help_CmdLoadMsg"]	= "Informant n'est pas chargé. Tapez /informant pour plus d'informations.";
 		["INF_Help_CmdLocale"]	= "Langue";
@@ -837,18 +881,18 @@ InformantLocalizations = {
 		["INF_Help_CmdShowVendorSell"]	= "Voir-Vendeur-Vente";
 		["INF_Help_CmdShowZeroMerchant"]	= "Voir-Zéro-Marchand";
 		["INF_Help_CmdUnknown"]	= "Raccourcis commande inconnue: '%s'";
-		["INF_Help_FirstUse"]	= "|c40ff50ffBienvenue dans Informant|r Comme c'est la première fois que vous utilisez Informant, ce message apparaît pour vous faire savoir qu'il est nécessaire d'attribuer une touche pour afficher cette fenêtre. Ceci se fait dans le menu |cffffffffRaccourcis|r du |cffffffffMenu général|r. Ceci fait, pour voir les informations détaillées des objets de votre inventaire, il suffit de placer votre curseur souris sur un objet qui vous intéresse et d'appuyer sur la touche que vous avez attribuée, cette fenêtre apparaîtra alors avec les informations souhaitées. Pour fermer la fenêtre, appuyer sur la touche de nouveau, ou cliquer sur le bouton de fermeture de la fenêtre. Cliquer sur le bouton de fermeture maintenant pour continuer.";
+		["INF_Help_FirstUse"]	= "|c40ff50ffBienvenue dans Informant|r \nComme c'est la première fois que vous utilisez Informant, ce message apparaît pour vous faire savoir qu'il est nécessaire d'attribuer une touche pour afficher cette fenêtre. Ceci se fait dans le menu |cffffffffRaccourcis|r du |cffffffffMenu général|r. \nCeci fait, pour voir les informations détaillées des objets de votre inventaire, il suffit de placer votre curseur souris sur un objet qui vous intéresse et d'appuyer sur la touche que vous avez attribuée, cette fenêtre apparaîtra alors avec les informations souhaitées. \nPour fermer la fenêtre, appuyer sur la touche de nouveau, ou cliquer sur le bouton de fermeture de la fenêtre. \nCliquer sur le bouton de fermeture maintenant pour continuer.";
 		["INF_Help_HowInfoWin"]	= "Comment puis-je utiliser la fenêtre d'information?";
 		["INF_Help_HowInfoWinAnswer"]	= "Vous pouvez attacher une touche a Informant pour obtenir des informations plus détaillées sur les objet de la fenêtre d'information . Pour ce faire, vous devez ouvrir le Menu de Jeux, sélectionnez \"Raccourcis\" et cherchez Informant: Toggle Information Window.";
 		["INF_Help_InfOff"]	= "Ne montrer aucune information d'objet";
 		["INF_Help_InfOn"]	= "Montrer les informations configurées";
-		["INF_Help_Locale"]	= "Change l'endroit des cadres qui est utilisé pour afficher les messages d'Informant. Noter que ceci affecte tout les cadres que les addons d'Informant utilise.";
-		["INF_Help_LocaleUnknown"]	= "L'endroit que vous avez spécifié (« %s ») est inconnu. Les endroits valides sont : ";
+		["INF_Help_Locale"]	= "Change la langue d'affichage des messages d'Informant. Notez que ceci affecte tous les cadres que les addons d'Informant utilise.";
+		["INF_Help_LocaleUnknown"]	= "La langue que vous avez spécifiée (« %s ») est inconnu. Les langues valides sont : ";
 		["INF_Help_Off"]	= "Arrêt";
 		["INF_Help_On"]	= "Marche";
 		["INF_Help_OptLocale"]	= "<langue>";
 		["INF_Help_Toggle"]	= "Changer";
-		["INF_Help_Welcome"]	= "Informant v%s charger";
+		["INF_Help_Welcome"]	= "Informant v%s chargé";
 		["INF_Help_WhatIs"]	= "Informant qu'est-ce que c'est?";
 		["INF_Help_WhatIsAnswer"]	= "Informant fournit des informations supplémentaires sur les objets par la bulle d'aide, une fenêtre d'informations, et d'autres addons. ";
 
@@ -1063,13 +1107,29 @@ InformantLocalizations = {
 	itIT = {
 
 		-- Section: Help
-		["INF_Help_ChatProfileDeleted"]	= "Cancellato profilo:";
+		["INF_Help_ChatProfileDeleted"]	= "Profilo cancellato:";
 		["INF_Help_ChatProfileReset"]	= "Reset profilo:";
 		["INF_Help_ChatProfileSaved"]	= "Profilo salvato:";
 		["INF_Help_ChatProfileUsing"]	= "Profilo in uso:";
+		["INF_Help_CmdClearAll"]	= "tutto";
+		["INF_Help_CmdDefault"]	= "predefinito";
+		["INF_Help_CmdDefaultAll"]	= "Tutte le opzioni di Informant sono state resettate ai valori predefiniti";
+		["INF_Help_CmdDefaultSingle"]	= "L'opzione %s di Informant è stata resettata al suo valore predefinito ";
 		["INF_Help_CmdDisable"]	= "disabilita";
 		["INF_Help_CmdHeader"]	= "Comandi di Informant:";
 		["INF_Help_CmdHelp"]	= "aiuto";
+		["INF_Help_CmdHelpDisable"]	= "Ferma Informant dal caricarsi automaticamente al prossimo Login";
+		["INF_Help_CmdLoadMsg"]	= "Informant non e' caricato. Digita /informant per maggiori informazioni";
+		["INF_Help_CmdLocale"]	= "locale";
+		["INF_Help_CmdMerchant"]	= "mostra-mercante";
+		["INF_Help_CmdQuest"]	= "mostra-missione";
+		["INF_Help_CmdShowILevel"]	= "mostra-ilevel";
+		["INF_Help_CmdShowLink"]	= "mostra-collegamento";
+		["INF_Help_CmdShowStack"]	= "mostra-stack";
+		["INF_Help_CmdShowVendor"]	= "mostra-venditore";
+		["INF_Help_CmdShowVendorBuy"]	= "mostra-venditore-buy";
+		["INF_Help_CmdShowVendorSell"]	= "mostra-venditore-sell";
+		["INF_Help_CmdShowZeroMerchant"]	= "mostra-zero-mercanti";
 		["INF_Help_Off"]	= "Off";
 		["INF_Help_On"]	= "On";
 		["INF_Help_WhatIs"]	= "Cos'è Informant?";
@@ -1287,6 +1347,7 @@ InformantLocalizations = {
 		["INF_Tooltip_AdditElixir"]	= "영약";
 		["INF_Tooltip_AdditEnchanting"]	= "마법부여";
 		["INF_Tooltip_AdditEnchantingBag"]	= "마법부여 가방";
+		["INF_Tooltip_AdditEnchArmor"]	= "방어구 마법부여";
 		["INF_Tooltip_AdditEnchWeapon"]	= "무기 마법부여";
 		["INF_Tooltip_AdditEngineering"]	= "기계공학";
 		["INF_Tooltip_AdditEngineeringBag"]	= "기계공학 가방";
@@ -1316,16 +1377,24 @@ InformantLocalizations = {
 		["INF_Tooltip_AdditLeatherworkingBag"]	= "가죽세공 가방";
 		["INF_Tooltip_AdditMage"]	= "마법사";
 		["INF_Tooltip_AdditMail"]	= "우편";
+		["INF_Tooltip_AdditMeat"]	= "고기";
 		["INF_Tooltip_AdditMetalStone"]	= "금속 & 암석";
+		["INF_Tooltip_AdditMiningBag"]	= "채광 가방";
+		["INF_Tooltip_AdditMiscellaneous"]	= "기타";
 		["INF_Tooltip_AdditMount"]	= "탈것";
 		["INF_Tooltip_AdditOneHandAxe"]	= "한손 도끼";
+		["INF_Tooltip_AdditOneHandSword"]	= "한손 검";
 		["INF_Tooltip_AdditOther"]	= "기타";
 		["INF_Tooltip_AdditPaladin"]	= "성기사";
+		["INF_Tooltip_AdditPotion"]	= "물약";
 		["INF_Tooltip_AdditPriest"]	= "사제";
 		["INF_Tooltip_AdditQuest"]	= "퀘스트";
 		["INF_Tooltip_AdditRing"]	= "반지";
 		["INF_Tooltip_AdditRogue"]	= "도적";
+		["INF_Tooltip_AdditScroll"]	= "두루마리";
 		["INF_Tooltip_AdditShaman"]	= "주술사";
+		["INF_Tooltip_AdditTailoring"]	= "재봉술";
+		["INF_Tooltip_AdditThrown"]	= "투사체";
 		["INF_Tooltip_AdditTotem"]	= "토템";
 		["INF_Tooltip_AdditTrinket"]	= "장신구";
 		["INF_Tooltip_AdditTwoHandAxe"]	= "양손 도끼";
@@ -1496,6 +1565,28 @@ InformantLocalizations = {
 		["INF_Help_CmdShowVendorSell"]	= "mostre-vendedor-venda";
 		["INF_Help_CmdShowZeroMerchant"]	= "mostre-zero-mercantes";
 		["INF_Help_CmdUnknown"]	= "Comando nao reconhecido: '%s'";
+
+		-- Section: HelpTooltip
+		["INF_HelpTooltip_ActivateProfile"]	= "Selecione o perfil que você deseja usar nesse personagem";
+		["INF_HelpTooltip_AutoUpdate"]	= "Permitir ao informante escanear as suas bolsas e inventório de vendas para atualizações";
+		["INF_Helptooltip_DefaultProfile"]	= "Resetar todas as opções para esse perfil no atual";
+		["INF_HelpTooltip_DeleteProfile"]	= "Deletar o perfil atualmente selecionado";
+		["INF_HelpTooltip_ProfileName"]	= "Entre com o nome do perfil que você deseja criar";
+		["INF_HelpTooltip_ProfileSave"]	= "Clique neste botão para criar ou sobrescrever o nome do perfil especificado";
+
+		-- Section: Interface
+		["INF_Interface_ActivateProfile"]	= "Ativar o pefil atual";
+		["INF_Interface_AutoUpdate"]	= "Automaticamente atualizar a informação do item aos vendedores";
+		["INF_Interface_BindingHeader"]	= "Informante";
+		["INF_Interface_CreateProfile"]	= "Criar ou repor o perfil";
+		["INF_Interface_Delete"]	= "Deletar";
+		["INF_Interface_EnableInformant"]	= "Liberar informante";
+		["INF_Interface_General"]	= "Geral";
+		["INF_Interface_GeneralOptions"]	= "Opções gerais";
+		["INF_Interface_InfWinQuestStart"]	= "Inicia a missã:";
+		["INF_Interface_ProfileName"]	= "Novo nome do perfil";
+		["INF_Interface_SaveProfile"]	= "Salvar";
+		["INF_Interface_SetupProfiles"]	= "Instalar, configurar e editar perfis";
 
 	};
 
