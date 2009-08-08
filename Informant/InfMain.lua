@@ -184,6 +184,7 @@ function getItem(itemID, static)
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
+	sell = select(11,GetItemInfo(itemID))
 	local dataItem = (static and staticDataItem or {})
 	dataItem.buy = buy
 	dataItem.sell = sell
