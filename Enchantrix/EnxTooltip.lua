@@ -673,6 +673,7 @@ function hookItemTooltip(tipFrame, item, count, name, link, quality)
 		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
 	
 	tooltip:SetFrame(tipFrame)
+	-- ccox - tooltip:DecodeLink will only work with type "item"
 	local itemType, itemId = tooltip:DecodeLink(link)
 	
 	if itemType == "item" then
@@ -693,7 +694,9 @@ function hookSpellTooltip(tipFrame, link, name, rank)
 	if link:sub(0, 8) == "enchant:" or link:sub(0, 6) == "spell:" then
 		link = "|H"..link.."|h|cffffffff["..name.."]|r|h"
 	end
-	local itemType, itemId = tooltip:DecodeLink(link)
+	-- ccox - tooltip:DecodeLink will only work with type "item", returning nil for any other link type
+	-- so we have to do this the hard way
+	local itemType, itemId = tooltip:BreakHyperlink("H", 1, strsplit("|", link))
 	
 	if itemType == "enchant" or itemType == "spell" then
 		name = name or ""
