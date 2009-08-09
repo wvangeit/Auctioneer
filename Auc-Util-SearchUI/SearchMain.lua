@@ -434,7 +434,7 @@ local function getter(setting)
 
 	if (isGlobalSetting(setting)) then
 		local value = AucAdvancedData.UtilSearchUiData.Global[setting]
-		if value then return value end
+		if value ~= nil then return value end
 		return getDefault(setting)
 	end
 
