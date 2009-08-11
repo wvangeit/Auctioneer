@@ -480,7 +480,25 @@ function private.CreateFrames()
 		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) },
 		{ _BC('UiDateHeader'), "TEXT", get("columnwidth.".._BC('UiDateHeader')) },
 	} )
-	
+
+	--Add tooltip help to the scrollframe headers
+	for i = 1, #frame.resultlist.sheet.labels do
+		local self = frame.resultlist.sheet.labels[i].button
+		self:SetScript("OnEnter", function() private.buttonTooltips( self, _BC('TT_ScrollHeader') ) end) --Rightclick+Drag to move\nALT++RightClick to resize\nCTRL+RightClick to reset
+		self:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	end
+	--If we have a saved order reapply
+	if get("columnorder") then
+		--print("saved order applied")
+		frame.resultlist.sheet:SetOrder(get("columnorder") )
+	end
+	--Apply last column sort used
+	if get("columnsortcurSort") then
+		frame.resultlist.sheet.curSort = get("columnsortcurSort") or 1
+		frame.resultlist.sheet.curDir = get("columnsortcurDir") or 1
+		frame.resultlist.sheet:PerformSort()
+	end
+	--After we have finished creating the scrollsheet and all saved settings have been applyed set our event processor
 	function frame.resultlist.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
 		if (callback == "ColumnOrder") then
 			set("columnorder", order)
@@ -499,25 +517,7 @@ function private.CreateFrames()
 			set("columnsortcurSort", column)
 		end
 	end
-
-	--Add tooltip help to the scrollframe headers
-	for i = 1, #frame.resultlist.sheet.labels do
-		local self = frame.resultlist.sheet.labels[i].button
-		local text = frame.resultlist.sheet.labels[i]:GetText()
-		self:SetScript("OnEnter", function() private.buttonTooltips( self, text.._BC('TT_ScrollHeader') ) end) --\nRightclick+Drag to resize\nCTRL+RightClick to reset
-		self:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	end
-	--If we have a saved order reapply
-	if get("columnorder") then
-		--print("saved order applied")
-		frame.resultlist.sheet:SetOrder(get("columnorder") )
-	end
-	--Apply last column sort used
-	if get("columnsortcurSort") then
-		frame.resultlist.sheet.curSort = get("columnsortcurSort") or 1
-		frame.resultlist.sheet.curDir = get("columnsortcurDir") or 1
-		frame.resultlist.sheet:PerformSort()
-	end
+	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
 		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(),
