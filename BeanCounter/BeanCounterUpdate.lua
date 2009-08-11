@@ -205,7 +205,7 @@ end
 function private.update._2_09(server, player)
 	local _, item = next(BeanCounterDB["ItemIDArray"])
 	--if not in new format then upgrade itemID array otherwise leave it alone
-	if not item:match("c........;.-") then
+	if item and not item:match("c........;.-") then
 		debugPrint("UPGRADE itemName", item)
 		for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
 			local color, name = itemLink:match("|(.-)|.item.*%[(.+)%].*")
