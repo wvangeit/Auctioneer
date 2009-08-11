@@ -81,9 +81,9 @@ function lib.API.search(name, settings, queryReturn)
 		if queryReturn and cached then
 			return cached
 		end
-		
+		--if API query lacks a settings table use whatever filter options the player has currently selected
 		if not settings then
-			settings = {["selectbox"] = {"1", "server"}, ["exact"] = false, ["bid"] = true, ["auction"] = true}
+			settings = private.getCheckboxSettings()
 		end
 	
 		--search data
