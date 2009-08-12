@@ -6,7 +6,7 @@
 ## OptionalDeps: Skillet, AdvancedTradeSkillWindow
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Util-PriceLevel.toc 4155 2009-04-14 19:40:57Z aesir $
+## Revision: $Id: Auc-Util-Glypher.toc 4155 2009-04-14 19:40:57Z aesir $
 ## URL: http://auctioneeraddon.com/
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer
