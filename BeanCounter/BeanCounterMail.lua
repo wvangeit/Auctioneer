@@ -55,6 +55,8 @@ local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("%%s", "(.+)")
 local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("%%s", "(.+)")
 local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "(.+)")
 ]]
+local reportTotalMail, reportAHMail, reportReadMail, reportAlreadyReadMail = 0, 0, 0, 0 --Used as a debug check on mail scanning engine
+
 local registeredAltaholicHook = false
 local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
@@ -88,6 +90,8 @@ end
 --Mailbox Snapshots
 local HideMailGUI
 function private.updateInboxStart()
+	reportTotalMail, reportAHMail, reportReadMail, reportAlreadyReadMail = 0, 0, 0, 0
+	reportTotalMail = GetInboxNumItems()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
 		if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
@@ -100,6 +104,7 @@ function private.updateInboxStart()
 				auctionHouse = "N"
 			end
 			if auctionHouse then
+				reportAHMail = reportAHMail + 1
 				HideMailGUI = true
 				wasRead = wasRead or 0 --its nil unless its has been read
 				local itemLink = GetInboxItemLink(n, 1)
@@ -111,6 +116,9 @@ function private.updateInboxStart()
 						})
 				GetInboxText(n) --read message
 			end
+			reportReadMail = reportReadMail + 1
+		else --was read or empty
+			reportAlreadyReadMail = reportAlreadyReadMail + 1
 		end
 	end
 	if HideMailGUI == true then
@@ -166,7 +174,7 @@ local total = #private.inboxStart
 			--debugPrint("data.retrieved == yes")
 
 		elseif  time() - data.startTime > get("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
-			debugPrint("time to retrieve invoice exceeded, most likely waiting on players name..", tbl["Seller/buyer"])
+			debugPrint("time to retrieve invoice exceeded, most likely waiting on players name if this is blank>..", tbl["Seller/buyer"])
 			tbl["retrieved"] = "failed" --time to get invoice exceded
 		else
 			--debugPrint("Invoice retieve attempt",tbl["subject"])
@@ -174,6 +182,7 @@ local total = #private.inboxStart
 		end
 	end
 	if (#private.inboxStart == 0) and (HideMailGUI == true) then
+		debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
 		InboxCloseButton:Show()
 		InboxFrame:Show()
 		MailFrameTab2:Show()
@@ -232,7 +241,7 @@ function private.matchDB(text)
 		if text == name then
 			itemID = string.split(":", itemKey)
 			local itemLink = lib.API.createItemLinkFromArray(itemKey)
-			debugPrint("|CFFFFFF00Searching",data,"for",text,"Sucess: link is",itemLink)
+			--debugPrint("|CFFFFFF00Searching",data,"for",text,"Sucess: link is",itemLink)
 			return itemID, itemLink
 		end
 	end
@@ -249,7 +258,7 @@ function private.sortCompletedAuctions( i )
 		if stack then
 			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
 			private.databaseAdd("completedAuctions", itemID, itemLink, value)
-			debugPrint("databaseAdd completedAuctions", itemID, itemLink)
+			--debugPrint("databaseAdd completedAuctions", itemID, itemLink)
 		else
 			debugPrint("Failure for completedAuctions", itemID, itemLink, value)
 		end
@@ -296,7 +305,7 @@ function private.sortFailedAuctions( i )
 		if stack then
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
 			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
-			debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+			--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		else
 			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		end
@@ -315,7 +324,7 @@ function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, e
 				local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
 						local timeAuctionPosted, timeFailedAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Time this message should have been posted
-						if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 800) then
+						if (timeAuctionPosted - 7200) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 7200) then
 							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
 							--debugPrint("postedAuction removed as Failed", itemID, itemLink )
@@ -337,7 +346,7 @@ function private.sortCompletedBidsBuyouts( i )
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
 		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		private.databaseAdd("completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
-		debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
+		--debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
 	else
 		debugPrint("Failure for completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
 	end
@@ -348,7 +357,7 @@ end
 function private.findCompletedBids(itemID, seller, bid, itemLink)
 	local buy, bid = tonumber(buy),tonumber(bid)
 	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
-	debugPrint("Starting search to remove posted Bid")
+	--debugPrint("Starting search to remove posted Bid")
 	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
 		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
 			if not text:match(".*USED.*") then
@@ -372,7 +381,7 @@ function private.sortFailedBids( i )
 	if itemID then
 		local value = private.packString(postStack, "", "", "", "", private.reconcilePending[i]["money"], postSeller, private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		private.databaseAdd("failedBids", itemID, itemLink, value)
-		debugPrint("databaseAdd failedBids", itemID, itemLink, value)
+		--debugPrint("databaseAdd failedBids", itemID, itemLink, value)
 	else
 		debugPrint("Failure for failedBids", itemID, itemLink, value)
 	end
@@ -389,7 +398,7 @@ function private.findFailedBids(itemID, itemLink, gold)
 				if tonumber(postBid) == gold then
 					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED FAILED"
-					debugPrint("posted Bid removed as Failed", itemString, index)
+					--debugPrint("posted Bid removed as Failed", itemString, index)
 					return postStack, postSeller, reason
 				end
 			end
