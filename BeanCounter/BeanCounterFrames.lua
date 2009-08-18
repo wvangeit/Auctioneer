@@ -40,8 +40,9 @@ local function debugPrint(...)
 end
 
 local frame
+local auctionUICreated
 function private.AuctionUI()
-	if frame then return end
+	if auctionUICreated then return end
 	frame = private.frame
 
 	--Create the TAB
@@ -57,15 +58,6 @@ function private.AuctionUI()
 	end
 
 	function frame.ScanTab.OnClick(self, button, index)
-		if not self then frame:Hide() return end --This should not be necessary in 3.1
-		
-		BeanCounterBaseFrame:Hide()
-		if private.frame:GetParent() == BeanCounterBaseFrame then
-			private.frame:SetParent(AuctionFrame)
-			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
-			private.relevelFrame(frame)--make sure our frame stays in proper order
-		end
-
 		if not index then index = self:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
@@ -82,34 +74,52 @@ function private.AuctionUI()
 				AuctionDressUpFrame:Hide()
 				AuctionDressUpFrame.reshow = true
 			end
-			frame:Show()
+			private.displayGUI("ShowAHGUI")
 		else
 			if (AuctionDressUpFrame.reshow) then
 				AuctionDressUpFrame:Show()
 				AuctionDressUpFrame.reshow = nil
 			end
 			AuctionFrameMoneyFrame:Show()
-			frame:Hide()
+			private.displayGUI("HideAHGUI")
 		end
 	end
-
+	auctionUICreated = true
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
+end
+
+--function handles showing the standalone or intergrated UI
+function private.displayGUI( action )
+	frame = private.frame
+
+	if action == "HideAHGUI" then --hide unless is on the external GUI
+		if not BeanCounterBaseFrame:IsVisible() then
+			frame:Hide()
+		else --when tab is created frame parent is set to AH, we dont want this
+			frame:SetParent("BeanCounterBaseFrame")
+			frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
+		end
+	elseif action == "ShowAHGUI" then
+		frame:SetParent(AuctionFrame)
+		frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
+		private.relevelFrame(frame)--make sure our frame stays in proper order
+		BeanCounterBaseFrame:Hide()
+		frame:Show()
+	elseif BeanCounterBaseFrame:IsVisible() then
+		BeanCounterBaseFrame:Hide()
+		frame:Hide()
+	else
+		frame:SetParent("BeanCounterBaseFrame")
+		frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
+		private.relevelFrame(frame)--make sure our frame stays in proper order
+		BeanCounterBaseFrame:Show()
+		frame:Show()
+	end
 end
 --Change parent to our GUI base frame/ Also used to display our Config frame
 function private.GUI(_, button)
 	if (button == "LeftButton") then
-		if private.frame:GetParent() == AuctionFrame then
-			private.frame:SetParent("BeanCounterBaseFrame")
-			private.frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
-		end
-		if not BeanCounterBaseFrame:IsVisible() then
-			if AuctionFrame then AuctionFrame:Hide() end
-			BeanCounterBaseFrame:Show()
-			--private.frame:SetFrameStrata("FULLSCREEN")
-			private.frame:Show()
-		else
-			BeanCounterBaseFrame:Hide()
-		end
+		private.displayGUI()
 	else
 		if not lib.Gui:IsVisible() then
 			lib.Gui:Show()
@@ -117,7 +127,6 @@ function private.GUI(_, button)
 			lib.Gui:Hide()
 		end
 	end
-
 end
 
 --Seperated frame items from frame creation, this should allow the same code to be reused for AH UI and Standalone UI
