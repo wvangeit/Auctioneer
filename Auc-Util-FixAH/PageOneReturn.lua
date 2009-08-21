@@ -51,7 +51,7 @@ The following functions are part of the module's exposed methods:
 ]]
 
 -- Auto disable if build version is not correct:
-local requiredBuildLive = 10192
+local requiredBuildLive = 10314
 local requiredBuildPTR = 10147
 local version, build = GetBuildInfo()
 if (tonumber(build) ~= requiredBuildLive) and (tonumber(build) ~= requiredBuildPTR) then
