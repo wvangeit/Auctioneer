@@ -672,6 +672,9 @@ function hookItemTooltip(tipFrame, item, count, name, link, quality)
 	if ((not Enchantrix.Settings.GetSetting('all'))
 		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
 	
+	-- we're getting nil links in here somehow, just return if that happens
+	if (link == nil) then return end
+	
 	tooltip:SetFrame(tipFrame)
 	-- ccox - tooltip:DecodeLink will only work with type "item"
 	local itemType, itemId = tooltip:DecodeLink(link)
@@ -689,6 +692,9 @@ end
 function hookSpellTooltip(tipFrame, link, name, rank)
 	if ((not Enchantrix.Settings.GetSetting('all'))
 		or (not Enchantrix.Settings.GetSetting('TooltipShowReagents'))) then return end
+	
+	-- we're getting nil links in here somehow, just return if that happens
+	if (link == nil) then return end
 	
 	tooltip:SetFrame(tipFrame)
 	if link:sub(0, 8) == "enchant:" or link:sub(0, 6) == "spell:" then
