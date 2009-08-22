@@ -2033,7 +2033,7 @@ function private.CreateFrames()
 
 	frame.salebox.duration:EnableMouseWheel(1)
 	frame.salebox.duration:SetScript("OnMouseWheel", function()
-		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() + arg1)
+		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - arg1)
 	end)
 
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
