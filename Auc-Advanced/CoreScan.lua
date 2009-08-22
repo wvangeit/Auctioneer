@@ -196,7 +196,7 @@ function lib.PopScan()
 			if (nLog) then
 				nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("Scan %d Too Old, committing what we have and aborting"):format(private.curQuery.qryinfo.id))
 			end
-			lib.Commit(true, false) --  Incomplete, non-GetAll Scan
+			private.Commit(true, false) --  Incomplete, non-GetAll Scan
 			return
 		end
 
@@ -335,7 +335,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			lib.Commit(true, false)
+			private.Commit(true, false)
 		end
 
 		private.isScanning = true
@@ -582,11 +582,12 @@ Commitfunction = function()
 	local scanStarted = private.CommitQueue[1]["scanStarted"]
 	local scanStartTime = private.CommitQueue[1]["scanStartTime"]
 	local totalPaused = private.CommitQueue[1]["totalPaused"]
-	local query = private.CommitQueue[1]["query"]	local TempcurScan = {}
+	local query = private.CommitQueue[1]["query"]
+	local TempcurScan = {}
 	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
 	local TempcurQuery = {}
 	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
-
+	wasGetAll = wasGetAll or (#TempcurScan < 50) -- Either retrieved all records in single pull (were less than 50 total or we asked explicitly for all records)
 	for i = 1, #private.CommitQueue do
 		if private.CommitQueue[i+1] then
 			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
@@ -931,7 +932,8 @@ local function CoroutineResume(...)
 	return status, result
 end
 
-function lib.Commit(wasIncomplete, wasGetAll)
+
+function private.Commit(wasIncomplete, wasGetAll)
 	if not private.curScan then return end
 	local Queuelength = #private.CommitQueue
 	private.CommitQueue[Queuelength + 1] = {}
@@ -949,12 +951,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		CoroutineResume(CoCommit)
 	else
 		CoCommit = coroutine.create(Commitfunction)
-		CoroutineResume(CoCommit)
-	end
-end
-
-function lib.LogoutCommit()
-	while coroutine.status(CoCommit) == "suspended" do
 		CoroutineResume(CoCommit)
 	end
 end
@@ -1225,7 +1221,7 @@ StorePageFunction = function()
 	if private.isScanning then
 		if isGetAll and (#(private.curScan) >= totalAuctions - 100) then
 			private.isScanning = false
-			lib.Commit(false, true)
+			private.Commit(false, true)
 		elseif (page+1 < maxPages) then
 			private.ScanPage(page + 1)
 		else
@@ -1234,10 +1230,10 @@ StorePageFunction = function()
 				incomplete = true
 			end
 			private.isScanning = false
-			lib.Commit(incomplete, false)
+			private.Commit(incomplete, false)
 		end
 	elseif isGetAll and (#(private.curScan) > totalAuctions - 100) then
-		lib.Commit(false, true)
+		private.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
 		-- while #private.curPages == maxPages seems a good effeciency gain, this could be a problem if say page 4 was looked at for a query that returns 2 pages.
 		local incomplete = false
@@ -1254,7 +1250,7 @@ StorePageFunction = function()
 			incomplete = true
 		end
 		if (maxPages == page+1) then
-			lib.Commit(incomplete, false)
+			private.Commit(incomplete, false)
 		end
 	end
 	BrowseSearchButton:Show()
@@ -1428,7 +1424,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 
 	if (not isSame or not private.curQuery) then
-		lib.Commit(true, false)
+		private.Commit(true, false)
 		private.scanStartTime = time()
 		private.scanStarted = GetTime()
 		private.totalPaused = 0
@@ -1543,7 +1539,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 function lib.Cancel()
 	if (private.curQuery) then
 		private.Print("Cancelling current scan")
-		lib.Commit(true, false)
+		private.Commit(true, false)
 	end
 	private.ResetAll()
 end
@@ -1554,7 +1550,7 @@ function lib.Interrupt()
 			private.unexpectedClose = true
 			lib.PushScan()
 		else
-			lib.Commit(true, false)
+			private.Commit(true, false)
 			private.sentQuery = false
 		end
 	end
@@ -1757,6 +1753,17 @@ function lib.GetStackedScanCount()
 	local scanCount = private.scanStack or 0
 	if (private.scanStack) then scanCount = #private.scanStack end
 	return scanCount
+end
+
+function lib.AHClosed()
+	lib.Interrupt()
+end
+
+function lib.Logout()
+	private.Commit(true, false)
+	while coroutine.status(CoCommit) == "suspended" do
+		CoroutineResume(CoCommit)
+	end
 end
 
 

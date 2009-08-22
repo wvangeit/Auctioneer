@@ -262,10 +262,9 @@ function private.OnEvent(self, event, arg1, arg2, ...)
 		AucAdvanced.SendProcessorMessage("auctionopen")
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		AucAdvanced.SendProcessorMessage("auctionclose")
-		AucAdvanced.Scan.Interrupt()
+		AucAdvanced.Scan.AHClosed()
 	elseif (event == "PLAYER_LOGOUT") then
-		AucAdvanced.Scan.Commit(true)
-		AucAdvanced.Scan.LogoutCommit()
+		AucAdvanced.Scan.Logout()
 		private.OnUnload()
 	elseif (event == "ITEM_LOCK_CHANGED" and arg2) or event == "BAG_UPDATE" then
 		if arg1 >= 0 and arg1 <= 4 then
