@@ -144,6 +144,11 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
+	if (currentPage+1 == totalPages) then 
+		secondsToScanCompletion = "Done" 
+	else 
+		secondsToScanCompletion = SecondsToTime(secondsToScanCompletion) 
+	end
 
 	BrowseNoResultsText:SetText(
 		private.scanProgressFormat:format(
@@ -152,7 +157,7 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 			totalPages,
 			auctionsScannedPerSecond,
 			scannedAuctions,
-			SecondsToTime(secondsToScanCompletion),
+			secondsToScanCompletion,
 			SecondsToTime(secondsElapsed)
 		)
 	)
