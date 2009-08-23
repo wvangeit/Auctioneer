@@ -472,11 +472,17 @@ local function processStats(operation, curItem, oldItem)
 		]]
 		local modules = AucAdvanced.GetAllModules("AuctionFilter", "Filter")
 		for pos, engineLib in ipairs(modules) do
-			local result=engineLib.AuctionFilter(operation, statItem)
-			if (result) then
-				curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
-				filtered = true
-				break
+			local pOK, result=pcall(engineLib.AuctionFilter, operation, statItem)
+			if (pOK) then
+				if (result) then
+					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
+					filtered = true
+					break
+				end
+			else
+				if (nLog) then
+					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("AuctionFilter %s Returned Error %s"):format(engineLib.Getname(), errormsg))
+				end
 			end
 		end
 	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
@@ -490,10 +496,16 @@ local function processStats(operation, curItem, oldItem)
 	local modules = AucAdvanced.GetAllModules("ScanProcessors")
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.ScanProcessors[operation] then
+			local pOK, errormsg
 			if (oldItem) then
-				engineLib.ScanProcessors[operation](operation, statItem, statItemOld)
+				pOK, errormsg = pcall(engineLib.ScanProcessors[operation],operation, statItem, statItemOld)
 			else
-				engineLib.ScanProcessors[operation](operation, statItem)
+				pOK, errormsg = pcall(engineLib.ScanProcessors[operation],operation, statItem)
+			end
+			if (not pOK) then
+				if (nLog) then
+					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("ScanProcessor %s Returned Error %s"):format(engineLib.Getname(), errormsg))
+				end
 			end
 		end
 	end
@@ -965,9 +977,15 @@ function private.FinishedPage(nextPage)
 	-- Tell everyone that our stats are updated
 	local modules = AucAdvanced.GetAllModules("FinishedPage")
 	for pos, engineLib in ipairs(modules) do
-		local finished = engineLib.FinishedPage(nextPage)
-		if finished and finished == false then
-			return false
+		local pOK, finished = pcall(engineLib.FinishedPage,nextPage)
+		if (pOK) then
+			if (finished~=nil) and (finished==false) then
+				return false
+			end
+		else
+			if (nLog) then
+				nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("FinishedPage %s Returned Error %s"):format(engineLib.Getname(), finished))
+			end
 		end
 	end
 	return true
@@ -1306,7 +1324,7 @@ function PlaceAuctionBid(type, index, bid, ...)
 		local modules = AucAdvanced.GetAllModules("ScanProcessors")
 		for pos, engineLib in ipairs(modules) do
 			if engineLib.ScanProcessors["placebid"] then
-				engineLib.ScanProcessors["placebid"]("placebid", statItem, type, index, bid)
+				pcall(engineLib.ScanProcessors["placebid"],"placebid", statItem, type, index, bid)
 			end
 		end
 	end
@@ -1332,7 +1350,7 @@ function StartAuction(minBid, buyoutPrice, runTime, ...)
 		local modules = AucAdvanced.GetAllModules("ScanProcessors")
 		for pos, engineLib in ipairs(modules) do
 			if engineLib.ScanProcessors["newauc"] then
-				engineLib.ScanProcessors["newauc"]("newauc", statItem, minBid, buyoutPrice, runTime, price)
+				pcall(engineLib.ScanProcessors["newauc"],"newauc", statItem, minBid, buyoutPrice, runTime, price)
 			end
 		end
 	end
@@ -1355,7 +1373,7 @@ function TakeInboxMoney(index, ...)
 
 		for pos, engineLib in ipairs(modules) do
 			if engineLib.ScanProcessors["aucsold"] then
-				engineLib.ScanProcessors["aucsold"]("aucsold", faction, itemName, playerName, bid, buyout, deposit, consignment)
+				pcall(engineLib.ScanProcessors["aucsold"],"aucsold", faction, itemName, playerName, bid, buyout, deposit, consignment)
 			end
 		end
 	end
