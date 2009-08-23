@@ -245,12 +245,23 @@ EnchantrixBarkerLocalizations = {
 		["OpenBarkerWindow"]	= "Åbner køb & salg barker vinduet.";
 
 		-- Section: User Interface
+		["BarkerOptionsAgilityPriority"]	= "Agility";
+		["BarkerOptionsArmorPriority"]	= "Armor";
+		["BarkerOptionsDamage"]	= "Damage";
+		["BarkerOptionsDefense"]	= "Defense";
+		["BarkerOptionsFireResistance"]	= "Fire Resistance";
+		["BarkerOptionsFrostResistance"]	= "Frost Resistance";
+		["BarkerOptionsHealth"]	= "Health";
 		["BarkerOptionsHighestPriceForFactorTitle"]	= "Højeste prisfaktor";
 		["BarkerOptionsHighestPriceForFactorTooltip"]	= "Enchentments får en score på nul ved en pris prioritet på eller over denne værdi.";
 		["BarkerOptionsHighestProfitTitle"]	= "Højeste profit.";
 		["BarkerOptionsHighestProfitTooltip"]	= "Højeste totale kontante profit på en enchant.";
+		["BarkerOptionsIntellectPriority"]	= "Intellect";
 		["BarkerOptionsLowestPriceTitle"]	= "Laveste pris";
 		["BarkerOptionsLowestPriceTooltip"]	= "Laveste kontante udbudspris for en enchantment.";
+		["BarkerOptionsMana"]	= "Mana";
+		["BarkerOptionsNatureResistance"]	= "Nature Resistance";
+		["BarkerOptionsOther"]	= "Other";
 		["BarkerOptionsPricePriorityTitle"]	= "Totale pris prioritet";
 		["BarkerOptionsPricePriorityTooltip"]	= "Dette bestemmer hvor vigtig prissætning er for den generelle annoncering.";
 		["BarkerOptionsPriceSweetspotTitle"]	= "Pirsfaktor SweetSpot";
@@ -259,6 +270,10 @@ EnchantrixBarkerLocalizations = {
 		["BarkerOptionsProfitMarginTooltip"]	= "Profit procent der skal ligges til materialernes købspris.";
 		["BarkerOptionsRandomFactorTitle"]	= "Tilfældig faktor";
 		["BarkerOptionsRandomFactorTooltip"]	= "Graden af tilfældighed i enchantments der reklameres for i \"trade\" kanalen.";
+		["BarkerOptionsShadowResistance"]	= "Shadow Resistance";
+		["BarkerOptionsSpiritPriority"]	= "Spirit";
+		["BarkerOptionsStaminaPriority"]	= "Stamina";
+		["BarkerOptionsStrengthPriority"]	= "Strength";
 		["BarkerOptionsTab1Title"]	= "Profit og pris prioritering";
 
 	};
@@ -1573,6 +1588,10 @@ EnchantrixBarkerLocalizations = {
 	};
 
 	ptPT = {
+
+		-- Section: Command Messages
+		["BarkerEnxWindowNotOpen"]	= "Enchantrix: A janela de encantamentos não está aberta. A Janela de encantamentos deve estar aberta para usar o barker.";
+		["BarkerNoEnchantsAvail"]	= "Enchantrix: Ou você não conhece nenhum encantamento ou não possuí reagentes para fazê-los.";
 
 		-- Section: Commands
 		["CmdBarker"]	= "Vender";
