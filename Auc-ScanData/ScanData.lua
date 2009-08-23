@@ -274,10 +274,10 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 			tooltip:AddLine("  |cffddeeff"..exact.."|r exact "..lib.Colored(doColor, dist.exact, "matches"))
 		end
 		if (suffix > 0) then
-			tooltip:AddLine("  |cffddeeff"..exact.."|r suffix "..lib.Colored(doColor, dist.suffix, "matches"))
+			tooltip:AddLine("  |cffddeeff"..suffix.."|r suffix "..lib.Colored(doColor, dist.suffix, "matches"))
 		end
 		if (base > 0) then
-			tooltip:AddLine("  |cffddeeff"..exact.."|r base "..lib.Colored(doColor, dist.base, "matches"))
+			tooltip:AddLine("  |cffddeeff"..base.."|r base "..lib.Colored(doColor, dist.base, "matches"))
 		end
         if (dist.stack and #(dist.stack) > 1) then
             for stackSize, stackColor in pairs(dist.stack) do
