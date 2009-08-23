@@ -279,7 +279,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 		if (base > 0) then
 			tooltip:AddLine("  |cffddeeff"..base.."|r base "..lib.Colored(doColor, dist.base, "matches"))
 		end
-        if (dist.stack and #(dist.stack) > 1) then
+        if (dist.stack) then
             for stackSize, stackColor in pairs(dist.stack) do
                 tooltip:AddLine("  Stacks of "..stackSize.."  "..lib.Colored(doColor, stackColor, "in image"))
             end
