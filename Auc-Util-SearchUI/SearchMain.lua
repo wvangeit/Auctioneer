@@ -1277,10 +1277,6 @@ function lib.MakeGuiConfig()
 		end
 	end
 
-	function lib.OnLeaveSheet(button, row, index)
-		GameTooltip:Hide()
-	end
-
 	function lib.OnClickSheet(button, row, index)
 		index = index - (index%15-1)
 		if IsShiftKeyDown() then --Add the item link to chat
@@ -1325,11 +1321,43 @@ function lib.MakeGuiConfig()
 		{ "CurBid", "COIN", lib.GetSetting("columnwidth.CurBid"), { DESCENDING=true } }, --85
 		{ "Min/ea", "COIN", lib.GetSetting("columnwidth.Min/ea"), { DESCENDING=true } }, --85
 		{ "Cur/ea", "COIN", lib.GetSetting("columnwidth.Cur/ea"), { DESCENDING=true } }, --85
-	}, lib.OnEnterSheet, lib.OnLeaveSheet, lib.OnClickSheet, private.OnResizeSheet, lib.UpdateControls)
-
-
+	})
 	gui.sheet:EnableSelect(true)
 	gui.sheet:EnableVerticalScrollReset(false) --tells scrollframes we do NOT want to reset position when rendering a new data table
+	
+	--If we have a saved order reapply
+	if lib.GetSetting("columnorder") then
+		--print("saved order applied")
+		gui.sheet:SetOrder(lib.GetSetting("columnorder") )
+	end
+	--Apply last column sort used
+	if lib.GetSetting("columnsortcurSort") then
+		gui.sheet.curSort = lib.GetSetting("columnsortcurSort") or 1
+		gui.sheet.curDir = lib.GetSetting("columnsortcurDir") or 1
+		gui.sheet:PerformSort()
+	end
+	--After we have finished creating the scrollsheet and all saved settings have been applied set our event processor
+	function gui.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
+		if (callback == "ColumnOrder") then
+			lib.SetSetting("columnorder", order)
+		elseif (callback == "ColumnWidthSet") then
+			private.OnResizeSheet(self, column, button:GetWidth() )
+		elseif (callback == "ColumnWidthReset") then
+			private.onResize(self, column, nil)
+		elseif (callback == "OnEnterCell")  then
+			lib.OnEnterSheet(button, row, column)
+		elseif (callback == "OnLeaveCell") then
+			GameTooltip:Hide()
+		elseif (callback == "OnClickCell") then
+			lib.OnClickSheet(button, row, column)
+		elseif (callback == "ColumnSort") then
+			lib.SetSetting("columnsortcurDir", curDir)
+			lib.SetSetting("columnsortcurSort", column)
+		elseif (callback == "OnMouseDownCell") then
+			lib.UpdateControls()		
+		end
+	end	
+	
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
 	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 50)
 	gui.Search:SetText("Search")
