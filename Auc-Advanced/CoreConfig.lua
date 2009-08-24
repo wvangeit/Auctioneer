@@ -38,26 +38,46 @@ local lib = AucAdvanced.Config
 local private = {}
 private.Print = AucAdvanced.Print
 
-function private.CommandHandler(command, subcommand, ...)
+function private.CommandHandler(editbox, command, subcommand, ...)
 	command = command:lower()
 	if (command == "help") then
-		private.Print("Auctioneer Help")
-		private.Print("  {{/auc help}} - Show this help")
-		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
-		private.Print("  {{/auc config}} - Opens the configuration page.")
-		private.Print("  {{/auc getall}} - Download auctionhouse using getall")
-		private.Print("  {{/auc pause}} - Pause scanning of the auctionhouse")
-		private.Print("  {{/auc resume||unpause||cont||continue}} - Recommence scanning of the auctionhouse")
-		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
-		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
-		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
-		private.Print("  {{/auc about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
+		local pos, cmdList, cmdL, cmd, cmdFunc = 0,"", "", "", nil
+		repeat
+			if (pos == 1) then
+				cmdList = cmd
+			elseif (pos == 2) then
+				cmdL = cmd
+			elseif (pos > 2) then
+				cmdList = cmdList..", "..cmdL
+				cmdL = cmd
+			end
+			pos = pos + 1
+			cmdFunc = loadstring("return SLASH_AUCADVANCED"..pos)
+			cmd = cmdFunc()
+		until (cmd == nil or cmd == "")
+		if (pos > 3 and cmdL~="") then
+			cmdList = cmdList..", or "..cmdL
+		elseif (cmdL~="") then
+			cmdList = cmdList.." or ".. cmdL
+		end		
+		local cmd = strsplit(" ", editbox:GetText())		
+		private.Print("Auctioneer Help ("..cmdList..")")
+		private.Print("  {{"..cmd.." help}} - Show this help")
+		private.Print("  {{"..cmd.." begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
+		private.Print("  {{"..cmd.." config}} - Opens the configuration page.")
+		private.Print("  {{"..cmd.." getall}} - Download auctionhouse using getall")
+		private.Print("  {{"..cmd.." pause}} - Pause scanning of the auctionhouse")
+		private.Print("  {{"..cmd.." resume||unpause||cont||continue}} - Recommence scanning of the auctionhouse")
+		private.Print("  {{"..cmd.." end}} - Stop scanning the auctionhouse, commit current data")
+		private.Print("  {{"..cmd.." abort}} - Stop scanning the auctionhouse, discard current data")
+		private.Print("  {{"..cmd.." clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
+		private.Print("  {{"..cmd.." about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
 
 		for system in pairs(AucAdvanced.Modules) do
 			local modules = AucAdvanced.GetAllModules("CommandHandler", system)
 			for pos, engineLib in ipairs(modules) do
 				local engine = engineLib:GetName()
-				private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
+				private.Print("  {{"..cmd.." "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
 			end
 		end
 	elseif command == "begin" or command == "scan" then
@@ -153,6 +173,7 @@ end
 
 SLASH_AUCADVANCED1 = "/auc"
 SLASH_AUCADVANCED2 = "/aadv"
-SlashCmdList["AUCADVANCED"] = function(msg) private.CommandHandler(strsplit(" ", msg)) end
+SLASH_AUCADVANCED3 = "/auctioneer"
+SlashCmdList["AUCADVANCED"] = function(msg, editbox) private.CommandHandler(editbox, strsplit(" ", msg)) end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
