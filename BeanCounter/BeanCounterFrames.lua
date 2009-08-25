@@ -97,11 +97,11 @@ function private.displayGUI( action )
 			frame:Hide()
 		else --when tab is created frame parent is set to AH, we dont want this
 			frame:SetParent("BeanCounterBaseFrame")
-			frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
+			frame:SetAllPoints(BeanCounterBaseFrame)
 		end
 	elseif action == "ShowAHGUI" then
 		frame:SetParent(AuctionFrame)
-		frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
+		frame:SetAllPoints("AuctionFrame")
 		private.relevelFrame(frame)--make sure our frame stays in proper order
 		BeanCounterBaseFrame:Hide()
 		frame:Show()
@@ -110,7 +110,7 @@ function private.displayGUI( action )
 		frame:Hide()
 	else
 		frame:SetParent("BeanCounterBaseFrame")
-		frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
+		frame:SetAllPoints(BeanCounterBaseFrame)
 		private.relevelFrame(frame)--make sure our frame stays in proper order
 		BeanCounterBaseFrame:Show()
 		frame:Show()
@@ -152,7 +152,23 @@ function private.CreateFrames()
 	base:SetMovable(true)
 	base:EnableMouse(true)
 	base:SetToplevel(true)
+	base:SetResizable(true)
+	base:SetMinResize(834, 450)
+	base:SetMaxResize(1500, 450)
 
+	--resize button for base GUI
+	base.Resizer = CreateFrame("Button", nil, base)
+	base.Resizer:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -8, 8)
+	base.Resizer:SetHeight(32)
+	base.Resizer:SetWidth(32)
+	base.Resizer:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")
+	base.Resizer:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+	base.Resizer:SetScript("OnMouseDown", function() base:StartSizing() end)
+	base.Resizer:SetScript("OnMouseUp", function()  base:StopMovingOrSizing()  end)
+	base.Resizer:SetScript("OnEnter", function() private.buttonTooltips( base.Resizer, _BC('Click and drag to resize window')) end)
+	base.Resizer:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	
+	
 	base.Drag = CreateFrame("Button", nil, base)
 	base.Drag:SetPoint("TOPLEFT", base, "TOPLEFT", 10,-5)
 	base.Drag:SetPoint("TOPRIGHT", base, "TOPRIGHT", -10,-5)
@@ -171,11 +187,11 @@ function private.CreateFrames()
 	base.DragBottom:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.DragBottom:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
 
-	--Launch BeanCounter GUI Config frame
-	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
-	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
-	base.Config:SetScript("OnClick", function() base:Hide() end)
-	base.Config:SetText(_BC('UiDone'))
+	--Close BeanCounter GUI Config frame
+	base.Done = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
+	base.Done:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -50, 10)
+	base.Done:SetScript("OnClick", function() base:Hide() end)
+	base.Done:SetText(_BC('UiDone'))
 
 	--Create the Actual Usable Frame
 	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
@@ -427,7 +443,7 @@ function private.CreateFrames()
 
 	frame.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
 	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
-	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 3, 0)
+	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -3, 0)
 	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
 
 	--Scripts that are executed when we mouse over a TOOLTIP frame
