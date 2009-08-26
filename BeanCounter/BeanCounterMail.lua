@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	BeanCounteMail - Handles recording of all auction house related mail
+	BeanCounterMail - Handles recording of all auction house related mail
 
 	License:
 		This program is free software; you can redistribute it and/or
