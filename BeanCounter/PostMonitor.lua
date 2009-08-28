@@ -123,7 +123,7 @@ function private.onAuctionCreated()
 		local itemID = lib.API.decodeLink(post.itemLink)
 		local text = private.packString(post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(),"")
 		
-		private.databaseAdd("postedAuctions", itemID, post.itemLink, text)
+		private.databaseAdd("postedAuctions", post.itemLink, nil, text)
 		
 		--debugPrint("3", post.minBid, post.buyoutPrice, #private.PendingPosts,  "Added", post.itemLink, "to the postedAuctions DB")
 	elseif post and not post.itemLink then

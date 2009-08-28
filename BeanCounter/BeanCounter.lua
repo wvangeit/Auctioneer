@@ -316,22 +316,37 @@ function private.unpackString(text)
 	
 	return stack, money, deposit , fee, buyout , bid, buyer, Time, reason, location
 end
---Add data to DB
---~ local color = {["cff9d9d9d"] = 0, ["cffffffff"] = 1, ["cff1eff00"] = 2, ["cff0070dd"] = 3, ["cffa335ee"] = 4, ["cffff8000"] = 5, ["cffe6cc80"] = 6}
-function private.databaseAdd(key, itemID, itemLink, value, compress)
-	if not key or not itemID or not itemLink or not value then 
-		debugPrint("BeanCounter database add error: Missing required data") debugPrint("Database:", key, "itemID:", itemID, "itemLink:", itemLink, "Data:", data, "compress:",compress)
+--[[
+Adds data to the database in proper place, adds link to itemName array, optionally compresses the itemstring into compact format
+return false if data fails to write
+]]
+function private.databaseAdd(key, itemLink, itemString, value, compress)
+	--if we are passed a link and not both then extract the string
+	if itemLink and not itemString then
+		itemString = lib.API.getItemString(itemLink)
+	end
+	
+	if not key or not itemString or not value then
+		debugPrint("BeanCounter database add error: Missing required data") 
+		debugPrint("Database:", key, "itemString:", itemString, "Data:", data, "compress:",compress)
 		return false
 	end
 
-	local _, suffix = lib.API.decodeLink(itemLink)
-	local itemString = lib.API.getItemString(itemLink)
-
-	--if this will be a compressed entry replace uniqueID with 0
+	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel = strsplit(":", itemString)
+	--if this will be a compressed entry replace uniqueID with 0 or its scaling factor
 	if compress then
-		itemString  = itemString:gsub("^(item:%d+:.+:.-):.-:(.-)", "%1:0:%2")
+		suffixID = tonumber(suffixID)
+		--print(itemString)
+		if suffixID < 0 then --scaling factor built into uniqueID, extract it and store so we can create properly scaled itemLinks
+			uniqueID = bit.band(uniqueID, 65535)
+		--	print(uniqueID)
+		else
+			uniqueID = 0
+		end
+		itemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel)
+		--print(itemString)
 	end
-
+	
 	if private.playerData[key][itemID] then --if ltemID exists
 		if private.playerData[key][itemID][itemString] then
 			table.insert(private.playerData[key][itemID][itemString], value)
@@ -342,10 +357,12 @@ function private.databaseAdd(key, itemID, itemLink, value, compress)
 		private.playerData[key][itemID]={[itemString] = {value}}
 	end
 	--Insert into the ItemName:ItemID dictionary array
-	if itemID and suffix and itemLink then
+	if itemLink then
 		lib.API.storeItemLinkToArray(itemLink)
 	end
+	return true
 end
+
 --remove item (for pending bids only atm)
 function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 	if key == "postedBids" then

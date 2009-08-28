@@ -304,21 +304,22 @@ end
 we store itemKeys with a unique ID but our name array does not
 ]]
 function lib.API.getArrayItemLink(itemString)
-	local itemID, suffix = lib.API.decodeLink(itemString)
+	local itemID, suffix, uniqueID = lib.API.decodeLink(itemString)
 	local itemKey = itemID..":"..suffix
 	if BeanCounterDB.ItemIDArray[itemKey] then
-		return lib.API.createItemLinkFromArray(itemKey, BeanCounterDB.ItemIDArray[itemKey])
+		return lib.API.createItemLinkFromArray(itemKey, uniqueID) --uniqueID is used as a scaling factor for "of the" suffix items
 	end
 	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
 	return
 end
 
 --[[Converts the compressed link stored in the itemIDArray back to a standard blizzard format]]
-function lib.API.createItemLinkFromArray(itemKey)
-	if BeanCounterDB["ItemIDArray"][itemKey] then 
+function lib.API.createItemLinkFromArray(itemKey, uniqueID)
+	if BeanCounterDB["ItemIDArray"][itemKey] then
+		if not uniqueID then uniqueID = 0 end
 		local itemID, suffix = string.split(":", itemKey)
 		local color, name = string.split(";", BeanCounterDB["ItemIDArray"][itemKey])
-		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":0:80|h[", name, "]|h|r")
+		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":", uniqueID, ":80|h[", name, "]|h|r")
 	end
 	return
 end

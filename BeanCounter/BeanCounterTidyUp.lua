@@ -121,15 +121,14 @@ function private.compactDB(announce)
 		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
-					local _, _, uniqueID = lib.API.decodeLink(itemString)
-					local itemLink = lib.API.getArrayItemLink(itemString)
-					if uniqueID ~= "0" then --ignore the already compacted keys
-						private.removeUniqueID(index, DB, itemID, itemLink, itemString)
+					local _, suffix, uniqueID = lib.API.decodeLink(itemString)
+					if uniqueID ~= "0" and string.len(uniqueID) > 8 then --ignore the already compacted keys, compacted keys are uniqueID of 0 or the scaling factor for negative suffix items
+						private.removeUniqueID(index, DB, itemString)
 					elseif lib.GetSetting("oldDataExpireEnabled") then
 						--for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
 						local months = lib.GetSetting("monthstokeepdata")
 						local expire =  time() - (months * 30 * 24 * 60 * 60)
-						private.removeOldData(index, DB, itemID, itemLink, itemString, expire)
+						private.removeOldData(index, DB, itemString, expire)
 					end
 					--remove itemStrings that are now empty, all the keys have been moved to compressed format
 					if #index == 0 then debugPrint("Removed empty table:", itemString) private.playerData[DB][itemID][itemString] = nil end
@@ -139,24 +138,26 @@ function private.compactDB(announce)
 	end
 	if announce then print("Finished compressing Databases") end
 end
-function private.removeUniqueID(data, DB, itemID, itemLink, itemString)
+function private.removeUniqueID(data, DB, itemString)
 	local _, _, _, _, _, _, _, postTime  = private.unpackString(data[1])
 	if data[1] and (time() - postTime) >= 3456000 then --we have an old data entry lets process this
-		--debugPrint("Compressed", "|H"..itemString, data[1] )
-		private.databaseAdd(DB, itemID, itemLink, data[1], true) --store using the compress option set to true
+		debugPrint("Compressed", "|H"..itemString, data[1] )
+		private.databaseAdd(DB, nil, itemString, data[1], true) --store using the compress option set to true
 		table.remove(data, 1)
-		private.removeUniqueID(data, DB, itemID, itemLink, itemString)
+		private.removeUniqueID(data, DB, itemString)
 	end
 end
-function private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
+
+function private.removeOldData(data, DB, itemString, expire)
 	local _, _, _, _, _, _, _, postTime = private.unpackString(data[1])
 	postTime = tonumber(postTime)
 	if data[1] and (postTime) <= expire then --we have an old data entry lets process this
 		debugPrint("Removed", "|H"..itemString, data[1] , date("%c", postTime), "Older than",  date("%c", keep) )
 		table.remove(data, 1)
-		private.removeOldData(data, DB, itemID, itemLink, itemString, expire)
+		private.removeOldData(data, DB, itemString, expire)
 	end
 end
+
 --Sort all array entries by Date oldest to newest
 --Helps make compact more efficent needs to run once per week or so
 function private.sortArrayByDate(announce)

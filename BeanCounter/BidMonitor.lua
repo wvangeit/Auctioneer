@@ -139,10 +139,10 @@ function private.onBidAccepted()
 				private.databaseRemove("postedBids", itemID, bid.itemLink, bid.owner, bid.count) --remove old entry
 			end
 			debugPrint('private.databaseAdd(pendingBids', itemID, text)
-			private.databaseAdd("postedBids", itemID, bid.itemLink, text) --replace with buyout entry.
+			private.databaseAdd("postedBids", bid.itemLink, nil, text) --replace with buyout entry.
 		else
 		debugPrint('private.databaseAdd(pendingBids', itemID, text)
-		private.databaseAdd("postedBids", itemID, bid.itemLink, text)
+		private.databaseAdd("postedBids", bid.itemLink, nil, text)
 		end
 	end
 end

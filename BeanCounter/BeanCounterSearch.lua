@@ -340,8 +340,8 @@ end
 			local stack = tonumber(uStack) or 0
 			if stack > 0 then pricePer =  (uMoney - uDeposit + uFee)/stack end
 			
-			local itemID, suffix = lib.API.decodeLink(itemKey)
-			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
+			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
+			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
@@ -369,8 +369,8 @@ end
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
 			
-			local itemID, suffix = lib.API.decodeLink(itemKey)
-			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
+			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
+			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
 			return({
@@ -408,8 +408,8 @@ end
 				if stack > 0 then pricePer = (uBuyout - uMoney + uFee)/stack end
 			end
 
-			local itemID, suffix = lib.API.decodeLink(itemKey)
-			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
+			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
+			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
 			return({
@@ -436,8 +436,8 @@ end
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
 			
-			local itemID, suffix = lib.API.decodeLink(itemKey)
-			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix)
+			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
+			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			
 			return({
