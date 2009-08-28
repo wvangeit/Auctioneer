@@ -455,6 +455,37 @@ function private.isSmartWordsRequest(text)
 	end
 end
 
+private.SlashHandler = {}
+
+--This is the function that will be called by the slash handler when
+--/askprice send is issued.
+function private.SlashHandler.send(querystr)
+	local number, color, item, name, player = querystr:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r (%w*)")
+	local count = tonumber(number) or 1
+	local link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r"
+	if count and link and player then
+		private.sendResponse(link, count, player, 1, private.getData(link))
+	else
+		print("The correct syntax is /asprice send <1>[Item Link] Player, where items in <> are optional and Player is the person you wish to send to.")
+		return
+	end
+end
+
+function private.slashcommands(commandstring)
+	if commandstring then
+		local command, remains = strsplit(" ",commandstring, 2)
+		if command then
+			command = command:lower()
+			if private.SlashHandler[command] then
+				private.SlashHandler[command](remains)
+			end
+		end
+	end
+end
+--Add the slash command
+SlashCmdList['AUC_UTIL_ASKPRICE_SEND'] = private.slashcommands
+SLASH_AUC_UTIL_ASKPRICE_SEND1 = '/askprice'
+
 --[[ Configator Section ]]--
 private.defaults = {
 	["util.askprice.activated"]    = true,
