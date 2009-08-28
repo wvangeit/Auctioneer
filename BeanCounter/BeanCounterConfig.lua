@@ -335,7 +335,6 @@ function lib.SetSetting(...)
 	end
 end
 
-
 local function getter(setting)
 	if (not settings) then settings = BeanCounterDB["settings"] end
 	if not setting then return end
@@ -351,32 +350,11 @@ local function getter(setting)
 		end
 	end
 
-	if (a == 'scanvalue') then
-		if (b == 'list') then
-			if not private.scanValueNames then private.scanValueNames = {} end
-
-			for i = 1, #private.scanValueNames do
-				private.scanValueNames[i] = nil
-			end
-
-			table.insert(private.scanValueNames,{"average", "GuiItemValueAverage"})
-			table.insert(private.scanValueNames,{"baseline", "GuiItemValueBaseline"})
-			if AucAdvanced then
-				table.insert(private.scanValueNames,{"adv:market", "GuiItemValueAuc5Market" })
-				local algoList = AucAdvanced.API.GetAlgorithms()
-				for pos, name in ipairs(algoList) do
-					table.insert(private.scanValueNames,{"aucadv:stat:"..name, "AucAdv Stat:"..name})
-				end
-			end
-			
-			return private.scanValueNames
-		end
-	end
-
+	
+	
 	if (setting == 'profile') then
 		return getUserProfileName()
 	end
-
 	local db = getUserProfile()
 	if ( db[setting] ~= nil ) then
 		return db[setting]
