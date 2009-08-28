@@ -214,6 +214,26 @@ function private.prunePostedDB(announce)
 	end
 	if announce then print("Finished pruning Posted Databases") end
 end
+--deletes all entires matching a itemLink from database for that server
+function private.deleteExactItem(itemLink)
+	if not itemLink or not itemLink:match("^(|c%x+|H.+|h%[.+%])") then return end
+	for player, playerData in pairs(private.serverData) do
+		for DB, data in pairs(playerData) do
+			if DB ~= "mailbox" and type(data) == "table" then
+				for itemID, itemIDData in pairs(data) do
+					for itemString, itemStringData in pairs(itemIDData) do
+						local  _,_,_,_,_,_, _, suffix, uniqueID = strsplit(":", itemString)
+						local linkID, linkSuffix = lib.API.decodeLink(itemLink)
+						if linkID == itemID and suffix == linkSuffix then
+							debugPrint("matched", link, itemString, linkSuffix, suffix)
+							itemIDData[itemString] = nil
+						end
+					end
+				end
+			end
+		end
+	end
+end
 
 --[[INTEGRITY CHECKS
 Make sure the DB format is correct removing any entries that were missed by updating.

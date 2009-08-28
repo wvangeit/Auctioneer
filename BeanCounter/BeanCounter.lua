@@ -111,6 +111,12 @@ end
 lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB
+	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
+	private.playerData = BeanCounterDB[private.realmName][private.playerName]
+	private.serverData = BeanCounterDB[private.realmName]
+	private.wealth = private.playerData["wealth"]
+	--Upgrade DB if needed
+	private.UpgradeDatabaseVersion()
 	--Check if user is trying to use old client with newer database or if the database has failed to update
 	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version then
 		if private.version < BeanCounterDB[private.realmName][private.playerName].version then
@@ -124,6 +130,7 @@ function lib.OnLoad(addon)
 	--Continue loading if the Database is ready
 	lib.MakeGuiConfig() --create the configurator GUI frame
 	private.CreateFrames() --create our framework used for AH and GUI
+	private.createDeleteItemPrompt() --create the item delete prompt
 	private.slidebar() --create slidebar icon
 
 	private.scriptframe:RegisterEvent("PLAYER_MONEY")
@@ -193,13 +200,6 @@ function private.initializeDB(server, player)
 
 		BeanCounterDB[server][player]["mailbox"] = {}
 	end
-
-
-	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
-	private.playerData = BeanCounterDB[private.realmName][private.playerName]
-	private.serverData = BeanCounterDB[private.realmName]
-	private.wealth = private.playerData["wealth"]
-	private.UpgradeDatabaseVersion()
 end
 
 --[[ Configator Section ]]--

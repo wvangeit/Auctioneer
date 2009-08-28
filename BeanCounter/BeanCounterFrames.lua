@@ -581,6 +581,48 @@ function private.CreateMailFrames()
 	countdown:SetText("Recording: "..count.." of "..total.." items")
 end
 
+
+function private.createDeleteItemPrompt()
+	--Create the base frame for external GUI
+	local frame = CreateFrame("Frame", nil, UIParent)
+	frame:SetFrameStrata("DIALOG")
+	frame:SetBackdrop({
+		bgFile = "Interface/Tooltips/ChatBubble-Background",
+		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 32, right = 32, top = 32, bottom = 32 }
+	})
+	frame:SetBackdropColor(0,0,0, 1)
+	frame:Hide()
+
+	frame:SetPoint("CENTER", UIParent, "CENTER")
+	frame:SetWidth(500)
+	frame:SetHeight(200)
+	
+	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	frame.title:SetPoint("CENTER", frame, "CENTER", 0,30)
+	frame.title:SetText(_BC('Do you want to delete this item from the database?'))
+	
+	frame.item = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	frame.item:SetPoint("CENTER", frame, "CENTER", 0,0)
+	
+	frame.yes = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.yes:SetPoint("CENTER", frame, "CENTER", -120, -60)
+	frame.yes:SetText(_BC('Yes'))
+	frame.yes:SetScript("OnClick", function() private.deleteExactItem( frame.item:GetText() )
+								frame:Hide()
+								frame.item:SetText("")
+					end)
+	
+	frame.no = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.no:SetPoint("LEFT", frame.yes, "RIGHT", 50, 0)
+	frame.no:SetText(_BC('No'))
+	frame.no:SetScale(1.8)
+	frame.no:SetScript("OnClick", function()  frame:Hide() frame.item:SetText("") end)
+	
+	private.deletePromptFrame = frame
+end
+
 --ONLOAD Error frame, used to show missmatched DB versus client errors that stop BC load NEEDS LOCALIZATION
 function private.CreateErrorFrames(error, expectedVersion, playerVersion)
 	frame = private.scriptframe

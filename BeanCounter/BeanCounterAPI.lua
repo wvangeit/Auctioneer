@@ -402,6 +402,16 @@ function lib.API.getBidReason(itemLink, quantity)
 	
 	return --if nothing found return nil
 end
+--[[Any itemlink passed into this function will be prompted to remove from the database]]
+function lib.API.deleteItem(itemLink)
+	if itemLink and itemLink:match("^(|c%x+|H.+|h%[.+%])") then
+		private.deletePromptFrame.item:SetText(itemLink)
+		private.deletePromptFrame:Show()
+	else
+		print("Invalid itemLink")
+	end
+end
+
 
 --[[===========================================================================
 --|| Deprecation Alert Functions
