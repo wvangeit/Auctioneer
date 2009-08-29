@@ -459,18 +459,37 @@ private.SlashHandler = {}
 
 --This is the function that will be called by the slash handler when
 --/askprice send is issued.
-function private.SlashHandler.send(querystr)
-	local number, color, item, name, player = querystr:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r (%w*)")
-	local count = tonumber(number) or 1
-	local link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r"
-	if count and link and player then
-		private.sendResponse(link, count, player, 1, private.getData(link))
+function private.SlashHandler.send(queryString)
+	local parseError = false
+	if queryString then
+		local player, itemLinks = strsplit(" ", queryString, 2)
+		print(player, itemLinks)
+
+		--Error out if we have a target, but no potential itemLinks
+		if itemLinks then
+			local items = private.getItems(itemLinks)
+			--Error out if we dont get any items back
+			if #items == 0 then parseError = true end
+
+			for i = 1, #items, 2 do
+				local count = items[i]
+				local link = items[i+1]
+
+				private.sendResponse(link, count, player, 1, private.getData(link))
+			end
+		else
+			parseError = true
+		end
 	else
-		print("The correct syntax is /asprice send <1>[Item Link] Player, where items in <> are optional and Player is the person you wish to send to.")
-		return
+			parseError = true
+	end
+
+	if parseError then
+		print("The correct syntax is {{/asprice send Player <#>[Item Link]}}, where {{<#>}} is the stack size (optional) and {{Player}} is the person you wish to send to.")
 	end
 end
 
+--This function handles parsing of the /askprice commands
 function private.slashcommands(commandstring)
 	if commandstring then
 		local command, remains = strsplit(" ",commandstring, 2)
@@ -482,9 +501,10 @@ function private.slashcommands(commandstring)
 		end
 	end
 end
+
 --Add the slash command
 SlashCmdList['AUC_UTIL_ASKPRICE_SEND'] = private.slashcommands
-SLASH_AUC_UTIL_ASKPRICE_SEND1 = '/askprice'
+_G['SLASH_AUC_UTIL_ASKPRICE_SEND1'] = '/askprice'
 
 --[[ Configator Section ]]--
 private.defaults = {
