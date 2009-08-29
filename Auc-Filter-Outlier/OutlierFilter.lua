@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Outlier Filter
+	Auctioneer - Outlier Filter
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

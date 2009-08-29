@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - iLevel Standard Deviation Statistics module
+	Auctioneer - iLevel Standard Deviation Statistics module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -298,7 +298,7 @@ function private.SetupConfigGui(gui)
 		gui:AddTip(id, _TRANS('ILVL_HelpTooltip_MultiplyStack') )--Multiplies by current stack size if on
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	end
-	--This is the Tooltip tab provided by aucadvanced so all tooltip configuration is in one place
+	--This is the Tooltip tab provided by Auctioneer so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
 	
 	--now we create a duplicate of these in the tooltip frame

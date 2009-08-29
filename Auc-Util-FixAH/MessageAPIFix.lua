@@ -1,10 +1,11 @@
 --[[
-	Auctioneer Advanced - Fix for searches not returning to page one in Blizzard code.
+	Auctioneer - Fix for searches not returning to page one in Blizzard code.
 	Version: <%version%> (<%codename%>)
 	Revision: $Id: Example.lua 3882 2008-12-02 16:36:58Z kandoko $
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that patches known errors with blizzards code
+	This is an Auctioneer module that temporarily patches known errors and issues
+	with Blizzard's code.
 
 	License:
 		This program is free software; you can redistribute it and/or

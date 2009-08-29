@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Search UI - Filter IgnoreTimeLeft
+	Auctioneer - Search UI - Filter IgnoreTimeLeft
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

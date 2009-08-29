@@ -1,10 +1,12 @@
 --[[
-	Auctioneer Advanced - EasyBuyout Utility Module
+	Auctioneer - EasyBuyout Utility Module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that does something nifty.
+	This Auctioneer module allows for the ability to purchase items from
+	the Browse tab with a single click.  It also allows for canceling your
+	own auctions from the Auctions tab with a single click.
 
 	License:
 		This program is free software; you can redistribute it and/or

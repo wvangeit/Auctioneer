@@ -5,8 +5,7 @@
 	URL: http://auctioneeraddon.com/
 
 	Auctioneer AskPrice created by Mikezter and merged into
-	Auctioneer Advanced by MentalPower. Swarm response
-	functionallity added by Kandoko.
+	Auctioneer by MentalPower. Swarm response functionallity added by Kandoko.
 
 	Functions responsible for AskPrice's operation.
 
@@ -222,7 +221,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	if (totalSeenCount > 0) then
 		local averageSeenCount = math.floor(totalSeenCount/answerCount + 0.5)
 		private.sendWhisper(
-			(_TRANS('ASKP_Interface_SeenAverageByAuctioneer') ):format( --%s: Seen an average of %d times at auction by %d people using Auctioneer Advanced
+			(_TRANS('ASKP_Interface_SeenAverageByAuctioneer') ):format( --%s: Seen an average of %d times at auction by %d people using Auctioneer
 				link,
 				averageSeenCount,
 				answerCount),
@@ -237,7 +236,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		)
 	else
 		private.sendWhisper(
-			(_TRANS('ASKP_Interface_NeverSeenByAuctioneer') ):format(--%s: Never seen at %s by Auctioneer Advanced
+			(_TRANS('ASKP_Interface_NeverSeenByAuctioneer') ):format(--%s: Never seen at %s by Auctioneer
 				link,
 				AucAdvanced.GetFaction()
 			),

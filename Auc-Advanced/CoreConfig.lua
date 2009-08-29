@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced
+	Auctioneer
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -71,7 +71,7 @@ function private.CommandHandler(editbox, command, subcommand, ...)
 		private.Print("  {{"..cmd.." end}} - Stop scanning the auctionhouse, commit current data")
 		private.Print("  {{"..cmd.." abort}} - Stop scanning the auctionhouse, discard current data")
 		private.Print("  {{"..cmd.." clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
-		private.Print("  {{"..cmd.." about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
+		private.Print("  {{"..cmd.." about [all]}} - Shows the currenly running version of Auctioneer, if all is specified, also shows the version for every file in the package")
 
 		for system in pairs(AucAdvanced.Modules) do
 			local modules = AucAdvanced.GetAllModules("CommandHandler", system)

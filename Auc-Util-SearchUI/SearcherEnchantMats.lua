@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Search UI - Searcher EnchantMats
+	Auctioneer - Search UI - Searcher EnchantMats
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

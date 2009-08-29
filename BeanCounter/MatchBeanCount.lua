@@ -1,11 +1,14 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - BeanCounter Matcher module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced Matcher module that returns an undercut price
-	based on the current market snapshot
+	This is an Auctioneer Matcher module which will modify the Appraiser
+	price, based on past successes and failures as recorded by 
+	BeanCounter.  As an items sells successfully, this matcher will slowly
+	raise the price for future auctions; as your auctions expire without
+	selling, the price will slowly drop.
 
 	License:
 		This program is free software; you can redistribute it and/or

@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Search UI - Searcher Resale
+	Auctioneer - Search UI - Searcher Resale
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

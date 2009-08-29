@@ -1,13 +1,13 @@
 --[[
-	Auctioneer Advanced - VendMarkup
+	Auctioneer - VendMarkup
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
-	when the auction is scanned, so that you can easily determine what price
-	you will be able to sell an item for at auction or at a vendor whenever you
-	mouse-over an item in the game
+	This is an addon for World of Warcraft that provides a vendor mark-up
+	price statistic for items.  It is intended to be used only at times when
+	you do not have a more reliable price statistic, and wish to post an item
+	for just a simple vendor markup price instead.
 
 	License:
 		This program is free software; you can redistribute it and/or

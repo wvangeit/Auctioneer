@@ -125,7 +125,7 @@ do
             return cacheTable.value, cacheTable.seen, cacheTable.stats;
         end
 
-        if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer Advanced missed market pricing cache on item '"..itemLink.."'"); end
+        if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer missed market pricing cache on item '"..itemLink.."'"); end
 
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
@@ -138,7 +138,7 @@ do
                 if fn then
                     tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
                 elseif nLog then
-                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer Advanced engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
+                    nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
                 end
             end
         end
@@ -751,7 +751,7 @@ end
 
 -------------------------------------------------------------------------------
 -- Statistical devices created by Matthew 'Shirik' Del Buono
--- For Auctioneer Advanced
+-- For Auctioneer
 -------------------------------------------------------------------------------
 local sqrtpi = math.sqrt(math.pi);
 local sqrtpiinv = 1/sqrtpi;
@@ -846,13 +846,13 @@ do
             seenCalls[source][caller]=true
             -- Display it
             AucAdvanced.Print(
-                "Auctioneer Advanced: "..
+                "Auctioneer: "..
                 functionName .. " has been deprecated and was called by |cFF9999FF"..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:").."|r. "..
                 (replacementName and ("Please use "..replacementName.." instead. ") or "")..
                 (comments or "")
             );
 	        geterrorhandler()(
-	            "Deprecated function call occurred in AuctioneerAdvanced API:\n     {{{Deprecated Function:}}} "..functionName..
+	            "Deprecated function call occurred in Auctioneer API:\n     {{{Deprecated Function:}}} "..functionName..
 	                "\n     {{{Source Module:}}} "..source:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
 	                "\n     {{{Calling Module:}}} "..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
 	                "\n     {{{Available Replacement:}}} "..replacementName..

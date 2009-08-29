@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Histogram Statistics module
+	Auctioneer - Histogram Statistics module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -54,7 +54,7 @@ function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
-		print(_TRANS('SHTG_Help_SlashHelp1') )--Help for Auctioneer Advanced - Histogram
+		print(_TRANS('SHTG_Help_SlashHelp1') )--Help for Auctioneer - Histogram
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('SHTG_Help_SlashHelp2') ) -- this Histogram help
 		print(line, "clear}} - ".._TRANS('SHTG_Help_SlashHelp3'):format(myFaction) ) --clear current %s Histogram price database

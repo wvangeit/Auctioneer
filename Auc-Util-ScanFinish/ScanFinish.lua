@@ -1,11 +1,11 @@
 --[[
-	Auctioneer Advanced - Scan Finish module
+	Auctioneer - Scan Finish module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that adds a few event functionalities
-	to Auctioneer 5 when a successful scan is completed.
+	This is an Auctioneer module that adds a few event functionalities
+	to Auctioneer when a successful scan is completed.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -79,7 +79,7 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.OnLoad()
-	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	print("Auctioneer: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.shutdown", false)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.logout", false)
@@ -272,7 +272,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is scanfinish",
 		"What is ScanFinish?",
-		"ScanFinish is an AuctioneerAdvanced module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\nScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or BottomScanner activities. Unfortunately, this also means the functionality will not be enabled in auction houses with under "..intScanMinThreshold.." items."
+		"ScanFinish is an Auctioneer module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\nScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or SearchUI activities. Unfortunately, this also means the functionality will not be enabled in auction houses with under "..intScanMinThreshold.." items."
 		)
 
 	gui:AddControl(id, "Header",	 0,	libName.." options")

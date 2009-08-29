@@ -1,9 +1,11 @@
 --[[
-	Auctioneer Advanced - AutoMagic Utility module
+	Auctioneer - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	AutoMagic is an Auctioneer Advanced module.
+
+	AutoMagic is an Auctioneer module which automates mundane tasks for you.
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License

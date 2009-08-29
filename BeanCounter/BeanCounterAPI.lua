@@ -444,7 +444,7 @@ do
 			seenCalls[source][caller]=true
 			-- Display it
 			debugPrint(
-			"Auctioneer Advanced: "..
+			"Auctioneer: "..
 			functionName .. " has been deprecated and was called by |cFF9999FF"..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:").."|r. "..
 				(replacementName and ("Please use "..replacementName.." instead. ") or "")..
 				(comments or "")

@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - StatPurchased
+	Auctioneer - StatPurchased
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -66,7 +66,7 @@ end
 function lib.CommandHandler(command, ...)
 	local serverKey = GetFaction()
 	if (command == "help") then
-		print(_TRANS('PURC_Help_SlashHelp1') )--Help for Auctioneer Advanced - Purchased
+		print(_TRANS('PURC_Help_SlashHelp1') )--Help for Auctioneer - Purchased
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('PURC_Help_SlashHelp2') ) --this Purchased help
 		print(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(serverKey) ) --clear current {{%s}} Purchased price database

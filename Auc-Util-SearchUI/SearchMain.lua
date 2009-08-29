@@ -1,12 +1,13 @@
 --[[
-	Auctioneer Advanced - Search UI
+	Auctioneer - Search UI
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds a price level indicator
-	to auctions when browsing the Auction House, so that you may readily see
-	which items are bargains or overpriced at a glance.
+	This Addon provides a Search tab on the AH interface, which allows
+	Auctioneer users to use Searcher plug-ins to search for good deals
+	in the auction house.  It searches the "snapshot", which requires 
+	having data from recent auction house scans.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -1672,7 +1673,7 @@ if SlideBar then
 	sideIcon:SetScript("OnClick", lib.Toggle)
 	sideIcon.tip = {
 		"Auction SearchUI",
-		"Allows you to perform searches on the AuctioneerAdvanced auction cache, even when away from the Auction House",
+		"Allows you to perform searches on the Auctioneer auction cache snapshot, even when away from the Auction House",
 		"{{Click}} to open the Search UI.",
 	}
 end

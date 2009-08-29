@@ -17,12 +17,12 @@ end
 --^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^ DELETE ^--
 
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that does something nifty.
+	This is an Auctioneer module that does something nifty.
 
 	License:
 		This program is free software; you can redistribute it and/or

@@ -32,7 +32,7 @@
 ]]
 Enchantrix_RegisterRevision("$URL$","$Rev$")
 
--- Provide fixed price data by registering ourselves as a bonafide legitimate AuctioneerAdvanced module.
+-- Provide fixed price data by registering ourselves as a bonafide legitimate Auctioneer module.
 if (not (AucAdvanced and AucAdvanced.Modules and AucAdvanced.Modules.Util) ) then return end
 
 local lib = {}

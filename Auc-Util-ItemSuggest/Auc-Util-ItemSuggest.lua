@@ -1,12 +1,12 @@
 --[[
-	Auctioneer Advanced - Item Suggest module
+	Auctioneer - Item Suggest module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that allows the added tooltip for suggesting
+	This is an Auctioneer module that allows the added tooltip for suggesting
 	what should be done with an item based on weights and skills set. This module is also
-	used by other modules in Auctioneer Advanced.
+	used by other modules in Auctioneer.
 
 	License:
 		This program is free software; you can redistribute it and/or

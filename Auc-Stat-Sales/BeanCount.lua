@@ -1,10 +1,12 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Stat-Sales module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that does something nifty.
+	This Auctioneer statistic module calculates a price statistics for items
+	based on the price that you specifically have sold this item for in the
+	past, based on your BeanCounter history information.
 
 	License:
 		This program is free software; you can redistribute it and/or

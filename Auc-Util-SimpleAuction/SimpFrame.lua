@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Simplified Auction Posting
+	Auctioneer - Simplified Auction Posting
 	Version: <%version%> (<%codename%>)
 	Revision: $Id: AprFrame.lua 3576 2008-10-10 03:07:13Z aesir $
 	URL: http://auctioneeraddon.com/

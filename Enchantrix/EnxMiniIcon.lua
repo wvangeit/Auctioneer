@@ -164,7 +164,7 @@ if LibStub then
 -- TODO - localize these strings!
 		sideIcon.tip = {
 			"Enchantrix",
-			"Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer Advanced to allow pricing and purchasing decisions to be made.",
+			"Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer to allow pricing and purchasing decisions to be made.",
 			"{{Click}} to open the Enchanting window.",
 			"{{Shift-Click}} to open Jewel Crafting.",
 			"{{Right-Click}} to edit the configuration.",

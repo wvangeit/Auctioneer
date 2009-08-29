@@ -1,5 +1,5 @@
 ﻿--[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

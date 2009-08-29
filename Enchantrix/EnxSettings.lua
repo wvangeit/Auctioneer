@@ -156,7 +156,7 @@ local settingDefaults = {
 	['AutoDeEpicItems'] = true, 		-- on by default for backwards compatibility
 	['AutoDeOnlyIfBoughtForDE'] = false, 	-- off by default for backwards compatibility, checks with BeanCounter for purchase reason
 
-	['export.aucadv'] = true, -- Send our price values to auctioneer advanced as stats
+	['export.aucadv'] = true, -- Send our price values to Auctioneer as stats
 	['ModTTShow'] = false,
 }
 

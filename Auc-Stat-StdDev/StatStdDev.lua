@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Standard Deviation Statistics module
+	Auctioneer - Standard Deviation Statistics module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
@@ -46,7 +46,7 @@ local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .75
 function lib.CommandHandler(command, ...)
 	local myFaction = GetFaction()
 	if (command == "help") then
-		print(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer Advanced - StdDev
+		print(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer - StdDev
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('SDEV_Help_SlashHelp2') ) --this StdDev help
 		print(line, "clear}} - ".._TRANS('SDEV_Help_SlashHelp3'):format(myFaction) ) --clear current %s StdDev price database

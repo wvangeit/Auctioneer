@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - StatDebug
+	Auctioneer - StatDebug
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

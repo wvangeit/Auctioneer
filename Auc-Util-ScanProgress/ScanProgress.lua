@@ -1,10 +1,10 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that adds a textual scan progress
+	This is an Auctioneer module that adds a textual scan progress
 	indicator to the Auction House UI.
 
 	License:
@@ -54,7 +54,7 @@ end
 
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
-private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d (%.1f%% complete)\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
+private.scanProgressFormat = "Auctioneer: %s\nScanning page %d of %d (%.1f%% complete)\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	--Check that we're enabled before passing on the callback
 	if not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")

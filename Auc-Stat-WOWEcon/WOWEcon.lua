@@ -1,10 +1,12 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - WoWEcon price statistics module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that does something nifty.
+	This is an Auctioneer statistic module that returns a price based on 
+	any WoWEcon data you have.  You must have the WoWEcon addon installed
+	for this statistic to have any affect.
 
 	License:
 		This program is free software; you can redistribute it and/or

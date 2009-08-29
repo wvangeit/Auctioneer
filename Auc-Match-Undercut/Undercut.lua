@@ -1,10 +1,10 @@
 --[[
-	Auctioneer Advanced - Price Level Utility module
+	Auctioneer - Price Level Utility module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced Matcher module that returns an undercut price
+	This is an Auctioneer Matcher module that returns an undercut price
 	based on the current market snapshot
 
 	License:
@@ -227,13 +227,13 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_EnableUndercut') )--Enable this module's functions.
 
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, _TRANS('UCUT_Interface_MaxMarkdown').." %d%%")--Max under market price (markdown):
-	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_MaxMarkdown') )--This controls how much below the market price you are willing to undercut before giving up. \n If AucAdvanced cannot beat the lowest price, it will undercut the lowest price it can.
+	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_MaxMarkdown') )--This controls how much below the market price you are willing to undercut before giving up. \n If Auctioneer cannot beat the lowest price, it will undercut the lowest price it can.
 
 	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, _TRANS('UCUT_Interface_MaxMarkup').." %d%%")--Max over market price (markup):
-	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_MaxMarkup') )--This controls how much above the market price you are willing to mark up. If there is no competition, or the competition is marked up higher than this value AucAdvanced will set the price to this value above market.
+	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_MaxMarkup') )--This controls how much above the market price you are willing to mark up. If there is no competition, or the competition is marked up higher than this value Auctioneer will set the price to this value above market.
 
 	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, _TRANS('UCUT_Interface_UndercutMinimum').." %g%%")--Undercut:
-	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_UndercutMinimum') )--This controls the minimum undercut.  AucAdvanced will try to undercut the competition by this amount
+	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_UndercutMinimum') )--This controls the minimum undercut.  Auctioneer will try to undercut the competition by this amount
 
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", _TRANS('UCUT_Interface_UndercutAmount') )--Specify undercut amount by coin value
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_UndercutAmount') )--Specify the amount to undercut by a specific amount, instead of by a percentage

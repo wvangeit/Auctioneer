@@ -1,12 +1,14 @@
 --[[
-	Auctioneer Advanced - Search UI - Realtime module
+	Auctioneer - Search UI - Realtime module
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds a price level indicator
-	to auctions when browsing the Auction House, so that you may readily see
-	which items are bargains or overpriced at a glance.
+	This Auctioneer module allows the user to search the current Browse tab
+	results in real time, without requiring scans or an up-to-date snapshot.
+	It also provides top- and bottom-scanning capabilities (i.e. first and
+	last AH pages) to find deals on items about to expire, or recently added
+	to the AH.
 
 	License:
 		This program is free software; you can redistribute it and/or

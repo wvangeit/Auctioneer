@@ -1,12 +1,12 @@
 --[[
-	Auctioneer Advanced - AH-WindowControl
+	Auctioneer - AH-WindowControl
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds the abilty to drag and reposition the Auction House Frame.
 	Protect the Auction Frame from being closed or moved by Escape or Blizzard frames.
-	Limited Font and Frame Scaling og the Auction House/CompactUI
+	It also adds limited Font and Frame Scaling of the Auction House/CompactUI
 
 	License:
 		This program is free software; you can redistribute it and/or

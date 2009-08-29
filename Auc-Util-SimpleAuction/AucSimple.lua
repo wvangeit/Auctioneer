@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - Basic Auction Posting
+	Auctioneer - Basic Auction Posting
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

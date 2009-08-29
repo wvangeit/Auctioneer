@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Advanced - BasicFilter
+	Auctioneer - BasicFilter
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/

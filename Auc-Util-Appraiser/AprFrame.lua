@@ -1,11 +1,11 @@
 --[[
-	Auctioneer Advanced - Appraisals and Auction Posting
+	Auctioneer - Appraisals and Auction Posting
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an addon for World of Warcraft that adds an appriasals dialog for
-	easy posting of your auctionables when you are at the auction-house.
+	This is an addon for World of Warcraft that adds an appraisals tab to the AH for
+	easy posting of your auctionables when you are at the auction house.
 
 	License:
 		This program is free software; you can redistribute it and/or
