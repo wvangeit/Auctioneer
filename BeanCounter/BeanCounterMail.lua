@@ -90,7 +90,6 @@ end
 --Mailbox Snapshots
 local HideMailGUI
 function private.updateInboxStart()
-	reportTotalMail, reportAHMail, reportReadMail, reportAlreadyReadMail = 0, 0, 0, 0
 	reportTotalMail = GetInboxNumItems()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
@@ -117,8 +116,6 @@ function private.updateInboxStart()
 				GetInboxText(n) --read message
 			end
 			reportReadMail = reportReadMail + 1
-		else --was read or empty
-			reportAlreadyReadMail = reportAlreadyReadMail + 1
 		end
 	end
 	if HideMailGUI == true then
@@ -183,6 +180,7 @@ local total = #private.inboxStart
 	end
 	if (#private.inboxStart == 0) and (HideMailGUI == true) then
 		debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
+		reportTotalMail, reportAHMail, reportReadMail = 0, 0, 0
 		InboxCloseButton:Show()
 		InboxFrame:Show()
 		MailFrameTab2:Show()
@@ -257,10 +255,10 @@ function private.sortCompletedAuctions( i )
 		local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, itemLink, private.reconcilePending[i].deposit, private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
-			private.databaseAdd("completedAuctions", itemID, itemLink, value)
+			private.databaseAdd("completedAuctions", itemLink, nil, value)
 			--debugPrint("databaseAdd completedAuctions", itemID, itemLink)
 		else
-			debugPrint("Failure for completedAuctions", itemID, itemLink, value)
+			debugPrint("Failure for completedAuctions", itemID, itemLink, value, "index", private.reconcilePending[i].n)
 		end
 	end
 	table.remove(private.reconcilePending, i)
@@ -304,10 +302,10 @@ function private.sortFailedAuctions( i )
 		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
-			private.databaseAdd("failedAuctions", itemID, private.reconcilePending[i]["itemLink"], value)
+			private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
 			--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 		else
-			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
 		end
 	end
 	table.remove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
@@ -345,10 +343,10 @@ function private.sortCompletedBidsBuyouts( i )
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
 		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
-		private.databaseAdd("completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
+		private.databaseAdd("completedBids/Buyouts", private.reconcilePending[i]["itemLink"], nil, value)
 		--debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
 	else
-		debugPrint("Failure for completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value)
+		debugPrint("Failure for completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
 	end
 
 	table.remove(private.reconcilePending,i)
@@ -380,10 +378,10 @@ function private.sortFailedBids( i )
 	local postStack, postSeller, reason = private.findFailedBids(itemID, itemLink, private.reconcilePending[i]["money"])
 	if itemID then
 		local value = private.packString(postStack, "", "", "", "", private.reconcilePending[i]["money"], postSeller, private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
-		private.databaseAdd("failedBids", itemID, itemLink, value)
+		private.databaseAdd("failedBids", itemLink, nil, value)
 		--debugPrint("databaseAdd failedBids", itemID, itemLink, value)
 	else
-		debugPrint("Failure for failedBids", itemID, itemLink, value)
+		debugPrint("Failure for failedBids", itemID, itemLink, value, "index", private.reconcilePending[i].n)
 	end
 	table.remove(private.reconcilePending,i)
 end
