@@ -176,9 +176,10 @@ function lib.OnLoad()
 	default("util.simpleauc.undercut", "percent")
 	default("util.simpleauc.undercut.fixed", 1)
 	default("util.simpleauc.undercut.percent", 2.5)
+	default("util.simpleauc.displayauctiontab", true)
 end
 
-function private.UpdateConfig()
+function private.UpdateConfig(setting, value)
 	if private.frame then
 		local frame = private.frame
 		local showing = false
@@ -188,11 +189,18 @@ function private.UpdateConfig()
 				showing = false
 			end
 		end
-
+		
 		if showing then
 			frame.scanbutton:Show()
 		else
 			frame.scanbutton:Hide()
+		end
+		if setting == "util.simpleauc.displayauctiontab" then
+			if value then
+				AucAdvanced.AddTab(private.frame.tab, private.frame)
+			else
+				AucAdvanced.RemoveTab(private.frame.tab, private.frame)
+			end
 		end
 	end
 end
@@ -209,6 +217,11 @@ function private.SetupConfigGui(gui)
 		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
 
 	gui:AddControl(id, "Header",       0,    lib.libName.." options")
+	
+	gui:AddControl(id, "Subhead",      0,    "")
+	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.displayauctiontab", "Show Post tab at the Auction House")
+	gui:AddTip(id, "Shows simple post tab on the auction house")
+	
 	gui:AddControl(id, "Subhead",      0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.tooltip", "Show prices in tooltip")
 	gui:AddTip(id, "Shows market price for the current item in the tooltip")

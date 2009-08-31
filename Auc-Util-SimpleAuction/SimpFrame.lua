@@ -1067,7 +1067,9 @@ function private.CreateFrames()
 	frame.tab:SetText(TAB_NAME)
 	frame.tab:Show()
 	PanelTemplates_DeselectTab(frame.tab)
-	AucAdvanced.AddTab(frame.tab, frame)
+	if get("util.simpleauc.displayauctiontab") then
+		AucAdvanced.AddTab(frame.tab, frame)
+	end
 
 	function frame.tab.OnClick(_, _, index)
 		if not index then index = this:GetID() end
