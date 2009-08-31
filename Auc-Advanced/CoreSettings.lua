@@ -167,9 +167,7 @@ local function setter(setting, value)
 	if type(setting)=="function" then
 		return setting("set", value)
 	end
-	
-	--we need to send out the proper option to configchanged before we nil it if its a default value
-	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
+
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then
 		-- Don't save default values
@@ -298,6 +296,7 @@ local function setter(setting, value)
 		lib.SetSetting("SelectedLocale", value)
 	end
 
+	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 end
 
 function lib.SetSetting(...)
