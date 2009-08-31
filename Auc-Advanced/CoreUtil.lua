@@ -291,6 +291,11 @@ function lib.AddTab(tabButton, tabFrame)
 	-- to insert).
 	local tabCount = 1;
 	while (getglobal("AuctionFrameTab"..(tabCount))) do
+		--check that tab has not already been created, since we can optionally remove tabs now
+		if getglobal("AuctionFrameTab"..(tabCount)):GetName() == tabButton:GetName() then
+			lib.Print("Tab with that name already exists")
+			return 
+		end
 		tabCount = tabCount + 1;
 	end
 
@@ -299,7 +304,7 @@ function lib.AddTab(tabButton, tabFrame)
 	-- Transactions tab.
 	local tabIndex = 1;
 	while (getglobal("AuctionFrameTab"..(tabIndex)) and
-		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
+		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabUtilBeanCounter") do
 		tabIndex = tabIndex + 1;
 	end
 
@@ -329,6 +334,52 @@ function lib.AddTab(tabButton, tabFrame)
 
 	-- Update the tab count.
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
+end
+--used by modules to "hide" their auction house tab.
+function lib.RemoveTab(tabButton, tabFrame)
+	-- Count the number of auction house tabs.
+	local tabCount = 0
+	while (getglobal("AuctionFrameTab"..(tabCount+1))) do
+		tabCount = tabCount + 1;
+	end
+	
+	-- Find the correct location to remove the tab
+	local tabIndex, tabFound = 1
+	while getglobal("AuctionFrameTab"..(tabIndex)) do
+		if getglobal("AuctionFrameTab"..(tabIndex)):GetName() == tabButton:GetName() then
+			tabFound = tabIndex
+			break
+		end
+		tabIndex = tabIndex + 1
+	end
+	
+	--if we did nto find the correct tab then end
+	if not tabFound then return end
+	
+	-- If we inserted a tab in the middle, adjust the layout of the next tab button after removal.
+	if tabFound and (tabFound < tabCount) then
+		nextTabButton = getglobal("AuctionFrameTab"..(tabFound + 1))
+		nextTabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabFound - 1)):GetName(), "TOPRIGHT", -8, 0)
+	end
+	
+	-- Reduce count on tabs remaining
+	setglobal("AuctionFrameTab"..(tabFound), nil) --remove old tab from namespace
+	for index = tabFound, tabCount do
+		local tab = getglobal("AuctionFrameTab"..(index + 1))
+		if tab then
+			setglobal("AuctionFrameTab"..(index),  tab)
+			getglobal("AuctionFrameTab"..(index)):SetID(index)
+		else --last tab index needs to be removed
+			setglobal("AuctionFrameTab"..(index), nil)
+		end
+	end
+	
+	-- Hide the frame.
+	tabFrame:Hide()
+	tabButton:Hide()
+	
+	-- Update the tab count.
+	PanelTemplates_SetNumTabs(AuctionFrame, tabCount - 1)
 end
 
 -- Table management functions:
