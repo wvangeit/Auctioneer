@@ -168,6 +168,8 @@ local function setter(setting, value)
 		return setting("set", value)
 	end
 
+	--Store the value before we nil it to be used in callback
+	local callbackValue = value
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then
 		-- Don't save default values
@@ -296,7 +298,7 @@ local function setter(setting, value)
 		lib.SetSetting("SelectedLocale", value)
 	end
 
-	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
+	AucAdvanced.SendProcessorMessage("configchanged", setting, callbackValue)
 end
 
 function lib.SetSetting(...)
