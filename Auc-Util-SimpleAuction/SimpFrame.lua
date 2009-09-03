@@ -509,6 +509,8 @@ end
 
 --function runs when we're alerted to a possible change in one of the controls.
 --we check if something is actually different, and if so, update.
+--rather than changing ONLY one setting, changed function allow multiple settings to be modified in one round
+--this solved issues with alt double click posting items before our onupdate could be called enough cycles to set all the changed values
 function private.CheckUpdate()
 	if not frame.CurItem.link then return end
 	local buy = MoneyInputFrame_GetCopper(frame.buyout)
@@ -524,18 +526,22 @@ function private.CheckUpdate()
 		frame.CurItem.buyper = buy/(stack or 1)
 		frame.CurItem.manual = true
 		private.UpdateDisplay()
-	elseif frame.CurItem.bid ~= bid then --New Bid manually entered
+	end
+	if frame.CurItem.bid ~= bid then --New Bid manually entered
 		frame.CurItem.bid = bid
 		frame.CurItem.bidper = bid/(stack or 1)
 		frame.CurItem.manual = true
 		private.UpdateDisplay()
-	elseif stack and stack > 0 and frame.CurItem.stack ~= stack then --new stack size entered
+	end
+	if  stack and stack > 0 and frame.CurItem.stack ~= stack then --new stack size entered
 		frame.CurItem.stack = stack
 		private.UpdatePricing()
-	elseif number and number > 0 and frame.CurItem.number ~= number then --new number of stacks entered
+	end
+	if  number and number > 0 and frame.CurItem.number ~= number then --new number of stacks entered
 		frame.CurItem.number = number
 		private.UpdatePricing()
-	elseif frame.CurItem.match ~= match then
+	end
+	if  frame.CurItem.match ~= match then
 		frame.CurItem.match = match
 		if match then --turn off other checkboxes
 			frame.CurItem.manual = false
@@ -545,7 +551,8 @@ function private.CheckUpdate()
 			frame.options.remember:SetChecked(false)
 		end
 		private.UpdatePricing()
-	elseif frame.CurItem.undercut ~= undercut then
+	end
+	if  frame.CurItem.undercut ~= undercut then
 		frame.CurItem.undercut = undercut
 		if undercut then --turn off other checkboxes
 			frame.CurItem.manual = false
@@ -555,10 +562,12 @@ function private.CheckUpdate()
 			frame.options.remember:SetChecked(false)
 		end
 		private.UpdatePricing()
-	elseif frame.CurItem.duration ~= duration then
+	end
+	if  frame.CurItem.duration ~= duration then
 		frame.CurItem.duration = duration
 		private.UpdatePricing()
-	elseif frame.CurItem.remember ~= remember then
+	end
+	if  frame.CurItem.remember ~= remember then
 		frame.CurItem.manual = true
 		frame.CurItem.remember = remember
 		if remember then
@@ -571,7 +580,7 @@ function private.CheckUpdate()
 			private.RemoveConfig()
 		end
 		private.UpdatePricing()
-	else return
+		
 	end
 	if frame.CurItem.remember then
 		private.SaveConfig()
