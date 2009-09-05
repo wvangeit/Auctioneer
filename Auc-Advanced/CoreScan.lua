@@ -594,12 +594,11 @@ Commitfunction = function()
 	local scanStarted = private.CommitQueue[1]["scanStarted"]
 	local scanStartTime = private.CommitQueue[1]["scanStartTime"]
 	local totalPaused = private.CommitQueue[1]["totalPaused"]
-	local query = private.CommitQueue[1]["query"]
 	local TempcurScan = {}
 	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
 	local TempcurQuery = {}
 	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
-	wasGetAll = wasGetAll or (#TempcurScan < 50) -- Either retrieved all records in single pull (were less than 50 total or we asked explicitly for all records)
+	wasGetAll = wasGetAll or (TempcurQuery.qryinfo.page == 0) -- retrieved all records in single pull (only one page scanned or we asked explicitly for all records)
 	for i = 1, #private.CommitQueue do
 		if private.CommitQueue[i+1] then
 			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
@@ -723,44 +722,41 @@ Commitfunction = function()
 			lastPause = GetTime()
 		end
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
-			local stillpossible = false
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
 			local dodelete = false
-			if (not data[Const.TIME]) or (now - data[Const.TIME] <= auctionmaxtime) then
-				stillpossible = true
-			end
-			if wasGetAll then
-				stillpossible = false
-			--elseif #TempcurScan <= 50 and not wasIncomplete then
-			--	stillpossible = false
-			end
 
-			if (stillpossible) then
-				if (not wasIncomplete) then
-					if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-						dodelete = true
-						if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
-							filterDeleteCount = filterDeleteCount + 1
-						else
-							earlyDeleteCount = earlyDeleteCount + 1
-						end
-					else
-						data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
-						missedCount = missedCount + 1
-					end
-				else
-					missedCount = missedCount + 1
-				end
-			else
+			if data[Const.TIME] and (now - data[Const.TIME] > auctionmaxtime) then
+				-- delete items that have passed their expiry time - even if scan was incomplete
 				dodelete = true
 				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 					filterDeleteCount = filterDeleteCount + 1
 				else
 					expiredDeleteCount = expiredDeleteCount + 1
 				end
+			elseif wasIncomplete then
+				missedCount = missedCount + 1
+			elseif wasGetAll then
+				-- a *completed* GetAll should not have missed any auctions
+				dodelete = true
+				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+					filterDeleteCount = filterDeleteCount + 1
+				else
+					earlyDeleteCount = earlyDeleteCount + 1
+				end
+			else
+				if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					dodelete = true
+					if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+						filterDeleteCount = filterDeleteCount + 1
+					else
+						earlyDeleteCount = earlyDeleteCount + 1
+					end
+				else
+					data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
+					missedCount = missedCount + 1
+				end
 			end
 			if dodelete then
-				-- Auction Time has expired
 				if not (bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
 					processStats("delete", data)
 				end
@@ -776,25 +772,25 @@ Commitfunction = function()
 
 	local currentCount = #scandata.image
 	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount ~= scanCount) then
-		if nLog then 
-			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Scan Count Discrepency Seen", 
-				("%d updated + %d same + %d new + %d filtered != %d scanned"):format(updateCount, sameCount, 
-					newCount, filterOldCount+filterNewCount, scanCount)) 
+		if nLog then
+			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Scan Count Discrepency Seen",
+				("%d updated + %d same + %d new + %d filtered != %d scanned"):format(updateCount, sameCount,
+					newCount, filterOldCount+filterNewCount, scanCount))
 		end
 	end
 
 	if numempty > 0 then
-		if nLog then 
-			nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "ScanData Missing Links", 
-				("We saw %d entries in scandata without links"):format(numempty)) 
+		if nLog then
+			nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "ScanData Missing Links",
+				("We saw %d entries in scandata without links"):format(numempty))
 		end
 	end
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
 	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
-		if nLog then 
-			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Current Count Discrepency Seen", 
+		if nLog then
+			nLog.AddMessage("Auctioneer", "Scan", N_WARN, "Current Count Discrepency Seen",
 				("%d - %d - %d + %d + %d - %d != %d"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
-					newCount, filterNewCount, filterDeleteCount, currentCount)) 
+					newCount, filterNewCount, filterDeleteCount, currentCount))
 		end
 	end
 
@@ -804,13 +800,13 @@ Commitfunction = function()
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
+
 	--Hides the end of scan summary if user is not interested
-	
 	local printSummary = false
-	if (TempcurQuery.qryinfo.nusummary) then
+	if (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
 	elseif ((not TempcurQuery.class) and (not TempcurQuery.subclass) and (not TempcurQuery.minUseLevel)
-			and (not TempcurQuery.name) and (not TempcurQuery.isUsable) 
+			and (not TempcurQuery.name) and (not TempcurQuery.isUsable)
 			and (not TempcurQuery.invType) and (not TempcurQuery.quality)) then
 		printSummary = private.getOption("scandata.summaryonfull");
 	elseif (TempcurQuery.name and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
@@ -818,24 +814,24 @@ Commitfunction = function()
 	else
 		printSummary = private.getOption("scandata.summaryonpartial")
 	end
-	
-	if (nLog or printSummary) then
-		local scanTime = "  "
-		local summaryLine = ""
-		local summary = ""
 
-		if (scanTimeHours and scanTimeHours ~= 0) then
-			scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
+	if (nLog or printSummary) then
+		local scanTime = " "
+		local summaryLine
+		local summary
+
+		if scanTimeHours ~= 0 then
+			scanTime = scanTime..scanTimeHours.." Hours "
 		end
-		if (scanTimeMins and scanTimeMins ~= 0) then
-			scanTime = scanTime.."{{"..scanTimeMins.."}} Mins "
+		if scanTimeMins ~= 0 then
+			scanTime = scanTime..scanTimeMins.." Mins "
 		end
-		if (scanTimeSecs and scanTimeSecs ~= 0) then
-			scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
+		if scanTimeSecs ~= 0 or (scanTimeHours == 0 and scanTimeMins == 0) then
+			scanTime = scanTime..scanTimeSecs.." Secs "
 		end
 
 		if (wasIncomplete) then
-			summaryLine = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}} before stopping:"
+			summaryLine = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}}before stopping:"
 		else
 			summaryLine = "Auctioneer finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:"
 		end
@@ -870,7 +866,11 @@ Commitfunction = function()
 			summary = summary.."\n"..summaryLine
 		end
 		if (earlyDeleteCount+expiredDeleteCount > 0) then
-			summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
+			if expiredDeleteCount > 0 then
+				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed (of which, {{"..expiredDeleteCount.."}} were past expiry time)"
+			else
+				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
+			end
 			if (printSummary) then private.Print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
@@ -1164,7 +1164,7 @@ StorePageFunction = function()
 
 	--page, maxpages, name  lets a module know when a "scan" they have queued is actually in progress. scansQueued lets a module know how may scans are left to go
 	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery.name) --page starts at 0 so we need to add +1
-	
+
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
 
@@ -1230,12 +1230,12 @@ StorePageFunction = function()
 	if (page > private.curQuery.qryinfo.page) then
 		private.curQuery.qryinfo.page = page
 	end
-	
+
 	--Send a Processor event to modules letting them know we are done with the page
 	AucAdvanced.SendProcessorMessage("pagefinished", pageNumber)
 
 	-- Send the next page query or finish scanning
-	
+
 	if private.isScanning then
 		if isGetAll and (#(private.curScan) >= totalAuctions - 100) then
 			private.isScanning = false
@@ -1446,11 +1446,11 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.scanStartTime = time()
 		private.scanStarted = GetTime()
 		private.totalPaused = 0
-		
+
 		local startPage = 0
 		query.qryinfo.id = private.querycount
 		private.querycount = private.querycount+1
-	
+
 		query.qryinfo.sig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 			query.name or "",
 			query.minUseLevel or "",
