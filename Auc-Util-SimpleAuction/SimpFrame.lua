@@ -1052,7 +1052,9 @@ function private.CreateFrames()
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
 				private.LoadItemLink(link, size)
-
+				--see if double clicking to auto post is allowed
+				if (not get("util.simpleauc.clickhook.doubleclick")) then return end
+				
 				if not private.clickdata then private.clickdata = {} end
 				local last = private.clickdata
 				local now = GetTime()
