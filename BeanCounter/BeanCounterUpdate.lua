@@ -102,11 +102,19 @@ function private.startPlayerUpgrade(server, player, playerData)
 		private.update._2_09(server, player)
 		performedUpdate = true
 	end
+	if playerData["version"] < 2.10 then -- remove slash from completedBids/Buys table so its completedBidsBuys
+		private.update._2_10(server, player)
+		performedUpdate = true
+	end
+	if playerData["version"] < 2.11 then -- adds neutral AH DB
+		private.update._2_11(server, player)
+		performedUpdate = true
+	end
 end
 
 function private.update._2_01(server, player)
 	for DB, data in pairs(BeanCounterDB[server][player]) do
-		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" then
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
 					for i, item in pairs(index) do
@@ -130,7 +138,7 @@ end
 function private.update._2_03(server, player)
 	if BeanCounterDB[server][player]["version"] < 2.03 then
 		for DB, data in pairs(BeanCounterDB[server][player]) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedAuctions" or DB == "postedBids" then
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "postedAuctions" or DB == "postedBids" then
 				for itemID, value in pairs(data) do
 					local temp = {}
 					for itemString, index in pairs(value) do
@@ -169,7 +177,7 @@ local function convert(DB , text)
 	elseif DB == "completedAuctions" then
 		local stack,  money, deposit, fee, buyout, bid, buyer, Time, reason = strsplit(";", text)
 		text = private.packString(stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, "")
-	elseif DB == "completedBids/Buyouts" then
+	elseif DB == "completedBidsBuyouts" then
 		local stack,  money, fee, buyout, bid, buyer, Time, reason = strsplit(";", text)
 		text = private.packString(stack,  money, "" , fee, buyout , bid, buyer, Time, reason, "")
 	end
@@ -177,7 +185,7 @@ local function convert(DB , text)
 end
 function private.update._2_07(server, player)
 	for DB, data in pairs(BeanCounterDB[server][player]) do
-		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts"  then
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts"  then
 			for itemID, value in pairs(data) do
 				for itemString, data in pairs(value) do
 					for index, text in pairs(data) do
@@ -192,12 +200,12 @@ function private.update._2_07(server, player)
 end
 
 --[[moves itemNameArray  to not store full itemlinks but generate when needed
-from "10155:1046"] = "|cff1eff00|Hitem:10155:0:0:0:0:0:1046:898585428:15|h[Mercurial Greaves of the Whale]|h|r",
-to "10155:1046"] = "cff1eff00:Mercurial Greaves of the Whale",
+from "10155:1046" = "|cff1eff00|Hitem:10155:0:0:0:0:0:1046:898585428:15|h[Mercurial Greaves of the Whale]|h|r",
+to "10155:1046" = "cff1eff00:Mercurial Greaves of the Whale",
 reduces saved variable size and slighty increases text string matching speed even with the overhead needed to change it back to an itemlink
 ]]
 function private.update._2_08(server, player)
---just let 2.09 do it.  Yes we will nuke teh array in each server that has not been upgraded. But we do not know how far behind each server is.
+--just let 2.09 do it. 
 	BeanCounterDB[server][player]["version"] = 2.08
 end
 --Storing the data using a colon caused issues with schematics so store using a ;  instead.
@@ -215,3 +223,58 @@ function private.update._2_09(server, player)
 	end
 	BeanCounterDB[server][player]["version"] = 2.09
 end
+
+--removes slash from DB name completedBidsBuyouts
+function private.update._2_10(server, player)
+	for DB, data in pairs(BeanCounterDB[server][player]) do
+		if  DB == "completedBids/Buyouts" then
+			BeanCounterDB[server][player]["completedBidsBuyouts"] = data
+			BeanCounterDB[server][player]["completedBids/Buyouts"] = nil
+		end
+	end
+	BeanCounterDB[server][player]["version"] = 2.10
+end
+
+--Helper function for 2.11 update
+local function migrateNeutralData(server, player, key, itemID, itemString, value)
+	key = key.."Neutral"
+	if BeanCounterDB[server][player][key][itemID] then --if ltemID exists
+		if BeanCounterDB[server][player][key][itemID][itemString] then
+			table.insert(BeanCounterDB[server][player][key][itemID][itemString], value)
+		else
+			BeanCounterDB[server][player][key][itemID][itemString] = {value}
+		end
+	else
+		BeanCounterDB[server][player][key][itemID]={[itemString] = {value}}
+	end
+end
+--adds in databases used for neutral AH trx handling, migrates neutral AH data over to these DB
+function private.update._2_11(server, player)
+	BeanCounterDB[server][player]["completedAuctionsNeutral"] = {}
+	BeanCounterDB[server][player]["failedAuctionsNeutral"] = {}
+
+	BeanCounterDB[server][player]["completedBidsBuyoutsNeutral"]  = {}
+	BeanCounterDB[server][player]["failedBidsNeutral"]  = {}
+		
+	
+	for DB, data in pairs(BeanCounterDB[server][player]) do
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" then
+			for itemID, itemIDData in pairs(data) do
+				for itemString, itemStringData in pairs(itemIDData) do
+					for i = #itemStringData, 1, -1 do
+						local stack, money, deposit , fee, buyout , bid, buyer, Time, reason, location = private.unpackString(itemStringData[i])
+						if location and location == "N" then
+							print(player, server, itemString)
+							migrateNeutralData(server, player, DB, itemID, itemString, itemStringData[i]) --local help[er function
+							itemStringData[i] = nil
+						end
+					end
+				end
+			end
+		end
+	end
+			
+
+	BeanCounterDB[server][player]["version"] = 2.11
+end
+	

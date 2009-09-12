@@ -32,7 +32,6 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local lib = BeanCounter
 lib.API = {}
-local private = lib.Private
 local private, print, get, set, _BC = lib.getLocals()
 
 local function debugPrint(...)
@@ -197,7 +196,7 @@ function lib.API.getAHProfitGraph(player, item ,days)
 		end
 	end
 	--remove now redundant table entries
-	tbl.completedAuctions, tbl["completedBids/Buyouts"], tbl.failedAuctions, tbl.failedBids = nil, nil, nil, nil
+	tbl.completedAuctions, tbl["completedBidsBuyouts"], tbl.failedAuctions, tbl.failedBids = nil, nil, nil, nil
 	--check if we actually have any results from the search
 	if #tbl == 0 then return {0}, 0, 0 end
 	--sort by date
@@ -381,8 +380,8 @@ function lib.API.getBidReason(itemLink, quantity)
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
 
-	if private.playerData["completedBids/Buyouts"][itemID] and private.playerData["completedBids/Buyouts"][itemID][itemString] then
-		for i,v in pairs(private.playerData["completedBids/Buyouts"][itemID][itemString]) do
+	if private.playerData["completedBidsBuyouts"][itemID] and private.playerData["completedBidsBuyouts"][itemID][itemString] then
+		for i,v in pairs(private.playerData["completedBidsBuyouts"][itemID][itemString]) do
 			local quan, _, _ , _, _, bid, _, Time, reason = private.unpackString(v)
 			if tonumber(quan) == tonumber(quantity) and reason and Time then
 				return reason, Time, tonumber(bid)
@@ -391,8 +390,8 @@ function lib.API.getBidReason(itemLink, quantity)
 	end
 	--not found on the current player lets see if we bought it on another player
 	for player in pairs(private.serverData) do
-		if private.serverData[player]["completedBids/Buyouts"][itemID] and private.serverData[player]["completedBids/Buyouts"][itemID][itemString] then
-			for i,v in pairs(private.serverData[player]["completedBids/Buyouts"][itemID][itemString]) do
+		if private.serverData[player]["completedBidsBuyouts"][itemID] and private.serverData[player]["completedBidsBuyouts"][itemID][itemString] then
+			for i,v in pairs(private.serverData[player]["completedBidsBuyouts"][itemID][itemString]) do
 				local quan, _, _ , _, _, bid, _, Time, reason = private.unpackString(v)
 				if tonumber(quan) == tonumber(quantity) and reason and Time then
 					return reason, Time, tonumber(bid), player

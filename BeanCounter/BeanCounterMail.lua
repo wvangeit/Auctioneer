@@ -255,8 +255,12 @@ function private.sortCompletedAuctions( i )
 		local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, itemLink, private.reconcilePending[i].deposit, private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
-			private.databaseAdd("completedAuctions", itemLink, nil, value)
-			--debugPrint("databaseAdd completedAuctions", itemID, itemLink)
+			if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
+				private.databaseAdd("completedAuctions", itemLink, nil, value)
+				--debugPrint("databaseAdd completedAuctions", itemID, itemLink)
+			else
+				private.databaseAdd("completedAuctionsNeutral", itemLink, nil, value)
+			end
 		else
 			debugPrint("Failure for completedAuctions", itemID, itemLink, value, "index", private.reconcilePending[i].n)
 		end
@@ -302,8 +306,12 @@ function private.sortFailedAuctions( i )
 		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
-			private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
-			--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+			if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
+				private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
+				--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+			else
+				private.databaseAdd("failedAuctionsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+			end
 		else
 			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
 		end
@@ -343,10 +351,14 @@ function private.sortCompletedBidsBuyouts( i )
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
 		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
-		private.databaseAdd("completedBids/Buyouts", private.reconcilePending[i]["itemLink"], nil, value)
-		--debugPrint("databaseAdd completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"])
+		if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
+			private.databaseAdd("completedBidsBuyouts", private.reconcilePending[i]["itemLink"], nil, value)
+		else
+			private.databaseAdd("completedBidsBuyoutsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+		end
+		--debugPrint("databaseAdd completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"])
 	else
-		debugPrint("Failure for completedBids/Buyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
+		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
 	end
 
 	table.remove(private.reconcilePending,i)
@@ -378,7 +390,11 @@ function private.sortFailedBids( i )
 	local postStack, postSeller, reason = private.findFailedBids(itemID, itemLink, private.reconcilePending[i]["money"])
 	if itemID then
 		local value = private.packString(postStack, "", "", "", "", private.reconcilePending[i]["money"], postSeller, private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
-		private.databaseAdd("failedBids", itemLink, nil, value)
+		if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
+			private.databaseAdd("failedBids", itemLink, nil, value)
+		else
+			private.databaseAdd("failedBidsNeutral", itemLink, nil, value)
+		end
 		--debugPrint("databaseAdd failedBids", itemID, itemLink, value)
 	else
 		debugPrint("Failure for failedBids", itemID, itemLink, value, "index", private.reconcilePending[i].n)

@@ -44,7 +44,7 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 2.09,
+	version = 2.11,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 	--cache for the searchAPI
@@ -194,9 +194,14 @@ function private.initializeDB(server, player)
 		BeanCounterDB[server][player]["failedAuctions"] = {}
 
 		BeanCounterDB[server][player]["postedBids"] = {}
-		--BeanCounterDB[server][player]["postedBuyouts"] = {} removed as unneccessary
-		BeanCounterDB[server][player]["completedBids/Buyouts"]  = {}
+		BeanCounterDB[server][player]["completedBidsBuyouts"]  = {}
 		BeanCounterDB[server][player]["failedBids"]  = {}
+		
+		BeanCounterDB[server][player]["completedAuctionsNeutral"] = {}
+		BeanCounterDB[server][player]["failedAuctionsNeutral"] = {}
+
+		BeanCounterDB[server][player]["completedBidsBuyoutsNeutral"]  = {}
+		BeanCounterDB[server][player]["failedBidsNeutral"]  = {}
 
 		BeanCounterDB[server][player]["mailbox"] = {}
 	end

@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	
-	BeanCounterTidyUp - Data base clean up and maintenance functions
+	BeanCounterTidyUp - Database clean up and maintenance functions
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ function private.sumDatabase()
 	private.DBSumEntry, private.DBSumItems = 0, 0
 	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
 				for itemID, value in pairs(data) do
 					for itemString, data in pairs(value) do
 						private.DBSumEntry = private.DBSumEntry +1
@@ -118,7 +118,7 @@ end
 function private.compactDB(announce)
 	debugPrint("Compressing database entries older than 40 days")
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
-		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
 			for itemID, value in pairs(data) do
 				for itemString, index in pairs(value) do
 					local _, suffix, uniqueID = lib.API.decodeLink(itemString)
@@ -163,7 +163,7 @@ end
 function private.sortArrayByDate(announce)
 	for player, v in pairs(private.serverData)do
 		for DB, data in pairs(private.serverData[player]) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" then
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
 				for itemID, value in pairs(data) do
 					for itemString, index in pairs(value) do
 						table.sort(index,  function(a,b)
@@ -215,7 +215,7 @@ function private.prunePostedDB(announce)
 	end
 	if announce then print("Finished pruning Posted Databases") end
 end
---deletes all entires matching a itemLink from database for that server
+--deletes all entries matching a itemLink from database for that server
 function private.deleteExactItem(itemLink)
 	if not itemLink or not itemLink:match("^(|c%x+|H.+|h%[.+%])") then return end
 	for player, playerData in pairs(private.serverData) do
@@ -241,12 +241,17 @@ Make sure the DB format is correct removing any entries that were missed by upda
 To be run after every DB update
 ]]--
 local integrity = {} --table containing teh DB layout
-	integrity["completedBids/Buyouts"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
+	integrity["completedBidsBuyouts"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
 	integrity["completedAuctions"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
 	integrity["failedBids"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
 	integrity["failedAuctions"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
 	integrity["postedBids"] = {"number", "number", "string", "string", "number", "number", "string" } --7
 	integrity["postedAuctions"] = {"number", "number", "number", "number", "number" ,"number", "string"} --7
+	
+	integrity["completedBidsBuyoutsNeutral"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
+	integrity["completedAuctionsNeutral"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
+	integrity["failedBidsNeutral"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
+	integrity["failedAuctionsNeutral"] = {"number", "number", "number", "number", "number", "number", "string", "number", "string", "string"}--10
 local integrityClean, integrityCount = true, 1
  function private.integrityCheck(complete, server)
 	if not server then server = private.realmName end
@@ -254,7 +259,7 @@ local integrityClean, integrityCount = true, 1
 	debugPrint(integrityCount)
 	for player, v in pairs(BeanCounterDB[server])do
 		for DB, data in pairs(v) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBids/Buyouts" or DB == "postedBids" or DB == "postedAuctions" then
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "postedBids" or DB == "postedAuctions" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
 				for itemID, value in pairs(data) do
 					for itemString, data in pairs(value) do
 						local _, itemStringLength = itemString:gsub(":", ":")

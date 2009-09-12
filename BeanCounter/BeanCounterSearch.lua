@@ -193,73 +193,50 @@ function private.searchServerData(serverName, data, tbl, settings)
 			--If looking for alliance and player is not alliance fall into this null
 		elseif settings.selectbox[2] == "horde" and server[i]["faction"] and server[i]["faction"]:lower() ~= settings.selectbox[2] then
 			--If looking for horde and player is not horde fall into this null
-		elseif (settings.selectbox[2] ~= "server" and settings.selectbox[2] ~= "alliance" and settings.selectbox[2] ~= "horde") and i ~= settings.selectbox[2] then
+		elseif (settings.selectbox[2] ~= "server" and settings.selectbox[2] ~= "alliance" and settings.selectbox[2] ~= "horde" and settings.selectbox[2] ~= "neutral") and i ~= settings.selectbox[2] then
 			--If we are not doing a whole server search and the chosen search player is not "i" then we fall into this null
 			--otherwise we search the server or toon as normal
 		else
-		--flag to filter neutral AH from results, this will remove neutral AH when alliance, horde filter is used. This is temporary we need to change teh DB layout to better manage neutral AH
-		local filterNeutral
-		if settings.selectbox[2] == "alliance" or settings.selectbox[2] == "horde" then filterNeutral = true end
+			--flag on how we handle neutral AH    nil = no filter  1 = remove neutral AH   2 = remove NON neutral
+			local filterNeutral = 1 --by default HIDE neutral trxns
+			if settings.neutral then filterNeutral = nil end --GUI check to display neutral trxn over ridden by select box
+			if settings.selectbox[2] == "neutral" then filterNeutral = 2 end
 			for _, id in pairs(tbl) do
-				if settings.auction and server[i]["completedAuctions"][id] then
-					for index, itemKey in pairs(server[i]["completedAuctions"][id]) do
-						for _, text in ipairs(itemKey) do
-							if filterNeutral then
-								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
-								if location ~= "N" then
-									table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
-								end
-							else
-								table.insert(data, {"COMPLETEDAUCTIONS", id, index, text})
-							end
-						end
-					end
+				if settings.auction and server[i]["completedAuctions"][id] and filterNeutral ~= 2 then
+					data = private.searchDB(data, server, i, "completedAuctions", id)
 				end
-				if settings.failedauction and server[i]["failedAuctions"][id] then
-					for index, itemKey in pairs(server[i]["failedAuctions"][id]) do
-						for _, text in ipairs(itemKey) do
-							if filterNeutral then
-								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
-								if location ~= "N" then
-									table.insert(data, {"FAILEDAUCTIONS", id, index, text})
-								end					
-							else
-								table.insert(data, {"FAILEDAUCTIONS", id, index, text})
-							end
-							
-						end
-					end
+				if settings.failedauction and server[i]["failedAuctions"][id] and filterNeutral ~= 2 then
+					data = private.searchDB(data, server, i, "failedAuctions", id)
 				end
-				if settings.bid and server[i]["completedBids/Buyouts"][id] then
-					for index, itemKey in pairs(server[i]["completedBids/Buyouts"][id]) do
-						for _, text in ipairs(itemKey) do
-							if filterNeutral then
-								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
-								if location ~= "N" then
-									table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
-								end
-							else
-								table.insert(data, {"COMPLETEDBIDSBUYOUTS", id, index, text})
-							end
-						end
-					end
+				if settings.bid and server[i]["completedBidsBuyouts"][id] and filterNeutral ~= 2 then
+					data =  private.searchDB(data, server, i, "completedBidsBuyouts", id)
 				end
-				if settings.failedbid and server[i]["failedBids"][id] then
-					for index, itemKey in pairs(server[i]["failedBids"][id]) do
-						for _, text in ipairs(itemKey) do
-							if filterNeutral then
-								local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
-								if location ~= "N" then
-									table.insert(data, {"FAILEDBIDS", id, index, text})
-								end
-							else
-								table.insert(data, {"FAILEDBIDS", id, index, text})
-							end
-							
-						end
-					end
+				if settings.failedbid and server[i]["failedBids"][id] and filterNeutral ~= 2 then
+					data = private.searchDB(data, server, i, "failedBids", id)
+				end
+				--neutral AH handling
+				if settings.auction and server[i]["completedAuctionsNeutral"][id] and filterNeutral ~= 1 then
+					data = private.searchDB(data, server, i, "completedAuctionsNeutral", id)
+				end
+				if settings.failedauction and server[i]["failedAuctionsNeutral"][id] and filterNeutral ~= 1 then
+					data = private.searchDB(data, server, i, "failedAuctionsNeutral", id)
+				end
+				if settings.bid and  server[i]["completedBidsBuyoutsNeutral"][id] and filterNeutral ~= 1 then
+					data =  private.searchDB(data, server, i, "completedBidsBuyoutsNeutral", id)
+				end
+				if settings.failedbid and server[i]["failedBidsNeutral"][id] and filterNeutral ~= 1 then
+					data = private.searchDB(data, server, i, "failedBidsNeutral", id)
 				end
 			end
+		end
+	end
+	return data
+end
+function private.searchDB(data, server, player, DB, itemID)
+	for index, itemKey in pairs(server[player][DB][itemID]) do
+		for _, text in ipairs(itemKey) do
+			DB = DB:gsub("Neutral", "")--remove the Neutral part so we send it to the proper function
+			table.insert(data, {DB:upper(), id, index, text})
 		end
 	end
 	return data

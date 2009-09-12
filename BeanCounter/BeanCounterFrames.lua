@@ -271,7 +271,7 @@ function private.CreateFrames()
 	end
 	--Default Server wide
 	--Used GLOBALSTRINGS for the horde alliance translations
-	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", FACTION_ALLIANCE.." ".._BC('UiData')},{"horde", FACTION_HORDE.." ".._BC('UiData')},}
+	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", FACTION_ALLIANCE.." ".._BC('UiData')},{"horde", FACTION_HORDE.." ".._BC('UiData')}, {"neutral", _BC('MailNeutralAuctionHouse')}}
 	for name,data in pairs(private.serverData) do
 		table.insert(vals,{name, name.." ".._BC('UiData')})
 	end
@@ -353,22 +353,15 @@ function private.CreateFrames()
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--search classic data
-	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
-	frame.classicCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
-	frame.classicCheck:SetScript("OnClick", function() local on if frame.classicCheck:GetChecked() then on = true end set("util.beancounter.ButtonClassicCheck", on) private.SearchCache = {} end)
-	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
-	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
-	frame.classicCheck:Hide()
-	frame.classicCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.classicCheck, _BC('TT_ClassicCheck')) end) --"Display results from BeanCounter Classic Database"
-	frame.classicCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	frame.neutralCheck = CreateFrame("CheckButton", "BeancounterneutralCheck", frame, "OptionsCheckButtonTemplate")
+	frame.neutralCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
+	frame.neutralCheck:SetScript("OnClick", function() local on if frame.neutralCheck:GetChecked() then on = true end set("util.beancounter.ButtonneutralCheck", on) private.SearchCache = {} end)
+	getglobal("BeancounterneutralCheckText"):SetText(_BC('UiNeutralCheckBox'))
+	frame.neutralCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
+	frame.neutralCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.neutralCheck, _BC('TT_neutralCheck')) end) --"Display results from BeanCounter Classic Database"
+	frame.neutralCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-	--no need to show this button if theres no classic data to search
-	if BeanCounterAccountDB then
-		if BeanCounterAccountDB[private.realmName] then
-			frame.classicCheck:Show() --Show id classic has server data
-			frame.classicCheck:SetChecked(get("util.beancounter.ButtonClassicCheck")) --Recall last checked state
-		end
-	end
+	
 
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
@@ -545,7 +538,7 @@ function private.CreateFrames()
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
-		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(),
+		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["neutral"] = frame.neutralCheck:GetChecked(),
 			["bid"] = frame.bidCheck:GetChecked(), ["failedbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked(),
 			["failedauction"] = frame.auctionFailedCheck:GetChecked()
 			}
