@@ -287,6 +287,10 @@ BeanCounterLocalizations = {
 		["Q_MailInvoiceTimeout"]	= "What is Mail Invoice Timeout?";
 		["Q_MailRecolor"]	= "What is Mail Re-color Method?";
 
+		-- Section: Interface
+		["TT_neutralCheck"]	= "Display results from the Neutral Blackwater Auction house";
+		["UiNeutralCheckBox"]	= "Show Neutral AH data";
+
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
