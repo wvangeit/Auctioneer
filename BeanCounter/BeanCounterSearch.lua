@@ -234,8 +234,8 @@ function private.searchServerData(serverName, data, tbl, settings)
 end
 function private.searchDB(data, server, player, DB, itemID)
 	for index, itemKey in pairs(server[player][DB][itemID]) do
+		DB = DB:gsub("Neutral", "")--remove the Neutral part so we send it to the proper function
 		for _, text in ipairs(itemKey) do
-			DB = DB:gsub("Neutral", "")--remove the Neutral part so we send it to the proper function
 			table.insert(data, {DB:upper(), id, index, text})
 		end
 	end
