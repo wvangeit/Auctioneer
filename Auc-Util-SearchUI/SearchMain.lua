@@ -654,7 +654,7 @@ function private.buyfirst()
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
 	elseif string.match(private.data.reason, ":bid") then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
-	elseif private.data.buyout then
+	elseif private.data.buyout > 0 then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
 	else
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
@@ -679,7 +679,7 @@ function private.purchase()
 		price = private.data.buyout
 	elseif string.match(private.data.reason, ":bid") then
 		price = private.data.bid
-	elseif private.data.buyout then
+	elseif private.data.buyout > 0 then
 		price = private.data.buyout
 	else
 		price = private.data.bid
@@ -712,7 +712,7 @@ function private.purchaseall()
 			price = private.data.buyout
 		elseif string.match(private.data.reason, ":bid") then
 			price = private.data.bid
-		elseif private.data.buyout then
+		elseif private.data.buyout > 0 then
 			price = private.data.buyout
 		else
 			price = private.data.bid
@@ -733,7 +733,7 @@ function private.ignore()
 		price = private.data.buyout
 	elseif string.match(private.data.reason, ":bid") then
 		price = private.data.bid
-	elseif private.data.buyout then
+	elseif private.data.buyout > 0 then
 		price = private.data.buyout
 	else
 		price = private.data.bid
@@ -771,7 +771,7 @@ function private.ignoretemp()
 		price = private.data.buyout
 	elseif string.match(private.data.reason, ":bid") then
 		price = private.data.bid
-	elseif private.data.buyout then
+	elseif private.data.buyout > 0 then
 		price = private.data.buyout
 	else
 		price = private.data.bid
@@ -790,7 +790,7 @@ function private.snatch()
 		price = private.data.buyout
 	elseif string.match(private.data.reason, ":bid") then
 		price = private.data.bid
-	elseif private.data.buyout then
+	elseif private.data.buyout > 0 then
 		price = private.data.buyout
 	else
 		price = private.data.bid
