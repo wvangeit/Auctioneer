@@ -44,18 +44,23 @@ function private.getTypes()
 end
 
 function private.getSubTypes()
-	local itemtype = get("general.type")
-	for i, j in pairs(private.typetable) do
-		if j == itemtype then
-			itemtype = i
-			break
+	local subtypetable, typenumber
+	local typename = get("general.type")
+	local typetable = private.getTypes()
+	if typename ~= "All" then
+		for i, j in pairs(typetable) do
+			if j == typename then
+				typenumber = i
+				break
+			end
 		end
 	end
-	if private.typetable == "All" then
-		return {[1]="All"}
+	if typenumber then
+		subtypetable = {GetAuctionItemSubClasses(typenumber-1)}-- subtract 1 because 1 is the "All" category
+		table.insert(subtypetable, 1, "All")
+	else
+		subtypetable = {[1]="All"}
 	end
-	local subtypetable = {GetAuctionItemSubClasses(itemtype-1)}--itemtype - 1 because 1 is the "All" category
-	table.insert(subtypetable, 1, "All")
 	return subtypetable
 end
 
