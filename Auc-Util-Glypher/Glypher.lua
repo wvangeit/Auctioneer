@@ -10,7 +10,15 @@ local timeRemaining
 local coFG
 local onupdateframe
 local INSCRIPTION_SPELLNAME = GetSpellInfo(45357)
+local _, _, _, _, _, GLYPH_TYPE = GetItemInfo(42956)
+print("Localized name of itemType for Glyphs: " .. GLYPH_TYPE)
 
+-- temporary check for Auc-Stat-Glypher
+if AucAdvanced.Modules.Stat.Glypher then
+    message("For this version of Auc-Util-Glypher, you MUST manually copy (in game) your Auc-Stat-Glypher configuration over to Auc-Util-Glypher, AND disable Auc-Stat-Glypher. The Glypher pricing model is now included in Auc-Util-Glypher.")
+    return
+end
+--
 function lib.Processor(callbackType, ...)
     if (callbackType == "config") then
         private.SetupConfigGui(...)
@@ -87,6 +95,11 @@ function lib.OnLoad()
     default("util.glypher.profitAppraiser", 100)
     default("util.glypher.profitBeancounter", 100)
     default("util.glypher.profitMarket", 50)
+    default("util.glypher.pricemodel.active", true) --weltmeister is this still needed?
+    default("util.glypher.pricemodel.min", 32500)
+    default("util.glypher.pricemodel.max", 999999)
+    default("util.glypher.pricemodel.undercut", 1)
+    default("stat.glypher.pricemodel.whitelist", nil)
 
 --Check to see if we've got a recent enough version of AucAdvanced
     local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -193,6 +206,32 @@ function private.SetupConfigGui(gui)
 
     gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitMarket", 1, 100, 1, "Market price")
     gui:AddTip(id, "Relative weight for the Market price " .. weightWords)
+
+    gui:AddControl(id, "Subhead", 0, "Glypher pricing model")
+
+    --gui:AddControl(id, "Subhead", 0, "Minimum Sale Price")
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Minimum Sale Price")
+    gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.min")
+    gui:AddTip(id, "The price that Glypher will never go below in order to undercut others")
+
+
+    --gui:AddControl(id, "Subhead", 0, "Maximum Sale Price")
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Maximum Sale Price")
+    gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.max")
+    gui:AddTip(id, "The price that Glypher will never go above in order to overcut others")
+
+
+    --gui:AddControl(id, "Subhead", 0, "Undercut Amount")
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Undercut Amount")
+    gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.undercut")
+    gui:AddTip(id, "The amount that you undercut others")
+
+
+    --gui:AddControl(id, "Subhead", 0, "Whitelist")
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Whitelist")
+    gui:AddControl(id, "Text", 0, 1, "util.glypher.pricemodel.whitelist")
+    gui:AddTip(id, "The players to whitelist on undercuts (blank for no whitelist, separarate whitelisted users with a ':')") --eventually have a list to edit
+
 
     frame.refreshButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
     frame.refreshButton:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 325, 225)
@@ -543,5 +582,71 @@ function private.refreshAll()
     AucAdvanced.Scan.StartScan(nil, nil, nil, nil, 5, nil, nil, nil, nil)
 end
 
+function lib.GetPrice(link, faction, realm)
+    local linkType, itemId, property, factor = AucAdvanced.DecodeLink(link)
+    local glypherMin = get("util.glypher.pricemodel.min")
+    local glypherMax = get("util.glypher.pricemodel.max")
+    local glypherUndercut = get("util.glypher.pricemodel.undercut")
+    local glypherWhitelist = get("util.glypher.pricemodel.whitelist")
+    if (linkType ~= "item") then return end
+    itemId = tonumber(itemId)
+    property = tonumber(property) or 0
+    factor = tonumber(factor) or 0
+    local data = AucAdvanced.API.QueryImage({
+    itemId = itemId,
+        suffix = property,
+        factor = factor,
+    })
+    local auctions = #data
+    local playerLow = glypherMax * 2
+    local competitorLow = glypherMax * 2
+    local whitelistLow = glypherMax * 2
+    for j = 1, #data do
+        local auction = AucAdvanced.API.UnpackImageItem(data[j])
+        auction.buyoutPrice = (auction.buyoutPrice/auction.stackSize)
+        if auction.stackSize == 1 then
+               if auction.sellerName == playerName then
+                if auction.buyoutPrice < playerLow then
+                    playerLow = auction.buyoutPrice
+                end
+            elseif string.find(":" .. glypherWhitelist .. ":", ":" .. auction.sellerName .. ":") then
+                if auction.buyoutPrice < whitelistLow then
+                    if auction.buyoutPrice >= glypherMin then
+                        --this if we're in is so that we don't even both with prices below our min
+                        whitelistLow = auction.buyoutPrice
+                    end
+                end
+            else
+                if auction.buyoutPrice < competitorLow then
+                    if auction.buyoutPrice >= glypherMin then
+                        --this if we're in is so that we don't even both with prices below our min
+                        competitorLow = auction.buyoutPrice
+                    end
+                end
+            end
+        end
+    end
+    local newPrice = glypherMax
+    newPrice = competitorLow - glypherUndercut
+    if whitelistLow < newPrice then
+        newPrice = whitelistLow
+    end
+    if newPrice > glypherMax then
+        newPrice = glypherMax
+    elseif newPrice < glypherMin then
+        --what do we do with the new price in this case?
+        --ideally we should match the 2nd lowest price minus undercut
+        newPrice = glypherMin
+    end    
+    return newPrice
+end
 
-
+function lib.IsValidAlgorithm(link)
+    if link then
+        local _, _, _, _, _, itemType, itemSubtype = GetItemInfo(link) 
+        if (GLYPH_TYPE == itemType) then
+            return true
+        end
+    end
+    return false
+end
