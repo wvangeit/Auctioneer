@@ -148,6 +148,11 @@ function private.SetupConfigGui(gui)
         end
     end
 
+    gui:AddHelp(id, "what is Glypher?",
+        "What is Glypher?",
+        "Glyher is a work-in-progress. Its goal is to assist in managing a profitable glyph-based business."
+    )
+
     gui:AddControl(id, "Subhead", 0, "Glypher: Profitable Glyph Utility")
 
     gui:AddControl(id, "Subhead", 0, "Glyph creation configuration")
@@ -190,7 +195,7 @@ function private.SetupConfigGui(gui)
     gui:AddTip(id, "Relative weight for the Market price " .. weightWords)
 
     frame.refreshButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-    frame.refreshButton:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 325, -15)
+    frame.refreshButton:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 325, 225)
     frame.refreshButton:SetWidth(110)
     frame.refreshButton:SetText("Scan Glyphs")
     frame.refreshButton:SetScript("OnClick", function() private.refreshAll() end)
@@ -223,8 +228,8 @@ function private.SetupConfigGui(gui)
     })
 
     frame.glypher:SetBackdropColor(0, 0, 0.0, 0.5)
-    frame.glypher:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -20, 2)
-    frame.glypher:SetPoint("BOTTOM", frame, "BOTTOM", 0, 0)
+    frame.glypher:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -20, -138)
+    frame.glypher:SetPoint("BOTTOM", frame, "BOTTOM", 0, -135)
     frame.glypher:SetWidth(275)
     frame.glypher:SetHeight(310)
 
@@ -373,7 +378,6 @@ function private.cofindGlyphs()
                 local bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(UnitName("player"), itemName, historyTime, time()) or 0, 0, 0
                 --local bcSold = BeanCounter.API.getAHSoldFailed("server", link, history) or 1 -- avoid divide by zero
                 --local bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(nil, itemName, historyTime, time()) or 0, 0, 0
---print("itemName: " .. itemName .. "bcSold: " .. bcSold .. " bcProfit: " .. bcProfit)
                 local priceBeancounter
                 if bcProfit > 0 and bcSold > 0 then
                     priceBeancounter = floor(bcProfit/bcSold)
@@ -381,14 +385,13 @@ function private.cofindGlyphs()
                     priceBeancounter = 0
                 end
                 if priceBeancounter == 0 then profitBeancounter = 0 end
-            	--evalutate based upon weights
+                --evalutate based upon weights
                 local profitTotalWeight = profitAppraiser + profitMarket + profitBeancounter
                 if profitTotalWeight == 0 then
                     print("profitTotalWeight is 0 - changing to 1")
                     profitTotalWeight = 1
                 end
                 local worthPrice = floor((priceAppraiser * (profitAppraiser/profitTotalWeight)) + (priceMarket * (profitMarket/profitTotalWeight)) + (priceBeancounter * (profitBeancounter/profitTotalWeight)))
---print("worthPrice: " .. worthPrice)
 
                 local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
                 itemId = tonumber(itemId)
@@ -428,7 +431,6 @@ function private.cofindGlyphs()
                     --local inkPrice = AucAdvanced.API.GetMarketValue(link) or 0
                     local _, _, _, _, Id  = string.find(link, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
                     local isVendored,isLimited,itemCost,toSell,buyStack,maxStack = Informant.getItemVendorInfo(Id)
---print("itemCost: " .. itemCost .. " toS: " .. toSell .. " buyS: " .. buyStack .. " maxS: " .. maxStack)
                     if string.find(":43126:43120:43124:37101:43118:43116:39774:39469:43122:", ":" .. Id .. ":") then
                         reagentCost = (reagentCost + (inkCost * count) )
                     elseif Id == 43127 then
@@ -438,7 +440,6 @@ function private.cofindGlyphs()
                     else
                         print("Not parchment or buyable ink -- " .. link .. "-- need market price")
                     end
---print("item: " .. link .. " now has a reagentCost of " .. reagentCost)
 
                     if INK:match("-") then -- ignore a specific ink
                         local INK = INK:gsub("-","")
@@ -472,9 +473,7 @@ function private.cofindGlyphs()
                     if make > 0 then
                         local failedratio
                         if (sold > 0) then failedratio = failed/sold else failedratio = -1 end
---print("Checking sold " .. sold .. " during " .. history .. "d and failed " .. failed .. " entire history. Found failedratio: " .. failedratio .. " vs " .. (failratio))
                         if (sold > 0 and failed/sold < failratio) or failed == 0 then
---print("Make " .. make .. " of " .. itemName .. " due to sales of " .. sold .. " during the past " .. history .. "d. You have " .. currentAuctions .. " in stock.")
                             table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
                             table.insert(private.Display, {link, make, worthPrice - reagentCost} )
                         end
