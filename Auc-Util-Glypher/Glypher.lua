@@ -647,6 +647,7 @@ function lib.IsValidAlgorithm(link)
         if (GLYPH_TYPE == itemType) then
             return true
         end
+    else
+	return true
     end
-    return false
 end
