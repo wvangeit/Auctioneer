@@ -99,7 +99,7 @@ function lib.OnLoad()
     default("util.glypher.pricemodel.min", 32500)
     default("util.glypher.pricemodel.max", 999999)
     default("util.glypher.pricemodel.undercut", 1)
-    default("stat.glypher.pricemodel.whitelist", nil)
+    default("stat.glypher.pricemodel.whitelist", "")
 
 --Check to see if we've got a recent enough version of AucAdvanced
     local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -628,9 +628,9 @@ function lib.GetPrice(link, faction, realm)
     end
     local newPrice = glypherMax
     newPrice = competitorLow - glypherUndercut
-    if whitelistLow < newPrice then
-        newPrice = whitelistLow
-    end
+    --tshea if whitelistLow < newPrice then
+        --tshea newPrice = whitelistLow
+    --tshea end
     if newPrice > glypherMax then
         newPrice = glypherMax
     elseif newPrice < glypherMin then
