@@ -6,7 +6,7 @@
 
 	This Addon provides a Search tab on the AH interface, which allows
 	Auctioneer users to use Searcher plug-ins to search for good deals
-	in the auction house.  It searches the "snapshot", which requires 
+	in the auction house.  It searches the "snapshot", which requires
 	having data from recent auction house scans.
 
 	License:
@@ -239,10 +239,12 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif callbackType == "scanstats" then
-		--lib.NotifyCallbacks("scanstats") -- pass the message on
+		-- pass the message in next OnUpdate
 		flagScanStats = true
 	elseif callbackType == "scanprogress" and private.UpdateScanProgress then
 		private.UpdateScanProgress(...)
+	elseif callbackType == "buyqueue" and private.UpdateBuyQueue then
+		private.UpdateBuyQueue()
 	end
 end
 
@@ -719,7 +721,6 @@ function private.purchaseall()
 		end
 		if ((balance-price) > reserve or not enableres) then
 			AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
-			gui.frame.cancel.updateDisplay() -- force update of gui.frame.cancel.value
 		else
 			print("Purchase cancelled: Reserve reached")
 		end
@@ -1325,7 +1326,7 @@ function lib.MakeGuiConfig()
 	})
 	gui.sheet:EnableSelect(true)
 	gui.sheet:EnableVerticalScrollReset(false) --tells scrollframes we do NOT want to reset position when rendering a new data table
-	
+
 	--If we have a saved order reapply
 	if lib.GetSetting("columnorder") then
 		--print("saved order applied")
@@ -1355,10 +1356,10 @@ function lib.MakeGuiConfig()
 			lib.SetSetting("columnsortcurDir", curDir)
 			lib.SetSetting("columnsortcurSort", column)
 		elseif (callback == "OnMouseDownCell") then
-			lib.UpdateControls()		
+			lib.UpdateControls()
 		end
-	end	
-	
+	end
+
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
 	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 50)
 	gui.Search:SetText("Search")
@@ -1498,25 +1499,24 @@ function lib.MakeGuiConfig()
 	gui.frame.cancel:SetHeight(18)
 	gui.frame.cancel:Disable()
 	gui.frame.cancel:SetScript("OnClick", function()
-		AucAdvanced.Buy.Private.BuyRequests = {}
-		gui.frame.cancel.size = 0
+		AucAdvanced.Buy.CancelBuyQueue(true)
 		gui.frame.cancel.value = 0
 	end)
-	gui.frame.cancel.size = 0
 	gui.frame.cancel.value = 0
-	gui.frame.cancel.updateDisplay = function()
-		local queuesize = #AucAdvanced.Buy.Private.BuyRequests
-		if queuesize > 0 and queuesize ~= gui.frame.cancel.size then
-			local value = 0
-			for i,j in pairs(AucAdvanced.Buy.Private.BuyRequests) do
-				value = value + j["price"]
-			end
-			gui.frame.cancel.label:SetText(tostring(queuesize)..": "..AucAdvanced.Coins(value, true))
-			gui.frame.cancel.value = value
+	private.UpdateBuyQueue = function ()
+		local queuelen, queuecost, prompt, promptcost = AucAdvanced.Buy.GetQueueStatus()
+		if prompt then
+			queuelen = queuelen + 1
+			queuecost = queuecost + promptcost
+		end
+		if queuelen > 0 then
+			gui.frame.cancel.label:SetText(tostring(queuelen)..": "..AucAdvanced.Coins(queuecost, true))
+			gui.frame.cancel.value = queuecost
 			gui.frame.cancel:Enable()
 			gui.frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
-		elseif queuesize == 0 and gui.frame.cancel:IsEnabled() == 1 then
+		else
 			gui.frame.cancel.label:SetText("")
+			gui.frame.cancel.value = 0
 			gui.frame.cancel:Disable()
 			gui.frame.cancel.tex:SetVertexColor(0.3, 0.3, 0.3)
 		end
@@ -1608,7 +1608,6 @@ function lib.MakeGuiConfig()
 		self.updateThrottle = TOOLTIP_UPDATE_TIME
 
 		-- display updater functions
-		self.cancel.updateDisplay()
 		self.purchase.updateDisplay()
 		gui.Search.updateDisplay()
 	end)
