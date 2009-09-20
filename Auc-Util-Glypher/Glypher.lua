@@ -11,6 +11,7 @@ local coFG
 local onupdateframe
 local INSCRIPTION_SPELLNAME = GetSpellInfo(45357)
 local _, _, _, _, _, GLYPH_TYPE = GetItemInfo(42956)
+if not GLYPH_TYPE then GLYPH_TYPE = "Glyph" end
 print("Localized name of itemType for Glyphs: " .. GLYPH_TYPE)
 
 -- temporary check for Auc-Stat-Glypher
@@ -99,7 +100,7 @@ function lib.OnLoad()
     default("util.glypher.pricemodel.min", 32500)
     default("util.glypher.pricemodel.max", 999999)
     default("util.glypher.pricemodel.undercut", 1)
-    default("stat.glypher.pricemodel.whitelist", "")
+    default("util.glypher.pricemodel.whitelist", "")
 
 --Check to see if we've got a recent enough version of AucAdvanced
     local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -593,7 +594,7 @@ function lib.GetPrice(link, faction, realm)
     property = tonumber(property) or 0
     factor = tonumber(factor) or 0
     local data = AucAdvanced.API.QueryImage({
-    itemId = itemId,
+        itemId = itemId,
         suffix = property,
         factor = factor,
     })
@@ -605,7 +606,7 @@ function lib.GetPrice(link, faction, realm)
         local auction = AucAdvanced.API.UnpackImageItem(data[j])
         auction.buyoutPrice = (auction.buyoutPrice/auction.stackSize)
         if auction.stackSize == 1 then
-               if auction.sellerName == playerName then
+            if auction.sellerName == playerName then
                 if auction.buyoutPrice < playerLow then
                     playerLow = auction.buyoutPrice
                 end
