@@ -525,7 +525,7 @@ end
 ]]
 local LAG_ADJUST = (3 / 1000)
 local POST_TIMEOUT = 6 -- seconds general timeout
-local POST_ERROR_PAUSE = 6 -- seconds pause after error
+local POST_ERROR_PAUSE = 1 -- seconds pause after error
 local POST_RETRYS = 2 -- Numer of retrys after the original failed attempt. Must never exceed value of POST_TIMEOUT
 local POST_THROTTLE = 0.1 -- time before starting to post the next item in the queue
 function private.ProcessPosts(source)
