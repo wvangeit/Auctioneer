@@ -90,7 +90,7 @@ function lib.OnLoad()
     default("util.glypher.history", 14)
     default("util.glypher.stockdays", 2)
     default("util.glypher.maxstock", 5)
-    default("util.glypher.failratio", 3)
+    default("util.glypher.failratio", 30)
     default("util.glypher.makefornew", 0)
     default("util.glypher.herbprice", 8000)
     default("util.glypher.profitAppraiser", 100)
@@ -180,8 +180,8 @@ function private.SetupConfigGui(gui)
     gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.history",    1, 31, 1, "Consider sales")
     gui:AddTip(id, "Consider sales you've made on all toons from the last number of days selected.")
 
-    gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.failratio", 2, 20, 1, "expired filter")
-    gui:AddTip(id, "The expired:success (slider:1) ratio at which we will not craft glyphs. For failures we go back to the start of BeanCounter history.")
+    gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.failratio", 0, 500, 1, "expired filter")
+    gui:AddTip(id, "The expired:success (slider:1) ratio at which we will not craft glyphs. For failures we go back to the start of BeanCounter history.\nIf set to 0 this feature will be disabled.")
 
     gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.stockdays", 1, 8, 1, "Days to stock")
     gui:AddTip(id, "Number of days worth of glyphs to stock based upon your considered sales")
@@ -513,7 +513,7 @@ function private.cofindGlyphs()
                     if make > 0 then
                         local failedratio
                         if (sold > 0) then failedratio = failed/sold else failedratio = -1 end
-                        if (sold > 0 and failed/sold < failratio) or failed == 0 then
+                        if (sold > 0 and failed/sold < failratio) or failed == 0 or failratio == 0 then
                             table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
                             table.insert(private.Display, {link, make, worthPrice - reagentCost} )
                         end
