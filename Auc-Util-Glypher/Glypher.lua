@@ -666,4 +666,5 @@ function lib.IsValidAlgorithm(link)
     else
 	return true
     end
+    return false
 end
