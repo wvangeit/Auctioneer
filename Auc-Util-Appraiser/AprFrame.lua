@@ -2737,12 +2737,6 @@ function private.CreateFrames()
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
 
-	frame:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
-	frame:SetScript("OnEvent", function()
-        AucAdvanced.Modules.Util.Appraiser.GetOwnAuctionDetails()
-	end)
-
-
 	--If we have a saved column arrangement reapply
 	if get("util.appraiser.columnorder") then
 		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )

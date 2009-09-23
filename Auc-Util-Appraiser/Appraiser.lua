@@ -119,12 +119,6 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 		end
 	end
     if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
-        -- Just to make sure it has the data seeing it likes to not load when you first load the auction house currently
-		if not lib.ownResults and AuctionFrame and AuctionFrame:IsVisible() then
-            lib.GetOwnAuctionDetails()
-        end
-        if not lib.ownResults then return end
-
         local itemName = name
 
         local colored = get('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel
@@ -381,10 +375,13 @@ function private.GetPriceCore(sig, link, serverKey, match)
 	return newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 end
 
--- Called by AprFrame in AUCTION_OWNED_LIST_UPDATE event
+lib.ownResults = {}
+lib.ownCounts = {}
 function lib.GetOwnAuctionDetails()
-	local results = {}
-	local counts = {}
+	local results = lib.ownResults
+	local counts = lib.ownCounts
+	empty(results)
+	empty(counts)
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
 	if totalAuctions >0 then
 		for i=1, totalAuctions do
@@ -412,8 +409,7 @@ function lib.GetOwnAuctionDetails()
 			end
 		end
 	end
-	lib.ownResults = results
-	lib.ownCounts = counts
 end
+Stubby.RegisterEventHook("AUCTION_OWNED_LIST_UPDATE", "Auc-Util-Appraiser", lib.GetOwnAuctionDetails)
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

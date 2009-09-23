@@ -1,6 +1,6 @@
 ## Title: Auc:Util:Appraiser
 ## Interface: 30200
-## Dependencies: Auc-Advanced
+## Dependencies: Stubby, Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
