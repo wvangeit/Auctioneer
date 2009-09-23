@@ -91,7 +91,7 @@ function lib.OnLoad()
     default("util.glypher.stockdays", 2)
     default("util.glypher.maxstock", 5)
     default("util.glypher.failratio", 30)
-    default("util.glypher.makefornew", 0)
+    default("util.glypher.makefornew", 2)
     default("util.glypher.herbprice", 8000)
     default("util.glypher.profitAppraiser", 100)
     default("util.glypher.profitBeancounter", 100)
@@ -194,7 +194,7 @@ function private.SetupConfigGui(gui)
 
     gui:AddControl(id, "Subhead", 0, "New glyph configuration")
 
-    gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.makefornew", 0, 5, 1, "Make new")
+    gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.makefornew", 0, 20, 1, "Make new")
     gui:AddTip(id, "Number of glyphs (probably newly learned) to make when there are zero sales and zero failures in history.")
 
     local weightWords = "for evaluation of new or previously unprofitable glyphs."
