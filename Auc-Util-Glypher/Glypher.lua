@@ -4,7 +4,8 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "Glypher"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+
 local tooltip = LibStub("nTipHelper:1")
 local timeRemaining
 local coFG
@@ -99,6 +100,8 @@ function lib.OnLoad()
     default("util.glypher.pricemodel.active", true) --weltmeister is this still needed?
     default("util.glypher.pricemodel.min", 32500)
     default("util.glypher.pricemodel.max", 999999)
+    default("util.glypher.pricemodel.underpct", 1)
+    default("util.glypher.pricemodel.useundercut", true)
     default("util.glypher.pricemodel.undercut", 1)
     default("util.glypher.pricemodel.whitelist", "")
 
@@ -222,9 +225,15 @@ function private.SetupConfigGui(gui)
     gui:AddTip(id, "The price that Glypher will never go above in order to overcut others")
 
 
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Undercut")
+    gui:AddControl(id, "Slider", 0, 1, "util.glypher.pricemodel.underpct", 0, 20, 0.1, _TRANS('UCUT_Interface_UndercutMinimum').." %g%%")--Undercut:
+
+    gui:AddControl(id, "Checkbox",   0, 1, "util.glypher.pricemodel.useundercut", _TRANS('UCUT_Interface_UndercutAmount') )--Specify undercut amount by coin value
+    gui:AddTip(id, _TRANS('UCUT_HelpTooltip_UndercutAmount') )--Specify the amount to undercut by a specific amount, instead of by a percentage
     --gui:AddControl(id, "Subhead", 0, "Undercut Amount")
-    gui:AddControl(id, "Note", 0, 1, nil, nil, "Undercut Amount")
-    gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.undercut")
+    --gui:AddControl(id, "Note", 0, 1, nil, nil, "Undercut Amount")
+    gui:AddControl(id, "MoneyFramePinned", 0, 2, "util.glypher.pricemodel.undercut", 1, 99999999, _TRANS('UCUT_Interface_CurrentValue') )--Undercut Amount
+    --gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.undercut")
     gui:AddTip(id, "The amount that you undercut others")
 
 
@@ -587,6 +596,8 @@ function lib.GetPrice(link, faction, realm)
     local linkType, itemId, property, factor = AucAdvanced.DecodeLink(link)
     local glypherMin = get("util.glypher.pricemodel.min")
     local glypherMax = get("util.glypher.pricemodel.max")
+    local glypherUnderpct = get("util.glypher.pricemodel.underpct")
+    local glypherUseundercut = get("util.glypher.pricemodel.useundercut")
     local glypherUndercut = get("util.glypher.pricemodel.undercut")
     local glypherWhitelist = get("util.glypher.pricemodel.whitelist")
     if (linkType ~= "item") then return end
@@ -628,7 +639,11 @@ function lib.GetPrice(link, faction, realm)
         end
     end
     local newPrice = glypherMax
-    newPrice = competitorLow - glypherUndercut
+    if glypherUseundercut then
+    	newPrice = competitorLow - glypherUndercut
+    else
+        newPrice = floor(competitorLow*((100-glypherUnderpct)/100))
+    end
     --tshea if whitelistLow < newPrice then
         --tshea newPrice = whitelistLow
     --tshea end
