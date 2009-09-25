@@ -561,6 +561,10 @@ end
 function private.addtoCraft()
     if Skillet and Skillet.QueueAppendCommand then
         if not Skillet.reagentsChanged then Skillet.reagentsChanged = {} end --this required table is nil when we use teh queue
+        if not private.data then
+            print("Glyph list is empty - use Get Profitable first.")
+            return
+        end
         for i, glyph in ipairs(private.data) do
             local command = {}
             --index is needed for skillet to properly make use of our  data
@@ -640,7 +644,7 @@ function lib.GetPrice(link, faction, realm)
     end
     local newPrice = glypherMax
     if glypherUseundercut then
-    	newPrice = competitorLow - glypherUndercut
+        newPrice = competitorLow - glypherUndercut
     else
         newPrice = floor(competitorLow*((100-glypherUnderpct)/100))
     end
@@ -664,7 +668,7 @@ function lib.IsValidAlgorithm(link)
             return true
         end
     else
-	return true
+        return true
     end
     return false
 end
