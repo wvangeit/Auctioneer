@@ -5,7 +5,7 @@
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Matcher module which will modify the Appraiser
-	price, based on past successes and failures as recorded by 
+	price, based on past successes and failures as recorded by
 	BeanCounter.  As an items sells successfully, this matcher will slowly
 	raise the price for future auctions; as your auctions expire without
 	selling, the price will slowly drop.
@@ -56,17 +56,33 @@ function lib.Processor(callbackType, ...)
 		--Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then
 		--Called when your config options (if Configator) have been changed.
+		lib.ClearMatchArrayCache()
+	elseif callbackType == "scanstats" then
+		-- AH has been scanned
+		lib.ClearMatchArrayCache()
+	elseif callbackType == "auctionclose" then
+		lib.ClearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
 	end
 end
 
+
+local matchArrayCache = {}
+
+function lib.ClearMatchArrayCache()	-- called from processor
+	wipe(matchArrayCache)
+end
+
 function lib.GetMatchArray(hyperlink, marketprice)
-	local matchArray = {}
 	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") or not BeanCounter or not BeanCounter.API.isLoaded then --check setting is on, beancounter exists, and that the database is sound
 		return
 	end
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
-	if (factor ~= 0) then property = property.."x"..factor end
+
+	local cacheKey = itemId .."x".. property .. "x" .. factor .. "x" .. marketprice
+	if matchArrayCache[cacheKey] then return matchArrayCache[cacheKey] end
+
+	local matchArray = {}
 
 	local marketdiff = 0
 	local competing = 0
@@ -83,10 +99,10 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	if not daterange then
 		numdays = nil
 	end
-	
+
 	increase = (increase / 100) + 1
 	decrease = (decrease / 100) + 1
-	
+
 	local player =  UnitName("player")
 	local success, failed = BeanCounter.API.getAHSoldFailed(player, hyperlink, numdays)
 
@@ -116,6 +132,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	if AucAdvanced.Settings.GetSetting("match.beancount.showhistory") then
 		matchArray.returnstring = "BeanCount: Succeeded: "..tostring(success).."\nBeanCount: Failed: "..tostring(failed).."\n"..matchArray.returnstring
 	end
+	matchArrayCache[cacheKey] = matchArray
 	return matchArray
 end
 
