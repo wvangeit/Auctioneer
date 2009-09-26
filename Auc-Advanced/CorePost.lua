@@ -72,13 +72,13 @@ local DecodeSig -- to be filled with AucAdvanced.API.DecodeSig when it has loade
 ]]
 local ERROR_NOITEM = "ItemId is empty"
 local ERROR_NOLOCAL = "Item is unknown"
-local ERROR_NOBLANK = "No blank bag spaces available"
+local ERROR_NOBLANK = "Requires a free bag slot that can hold a new stack of this item for posting"
 local ERROR_MAXSIZE = "Item cannot be stacked that high"
 local ERROR_AHCLOSED = "Auctionhouse is not open"
 local ERROR_NOTFOUND = "Item was not found in inventory"
 local ERROR_NOTENOUGH = "Not enough of item available"
 local ERROR_FAILRETRY = "Posting failed too many times"
-local ERROR_FAILTIMEOUT = "Timeout while waiting for posted item to clear"
+local ERROR_FAILTIMEOUT = "Timed out while waiting for posted item to clear from bags"
 
 local ConstErrors = {
 	ERROR_NOITEM = ERROR_NOITEM,
