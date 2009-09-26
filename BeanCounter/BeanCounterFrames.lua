@@ -115,6 +115,11 @@ function private.displayGUI( action )
 		BeanCounterBaseFrame:Show()
 		frame:Show()
 	end
+	--show the last postponed query if one was sent while frame was hidden
+	if private.storedQuery then
+		private.searchByItemID(private.storedQuery)
+		private.storedQuery = nil
+	end
 end
 --Change parent to our GUI base frame/ Also used to display our Config frame
 function private.GUI(_, button)

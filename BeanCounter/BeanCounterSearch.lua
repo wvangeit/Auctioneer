@@ -140,6 +140,12 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		return data --All results are now returned, calling addons can filter
 	end
 	
+	--if BeanCounters frame is not visible then store till we are and cease processing
+	if not private.frame:IsVisible() then
+		private.storedQuery = id
+		return
+	end
+	
 	--store profit for this item, need to do this before we reduce number of results for display
 	local player = private.frame.SelectBoxSetting[2]
 	profit, low, high = lib.API.getAHProfit(player, data)
