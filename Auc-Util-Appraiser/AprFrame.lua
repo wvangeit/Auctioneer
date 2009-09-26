@@ -2566,7 +2566,7 @@ function private.CreateFrames()
 	frame.sellerIgnore.no:SetNormalFontObject(GameFontNormalSmall)
 	frame.sellerIgnore.no:SetPoint("BOTTOMRIGHT", frame.sellerIgnore, "BOTTOMRIGHT", -5, 10)
 	frame.sellerIgnore.no:SetScript("OnClick", function()  frame.sellerIgnore:Hide() end)
-	frame.sellerIgnore.no:SetText("APPR_Interface_No")--No
+	frame.sellerIgnore.no:SetText(_TRANS("APPR_Interface_No"))--No
 	frame.sellerIgnore.no:SetWidth(30)
 	frame.sellerIgnore.no:SetHeight(10)
 	local font = frame.sellerIgnore.no:GetFontString()
