@@ -36,14 +36,17 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Histogram"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
+
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local tonumber,pairs,type,setmetatable=tonumber,pairs,type,setmetatable
+local strsplit,strjoin = strsplit,strjoin
+local min,max,abs,ceil,floor = min,max,abs,ceil,floor
+local concat = table.concat
+local wipe,unpack = wipe,unpack
 
 local data
 local totaldata
-local sessionseen = {}
 local stattable = {}
-local totalstattable = {}
-			for i = 1, 300 do totalstattable[i] = 0 end
 local PDcurve = {}
 local newstats = {}
 local array = {}
@@ -75,6 +78,8 @@ function lib.Processor(callbackType, ...)
 		lib.OnLoad(...)
 	elseif (callbackType == "scanstats") then
 		pricecache = nil
+	elseif callbackType == "auctionclose" then		
+		pricecache = nil	-- not actually needed, just conserving RAM
 	end
 end
 
@@ -147,7 +152,7 @@ end
 
 function lib.GetPrice(link, faction)
 	if not get("stat.histogram.enable") then return end
-	empty(stattable)
+	wipe(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -158,9 +163,7 @@ function lib.GetPrice(link, faction)
 		return
 	end
 	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
-		local median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
-		median, Qone, Qthree, step, count = tonumber(median), tonumber(Qone), tonumber(Qthree), tonumber(step), tonumber(count)
-		return median, Qone, Qthree, step, count
+		return unpack(pricecache[faction][itemId][property])
 	end
 	private.UnpackStats(data[faction][itemId][property])
 	local median, Qone, Qthree, step, count, refactored, percent40, percent30 = private.GetPriceData()
@@ -171,11 +174,11 @@ function lib.GetPrice(link, faction)
 		median, Qone, Qthree, step, count = private.GetPriceData()
 	end
 	--we're done with the data, so clear the table
-	empty(stattable)
+	wipe(stattable)
 	if not pricecache then pricecache = {} end
 	if not pricecache[faction] then pricecache[faction] = {} end
 	if not pricecache[faction][itemId] then pricecache[faction][itemId] = {} end
-	pricecache[faction][itemId][property] = strjoin(",", median or "", Qone or "", Qthree or "", step or "", count or "")
+	pricecache[faction][itemId][property] = {median or false, Qone or false, Qthree or false, step or false, count or false}
 	return median, Qone, Qthree, step, count, percent40, percent30
 end
 
@@ -187,7 +190,7 @@ end
 function lib.GetPriceArray(link, faction)
 	if not get("stat.histogram.enable") then return end
 	--make sure that array is empty
-	empty(array)
+	wipe(array)
 	local median, Qone, Qthree, step, count = lib.GetPrice(link, faction)
 	--these are the two values that GetMarketPrice cares about
 	array.price = median
@@ -204,7 +207,7 @@ end
 
 function private.ItemPDF(price)
 	if not PDcurve["step"] then return 0 end
-	local index = math.floor(price/PDcurve["step"])
+	local index = floor(price/PDcurve["step"])
 	if (index >= PDcurve["min"]) and (index <= PDcurve["max"]) then
 		return PDcurve[index]
 	else
@@ -214,8 +217,8 @@ end
 
 function lib.GetItemPDF(link, faction)
 	if not get("stat.histogram.enable") then return end
-	empty(PDcurve)
-	empty(stattable)
+	wipe(PDcurve)
+	wipe(stattable)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
@@ -226,8 +229,7 @@ function lib.GetItemPDF(link, faction)
 	if not data[faction][itemId][property] then return end
 	local median, Qone, Qthree, step, count, refactored
 	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
-		median, Qone, Qthree, step, count = strsplit(",", pricecache[faction][itemId][property])
-		median, Qone, Qthree, step, count = tonumber(median), tonumber(Qone), tonumber(Qthree), tonumber(step), tonumber(count)
+		median, Qone, Qthree, step, count = unpack(pricecache[faction][itemId][property])
 	end
 
 	private.UnpackStats(data[faction][itemId][property])
@@ -247,11 +249,11 @@ function lib.GetItemPDF(link, faction)
 	if not pricecache then pricecache = {} end
 	if not pricecache[faction] then pricecache[faction] = {} end
 	if not pricecache[faction][itemId] then pricecache[faction][itemId] = {} end
-	pricecache[faction][itemId][property] = strjoin(",", median or "", Qone or "", Qthree or "", step or "", count or "")
+	pricecache[faction][itemId][property] = {median or false, Qone or false, Qthree or false, step or false, count or false}
 	
 	local curcount = 0
 	local area = 0
-	local targetarea = math.min(1, count/30) --if count is less than thirty, we're not very sure about the price
+	local targetarea = min(1, count/30) --if count is less than thirty, we're not very sure about the price
 
 	PDcurve["step"] = step
 	PDcurve["min"] = stattable["min"]-1
@@ -262,7 +264,7 @@ function lib.GetItemPDF(link, faction)
 		if count == stattable[i] then
 			PDcurve[i] = 1
 		else
-			PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+			PDcurve[i] = 1-(abs(2*curcount - count)/count)
 		end
 		area = area + step*PDcurve[i]
 	end
@@ -299,7 +301,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
-	empty(stattable)
+	wipe(stattable)
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
 	if not data[faction][itemId] then data[faction][itemId] = {} end
@@ -309,10 +311,10 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not stattable["count"] then
 		--start out with first 20 prices pushing max to 100.  This should help prevent losing data due to the first price being way too low
 		--also keeps data small initially, as we don't need extremely accurate prices with that little data
-		stattable["step"] = math.ceil(buyout / 100)
+		stattable["step"] = ceil(buyout / 100)
 		stattable["count"] = 0
 	end
-	priceindex = math.ceil(buyout / stattable["step"])
+	priceindex = ceil(buyout / stattable["step"])
 	if stattable["count"] <= 20 then
 		stattable["count"] = stattable["count"] + 1
 		--get the refactoring out of the way first, because we're not capping the price yet
@@ -355,7 +357,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 		stattable[priceindex] = stattable[priceindex] + 1
 		data[faction][itemId][property] = private.PackStats()
 	end
-	empty(stattable)
+	wipe(stattable)
 end
 
 function private.SetupConfigGui(gui)
@@ -536,7 +538,7 @@ function lib.SetWorkingItem(link)
 	frame.link = link
 	frame.icon:SetNormalTexture(texture) --set icon texture
 	
-	empty(stattable)
+	wipe(stattable)
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
 	local faction = AucAdvanced.GetFaction()
@@ -567,7 +569,7 @@ function lib.SetWorkingItem(link)
 	end
 	
 	--now show the PD curve
-	empty(PDcurve)
+	wipe(PDcurve)
 	PDcurve["step"] = stattable["step"]
 	PDcurve["min"] = stattable["min"]
 	PDcurve["max"] = stattable["max"]
@@ -579,7 +581,7 @@ function lib.SetWorkingItem(link)
 		if count == stattable[i] then
 			PDcurve[i] = 1
 		else
-			PDcurve[i] = 1-(math.abs(2*curcount - count)/count)
+			PDcurve[i] = 1-(abs(2*curcount - count)/count)
 		end
 		if PDcurve[i] > maxvalue then
 			maxvalue = PDcurve[i]
@@ -675,7 +677,7 @@ function private.DataLoaded()
 				for itemId, proplist in pairs(itemlist) do
 					for prop, datastring in pairs(proplist) do
 						i = i+1
-						empty(stattable)
+						wipe(stattable)
 						private.UnpackStats(datastring)
 						local _,_,_,_,_,refactored = private.GetPriceData()
 						if refactored then
@@ -693,9 +695,11 @@ function private.DataLoaded()
 	end
 	local co = coroutine.create(findallprices)
 	coroutine.resume(co)
-	local function onupdate()
+	local function onupdate(self)
 		if coroutine.status(co) ~= "dead" then
 			coroutine.resume(co)
+		else
+			self:Hide()	-- stops further onupdates
 		end
 	end
 	local onupdateframe = CreateFrame("Frame")
@@ -708,6 +712,7 @@ function private.makeData()
 	data = AucAdvancedStatHistogramData
 	private.DataLoaded()
 end
+
 function private.makeTotalData()
 	if totaldata then return end
 	AucAdvancedStatHistogramTotalData = ""
@@ -716,7 +721,7 @@ function private.makeTotalData()
 end
 
 function private.UnpackStats(dataItem)
-	empty(stattable)
+	wipe(stattable)
 	if dataItem then
 		local firstvalue, maxvalue, step, count, newdataItem = strsplit(";",dataItem)
 		if not newdataItem then
@@ -740,17 +745,18 @@ function private.UnpackStats(dataItem)
 	end
 end
 
+local meta0 = { __index = function(tbl,key) return 0 end }
 function private.PackStats()
-	local tempstr = ""
-	local datastr = ""
-	local imin = stattable["min"]
-	tempstr = strjoin(";",imin,stattable["max"], stattable["step"], stattable["count"])
-		datastr = tostring(stattable[imin] or 0)--this gets rid of the string starting as ",1,0,0..."
-	for i = imin+1,stattable["max"] do
-		datastr = datastr..","..tostring(stattable[i] or 0)
-	end
-	tempstr = tempstr..";"..datastr
-	return tempstr
+
+	setmetatable(stattable, meta0)	-- Instead of looping through and checking for nil->0. /Mikk
+	
+	local values = concat(stattable, ",", stattable.min, stattable.max)
+	
+	local ret = strjoin(";",stattable.min, stattable.max, stattable.step, stattable.count, values)
+	
+	setmetatable(stattable, nil)	-- I'm not even sure if this needs to be unset, but I don't want to change the behavior of code I don't fully understand, so unsetting it. /Mikk
+	
+	return ret
 end
 
 --private.refactor(pmax, precision)
@@ -765,27 +771,27 @@ function private.refactor(pmax, precision)
 	if type(stattable) ~= "table" or type(pmax)~="number" or pmax == 0 then
 		return
 	end
-	empty(newstats)
-	newstats["step"] = math.ceil(pmax/precision)
+	wipe(newstats)
+	newstats["step"] = ceil(pmax/precision)
 	local conversion = stattable["step"]/newstats["step"]
-	newstats["min"] = math.ceil(conversion*stattable["min"])
-	newstats["max"] = math.ceil(conversion*stattable["max"])
+	newstats["min"] = ceil(conversion*stattable["min"])
+	newstats["max"] = ceil(conversion*stattable["max"])
 	local count = 0
 	if newstats["max"] > 300 then
 		--we need to crop off the top end
 		newstats["max"] = 300
-		stattable["max"] = math.floor(300/conversion)
+		stattable["max"] = floor(300/conversion)
 	end
 	for i = newstats["min"], newstats["max"] do
 		newstats[i] = 0
 	end
 	for i = stattable["min"], stattable["max"] do
-		local j = math.ceil(conversion*i)
+		local j = ceil(conversion*i)
 		if not newstats[j] then newstats[j] = 0 end
 		newstats[j]= newstats[j] + stattable[i]
 		count = count + stattable[i]
 	end
-	empty(stattable)
+	wipe(stattable)
 	for i,j in pairs(newstats) do
 		stattable[i] = j
 	end
