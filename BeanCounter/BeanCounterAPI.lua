@@ -106,6 +106,7 @@ end
 --Cache system for searches
 
 function private.checkSearchCache(name, serverName, playerName)
+	if not name or not serverName or not playerName then return end --nil safe the cache check
 	local SearchCache = private.SearchCache
 	--return cached search
 	name = name:lower() --lower case names for better matching
@@ -115,9 +116,10 @@ function private.checkSearchCache(name, serverName, playerName)
 	end
 end
 function private.addSearchCache(name, data, serverName, playerName)
+	if not name or not serverName or not playerName then return end --nil safe the cache add
 	local SearchCache = private.SearchCache
 	--remove oldest cache entry, only save 5 searches
-	if #SearchCache >= 10 then
+	if #SearchCache >= 100 then
 		--debugPrint("removing",  SearchCache[1] )
 		SearchCache[ SearchCache[1] ] = nil
 		table.remove(SearchCache, 1)

@@ -116,7 +116,7 @@ function private.displayGUI( action )
 		frame:Show()
 	end
 	--show the last postponed query if one was sent while frame was hidden
-	if private.storedQuery then
+	if private.storedQuery and frame:IsVisible() then
 		private.searchByItemID(private.storedQuery)
 		private.storedQuery = nil
 	end
