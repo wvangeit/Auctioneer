@@ -24,6 +24,8 @@ end
 function lib.Processor(callbackType, ...)
     if (callbackType == "config") then
         private.SetupConfigGui(...)
+    elseif (callbackType == "tooltip") then
+        private.ProcessTooltip(...)
     elseif (callbackType == "configchanged") then
         private.ConfigChanged(...)
     elseif (callbackType == "auctionui") then
@@ -104,6 +106,8 @@ function lib.OnLoad()
     default("util.glypher.pricemodel.useundercut", true)
     default("util.glypher.pricemodel.undercut", 1)
     default("util.glypher.pricemodel.whitelist", "")
+    default("util.glypher.altlist", "")
+    default("util.glypher.gvault", "")
 
 --Check to see if we've got a recent enough version of AucAdvanced
     local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -167,8 +171,43 @@ function private.SetupConfigGui(gui)
 
     gui:AddHelp(id, "what is Glypher?",
         "What is Glypher?",
-        "Glyher is a work-in-progress. Its goal is to assist in managing a profitable glyph-based business."
+        "Glyher is a work-in-progress. Its goal is to assist in managing a profitable glyph-based business." 
     )
+
+    local moreHelp = ""
+    local DSa, DSc, DSm
+    if not DataStore then
+        DSa = true
+        DSc = true
+        DSm = true
+    else
+        if not DataStore:IsModuleEnabled("DataStore_Auctions") then
+            DSa = true
+        end
+        if not DataStore:IsModuleEnabled("DataStore_Containers") then
+            DSc = true
+        end
+        if not DataStore:IsModuleEnabled( "DataStore_Mails") then
+            DSm = true
+        end
+    end
+    if DSa then
+        moreHelp = moreHelp .. "Installing the DataStore_Auctions addon will allow Glypher to see auctions of specified alts.\n\n"
+    end
+    if DSc then
+        moreHelp = moreHelp .. "Installing the DataStore_Containers addon will allow Glypher to see bags and banks of specified alts, as well as an optional guild vault.\n\n"
+    end
+    if DSm then
+        moreHelp = moreHelp .. "Installing the DataStore_Mails addon will allow Glypher to see the mailboxes of specified alts.\n\n"
+    end
+    if moreHelp ~= "" then
+        moreHelp = "Optional DataStore addons can improve your business efficiency by seeing what your glyph-handling alts have:\n\n" .. moreHelp
+        gui:AddHelp(id, "More features are available:",
+            "More features are available:",
+            moreHelp
+        )
+    end
+
 
     gui:AddControl(id, "Subhead", 0, "Glypher: Profitable Glyph Utility")
 
@@ -242,6 +281,19 @@ function private.SetupConfigGui(gui)
     gui:AddControl(id, "Text", 0, 1, "util.glypher.pricemodel.whitelist")
     gui:AddTip(id, "The players to whitelist on undercuts (blank for no whitelist, separarate whitelisted users with a ':')") --eventually have a list to edit
 
+    if DataStore then
+        gui:AddControl(id, "Subhead", 0, "DataStore Configuration")
+        
+        gui:AddControl(id, "Note", 0, 1, nil, nil, "Alt list")
+        gui:AddControl(id, "Text", 0, 1, "util.glypher.altlist")
+        gui:AddTip(id, "List of alts which you use for your glyph business, separate alts with a ':'. Leave blank to disable.")
+
+        gui:AddControl(id, "Note", 0, 1, nil, nil, "Guild")
+        gui:AddControl(id, "Text", 0, 1, "util.glypher.gvault")
+        gui:AddTip(id, "Guild name for the vault which you use for your glyph business. Leave blank to disable.")    
+
+
+    end
 
     frame.refreshButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
     frame.refreshButton:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 325, 225)
@@ -311,6 +363,20 @@ function private.SetupConfigGui(gui)
 
 end
 
+function private.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+    if not link then return end
+    if not DataStore then return end
+    frame:SetColor(0.9, 0.3, 0.3)
+    frame:AddLine("Glypher DataStore Debugging")
+    local _, itemId = AucAdvanced.DecodeLink(link)
+    local stock, a = private.GetStock(itemId)
+    local i, v
+    for i, v in ipairs(a) do
+        frame:AddLine(v)
+    end
+    frame:AddLine("Total DataStore stock: " .. stock)
+end
+
 function private.sheetOnEnter(button, row, column)
     local link, name, _
     link = private.frame.glypher.sheet.rows[row][column]:GetText() or "FAILED LINK"
@@ -337,14 +403,25 @@ function private.ConfigChanged(setting, value, ...)
 end
 function private.findGlyphs()
     if not AuctionFrame or not AuctionFrame:IsVisible() then
-        print("Please visit your local auctioneer before using this function.")
-        return
+        if not DataStore or not DataStore:IsModuleEnabled("DataStore_Auctions") then
+            print("Please visit your local auctioneer before using this function.")
+            return
+        end
     end
         if (not coFG) or (coroutine.status(coFG) == "dead") then
                 coFG = coroutine.create(private.cofindGlyphs)
                 onupdateframe = CreateFrame("frame")
+
                 onupdateframe:SetScript("OnUpdate", function()
-                        coroutine.resume(coFG)
+                    local status, result
+                    status = coroutine.status(coFG)
+                    if status ~= "dead" then
+                           status, result = coroutine.resume(coFG)
+                        if not status and result then
+                            error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coFG));
+                        end
+                    end
+
                 end)
 
                 local status, result = coroutine.resume(coFG)
@@ -391,7 +468,13 @@ function private.cofindGlyphs()
         print("Ink cost: " .. inkCost)
     end
 
-    if not private.auctionCount or not BeanCounter then return end
+    if DataStore and not DataStore:IsModuleEnabled("DataStore_Auctions") then
+        if not private.auctionCount or not BeanCounter then 
+            print("Please visit your local auctioneer before using this function. (auc/BC)")
+            private.frame.searchButton:Enable()
+            return
+        end
+    end
 
     private.data = {}
     private.Display = {}
@@ -403,6 +486,12 @@ function private.cofindGlyphs()
     end
     --end lilsparky suggested change
     local numTradeSkills = GetNumTradeSkills()
+    local name = UnitName("player")
+    local realm = GetRealmName()
+    local account = "Default"
+    local currentcharacter = format("%s.%s.%s", account, realm, name)
+    local altList = get("util.glypher.altlist")
+
     for ID = GetFirstTradeSkill(), GetNumTradeSkills() do
         coroutine.yield()
         local pctDone = 100 - floor((numTradeSkills-ID)/numTradeSkills*100)
@@ -423,10 +512,21 @@ function private.cofindGlyphs()
                 if priceAppraiser == 0 then profitAppraiser = 0 end
                 local priceMarket = AucAdvanced.API.GetMarketValue(link) or 0
                 if priceMarket == 0 then profitMarket = 0 end
-                local bcSold = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) or 1 -- avoid divide by zero
-                local bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(UnitName("player"), itemName, historyTime, time()) or 0, 0, 0
-                --local bcSold = BeanCounter.API.getAHSoldFailed("server", link, history) or 1 -- avoid divide by zero
-                --local bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(nil, itemName, historyTime, time()) or 0, 0, 0
+
+                local bcSold = 0
+                local bcProfit = 0
+                if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
+                       for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+                        if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+                            bcSold = bcSold + (BeanCounter.API.getAHSoldFailed(characterName, link, history) or 0)
+                            bcProfit = bcProfit + (BeanCounter.API.getAHProfit(characterName, itemName, historyTime, time()) or 0)
+                        end
+                    end
+                else    
+                    bcSold = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) or 0
+                    bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(UnitName("player"), itemName, historyTime, time()) or 0 
+                end
+
                 local priceBeancounter
                 if bcProfit > 0 and bcSold > 0 then
                     priceBeancounter = floor(bcProfit/bcSold)
@@ -466,11 +566,6 @@ function private.cofindGlyphs()
                     worthPrice = buyoutMin
                 end
 
-                local sold
-                if BeanCounter and BeanCounter.API and BeanCounter.API.isLoaded and BeanCounter.API.getAHSoldFailed then
-                     sold = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) or 0
-                     --sold = BeanCounter.API.getAHSoldFailed(nil, link, history) or 0
-                end
                 local reagentCost = 0
                 --Sum the cost of the mats to craft this item, parchment is not considered its really too cheap to matter
                 local inkMatch = false --only match inks choosen by user
@@ -505,14 +600,13 @@ function private.cofindGlyphs()
 
             --if we match the ink and our profits high enough, check how many we currently have on AH
                 if worthPrice and (worthPrice - reagentCost) >= MinimumProfit and inkMatch then
-                    local currentAuctions = private.auctionCount[itemName] or 0
-                    currentAuctions = currentAuctions + GetItemCount(itemName,true) -- Auctions + Bags + Bank
+                    local currentAuctions = private.GetStock(itemId)
 
-                    local make = floor(sold/history * stockdays + .9) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
+                    local make = floor(bcSold/history * stockdays + .9) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
                     local _, failed = BeanCounter.API.getAHSoldFailed(UnitName("player"), link) or 0, 0
                     --local _, failed = BeanCounter.API.getAHSoldFailed(nil, link) or 0, 0
 
-                    if sold == 0 and failed == 0 and currentAuctions == 0 then
+                    if bcSold == 0 and failed == 0 and currentAuctions == 0 then
                         make = makefornew
                         local mess = "New glyph: " .. link
                         DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
@@ -521,8 +615,8 @@ function private.cofindGlyphs()
                     if (make + currentAuctions) > maxstock then make = (maxstock - currentAuctions) end
                     if make > 0 then
                         local failedratio
-                        if (sold > 0) then failedratio = failed/sold else failedratio = -1 end
-                        if (sold > 0 and failed/sold < failratio) or failed == 0 or failratio == 0 then
+                        if (bcSold > 0) then failedratio = failed/bcSold else failedratio = -1 end
+                        if (bcSold > 0 and failed/bcSold < failratio) or failed == 0 or failratio == 0 then
                             table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
                             table.insert(private.Display, {link, make, worthPrice - reagentCost} )
                         end
@@ -535,7 +629,6 @@ function private.cofindGlyphs()
     private.frame.glypher.sheet:SetData(private.Display, Style)
     private.frame.searchButton:Enable()
     private.frame.searchButton:SetText("Get Profitable")
-
 end
 --store the players current auctions
 function private.storeCurrentAuctions()
@@ -648,9 +741,6 @@ function lib.GetPrice(link, faction, realm)
     else
         newPrice = floor(competitorLow*((100-glypherUnderpct)/100))
     end
-    --tshea if whitelistLow < newPrice then
-        --tshea newPrice = whitelistLow
-    --tshea end
     if newPrice > glypherMax then
         newPrice = glypherMax
     elseif newPrice < glypherMin then
@@ -671,4 +761,58 @@ function lib.IsValidAlgorithm(link)
         return true
     end
     return false
+end
+
+function private.GetStock(itemId)
+    local stockCount = 0
+    local tooltip = {}
+    local name = UnitName("player")
+    local realm = GetRealmName()
+    local account = "Default"
+    local currentcharacter = format("%s.%s.%s", account, realm, name)
+    local altList = get("util.glypher.altlist")
+    local gVault = get("util.glypher.gvault")
+
+    if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
+        for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+            if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+                local add = (DataStore:GetAuctionHouseItemCount(character, itemId) or 0)
+                stockCount = stockCount + add
+--(DataStore:GetAuctionHouseItemCount(character, itemId) or 0)
+                if add > 0 then table.insert(tooltip, "  Auctions " .. characterName .. " = " .. add) end
+            end
+        end
+    else
+        if private.auctionCount and BeanCounter then
+            stockCount = stockCount + (private.auctionCount[itemName] or 0)
+        end
+    end
+    if DataStore and DataStore:IsModuleEnabled("DataStore_Containers") then -- Bags, Bank, and Guild Bank
+        for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+            if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+                local bagCount, bankCount = DataStore:GetContainerItemCount(character, itemId)
+                stockCount = stockCount + bagCount + bankCount
+                if bagCount > 0 then table.insert(tooltip, "  Bags " .. characterName .. " = " .. bagCount) end
+                if bankCount > 0 then table.insert(tooltip, "  Bank " .. characterName .. " = " .. bankCount) end
+            end
+        end
+        if gVault ~= "" then
+            local guildCount =  DataStore:GetGuildBankItemCount(itemId, gVault, realm, account) or 0
+            stockCount = stockCount + guildCount    
+            if guildCount > 0 then table.insert(tooltip, "  Vault " .. gVault .. " = " .. guildCount) end
+        end
+    else
+        stockCount = stockCount + GetItemCount(itemId, true)
+    end
+    if DataStore and DataStore:IsModuleEnabled("DataStore_Mails") then -- Mails
+        for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+            if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+                local add = (DataStore:GetMailItemCount(character, itemId) or 0)
+                stockCount = stockCount + add
+--(DataStore:GetAuctionHouseItemCount(character, itemId) or 0)
+                if add > 0 then table.insert(tooltip, "  Mail " .. characterName .. " = " .. add) end
+            end
+        end
+    end
+    return stockCount, tooltip
 end
