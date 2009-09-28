@@ -46,13 +46,12 @@ local GetFaction = AucAdvanced.GetFaction
 local assert = assert
 local tinsert = tinsert
 local sqrt = sqrt
-local select = select
-local unpack = unpack
-local ipairs = ipairs
-local pairs = pairs
+local select,ipairs,pairs,unpack,type,wipe = select,ipairs,pairs,unpack,type,wipe
 local tonumber = tonumber
 local strsplit = strsplit
-local tconcat = table.concat
+local time = time
+local concat = table.concat
+local strmatch = strmatch
 
 -- Internal variables
 local SPRealmData
@@ -60,7 +59,7 @@ local SPRealmData
 local pricecache = setmetatable({}, {__mode="v"})
 
 function private.ClearCache()
-	empty(pricecache)
+	wipe(pricecache)
 end
 
 function lib.CommandHandler(command, ...)
@@ -141,57 +140,51 @@ end
 -- @return The estimated population mean
 -- @return The estimated population standard deviation
 -- @return The number of views found to base the standard deviation upon
+
+local dataset = {}
+
 function private.EstimateStandardDeviation(hyperlink, serverKey)
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 
 	if not seenDays then return end
 
-    local dataset = {}
     local count = 0
     if dayAverage then --[[dayAverage should never be nil at this point. It may be 0 if item has not been seen today - does that mess up the stats?]]
-        tinsert(dataset, dayAverage);
         count = count + 1
+        dataset[count] = dayAverage
     end
     if seenDays >= 3 then
-        tinsert(dataset, avg3);
         count = count + 1
+        dataset[count] = avg3
         if seenDays >= 7 then
-            tinsert(dataset, avg7);
             count = count + 1
+            dataset[count] = avg7
             if seenDays >= 14 then
-                tinsert(dataset, avg14);
                 count = count + 1
+                dataset[count] = avg14
            end
         end
     end
 
-    if #dataset == 0 then                               -- No data
+    if count == 0 then                               -- No data
          print(_TRANS('PURC_Interface_WarningPurchasedEmpty'):format(hyperlink) )--Warning: Purchased dataset for %s is empty.
-        return;
+        return
     end
 
-    local mean = private.sum(unpack(dataset))/#dataset;
-    local variance = 0;
-    for k,v in ipairs(dataset) do
-        variance = variance + (mean - v)^2;
+    local mean = 0
+	for i=1,count do
+		mean = mean + dataset[count]
+	end
+	mean = mean / count
+
+    local variance = 0
+	for i=1,count do
+        variance = variance + (mean - dataset[count])^2
     end
 
-    return mean, sqrt(variance), count;
+    return mean, sqrt(variance), count
 end
 
--- Simple function to total all of the values in the tuple
--- @param ... The values to add. Note: tonumber() is called
--- on all passed in values. Type checking is not performed.
--- This may result in silent failures.
--- @return The sum of all of the values passed in
-function private.sum(...)
-    local total = 0;
-    for x = 1, select('#', ...) do
-        total = total + select(x, ...);
-    end
-
-    return total;
-end
 
 local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- Gets the PDF curve for a given item. This curve indicates
@@ -214,15 +207,15 @@ function lib.GetItemPDF(hyperlink, serverKey)
     local mean, stddev, count = private.EstimateStandardDeviation(hyperlink, serverKey)
 
     if stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
-        return;                         -- No available data or cannot estimate
+        return ;                         -- No available data or cannot estimate
     end
 
     if not count or count == 0 then
-    print(mean)
-    print(stddev)
-    print(count)
-    print(_TRANS('PURC_Interface_CountBroken') ..hyperlink)--count broken! for
-    count = 1
+	    print(mean)
+	    print(stddev)
+	    print(count)
+	    print(_TRANS('PURC_Interface_CountBroken') ..hyperlink)--count broken! for
+	    count = 1
     end
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
     -- the std dev is 100% of the mean divided by square root of number of views
@@ -279,7 +272,7 @@ end
 local pricearray={} -- used to return stuff in
 function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
-	empty(pricearray)
+	wipe(pricearray)
 
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
@@ -495,15 +488,15 @@ end
 
 local tmp={}
 function private.PackStats(data)
-	local n=1
+	local n=0
 	for property, info in pairs(data) do
-		tmp[n]=property
-		tmp[n+1]=":"
-		tmp[n+2]=strjoin(";", unpack(info))
-		tmp[n+3]=","
+		tmp[n+1]=property
+		tmp[n+2]=":"
+		tmp[n+3]=concat(info, ";")
+		tmp[n+4]=","
 		n=n+4
 	end
-	return table.concat(tmp, "", 1, n-2)   -- n-2 to skip last ","
+	return concat(tmp, "", 1, n-1)   -- n-1 to skip last ","
 end
 
 -- The following Functions are the routines used to access the permanent store data
@@ -519,7 +512,7 @@ function private.UpgradeDb()
 		for realm, realmData in pairs (AucAdvancedStatPurchasedData.RealmData) do
 			if type(realm) == "string" and type(realmData) == "table" then
 				for faction, data in pairs (realmData) do
-					if type(faction) == "string" and type(data) == "table" and strfind(faction, "^%u%l+$") then
+					if type(faction) == "string" and type(data) == "table" and strmatch(faction, "^%u%l+$") then
 						-- looks like a valid realm/faction combination
 						local serverKey = realm.."-"..faction
 						local stats = data.stats
@@ -590,7 +583,7 @@ end
 function private.GetPriceData(serverKey)
 	local data = SPRealmData[serverKey]
 	if not data then
-		if type(serverKey) ~= "string" or not strfind(serverKey, ".%-%u%l") then
+		if type(serverKey) ~= "string" or not strmatch(serverKey, ".%-%u%l") then
 			error("Invalid serverKey passed to Stat-Purchased")
 		end
 		data = {means = {}, daily = {created = time()}}
@@ -612,7 +605,7 @@ function private.InitData()
 
 	-- Data maintenance
 	for serverKey, data in pairs(SPRealmData) do
-		if type(serverKey) ~= "string" or not strfind(serverKey, ".%-%u%l") then
+		if type(serverKey) ~= "string" or not strmatch(serverKey, ".%-%u%l") then
 			-- not a valid serverKey - remove it
 			SPRealmData[serverKey] = nil
 		else
