@@ -34,7 +34,12 @@ if not AucAdvanced then return end
 local libType, libName = "Match", "Undercut"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
+
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local floor,min,max,ceil = floor,min,max,ceil
+local tonumber,tostring,next = tonumber,tostring,next
+
+
 local pricecache --only used for tooltip info, as that's the only place where we know that the starting price will remain the same
 
 function lib.Processor(callbackType, ...)
@@ -48,11 +53,26 @@ function lib.Processor(callbackType, ...)
 		--Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then
 		--Called when your config options (if Configator) have been changed.
+		lib.ClearMatchArrayCache()
 		pricecache = nil
 	elseif (callbackType == "scanstats") then
+		-- AH has been scanned
+		lib.ClearMatchArrayCache()
 		pricecache = nil
+	elseif callbackType == "auctionclose" then
+		lib.ClearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
 	end
 end
+
+local matchArrayCache = {}
+
+function lib.ClearMatchArrayCache()	-- called from processor
+	if next(matchArrayCache) then
+		matchArrayCache = {}
+	end
+end
+
+local playerName = UnitName("player")
 
 function lib.GetMatchArray(hyperlink, marketprice)
 	if not AucAdvanced.Settings.GetSetting("match.undercut.enable") then
@@ -61,6 +81,10 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 
+	local cacheKey = itemId .."x".. property .. "x" .. factor .. "x" .. (marketprice or "0")
+	if matchArrayCache[cacheKey] then return matchArrayCache[cacheKey] end
+	
+	
 	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
 	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
 	local usevalue = AucAdvanced.Settings.GetSetting("match.undercut.usevalue")
@@ -70,7 +94,6 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	else
 		undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
 	end
-	local playerName = UnitName("player")
 	local marketdiff = 0
 	local competing = 0
 	local matchprice = 0
@@ -146,6 +169,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	end
 	matchArray.competing = competing
 	matchArray.diff = marketdiff
+	matchArrayCache[cacheKey] = matchArray
 	return matchArray
 end
 
