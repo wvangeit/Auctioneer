@@ -37,7 +37,14 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
+
 local empty = wipe
+local ipairs,pairs,type,select = ipairs,pairs,type,select
+local tostring,tonumber = tostring,tonumber
+local floor,ceil,abs = floor,ceil,abs
+local strmatch,format = strmatch,format
+local tinsert,tremove = tinsert,tremove
+-- GLOBALS: this, CreateFrame, GameTooltip
 
 -- Our official name:
 AucSearchUI = lib
@@ -308,7 +315,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 			local success, returnvalue, value = lib.SearchItem(name, ItemTable, true, true)
 			if success then
 				if value then
-					tooltip:AddLine("  "..name.." profit:"..math.floor(100*returnvalue/value).."%:", returnvalue, 1, 0.7, 0.3)
+					tooltip:AddLine("  "..name.." profit:"..floor(100*returnvalue/value).."%:", returnvalue, 1, 0.7, 0.3)
 				elseif returnvalue then
 					tooltip:AddLine("  "..name.." profit:", returnvalue, 1, 0.7, 0.3)
 				else
@@ -379,6 +386,7 @@ local function isGlobalSetting(setting)
 	local a,b,c = strsplit(".", setting)
 	if a == "configator" then return true end
 	if a == "global" then return true end
+	return
 end
 
 local function setter(setting, value)
@@ -610,7 +618,7 @@ function private.removeline()
 			break
 		end
 	end
-	table.remove(private.sheetData, gui.sheet.selected)
+	tremove(private.sheetData, gui.sheet.selected)
 	--gui.frame.remove:Disable()
 	gui.sheet.selected = nil
 	gui.sheet:SetData(private.sheetData)
@@ -630,7 +638,7 @@ end
 
 function private.cropreason(reason)
 	if reason then
-		reason = string.split(":", reason)
+		reason = strsplit(":", reason)
 		return reason
 	end
 end
@@ -652,9 +660,9 @@ function private.buyfirst()
 		return
 	end
 	lib.UpdateControls()
-	if string.match(private.data.reason, ":buy") then
+	if strmatch(private.data.reason, ":buy") then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
-	elseif string.match(private.data.reason, ":bid") then
+	elseif strmatch(private.data.reason, ":bid") then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.bid, private.cropreason(private.data.reason))
 	elseif private.data.buyout > 0 then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, private.data.buyout, private.cropreason(private.data.reason))
@@ -677,9 +685,9 @@ function private.purchase()
 	balance = balance - bidqueue --account for money we've already "spent"
 
 	local price = 0
-	if string.match(private.data.reason, ":buy") then
+	if strmatch(private.data.reason, ":buy") then
 		price = private.data.buyout
-	elseif string.match(private.data.reason, ":bid") then
+	elseif strmatch(private.data.reason, ":bid") then
 		price = private.data.bid
 	elseif private.data.buyout > 0 then
 		price = private.data.buyout
@@ -710,9 +718,9 @@ function private.purchaseall()
 		balance = balance - bidqueue --account for money we've already "spent"
 
 		local price = 0
-		if string.match(private.data.reason, ":buy") then
+		if strmatch(private.data.reason, ":buy") then
 			price = private.data.buyout
-		elseif string.match(private.data.reason, ":bid") then
+		elseif strmatch(private.data.reason, ":bid") then
 			price = private.data.bid
 		elseif private.data.buyout > 0 then
 			price = private.data.buyout
@@ -730,9 +738,9 @@ end
 function private.ignore()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
 	local price
-	if string.match(private.data.reason, ":buy") then
+	if strmatch(private.data.reason, ":buy") then
 		price = private.data.buyout
-	elseif string.match(private.data.reason, ":bid") then
+	elseif strmatch(private.data.reason, ":bid") then
 		price = private.data.bid
 	elseif private.data.buyout > 0 then
 		price = private.data.buyout
@@ -740,7 +748,7 @@ function private.ignore()
 		price = private.data.bid
 	end
 	local count = private.data.stack or 1
-	price = math.floor(price/count)
+	price = floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price)
 	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 	private.removeline()
@@ -755,9 +763,9 @@ end
 
 --a bid was cancelled, so ignore for session
 function private.bidcancelled(callbackstring)
-	local link, price, count = string.split(";", callbackstring)
+	local link, price, count = strsplit(";", callbackstring)
 	local sig = AucAdvanced.API.GetSigFromLink(link)
-	local price = math.floor(price/count) - 1
+	local price = floor(price/count) - 1
 	if AucSearchUI.Filters.ItemPrice then
 		AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
 		print("SearchUI now ignoring "..link.." at "..AucAdvanced.Coins(price, true).." for the session")
@@ -768,9 +776,9 @@ end
 function private.ignoretemp()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
 	local price
-	if string.match(private.data.reason, ":buy") then
+	if strmatch(private.data.reason, ":buy") then
 		price = private.data.buyout
-	elseif string.match(private.data.reason, ":bid") then
+	elseif strmatch(private.data.reason, ":bid") then
 		price = private.data.bid
 	elseif private.data.buyout > 0 then
 		price = private.data.buyout
@@ -778,7 +786,7 @@ function private.ignoretemp()
 		price = private.data.bid
 	end
 	local count = private.data.stack or 1
-	price = math.floor(price/count)
+	price = floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
 	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true).." for the session")
 	private.removeline()
@@ -787,9 +795,9 @@ end
 function private.snatch()
 	local link = private.data.link
 	local price
-		if string.match(private.data.reason, ":buy") then
+		if strmatch(private.data.reason, ":buy") then
 		price = private.data.buyout
-	elseif string.match(private.data.reason, ":bid") then
+	elseif strmatch(private.data.reason, ":bid") then
 		price = private.data.bid
 	elseif private.data.buyout > 0 then
 		price = private.data.buyout
@@ -797,14 +805,14 @@ function private.snatch()
 		price = private.data.bid
 	end
 	local count = private.data.stack or 1
-	price = math.floor(price/count) + 1 -- +1 so the current item also matches the search
+	price = floor(price/count) + 1 -- +1 so the current item also matches the search
 	lib.Searchers.Snatch.AddSnatch(link,price)
 	print("SearchUI will now snatch "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 end
 
 local function keyPairs(t,f)
 	local a, i = {}, 0
-	for n in pairs(t) do table.insert(a, n) end
+	for n in pairs(t) do tinsert(a, n) end
 	table.sort(a, f)
 	local iter = function ()
 		i = i + 1
@@ -1139,7 +1147,7 @@ function lib.MakeGuiConfig()
 		local items = {}
 		if (saves) then
 			for name, sdata in keyPairs(saves) do
-				table.insert(items, name)
+				tinsert(items, name)
 			end
 		end
 		return items
@@ -1230,8 +1238,8 @@ function lib.MakeGuiConfig()
 				gui.frame.bid:Disable()
 			end
 		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable
-			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < math.ceil(private.data.curbid*1.05) then
-				MoneyInputFrame_SetCopper(gui.frame.bidbox, math.ceil(private.data.curbid*1.05))
+			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < ceil(private.data.curbid*1.05) then
+				MoneyInputFrame_SetCopper(gui.frame.bidbox, ceil(private.data.curbid*1.05))
 			end
 			gui.frame.bid:Enable()
 		end
@@ -1685,10 +1693,10 @@ end
 --lib.SearchItem(searcherName, item, nodupes)
 --purpose: handles sending the item to the specified searcher, and if necessary, adds it to the SearchUI results
 --nodupes is boolean flag.  If true, no duplicate checking is done.  This flag is true for searching from the cache, but false for realtime.
---debugonly is boolean flag, If true, nothing gets added to the results list
+--skipresults is boolean flag, If true, nothing gets added to the results list
 --returns true, value, profit when successful
 --returns false, reason when not
-function lib.SearchItem(searcherName, item, nodupes, debugonly)
+function lib.SearchItem(searcherName, item, nodupes, skipresults)
 	if not searcherName or not item or #item == 0 then
 		return
 	end
@@ -1779,6 +1787,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 			--Check to see whether the item already exists in the results table
 			local isdupe = false
 			if not nodupes then
+				
 				if not private.sheetData then
 					private.sheetData = {}
 				end
@@ -1787,6 +1796,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 						isdupe = true
 					end
 				end
+				 
 			end
 			if nodupes or (not isdupe) then
 				local level, _, r, g, b
@@ -1806,7 +1816,7 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 						g = g*255
 						b = b*255
 						--first color code here is for sorting purposes
-						pctstring = string.format("|cff%06d|cff%02x%02x%02x"..math.floor(level), 100*level, r, g, b)
+						pctstring = format("|cff%06d|cff%02x%02x%02x"..floor(level), 100*level, r, g, b)
 						pct = pctstring
 					end
 				end
@@ -1817,8 +1827,8 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 				local cur = item[Const.CURBID] or 0
 				local buy = item[Const.BUYOUT] or 0
 				local price = item[Const.PRICE] or 0
-				if not debugonly then
-					table.insert(private.sheetData, {
+				if not skipresults then
+					tinsert(private.sheetData, {
 						item[Const.LINK],
 						item["pct"],
 						item["profit"],
@@ -1835,12 +1845,6 @@ function lib.SearchItem(searcherName, item, nodupes, debugonly)
 						min/count,
 						cur/count
 					})
-					gui.sheet:SetData(private.sheetData)
-					if #private.sheetData == 1 then --sheet was empty, so select the just added auction
-						gui.sheet.selected = 1
-						gui.sheet:Render() --need to redraw, so the selection looks right
-						lib.UpdateControls()
-					end
 				end
 				return true, item["profit"], value
 			end
@@ -1864,7 +1868,7 @@ local PerformSearch = function()
 	speed = (speed / 100)^2.5
 	local processingTime = speed * 0.1 + 0.02
 	local GetTime = GetTime
-	local lastPause = GetTime()
+	local nextPause = GetTime() + processingTime
 
 	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
@@ -1876,22 +1880,48 @@ local PerformSearch = function()
 
 	--clear the results table
 	private.removeall()
+	local repaintSheet = false
+	local nextRepaint = 0	-- can do it immediately
 
 	private.isSearching = true
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(scandata.image) do
-		if GetTime() - lastPause > processingTime then
+		if GetTime() > nextPause then
 			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
+			 
 			coroutine.yield()
-			lastPause = GetTime()
+			
+			nextPause = GetTime() + processingTime
 			if private.SearchCancel then
 				private.SearchCancel = nil
 				break
 			end
+			if repaintSheet and GetTime()>=nextRepaint then
+				local b=GetTime()
+				gui.sheet:SetData(private.sheetData)
+				if #private.sheetData == 1 then --sheet was empty, so select the just added auction
+					gui.sheet.selected = 1
+					gui.sheet:Render() --need to redraw, so the selection looks right
+					lib.UpdateControls()
+				end
+				repaintSheet = false
+				local e=GetTime()
+				nextRepaint = e + ((e-b)*10)  -- only let repainting consume 10% of our total CPU
+			end
 		end
-		lib.SearchItem(searcher.name, data, true)
+		if lib.SearchItem(searcher.name, data, true) then
+			repaintSheet = true
+		end
 	end
+
+	gui.sheet:SetData(private.sheetData)
+	if #private.sheetData == 1 then --sheet was empty, so select the just added auction
+		gui.sheet.selected = 1
+		gui.sheet:Render() --need to redraw, so the selection looks right
+		lib.UpdateControls()
+	end
+	
 	private.isSearching = false
 	empty(SettingCache)
 	gui.frame.progressbar:Hide()
