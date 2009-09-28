@@ -33,6 +33,7 @@
 --]]
 
 local libType, libName = "Util", "SearchUI"
+local AucAdvanced = AucAdvanced
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
@@ -635,6 +636,15 @@ function private.removeall()
 	gui.sheet:Render() --need to redraw, so the selection looks right
 	lib.UpdateControls()
 end
+
+function private.repaintSheet()
+	gui.sheet:SetData(private.sheetData)
+	if #private.sheetData == 1 then --sheet was empty, so select the just added auction
+		gui.sheet.selected = 1
+		gui.sheet:Render() --need to redraw, so the selection looks right
+		lib.UpdateControls()
+	end
+end	
 
 function private.cropreason(reason)
 	if reason then
@@ -1899,12 +1909,7 @@ local PerformSearch = function()
 			end
 			if repaintSheet and GetTime()>=nextRepaint then
 				local b=GetTime()
-				gui.sheet:SetData(private.sheetData)
-				if #private.sheetData == 1 then --sheet was empty, so select the just added auction
-					gui.sheet.selected = 1
-					gui.sheet:Render() --need to redraw, so the selection looks right
-					lib.UpdateControls()
-				end
+				private.repaintSheet()
 				repaintSheet = false
 				local e=GetTime()
 				nextRepaint = e + ((e-b)*10)  -- only let repainting consume 10% of our total CPU
@@ -1915,12 +1920,7 @@ local PerformSearch = function()
 		end
 	end
 
-	gui.sheet:SetData(private.sheetData)
-	if #private.sheetData == 1 then --sheet was empty, so select the just added auction
-		gui.sheet.selected = 1
-		gui.sheet:Render() --need to redraw, so the selection looks right
-		lib.UpdateControls()
-	end
+	private.repaintSheet()
 	
 	private.isSearching = false
 	empty(SettingCache)
