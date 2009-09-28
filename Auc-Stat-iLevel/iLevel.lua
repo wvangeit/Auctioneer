@@ -37,7 +37,13 @@ local libType, libName = "Stat", "iLevel"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
-local empty = wipe
+
+local select,next,pairs,ipairs,type,unpack,wipe = select,next,pairs,ipairs,type,unpack,wipe
+local tonumber,tostring,strsplit,strjoin = tonumber,tostring,strsplit,strjoin
+local floor,abs,max = floor,abs,max
+local concat = table.concat
+local strmatch = strmatch
+
 local iTypes = AucAdvanced.Const.InvTypes
 local GetFaction = AucAdvanced.GetFaction
 
@@ -145,8 +151,12 @@ end
 local weakmeta = {__mode="kv"}
 local pricecache = setmetatable({}, weakmeta)
 function private.ResetCache()
-	empty(pricecache)
+	wipe(pricecache)
 end
+
+local datapoints_price = {}   -- used temporarily in .GetPrice() to avoid unpacking strings multiple times
+local datapoints_stack = {}
+
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.ilevel.enable") then return end
 	local itemSig, iLevel = private.GetItemDetail(hyperlink)
@@ -173,6 +183,8 @@ function lib.GetPrice(hyperlink, serverKey)
 		price = tonumber(price) or 0
 		stack = tonumber(stack) or 1
 		if (stack < 1) then stack = 1 end
+		datapoints_price[i] = price
+		datapoints_stack[i] = stack
 		total = total + tonumber(price)
 		number = number + stack
 	end
@@ -182,33 +194,26 @@ function lib.GetPrice(hyperlink, serverKey)
 
 	variance = 0
 	for i = 1, count do
-		local price, stack = strsplit("/", stats[iLevel][i])
-		price = tonumber(price) or 0
-		stack = tonumber(stack) or 1
-		if (stack < 1) then stack = 1 end
-		variance = variance + ((mean - price/stack) ^ 2);
+		variance = variance + ((mean - datapoints_price[i]/datapoints_stack[i]) ^ 2);
 	end
 
 	variance = variance / count;
 	stdev = variance ^ 0.5
-	total = 0
 
 	local deviation = 1.5 * stdev
-
+	total = 0	-- recomputing with only data within deviation
 	number = 0
+	
 	for i = 1, count do
-		local price, stack = strsplit("/", stats[iLevel][i])
-		price = tonumber(price) or 0
-		stack = tonumber(stack) or 1
-		if (stack < 1) then stack = 1 end
-		if (math.abs(price - mean) < deviation) then
+		local price,stack = datapoints_price[i], datapoints_stack[i]
+		if abs((price/stack) - mean) < deviation then
 			total = total + price
 			number = number + stack
 		end
 	end
 
 	confidence = .01
-	if (number > 0) then
+	if (number > 0) then	-- number<1  will happen if we have e.g. two big clusters: one at 1g and one at 10g
 		average = total / number
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
@@ -225,7 +230,7 @@ local array = {}
 function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.ilevel.enable") then return end
 	-- Clean out the old array
-	empty(array)
+	wipe(array)
 
 	-- Get our statistics
 	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
@@ -419,7 +424,7 @@ function private.GetUnpackedStats(serverKey, itemSig, writing)
 
 	local realmdata = ILRealmData[serverKey]
 	if not realmdata then
-		if type(serverKey) ~= "string" or not strfind (serverKey, ".%-%u%l") then
+		if type(serverKey) ~= "string" or not strmatch(serverKey, ".%-%u%l") then
 			error("Invalid serverKey passed to Stat-iLevel")
 		end
 		realmdata = {}
@@ -467,12 +472,11 @@ function private.UnpackStatIter(data, ...)
 		local property, info = strsplit(":", v)
 		property = tonumber(property) or property
 		if (property and info) then
-			data[property] = {strsplit(";", info)}
-			local item
-			for i=1, #data[property] do
-				item = data[property][i]
-				data[property][i] = tonumber(item) or item
+			local t= {strsplit(";", info)}
+			for k,v in ipairs(t) do
+				t[k] = tonumber(v) or v
 			end
+			data[property] = t
 		end
 	end
 end
@@ -483,15 +487,15 @@ function private.UnpackStats(data, item)
 	end
 	return stats
 end
+local tmp={}
 function private.PackStats(data)
-	local stats = ""
-	local joiner = ""
+	local ntmp=0
 	for property, info in pairs(data) do
-		local n = max(1, #info - KEEP_NUM_POINTS)
-        stats = stats..joiner..property..":"..strjoin(";", select(n, unpack(info)))
-		joiner = ","
+		ntmp=ntmp+1
+		local n = max(1, #info - KEEP_NUM_POINTS + 1)
+        tmp[ntmp] = property..":"..concat(info, ";", n)
 	end
-	return stats
+	return concat(tmp, ",", 1, ntmp)
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
