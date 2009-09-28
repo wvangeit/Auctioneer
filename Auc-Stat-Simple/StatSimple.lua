@@ -36,10 +36,10 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "Simple"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
+
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local GetFaction = AucAdvanced.GetFaction
-local empty = wipe
 
 -- Eliminate some global lookups
 local select = select
@@ -50,6 +50,11 @@ local tinsert = table.insert
 local assert = assert
 local tonumber = tonumber
 local pairs = pairs
+local type,time,wipe,ceil = type,time,wipe,ceil
+local concat=table.concat
+local strsplit,strfind=strsplit,strfind
+-- GLOBALS: AucAdvancedStatSimpleData
+
 
 -- local reference to our saved stats table
 local SSRealmData
@@ -108,6 +113,9 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	data.daily[itemId] = private.PackStats(stats)
 end
 
+
+local dataset = {}
+
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.simple.enable") then return end
 	
@@ -120,8 +128,9 @@ function lib.GetPrice(hyperlink, serverKey)
 	local dayTotal, dayCount, dayAverage, minBuyout = 0,0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14, avgmins = 0,0,0,0,0,0
 	-- Stddev calculations for market price
-	local count, daysUsed, k, v = 0, 0, 0, 0 -- used to keep running track of which daily averages we have
-	local dataset = {}
+	local count=0	-- index into dataset[] (living static outside the function)
+	local daysUsed =  0 -- used to keep running track of which daily averages we have
+	
 	
 	if data.daily[itemId] then
 		local stats = private.UnpackStats(data.daily[itemId])
@@ -130,7 +139,8 @@ function lib.GetPrice(hyperlink, serverKey)
 			dayAverage = dayTotal/dayCount
 			if not minBuyout then minBuyout = 0 end
 			-- Stddev calculations for market price
-			tinsert(dataset,dayAverage)
+			count=count+1
+			dataset[count] = dayAverage
 			daysUsed = 1
 		end
 	end
@@ -141,40 +151,46 @@ function lib.GetPrice(hyperlink, serverKey)
 			if not avgmins then avgmins = 0 end
 			-- Stddev calculations for market price
 			if seenDays >= 3 then
-				for count = 1, 3-daysUsed do
-					tinsert(dataset, avg3);
+				for n = 1, 3-daysUsed do
+					count=count+1
+					dataset[count] = avg3
 				end
 				daysUsed = 3
 			end
 			if seenDays >= 7 then
-				for count = 1, 7-daysUsed do
-					tinsert(dataset, avg7);
+				for n = 1, 7-daysUsed do
+					count=count+1
+					dataset[count] = avg7
 				end
 				daysUsed = 7
 			end
 			if seenDays >= 14 then
-				for count = 1, 14-daysUsed do
-					tinsert(dataset, avg14);
+				for n = 1, 14-daysUsed do
+					count=count+1
+					dataset[count] = avg14
 				end
 				daysUsed = 14
 			end
 		end
 	end
 	local mean = 0
-	if dataset and #dataset > 0 then
-		mean = private.sum(unpack(dataset))/#dataset;
+	if count > 0 then
+		for n=1,count do
+			mean=mean+dataset[n]
+		end
+		mean = mean/count
 	end
-	local variance = 0;
-	for k,v in ipairs(dataset) do
-		variance = variance + (mean - v)^2;
-	end
-	if #dataset == 1 then
+	local variance = 0
+	if count == 1 then
 		variance = 0
 	else
-		variance = variance/(#dataset-1)
+		for n=1,count do
+			variance = variance + (mean - dataset[n])^2;
+		end
+		variance = sqrt(variance/(count-1))
 	end
 	
-	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, sqrt(variance)
+	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, variance
 end
 
 function lib.GetPriceColumns()
@@ -185,7 +201,7 @@ local array = {}
 function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.simple.enable") then return end
 	-- Clean out the old array
-	empty(array)
+	wipe(array)
 	
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
@@ -241,7 +257,7 @@ function lib.GetItemPDF(hyperlink, serverKey)
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
 	
 	if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
-		return;                         -- No available data or cannot estimate
+		return ;                         -- No available data or cannot estimate
 	end
 	
 	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
@@ -523,14 +539,14 @@ function private.UnpackStats(dataItem)
 	return data
 end
 
+local tmp={}
 function private.PackStats(data)
-	local stats = ""
-	local joiner = ""
+	local n=0
 	for property, info in pairs(data) do
-		stats = stats..joiner..property..":"..strjoin(";", unpack(info))
-		joiner = ","
+		n=n+1
+		tmp[n]=property..":"..concat(info, ";")
 	end
-	return stats
+	return concat(tmp,",",1,n)
 end
 
 -- The following Functions are the routines used to access the permanent store data
@@ -644,18 +660,5 @@ function private.InitData()
 	end
 end
 
--- Simple function to total all of the values in the tuple
--- @param ... The values to add. Note: tonumber() is called
--- on all passed in values. Type checking is not performed.
--- This may result in silent failures.
--- @return The sum of all of the values passed in
-function private.sum(...)
-	local total = 0;
-	for x = 1, select('#', ...) do
-		total = total + select(x, ...);
-	end
-	
-	return total;
-end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
