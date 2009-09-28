@@ -980,9 +980,9 @@ function lib.CreateAuctionFrames()
 	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
 	frame:SetPoint("BOTTOMRIGHT", AuctionFrame, "BOTTOMRIGHT")
 
-	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.title:SetPoint("TOP", frame,  "TOP", 0, -20)
-	frame.title:SetText("SearchUi - Auction search interface.")
+	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	frame.title:SetPoint("TOP", frame,  "TOP", 20, -17)
+	frame.title:SetText("SearchUI - Auction search interface")
 
 	local myTabName = "AuctionFrameTabUtilSearchUi"
 	frame.tab = CreateFrame("Button", myTabName, AuctionFrame, "AuctionTabTemplate")
@@ -1026,16 +1026,24 @@ function lib.CreateAuctionFrames()
 	frame.backing:SetBackdrop({ bgFile="Interface\\AddOns\\Auc-Advanced\\Textures\\BlackBack", edgeFile="Interface\\AddOns\\Auc-Advanced\\Textures\\WhiteCornerBorder", tile=1, tileSize=8, edgeSize=8, insets={left=3, right=3, top=3, bottom=3} })
 	frame.backing:SetBackdropColor(0,0,0, 0.60)
 
---[[
-	frame.config = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	frame.config:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -13)
-	frame.config:SetText("Configure")
-	frame.config:SetScript("OnClick", function()
-		AucAdvanced.Settings.Show()
-		private.gui:ActivateTab(private.guiId)
-	end)
-]]
-
+	frame.scanslabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.scanslabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 72, -20)
+	frame.scanslabel:SetText("Pending Scans")
+	frame.scanscount = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.scanscount:ClearAllPoints()
+	frame.scanscount:SetPoint("LEFT", frame.scanslabel, "RIGHT", 5, 0)
+	frame.scanscount:SetText("0")
+	frame.scanscount:SetJustifyH("RIGHT")
+	frame.scanscount.last = 0
+	function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
+		if AucAdvanced.Scan.IsScanning() then
+			scansQueued = scansQueued + 1
+		end
+		if scansQueued ~= frame.scanscount.last then
+			frame.scanscount.last = scansQueued
+			frame.scanscount:SetText(scansQueued)
+		end
+	end
 end
 
 function lib.MakeGuiConfig()
@@ -1176,24 +1184,6 @@ function lib.MakeGuiConfig()
 			print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
 		end
 	end)
-
-	 --displays remaining # of scans queued
-	gui.ScansRemaining = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	gui.ScansRemaining:ClearAllPoints()
-	gui.ScansRemaining:SetPoint("RIGHT", gui.saves, "LEFT", -5, 0)
-	gui.ScansRemaining:SetTextColor(1, 0.8, 0)
-	gui.ScansRemaining:SetText("0")
-	gui.ScansRemaining:SetJustifyH("RIGHT")
-	gui.ScansRemaining.last = 0
-	function private.UpdateScanProgress(_, _, _, _, _, _, _, scansQueued)
-		if AucAdvanced.Scan.IsScanning() then
-			scansQueued = scansQueued + 1
-		end
-		if scansQueued ~= gui.ScansRemaining.last then
-			gui.ScansRemaining.last = scansQueued
-			gui.ScansRemaining:SetText(scansQueued)
-		end
-	end
 
 	function lib.UpdateControls()
 		if gui.sheet.selected then
