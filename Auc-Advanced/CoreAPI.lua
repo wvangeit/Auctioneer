@@ -32,6 +32,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 if not AucAdvanced then return end
+local AucAdvanced = AucAdvanced
 
 AucAdvanced.API = {}
 local lib = AucAdvanced.API
@@ -40,18 +41,16 @@ local private = {}
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 
---local replicate, empty, fill = AucAdvanced.Replicate, AucAdvanced.Empty, AucAdvanced.Fill
-local empty = wipe
 
 local tinsert = table.insert
 local tremove = table.remove
-local next = next
-local pairs = pairs
-local ipairs = ipairs
-local ceil = math.ceil
-local max = math.max
-local tostring = tostring
-local type = type
+local next,pairs,ipairs,type = next,pairs,ipairs,type
+local wipe = wipe
+local ceil,floor,max,abs = ceil,floor,max,abs
+local tostring,tonumber,strjoin,strsplit,format = tostring,tonumber,strjoin,strsplit,format
+local GetItemInfo = GetItemInfo
+-- GLOBALS: nLog, N_NOTICE, N_WARNING, N_ERROR
+
 
 --[[
 	The following functions are defined for modules's exposed methods:
@@ -90,16 +89,19 @@ do
     local IMPROVEMENT_FACTOR = 0.8;
     local CORRECTION_FACTOR = 1000; -- 10 silver per gold, integration steps at tail
     local FALLBACK_ERROR = 1;       -- 1 silver per gold fallback error max
-    local cache = {};
+	
+	-- cache[serverKey][itemsig]={list,of,return,values}
+    local cache = setmetatable({}, { __index = function(tbl,key)
+			tbl[key] = {}
+			return tbl[key]
+		end
+	})
     local pdfList = {};
     local engines = {};
-    local abs = math.abs;
-    local floor = math.floor;
     local ERROR = 0.05;
     local GetSetting = AucAdvanced.Settings.GetSetting;
     local GetItemInfo = GetItemInfo;
     local GetCVar = GetCVar;
-    local assert = assert;
     -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
     --[[
         This function acquires the current market value of the mentioned item using
@@ -113,17 +115,18 @@ do
         AucAdvanced.API.GetMarketValue(itemLink, serverKey)
     ]]
     function lib.GetMarketValue(itemLink, serverKey)
-        ERROR = GetSetting("marketvalue.accuracy");
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
         if not itemLink then return; end
-        local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
         -- Look up in the cache if it's recent enough
-        local cacheTable = cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))];
-        if cacheTable then
-            return cacheTable.value, cacheTable.seen, cacheTable.stats;
+        local cacheEntry = cache[serverKey or GetCVar("realmName")][lib.GetSigFromLink(itemLink)]
+        if cacheEntry then
+            return cacheEntry.value, cacheEntry.seen, cacheEntry.stats;
         end
+
+        ERROR = GetSetting("marketvalue.accuracy");
+        local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
         if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer missed market pricing cache on item '"..itemLink.."'"); end
 
@@ -153,7 +156,7 @@ do
 
             if type(i) == 'number' then
                 -- This is a fallback
-                if convergedFallback == nil or (type(convergedFallback) == 'number' and math.abs(convergedFallback - i) < FALLBACK_ERROR * convergedFallback / 10000) then
+                if convergedFallback == nil or (type(convergedFallback) == 'number' and abs(convergedFallback - i) < FALLBACK_ERROR * convergedFallback / 10000) then
                     convergedFallback = i;
                 else
                     convergedFallback = false;      -- Cannot converge on fallback pricing
@@ -181,13 +184,14 @@ do
         end
 
         if #pdfList == 0 and convergedFallback then
-            if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to no available PDFs on item "..itemlink); end
+            if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Fallback Pricing Used", "Fallback pricing used due to no available PDFs on item "..itemLink); end
             return convergedFallback, 1, 1;
         end
 
 
-        assert(lowerLimit > -1/0 and upperLimit < 1/0, "Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit));
-
+        if not (lowerLimit > -1/0 and upperLimit < 1/0) then
+			error("Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit))
+		end
 
 
         -- Determine the totals from the PDFs
@@ -205,7 +209,9 @@ do
             lastMidpoint = midpoint;
             total = 0;
 
-            assert(delta > 0, "Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink));
+            if not(delta > 0) then
+				error("Infinite loop detected during market pricing for "..(GetItemInfo(itemLink) or itemLink))
+			end
 
             for x = lowerLimit, upperLimit, delta do
                 for i = 1, #pdfList do
@@ -244,13 +250,12 @@ do
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
 
             -- Cache before finishing up
-            local cacheTable = {}
-            cache[lib.GetSigFromLink(itemLink)..":"..(serverKey or GetCVar("realmName"))] = cacheTable;
-            cacheTable.time = GetTime();
-            cacheTable.value = midpoint;
-            cacheTable.seen = seen;
-            cacheTable.stats = #pdfList;
-
+            cache[serverKey or GetCVar("realmName")][lib.GetSigFromLink(itemLink)] = {
+	            time = GetTime(),
+	            value = midpoint,
+	            seen = seen,
+	            stats = #pdfList,
+			}
 
             return midpoint, seen, #pdfList;
         else
@@ -271,9 +276,7 @@ do
 
     -- Clears the cache for AucAdvanced.API.GetMarketValue()
     function lib.ClearMarketCache()
-        for x, _ in pairs(cache) do
-            cache[x] = nil;
-        end
+		wipe(cache)
     end
 end
 
@@ -439,8 +442,8 @@ function lib.QueryImage(query, faction, realm, ...)
 	end
 
 	-- reset results and save a copy of query
-	empty(curResults)
-	empty(prevQuery)
+	wipe(curResults)
+	wipe(prevQuery)
 	for k, v in pairs(query) do prevQuery[k] = v end
 
 	-- get image to search - may be the whole snapshot or a subset
@@ -507,10 +510,10 @@ end
 
 function private.clearCaches(scanstats)
 	local serverKey = AucAdvanced.GetFaction()
-	empty(private.scandataIndex[serverKey])
+	wipe(private.scandataIndex[serverKey])
 
-	empty(private.curResults)
-	empty(private.prevQuery)
+	wipe(private.curResults)
+	wipe(private.prevQuery)
 	private.prevQuery.empty = true
 end
 
@@ -724,14 +727,10 @@ end
 
 -- Creates an item link from an AucAdvanced signature
 function lib.GetLinkFromSig(sig)
-	local link, name
 	local id, suffix, factor, enchant = strsplit(":", sig)
-	if not suffix then suffix = "0" end
-	if not factor then factor = "0" end
-	if not enchant then enchant = "0" end
 
-	link = ("item:%d:%d:0:0:0:0:%d:%d:0"):format(id, enchant, suffix, factor)
-	name, link = GetItemInfo(link)
+	local itemstring = format("item:%d:%d:0:0:0:0:%d:%d:0", id, enchant or 0, suffix or 0, factor or 0)
+	local name, link = GetItemInfo(itemstring)
 	link = AucAdvanced.SanitizeLink(link)
 	return link, name -- name is ignored by most calls
 end
