@@ -36,7 +36,11 @@ local libType, libName = "Stat", "Sales"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
-local empty = table.wipe
+
+local unpack,pairs,wipe = unpack,pairs,wipe
+local floor,abs,sqrt = floor,abs,sqrt
+local strmatch = strmatch
+
 local GetSigFromLink = AucAdvanced.API.GetSigFromLink
 local GetFaction = AucAdvanced.GetFaction
 
@@ -49,7 +53,7 @@ local day7time = currenttime - 7*86400
 function private.onEvent(frame, event, arg, ...)
 	if (event == "MAIL_CLOSED") then
 		-- Clear pricecache
-		empty(pricecache)
+		wipe(pricecache)
 	end
 end
 
@@ -229,7 +233,7 @@ function lib.GetPrice(hyperlink, serverKey)
 	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
 		reason, qty, priceper = v[2], v[6], v[7]
 		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success  then
-			if (math.abs(priceper - mean) < deviation) then
+			if (abs(priceper - mean) < deviation) then
 				total = total + priceper * qty
 				number = number + qty
 			end
