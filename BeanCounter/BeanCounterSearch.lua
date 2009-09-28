@@ -33,6 +33,12 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals()
 
+local ipairs,pairs,select,type,next = ipairs,pairs,select,type,next
+local tinsert = tinsert
+local tonumber,tostring = tonumber,tostring
+local abs = abs
+local strsplit = strsplit
+
 local function debugPrint(...)
     if get("util.beancounter.debugSearch") then
         private.debugPrint("BeanCounterSearch",...)
@@ -61,20 +67,20 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 			if settings.exact and private.frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
 				local _, name = strsplit(";", data)
 				if itemName:lower() == name:lower() then
-					local itemID, suffix = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+					local itemID, suffix = strsplit(":", itemKey)--Create a list of itemIDs that match the search text
 					settings.suffix = suffix -- Store Suffix used to later filter unwated results from the itemID search
 					tbl[itemID] = itemID --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
 					break
 				end
 			else
-				local itemID = string.split(":", itemKey)--Create a list of itemIDs that match the search text
+				local itemID = strsplit(":", itemKey)--Create a list of itemIDs that match the search text
 				tbl[itemID] = itemID --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
 			end
 		end
 	end
 
 	if queryReturn then --need to return the ItemID results to calling function
-		return(private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName))
+		return private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName)
 	else
 		--get the itemTexture for display in the drop box
 		for i, data in pairs(BeanCounterDB.ItemIDArray) do
@@ -98,7 +104,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	tbl = {}
 	if type(id) == "table" then --we can search for a sinlge itemID or an array of itemIDs
 		for i,v in pairs(id)do
-			table.insert(tbl, tostring(v))
+			tinsert(tbl, tostring(v))
 		end
 	else
 		tbl[1] = tostring(id)
@@ -167,7 +173,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	--display profit for the search term
 	if profit then
 		local change = "|CFF33FF33Gained"
-		if profit < 0 then change = "|CFFFF3333Lost" profit = math.abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
+		if profit < 0 then change = "|CFFFF3333Lost" profit = abs(profit) end-- if profit negative  ABS to keep tiplib from missrepresenting #
 		profit = private.tooltip:Coins(profit)
 		private.frame.slot.help:SetTextColor(.8, .5, 1)
 		private.frame.slot.help:SetText(change..(" %s from %s to %s"):format(profit or "", date("%x", low) or "", date("%x", high) or ""))
@@ -242,7 +248,7 @@ function private.searchDB(data, server, player, DB, itemID)
 	for index, itemKey in pairs(server[player][DB][itemID]) do
 		DB = DB:gsub("Neutral", "")--remove the Neutral part so we send it to the proper function
 		for _, text in ipairs(itemKey) do
-			table.insert(data, {DB:upper(), id, index, text})
+			tinsert(data, {DB:upper(), id, index, text})
 		end
 	end
 	return data
@@ -267,7 +273,7 @@ function private.formatServerData(data, settings)
 			--just a wrapper to call the correct function for the database we are wanting to format. Example function private.FAILEDBIDS(...)  ==  private["FAILEDBIDS"](...)
 			local store = private[database]
 			local entry = store(v[2], v[3], v[4], settings)
-			table.insert(formatedData, entry)
+			tinsert(formatedData, entry)
 		end
 	end
 	
@@ -308,7 +314,7 @@ function private.reduceSize(tbl, count)
 			end)
 	local data = {} -- this will be a new table, this prevents chages from being propagated back to the cached "data" refrence
 	for i = 1, count do
-		table.insert(data, tbl[i])
+		tinsert(data, tbl[i])
 	end
 	return data
 end
@@ -328,7 +334,7 @@ end
 
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
-			return({
+			return {
 				itemLink or "Failed to get Link", --itemname
 				_BC('UiAucSuccessful'), --status
 
@@ -344,7 +350,7 @@ end
 				tonumber(uFee), --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
-			})
+			}
 	end
 	--STACK; BUY; BID; DEPOSIT; TIME; DATE; WEALTH
 	function private.FAILEDAUCTIONS(id, itemKey, text)
@@ -356,7 +362,7 @@ end
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
-			return({
+			return {
 				itemLink, --itemname
 				_BC('UiAucExpired'), --status
 
@@ -372,7 +378,7 @@ end
 				0, --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
-			})
+			}
 	end
 	function private.COMPLETEDBIDSBUYOUTS(id, itemKey, text)
 			--local value = "stack"], "money"], p"fee"], buyout"], "bid"], p"Seller/buyer"], ["time"], reason)
@@ -395,7 +401,7 @@ end
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 
-			return({
+			return {
 				itemLink, --itemname
 				text, --status
 
@@ -411,7 +417,7 @@ end
 				tonumber(uFee), --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
-			})
+			}
 	end
 	function private.FAILEDBIDS(id, itemKey, text)
 			
@@ -423,7 +429,7 @@ end
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
 			if not itemLink then itemLink = private.getItemInfo(id, "name") end--if not in our DB ask the server
 			
-			return({
+			return {
 				itemLink, --itemname
 				_BC('UiOutbid'), --status
 
@@ -439,5 +445,5 @@ end
 				tonumber(uFee), --fee
 				tonumber(uReason), --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
-			})
+			}
 	end

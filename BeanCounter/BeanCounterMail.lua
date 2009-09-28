@@ -33,6 +33,13 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals() --_BC localization function
 
+local _G = _G
+local pairs,ipairs,select,type = pairs,ipairs,select,type
+local tonumber,tostring,format = tonumber,tostring,format
+local tinsert,tremove = tinsert,tremove
+local strsplit = strsplit
+local time = time
+local floor = floor
 
 local function debugPrint(...)
     if get("util.beancounter.debugMail") then
@@ -109,7 +116,7 @@ function private.updateInboxStart()
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
 				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
-				table.insert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft,
+				tinsert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft,
 						["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout,
 						["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
 						})
@@ -123,7 +130,7 @@ function private.updateInboxStart()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
-		private.SearchCache = {} --clear the search cache, we are updating data so it is now outdated
+		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 	end
 	private.mailBoxColorStart()
 end
@@ -156,17 +163,17 @@ local total = #private.inboxStart
 
 		local tbl = private.inboxStart[i]
 		if not data.retrieved then --Send non invoiceable mails through
-			table.insert(private.reconcilePending, data)
+			tinsert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
 			--debugPrint("not a invoice mail type")
 
 		elseif  data.retrieved == "failed" then
-			table.insert(private.reconcilePending, data)
+			tinsert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
 			--debugPrint("data.retrieved == failed")
 
 		elseif  data.retrieved == "yes" then
-			table.insert(private.reconcilePending, data)
+			tinsert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
 			--debugPrint("data.retrieved == yes")
 
@@ -197,7 +204,7 @@ end
 function private.mailSort()
 	for i in pairs(private.reconcilePending) do
 		--Get Age of message for timestamp
-		local messageAgeInSeconds = math.floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
+		local messageAgeInSeconds = floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
 
 		if private.reconcilePending[i]["sender"]:match(_BC('MailAllianceAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailHordeAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailNeutralAuctionHouse')) then
@@ -215,18 +222,18 @@ function private.mailSort()
 
 			elseif private.reconcilePending[i].subject:match(cancelledLocale) then
 				--Need to add a filter to remove/record canceled
-				table.remove(private.reconcilePending,i)
+				tremove(private.reconcilePending,i)
 
 			elseif private.reconcilePending[i].subject:match(salePendingLocale) then
 				--ignore We dont care about this message
-				table.remove(private.reconcilePending,i)
+				tremove(private.reconcilePending,i)
 			else
 				debugPrint("We had an Auction mail that failed mailsort()", private.reconcilePending[i].subject)
-				table.remove(private.reconcilePending,i)
+				tremove(private.reconcilePending,i)
 			end
 		else --if its not AH do we care? We need to record cash arrival from other toons
 			debugPrint("OTHER", private.reconcilePending[i].subject)
-			table.remove(private.reconcilePending, i)
+			tremove(private.reconcilePending, i)
 
 		end
 	end
@@ -265,7 +272,7 @@ function private.sortCompletedAuctions( i )
 			debugPrint("Failure for completedAuctions", itemID, itemLink, value, "index", private.reconcilePending[i].n)
 		end
 	end
-	table.remove(private.reconcilePending, i)
+	tremove(private.reconcilePending, i)
 end
 --Find the stack information in postedAuctions to add into the completedAuctions DB on mail arrivial
 function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, soldBuy, soldTime)
@@ -285,7 +292,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 					--if the deposits and buyouts match, check if time range would make this a possible match
 					 if postDeposit == soldDeposit and postBuy >= soldBuy and postBid <= soldBuy then --We may have sold it on a bid so we need to loosen this search
 						if (soldTime > postTime) and (oldestPossible < postTime) then
-							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
+							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Sold"
 							--debugPrint("postedAuction removed as sold", itemID, itemLink)
 							return tonumber(postStack), tonumber(postBid)
@@ -316,7 +323,7 @@ function private.sortFailedAuctions( i )
 			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
 		end
 	end
-	table.remove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
+	tremove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
 end
 --find stack, bid and buy info for failedauctions
 function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, expiredTime)
@@ -331,7 +338,7 @@ function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, e
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
 						local timeAuctionPosted, timeFailedAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Time this message should have been posted
 						if (timeAuctionPosted - 7200) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 7200) then
-							table.remove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
+							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
 							--debugPrint("postedAuction removed as Failed", itemID, itemLink )
 							return postStack, postBid, postBuy, postDeposit
@@ -361,7 +368,7 @@ function private.sortCompletedBidsBuyouts( i )
 		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
 	end
 
-	table.remove(private.reconcilePending,i)
+	tremove(private.reconcilePending,i)
 end
 --Used only to clear postedBid entries so failed bids is less likely to miss
 function private.findCompletedBids(itemID, seller, bid, itemLink)
@@ -375,7 +382,7 @@ function private.findCompletedBids(itemID, seller, bid, itemLink)
 				postStack, postBid = tonumber(postStack), tonumber(postBid)
 				--if seller ==  postSeller and postBid == bid then --Seller is mostly useless thanks to blizzards item name cahce chamges. Can often be nil  esp after a getall
 				if postBid == bid then
-					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					tremove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
 					--debugPrint("posted Bid removed as Won", itemString, index, reason)
 					return reason --return the reason code provided for why we bid/bought item
@@ -399,7 +406,7 @@ function private.sortFailedBids( i )
 	else
 		debugPrint("Failure for failedBids", itemID, itemLink, value, "index", private.reconcilePending[i].n)
 	end
-	table.remove(private.reconcilePending,i)
+	tremove(private.reconcilePending,i)
 end
 function private.findFailedBids(itemID, itemLink, gold)
 	gold = tonumber(gold)
@@ -410,7 +417,7 @@ function private.findFailedBids(itemID, itemLink, gold)
  			if not text:match(".*USED.*") then
 				local postStack, postBid, postSeller, isBuyout, postTimeLeft, postTime, reason = private.unpackString(text)
 				if tonumber(postBid) == gold then
-					table.remove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
+					tremove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
 					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED FAILED"
 					--debugPrint("posted Bid removed as Failed", itemString, index)
 					return postStack, postSeller, reason
@@ -449,10 +456,13 @@ function private.mailFrameClick(self, index)
 	end
 end
 
+local NORMAL_FONT_COLOR, HIGHLIGHT_FONT_COLOR = NORMAL_FONT_COLOR, HIGHLIGHT_FONT_COLOR
+
 function private.mailFrameUpdate()
---Change Icon back color if only addon read
-if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
-if get("util.beancounter.mailrecolor") == "off" then return end
+	--Change Icon back color if only addon read
+	local db = BeanCounterDB[private.realmName][private.playerName]
+	if not db["mailbox"] then return end  --we havn't read mail yet
+	if get("util.beancounter.mailrecolor") == "off" then return end
 
 	local numItems = GetInboxNumItems()
 	local  index
@@ -462,24 +472,25 @@ if get("util.beancounter.mailrecolor") == "off" then return end
 		index = 7 - ((InboxFrame.pageNum * 7) - numItems)
 	end
 	for i = 1, index do
-		local button = getglobal("MailItem"..i.."Button")
-		local buttonIcon = getglobal("MailItem"..i.."ButtonIcon")
-		local senderText = getglobal("MailItem"..i.."Sender")
-		local subjectText = getglobal("MailItem"..i.."Subject")
+		local basename=format("MailItem%d",i)
+		local button = _G[basename.."Button"]
+		local buttonIcon = _G[basename.."ButtonIcon"]
+		local senderText = _G[basename.."Sender"]
+		local subjectText = _G[basename.."Subject"]
 		button:Show()
 
 		local itemindex = ((InboxFrame.pageNum * 7) - 7 + i) --this gives us the actual itemindex as oposed to teh 1-7 button index
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
-		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
-			local sender = BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["sender"]
+		if db["mailbox"][itemindex] then
+			local sender = db["mailbox"][itemindex]["sender"]
 			if sender and (sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse'))) then
-				if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
+				if (db["mailbox"][itemindex]["read"] < 2) then
 					if get("util.beancounter.mailrecolor") == "icon" or get("util.beancounter.mailrecolor") == "both" then
-						getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
+						_G[basename.."ButtonSlot"]:SetVertexColor(1.0, 0.82, 0)
 						SetDesaturation(buttonIcon, nil)
 					end
 					if get("util.beancounter.mailrecolor") == "text" or get("util.beancounter.mailrecolor") == "both" then
-						senderText = getglobal("MailItem"..i.."Sender");senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+						senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 						subjectText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 					end
 				end
@@ -493,6 +504,7 @@ local mailCurrent
 local group = {["n"] = "", ["start"] = 1, ["end"] = 1} --stores the start and end locations for a group of same name items
 function private.mailBoxColorStart()
 	mailCurrent = {} --clean table every update
+	local db=BeanCounterDB[private.realmName][private.playerName]
 
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
@@ -500,36 +512,36 @@ function private.mailBoxColorStart()
 	end
 
 	--Fix reported errors of mail DB not existing for some reason.
-	if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {} end
+	if not db["mailbox"] then db["mailbox"] = {} end
 	--Create Characters Mailbox, or resync if we get more that 5 mails out of tune
-	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+2) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
+	if #db["mailbox"] > (#mailCurrent+2) or #db["mailbox"] == 0 then
 		--debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
-		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
+		db["mailbox"] = {}
 		for i, v in pairs(mailCurrent) do
-			BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] = v
+			db["mailbox"][i] = v
 		end
 	end
 
-	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] >= #mailCurrent then --mail removed or same
+	if #db["mailbox"] >= #mailCurrent then --mail removed or same
 		for i in ipairs(mailCurrent) do
-			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] == group["n"] then
+			if db["mailbox"][i]["subject"] == group["n"] then
 				if group["start"] then group["end"] = i else group["start"] = i end
 			else
-				group["n"], group["start"], group["end"] = BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"], i, i
+				group["n"], group["start"], group["end"] = db["mailbox"][i]["subject"], i, i
 			end
 
-			if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
+			if mailCurrent[i]["subject"] ~= db["mailbox"][i]["subject"] then
 				--debugPrint("group = ",group["n"], group["start"], group["end"])
-				if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] == 2 then
+				if db["mailbox"][i]["read"] == 2 then
 					--debugPrint("This is marked read so removing ", i)
-					table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
+					tremove(db["mailbox"], i)
 					break
-				elseif BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] < 2 then
+				elseif db["mailbox"][i]["read"] < 2 then
 	--This message has not been read, so we have a sequence of messages with the same name. Need to go back recursivly till we find the "Real read" message that need removal
 					for V = group["end"], group["start"], -1 do
-						if BeanCounterDB[private.realmName][private.playerName]["mailbox"][V]["read"] == 2 then
+						if db["mailbox"][V]["read"] == 2 then
 							--debugPrint("recursive read group",group["end"] ,"--",group["start"], "found read at",V )
-							table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], V)
+							tremove(db["mailbox"], V)
 							break
 						end
 					end
@@ -537,16 +549,16 @@ function private.mailBoxColorStart()
 				break
 			end
 		end
-	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] < #mailCurrent then --mail added
+	elseif #db["mailbox"] < #mailCurrent then --mail added
 		for i,v in ipairs(mailCurrent) do
-			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] then
-				if mailCurrent[i]["subject"] ~=  BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
+			if db["mailbox"][i] then
+				if mailCurrent[i]["subject"] ~=  db["mailbox"][i]["subject"] then
 					--debugPrint("#private.mailData < #mailCurrent adding", i, mailCurrent[i]["subject"])
-					table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+					tinsert(db["mailbox"], i, v)
 				end
 			else
 			--debugPrint("need to add key ", i)
-				table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+				tinsert(db["mailbox"], i, v)
 			end
 		end
 

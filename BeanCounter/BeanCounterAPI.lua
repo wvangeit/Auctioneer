@@ -34,6 +34,11 @@ local lib = BeanCounter
 lib.API = {}
 local private, print, get, set, _BC = lib.getLocals()
 
+local type,select,strsplit,strjoin,ipairs,pairs = type,select,strsplit,strjoin,ipairs,pairs
+local tostring,tonumber,strlower = tostring,tonumber,strlower
+local tinsert,tremove = tinsert,tremove
+local wipe = wipe
+
 local function debugPrint(...)
     if get("util.beancounter.debugAPI") then
         private.debugPrint("BeanCounterAPI",...)
@@ -103,32 +108,27 @@ function lib.API.search(name, settings, queryReturn)
 		end
 	end
 end
---Cache system for searches
+
+
+
+
+-- Cache system for searches
+local cache = setmetatable({}, {__mode="v"})
 
 function private.checkSearchCache(name, serverName, playerName)
 	if not name or not serverName or not playerName then return end --nil safe the cache check
-	local SearchCache = private.SearchCache
-	--return cached search
-	name = name:lower() --lower case names for better matching
-	if SearchCache[name..serverName..playerName] then
-		debugPrint("cached used", name, serverName, playerName  )
-		return SearchCache[name..serverName..playerName]
-	end
+	return cache[strlower(name)..serverName..playerName]
 end
+
 function private.addSearchCache(name, data, serverName, playerName)
 	if not name or not serverName or not playerName then return end --nil safe the cache add
-	local SearchCache = private.SearchCache
-	--remove oldest cache entry, only save 5 searches
-	if #SearchCache >= 100 then
-		--debugPrint("removing",  SearchCache[1] )
-		SearchCache[ SearchCache[1] ] = nil
-		table.remove(SearchCache, 1)
-	end
-	--store cache of the request
-	name = name:lower() -- store as lower case for better matching
-	SearchCache[name..serverName..playerName] = data
-	SearchCache[#SearchCache + 1] = name..serverName..playerName
+	cache[strlower(name)..serverName..playerName] = data
 end
+
+function private.wipeSearchCache()
+	wipe(cache)
+end
+
 
 --[[ Returns the Sum of all AH sold vs AH buys along with the date range
 If no player name is supplied then the entire server profit will be totaled
@@ -194,7 +194,7 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	--Merge and edit provided table to needed format
 	for i,v in pairs(tbl) do
 		for a,b in pairs(v) do
-			table.insert(tbl, b)
+			tinsert(tbl, b)
 		end
 	end
 	--remove now redundant table entries
@@ -318,8 +318,8 @@ end
 function lib.API.createItemLinkFromArray(itemKey, uniqueID)
 	if BeanCounterDB["ItemIDArray"][itemKey] then
 		if not uniqueID then uniqueID = 0 end
-		local itemID, suffix = string.split(":", itemKey)
-		local color, name = string.split(";", BeanCounterDB["ItemIDArray"][itemKey])
+		local itemID, suffix = strsplit(":", itemKey)
+		local color, name = strsplit(";", BeanCounterDB["ItemIDArray"][itemKey])
 		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":", uniqueID, ":80|h[", name, "]|h|r")
 	end
 	return

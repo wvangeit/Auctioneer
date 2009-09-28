@@ -32,6 +32,11 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 --AucAdvanced.Modules["Util"]["BeanCounter"]
 
+local select,ipairs,pairs=select,ipairs,pairs
+local concat=table.concat
+local tonumber,tostring,strsplit,strjoin=tonumber,tostring,strsplit,strjoin
+local tinsert,tremove = tinsert,tremove
+
 local libName = "BeanCounter"
 local libType = "Util"
 local lib
@@ -47,8 +52,6 @@ local private = {
 	version = 2.11,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
-	--cache for the searchAPI
-	SearchCache = {},
 
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -112,18 +115,19 @@ lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB
 	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
-	private.playerData = BeanCounterDB[private.realmName][private.playerName]
-	private.serverData = BeanCounterDB[private.realmName]
+	local db = BeanCounterDB
+	private.playerData = db[private.realmName][private.playerName]
+	private.serverData = db[private.realmName]
 	private.wealth = private.playerData["wealth"]
 	--Upgrade DB if needed
 	private.UpgradeDatabaseVersion()
 	--Check if user is trying to use old client with newer database or if the database has failed to update
-	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version then
-		if private.version < BeanCounterDB[private.realmName][private.playerName].version then
-			private.CreateErrorFrames("bean older", private.version, BeanCounterDB[private.realmName][private.playerName].version)
+	if private.version and private.playerData.version then
+		if private.version < private.playerData.version then
+			private.CreateErrorFrames("bean older", private.version, private.playerData.version)
 			return
-		elseif private.version ~= BeanCounterDB[private.realmName][private.playerName].version then
-			private.CreateErrorFrames("failed update", private.version, BeanCounterDB[private.realmName][private.playerName].version)
+		elseif private.version ~= private.playerData.version then
+			private.CreateErrorFrames("failed update", private.version, private.playerData.version)
 			return
 		end
 	end
@@ -170,40 +174,44 @@ function private.initializeDB(server, player)
 	if not server then server = private.realmName end
 	if not player then player = private.playerName end
 	
-	if not BeanCounterDB  then
-		BeanCounterDB  = {}
-		BeanCounterDB["settings"] = {}
-		BeanCounterDB["ItemIDArray"] = {}
+	local db = BeanCounterDB
+	if not db then
+		db = {}
+		BeanCounterDB  = db
+		db["settings"] = {}
+		db["ItemIDArray"] = {}
 	end
-	if not BeanCounterDB[server] then
-		BeanCounterDB[server] = {}
-
+	
+	if not db[server] then
+		db[server] = {}
 	end
-	if not BeanCounterDB[server][player] then
-		BeanCounterDB[server][player] = {}
-		BeanCounterDB[server][player]["version"] = private.version
+	
+	if not db[server][player] then
+		local player = {}
+		db[server][player] = player
+		player["version"] = private.version
 
-		BeanCounterDB[server][player]["faction"] = "unknown" --faction is recorded when we get the login event
-		BeanCounterDB[server][player]["wealth"] = GetMoney()
+		player["faction"] = "unknown" --faction is recorded when we get the login event
+		player["wealth"] = GetMoney()
 
-		BeanCounterDB[server][player]["vendorbuy"] = {}
-		BeanCounterDB[server][player]["vendorsell"] = {}
+		player["vendorbuy"] = {}
+		player["vendorsell"] = {}
 
-		BeanCounterDB[server][player]["postedAuctions"] = {}
-		BeanCounterDB[server][player]["completedAuctions"] = {}
-		BeanCounterDB[server][player]["failedAuctions"] = {}
+		player["postedAuctions"] = {}
+		player["completedAuctions"] = {}
+		player["failedAuctions"] = {}
 
-		BeanCounterDB[server][player]["postedBids"] = {}
-		BeanCounterDB[server][player]["completedBidsBuyouts"]  = {}
-		BeanCounterDB[server][player]["failedBids"]  = {}
+		player["postedBids"] = {}
+		player["completedBidsBuyouts"]  = {}
+		player["failedBids"]  = {}
 		
-		BeanCounterDB[server][player]["completedAuctionsNeutral"] = {}
-		BeanCounterDB[server][player]["failedAuctionsNeutral"] = {}
+		player["completedAuctionsNeutral"] = {}
+		player["failedAuctionsNeutral"] = {}
 
-		BeanCounterDB[server][player]["completedBidsBuyoutsNeutral"]  = {}
-		BeanCounterDB[server][player]["failedBidsNeutral"]  = {}
+		player["completedBidsBuyoutsNeutral"]  = {}
+		player["failedBidsNeutral"]  = {}
 
-		BeanCounterDB[server][player]["mailbox"] = {}
+		player["mailbox"] = {}
 	end
 end
 
@@ -263,6 +271,7 @@ function private.onEvent(frame, event, arg, ...)
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
 		   lib.OnLoad()
+		   private.scriptframe:UnregisterEvent("ADDON_LOADED")
 		end
 	end
 end
@@ -281,9 +290,10 @@ function lib.externalSearch(name, settings, queryReturn, count)
 end
 
 --will return any length arguments into a ; seperated string
+local tmp={}
 function private.packString(...)
-local String
-	for n = 1, select("#", ...) do
+	local num = select("#", ...)
+	for n = 1, num do
 		local msg = select(n, ...)
 		if msg == nil then
 			msg = ""
@@ -296,13 +306,9 @@ local String
 		elseif msg == "<nil>" then
 			msg = ""
 		end
-		if n == 1 then  --This prevents a seperator from being the first character.  :foo:foo:
-			String = msg
-		else
-			String = strjoin(";",String,msg)
-		end
+		tmp[n] = msg
 	end
-	return(String)
+	return concat(tmp,";",1,num)
 end
 --Will split any string and return a table value, replace gsub with tbl compare, slightly faster this way.
 function private.unpackString(text)
@@ -333,7 +339,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress)
 	
 	if not key or not itemString or not value then
 		debugPrint("BeanCounter database add error: Missing required data") 
-		debugPrint("Database:", key, "itemString:", itemString, "Data:", data, "compress:",compress)
+		debugPrint("Database:", key, "itemString:", itemString, "Value:", value, "compress:",compress)
 		return false
 	end
 
@@ -354,7 +360,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress)
 	
 	if private.playerData[key][itemID] then --if ltemID exists
 		if private.playerData[key][itemID][itemString] then
-			table.insert(private.playerData[key][itemID][itemString], value)
+			tinsert(private.playerData[key][itemID][itemString], value)
 		else
 			private.playerData[key][itemID][itemString] = {value}
 		end
@@ -379,8 +385,8 @@ function private.databaseRemove(key, itemID, itemLink, NAME, COUNT)
 				if postSeller and itemID  and NAME then
 					if postSeller == NAME and tonumber(postCount) == COUNT then
 						--debugPrint("Removing entry from postedBids this is a match", itemID, NAME, "vs", postedName, postedCount, "vs",  COUNT)
-						table.remove(private.playerData[key][itemID][itemString], i)--Just remove the key
-							break
+						tremove(private.playerData[key][itemID][itemString], i)--Just remove the key
+						break
 					end
 				end
 			end
@@ -431,6 +437,7 @@ function private.getItemInfo(link, cmd)
 	elseif itemStackCount and (cmd == "stack") then
 		return itemStackCount
 	end
+	return
 end
 
 function private.debugPrint(...)

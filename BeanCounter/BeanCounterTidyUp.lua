@@ -33,6 +33,8 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 local lib = BeanCounter
 local private = lib.Private
 local private, print, get, set, _BC = lib.getLocals()
+local pairs,ipairs,next,select,type = pairs,ipairs,next,select,type
+local strsplit = strsplit
 
 local function debugPrint(...)
     if get("util.beancounter.debugTidyUp") then
@@ -226,7 +228,7 @@ function private.deleteExactItem(itemLink)
 						local  _,_,_,_,_,_, _, suffix, uniqueID = strsplit(":", itemString)
 						local linkID, linkSuffix = lib.API.decodeLink(itemLink)
 						if linkID == itemID and suffix == linkSuffix then
-							debugPrint("matched", link, itemString, linkSuffix, suffix)
+							debugPrint("matched", itemLink, itemString, linkSuffix, suffix)
 							itemIDData[itemString] = nil
 						end
 					end

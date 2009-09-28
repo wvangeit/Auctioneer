@@ -352,7 +352,7 @@ function private.CreateFrames()
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
 	frame.exactCheck:SetChecked(get("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
-	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) private.SearchCache = {} end)
+	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) private.wipeSearchCache() end)
 	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, _BC('TT_ExactCheck')) end) --"Only match the Exact text in the search box"
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -360,7 +360,7 @@ function private.CreateFrames()
 	--search classic data
 	frame.neutralCheck = CreateFrame("CheckButton", "BeancounterneutralCheck", frame, "OptionsCheckButtonTemplate")
 	frame.neutralCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
-	frame.neutralCheck:SetScript("OnClick", function() local on if frame.neutralCheck:GetChecked() then on = true end set("util.beancounter.ButtonneutralCheck", on) private.SearchCache = {} end)
+	frame.neutralCheck:SetScript("OnClick", function() local on if frame.neutralCheck:GetChecked() then on = true end set("util.beancounter.ButtonneutralCheck", on) private.wipeSearchCache() end)
 	getglobal("BeancounterneutralCheckText"):SetText(_BC('UiNeutralCheckBox'))
 	frame.neutralCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
 	frame.neutralCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.neutralCheck, _BC('TT_neutralCheck')) end) --"Display results from BeanCounter Classic Database"
@@ -371,7 +371,7 @@ function private.CreateFrames()
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(get("util.beancounter.ButtonBidCheck"))
-	frame.bidCheck:SetScript("OnClick", function() local on if frame.bidCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidCheck", on) private.SearchCache = {} end)
+	frame.bidCheck:SetScript("OnClick", function() local on if frame.bidCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidCheck", on) private.wipeSearchCache() end)
 	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
@@ -382,7 +382,7 @@ function private.CreateFrames()
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
-	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) private.SearchCache = {} end)
+	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) private.wipeSearchCache() end)
 	frame.bidFailedCheck:SetScale(0.85)
 	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
@@ -392,7 +392,7 @@ function private.CreateFrames()
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(get("util.beancounter.ButtonAuctionCheck"))
-	frame.auctionCheck:SetScript("OnClick", function() local on if frame.auctionCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionCheck", on) private.SearchCache = {} end)
+	frame.auctionCheck:SetScript("OnClick", function() local on if frame.auctionCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionCheck", on) private.wipeSearchCache() end)
 	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
@@ -403,7 +403,7 @@ function private.CreateFrames()
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
-	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) private.SearchCache = {} end)
+	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) private.wipeSearchCache() end)
 	frame.auctionFailedCheck:SetScale(0.85)
 	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions'))
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
@@ -479,7 +479,7 @@ function private.CreateFrames()
 		if IsShiftKeyDown() then
 			ChatEdit_InsertLink(link)--sends to chat or auction house
 		elseif IsAltKeyDown() and text then -- Search for the item in BeanCounter
-			private.SearchCache = {} --clear cache
+			private.wipeSearchCache()
 			frame.searchBox:SetText(text)
 			private.startSearch(text, private.getCheckboxSettings())
 		end

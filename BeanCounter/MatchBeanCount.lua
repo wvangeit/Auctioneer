@@ -66,10 +66,20 @@ function lib.Processor(callbackType, ...)
 end
 
 
+local frame = CreateFrame("Frame", "MatchBeanCountHelperFrame")
+frame:Hide()
+frame:SetScript("OnEvent", function()
+	lib.ClearMatchArrayCache()
+end)
+frame:RegisterEvent("MAIL_CLOSED")
+
+
 local matchArrayCache = {}
 
 function lib.ClearMatchArrayCache()	-- called from processor
-	wipe(matchArrayCache)
+	if next(matchArrayCache) then
+		matchArrayCache = {}
+	end
 end
 
 function lib.GetMatchArray(hyperlink, marketprice)
