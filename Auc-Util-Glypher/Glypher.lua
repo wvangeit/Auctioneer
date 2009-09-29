@@ -718,7 +718,7 @@ function lib.GetPrice(link, faction, realm)
                 if auction.buyoutPrice < playerLow then
                     playerLow = auction.buyoutPrice
                 end
-            elseif string.find(":" .. glypherWhitelist .. ":", ":" .. auction.sellerName .. ":") then
+            elseif auction.sellerName ~= "" and string.find(":" .. glypherWhitelist .. ":", ":" .. auction.sellerName .. ":") then
                 if auction.buyoutPrice < whitelistLow then
                     if auction.buyoutPrice >= glypherMin then
                         --this if we're in is so that we don't even both with prices below our min
