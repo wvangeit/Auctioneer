@@ -40,6 +40,7 @@ if not lib then return end
 
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local tonumber,strsplit,select,pairs=tonumber,strsplit,select,pairs
+local setmetatable=setmetatable
 local wipe=wipe
 local floor,ceil,abs=floor,ceil,abs
 local concat=table.concat
@@ -50,6 +51,7 @@ local GetFaction = AucAdvanced.GetFaction
 
 local SSDRealmData
 
+local cache = {} -- setmetatable({}, {__mode="v"})
 
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
@@ -72,6 +74,8 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
+	elseif (callbackType == "scanstats") then
+		wipe(cache)
 	end
 end
 
@@ -160,8 +164,14 @@ function lib.GetPrice(hyperlink, serverKey)
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
 	if not serverKey then serverKey = GetFaction() end
+	
 	if not SSDRealmData[serverKey] then return end
 	if not SSDRealmData[serverKey][itemId] then return end
+	
+	local cacheKey = serverKey ..":"..itemId..":"..property
+	if cache[cacheKey] then
+		return unpack(cache[cacheKey])
+	end
 
 	local stats = private.UnpackStats(SSDRealmData[serverKey][itemId])
 	if not stats[property] then return end
@@ -213,6 +223,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		confidence = private.GetCfromZ(confidence)
 	end
 
+	cache[cacheKey] = { average, mean, false, stdev, variance, count, confidence }
 	return average, mean, false, stdev, variance, count, confidence
 end
 
