@@ -34,6 +34,21 @@ if (INFORMANT_VERSION == "<".."%version%>") then
 	INFORMANT_VERSION = "5.2.DEV"
 end
 
+local _G=_G
+local type,pairs,ipairs,select = type,pairs,ipairs,select
+local tonumber,tostring,strmatch = tonumber,tostring,strmatch
+local strsplit,strsub,format = strsplit,strsub,format
+local tinsert,wipe = tinsert,wipe
+local GetItemInfo = GetItemInfo
+local Informant
+-- GLOBALS: INFORMANT_VERSION, _TRANS, this, LibStub
+-- GLOBALS: InformantLocalUpdates, InformantConfig
+-- GLOBALS: InformantFrame, InformantFrameScrollBar
+-- GLOBALS: UIParent, MerchantFrame
+-- GLOBALS: UnitGUID, UnitFactionGroup, UnitName
+-- GLOBALS: InRepairMode, GetMerchantItemLink, GetMerchantItemInfo, GetMerchantNumItems
+
+
 -- LOCAL FUNCTION PROTOTYPES:
 local addLine				-- addLine(text, color)
 local clear					-- clear()
@@ -42,6 +57,7 @@ local frameActive			-- frameActive(isActive)
 local frameLoaded			-- frameLoaded()
 local getCatName			-- getCatName(catID)
 local getItem				-- getItem(itemID)
+local getLocale
 local getRowCount			-- getRowCount()
 local infDebugPrint         -- debugPrint(message, category, title, errorCode, level)
 local onEvent				-- onEvent(event)
@@ -54,6 +70,10 @@ local setRequirements		-- setRequirements(requirements)
 local setSkills				-- setSkills(skills)
 local setVendors			-- setVendors(vendors)
 local setVendorLocation			-- setVendorLocation(vendors)
+local setQuestStarts
+local setQuestRequires
+local setQuestRewards
+local setQuestNames
 local setZones				--
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
@@ -121,8 +141,7 @@ end
 
 -- utility, so we don't have to maintain multiple copies of this
 function idFromLink( itemLink )
-	local _, _, itemid = string.find(itemLink, "item:(%d+)")
-	return tonumber(itemid)
+	return tonumber(strmatch(itemLink, "item:(%d+)"))
 end
 
 function skillToName(userSkill)
@@ -137,10 +156,12 @@ end
 local staticDataItem={}
 local emptyTable={}
 local staticDataID
+local cache = setmetatable({}, {__mode="v"})
 function getItem(itemID, static)
 	if (not itemID) then return end
 	if (static and staticDataID and staticDataID==itemID) then return staticDataItem end
-
+	if cache[itemID] then return cache[itemID] end
+	
 	local baseData = self.database[itemID]
 	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
@@ -229,7 +250,7 @@ function getItem(itemID, static)
 				else
 					usage = usage .. ", " .. localized
 				end
-				table.insert(dataItem.usedList, localized)
+				tinsert(dataItem.usedList, localized)
 			end
 		end
 		dataItem.usageText = usage
@@ -260,7 +281,7 @@ function getItem(itemID, static)
 			local moreMerch = split(itemUpdateData.merchants, ",")
 			if (#moreMerch > 0 and not merchList) then merchList = {} end
 			for pos, merchID in pairs(moreMerch) do
-				table.insert(merchList, merchID)
+				tinsert(merchList, merchID)
 			end
 		end
 		local vendList = {}
@@ -277,7 +298,7 @@ function getItem(itemID, static)
 					end
 				end
 				if (vendName) then
-					table.insert(vendList, vendName)
+					tinsert(vendList, vendName)
 					local zone,xloc,yloc
 					if self.vendorLocation[merchID] then
 						zone,xloc,yloc = strsplit(",",self.vendorLocation[merchID])
@@ -329,6 +350,7 @@ function getItem(itemID, static)
 
 	questItemUse = self.questRewards[itemID]
 	if (questItemUse) then
+		local list
 		if (type(questItemUse) == 'number') then
 			list = { questItemUse }
 		else
@@ -346,6 +368,8 @@ function getItem(itemID, static)
 	-- so save the itemID for future calls
 	if static then
 		staticDataID = itemID
+	else
+		cache[itemID] = dataItem
 	end
 	return dataItem
 end
@@ -375,13 +399,19 @@ end
 --Implementation of GetSellValue API proposed by Tekkub at http://www.wowwiki.com/API_GetSellValue
 local origGetSellValue = GetSellValue
 function GetSellValue(item)
+	local itemName, itemLink, _, _, _, _, _, _, _, _, itemSellPrice = GetItemInfo(item)
+	if itemSellPrice then
+		return itemSellPrice
+	end
+
 	local id
 	if type(item) == "number" then
 		id = item
 	elseif type(item) == "string" then
-		-- Find the itemid
-		local _, link = GetItemInfo(item)
-		id = idFromLink( link or item )
+		id = tonumber(strmatch(item, "item:(%d+)"))
+		if not id and itemLink then
+			id = tonumber(strmatch(itemLink, "item:(%d+)"))
+		end
 	end
 
 	-- Return out if we didn't find an id
@@ -550,7 +580,7 @@ local function showItem(itemInfo)
 
 		if (questCount > 0) then
 			addLine("")
-			addLine(_TRANS('INF_Interface_InfWinQuest'):format(questCount), nil, embed)
+			addLine(_TRANS('INF_Interface_InfWinQuest'):format(questCount), nil, nil --[[TODO: this used to say: embed. what gives?!]])
 
 			if (numSta > 0) then
 				addLine(_TRANS('INF_Interface_InfWinQuestStart'), "70ee90")
@@ -559,14 +589,14 @@ local function showItem(itemInfo)
 			if (numRew > 0) then
 				addLine(_TRANS('INF_Interface_InfWinQuestReward'):format(numRew), "70ee90")
 				for i=1, numRew do
-					quest = itemInfo.rewardFrom[i]
+					local quest = itemInfo.rewardFrom[i]
 					addLine("  ".._TRANS('INF_Interface_InfWinQuestLine'):format(getQuestName(quest)), "80ee80")
 				end
 			end
 			if (numReq > 0) then
 				addLine(_TRANS('INF_Interface_InfWinQuestRequires'):format(numReq), "70ee90")
 				for i=1, numReq do
-					quest = itemInfo.requiredFor[i]
+					local quest = itemInfo.requiredFor[i]
 					addLine("  ".._TRANS('INF_Interface_InfWinQuestMultiLine'):format(quest[2], getQuestName(quest[1])), "80ee80")
 				end
 			end
@@ -620,17 +650,18 @@ end
 
 
 local function TooltipScanBagItem(bag, slot)
-	Informant_ScanTooltip.scanningMoneyFound = false
-	Informant_ScanTooltip:ClearLines()
+	local tt = Informant_ScanTooltip
+	tt.scanningMoneyFound = false
+	tt:ClearLines()
 	local _, count = GetContainerItemInfo(bag, slot)
 	if (not count or count < 1) then return end
-	Informant_ScanTooltip.scanningStack = count
+	tt.scanningStack = count
 
 	-- magic happens here as OnTooltipAddMoney gets called
-	local _, repairCost = Informant_ScanTooltip:SetBagItem(bag, slot)
+	local _, repairCost = tt:SetBagItem(bag, slot)
 	if (type(repairCost) == "number" and repairCost > 0) then
 		-- don't count price for items that need repair
-		Informant_ScanTooltip.scanningMoneyFound = false
+		tt.scanningMoneyFound = false
 		return
 	end
 end
@@ -638,17 +669,19 @@ end
 
 local function updateSellPricesFromMerchant()
 	if (not InformantLocalUpdates.items) then InformantLocalUpdates.items = {} end
+	local tt = Informant_ScanTooltip
+	
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local scanningLink = GetContainerItemLink(bag, slot)
 			if (scanningLink) then
 				TooltipScanBagItem(bag, slot)
-				if (Informant_ScanTooltip.scanningMoneyFound) then
+				if (tt.scanningMoneyFound) then
 					local itemid = idFromLink(scanningLink)
 					local informantItemInfo = getItem( itemid )
 					if (informantItemInfo) then
 
-						local sellPrice = Informant_ScanTooltip.scanningMoneyFound / Informant_ScanTooltip.scanningStack
+						local sellPrice = tt.scanningMoneyFound / tt.scanningStack
 
 						if (informantItemInfo.sell ~= sellPrice) then
 							-- is this item sell price correct in our database? or missing from our database?
@@ -749,7 +782,7 @@ local function updateMerchantName()
 	-- TODO - we are not currently using the faction information for vendors
 
 	local vendorGUID = UnitGUID("NPC")
-	local vendorID = tonumber(string.sub(vendorGUID,6,12),16)
+	local vendorID = tonumber(strsub(vendorGUID,6,12),16)
 
 	if (not self.vendors[ vendorID ] and not InformantLocalUpdates.vendor[ vendorID ]) then
 		-- add the new vendor name to our update list
@@ -775,6 +808,7 @@ local function doUpdateMerchant()
 	updateBuyPricesFromMerchant( vendorID )
 	updateSellPricesFromMerchant()
 
+	wipe(cache)
 end
 
 
@@ -943,7 +977,7 @@ function scrollUpdate()
 	local line
 	for i=1, 25 do
 		line = lines[i+offset]
-		local f = getglobal("InformantFrameText"..i)
+		local f = _G[format("InformantFrameText%d",i)]
 		if (line) then
 			f:SetText(line)
 			f:Show()
@@ -959,7 +993,7 @@ function scrollUpdate()
 	end
 end
 
-function testWrap(text)
+local function testWrap(text)
 	InformantFrameTextTest:SetText(text)
 	if (InformantFrameTextTest:GetWidth() < InformantFrame:GetWidth() - 20) then
 		return text, ""
@@ -998,13 +1032,13 @@ function addLine(text, color, level)
 	end
 
 	if (not text) then
-		table.insert(lines, "nil")
+		tinsert(lines, "nil")
 	else
 		local best, rest = testWrap(text)
 		if (color) then
-			table.insert(lines, ("|cff%s%s|r"):format(color, best))
+			tinsert(lines, ("|cff%s%s|r"):format(color, best))
 		else
-			table.insert(lines, best)
+			tinsert(lines, best)
 		end
 		if (rest) and (rest ~= "") then
 			addLine(rest, color, level+1)
@@ -1124,4 +1158,5 @@ Informant = {
 	DebugPrintQuick = debugPrintQuick
 }
 
+_G.Informant = Informant
 
