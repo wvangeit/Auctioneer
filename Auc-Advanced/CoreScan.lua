@@ -919,7 +919,6 @@ Commitfunction = function()
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
 
-	AucAdvanced.API.ClearMarketCache();
 	-- Tell everyone that our stats are updated
 	AucAdvanced.SendProcessorMessage("scanstats", replicate(scandata.scanstats[0]))
 	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)

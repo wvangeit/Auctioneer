@@ -40,7 +40,9 @@ local private = {}
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
-
+local GetFaction = AucAdvanced.GetFaction
+local GetSetting = AucAdvanced.Settings.GetSetting
+local DecodeLink = AucAdvanced.DecodeLink
 
 local tinsert = table.insert
 local tremove = table.remove
@@ -81,6 +83,12 @@ local GetItemInfo = GetItemInfo
 function lib.Processor(event, ...)
 	if event == "scanstats" then
 		private.clearCaches(...)
+		lib.ClearMarketCache()
+	elseif event == "configchanged" then
+		lib.ClearMarketCache()
+	elseif event == "newmodule" then
+		private.ClearEngineCache()
+		lib.ClearMarketCache()
 	end
 end
 
@@ -89,8 +97,8 @@ do
     local IMPROVEMENT_FACTOR = 0.8;
     local CORRECTION_FACTOR = 1000; -- 10 silver per gold, integration steps at tail
     local FALLBACK_ERROR = 1;       -- 1 silver per gold fallback error max
-	
-	-- cache[serverKey][itemsig]={list,of,return,values}
+
+	-- cache[serverKey][itemsig]={value, seen, #stats}
     local cache = setmetatable({}, { __index = function(tbl,key)
 			tbl[key] = {}
 			return tbl[key]
@@ -99,9 +107,6 @@ do
     local pdfList = {};
     local engines = {};
     local ERROR = 0.05;
-    local GetSetting = AucAdvanced.Settings.GetSetting;
-    local GetItemInfo = GetItemInfo;
-    local GetCVar = GetCVar;
     -- local LOWER_INT_LIMIT, HIGHER_INT_LIMIT = -100000, 10000000;
     --[[
         This function acquires the current market value of the mentioned item using
@@ -117,19 +122,19 @@ do
     function lib.GetMarketValue(itemLink, serverKey)
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
-        if not itemLink then return; end
+		if not itemLink then return end
 
-        -- Look up in the cache if it's recent enough
-        local cacheEntry = cache[serverKey or GetCVar("realmName")][lib.GetSigFromLink(itemLink)]
+		local cacheSig = lib.GetSigFromLink(itemLink)
+		if not cacheSig then return end -- not a valid item link
+		serverKey = serverKey or GetFaction() -- call GetFaction once here, instead of in every Stat module
+
+        local cacheEntry = cache[serverKey][cacheSig]
         if cacheEntry then
-            return cacheEntry.value, cacheEntry.seen, cacheEntry.stats;
+            return cacheEntry[1], cacheEntry[1], cacheEntry[3] -- explicit indexing faster than 'unpack' for 3 values
         end
 
         ERROR = GetSetting("marketvalue.accuracy");
         local saneLink = AucAdvanced.SanitizeLink(itemLink)
-
-        if nLog then nLog.AddMessage("Auctioneer", "Market Pricing", N_NOTICE, "Cache Miss", "Auctioneer missed market pricing cache on item '"..itemLink.."'"); end
-
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
 
@@ -145,8 +150,6 @@ do
                 end
             end
         end
-
-        -- print("Calculating", itemLink);
 
         -- Run through all of the stat modules and get the PDFs
         local c, oldPdfMax, total = 0, #pdfList, 0;
@@ -250,12 +253,7 @@ do
             midpoint = floor(midpoint + 0.5);   -- Round to nearest copper
 
             -- Cache before finishing up
-            cache[serverKey or GetCVar("realmName")][lib.GetSigFromLink(itemLink)] = {
-	            time = GetTime(),
-	            value = midpoint,
-	            seen = seen,
-	            stats = #pdfList,
-			}
+			cache[serverKey][cacheSig] = {midpoint, seen, #pdfList}
 
             return midpoint, seen, #pdfList;
         else
@@ -267,14 +265,12 @@ do
 
     end
 
-    -- Now hook NewModule so that we clear the engine cache when a new module comes into play
-    local oldNewModule = AucAdvanced.NewModule;
-    AucAdvanced.NewModule = function(...)
-        engines = {};               -- Clear the engine list
-        return oldNewModule(...);   -- Tailcall original function
-    end
+	-- Clear the cache of Stats engines (called if a new module is registered)
+	function private.ClearEngineCache()
+		wipe(engines)
+	end
 
-    -- Clears the cache for AucAdvanced.API.GetMarketValue()
+    -- Clears the results cache for AucAdvanced.API.GetMarketValue()
     function lib.ClearMarketCache()
 		wipe(cache)
     end
@@ -341,7 +337,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 
         serverKey = reserved.."-"..serverKey;
     end
-    serverKey = serverKey or AucAdvanced.GetFaction()
+    serverKey = serverKey or GetFaction()
 
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
@@ -509,7 +505,7 @@ function lib.QueryImage(query, faction, realm, ...)
 end
 
 function private.clearCaches(scanstats)
-	local serverKey = AucAdvanced.GetFaction()
+	local serverKey = GetFaction()
 	wipe(private.scandataIndex[serverKey])
 
 	wipe(private.curResults)
@@ -548,7 +544,6 @@ function lib.IsBlocked()
 end
 
 --Market matcher APIs
-private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
 
@@ -564,7 +559,7 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
 
-    local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or AucAdvanced.GetFaction()
+    local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or GetFaction()
 	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
 
 	local matchers = lib.GetMatchers(saneLink)
@@ -601,7 +596,7 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 end
 
 function lib.GetMatcherDropdownList()
-	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
+	private.matcherlist = GetSetting("matcherlist")
 	if not private.matcherlist or #private.matcherlist == 0 then
 		lib.GetMatchers()
 	end
@@ -617,7 +612,7 @@ end
 
 function lib.GetMatchers(itemLink)
 	local saneLink = AucAdvanced.SanitizeLink(itemLink)
-	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
+	private.matcherlist = GetSetting("matcherlist")
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
@@ -708,7 +703,7 @@ end
 -- Creates an AucAdvanced signature from an item link
 function lib.GetSigFromLink(link)
 	local sig
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	local itype, id, suffix, factor, enchant, seed = DecodeLink(link)
 	if itype == "item" then
 		if enchant ~= 0 then
 			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
