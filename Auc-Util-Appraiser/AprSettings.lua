@@ -307,13 +307,28 @@ function private.SetupConfigGui(gui)
 		_TRANS('APPR_Help_WhatAppraiser') ,--What is Appraiser?
 		_TRANS('APPR_Help_WhatAppraiserAnswer') )--Appraiser is a tool to allow you to rapidly post auctions, and remembers your last posting prices automatically. The Appraiser interface attaches to your Auction House window as an extra tab at the bottom of the window. When you first select the Appraiser window, it will display all your auctionable items on the left side of your window. When you select an item from the left, you will see the control window at the top and the current auctions list at the bottom. The control window allows you to specify the posting stack size, for posting stack-splitted auctions, and the number of stacks to post by sliding the two sliders left and right.
 
-	gui:AddControl(id, "Header",     0,    _TRANS('APPR_Interface_AppraiserOptions') )--Appraiser options
-	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", _TRANS('APPR_Interface_ShowAppraisalTooltips') )--Show appraisal in the tooltips?
-	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowAppraisalTooltips') )--This option will cause the current Appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item
-	gui:AddControl(id, "Checkbox",   0, 2, "util.appraiser.bidtooltip", _TRANS('APPR_Interface_AlsoShowBid') )--Also show starting bid
-	gui:AddTip(id, _TRANS('APPR_HelpTooltip_AlsoShowBid') )--This option will cause Appraiser to also show the starting bid price in the tooltip
-	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.ownauctions", _TRANS('APPR_Interface_ShowOwnAuctionsTooltips') )--Show own Auctions in the tooltips?
-	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowOwnAuctionsTooltips') )--This option will cause your current auctions to be displayed in your tooltips when you mouseover the given item
+	function private.addTooltipControls(id)
+		gui:AddControl(id, "Header",     0,    _TRANS('APPR_Interface_AppraiserOptions') )--Appraiser options
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", _TRANS('APPR_Interface_ShowAppraisalTooltips') )--Show appraisal in the tooltips?
+		gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowAppraisalTooltips') )--This option will cause the current Appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item
+		gui:AddControl(id, "Checkbox",   0, 4, "util.appraiser.bidtooltip", _TRANS('APPR_Interface_AlsoShowBid') )--Also show starting bid
+		gui:AddTip(id, _TRANS('APPR_HelpTooltip_AlsoShowBid') )--This option will cause Appraiser to also show the starting bid price in the tooltip
+		gui:AddControl(id, "Checkbox",   0, 4, "util.appraiser.ownauctions", _TRANS('APPR_Interface_ShowOwnAuctionsTooltips') )--Show own Auctions in the tooltips?
+		gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowOwnAuctionsTooltips') )--This option will cause your current auctions to be displayed in your tooltips when you mouseover the given item
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	end
+	--This is the Tooltip tab provided by aucadvanced so all tooltip configuration is in one place
+	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
+	
+	--now we create a duplicate of these in the tooltip frame
+	private.addTooltipControls(id)
+	if tooltipID then private.addTooltipControls(tooltipID) end
+	
+	gui:AddControl(id, "Checkbox",     0, 1, "util.appraiser.displayauctiontab", _TRANS('APPR_Interface_ShowAppraiserTab') )--Show Appraiser tab at the Auction House
+	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowAppraiserTab') )--Shows the appraiser tab on the auction house
+	
+	gui:AddControl(id, "Subhead",      0,    _TRANS('APPR_Interface_AppraiserFrameColoration') ) --Appraiser frame coloration
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", _TRANS('APPR_Interface_ColorAppraiserPriceLevel') )--Color Appraiser items by their PriceLevel data
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ColorAppraiserPriceLevel') )--This option will use information from PriceLevel to tint the current auction valuations by how far above/below the current priceing model's mean in shades from red to blue.
 	gui:AddControl(id, "Selectbox",  0, 3, {
