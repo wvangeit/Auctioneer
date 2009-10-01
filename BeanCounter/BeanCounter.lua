@@ -187,31 +187,31 @@ function private.initializeDB(server, player)
 	end
 	
 	if not db[server][player] then
-		local player = {}
-		db[server][player] = player
-		player["version"] = private.version
-
-		player["faction"] = "unknown" --faction is recorded when we get the login event
-		player["wealth"] = GetMoney()
-
-		player["vendorbuy"] = {}
-		player["vendorsell"] = {}
-
-		player["postedAuctions"] = {}
-		player["completedAuctions"] = {}
-		player["failedAuctions"] = {}
-
-		player["postedBids"] = {}
-		player["completedBidsBuyouts"]  = {}
-		player["failedBids"]  = {}
+		local playerData = {}
+		db[server][player] = playerData
 		
-		player["completedAuctionsNeutral"] = {}
-		player["failedAuctionsNeutral"] = {}
+		playerData["version"] = private.version
+		playerData["faction"] = "unknown" --faction is recorded when we get the login event
+		playerData["wealth"] = GetMoney()
 
-		player["completedBidsBuyoutsNeutral"]  = {}
-		player["failedBidsNeutral"]  = {}
+		playerData["vendorbuy"] = {}
+		playerData["vendorsell"] = {}
 
-		player["mailbox"] = {}
+		playerData["postedAuctions"] = {}
+		playerData["completedAuctions"] = {}
+		playerData["failedAuctions"] = {}
+
+		playerData["postedBids"] = {}
+		playerData["completedBidsBuyouts"]  = {}
+		playerData["failedBids"]  = {}
+		
+		playerData["completedAuctionsNeutral"] = {}
+		playerData["failedAuctionsNeutral"] = {}
+
+		playerData["completedBidsBuyoutsNeutral"]  = {}
+		playerData["failedBidsNeutral"]  = {}
+
+		playerData["mailbox"] = {}
 	end
 end
 
