@@ -36,8 +36,13 @@ local private, print, get, set, _BC = lib.getLocals()
 
 local type,select,strsplit,strjoin,ipairs,pairs = type,select,strsplit,strjoin,ipairs,pairs
 local tostring,tonumber,strlower = tostring,tonumber,strlower
-local tinsert,tremove = tinsert,tremove
+local tinsert,tremove,sort = tinsert,tremove,sort
 local wipe = wipe
+local time = time
+
+local GetRealmName = GetRealmName
+-- GLOBALS: BeanCounter, BeanCounterDB
+
 
 local function debugPrint(...)
     if get("util.beancounter.debugAPI") then
@@ -202,7 +207,7 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	--check if we actually have any results from the search
 	if #tbl == 0 then return {0}, 0, 0 end
 	--sort by date
-	table.sort(tbl, function(a,b) return a[5] > b[5] end)
+	sort(tbl, function(a,b) return a[5] > b[5] end)
 	--get min and max dates.
 	local high, low, count, sum, number = tbl[1][5], tbl[#tbl][5], 1, 0, 0
 	local range = high - (days* 86400)
@@ -282,7 +287,7 @@ function lib.API.getAHSoldFailed(player, link, days)
 			end
 		end
 	else
-		if BeanCounter and BeanCounter.Private.playerData then
+		if private.playerData then
 			if private.serverData[player]["completedAuctions"][itemID]  then
 				for key in pairs(private.serverData[player]["completedAuctions"][itemID] ) do
 					success = success + #private.serverData[player]["completedAuctions"][itemID][key]
@@ -418,6 +423,7 @@ end
 --[[===========================================================================
 --|| Deprecation Alert Functions
 --||=========================================================================]]
+-- GLOBALS: debugstack, geterrorhandler
  --Ths function was created by Shirik all thanks and blame go to him :P
 do
 	local SOURCE_PATTERN = "([^\\/:]+:%d+): in function ([^\"']+)[\"']";
