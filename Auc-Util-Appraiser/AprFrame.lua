@@ -723,13 +723,13 @@ function private.CreateFrames()
 			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", number)
 		elseif numberentry ~= frame.valuecache.numberentry then
-			if numberentry:lower() == _TRANS('APPR_Interface_Full') then
+			if numberentry:lower() == _TRANS('APPR_Interface_Full') then --Full
 				frame.salebox.number:SetAdjustedValue(-2)
-				numberentry = _TRANS('APPR_Interface_Full')
+				numberentry = _TRANS('APPR_Interface_Full') --Full
 				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -2)
-			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then
+			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then --All
 				frame.salebox.number:SetAdjustedValue(-1)
-				numberentry = _TRANS('APPR_Interface_All')
+				numberentry = _TRANS('APPR_Interface_All') --All
 				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -1)
 			elseif tonumber(numberentry) == nil then --we've typed in a partial word.  let them keep typing
 			else
@@ -2245,7 +2245,7 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
-	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')
+	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')--Switch between 'Per Item' and 'Per Stack' Pricing.
 	frame.switchToStack2:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
 	frame.switchToStack2:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack2:Enable()
@@ -2646,7 +2646,10 @@ function private.CreateFrames()
 	frame.ScanTab:SetText(_TRANS('APPR_Interface_Appraiser') )--Appraiser
 	frame.ScanTab:Show()
 	PanelTemplates_DeselectTab(frame.ScanTab)
-	AucAdvanced.AddTab(frame.ScanTab, frame)
+	
+	if get("util.appraiser.displayauctiontab") then
+		AucAdvanced.AddTab(frame.ScanTab, frame)
+	end
 
 	function frame.ScanTab.OnClick(_, _, index)
 		if not index then index = this:GetID() end

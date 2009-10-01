@@ -46,19 +46,27 @@ function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "auctionui") then
-        if private.CreateFrames then private.CreateFrames(...) end
+		if private.CreateFrames then private.CreateFrames(...) end
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
-		local change = ... --get the reason if its a scrollframe color change re-render the window
+		local change, value = ... --get the reason if its a scrollframe color change re-render the window
 		if private.frame then
 			private.frame.salebox.config = true
-		--	private.frame.SetPriceFromModel()
+			--	private.frame.SetPriceFromModel()
 			private.frame.UpdatePricing()
 			private.frame.UpdateDisplay()
-		--	private.frame.salebox.config = nil
+			--	private.frame.salebox.config = nil
 			if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
 				private.frame.UpdateImage()
+			end
+			--show/hide the appraiser tab on the AH
+			if change == "util.appraiser.displayauctiontab" then
+				if value then
+					AucAdvanced.AddTab(private.frame.ScanTab, private.frame)
+				else
+					AucAdvanced.RemoveTab(private.frame.ScanTab, private.frame)
+				end
 			end
 		end
 		if change:sub(1, 20) == "util.appraiser.round" then
@@ -239,16 +247,17 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.clickhookany", true)
 	AucAdvanced.Settings.SetDefault("util.appraiser.reselect", true)
 	AucAdvanced.Settings.SetDefault("util.appraiser.buttontips", true)
+	AucAdvanced.Settings.SetDefault("util.appraiser.displayauctiontab", true)
 	--Default sizes for the scrollframe column widths
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'), 71)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'), 25)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'), 27 )
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea'), 65)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea'), 65)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea'), 65)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid'), 65)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid'), 65)
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 68)
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'), 71) --Seller
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'), 25) --Left
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'), 27 ) --Stk
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea'), 65) --Min/ea
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea'), 65) --Cur/ea
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea'), 65) --Buy/ea
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid'), 65) --MinBid
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid'), 65) --CurBid
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 68) --Buyout
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0.05)
 end
 
