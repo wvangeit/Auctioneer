@@ -2588,24 +2588,7 @@ function private.CreateFrames()
 	})
 
 	frame.imageview.sheet:EnableSelect(true)
-	--callback functions for frame.imageview.sheet events
-	function frame.imageview.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
-		if (callback == "OnMouseDownCell")  then
-			private.onSelect()
-		elseif (callback == "OnClickCell") then
-			private.onClick(button, row, column)
-		elseif (callback == "ColumnOrder") then
-			set("util.appraiser.columnorder", order)
-		elseif (callback == "ColumnWidthSet") then
-			private.onResize(self, column, button:GetWidth() )
-		elseif (callback == "ColumnWidthReset") then
-			private.onResize(self, column, nil)
-		elseif (callback == "ColumnSort") then
-			set("util.appraiser.columnsortcurDir", curDir)
-			set("util.appraiser.columnsortcurSort", column)
-		end
-	end
-
+	
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
@@ -2740,6 +2723,7 @@ function private.CreateFrames()
 
 	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
 
+	--[[These scrollframe functions need to be here to avoid errors, since many elements of appraisers frames are not finished when we create the scrollframe]]
 	--If we have a saved column arrangement reapply
 	if get("util.appraiser.columnorder") then
 		frame.imageview.sheet:SetOrder(get("util.appraiser.columnorder") )
@@ -2750,6 +2734,24 @@ function private.CreateFrames()
 		frame.imageview.sheet.curDir = get("util.appraiser.columnsortcurDir") or 1
 		frame.imageview.sheet:PerformSort()
 	end
+	--callback functions for frame.imageview.sheet events, register for callbacks AFTER we have applied any saved changes
+	function frame.imageview.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
+		if (callback == "OnMouseDownCell")  then
+			private.onSelect()
+		elseif (callback == "OnClickCell") then
+			private.onClick(button, row, column)
+		elseif (callback == "ColumnOrder") then
+			set("util.appraiser.columnorder", order)
+		elseif (callback == "ColumnWidthSet") then
+			private.onResize(self, column, button:GetWidth() )
+		elseif (callback == "ColumnWidthReset") then
+			private.onResize(self, column, nil)
+		elseif (callback == "ColumnSort") then
+			set("util.appraiser.columnsortcurDir", curDir)
+			set("util.appraiser.columnsortcurSort", column)
+		end
+	end
+
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
