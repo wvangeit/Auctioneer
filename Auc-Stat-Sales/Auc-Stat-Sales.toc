@@ -3,6 +3,7 @@
 ##
 ## Interface: 30200
 ## Dependancies: Auc-Advanced BeanCounter
+## SavedVariables: AucAdvancedStatSalesData
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
