@@ -43,6 +43,7 @@ local Const = AucAdvanced.Const
 local GetFaction = AucAdvanced.GetFaction
 local GetSetting = AucAdvanced.Settings.GetSetting
 local DecodeLink = AucAdvanced.DecodeLink
+local SanitizeLink = AucAdvanced.SanitizeLink
 
 local tinsert = table.insert
 local tremove = table.remove
@@ -130,11 +131,11 @@ do
 
         local cacheEntry = cache[serverKey][cacheSig]
         if cacheEntry then
-            return cacheEntry[1], cacheEntry[1], cacheEntry[3] -- explicit indexing faster than 'unpack' for 3 values
+            return cacheEntry[1], cacheEntry[2], cacheEntry[3] -- explicit indexing faster than 'unpack' for 3 values
         end
 
         ERROR = GetSetting("marketvalue.accuracy");
-        local saneLink = AucAdvanced.SanitizeLink(itemLink)
+        local saneLink = SanitizeLink(itemLink)
 
         local upperLimit, lowerLimit, seen = 0, 1e11, 0;
 
@@ -277,7 +278,7 @@ do
 end
 
 function lib.ClearItem(itemLink, serverKey)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules("ClearItem")
 	for pos, engineLib in ipairs(modules) do
 		engineLib.ClearItem(saneLink, serverKey)
@@ -286,7 +287,7 @@ function lib.ClearItem(itemLink, serverKey)
 end
 
 function lib.GetAlgorithms(itemLink)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
@@ -302,7 +303,7 @@ function lib.GetAlgorithms(itemLink)
 end
 
 function lib.IsValidAlgorithm(algorithm, itemLink)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -339,7 +340,7 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
     end
     serverKey = serverKey or GetFaction()
 
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -453,7 +454,7 @@ function lib.QueryImage(query, faction, realm, ...)
 
 	local saneQueryLink
 	if query.link then
-		saneQueryLink = AucAdvanced.SanitizeLink(query.link)
+		saneQueryLink = SanitizeLink(query.link)
 	end
 
 	-- scan image to build a table of auctions that match query
@@ -545,7 +546,7 @@ end
 
 --Market matcher APIs
 function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 
     if reserved then
         lib.ShowDeprecationAlert("AucAdvanced.API.GetBestMatch(itemLink, algorithm, serverKey)",
@@ -611,7 +612,7 @@ function lib.GetMatcherDropdownList()
 end
 
 function lib.GetMatchers(itemLink)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	private.matcherlist = GetSetting("matcherlist")
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
@@ -648,7 +649,7 @@ function lib.GetMatchers(itemLink)
 end
 
 function lib.IsValidMatcher(matcher, itemLink)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local engines = {}
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
@@ -664,7 +665,7 @@ function lib.IsValidMatcher(matcher, itemLink)
 end
 
 function lib.GetMatcherValue(matcher, itemLink, price)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	if (type(matcher) == "string") then
 		matcher = lib.IsValidMatcher(matcher, saneLink)
 	end
@@ -684,7 +685,7 @@ end
 -- Allows the return of Appraiser price values to other functions.
 -- If Appraiser is not loaded it uses Market Price
 function lib.GetAppraiserValue(itemLink, useMatching)
-	local saneLink = AucAdvanced.SanitizeLink(itemLink)
+	local saneLink = SanitizeLink(itemLink)
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
 	if not AucAdvanced.Modules.Util.Appraiser then
 		newBuy, seen = AucAdvanced.API.GetMarketValue(saneLink)
@@ -726,7 +727,7 @@ function lib.GetLinkFromSig(sig)
 
 	local itemstring = format("item:%d:%d:0:0:0:0:%d:%d:0", id, enchant or 0, suffix or 0, factor or 0)
 	local name, link = GetItemInfo(itemstring)
-	link = AucAdvanced.SanitizeLink(link)
+	link = SanitizeLink(link)
 	return link, name -- name is ignored by most calls
 end
 
