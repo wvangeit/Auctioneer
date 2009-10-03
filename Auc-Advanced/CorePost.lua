@@ -342,10 +342,6 @@ function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEncha
 					local link = GetContainerItemLink(bag,slot)
 					if link then
 						local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
-						if locked then
-							foundLocked = true
-						end
-
 						local itype, itemId, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 						if itype == "item"
 						and itemId == matchId
@@ -358,6 +354,9 @@ function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEncha
 							tinsert(matches, {bag, slot, itemCount})
 							total = total + itemCount
 							foundLink = link
+							if locked then
+								foundLocked = true
+							end
 						end
 					else -- blank slot
 						if bagtype ~= 0 and not blankSpecial then
