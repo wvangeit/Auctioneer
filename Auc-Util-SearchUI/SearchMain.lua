@@ -1094,6 +1094,7 @@ function lib.MakeGuiConfig()
 			gui.LastActiveTab = newtab
 			lib.NotifyCallbacks("selecttab", newtab)
 		end
+		gui.Search.updateDisplay()
 	end
 
 	private.gui = gui
@@ -1375,16 +1376,12 @@ function lib.MakeGuiConfig()
 	gui.Search.TooltipText = "Search Snapshot using current Searcher"
 	gui.Search:SetScript("OnEnter", showTooltipText)
 	gui.Search:SetScript("OnLeave", hideTooltip)
-	gui.Search:Hide()
+	gui.Search:Disable()
 	gui.Search.updateDisplay = function()
 		if gui.config.selectedCat == "Searchers" then
-			if not gui.Search:IsShown() then
-				gui.Search:Show()
-			end
+			gui.Search:Enable()
 		else
-			if gui.Search:IsShown() then
-				gui.Search:Hide()
-			end
+			gui.Search:Disable()
 		end
 	end
 
@@ -1610,18 +1607,6 @@ function lib.MakeGuiConfig()
 	gui.frame.progressbar.cancel:SetPoint("TOPLEFT", gui.frame.progressbar, "TOPRIGHT", -25, -5)
 	gui.frame.progressbar.cancel:SetText("X")
 	gui.frame.progressbar.cancel:SetScript("OnClick", private.cancelSearch)
-
-	gui.frame.updateThrottle = TOOLTIP_UPDATE_TIME
-	gui.frame:SetScript("OnUpdate", function(self, elapsed)
-		self.updateThrottle = self.updateThrottle - elapsed
-		if self.updateThrottle > 0 then
-			return
-		end
-		self.updateThrottle = TOOLTIP_UPDATE_TIME
-
-		-- display updater functions
-		gui.Search.updateDisplay()
-	end)
 
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
