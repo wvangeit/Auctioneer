@@ -631,8 +631,9 @@ function private.removeall()
 end
 
 function private.repaintSheet()
+	local wasEmpty = #gui.sheet.data < 1
 	gui.sheet:SetData(private.sheetData)
-	if #private.sheetData == 1 then --sheet was empty, so select the just added auction
+	if wasEmpty then --sheet was empty, so select the just added auction
 		gui.sheet.selected = 1
 		gui.sheet:Render() --need to redraw, so the selection looks right
 		lib.UpdateControls()
