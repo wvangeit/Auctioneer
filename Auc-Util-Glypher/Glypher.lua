@@ -690,6 +690,7 @@ function private.refreshAll()
 end
 
 function lib.GetPrice(link, faction, realm)
+    local playerName = UnitName("player")
     local linkType, itemId, property, factor = AucAdvanced.DecodeLink(link)
     local glypherMin = get("util.glypher.pricemodel.min")
     local glypherMax = get("util.glypher.pricemodel.max")
