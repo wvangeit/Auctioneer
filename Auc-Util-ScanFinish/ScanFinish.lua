@@ -48,71 +48,75 @@ local strPrevSound = "AuctioneerClassic"
 
 function lib.Processor(callbackType, ...)
 
-	if blnDebug then
-		print(".")
-		print("  Debug:CallbackType:", callbackType)
-		print("  Debug:Sound:", AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-		print("  Debug:ScanFinish:Processor:CallbackType:", callbackType)
-		print("  Debug:API.IsBlocked=", AucAdvanced.API.IsBlocked())
-		print("  Debug:API.IsScanning=", AucAdvanced.Scan.IsScanning())
-		print("  Debug:ScanStarted=", blnScanStarted)
-		print("  Debug:ScanLastPage=", blnScanLastPage)
-		print("  Debug:ScanStatsReceived=", blnScanStatsReceived)
-	end
-
 	if (callbackType == "scanprogress") then
-		if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
+		if blnDebug then
+			print(".")
+			print("  Debug:CallbackType:", callbackType)
+		end
+		if not get("util.scanfinish.activated") then
 			return
 		end
 		private.ScanProgressReceiver(...)
 	elseif (callbackType == "scanstats") then
-		if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
+		if blnDebug then
+			print(".")
+			print("  Debug:CallbackType:", callbackType)
+			print("  Debug:ScanStarted="..tostring(blnScanStarted))
+			print("  Debug:ScanLastPage="..tostring(blnScanLastPage))
+			print("  Debug:ScanMinThresholdMet="..tostring(blnScanMinThresholdMet))
+			print("  Debug:ScanStatsReceived="..tostring(blnScanStatsReceived))
+		end
+		if not get("util.scanfinish.activated") then
 			return
 		end
-		if blnDebug then print("  Debug:Updating ScanStatsReceived=true") end
+		local scanstats = ...
+		blnScanMinThresholdMet = blnScanMinThresholdMet and not scanstats.wasIncomplete -- if scan was incomplete then treat threshold as not met
+		if blnDebug then
+			print("  Debug:Updating ScanMinThresholdMet="..tostring(blnScanMinThresholdMet))
+			print("  Debug:Updating ScanStatsReceived=true")
+		end
 		blnScanStatsReceived = true
 	elseif (callbackType == "config") then
+		if blnDebug then
+			print(".")
+			print("  Debug:CallbackType:", callbackType)
+		end
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
+		if blnDebug then
+			print(".")
+			print("  Debug:CallbackType:", callbackType)
+		end
 		private.ConfigChanged(...)
 	end
 end
 
 function lib.OnLoad()
-	print("Auctioneer: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.shutdown", false)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.logout", false)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.message", "So many auctions... so little time")
-	AucAdvanced.Settings.SetDefault("util.scanfinish.messagechannel", "none")
-	AucAdvanced.Settings.SetDefault("util.scanfinish.emote", "none")
-	AucAdvanced.Settings.SetDefault("util.scanfinish.debug", false)
-	if AucAdvanced.Settings.GetSetting("util.scanfinish.debug") then blnDebug = true end
+	default("util.scanfinish.activated", true)
+	default("util.scanfinish.shutdown", false)
+	default("util.scanfinish.logout", false)
+	default("util.scanfinish.message", "So many auctions... so little time")
+	default("util.scanfinish.messagechannel", "none")
+	default("util.scanfinish.emote", "none")
+	default("util.scanfinish.debug", false)
+	if get("util.scanfinish.debug") then blnDebug = true end
+	default("util.scanfinish.soundpath", "none")
+	strPrevSound = get("util.scanfinish.soundpath")
 end
 
-function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, elapsedTime)
-	if blnDebug then print("	Debug:ScanProgressReceiver:Init") end
-	if blnDebug then print("	Debug:Process State=", state) end
-
-	--Check that we're enabled before passing on the callback
-	-- OR
-	--Check to see if browseoverride has been set, if so gracefully allow it to continue as is
-	if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
-		if blnDebug then print("  Debug:ScanFinish Switching State=false (ScanFinish is deactivated)") end
-		state = false
-	elseif AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
-		if blnDebug then print("  Debug:ScanFinish Switching State=false (Browser override is activated)") end
-		state = false
-	end
+function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, queryName, scanCount)
+	if blnDebug then print("  Debug:Process State=", state) end
 
 	if blnDebug then
-		print(" Debug:Sound: "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-		print("	Debug:ScanStarted="..tostring(blnScanStarted))
-		print("	Debug:ScanLastPage="..tostring(blnScanLastPage))
-		print("	Debug:ScanStatsReceived="..tostring(blnScanStatsReceived))
-		print("	Debug:ScanMinThreshold="..tostring(intScanMinThreshold))
-		if scannedAuctions then print("	Debug:ScannedAuctions="..tostring(scannedAuctions)) end
-		if totalAuctions then print("	Debug:TotalAuctions="..tostring(totalAuctions)) end
+		print("  Debug:ScanStarted="..tostring(blnScanStarted))
+		print("  Debug:ScanLastPage="..tostring(blnScanLastPage))
+		print("  Debug:ScanStatsReceived="..tostring(blnScanStatsReceived))
+		print("  Debug:ScanMinThresholdMet="..tostring(blnScanMinThresholdMet))
+		print("  Debug:API.IsBlocked="..tostring(AucAdvanced.API.IsBlocked()))
+		print("  Debug:API.IsScanning="..tostring(AucAdvanced.Scan.IsScanning()))
+		if scannedAuctions then print("  Debug:ScannedAuctions="..tostring(scannedAuctions)) end
+		if totalAuctions then print("  Debug:TotalAuctions="..tostring(totalAuctions)) end
+		if maxPages then print("  Debug:maxPages="..tostring(maxPages)) end
 	end
 
 	--Change the state if we have not scanned any auctions yet.
@@ -124,9 +128,9 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		BrowseButton1:IsVisible()
 	)) then
 		if blnDebug then
-			print("	Debug:ScanFinish Switching State=true")
-			print("	Debug:Updating ScanStarted=true")
-			print("	Debug:Updating ScanStatsReceived=false")
+			print("  Debug:ScanFinish Switching State=true")
+			print("  Debug:Updating ScanStarted=true")
+			print("  Debug:Updating ScanStatsReceived=false")
 		end
 		blnScanStarted = true
 		blnScanLastPage = false
@@ -140,12 +144,13 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 	--3. Did we find a minimum amount of scan items
 	--4. Did we see the last page of the scan
 	--5. Did we receive the stats
+	--6. There are no pending scans
 	if (state == false
 		and blnScanStarted
 		and blnScanMinThresholdMet
 		and blnScanLastPage
 		and blnScanStatsReceived
-		and not (AucAdvanced.Scan.Private.scanStack and #AucAdvanced.Scan.Private.scanStack > 0)
+		and scanCount == 0
 	) then
 		private.PerformFinishEvents()
 	end
@@ -153,31 +158,42 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 	--detect if we've reached the last page. Print progress on the way if we're in debug
 	--don't detect do this before the completed detection to prevent premature execution
 	if totalAuctions and scannedAuctions then
-		if blnDebug then
-			print("	Debug:ScanFinish:totalAuctions:"..totalAuctions.."   scannedAuctions:"..scannedAuctions)
-		end
 
-		--Check to see if we've scanned to our minimum threshold to enable shutdown or logout
-		if scannedAuctions > intScanMinThreshold and blnScanMinThresholdMet == false then
-			if blnDebug then print("	Debug:ScanFinish Switching ScanMinThresholdMet=true") end
-			--Send a friendly reminder that we may be shutting down or logging off now
-			AlertShutdownOrLogOff()
-			blnScanMinThresholdMet = true
-		end
+		-- check for GetAll scan
+		if maxPages == 1 and totalAuctions > 50 then
+			if blnDebug then print("  Debug:GetAll scan detected") end
+			if blnDebug then print("  Debug:ScanFinish Switching LastPageReached=true") end
+			blnScanLastPage = true -- GetAll only has one page, and this is it
+			if totalAuctions > intScanMinThreshold then
+				-- scannedAucions will always be 0 at this point in a GetAll, so test totalAuctions instead
+				--Send a friendly reminder that we may be shutting down or logging off now
+				private.AlertShutdownOrLogOff()
+				if blnDebug then print("  Debug:ScanFinish Switching ScanMinThresholdMet=true") end
+				blnScanMinThresholdMet = true
+			end
+		else
 
-		--Send a warning about the impending shutdown/logout as we approach the end of our auction scan
-		if blnScanStarted and blnScanMinThresholdMet and (totalAuctions - scannedAuctions < 150) then
-			AlertShutdownOrLogOff()
-		end
-		if totalAuctions - scannedAuctions < 50 then
-			if blnDebug then
-				print("	Debug:ScanFinish Switching LastPageReached=true")
+			--Check to see if we've scanned to our minimum threshold to enable shutdown or logout
+			if scannedAuctions > intScanMinThreshold and blnScanMinThresholdMet == false then
+				if blnDebug then print("  Debug:ScanFinish Switching ScanMinThresholdMet=true") end
+				--Send a friendly reminder that we may be shutting down or logging off now
+				private.AlertShutdownOrLogOff()
+				blnScanMinThresholdMet = true
 			end
 
-			blnScanLastPage = true
+			--Send a warning about the impending shutdown/logout as we approach the end of our auction scan
+			if blnScanStarted and blnScanMinThresholdMet and (totalAuctions - scannedAuctions < 150) then
+				private.AlertShutdownOrLogOff()
+			end
+			if totalAuctions - scannedAuctions < 50 then
+				if blnDebug then
+					print("  Debug:ScanFinish Switching LastPageReached=true")
+				end
+
+				blnScanLastPage = true
 			end
 		end
-
+	end
 end
 
 function private.PerformFinishEvents()
@@ -188,38 +204,38 @@ function private.PerformFinishEvents()
 	blnScanMinThresholdMet = false
 
 	if blnDebug then
-		print("  Debug:Message: "..AucAdvanced.Settings.GetSetting("util.scanfinish.message"))
-		print("  Debug:MessageChannel: "..AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel"))
-		print("  Debug:Emote: "..AucAdvanced.Settings.GetSetting("util.scanfinish.emote"))
-		print("  Debug:LogOut: "..tostring(AucAdvanced.Settings.GetSetting("util.scanfinish.logout")))
-		print("  Debug:ShutDown: "..tostring(AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")))
+		print("  Debug:Message: "..get("util.scanfinish.message"))
+		print("  Debug:MessageChannel: "..get("util.scanfinish.messagechannel"))
+		print("  Debug:Emote: "..get("util.scanfinish.emote"))
+		print("  Debug:LogOut: "..tostring(get("util.scanfinish.logout")))
+		print("  Debug:ShutDown: "..tostring(get("util.scanfinish.shutdown")))
 	end
 
 	--Sound
-	PlayCompleteSound()
+	private.PlayCompleteSound()
 
 	--Message
-	if AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel") == "none" then
+	if get("util.scanfinish.messagechannel") == "none" then
 		--don't do anything
-	elseif AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel") == "GENERAL" then
-		SendChatMessage(AucAdvanced.Settings.GetSetting("util.scanfinish.message"),"CHANNEL",nil,GetChannelName("General"))
+	elseif get("util.scanfinish.messagechannel") == "GENERAL" then
+		SendChatMessage(get("util.scanfinish.message"),"CHANNEL",nil,GetChannelName("General"))
 	else
-		SendChatMessage(AucAdvanced.Settings.GetSetting("util.scanfinish.message"),AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel"))
+		SendChatMessage(get("util.scanfinish.message"),get("util.scanfinish.messagechannel"))
 	end
 
 
 	--Emote
-	if not (AucAdvanced.Settings.GetSetting("util.scanfinish.emote") == "none") then
-		DoEmote(AucAdvanced.Settings.GetSetting("util.scanfinish.emote"))
+	if not (get("util.scanfinish.emote") == "none") then
+		DoEmote(get("util.scanfinish.emote"))
 	end
 
 	--Shutdown or Logoff
-	if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
+	if (get("util.scanfinish.shutdown")) then
 		print("AucAdvanced: {{"..libName.."}} Shutting Down!!")
 		if not blnDebug then
 			Quit()
 		end
-	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
+	elseif (get("util.scanfinish.logout")) then
 		print("AucAdvanced: {{"..libName.."}} Logging Out!")
 		if not blnDebug then
 			Logout()
@@ -227,18 +243,18 @@ function private.PerformFinishEvents()
 	end
 end
 
-function AlertShutdownOrLogOff()
-	if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
+function private.AlertShutdownOrLogOff()
+	if (get("util.scanfinish.shutdown")) then
 		PlaySound("TellMessage")
 		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: Shutdown is enabled. World of Warcraft will be shut down once the current scan successfully completes.")
-	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
+	elseif (get("util.scanfinish.logout")) then
 		PlaySound("TellMessage")
 		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: LogOut is enabled. This character will be logged off once the current scan successfully completes.")
 	end
 end
 
-function PlayCompleteSound()
-	strConfiguredSoundPath = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+function private.PlayCompleteSound()
+	strConfiguredSoundPath = get("util.scanfinish.soundpath")
 	if strConfiguredSoundPath and not (strConfiguredSoundPath == "none") then
 		if blnDebug then
 			print("AucAdvanced: {{"..libName.."}} You are listening to "..strConfiguredSoundPath)
@@ -256,7 +272,7 @@ function PlayCompleteSound()
 			--Can get this working as a print to screen or an internal sound. Other developers
 			--suggested this workaround.
 			--http://forums.worldofwarcraft.com/thread.html?topicId=1777875494&sid=1&pageNo=4
-			PlaySound("GAMEHIGHLIGHTFRIENDLYUNIT")
+			--PlaySound("GAMEHIGHLIGHTFRIENDLYUNIT") -- this bug appears to be fixed
 			PlaySoundFile(strConfiguredSoundPath)
 
 		else
@@ -359,17 +375,17 @@ end
 
 function private.ConfigChanged()
 	--Debug switch via gui. Currently not exposed to the end user
-	--blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")
+	--blnDebug = get("util.scanfinish.debug")
 	if blnDebug then
 		print("  Debug:Configuration Changed")
 	end
 
-	if not (strPrevSound == AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) then
-		PlayCompleteSound()
-		strPrevSound = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+	if not (strPrevSound == get("util.scanfinish.soundpath")) then
+		private.PlayCompleteSound()
+		strPrevSound = get("util.scanfinish.soundpath")
 	end
 
-	if (not AucAdvanced.Settings.GetSetting("util.scanfinish.activated")) then
+	if (not get("util.scanfinish.activated")) then
 		if blnDebug then print("  Debug:Updating ScanFinish:Deactivated") end
 		private.ScanProgressReceiver(false)
 	elseif (AucAdvanced.Scan.IsScanning()) then
