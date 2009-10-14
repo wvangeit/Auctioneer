@@ -106,6 +106,9 @@ function lib.OnLoad()
     default("util.glypher.pricemodel.useundercut", true)
     default("util.glypher.pricemodel.undercut", 1)
     default("util.glypher.pricemodel.whitelist", "")
+    default("util.glypher.pricemodel.ignoretime", 0)
+    default("util.glypher.misc.clearqueue", true)
+    default("util.glypher.misc.inktrader", true)
     default("util.glypher.altlist", "")
     default("util.glypher.gvault", "")
 
@@ -275,11 +278,26 @@ function private.SetupConfigGui(gui)
     --gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.undercut")
     gui:AddTip(id, "The amount that you undercut others")
 
-
     --gui:AddControl(id, "Subhead", 0, "Whitelist")
     gui:AddControl(id, "Note", 0, 1, nil, nil, "Whitelist")
     gui:AddControl(id, "Text", 0, 1, "util.glypher.pricemodel.whitelist")
     gui:AddTip(id, "The players to whitelist on undercuts (blank for no whitelist, separarate whitelisted users with a ':')") --eventually have a list to edit
+
+    gui:AddControl(id, "Note", 0, 1, nil, nil, "Ignore Time Left")
+    gui:AddControl(id, "Selectbox", 0, 1, {
+        {0, "Disable"},
+        {1, "30 Minutes"},
+        {2, "2 Hours"}
+    }, "util.glypher.pricemodel.ignoretime", "Ignore competitor auctions when time left is less than time selected.")
+    gui:AddTip(id, "Ignore competitor auctions when time left is less than time selected.")
+
+    gui:AddControl(id, "Subhead", 0, "Misc options")
+
+    gui:AddControl(id, "Checkbox", 0, 1, "util.glypher.misc.clearqueue", "Auto clear skill queue")
+    gui:AddTip(id, "Automatically clear the skill queue when 'Get Profit' or 'Add to Skill' are pressed.")
+
+    gui:AddControl(id, "Checkbox", 0, 1, "util.glypher.misc.inktrader", "Use Ink Trader")
+    gui:AddTip(id, "Use the ink trader in Dalaran instead of having the skill window recursively queue inks to be made.")
 
     if DataStore then
         gui:AddControl(id, "Subhead", 0, "DataStore Configuration")
@@ -291,8 +309,6 @@ function private.SetupConfigGui(gui)
         gui:AddControl(id, "Note", 0, 1, nil, nil, "Guild")
         gui:AddControl(id, "Text", 0, 1, "util.glypher.gvault")
         gui:AddTip(id, "Guild name for the vault which you use for your glyph business. Leave blank to disable.")    
-
-
     end
 
     frame.refreshButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -408,21 +424,26 @@ function private.findGlyphs()
             return
         end
     end
-        if (not coFG) or (coroutine.status(coFG) == "dead") then
-                coFG = coroutine.create(private.cofindGlyphs)
-                onupdateframe = CreateFrame("frame")
+    private.data = nil
+    private.frame.glypher.sheet:SetData({}, Style)
+    if get("util.glypher.misc.clearqueue") then
+        if Skillet then Skillet:ClearQueue() end
+        if ATSW_DeleteQueue then ATSW_DeleteQueue() end
+    end
+    if (not coFG) or (coroutine.status(coFG) == "dead") then
+        coFG = coroutine.create(private.cofindGlyphs)
+        onupdateframe = CreateFrame("frame")
 
-                onupdateframe:SetScript("OnUpdate", function()
-                    local status, result
-                    status = coroutine.status(coFG)
-                    if status ~= "dead" then
-                           status, result = coroutine.resume(coFG)
-                        if not status and result then
-                            error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coFG));
-                        end
-                    end
-
-                end)
+        onupdateframe:SetScript("OnUpdate", function()
+            local status, result
+            status = coroutine.status(coFG)
+            if status ~= "dead" then
+                status, result = coroutine.resume(coFG)
+                if not status and result then
+                    error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coFG));
+                end
+               end
+        end)
 
                 local status, result = coroutine.resume(coFG)
                 if not status and result then
@@ -603,8 +624,18 @@ function private.cofindGlyphs()
                     local currentAuctions = private.GetStock(itemId)
 
                     local make = floor(bcSold/history * stockdays + .9) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
-                    local _, failed = BeanCounter.API.getAHSoldFailed(UnitName("player"), link) or 0, 0
-                    --local _, failed = BeanCounter.API.getAHSoldFailed(nil, link) or 0, 0
+                    local failed = 0
+                    if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
+                        for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+                               if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+                                local _, characterFailed = BeanCounter.API.getAHSoldFailed(characterName, link)
+                                if characterFailed then failed = failed + characterFailed end
+                            end
+                        end
+                    else  
+                        local _, characterFailed = BeanCounter.API.getAHSoldFailed(UnitName("player"), link) 
+                        if characterFailed then failed = characterFailed end
+                    end
 
                     if bcSold == 0 and failed == 0 and currentAuctions == 0 then
                         make = makefornew
@@ -616,9 +647,12 @@ function private.cofindGlyphs()
                     if make > 0 then
                         local failedratio
                         if (bcSold > 0) then failedratio = failed/bcSold else failedratio = -1 end
-                        if (bcSold > 0 and failed/bcSold < failratio) or failed == 0 or failratio == 0 then
+                        if (bcSold > 0 and failedratio < failratio) or failed == 0 or failratio == 0 then
                             table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
                             table.insert(private.Display, {link, make, worthPrice - reagentCost} )
+                        else
+                            local mess = "Skipping " .. link .. ": failedratio = " .. failedratio .. " (failed: " .. failed .. " / sold: " .. bcSold .. ")"
+                            DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
                         end
                     end
                 end
@@ -652,11 +686,16 @@ end
 
 
 function private.addtoCraft()
+    local queueRecurse = not get("util.glypher.misc.inktrader")
     if Skillet and Skillet.QueueAppendCommand then
         if not Skillet.reagentsChanged then Skillet.reagentsChanged = {} end --this required table is nil when we use teh queue
         if not private.data then
             print("Glyph list is empty - use Get Profitable first.")
             return
+        end
+        if get("util.glypher.misc.clearqueue") then
+            if Skillet then Skillet:ClearQueue() end
+            if ATSW_DeleteQueue then ATSW_DeleteQueue() end
         end
         for i, glyph in ipairs(private.data) do
             local command = {}
@@ -666,13 +705,21 @@ function private.addtoCraft()
             command["recipeID"] = index
             command["op"] = "iterate"
             command["count"] = glyph.count
-            Skillet:QueueAppendCommand(command, true)
+            Skillet:QueueAppendCommand(command, queueRecurse)
         end
         Skillet:UpdateTradeSkillWindow()
+        private.data = nil
+        private.frame.glypher.sheet:SetData({}, Style)
     elseif ATSW_AddJobRecursive then
         for i, glyph in ipairs(private.data) do
-            ATSW_AddJobRecursive(glyph.name, glyph.count)
+            if queueRecurse then
+                ATSW_AddJobRecursive(glyph.name, glyph.count)
+            else
+                ATSW_AddJob(glyph.name, glyph.count)
+            end
         end
+        private.data = nil
+        private.frame.glypher.sheet:SetData({}, Style)
     else
         print("Lilsparky's clone of Skillet or Advanced Trade Skill Window not found")
         print("Get Lilsparky's clone of Skillet at http://www.wowace.com/addons/skillet/repositories/lilsparkys-clone/files/")
@@ -698,6 +745,7 @@ function lib.GetPrice(link, faction, realm)
     local glypherUseundercut = get("util.glypher.pricemodel.useundercut")
     local glypherUndercut = get("util.glypher.pricemodel.undercut")
     local glypherWhitelist = get("util.glypher.pricemodel.whitelist")
+    local glypherIgnoretime = get("util.glypher.pricemodel.ignoretime")
     if (linkType ~= "item") then return end
     itemId = tonumber(itemId)
     property = tonumber(property) or 0
@@ -727,10 +775,11 @@ function lib.GetPrice(link, faction, realm)
                     end
                 end
             else
-                if auction.buyoutPrice < competitorLow then
-                    if auction.buyoutPrice >= glypherMin then
-                        --this if we're in is so that we don't even both with prices below our min
-                        competitorLow = auction.buyoutPrice
+                if auction.timeLeft > glypherIgnoretime then
+                    if auction.buyoutPrice < competitorLow then
+                        if auction.buyoutPrice >= glypherMin then
+                            competitorLow = auction.buyoutPrice
+                        end
                     end
                 end
             end
