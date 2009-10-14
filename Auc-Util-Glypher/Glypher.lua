@@ -471,6 +471,7 @@ function private.cofindGlyphs()
     local SECONDS_IN_MINUTE = 60;
     local SECONDS_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
     local historyTime = time() - (history * SECONDS_IN_DAY)
+    local qtyInk = 0
 
     local milldata = Enchantrix.Storage.GetItemMilling(36904) -- get probability data on Tiger Lily
     if not milldata then
@@ -598,8 +599,10 @@ function private.cofindGlyphs()
                     local isVendored,isLimited,itemCost,toSell,buyStack,maxStack = Informant.getItemVendorInfo(Id)
                     if string.find(":43126:43120:43124:37101:43118:43116:39774:39469:43122:", ":" .. Id .. ":") then
                         reagentCost = (reagentCost + (inkCost * count) )
+                        qtyInk = qtyInk + count
                     elseif Id == 43127 then
                         reagentCost = (reagentCost + (inkCost * count * 10) )
+                        qtyInk = qtyInk + (count * 10)
                     elseif isVendored then
                         reagentCost = (reagentCost + (itemCost * count) )
                     else
@@ -660,6 +663,11 @@ function private.cofindGlyphs()
         end
     end
 
+    if get("util.glypher.misc.inktrader") then
+        local _, link = GetItemInfo(43126)
+        local mess = "You need " .. link .. "x" .. qtyInk .. " to process this queue."
+        DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
+    end
     private.frame.glypher.sheet:SetData(private.Display, Style)
     private.frame.searchButton:Enable()
     private.frame.searchButton:SetText("Get Profitable")
