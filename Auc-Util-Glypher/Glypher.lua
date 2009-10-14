@@ -589,6 +589,7 @@ function private.cofindGlyphs()
                 end
 
                 local reagentCost = 0
+                local addInk = 0
                 --Sum the cost of the mats to craft this item, parchment is not considered its really too cheap to matter
                 local inkMatch = false --only match inks choosen by user
                 for i = 1 ,GetTradeSkillNumReagents(ID) do
@@ -599,10 +600,10 @@ function private.cofindGlyphs()
                     local isVendored,isLimited,itemCost,toSell,buyStack,maxStack = Informant.getItemVendorInfo(Id)
                     if string.find(":43126:43120:43124:37101:43118:43116:39774:39469:43122:", ":" .. Id .. ":") then
                         reagentCost = (reagentCost + (inkCost * count) )
-                        qtyInk = qtyInk + count
+                        addInk = addInk + count
                     elseif Id == 43127 then
                         reagentCost = (reagentCost + (inkCost * count * 10) )
-                        qtyInk = qtyInk + (count * 10)
+                        addInk = addInk + (count * 10)
                     elseif isVendored then
                         reagentCost = (reagentCost + (itemCost * count) )
                     else
@@ -653,6 +654,7 @@ function private.cofindGlyphs()
                         if (bcSold > 0 and failedratio < failratio) or failed == 0 or failratio == 0 then
                             table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
                             table.insert(private.Display, {link, make, worthPrice - reagentCost} )
+                            qtyInk = qtyInk + (addInk * make)    
                         else
                             local mess = "Skipping " .. link .. ": failedratio = " .. failedratio .. " (failed: " .. failed .. " / sold: " .. bcSold .. ")"
                             DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
