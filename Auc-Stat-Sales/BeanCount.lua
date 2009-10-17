@@ -319,10 +319,11 @@ function lib.OnLoad(addon)
 	default("stat.sales.confidence", false)
 	default("stat.sales.enable", true)
 	
-	if not AucAdvancedStatSalesData then
-		AucAdvancedStatSalesData = {}
+	if not get("stat.sales.ignoredsigs") then
+		set("stat.sales.ignoredsigs", {} )
 	end
-	SalesDB = AucAdvancedStatSalesData
+	--AucAdvancedStatSalesData
+	SalesDB = get("stat.sales.ignoredsigs")
 end
 
 function lib.Processor(callbackType, ...)
