@@ -111,17 +111,38 @@ local BindTypes = {
 	[ITEM_BIND_TO_ACCOUNT] = "ITEM_BIND_TO_ACCOUNT",
 }
 
--- local constants to index the posting 'request' tables
-local REQ_ID = 0
+-- local constants to index the posting request tables
 local REQ_SIG = 1
 local REQ_COUNT = 2
 local REQ_BID = 3
 local REQ_BUYOUT = 4
 local REQ_DURATION = 5
-local REQ_FAILCOUNT = 6
+local REQ_ID = 6
 local REQ_POSTLINK = 7
 local REQ_BAG = 8
 local REQ_SLOT = 9
+local REQ_TIMEOUT = 10
+local REQ_FLAGPOSTFAIL = 11
+-- function to create a new posting request table; keep sync'd with the above constants
+private.lastPostId = 0
+function private.NewRequestTable(sig, count, bid, buyout, duration)
+	local postId = private.lastPostId + 1
+	private.lastPostId = postId
+	local request = {
+		sig, --REQ_SIG
+		count, --REQ_COUNT
+		bid, --REQ_BID
+		buyout, --REQ_BUYOUT
+		duration, --REQ_DURATION
+		postId, --REQ_ID
+		false, --REQ_POSTLINK
+		0, --REQ_BAG
+		0, --REQ_SLOT
+		0, --REQ_TIMEOUT
+		false, --REQ_FLAGPOSTFAIL
+	}
+	return request
+end
 
 --[[
 	Functions to safely handle the Post Request queue
@@ -155,18 +176,38 @@ end
 function private.QueueRemove(index)
 	index = index or 1
 	if private.postRequests[index] then
-		tremove(private.postRequests, index)
+		local request = tremove(private.postRequests, index)
 		private.QueueReport()
+		return request
 	end
 end
+function private.QueueReorder(indexfrom, indexto)
+	local queuelen = #private.postRequests
+	if queuelen < 2 then return end
+	indexfrom = indexfrom or 1
+	local request = tremove(private.postRequests, indexfrom)
+	if not request then return end
+	if indexto and indexto ~= indexfrom and indexto <= queuelen then
+		tinsert(private.postRequests, indexto, request)
+	else
+		tinsert(private.postRequests, request)
+	end
+	private.QueueReport()
+	return true
+end
+function private.GetQueueIterator()
+	return ipairs(private.postRequests)
+end
+function private.GetQueueIndex(index)
+	return private.postRequests[index]
+end
 
---[[ GetQueueStatus
-	(proposed: expand this function later with any other useful values)
---
-function lib.GetQueueStatus()
+--[[ GetQueueLen()
+	Return number of requests remaining in the Post Queue
+--]]
+function lib.GetQueueLen()
 	return #private.postRequests
 end
-]]
 
 --[[ CancelPostQueue()
 	Safely removes all possible Post requests from the Post queue
@@ -183,6 +224,8 @@ function lib.CancelPostQueue()
 	end
 end
 
+--[[ End of Post Request Queue section; there should be no references to private.postRequests after this point]]
+
 --[[
     PostAuction(sig, size, bid, buyout, duration, [multiple])
 	Throws: ERROR_AHCLOSED
@@ -192,7 +235,6 @@ end
 	posted for "duration" minutes. The request will be posted
 	"multiple" number of times.
 ]]
-private.lastPostId = 0
 function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	if not AuctionFrame
 	or not AuctionFrame:IsVisible()
@@ -204,11 +246,9 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	if not multiple then multiple = 1 end
 	private.SetQueueReports(false)
 	for i = 1, multiple do
-		local postId = private.lastPostId + 1
-		private.lastPostId = postId
-
-		private.QueueInsert({[0]=postId, sig, size, bid, buyout, duration, 0, false, 0, 0})
-		tinsert(postIds, postId)
+		local request = private.NewRequestTable(sig, size, bid, buyout, duration)
+		private.QueueInsert(request)
+		tinsert(postIds, request[REQ_ID])
 	end
 	private.SetQueueReports(true)
 	private.Wait(0) -- delay until next OnUpdate
@@ -293,7 +333,7 @@ function lib.CountAvailableItems(sig)
 		end
 	end
 
-	for _, request in ipairs(private.postRequests) do
+	for _, request in private.GetQueueIterator() do
 		local itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = DecodeSig(request[1])
 		if itemId == matchId
 		and itemSuffix == matchSuffix
@@ -321,7 +361,7 @@ function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEncha
 	if not matchId then return end
 	local matches = {}
 	local total = 0
-	local blankBag, blankSlot, foundLink, foundLocked, blankSpecial
+	local blankBag, blankSlot, foundLink, foundLocked
 
 	local itemtype = GetItemFamily(matchId) or 0
 	if itemtype > 0 then
@@ -359,11 +399,7 @@ function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEncha
 							end
 						end
 					else -- blank slot
-						if bagtype ~= 0 and not blankSpecial then
-							blankBag = bag
-							blankSlot = slot
-							blankSpecial = true
-						elseif not blankBag then
+						if not blankBag then
 							blankBag = bag
 							blankSlot = slot
 						end
@@ -508,36 +544,22 @@ end
 --[[
 	PRIVATE: ProcessPosts()
 	This function is responsible for maintaining and processing the post queue.
-	Note:
-	private.postRequests[queuenumber] = {
-		[0]=postId, -- REQ_ID
-		[1]=sig, -- REQ_SIG
-		[2]=stackcount, -- REQ_COUNT
-		[3]=bid, -- REQ_BID
-		[4]=buyout, -- REQ_BUYOUT
-		[5]=duration, -- REQ_DURATION
-		[6]=failure, -- REQ_FAILCOUNT: initially 0. used for number of tries to post auction, then for expiry time after posting
-		[7]=uniquelink, -- REQ_POSTLINK: initially false; serves as a flag for successful StartAuction and holds unique item link
-		[8]=bag, -- REQ_BAG
-		[9]=slot, -- REQ_SLOT
-	}
 ]]
 local LAG_ADJUST = (3 / 1000)
 local POST_TIMEOUT = 6 -- seconds general timeout
 local POST_ERROR_PAUSE = 1 -- seconds pause after error
-local POST_RETRYS = 2 -- Numer of retrys after the original failed attempt. Must never exceed value of POST_TIMEOUT
 local POST_THROTTLE = 0.1 -- time before starting to post the next item in the queue
 function private.ProcessPosts(source)
-	if #private.postRequests <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
+	if lib.GetQueueLen() <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
 		private.Wait() -- put timer to sleep
 		return
 	end
-
-	local request = private.postRequests[1]
-
 	-- use longer timeout delays if connectivity is bad, but always at least 1 second
 	local _,_, lag = GetNetStats()
 	lag = max(lag * LAG_ADJUST, 1)
+	private.Wait(lag) -- set default wait time (overwritten later in certain cases)
+
+	local request = private.GetQueueIndex(1)
 
 	if request[REQ_POSTLINK] then
 		-- We're waiting for the item to vanish from the bags
@@ -547,7 +569,7 @@ function private.ProcessPosts(source)
 			private.QueueRemove()
 			private.Wait(POST_THROTTLE)
 			AucAdvanced.SendProcessorMessage("postresult", true, request[REQ_ID], request)
-		elseif GetTime() > request[REQ_FAILCOUNT] then
+		elseif GetTime() > request[REQ_TIMEOUT] then
 			-- Can't auction this item!
 			local _, itemCount = GetContainerItemInfo(request[REQ_BAG], request[REQ_SLOT])
 			local msg = ("Unable to confirm auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILTIMEOUT)
@@ -584,11 +606,9 @@ function private.ProcessPosts(source)
 	end
 
 	if bag then
-		local tries = request[REQ_FAILCOUNT]
-		-- if tries > 0 then something went wrong last time
-		-- we want to avoid spamming with the events just triggered by our failed attempt
-		-- so we will wait for the timer
-		if tries > 0 and source ~= "timer" then
+		local failed = request[REQ_FLAGPOSTFAIL]
+		if failed and GetTime() < request[REQ_TIMEOUT] then
+			-- Auction posting failed the first time; wait for full delay time before retrying
 			return
 		end
 		local link = GetContainerItemLink(bag,slot)
@@ -598,11 +618,8 @@ function private.ProcessPosts(source)
 		ClickAuctionSellItemButton()
 		if (CursorHasItem()) then -- Didn't auction successfully
 			ClearCursor() -- Put it back in the bags
-
-			tries = tries + 1
-			request[REQ_FAILCOUNT] = tries
-			if tries > POST_RETRYS then
-				-- Can't auction this item!
+			if failed then
+				-- Auction posting has failed twice - abort this request
 				local _, itemCount = GetContainerItemInfo(bag,slot)
 				local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILRETRY)
 				debugPrint(msg, "CorePost", "Posting Failure", "Warning")
@@ -610,21 +627,21 @@ function private.ProcessPosts(source)
 				private.Wait(POST_ERROR_PAUSE)
 				AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, ERROR_FAILRETRY)
 				message(msg)
+				return
 			else
-				-- If we reach this point something has gone wrong, possibly because we are trying to post too fast
-				-- we want to avoid spamming this 'posting' section; we will use a larger delay value in case 'lag' is too small
-				-- Original plus POST_RETRYS attempts, at least (POST_TIMEOUT/POST_RETRYS) seconds apart = POST_TIMEOUT minimum timeout
-				private.Wait(lag * POST_TIMEOUT / POST_RETRYS)
+				-- First time the auction posting has failed
+				-- The problem may be due to lag or something else that will clear given enough time
+				request[REQ_TIMEOUT] = GetTime() + lag * POST_TIMEOUT -- delay before trying to post this auction again
+				request[REQ_FLAGPOSTFAIL] = true
+				private.QueueReorder() -- Move to the back of the queue and try a different auction (if possible)
 			end
-			return
-		else -- Successful post - wait for this item to vanish
-			request[REQ_FAILCOUNT] = GetTime() + lag * POST_TIMEOUT
+		else -- Successful post - wait for this item to vanish from bag
+			request[REQ_TIMEOUT] = GetTime() + lag * POST_TIMEOUT
 			request[REQ_POSTLINK] = link
 			request[REQ_BAG] = bag
 			request[REQ_SLOT] = slot
 		end
 	end
-	private.Wait(lag)
 end
 
 --[[
@@ -660,7 +677,7 @@ function lib.Processor(event, ...)
 			private.ProcessPosts(event)
 		end
 	elseif event == "auctionopen" then
-		if #private.postRequests > 0 then
+		if lib.GetQueueLen() > 0 then
 			private.ProcessPosts(event)
 		end
 	end
@@ -677,8 +694,7 @@ private.updateFrame:Hide()
 private.updateFrame:SetScript("OnUpdate", function(obj, delay)
 	obj.timer = obj.timer - delay
 	if obj.timer <= 0 then
-		obj.timer = 6 -- safety value, will be overwritten later
-		private.ProcessPosts("timer")
+		private.ProcessPosts("timer") -- obj.timer will be updated by ProcessPosts
 	end
 end)
 
