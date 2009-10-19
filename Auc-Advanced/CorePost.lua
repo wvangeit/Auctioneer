@@ -123,6 +123,7 @@ local REQ_BAG = 8
 local REQ_SLOT = 9
 local REQ_TIMEOUT = 10
 local REQ_FLAGPOSTFAIL = 11
+local REQ_FLAGNOSPACE = 12
 -- function to create a new posting request table; keep sync'd with the above constants
 private.lastPostId = 0
 function private.NewRequestTable(sig, count, bid, buyout, duration)
@@ -140,6 +141,7 @@ function private.NewRequestTable(sig, count, bid, buyout, duration)
 		0, --REQ_SLOT
 		0, --REQ_TIMEOUT
 		false, --REQ_FLAGPOSTFAIL
+		false, --REQ_FLAGNOSPACE
 	}
 	return request
 end
@@ -588,10 +590,19 @@ function private.ProcessPosts(source)
 		local link, name = AucAdvanced.API.GetLinkFromSig(request[REQ_SIG])
 		local msg
 		if ConstErrors[err] then -- Check for our own special "errors"
+			private.Wait(POST_ERROR_PAUSE)
+			if err == ERROR_NOBLANK then -- special case
+				private.Wait(0)
+				if not request[REQ_FLAGNOSPACE] then
+					request[REQ_FLAGNOSPACE] = true
+					if private.QueueReorder() then
+						return
+					end
+				end
+			end
 			msg = ("Aborting post request for %s x%d: %s"):format(link, request[REQ_COUNT], err)
 			debugPrint(msg, "CorePost", "Post request aborted", "Warning")
 			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
 			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, err)
 			message(msg)
 		else -- Unexpected (probably real) error
