@@ -152,6 +152,10 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		and blnScanStatsReceived
 		and scanCount == 0
 	) then
+		blnScanStarted = false
+		blnScanMinThresholdMet = false
+		blnScanLastPage = false
+		blnScanStatsReceived = false
 		private.PerformFinishEvents()
 	end
 
