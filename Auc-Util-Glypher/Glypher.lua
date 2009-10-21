@@ -697,6 +697,10 @@ end
 
 function private.addtoCraft()
 	local queueRecurse = not get("util.glypher.misc.inktrader")
+	if not private.data then
+		print("No glyphs to add to skill.")
+		return
+	end
 	if Skillet and Skillet.QueueAppendCommand then
 		if not Skillet.reagentsChanged then Skillet.reagentsChanged = {} end --this required table is nil when we use teh queue
 		if not private.data then
@@ -720,16 +724,33 @@ function private.addtoCraft()
 		Skillet:UpdateTradeSkillWindow()
 		private.data = nil
 		private.frame.glypher.sheet:SetData({}, Style)
-	elseif ATSW_AddJobRecursive then
+	elseif ATSW_AddJobRecursive and atsw_preventupdate ~= nil then
+		local atsw_tmp = atsw_preventupdate
+		atsw_preventupdate = true
 		for i, glyph in ipairs(private.data) do
 			if queueRecurse then
 				ATSW_AddJobRecursive(glyph.name, glyph.count)
 			else
-				ATSW_AddJob(glyph.name, glyph.count)
+				ATSW_AddJobLL(glyph.name, glyph.count)
 			end
 		end
+		atsw_preventupdate = atsw_tmp
+		ATSW_ResetPossibleItemCounts();
+		ATSWInv_UpdateQueuedItemList();
+		ATSWFrame_UpdateQueue();
+		ATSWFrame_Update();
+
 		private.data = nil
 		private.frame.glypher.sheet:SetData({}, Style)
+	elseif ATSW_AddJobRecursive and atsw_preventupdate == nil then
+		print("Advanced Trade Skill Window found, but needs to be patched in Interface/AddOns/AdvancedTradeSkillWindow/atsw.lua:")
+		print("Change the following line:")
+		print("local atsw_preventupdate=false;") 
+		print("To:")
+		print("atsw_preventupdate=false;")
+		print("Then type /reloadui")
+		print("---> Using Lilsparky's clone of Skillet instead of ATSW is HIGHLY recommended. <---")
+		print("Get Lilsparky's clone of Skillet at http://www.wowace.com/addons/skillet/repositories/lilsparkys-clone/files/")
 	else
 		print("Lilsparky's clone of Skillet or Advanced Trade Skill Window not found")
 		print("Get Lilsparky's clone of Skillet at http://www.wowace.com/addons/skillet/repositories/lilsparkys-clone/files/")
