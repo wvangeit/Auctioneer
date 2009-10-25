@@ -248,7 +248,7 @@ function private.searchDB(data, server, player, DB, itemID)
 	for index, itemKey in pairs(server[player][DB][itemID]) do
 		DB = DB:gsub("Neutral", "")--remove the Neutral part so we send it to the proper function
 		for _, text in ipairs(itemKey) do
-			tinsert(data, {DB:upper(), id, index, text})
+			tinsert(data, {DB:upper(), itemID, index, text})
 		end
 	end
 	return data
