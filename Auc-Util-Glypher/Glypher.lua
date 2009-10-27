@@ -99,8 +99,8 @@ function lib.OnLoad()
 	default("util.glypher.profitAppraiser", 100)
 	default("util.glypher.profitBeancounter", 100)
 	default("util.glypher.profitMarket", 50)
-	default("util.glypher.pricemodel.active", true) --weltmeister is this still needed?
-	default("util.glypher.pricemodel.min", 32500)
+	default("util.glypher.pricemodel.min1", get("util.glypher.pricemodel.min") or 32500)
+	default("util.glypher.pricemodel.min2", get("util.glypher.pricemodel.min") or 35000)
 	default("util.glypher.pricemodel.max", 999999)
 	default("util.glypher.pricemodel.underpct", 1)
 	default("util.glypher.pricemodel.useundercut", true)
@@ -111,6 +111,8 @@ function lib.OnLoad()
 	default("util.glypher.misc.inktrader", true)
 	default("util.glypher.altlist", "")
 	default("util.glypher.gvault", "")
+	default("util.glypher.inks.found", false)
+	default("util.glypher.debugTooltip", false)
 
 --Check to see if we've got a recent enough version of AucAdvanced
 	local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -118,7 +120,7 @@ function lib.OnLoad()
 		local mess = "Auc-Util-Glypher requires Auctioneer Advanced build >= 4409"
 		DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
 		mess = "Auc-Util-Glypher will still load, but some features are guaranteed to NOT work"
-				DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
+		DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
 	end
 
 	local sideIcon
@@ -145,6 +147,10 @@ function private.SlideBarClick(_, button)
 	else
 		AucAdvanced.Settings.Show()
 		private.gui:ActivateTab(private.id)
+	end
+	if not get("util.glypher.inks.found") then
+		local mess = "The pricing model feature of Auc-Util-Glypher requires that you to use the 'Get Profitable' function in order to populate it's database."
+		DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
 	end
 end
 
@@ -255,11 +261,14 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Subhead", 0, "Glypher pricing model")
 
-	--gui:AddControl(id, "Subhead", 0, "Minimum Sale Price")
-	gui:AddControl(id, "Note", 0, 1, nil, nil, "Minimum Sale Price")
-	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.min")
-	gui:AddTip(id, "The price that Glypher will never go below in order to undercut others")
+	--gui:AddControl(id, "Subhead", 0, "Minimum Sale Price - 1-Ink Glyphs")
+	gui:AddControl(id, "Note", 0, 1, nil, nil, "Minimum Sale Price - 1-Ink Glyphs")
+	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.min1")
+	gui:AddTip(id, "The price that Glypher will never go below on 1-ink glyphs in order to undercut others")
 
+	gui:AddControl(id, "Note", 0, 1, nil, nil, "Minimum Sale Price - 2-Ink Glyphs")
+	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.pricemodel.min2")
+	gui:AddTip(id, "The price that Glypher will never go below on 2-ink glyphs in order to undercut others")
 
 	--gui:AddControl(id, "Subhead", 0, "Maximum Sale Price")
 	gui:AddControl(id, "Note", 0, 1, nil, nil, "Maximum Sale Price")
@@ -298,6 +307,9 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Checkbox", 0, 1, "util.glypher.misc.inktrader", "Use Ink Trader")
 	gui:AddTip(id, "Use the ink trader in Dalaran instead of having the skill window recursively queue inks to be made.")
+
+	gui:AddControl(id, "Checkbox", 0, 1, "util.glypher.debugTooltip", "Show debug tooltip")
+	gui:AddTip(id, "Show some debugging information in item tooltips.")
 
 	if DataStore then
 		gui:AddControl(id, "Subhead", 0, "DataStore Configuration")
@@ -380,17 +392,21 @@ function private.SetupConfigGui(gui)
 end
 
 function private.ProcessTooltip(frame, name, link, quality, quantity, cost, additional)
+	if not get("util.glypher.debugTooltip") then return end
 	if not link then return end
 	if not DataStore then return end
 	frame:SetColor(0.9, 0.3, 0.3)
-	frame:AddLine("Glypher DataStore Debugging")
+	frame:AddLine("Glypher Debugging Data")
 	local _, itemId = AucAdvanced.DecodeLink(link)
 	local stock, a = private.GetStock(itemId)
 	local i, v
 	for i, v in ipairs(a) do
 		frame:AddLine(v)
 	end
-	frame:AddLine("Total DataStore stock: " .. stock)
+	frame:AddLine("Total stock: " .. stock)
+	local ink = get("util.glypher.inks."..itemId..".ink") or 0
+	local count = get("util.glypher.inks."..itemId..".count") or 0
+	frame:AddLine("Ink: " .. ink .. " count: " .. count)
 end
 
 function private.sheetOnEnter(button, row, column)
@@ -456,6 +472,7 @@ function private.findGlyphs()
 end
 function private.cofindGlyphs()
 	private.frame.searchButton:Disable()
+	set("util.glypher.inks.found", true)
 	local MinimumProfit = get("util.glypher.moneyframeprofit")
 	local quality = 2 --no rare quality items
 	local history = get("util.glypher.history") --how far back in beancounter to look, in days
@@ -521,8 +538,50 @@ function private.cofindGlyphs()
 
 		local link = GetTradeSkillItemLink(ID)
 		local itemName = GetTradeSkillInfo(ID)
+        local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
+        itemId = tonumber(itemId)
+
 		if itemName:find("Glyph") then
 			if link and link:match("^|c%x+|Hitem.+|h%[.*%]") and itemName and select(3, GetItemInfo(link)) <= quality then --if its a craftable line and not a header and lower than our Quality
+				local reagentCost = 0
+				local addInk = 0
+				--Sum the cost of the mats to craft this item, parchment is not considered its really too cheap to matter
+				local inkMatch = false --only match inks choosen by user
+				for i = 1 ,GetTradeSkillNumReagents(ID) do
+					local inkName, _, count = GetTradeSkillReagentInfo(ID, 1)
+					local link = GetTradeSkillReagentItemLink(ID, i)
+					--local inkPrice = AucAdvanced.API.GetMarketValue(link) or 0
+					local _, _, _, _, Id  = string.find(link, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
+					local isVendored,isLimited,itemCost,toSell,buyStack,maxStack = Informant.getItemVendorInfo(Id)
+					if string.find(":43126:43120:43124:37101:43118:43116:39774:39469:43122:", ":" .. Id .. ":") then
+						reagentCost = (reagentCost + (inkCost * count) )
+						addInk = addInk + count
+						set("util.glypher.inks."..itemId..".ink", 43126)
+						set("util.glypher.inks."..itemId..".count", count)
+					elseif Id == 43127 then
+						reagentCost = (reagentCost + (inkCost * count * 10) )
+						addInk = addInk + (count * 10)
+						set("util.glypher.inks."..itemId..".ink", 43127)
+						set("util.glypher.inks."..itemId..".count", count)
+					elseif isVendored then
+						reagentCost = (reagentCost + (itemCost * count) )
+					else
+						print("Not parchment or buyable ink -- " .. link .. "-- need market price")
+					end
+
+					if INK:match("-") then -- ignore a specific ink
+						local INK = INK:gsub("-","")
+						inkMatch = true
+						if inkName:lower():match(INK:lower()) then
+							inkMatch = false
+						end
+					else
+						if inkName:lower():match(INK:lower()) then
+							inkMatch = true
+						end
+					end
+				end
+
 				--We want these local to the loop (at least) because we're zeroing them if there is no price
 				local profitAppraiser = get("util.glypher.profitAppraiser")
 				local profitMarket = get("util.glypher.profitMarket")
@@ -564,8 +623,6 @@ function private.cofindGlyphs()
 				end
 				local worthPrice = floor((priceAppraiser * (profitAppraiser/profitTotalWeight)) + (priceMarket * (profitMarket/profitTotalWeight)) + (priceBeancounter * (profitBeancounter/profitTotalWeight)))
 
-				local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
-				itemId = tonumber(itemId)
 				property = tonumber(property) or 0
 				factor = tonumber(factor) or 0
 				local data = AucAdvanced.API.QueryImage({
@@ -578,7 +635,7 @@ function private.cofindGlyphs()
 				for j = 1, #data do
 						local compet = AucAdvanced.API.UnpackImageItem(data[j])
 						compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
-						local postPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemId, serverKey) or 0
+						-- unused -- local postPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice(itemId, serverKey) or 0
 						if compet.buyoutPrice < buyoutMin then
 								buyoutMin = compet.buyoutPrice
 						end
@@ -586,41 +643,6 @@ function private.cofindGlyphs()
 
 				if worthPrice > buyoutMin then
 					worthPrice = buyoutMin
-				end
-
-				local reagentCost = 0
-				local addInk = 0
-				--Sum the cost of the mats to craft this item, parchment is not considered its really too cheap to matter
-				local inkMatch = false --only match inks choosen by user
-				for i = 1 ,GetTradeSkillNumReagents(ID) do
-					local inkName, _, count = GetTradeSkillReagentInfo(ID, 1)
-					local link = GetTradeSkillReagentItemLink(ID, i)
-					--local inkPrice = AucAdvanced.API.GetMarketValue(link) or 0
-					local _, _, _, _, Id  = string.find(link, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
-					local isVendored,isLimited,itemCost,toSell,buyStack,maxStack = Informant.getItemVendorInfo(Id)
-					if string.find(":43126:43120:43124:37101:43118:43116:39774:39469:43122:", ":" .. Id .. ":") then
-						reagentCost = (reagentCost + (inkCost * count) )
-						addInk = addInk + count
-					elseif Id == 43127 then
-						reagentCost = (reagentCost + (inkCost * count * 10) )
-						addInk = addInk + (count * 10)
-					elseif isVendored then
-						reagentCost = (reagentCost + (itemCost * count) )
-					else
-						print("Not parchment or buyable ink -- " .. link .. "-- need market price")
-					end
-
-					if INK:match("-") then -- ignore a specific ink
-						local INK = INK:gsub("-","")
-						inkMatch = true
-						if inkName:lower():match(INK:lower()) then
-							inkMatch = false
-						end
-					else
-						if inkName:lower():match(INK:lower()) then
-							inkMatch = true
-						end
-					end
 				end
 
 			--if we match the ink and our profits high enough, check how many we currently have on AH
@@ -701,7 +723,7 @@ function private.addtoCraft()
 		print("No glyphs to add to skill.")
 		return
 	end
-	if Skillet and Skillet.QueueAppendCommand then
+	if Skillet and Skillet.QueueAppendCommand and Skillet.ClearQueue then
 		if not Skillet.reagentsChanged then Skillet.reagentsChanged = {} end --this required table is nil when we use teh queue
 		if not private.data then
 			print("Glyph list is empty - use Get Profitable first.")
@@ -770,7 +792,8 @@ end
 function lib.GetPrice(link, faction, realm)
 	local playerName = UnitName("player")
 	local linkType, itemId, property, factor = AucAdvanced.DecodeLink(link)
-	local glypherMin = get("util.glypher.pricemodel.min")
+	local glypherMin1 = get("util.glypher.pricemodel.min1")
+	local glypherMin2 = get("util.glypher.pricemodel.min2")
 	local glypherMax = get("util.glypher.pricemodel.max")
 	local glypherUnderpct = get("util.glypher.pricemodel.underpct")
 	local glypherUseundercut = get("util.glypher.pricemodel.useundercut")
@@ -793,6 +816,23 @@ function lib.GetPrice(link, faction, realm)
 	for j = 1, #data do
 		local auction = AucAdvanced.API.UnpackImageItem(data[j])
 		auction.buyoutPrice = (auction.buyoutPrice/auction.stackSize)
+		itemId = auction.itemId
+		local ink = get("util.glypher.inks."..itemId..".ink") or 43126
+		local count = get("util.glypher.inks."..itemId..".count") or 3
+		if ink == 43126 then
+			if count == 1 then
+				glypherMin = glypherMin1
+			elseif count == 2 then
+				glypherMin = glypherMin2
+			else
+				glypherMin = glypherMin2
+				print("Warning: Item " .. itemId .. " has not been scanned by Glypher:Get Profitable Glyphs, assuming for now that 2 inks are required to make.")
+				set("util.glypher.inks."..itemId..".count", 2)
+			end
+		else
+			print("Cannot find ink type " .. ink .. " for glyph " .. itemId .. " for pricing - check auctioneeraddon.org for an update to Auc-Util-Glypher")
+			glypherMin = glypherMin2 -- fallback
+		end
 		if auction.stackSize == 1 then
 			if auction.sellerName == playerName then
 				if auction.buyoutPrice < playerLow then
