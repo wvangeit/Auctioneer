@@ -818,7 +818,7 @@ function lib.GetPrice(link, faction, realm)
 		auction.buyoutPrice = (auction.buyoutPrice/auction.stackSize)
 		itemId = auction.itemId
 		local ink = get("util.glypher.inks."..itemId..".ink") or 43126
-		local count = get("util.glypher.inks."..itemId..".count") or 3
+		local count = get("util.glypher.inks."..itemId..".count") or 2
 		if ink == 43126 then
 			if count == 1 then
 				glypherMin = glypherMin1
@@ -826,11 +826,11 @@ function lib.GetPrice(link, faction, realm)
 				glypherMin = glypherMin2
 			else
 				glypherMin = glypherMin2
-				print("Warning: Item " .. itemId .. " has not been scanned by Glypher:Get Profitable Glyphs, assuming for now that 2 inks are required to make.")
-				set("util.glypher.inks."..itemId..".count", 2)
+				--print("Warning: Item " .. itemId .. " has not been scanned by Glypher:Get Profitable Glyphs, assuming for now that 2 inks are required to make.")
+				--set("util.glypher.inks."..itemId..".count", 2)
 			end
 		else
-			print("Cannot find ink type " .. ink .. " for glyph " .. itemId .. " for pricing - check auctioneeraddon.org for an update to Auc-Util-Glypher")
+			--print("Cannot find ink type " .. ink .. " for glyph " .. itemId .. " for pricing - check http://forums.norganna.org/8/ for information on an update to Auc-Util-Glypher")
 			glypherMin = glypherMin2 -- fallback
 		end
 		if auction.stackSize == 1 then
