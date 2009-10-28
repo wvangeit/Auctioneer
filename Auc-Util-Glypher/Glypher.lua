@@ -141,6 +141,17 @@ function lib.OnLoad()
 	private.sideIcon = sideIcon
 end
 
+function lib.CommandHandler(command, ...)
+	if (command == "help") then
+		print("Help for Glypher - "..libName)
+		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
+		print(line, "help}} - this", libName, "help")
+		print(line, "show}} - show/hide the Glypher UI")
+	elseif (command == "show") then
+		private.SlideBarClick()
+	end
+end
+
 function private.SlideBarClick(_, button)
 	if private.gui and private.gui:IsShown() then
 		AucAdvanced.Settings.Hide()
@@ -538,8 +549,8 @@ function private.cofindGlyphs()
 
 		local link = GetTradeSkillItemLink(ID)
 		local itemName = GetTradeSkillInfo(ID)
-        local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
-        itemId = tonumber(itemId)
+		local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
+		itemId = tonumber(itemId)
 
 		if itemName:find("Glyph") then
 			if link and link:match("^|c%x+|Hitem.+|h%[.*%]") and itemName and select(3, GetItemInfo(link)) <= quality then --if its a craftable line and not a header and lower than our Quality
