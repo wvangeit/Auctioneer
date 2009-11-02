@@ -75,6 +75,8 @@ local setQuestRequires
 local setQuestRewards
 local setQuestNames
 local setZones				--
+local setCrafted			-- setCrafted(crafted)
+local setCraftCount			-- setCraftCount(craft_counts)
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
@@ -363,7 +365,20 @@ function getItem(itemID, static)
 	else
 		dataItem.rewardFrom = (static and emptyTable or {})
 	end
-
+	
+	-- see if this is a recipe, and what it might create
+	if (self.crafted) then
+		local crafted_item = self.crafted[ tonumber(itemID) ]
+		if (crafted_item) then
+			dataItem.crafts = crafted_item
+			-- see if it crafts more than 1 at a time
+			if (self.craftCount) then
+				local crafted_count = self.craftCount[ crafted_item ]
+				dataItem.craftsCount = crafted_count or 1
+			end
+		end
+	end
+	
 	-- we adjusted the static table, if called with static = true
 	-- so save the itemID for future calls
 	if static then
@@ -478,6 +493,14 @@ function setZones(zones)
 	self.infZones = zones
 	Informant.zonestest = self.infZones
 	Informant.SetZones = nil -- Set only once
+end
+function setCrafted(crafted)
+	self.crafted = crafted
+	Informant.SetCrafted = nil -- Set only once
+end
+function setCraftCount(craft_counts)
+	self.craftCount = craft_counts
+	Informant.SetCraftCount = nil -- Set only once
 end
 
 function getLocale()
@@ -1148,6 +1171,8 @@ Informant = {
 	SetQuestNames = setQuestNames,
 	SetVendorLocation = setVendorLocation,
 	SetZones = setZones,
+	SetCrafted = setCrafted,
+	SetCraftCount = setCraftCount,
 	FrameActive = frameActive,
 	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,

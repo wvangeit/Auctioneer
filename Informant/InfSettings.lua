@@ -130,6 +130,10 @@ local settingDefaults = {
 	['show-link'] = false,
 	['auto-update'] = false,
 	['ModTTShow'] = false,
+
+-- leave this option off until we have real data to test with
+-- enable only for dev testing
+	['show-crafted'] = false,
 }
 
 local function getDefault(setting)

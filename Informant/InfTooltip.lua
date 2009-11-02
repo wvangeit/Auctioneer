@@ -135,6 +135,7 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 			tooltip:AddLine(_TRANS('INF_Tooltip_StackSize'):format(stacks), nil, embedded)
 		end
 	end
+	
 	if (getFilter('show-merchant')) then
 		if (itemInfo.vendors) then
 			local merchantCount = #itemInfo.vendors
@@ -153,6 +154,7 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 			end
 		end
 	end
+	
 	if (getFilter('show-usage')) then
 		tooltip:SetColor(0.6, 0.4, 0.8)
 		local reagentInfo = ""
@@ -182,11 +184,50 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 			end
 		end
 	end
+
+-- ccox - TODO - localize me!
+	if ( getFilter('show-crafted') and itemInfo.crafts) then
+		local crafted_item = itemInfo.crafts
+		local itemName, itemLink, itemQuality, itemLevel, playerLevel, itemType, itemSubType, stackCount, equipLoc, texture, sellPrice = GetItemInfo( tonumber( crafted_item ) )
+		local item_craft_count = itemInfo.craftsCount or 1
+		
+		tooltip:SetColor(0.6, 0.4, 0.8)
+		
+		-- show item that this recipe teaches, in quality color
+		if (itemLink) then	-- sometimes GetInfo fails
+			tooltip:AddLine( ("Crafts: %s"):format(itemLink), embedded)
+		else
+			tooltip:AddLine( "Crafts item: "..crafted_item, embedded)
+		end
+
+		-- show AucAdv value
+		if (itemLink and AucAdvanced) then
+			local price5 = AucAdvanced.API.GetMarketValue( itemLink );
+			if (price5) then
+				tooltip:AddLine( "        AucAdv: ", item_craft_count*price5, embedded)
+			end
+		end
+		
+		-- show DE value if non-zero
+		if (Enchantrix and Enchantrix.Storage) then
+			local _, _, baseline, aucadv = Enchantrix.Storage.GetItemDisenchantTotals( crafted_item )
+			if (aucadv or baseline) then
+				-- this can be disenchanted
+				tooltip:AddLine( "        Disenchant: ", item_craft_count*(aucadv or baseline), embedded)
+			end
+		end
+		
+		-- show vendor value if non-zero
+		if (sellPrice) then
+			tooltip:AddLine( "        Vendor: ", item_craft_count*sellPrice, embedded)
+		end
+	end
+	
 	if (getFilter('show-quest')) then
-		tooltip:SetColor(0.5, 0.5, 0.8)
 		if (itemInfo.quests) then
 			local questCount = itemInfo.questCount
 			if (questCount > 0) then
+				tooltip:SetColor(0.5, 0.5, 0.8)
 				tooltip:AddLine(_TRANS('INF_Interface_InfWinQuest'):format(questCount), embedded)
 			end
 		end
