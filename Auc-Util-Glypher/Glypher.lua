@@ -92,7 +92,12 @@ function lib.OnLoad()
 	default("util.glypher.moneyframeprofit", 35000)
 	default("util.glypher.history", 14)
 	default("util.glypher.stockdays", 2)
+	default("util.glypher.minstock", 0)
+	default("util.glypher.mincraft", 1)
+	default("util.glypher.mincraftthreshold", 50)
 	default("util.glypher.maxstock", 5)
+	default("util.glypher.minoverstock", 0)
+	default("util.glypher.overstock", 0)
 	default("util.glypher.failratio", 30)
 	default("util.glypher.makefornew", 2)
 	default("util.glypher.herbprice", 8000)
@@ -113,6 +118,8 @@ function lib.OnLoad()
 	default("util.glypher.gvault", "")
 	default("util.glypher.inks.found", false)
 	default("util.glypher.debugTooltip", false)
+	default("util.glypher.makemaxstock", false)
+
 
 --Check to see if we've got a recent enough version of AucAdvanced
 	local rev = AucAdvanced.GetCurrentRevision() or 0
@@ -147,8 +154,18 @@ function lib.CommandHandler(command, ...)
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - this", libName, "help")
 		print(line, "show}} - show/hide the Glypher UI")
+		print(line, "makemaxstock}} - toggle the makemaxstock flag - Warning: advanced users only")
 	elseif (command == "show") then
 		private.SlideBarClick()
+	elseif (command == "makemaxstock") then
+		local makemaxstock = get("util.glypher.makemaxstock")
+		if makemaxstock then
+			set("util.glypher.makemaxstock", false)
+			print("makemaxstock is now OFF")
+		else
+			set("util.glypher.makemaxstock", true)
+			print("makemaxstock is now ON")
+		end
 	end
 end
 
@@ -248,8 +265,23 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.stockdays", 1, 8, 1, "Days to stock")
 	gui:AddTip(id, "Number of days worth of glyphs to stock based upon your considered sales")
 
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minstock", 0, 40, 1, "Min stock")
+	gui:AddTip(id, "Minimum number of each glyph to stock.")
+
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraft", 1, 40, 1, "Min Craft")
+	gui:AddTip(id, "Minimum number of each glyph to craft.")
+
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraftthreshold", 0, 100, 10, "Min craft %%")
+	gui:AddTip(id, "Threshold for deciding on whether to craft Min Craft or none.")
+
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.maxstock", 1, 40, 1, "Max stock")
 	gui:AddTip(id, "Maximum number of each glyph to stock.")
+
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minoverstock", 0, 100, 20, "Min overstock %%")
+	gui:AddTip(id, "Minimum percentage of over max stock to allow up to overstock to be made. Set to 0 to disable this feature.")
+
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.overstock", 0, 60, 1, "Overstock")
+	gui:AddTip(id, "Maximimum stock to allow when Glypher wants to make at least min overstock more than max stock")
 
 	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.herbprice", "Price of single Northrend herb")
 	gui:AddTip(id, "Used to calculate the price of Ink of the Sea which can be traded for most other inks.")
@@ -488,7 +520,12 @@ function private.cofindGlyphs()
 	local quality = 2 --no rare quality items
 	local history = get("util.glypher.history") --how far back in beancounter to look, in days
 	local stockdays = get("util.glypher.stockdays")
+	local minstock = get("util.glypher.minstock")
+	local mincraft = get("util.glypher.mincraft")
+	local mincraftthreshold = get("util.glypher.mincraftthreshold")
 	local maxstock = get("util.glypher.maxstock")
+	local minoverstock = get("util.glypher.minoverstock")
+	local overstock = get("util.glypher.overstock")
 	local failratio = get("util.glypher.failratio")
 	local makefornew = get("util.glypher.makefornew")
 	local herbprice = get("util.glypher.herbprice")
@@ -679,8 +716,25 @@ function private.cofindGlyphs()
 						local mess = "New glyph: " .. link
 						DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
 					end
-
-					if (make + currentAuctions) > maxstock then make = (maxstock - currentAuctions) end
+					local makemaxstock = get("util.glypher.makemaxstock")
+					if makemaxstock and (currentAuctions == 0) and (make < maxstock) then make = maxstock end
+					if (make + currentAuctions) < minstock then make = (minstock - currentAuctions) end
+					if (make > 0) and (make < mincraft) then
+						if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
+							make = mincraft
+						else
+							make = 0
+						end
+					end
+					if (minoverstock > 0) and (make + currentAuctions) > maxstock and (make + currentAuctions) > (((100+minoverstock)/100)*maxstock) then
+						if (make + currentAuctions) > overstock then
+							make = (overstock - currentAuctions)
+						end
+					elseif (make + currentAuctions) > maxstock then 
+						make = (maxstock - currentAuctions) 
+					end
+					if (make > 0) and (make < mincraft) then make = 0 end -- in this case we can't make mincraft because it would put us over the limit, so let's make none at all (this avoids repeatedly "topping off" stacks)
+					-- Weltmeister: but, if someone has a low maxstock and a relatively high mincraft, this might not work so well...need to warn the user I guess
 					if make > 0 then
 						local failedratio
 						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = -1 end
