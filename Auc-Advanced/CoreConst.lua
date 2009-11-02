@@ -46,6 +46,14 @@ AucAdvanced.Const = {
 		28800, -- 12 hours
 		172800 -- 48 hours
 	},
+	AucTimes = {
+		0,
+		1800, -- 30 mins
+		7200, -- 2 hours
+		28800, -- 12 hours
+		172800 -- 48 hours
+	},
+	
 	InvTypes = {
 		INVTYPE_HEAD = 1,
 		INVTYPE_NECK = 2,
@@ -108,10 +116,17 @@ AucAdvanced.Const = {
 
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
+	CLASSESREV = { }, -- Table mapping names to index in CLASSES table
+	SUBCLASSESREV = { }, -- Table mapping from CLASS and SUBCLASSES names to index number in SUBCLASSES
 }
 
 for i = 1, #AucAdvanced.Const.CLASSES do
+	AucAdvanced.Const.CLASSESREV[AucAdvanced.Const.CLASSES[i]] = i
+	AucAdvanced.Const.SUBCLASSESREV[AucAdvanced.Const.CLASSES[i]] = {}
 	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
+	for j = 1, #AucAdvanced.Const.SUBCLASSES[i] do
+		AucAdvanced.Const.SUBCLASSESREV[AucAdvanced.Const.CLASSES[i]][AucAdvanced.Const.SUBCLASSES[i][j]] = j	
+	end
 end
 
 AucAdvanced.Defaults = {
