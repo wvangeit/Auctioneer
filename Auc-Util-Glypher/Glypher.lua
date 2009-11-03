@@ -94,10 +94,10 @@ function lib.OnLoad()
 	default("util.glypher.stockdays", 2)
 	default("util.glypher.minstock", 0)
 	default("util.glypher.mincraft", 1)
-	default("util.glypher.mincraftthreshold", 50)
+	--default("util.glypher.mincraftthreshold", 50)
 	default("util.glypher.maxstock", 5)
-	default("util.glypher.minoverstock", 0)
-	default("util.glypher.overstock", 0)
+	--default("util.glypher.minoverstock", 0)
+	--default("util.glypher.overstock", 0)
 	default("util.glypher.failratio", 30)
 	default("util.glypher.makefornew", 2)
 	default("util.glypher.herbprice", 8000)
@@ -271,17 +271,17 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraft", 1, 40, 1, "Min Craft")
 	gui:AddTip(id, "Minimum number of each glyph to craft.")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraftthreshold", 0, 100, 10, "Min craft %%")
-	gui:AddTip(id, "Threshold for deciding on whether to craft Min Craft or none.")
+	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraftthreshold", 0, 100, 10, "Min craft %%")
+	--gui:AddTip(id, "Threshold for deciding on whether to craft Min Craft or none.")
 
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.maxstock", 1, 40, 1, "Max stock")
 	gui:AddTip(id, "Maximum number of each glyph to stock.")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minoverstock", 0, 100, 20, "Min overstock %%")
-	gui:AddTip(id, "Minimum percentage of over max stock to allow up to overstock to be made. Set to 0 to disable this feature.")
+	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minoverstock", 0, 100, 20, "Min overstock %%")
+	--gui:AddTip(id, "Minimum percentage of over max stock to allow up to overstock to be made. Set to 0 to disable this feature.")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.overstock", 0, 60, 1, "Overstock")
-	gui:AddTip(id, "Maximimum stock to allow when Glypher wants to make at least min overstock more than max stock")
+	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.overstock", 0, 60, 1, "Overstock")
+	--gui:AddTip(id, "Maximimum stock to allow when Glypher wants to make at least min overstock more than max stock")
 
 	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.herbprice", "Price of single Northrend herb")
 	gui:AddTip(id, "Used to calculate the price of Ink of the Sea which can be traded for most other inks.")
@@ -522,10 +522,10 @@ function private.cofindGlyphs()
 	local stockdays = get("util.glypher.stockdays")
 	local minstock = get("util.glypher.minstock")
 	local mincraft = get("util.glypher.mincraft")
-	local mincraftthreshold = get("util.glypher.mincraftthreshold")
+	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
 	local maxstock = get("util.glypher.maxstock")
-	local minoverstock = get("util.glypher.minoverstock")
-	local overstock = get("util.glypher.overstock")
+	--local minoverstock = get("util.glypher.minoverstock")
+	--local overstock = get("util.glypher.overstock")
 	local failratio = get("util.glypher.failratio")
 	local makefornew = get("util.glypher.makefornew")
 	local herbprice = get("util.glypher.herbprice")
@@ -720,17 +720,19 @@ function private.cofindGlyphs()
 					if makemaxstock and (currentAuctions == 0) and (make < maxstock) then make = maxstock end
 					if (make + currentAuctions) < minstock then make = (minstock - currentAuctions) end
 					if (make > 0) and (make < mincraft) then
-						if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
+						--if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
+						if (currentAuctions < minstock) or (currentAuctions == 0) then
 							make = mincraft
 						else
 							make = 0
 						end
 					end
-					if (minoverstock > 0) and (make + currentAuctions) > maxstock and (make + currentAuctions) > (((100+minoverstock)/100)*maxstock) then
-						if (make + currentAuctions) > overstock then
-							make = (overstock - currentAuctions)
-						end
-					elseif (make + currentAuctions) > maxstock then 
+					--if (minoverstock > 0) and (make + currentAuctions) > maxstock and (make + currentAuctions) > (((100+minoverstock)/100)*maxstock) then
+					--	if (make + currentAuctions) > overstock then
+					--		make = (overstock - currentAuctions)
+					--	end
+					--elseif (make + currentAuctions) > maxstock then 
+					if (make + currentAuctions) > maxstock then
 						make = (maxstock - currentAuctions) 
 					end
 					if (make > 0) and (make < mincraft) then make = 0 end -- in this case we can't make mincraft because it would put us over the limit, so let's make none at all (this avoids repeatedly "topping off" stacks)
