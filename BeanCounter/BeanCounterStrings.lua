@@ -146,6 +146,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "Icons und Text einfärben";
 		["Re-ColorText"]	= "Text einfärben";
 		["TooltipFailed"]	= "Tooltipinfo nicht vorhanden";
+		["UiNeutralCheckBox"]	= "Zeige neutrale AH-Daten";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter speichert den Suchgrund, zu dem ein Gegenstand gekauft wurde und zeigt ihn im Tooltip an.";
@@ -161,6 +162,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "Erlaube externen AddOns die Benutzung von BeanCounter?";
 		["Q_MailInvoiceTimeout"]	= "Was ist eine Mail-Zeitüberschreitung?";
 		["Q_MailRecolor"]	= "Was ist Mail einfärben ?";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "Ergebnissanzeige für neutrales Schwarzmeer Auktionshaus";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Auktionshaus der Allianz";
@@ -248,6 +252,8 @@ BeanCounterLocalizations = {
 		["C_BeanCounterConfig"]	= "BeanCounter Config";
 		["C_BeanCounterDatabaseMaintenance"]	= "BeanCounter Database Maintenance";
 		["C_BeanCounterOptions"]	= "BeanCounter Options";
+		["C_ColorizeSearch"]	= "Add a gradient color to each result in the search window";
+		["C_DatabaseLength"]	= "Determines how long BeanCounter will save Auction House Transactions.";
 		["C_DataMaintenance"]	= "Data Maintenance";
 		["C_DateString"]	= "Date format to use:";
 		["C_DateStringExample"]	= "Example Date:";
@@ -255,9 +261,12 @@ BeanCounterLocalizations = {
 		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
 		["C_MailRecolor"]	= "Mail Re-Color Method";
 		["C_ModTTShow"]	= "Display the extra tooltip only if Alt is pressed.";
+		["C_MonthsToKeep"]	= "How many months of data to keep?";
+		["C_OpacityLevel"]	= "Opacity level";
 		["C_Resortascendingtime"]	= "Resort all entries by ascending time";
 		["C_ResortDatabase"]	= "Resort Database";
-		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter. \n Backup BeanCounter's saved variables before using.";
+		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter.\nBackup BeanCounter's saved variables before using.";
+		["C_SendToSearch"]	= "Add BeanCounter's searched item to the Main Auction House Window?";
 		["C_ShowBeginnerTooltips"]	= "Show beginner tooltips on mouse over";
 		["C_ShowReasonPurchase"]	= "Show reason for purchase in the tooltip";
 		["C_ValidateDatabase"]	= "Validate Database";
@@ -271,6 +280,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "Re-Color Icons and Text";
 		["Re-ColorText"]	= "Re-Color Text";
 		["TooltipFailed"]	= "Unable to get Tooltip Info";
+		["UiNeutralCheckBox"]	= "Show Neutral AH data";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter will store the SearchUI reason an item was purchased and display it in the tooltip.";
@@ -287,9 +297,11 @@ BeanCounterLocalizations = {
 		["Q_MailInvoiceTimeout"]	= "What is Mail Invoice Timeout?";
 		["Q_MailRecolor"]	= "What is Mail Re-color Method?";
 
-		-- Section: Interface
+		-- Section: HelpTooltip
+		["TTDataExpireEnabled"]	= "Data older than the selected time range will be DELETED";
+		["TTSendToSearch"]	= "When entering a search in BeanCounter it will also add the string to the AH browse frame.";
+		["TT_ColorizeSearch"]	= "This option changes the color of the items lines in the BeanCounter search window.";
 		["TT_neutralCheck"]	= "Display results from the Neutral Blackwater Auction house";
-		["UiNeutralCheckBox"]	= "Show Neutral AH data";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
@@ -316,7 +328,7 @@ BeanCounterLocalizations = {
 		["TT_ClassicCheck"]	= "Display results from BeanCounter Classic Database.";
 		["TT_ExactCheck"]	= "Only match the exact text in the search box";
 		["TT_ItemIconBox"]	= "Drop an item here to start a search for it.\nDisplays current search's icon if possible.";
-		["TT_ScrollHeader"]	= "\nRightclick+Drag to resize\nCTRL+RightClick to reset";
+		["TT_ScrollHeader"]	= "\nRightClick+Drag to Move\nALT+RightClick to resize\nCTRL+RightClick to reset";
 		["TT_SearchBox"]	= "Enter search queries here or leave blank to search all";
 
 		-- Section: User Interface
@@ -393,6 +405,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "Recolorear iconos y texto";
 		["Re-ColorText"]	= "Recolorear texto";
 		["TooltipFailed"]	= "No se encuentra informacion";
+		["UiNeutralCheckBox"]	= "Muestre los datos de la casa de subastas neutral.";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter almacenará el comentario de un objeto cuando fue comprado y lo mostrará en el tooltip.";
@@ -408,6 +421,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "¿Permitir que addons externos utilicen BeanCounter?";
 		["Q_MailInvoiceTimeout"]	= "¿Qué es el tiempo de espera de la factura de un correo?";
 		["Q_MailRecolor"]	= "¿Qué es el método de recolorear correos?";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "Muestre los resultados de la casa de subastas neutral de los Jinetes de Aguas Negras. ";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Casa de subastas: Alianza";
@@ -511,6 +527,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "Changement couleur d'icones et du texte";
 		["Re-ColorText"]	= "Changement couleur du texte";
 		["TooltipFailed"]	= "Impossible d'obtenir la bulle d'aide";
+		["UiNeutralCheckBox"]	= "Montrer les données de l'HV neutre";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter enregistrera la raison SearchUI pour laquelle un objet a été acheté et l'affichera dans l'encadré d'aide.";
@@ -526,6 +543,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "Autoriser les addons externes à utiliser BeanCounter";
 		["Q_MailInvoiceTimeout"]	= "Quel est temps mort de facture de courrier ? ";
 		["Q_MailRecolor"]	= "Quelle est méthode de Re-couleur de courrier ? ";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "Afficher les résultats de l'hôtel des ventes \"Blackwater\"";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Hôtel des ventes de l'Alliance";
@@ -669,6 +689,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "아이콘과 글자에 다시 색입히기";
 		["Re-ColorText"]	= "글씨에 다시 색입히기";
 		["TooltipFailed"]	= "툴팁 정보를 가져올수 없습니다";
+		["UiNeutralCheckBox"]	= "중립 경매장 결과도 보기";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "SearchUI의 아이템 구입사유를 저장하고 툴팁에 보여줍니다.";
@@ -684,6 +705,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "외부 애드온의 콩순이 사용이란?";
 		["Q_MailInvoiceTimeout"]	= "우편 송장 타임아웃이란?";
 		["Q_MailRecolor"]	= "우편에 다시 색입히기 방법이란?";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "중립 경매장 결과도 보기";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "얼라이언스 경매장";
@@ -806,6 +830,7 @@ BeanCounterLocalizations = {
 		["C_BeanCounterOptions"]	= "Opcje BeanCounter'a";
 		["C_DateString"]	= "Format Daty:";
 		["C_DateStringExample"]	= "Przykładowa Data:";
+		["C_ExtenalSearch"]	= "Zezwól innym Addonom na użycie wyszukiwarki BeanCounter";
 
 		-- Section: Generic Strings
 		["NoRe-Color"]	= "Brak przemalowywania";
@@ -955,6 +980,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "Изменить цвет иконок и текста";
 		["Re-ColorText"]	= "Изменить цвет текста";
 		["TooltipFailed"]	= "Не удалось получить информацию для всплывающей подсказки";
+		["UiNeutralCheckBox"]	= "Показать нейтральные данные аукциона";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter сохраняет причины покупки предметов и отображает их в подсказке.";
@@ -970,6 +996,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "Позволить сторонним аддонам использовать BeanCounter?";
 		["Q_MailInvoiceTimeout"]	= "Что такое таймаут получения почты?";
 		["Q_MailRecolor"]	= "Что такое метод окрашивания почты?";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "Показать результаты из Neutral Blackwater Аукционного дома\n";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Аукционный дом Альянса";
@@ -1073,6 +1102,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "为图标和文字上色";
 		["Re-ColorText"]	= "为文字上色";
 		["TooltipFailed"]	= "无法获得提示信息";
+		["UiNeutralCheckBox"]	= "显示中立拍卖行数据";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter将储存物品被购买的搜索界面原因并于提示中显示它.";
@@ -1088,6 +1118,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "允许外部插件使用BeanCounter?";
 		["Q_MailInvoiceTimeout"]	= "什么是邮件通知延迟?";
 		["Q_MailRecolor"]	= "什么是上色?";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "显示黑水拍卖行数据结果";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "联盟拍卖行";
@@ -1191,6 +1224,7 @@ BeanCounterLocalizations = {
 		["Re-ColorIconsandText"]	= "圖標和文字重新上色";
 		["Re-ColorText"]	= "文字重新上色";
 		["TooltipFailed"]	= "無法取得訊息窗資訊";
+		["UiNeutralCheckBox"]	= "顯示中立拍賣場的資料";
 
 		-- Section: Help Text
 		["A_BeanCountersTooltip"]	= "BeanCounter將儲存物品被購買的搜索界面原因並於提示中顯示它.";
@@ -1206,6 +1240,9 @@ BeanCounterLocalizations = {
 		["Q_ExtenalSearch"]	= "允許外部插件使用BeanCounter?";
 		["Q_MailInvoiceTimeout"]	= "什麼是郵件通知逾時？";
 		["Q_MailRecolor"]	= "什麼是重新上色？";
+
+		-- Section: HelpTooltip
+		["TT_neutralCheck"]	= "顯示中立的黑水灣拍賣場的結果";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "聯盟拍賣場";
