@@ -801,7 +801,7 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	
 	if (level >= 200) then
 		-- rares still bugged Nov 2009
-		if (quality != 3) then
+		if (quality ~= 3) then
 			return 375;
 		else
 			return 325;
@@ -809,7 +809,7 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 
 	elseif (level >= 152) then
 		-- rares still bugged Nov 2009
-		if (quality != 3) then
+		if (quality ~= 3) then
 			return 350;
 		else
 			return 325;
