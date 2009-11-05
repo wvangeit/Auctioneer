@@ -800,10 +800,20 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	end
 	
 	if (level >= 200) then
-		return 375;
+		-- rares still bugged Nov 2009
+		if (quality != 3) then
+			return 375;
+		else
+			return 325;
+		end
 
 	elseif (level >= 152) then
-		return 350;			-- ccox - rare/blue items are still 325 due to a Blizzard bug, hope it gets fixed soon
+		-- rares still bugged Nov 2009
+		if (quality != 3) then
+			return 350;
+		else
+			return 325;
+		end			-- ccox - rare/blue items are still 325 due to a Blizzard bug, hope it gets fixed soon
 
 	elseif (level >= 130) then
 		return 325;
