@@ -368,12 +368,13 @@ function getItem(itemID, static)
 	
 	-- see if this is a recipe, and what it might create
 	if (self.crafted) then
-		local crafted_item = self.crafted[ tonumber(itemID) ]
+		local recipe_number = tonumber(itemID)
+		local crafted_item = self.crafted[ recipe_number ]
 		if (crafted_item) then
 			dataItem.crafts = crafted_item
 			-- see if it crafts more than 1 at a time
 			if (self.craftCount) then
-				local crafted_count = self.craftCount[ crafted_item ]
+				local crafted_count = self.craftCount[ recipe_number ]
 				dataItem.craftsCount = crafted_count or 1
 			end
 		end
