@@ -185,6 +185,56 @@ end
 
 --[[ Local functions ]]--
 
+function private.minstockFormat()
+	local minstock = get("util.glypher.minstock")
+	local mincraft = get("util.glypher.mincraft")
+	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
+	local maxstock = get("util.glypher.maxstock")
+	local makefornew = get("util.glypher.makefornew")
+	local fmt = ""
+	if (maxstock - minstock) < mincraft then fmt = "!Warn!" end -- This is a fairly illogical situation since the actual minstock is going to be maxstock - mincraft
+	if makefornew < minstock then fmt = "!Warn!" end -- We'd end up making minstock instead
+	if minstock > maxstock then fmt = "!Err!" end -- This situation is illogical
+	return fmt
+end
+function private.mincraftFormat()
+	local minstock = get("util.glypher.minstock")
+	local mincraft = get("util.glypher.mincraft")
+	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
+	local maxstock = get("util.glypher.maxstock")
+	local makefornew = get("util.glypher.makefornew")
+	local fmt = ""
+	if (maxstock - minstock) < mincraft then fmt = "!Warn!" end -- This is a fairly illogical situation since the actual minstock is going to be maxstock - mincraft
+	if mincraft > makefornew then fmt = "!Warn!" end -- makefornew should be <= mincraft
+	if maxstock < mincraft then fmt = "!Err!" end -- In this situation we'd never craft anything at all
+	return fmt
+end
+function private.maxstockFormat()
+	local minstock = get("util.glypher.minstock")
+	local mincraft = get("util.glypher.mincraft")
+	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
+	local maxstock = get("util.glypher.maxstock")
+	local makefornew = get("util.glypher.makefornew")
+	local fmt = ""
+	if (maxstock - minstock) < mincraft then fmt = "!Warn!" end -- This is a fairly illogical situation since the actual minstock is going to be maxstock - mincraft
+	if makefornew > maxstock then fmt = "!Warn!" end -- We'd never make the total amount because maxstock is less than makefornew
+	if maxstock < minstock then fmt = "!Err!" end -- This situation is illogical
+	if maxstock < mincraft then fmt = "!Err!" end -- In this situation we'd never craft anything at all
+	return fmt
+end
+function private.makefornewFormat()
+	local minstock = get("util.glypher.minstock")
+	local mincraft = get("util.glypher.mincraft")
+	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
+	local maxstock = get("util.glypher.maxstock")
+	local makefornew = get("util.glypher.makefornew")
+	local fmt = ""
+	if mincraft > makefornew then fmt = "!Warn!" end -- makefornew should be <= mincraft
+	if makefornew < minstock then fmt = "!Warn!" end -- We'd end up making minstock instead
+	if makefornew > maxstock then fmt = "!Warn!" end -- We'd never make the total amount because maxstock is less than makefornew
+	return fmt
+end
+
 local frame
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
@@ -265,17 +315,17 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.stockdays", 1, 8, 1, "Days to stock")
 	gui:AddTip(id, "Number of days worth of glyphs to stock based upon your considered sales")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minstock", 0, 40, 1, "Min stock")
-	gui:AddTip(id, "Minimum number of each glyph to stock.")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minstock", 0, 40, 1, "Min Stock %s", private.minstockFormat)
+	gui:AddTip(id, "Minimum number of each glyph to stock. This must be less than or equal to the Max Stock.")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraft", 1, 40, 1, "Min Craft")
-	gui:AddTip(id, "Minimum number of each glyph to craft.")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraft", 1, 40, 1, "Min Craft %s", private.mincraftFormat)
+	gui:AddTip(id, "Minimum number of each glyph to craft. Generally this should be less than or equal to the difference between Min Stock and Max Stock")
 
 	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.mincraftthreshold", 0, 100, 10, "Min craft %%")
 	--gui:AddTip(id, "Threshold for deciding on whether to craft Min Craft or none.")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.maxstock", 1, 40, 1, "Max stock")
-	gui:AddTip(id, "Maximum number of each glyph to stock.")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.maxstock", 1, 40, 1, "Max Stock %s", private.maxstockFormat)
+	gui:AddTip(id, "Maximum number of each glyph to stock. This must be greater than or equal to the Min Stock.")
 
 	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.minoverstock", 0, 100, 20, "Min overstock %%")
 	--gui:AddTip(id, "Minimum percentage of over max stock to allow up to overstock to be made. Set to 0 to disable this feature.")
@@ -288,8 +338,8 @@ function private.SetupConfigGui(gui)
 
 	gui:AddControl(id, "Subhead", 0, "New glyph configuration")
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.makefornew", 0, 20, 1, "Make new")
-	gui:AddTip(id, "Number of glyphs (probably newly learned) to make when there are zero sales and zero failures in history.")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.makefornew", 0, 20, 1, "Make New %s", private.makefornewFormat)
+	gui:AddTip(id, "Number of glyphs (newly learned or newly profitable) to make when there are zero sales and zero failures in history.")
 
 	local weightWords = "for evaluation of new or previously unprofitable glyphs."
 
@@ -721,11 +771,11 @@ function private.cofindGlyphs()
 					if (make + currentAuctions) < minstock then make = (minstock - currentAuctions) end
 					if (make > 0) and (make < mincraft) then
 						--if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
-						if (currentAuctions < minstock) or (currentAuctions == 0) then
+						--if (currentAuctions < minstock) or (currentAuctions == 0) then
 							make = mincraft
-						else
-							make = 0
-						end
+						--else
+						--	make = 0
+						--end
 					end
 					--if (minoverstock > 0) and (make + currentAuctions) > maxstock and (make + currentAuctions) > (((100+minoverstock)/100)*maxstock) then
 					--	if (make + currentAuctions) > overstock then
