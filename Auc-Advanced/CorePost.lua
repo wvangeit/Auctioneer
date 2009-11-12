@@ -59,6 +59,11 @@ local print = lib.Print
 local debugPrint = AucAdvanced.Debug.DebugPrint
 local DecodeSig -- to be filled with AucAdvanced.API.DecodeSig when it has loaded
 
+-- Tooltip Scanning locals for speed, to be filled in near end of file
+local ScanTip
+local ScanTip2
+local ScanTip3
+
 --[[
     Errors that may be "thrown" by the below functions.
 
@@ -103,12 +108,12 @@ local ConstErrors = {
 lib.Const = ConstErrors
 
 local BindTypes = {
-	[ITEM_SOULBOUND] = "ITEM_SOULBOUND",
-	[ITEM_BIND_QUEST] = "ITEM_BIND_QUEST",
-	[ITEM_BIND_ON_PICKUP] = "ITEM_BIND_ON_PICKUP",
-	[ITEM_CONJURED] = "ITEM_CONJURED",
-	[ITEM_ACCOUNTBOUND] = "ITEM_ACCOUNTBOUND",
-	[ITEM_BIND_TO_ACCOUNT] = "ITEM_BIND_TO_ACCOUNT",
+	[ITEM_SOULBOUND] = "Bound",
+	[ITEM_BIND_QUEST] = "Quest",
+	[ITEM_BIND_ON_PICKUP] = "Bound",
+	[ITEM_CONJURED] = "Conjured",
+	[ITEM_ACCOUNTBOUND] = "Accountbound",
+	[ITEM_BIND_TO_ACCOUNT] = "Accountbound",
 }
 
 -- local constants to index the posting request tables
@@ -280,24 +285,34 @@ end
 
 --[[
     IsAuctionable(bag, slot)
-      Returns: true if the item is possibly auctionable.
+    Returns:
+		true : if the item is possibly auctionable.
+		false, errorcode : if the item is not auctionable
+			errorcode will be an internal (non-localized) string code
+			Future: develop an easy method to convert an errorcode into a localized printable message
+			For now: the errorcode is printable
 
-      This function does not check everything, but if it says no,
-      then the item is definately not auctionable.
+    This function does not check everything, but if it says no,
+    then the item is definately not auctionable.
 ]]
 function lib.IsAuctionable(bag, slot)
 	local damage, maxdur = GetContainerItemDurability(bag, slot)
 	if damage and damage ~= maxdur then
-		return false
+		return false, "Damaged"
 	end
 
-	private.tip:SetOwner(UIParent, "ANCHOR_NONE")
-	private.tip:ClearLines()
-	private.tip:SetBagItem(bag, slot)
-	local test = BindTypes[AppraiserTipTextLeft2:GetText()] or BindTypes[AppraiserTipTextLeft3:GetText()]
-	private.tip:Hide()
+	local _,_,_,_,_,lootable = GetContainerItemInfo(bag, slot)
+	if lootable then
+		return false, "Lootable"
+	end
+
+	ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
+	ScanTip:ClearLines()
+	ScanTip:SetBagItem(bag, slot)
+	local test = BindTypes[ScanTip2:GetText()] or BindTypes[ScanTip3:GetText()]
+	ScanTip:Hide()
 	if test then
-		return false
+		return false, test
 	end
 
 	return true
@@ -710,6 +725,8 @@ private.updateFrame:SetScript("OnUpdate", function(obj, delay)
 end)
 
 -- Local tooltip for getting soulbound line from tooltip contents
-private.tip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
+ScanTip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
+ScanTip2 = _G["AppraiserTipTextLeft2"]
+ScanTip3 = _G["AppraiserTipTextLeft3"]
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
