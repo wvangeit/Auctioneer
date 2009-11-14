@@ -28,7 +28,7 @@ function lib.Processor(callbackType, ...)
 		private.ProcessTooltip(...)
 	elseif (callbackType == "configchanged") then
 		private.ConfigChanged(...)
-		private.gui:Refresh()
+		if private.gui then private.gui:Refresh() end
 	elseif (callbackType == "auctionui") then
 		private.auctionHook() ---When AuctionHouse loads hook the auction function we need
 	elseif (callbackType == "scanprogress") then
