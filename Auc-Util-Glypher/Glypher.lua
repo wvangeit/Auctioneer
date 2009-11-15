@@ -787,8 +787,9 @@ function private.cofindGlyphs()
 					-- Weltmeister: but, if someone has a low maxstock and a relatively high mincraft, this might not work so well...need to warn the user I guess
 					if make > 0 then
 						local failedratio
-						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = -1 end
-						if (bcSold > 0 and failedratio < failratio) or failed == 0 or failratio == 0 then
+						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = failed end
+						--if (bcSold > 0 and failedratio < failratio) or failed == 0 or failratio == 0 then
+						if failedratio < failratio or failed == 0 or failratio == 0 then
 							table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
 							table.insert(private.Display, {link, make, worthPrice - reagentCost} )
 							qtyInk = qtyInk + (addInk * make)	
