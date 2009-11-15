@@ -266,6 +266,7 @@ BeanCounterLocalizations = {
 		["C_Resortascendingtime"]	= "Resort all entries by ascending time";
 		["C_ResortDatabase"]	= "Resort Database";
 		["C_ScanDatabase"]	= "Scan Database for errors: Use if you have errors when searching BeanCounter.\nBackup BeanCounter's saved variables before using.";
+		["C_SearchConfiguration"]	= "Search Configuration";
 		["C_SendToSearch"]	= "Add BeanCounter's searched item to the Main Auction House Window?";
 		["C_ShowBeginnerTooltips"]	= "Show beginner tooltips on mouse over";
 		["C_ShowReasonPurchase"]	= "Show reason for purchase in the tooltip";
@@ -298,10 +299,12 @@ BeanCounterLocalizations = {
 		["Q_MailRecolor"]	= "What is Mail Re-color Method?";
 
 		-- Section: HelpTooltip
+		["C_MaxDisplayedResults"]	= "Max displayed search results (from each database)";
 		["TTDataExpireEnabled"]	= "Data older than the selected time range will be DELETED";
-		["TTSendToSearch"]	= "When entering a search in BeanCounter it will also add the string to the AH browse frame.";
 		["TT_ColorizeSearch"]	= "This option changes the color of the items lines in the BeanCounter search window.";
+		["TT_MaxDisplayedResults"]	= "This controls the total number of results displayed in the scroll frame.";
 		["TT_neutralCheck"]	= "Display results from the Neutral Blackwater Auction house";
+		["TT_OpacityLevel"]	= "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
