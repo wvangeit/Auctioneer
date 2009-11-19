@@ -209,6 +209,9 @@ function lib.FinishedSearch(query)
 				if minlevel == 0 then
 					minlevel = nil
 				end
+				if rarity == 0 then
+					rarity = nil
+				end
 				if rarity == queryquality and minlevel == querylevel then
 					print("AucAdv: Auction for "..link.." no longer exists")
 					private.QueueRemove(i)
