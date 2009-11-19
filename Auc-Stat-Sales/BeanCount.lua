@@ -107,7 +107,7 @@ end
 
 do
 	local keycache = {}
-	local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}}
+	local faction2selectbox = {["Horde"]={"1","horde"}, ["Alliance"]={"1","alliance"}, ["Neutral"]={"1","neutral"}}
 	local basesettings = {
 	["bid"] =true,
 	["auction"] = true,
@@ -120,7 +120,7 @@ do
 			-- only split each unique serverKey once, and cache the results
 			local realmName, factionName = strmatch(serverKey, "^(.+)%-(%u%l+)$")
 			local sbox = faction2selectbox[factionName]
-			if not sbox then -- Neutral faction
+			if not sbox then -- Invalid faction
 				return
 			end
 			keysettings = {sbox, realmName}
