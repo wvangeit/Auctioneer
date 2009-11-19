@@ -302,36 +302,33 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			return
 		end
 		local CanQuery, CanQueryAll = CanSendAuctionQuery()
-		local scandata = AucAdvanced.Scan.GetScanData()
-		local now = time()
-		if not scandata.LastFullScan then
-			scandata.LastFullScan = 0
-		end
-		local minleft = ceil((now - scandata.LastFullScan) / 60)
-		local secleft = (now - scandata.LastFullScan) - (minleft - 1 ) * 60
-		--this can be removed once 2.3 rolls out
-		if (CanQueryAll == nil) and (minleft > 20) then
-			CanQueryAll = true
-		end
-		minleft = 15 - minleft
-		secleft = 60 - secleft
-		if not GetAll then
-			if not CanQuery then
-				private.queueScan = {
-					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
-				}
-				return
-			end
-		else
+		if GetAll then
+			local now = time()
 			if not CanQueryAll then
-
-				message("You must wait "..minleft..":"..secleft.." until you can do a full scan again")
+				local text = "You cannot do a GetAll scan at this time."
+				if private.LastGetAll then
+					local timeleft = 900 - (now - private.LastGetAll) -- 900 = 15 * 60 sec = 15 min
+					if timeleft > 0 then
+						local minleft = floor(timeleft / 60)
+						local secleft = timeleft - minleft * 60
+						text = text.." You must wait "..minleft..":"..secleft.." until you can scan again."
+					end
+				end
+				message(text)
 				return
 			end
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
 
 			lib.ProgressBars(GetAllProgressBar, 0, true)
+			private.LastGetAll = now
+		else
+			if not CanQuery then
+				private.queueScan = {
+					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
+				}
+				return
+			end
 		end
 
 		if private.curQuery then
@@ -589,23 +586,19 @@ Commitfunction = function()
 	local scandata, idList = lib.GetScanData()
 
 	--grab the first item in the commit queue, and bump everything else down
-	local wasIncomplete = private.CommitQueue[1]["wasIncomplete"]
-	local wasGetAll = private.CommitQueue[1]["wasGetAll"]
-	local scanStarted = private.CommitQueue[1]["scanStarted"]
-	local scanStartTime = private.CommitQueue[1]["scanStartTime"]
-	local totalPaused = private.CommitQueue[1]["totalPaused"]
-	local TempcurScan = {}
-	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
-	local TempcurQuery = {}
-	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
-	wasGetAll = wasGetAll or (TempcurQuery.qryinfo.page == 0) -- retrieved all records in single pull (only one page scanned or we asked explicitly for all records)
-	for i = 1, #private.CommitQueue do
-		if private.CommitQueue[i+1] then
-			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
-		else
-			private.CommitQueue[i] = nil
-		end
-	end
+	local TempcurCommit = tremove(private.CommitQueue)
+	-- setup various locals for later use
+	local TempcurScan = TempcurCommit.Scan
+	local TempcurQuery = TempcurCommit.Query
+	local wasIncomplete = TempcurCommit.wasIncomplete
+	local wasGetAll = TempcurCommit.wasGetAll
+	local scanStarted = TempcurCommit.scanStarted
+	local scanStartTime = TempcurCommit.scanStartTime
+	local totalPaused = TempcurCommit.totalPaused
+	local wasOnePage = wasGetAll or (TempcurQuery.qryinfo.page == 0) -- retrieved all records in single pull (only one page scanned or was GetAll)
+	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
+		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
+
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
@@ -735,8 +728,8 @@ Commitfunction = function()
 				end
 			elseif wasIncomplete then
 				missedCount = missedCount + 1
-			elseif wasGetAll then
-				-- a *completed* GetAll should not have missed any auctions
+			elseif wasOnePage then
+				-- a *completed* one-page scan should not have missed any auctions
 				dodelete = true
 				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 					filterDeleteCount = filterDeleteCount + 1
@@ -802,12 +795,10 @@ Commitfunction = function()
 	scanTimeMins = mod(scanTimeMins, 60)
 
 	--Hides the end of scan summary if user is not interested
-	local printSummary = false
+	local printSummary
 	if (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
-	elseif ((not TempcurQuery.class) and (not TempcurQuery.subclass) and (not TempcurQuery.minUseLevel)
-			and (not TempcurQuery.name) and (not TempcurQuery.isUsable)
-			and (not TempcurQuery.invType) and (not TempcurQuery.quality)) then
+	elseif wasUnrestricted then
 		printSummary = private.getOption("scandata.summaryonfull");
 	elseif (TempcurQuery.name and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
 		printSummary = private.getOption("scandata.summaryonmicro")
@@ -892,36 +883,41 @@ Commitfunction = function()
 		if (nLog) then nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed", summary) end
 	end
 
+	local TempcurScanStats = {
+		scanCount = scanCount,
+		oldCount = oldCount,
+		sameCount = sameCount,
+		newCount = newCount,
+		updateCount = updateCount,
+		matchedCount = dirtyCount,
+		earlyDeleteCount = earlyDeleteCount,
+		expiredDeleteCount = expiredDeleteCount,
+		currentCount = currentCount,
+		missedCount = missedCount,
+		filteredCount = filterNewCount+filterOldCount,
+		wasIncomplete = wasIncomplete or false,
+		wasGetAll = wasGetAll or false,
+		startTime = scanStartTime,
+		endTime = now,
+		started = scanStarted,
+		paused = totalPaused,
+		ended = GetTime(),
+		elapsed = GetTime() - scanStarted - totalPaused,
+		query = TempcurQuery,
+	}
+
 	if (not scandata.scanstats) then scandata.scanstats = {} end
-	if (scandata.scanstats[1]) then
-		scandata.scanstats[2] = scandata.scanstats[1]
-		scandata.scanstats[1] = nil
-	end
-	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
-	scandata.scanstats[0] = {}
-	scandata.scanstats[0].oldCount = oldCount
-	scandata.scanstats[0].sameCount = sameCount
-	scandata.scanstats[0].newCount = newCount
-	scandata.scanstats[0].updateCount = updateCount
-	scandata.scanstats[0].earlyDeleteCount = earlyDeleteCount
-	scandata.scanstats[0].expiredDeleteCount = expiredDeleteCount
-	scandata.scanstats[0].currentCount = currentCount
-	scandata.scanstats[0].missedCount = missedCount
-	scandata.scanstats[0].filteredCount = filterCount
-	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
-	scandata.scanstats[0].startTime = scanStartTime
-	scandata.scanstats[0].endTime = now
-	scandata.scanstats[0].started = scanStarted
-	scandata.scanstats[0].paused = totalPaused
-	scandata.scanstats[0].ended = GetTime()
-	scandata.scanstats[0].elapsed = GetTime() - scanStarted - totalPaused
-	scandata.scanstats[0].query = replicate(TempcurQuery)
+	-- keep 2 old copies for compatibility
+	scandata.scanstats[2] = scandata.scanstats[1]
+	scandata.scanstats[1] = scandata.scanstats[0]
+	scandata.scanstats[0] = TempcurScanStats
+
 	scandata.time = now
-	if wasGetAll then scandata.LastFullScan = now end
+	if wasUnrestricted and not wasIncomplete then scandata.LastFullScan = now end
 
 	-- Tell everyone that our stats are updated
-	AucAdvanced.SendProcessorMessage("scanstats", replicate(scandata.scanstats[0]))
-	AucAdvanced.Buy.FinishedSearch(scandata.scanstats[0].query)
+	AucAdvanced.SendProcessorMessage("scanstats", TempcurScanStats)
+	AucAdvanced.Buy.FinishedSearch(TempcurQuery)
 
 	--Hide the progress indicator
 	lib.ProgressBars(CommitProgressBar, nil, false)
