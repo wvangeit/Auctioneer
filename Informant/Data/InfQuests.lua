@@ -1,7 +1,7 @@
 --[[
 	Up-to-date list of quest items and rewards for informant.
 	File courtesy of http://www.wowhead.com/
-	File generated at: 2009-11-20 20:13:45 Z
+	File generated at: 2009-11-20 20:22:16 Z
 --]]
 Informant.SetQuestStarts({
 	[1307]='123',
@@ -9239,7 +9239,6 @@ Informant.SetQuestRequires({
 })
 if (GetLocale() == 'ruRU') then
  Informant.SetQuestNames({
-	[id]='title_ruru',
 	[2]='[30]Коготь гиппогрифа Острокогтя',
 	[5]='[20]Урчащий живот Трясунчика',
 	[6]='[5]Награда за голову Гаррика Тихокрада',
@@ -17389,7 +17388,6 @@ if (GetLocale() == 'ruRU') then
 end
 if (GetLocale() == 'frFR') then
  Informant.SetQuestNames({
-	[id]='title_frfr',
 	[2]='[30]La griffe de Serres-tranchantes',
 	[5]='[20]L\'estomac qui gargouille',
 	[6]='[5]La prime pour Garrick Ladétrousse',
@@ -25539,7 +25537,6 @@ if (GetLocale() == 'frFR') then
 end
 if (GetLocale() == 'deDE') then
  Informant.SetQuestNames({
-	[id]='title_dede',
 	[2]='[30]Klaue von Scharfkralle',
 	[5]='[20]Bibbers\' knurrender Magen',
 	[6]='[5]Kopfgeld auf Garrick Schleichfuß',
@@ -33689,7 +33686,6 @@ if (GetLocale() == 'deDE') then
 end
 if (GetLocale() == 'enUS') then
  Informant.SetQuestNames({
-	[id]='title_enus',
 	[2]='[30]Sharptalon\'s Claw',
 	[5]='[20]Jitters\' Growling Gut',
 	[6]='[5]Bounty on Garrick Padfoot',
@@ -41839,7 +41835,6 @@ if (GetLocale() == 'enUS') then
 end
 if (GetLocale() == 'esES') then
  Informant.SetQuestNames({
-	[id]='title_eses',
 	[2]='[30]La garfa de Garrafilada',
 	[5]='[20]La hambruna de Alterio',
 	[6]='[5]La recompensa por Garrick Piesuaves',
