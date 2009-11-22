@@ -104,10 +104,11 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		-- if not market then market = 0 end
         if not (seen and market) then
             tooltip:AddLine("Market Price: Not Available");
-		elseif quantity == 1 then
-			tooltip:AddLine("Market Price: (seen "..tostring(seen)..")", market)
 		else
-			tooltip:AddLine("Market Price x"..tostring(quantity)..": (seen "..tostring(seen)..")", market*quantity)
+			tooltip:AddLine("Market Price: (seen "..tostring(seen)..")", market)
+			if ((quantity > 1) and AucAdvanced.Settings.GetSetting("tooltip.marketprice.stacksize")) then
+				tooltip:AddLine("Market Price x"..tostring(quantity)..": ", market*quantity)
+			end
 		end
 
 		if IsShiftKeyDown() then

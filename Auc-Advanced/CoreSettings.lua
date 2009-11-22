@@ -105,6 +105,7 @@ local settingDefaults = {
 	['scandata.tooltip.display'] = false,
 	['scandata.tooltip.modifier'] = true,
 	["tooltip.marketprice.show"] = true,
+	["tooltip.marketprice.stacksize"] = true,
 	['scandata.force'] = false,
 	['scandata.summaryonfull'] = true,
 	['scandata.summaryonmicro'] = false,
@@ -521,16 +522,21 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataDisplay')) --"Enable the display of how many items in the current scan image match this item"
 	gui:AddControl(id, "Checkbox",   0, 3, "scandata.tooltip.modifier", _TRANS('ADV_Interface_ScanDataModifier')) --"Only show exact match unless SHIFT is held"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataModifier')) --"Makes the scan data only display exact matches unless the shift key is held down"
-	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
-	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _TRANS('ADV_Interface_ModTTShow'))--"Only show Auctioneer's extra tooltip if Alt is pressed."
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"This option will hide Auctioneer's extra tooltip unless the Alt key is pressed"
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	
+	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
+	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
+	gui:AddControl(id, "Checkbox",   0, 2, "tooltip.marketprice.stacksize", _TRANS('ADV_Interface_MultiplyStack')) --"Multiply by Stack Size"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MultiplyStack')) --"Multiplies by current stack size if enabled"
+	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+
 	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
   	gui:AddCat("Match Modules")
