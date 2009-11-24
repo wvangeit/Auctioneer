@@ -351,13 +351,13 @@ function lib.CountAvailableItems(sig)
 	end
 
 	for _, request in private.GetQueueIterator() do
-		local itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = DecodeSig(request[1])
+		local itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = DecodeSig(request[REQ_SIG])
 		if itemId == matchId
 		and itemSuffix == matchSuffix
 		and itemFactor == matchFactor
 		and itemEnchant == matchEnchant
 		and (matchSeed == 0 or itemSeed == matchSeed) then
-			queuedCount = queuedCount + request[2]
+			queuedCount = queuedCount + request[REQ_COUNT]
 		end
 	end
 
@@ -706,6 +706,10 @@ function lib.Processor(event, ...)
 		if lib.GetQueueLen() > 0 then
 			private.ProcessPosts(event)
 		end
+	elseif event == "auctionclose" then
+		if lib.GetQueueLen() > 0 then
+			StaticPopup_Show("CONFIRM_CANCEL_QUEUE_AH_CLOSED")
+		end
 	end
 end
 
@@ -728,5 +732,15 @@ end)
 ScanTip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
 ScanTip2 = _G["AppraiserTipTextLeft2"]
 ScanTip3 = _G["AppraiserTipTextLeft3"]
+
+StaticPopupDialogs["CONFIRM_CANCEL_QUEUE_AH_CLOSED"] = {
+  text = "The Auctionhouse has closed. Do you want to clear the Posting queue?",
+  button1 = YES,
+  button2 = NO,
+  OnAccept = lib.CancelPostQueue,
+  timeout = 20,
+  whileDead = true,
+  hideOnEscape = true,
+}
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
