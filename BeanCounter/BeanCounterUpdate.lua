@@ -110,6 +110,10 @@ function private.startPlayerUpgrade(server, player, playerData)
 		private.update._2_11(server, player)
 		performedUpdate = true
 	end
+	if playerData["version"] < 2.12 then -- corrects nil index bug in 2.11 upgrade
+		private.update._2_12(server, player)
+		performedUpdate = true
+	end
 end
 
 function private.update._2_01(server, player)
@@ -238,6 +242,7 @@ end
 --Helper function for 2.11 update
 local function migrateNeutralData(server, player, key, itemID, itemString, value)
 	key = key.."Neutral"
+	if not value then return end --Possible nil values could be inserted.
 	if BeanCounterDB[server][player][key][itemID] then --if ltemID exists
 		if BeanCounterDB[server][player][key][itemID][itemString] then
 			table.insert(BeanCounterDB[server][player][key][itemID][itemString], value)
@@ -256,7 +261,6 @@ function private.update._2_11(server, player)
 	BeanCounterDB[server][player]["completedBidsBuyoutsNeutral"]  = {}
 	BeanCounterDB[server][player]["failedBidsNeutral"]  = {}
 		
-	
 	for DB, data in pairs(BeanCounterDB[server][player]) do
 		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" then
 			for itemID, itemIDData in pairs(data) do
@@ -266,15 +270,33 @@ function private.update._2_11(server, player)
 						if location and location == "N" then
 							print(player, server, itemString)
 							migrateNeutralData(server, player, DB, itemID, itemString, itemStringData[i]) --local help[er function
-							itemStringData[i] = nil
+							--itemStringData[i] = nil --This was a bad idea, left nil holes in my indexed data tables. We correct Nils in upgrade 2.12
+							table.remove(itemStringData, i)
 						end
 					end
 				end
 			end
 		end
 	end
-			
 
 	BeanCounterDB[server][player]["version"] = 2.11
+end
+--correct nil holes in the transaction tables indexes
+function private.update._2_12(server, player)
+	for DB, data in pairs(BeanCounterDB[server][player]) do
+		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" then
+			for itemID, itemIDData in pairs(data) do
+				for itemString, itemStringData in pairs(itemIDData) do
+					for i = #itemStringData, 1, -1 do
+						if not itemStringData[i] then --catch Nil values in indexed tables and remove em'
+							table.remove(itemStringData, i)
+						end
+					end
+				end
+			end
+		end
+	end
+
+	BeanCounterDB[server][player]["version"] = 2.12
 end
 	

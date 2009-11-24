@@ -49,7 +49,7 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 2.11,
+	version = 2.12,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 
