@@ -163,16 +163,17 @@ function lib.PushScan()
 			private.totalPaused,
 			GetTime()
 		})
+		local oldquery = private.curQuery
+		private.curQuery = nil
 		private.scanStartTime = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
-		private.curQuery = nil
 		private.curScan = nil
 
 		private.curPages = nil
 		private.sentQuery = nil
 		private.isScanning = false
-		private.UpdateScanProgress(false)
+		private.UpdateScanProgress(false, nil, nil, nil, nil, nil, oldquery)
 	end
 end
 
@@ -208,7 +209,7 @@ function lib.PopScan()
 		private.isScanning = true
 		private.sentQuery = false
 		private.ScanPage(private.curQuery.qryinfo.page+1)
-		private.UpdateScanProgress(true)
+		private.UpdateScanProgress(true, nil, nil, nil, nil, nil, private.curQuery)
 	end
 end
 
@@ -337,7 +338,6 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 
 		private.isScanning = true
 		local startPage = 0
-		local numBatchAuctions, totalAuctions
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
@@ -347,7 +347,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		--Show the progress indicator
-		private.UpdateScanProgress(true, totalAuctions)
+		private.UpdateScanProgress(true, nil, nil, nil, nil, nil, private.curQuery)
 	else
 		message("Steady on; You'll need to talk to the auctioneer first!")
 	end
@@ -399,13 +399,13 @@ lib.UnpackImageItem = private.Unpack
 --The first parameter will be true if we want to show the process indicator, false if we want to hide it. and nil if we only want to update it.
 --The second parameter will be a number that is the max number of items in the scan.
 --The third parameter is the current progress of the scan.
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, querySig)
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query)
 	if (not (lib.IsScanning() or (state == false))) then
 		return
 	end
 	local scanCount = 0
 	if (private.scanStack) then scanCount=#private.scanStack end
-	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, querySig, scanCount)
+	AucAdvanced.SendProcessorMessage("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query, scanCount)
 end
 
 function private.IsIdentical(focus, compare)
@@ -581,7 +581,6 @@ Commitfunction = function()
 		-- Min (1): 0.02s (~50 fps)      --    Max (100): 0.12s  (~8 fps).   Default (50):  0.037s (~25 fps)
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
-	--	if not private.curQuery then CommitRunning = false return end
 	CommitRunning = true
 	local scandata, idList = lib.GetScanData()
 
@@ -603,34 +602,36 @@ Commitfunction = function()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
 	end
-	local totali = 2*(#scandata.image) + 3*#TempcurScan
+	local oldCount = #scandata.image
+	local scanCount = #TempcurScan
 
-	local list, link, flag
-	local lut = {}
-
-	-- Mark all matching auctions as DIRTY, and build a LookUpTable
-	local dirtyCount = 0
-	local i = 0
+	local progresscounter = 0
+	local progresstotal = 3*oldCount + 4*scanCount
 	local lastPause = GetTime()
 
+	local filterDeleteCount,filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0,0,0,0
+
+
+	--[[ *** Stage 1: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
+	local dirtyCount = 0
+	local lut = {}
 
 	for pos, data in ipairs(scandata.image) do
-		link = data[Const.LINK]
-		i = i + 1
+		local link = data[Const.LINK]
+		progresscounter = progresscounter + 1
 		if GetTime() - lastPause >= processingTime then
-			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 1")
+			lib.ProgressBars(CommitProgressBar, 100*progresscounter/progresstotal, true, "AucAdv: Processing Stage 1")
 			coroutine.yield()
 			lastPause = GetTime()
 		end
 		if link then
 			if private.IsInQuery(TempcurQuery, data) then
 				-- Mark dirty
-				flag = data[Const.FLAG] or 0
-				data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
+				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_DIRTY)
 				dirtyCount = dirtyCount+1
 
 				-- Build lookup table
-				list = lut[link]
+				local list = lut[link]
 				if (not list) then
 					lut[link] = pos
 				else
@@ -647,17 +648,14 @@ Commitfunction = function()
 		end
 	end
 
-	local itemPos
-	local oldCount = #scandata.image
-	local scanCount = #TempcurScan
-	local filterDeleteCount,filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0,0,0,0
 
+	--[[ *** Stage 2: Merge new scan into ScanData *** ]]
 	processStats("begin")
 	for index, data in ipairs(TempcurScan) do
-		i = i + 3
+		local itemPos
+		progresscounter = progresscounter + 4
 		if GetTime() - lastPause >= processingTime then
-			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 2")
-			--CommitProgressBar:SetValue(100*i/totali)
+			lib.ProgressBars(CommitProgressBar, 100*progresscounter/progresstotal, true, "AucAdv: Processing Stage 2")
 			coroutine.yield()
 			lastPause = GetTime()
 		end
@@ -694,23 +692,28 @@ Commitfunction = function()
 		else
 			if (processStats("create", data)) then
 				newCount = newCount + 1
-			else
+			else -- processStats("create"...) filtered the auction: flag it
 				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
 				filterNewCount = filterNewCount + 1
 			end
-			-- processStats("create", ...) will mark the packed data item as filtered.  Save so we have all items on AH in data.
 			data[Const.ID] = private.GetNextID(idList)
 			table.insert(scandata.image, replicate(data))
 		end
 	end
 
-	local data, flag
+
+	--[[ *** Stage 3: Cleanup deleted auctions *** ]]
 	local numempty = 0
+	local progressstep = 1
+	if #scandata.image > 0 then -- (avoid potential div0)
+		-- #scandata.image is probably now larger than when we originally calculated progresstotal -- adjust the step size to compensate
+		progressstep = (progresstotal - progresscounter) / #scandata.image
+	end
 	for pos = #scandata.image, 1, -1 do
-		data = scandata.image[pos]
-		i = i + 1
+		local data = scandata.image[pos]
+		progresscounter = progresscounter + progressstep
 		if GetTime() - lastPause >= processingTime then
-			lib.ProgressBars(CommitProgressBar, 100*i/totali, true, "AucAdv: Processing Stage 3")
+			lib.ProgressBars(CommitProgressBar, 100*progresscounter/progresstotal, true, "AucAdv: Processing Stage 3")
 			coroutine.yield()
 			lastPause = GetTime()
 		end
@@ -760,6 +763,9 @@ Commitfunction = function()
 			numempty = numempty + 1
 		end
 	end
+
+
+	--[[ *** Stage 4: Reports *** ]]
 	lib.ProgressBars(CommitProgressBar, 100, true, "AucAdv: Processing Finished")
 	processStats("complete")
 
@@ -921,7 +927,7 @@ Commitfunction = function()
 
 	--Hide the progress indicator
 	lib.ProgressBars(CommitProgressBar, nil, false)
-	private.UpdateScanProgress(false)
+	private.UpdateScanProgress(false, nil, nil, nil, nil, nil, TempcurQuery)
 	lib.PopScan()
 	CommitRunning = false
 	if not private.curQuery then
@@ -1158,7 +1164,7 @@ StorePageFunction = function()
 	--store queued scans to pass along on the callback, used by scanbutton and searchUI etc to display how many scans are still queued
 
 	--page, maxpages, name  lets a module know when a "scan" they have queued is actually in progress. scansQueued lets a module know how may scans are left to go
-	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery.name) --page starts at 0 so we need to add +1
+	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed, page+1, maxPages, private.curQuery) --page starts at 0 so we need to add +1
 
 	local curTime = time()
 	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
@@ -1577,32 +1583,28 @@ function lib.Abort()
 end
 
 function private.ResetAll()
+	local oldquery = private.curQuery
+	private.curQuery = nil
+	private.curScan = nil
+	private.isPaused = nil
+	private.sentQuery = nil
+	private.isScanning = false
+	private.unexpectedClose = false
+
 	if CommitRunning then
-		private.curQuery = nil
-		private.curScan = nil
-		private.isPaused = nil
-		private.sentQuery = nil
-		private.isScanning = false
-		private.unexpectedClose = false
-		private.UpdateScanProgress(false)
+		private.UpdateScanProgress(false, nil, nil, nil, nil, nil, oldquery)
 		return
 	end
 	private.scanStartTime = nil
 	private.scanStarted = nil
 	private.totalPaused = nil
 
-	private.curQuery = nil
-	private.curScan = nil
 	private.curPages = nil
 	private.scanStack = nil
 
-	private.isPaused = nil
 	private.Pausing = nil
-	private.sentQuery = nil
-	private.isScanning = false
-	private.unexpectedClose = false
 	--Hide the progress indicator
-	private.UpdateScanProgress(false)
+	private.UpdateScanProgress(false, nil, nil, nil, nil, nil, oldquery)
 end
 --Did not have a way of easily retrieving options for corescan  Kandoko
 function private.getOption(option)
