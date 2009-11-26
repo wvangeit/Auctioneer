@@ -682,29 +682,12 @@ function lib.GetMatcherValue(matcher, itemLink, price)
 end
 
 
--- Allows the return of Appraiser price values to other functions.
--- If Appraiser is not loaded it uses Market Price
-function lib.GetAppraiserValue(itemLink, useMatching)
-	local saneLink = SanitizeLink(itemLink)
-	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration
-	if not AucAdvanced.Modules.Util.Appraiser then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(saneLink)
-		curModelText = "Market"
-		return newBuy, newBuy, seen, curModelText
-	end
-
-	newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(saneLink, 0, useMatching)
-	lib.ShowDeprecationAlert("AucAdvanced.Modules.Util.Appraiser.GetPrice(itemLink, _, useMatching)");
-
-	return newBid, newBuy, seen, curModelText, MatchString, stack, number, duration
-end
-
 -- Signature conversion functions
 
 -- Creates an AucAdvanced signature from an item link
 function lib.GetSigFromLink(link)
 	local sig
-	local itype, id, suffix, factor, enchant, seed = DecodeLink(link)
+	local itype, id, suffix, factor, enchant = DecodeLink(link)
 	if itype == "item" then
 		if enchant ~= 0 then
 			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
@@ -734,14 +717,13 @@ end
 -- Decodes an AucAdvanced signature into numerical values
 -- Can be compared to the return values from DecodeLink
 function lib.DecodeSig(sig)
-	local id, suffix, factor, enchant, seed = strsplit(":", sig)
+	local id, suffix, factor, enchant = strsplit(":", sig)
 	id = tonumber(id)
 	if not id or id == 0 then return end
 	suffix = tonumber(suffix) or 0
 	factor = tonumber(factor) or 0
 	enchant = tonumber(enchant) or 0
-	seed = tonumber(seed) or 0
-	return id, suffix, factor, enchant, seed
+	return id, suffix, factor, enchant
 end
 
 -------------------------------------------------------------------------------
