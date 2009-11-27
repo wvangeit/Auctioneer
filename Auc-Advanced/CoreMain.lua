@@ -55,8 +55,10 @@ if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 local DebugLib = LibStub("DebugLib")
 
 local tooltip
+local flagBlockTooltip = true
 
 function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, rlvl, itype, isubtype, stack, equiploc, texture)
+	if flagBlockTooltip then return end
 	if not tip then return end
 	if AucAdvanced.Settings.GetSetting("ModTTShow") and not IsAltKeyDown() then
 		return
@@ -271,6 +273,9 @@ function private.OnEvent(self, event, arg1, arg2, ...)
 		if arg1 >= 0 and arg1 <= 4 then
 			private.Schedule["inventory"] = GetTime() + 0.05 -- collect multiple events for same bag change using a slight delay
 		end
+	elseif event == "PLAYER_ENTERING_WORLD" then
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD") -- we only want the first instance of this event
+		flagBlockTooltip = nil -- Unblock tooltips: this flag prevented us from trying to draw a tooltip while the game was still loading
 	end
 end
 
@@ -293,6 +298,7 @@ private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
 private.Frame:RegisterEvent("BAG_UPDATE")
 private.Frame:RegisterEvent("PLAYER_LOGOUT")
 private.Frame:RegisterEvent("PLAYER_LOGIN")
+private.Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
 
