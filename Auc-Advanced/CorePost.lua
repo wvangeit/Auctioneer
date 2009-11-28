@@ -118,6 +118,7 @@ local BindTypes = {
 }
 
 -- in OnLoad: auto-replace values with translations based on table key: "ADV_Help_PostError"..key - e.g. "ADV_Help_PostErrorBound"
+-- Some of these errors are only of use when debugging, so should probably not be translated. i.e. the "InvalidX" codes
 local ErrorText = {
 	Bound = "Cannot auction a Soulbound item",
 	Accountbound = "Cannot auction an Account Bound item",
@@ -125,6 +126,15 @@ local ErrorText = {
 	Quest = "Cannot auction a Quest item",
 	Lootable = "Cannot auction a Lootable item",
 	Damaged = "Cannot auction a Damaged item",
+	InvalidBid = "Bid value is invalid",
+	InvalidBuyout = "Buyout value is invalid",
+	InvalidDuration = "Duration value is invalid",
+	InvalidSig = "Function requires a valid item sig",
+	InvalidSize = "Size value is invalid",
+	UnknownItem = "Item is unknown",
+	MaxSize = "Item cannot be stacked that high",
+	NotFound = "Item was not found in inventory",
+	NotEnough = "Not enough of item available",
 }
 lib.ErrorText = ErrorText
 
@@ -171,6 +181,7 @@ private.postRequests = {}
 private.lastReported = 0
 private.reportLock = 0
 function private.QueueReport()
+	private.lastCountSig = nil
 	if private.reportLock ~= 0 then return end
 	local queuelength = #private.postRequests
 	if private.lastReported ~= queuelength then
@@ -229,6 +240,10 @@ end
 	Return number of requests and total number of items matching the sig
 --]]
 function lib.GetQueueItemCount(sig)
+	if sig and sig == private.lastCountSig then
+		-- "last item" cache: this function tends to get called multiple times for the same sig
+		return private.lastCountRequests, private.lastCountItems
+	end
 	local requestCount, itemCount = 0, 0
 	for _, request in ipairs(private.postRequests) do
 		if request[REQ_SIG] == sig then
@@ -236,6 +251,9 @@ function lib.GetQueueItemCount(sig)
 			itemCount = itemCount + request[REQ_COUNT]
 		end
 	end
+	private.lastCountSig = sig
+	private.lastCountRequests = requestCount
+	private.lastCountItems = itemCount
 	return requestCount, itemCount
 end
 
@@ -258,22 +276,45 @@ end
 
 --[[
     PostAuction(sig, size, bid, buyout, duration, [multiple])
-	Throws: ERROR_AHCLOSED
 
 	Places the request to post a stack of the "sig" item, "size" high
 	into the auction house for "bid" minimum bid, and "buy" buyout and
 	posted for "duration" minutes. The request will be posted
 	"multiple" number of times.
+
+	This is the main entry point to the Post library for other AddOns, so has the strictest parameter checking
+	"multiple" is optional, defaulting to 1. All other parameters are required.
 ]]
 function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
-	if not AuctionFrame
-	or not AuctionFrame:IsVisible()
-	then
-		return error(ERROR_AHCLOSED)
+	local id = DecodeSig(sig)
+	if not id then
+		return nil, "InvalidSig"
+	elseif type(size) ~= "number" then
+		return nil, "InvalidSize"
+	elseif type(bid) ~= "number" or bid < 1 then
+		return nil, "InvalidBid"
+	elseif type(buyout) ~= "number" or (buyout < bid and buyout ~= 0) then
+		return nil, "InvalidBuyout"
+	elseif duration ~= 720 and duration ~= 1440 and duration ~= 2880 then
+		return nil, "InvalidDuration"
+	end
+
+	local name,_,_,_,_,_,_, maxSize = GetItemInfo(id)
+	if not name then
+		return nil, "UnknownItem"
+	elseif size > maxSize then
+		return nil, "MaxSize"
+	end
+
+	multiple = tonumber(multiple) or 1
+	local available, total, _, _, _, reason = lib.CountAvailableItems(sig)
+	if total == 0 then
+		return nil, reason or "NotFound"
+	elseif available < size * multiple then
+		return nil, "NotEnough"
 	end
 
 	local postIds = {}
-	if not multiple then multiple = 1 end
 	private.SetQueueReports(false)
 	for i = 1, multiple do
 		local request = private.NewRequestTable(sig, size, bid, buyout, duration)
@@ -342,7 +383,7 @@ end
 
 --[[
 	CountAvailableItems(sig)
-	Returns: availableCount, totalCount, unpostableCount, queuedCount
+	Returns: availableCount, totalCount, unpostableCount, queuedCount, nil, unpostableError
 	The Posting modules need to know how many items are available to be posted;
 	this is not the same as the number of items currently in the bags
 --]]
@@ -350,6 +391,7 @@ function lib.CountAvailableItems(sig)
 	local matchId, matchSuffix, matchFactor, matchEnchant = DecodeSig(sig)
 	if not matchId then return end
 	local totalCount, unpostableCount = 0, 0
+	local expansionspace, unpostableError
 
 	for bag = 0, NUM_BAG_FRAMES do
 		for slot = 1, GetContainerNumSlots(bag) do
@@ -363,8 +405,12 @@ function lib.CountAvailableItems(sig)
 					local _, count = GetContainerItemInfo(bag, slot)
 					if not count or count < 1 then count = 1 end
 					totalCount = totalCount + count
-					if not lib.IsAuctionable(bag, slot) then
+					local test, code = lib.IsAuctionable(bag, slot)
+					if not test then
 						unpostableCount = unpostableCount + count
+						if unpostableError ~= "Damaged" then -- if there are both "Damaged" and "Soulbound" items, we want to report the "Damaged" code here
+							unpostableError = code
+						end
 					end
 				end
 			end
@@ -373,7 +419,7 @@ function lib.CountAvailableItems(sig)
 
 	local _, queuedCount = lib.GetQueueItemCount(sig)
 
-	return (totalCount - unpostableCount - queuedCount), totalCount, unpostableCount, queuedCount
+	return (totalCount - unpostableCount - queuedCount), totalCount, unpostableCount, queuedCount, expansionspace, unpostableError
 end
 
 --[[
