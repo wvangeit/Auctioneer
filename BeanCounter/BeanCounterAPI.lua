@@ -253,7 +253,7 @@ function lib.API.getAHSoldFailed(player, link, days, serverKey)
 	--check for server key or use home
 	local server
 	if serverKey then
-		server = strsplit(" - ", serverKey)
+		server = lib.API.SplitServerKey(serverKey)
 	else
 		server = private.realmName
 	end
@@ -428,6 +428,28 @@ function lib.API.deleteItem(itemLink)
 		print("Invalid itemLink")
 	end
 end
+
+--[[Duplicate of the function in auctioneer,  Splits and caches serverKey variable
+ realm, faction, localizedFaction = lib.API.SplitServerKey(serverKey)   ]]
+local splitcache = {}
+local localizedfactions = {
+["Alliance"] = FACTION_ALLIANCE,
+["Horde"] = FACTION_HORDE,
+["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
+}
+function lib.API.SplitServerKey(serverKey)
+	local split = splitcache[serverKey]
+	if not split then
+		local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")
+		local transfaction = localizedfactions[faction]
+		if not transfaction then return end
+		split = {realm, faction, realm.." - "..transfaction}
+		splitcache[serverKey] = split
+	end
+	return split[1], split[2], split[3]
+end
+
+
 
 
 --[[===========================================================================

@@ -82,7 +82,7 @@ function lib.ClearMatchArrayCache()	-- called from processor
 	end
 end
 
-function lib.GetMatchArray(hyperlink, marketprice)
+function lib.GetMatchArray(hyperlink, marketprice, serverKey)
 	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") or not BeanCounter or not BeanCounter.API.isLoaded then --check setting is on, beancounter exists, and that the database is sound
 		return
 	end
@@ -114,7 +114,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	decrease = (decrease / 100) + 1
 
 	local player =  UnitName("player")
-	local success, failed = BeanCounter.API.getAHSoldFailed(player, hyperlink, numdays)
+	local success, failed = BeanCounter.API.getAHSoldFailed(player, hyperlink, numdays, serverKey)
 
 	increase = math.pow(increase, math.pow(success, 0.8))
 	decrease = math.pow(decrease, math.pow(failed, 0.8))
