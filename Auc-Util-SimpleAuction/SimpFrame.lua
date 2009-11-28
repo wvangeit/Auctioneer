@@ -1,7 +1,7 @@
 --[[
 	Auctioneer - Simplified Auction Posting
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: AprFrame.lua 3576 2008-10-10 03:07:13Z aesir $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds a simple dialog for
@@ -34,10 +34,11 @@ if not AucAdvanced then return end
 local lib = AucAdvanced.Modules.Util.SimpleAuction
 local private = lib.Private
 local const = AucAdvanced.Const
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = const
-local pricecache
+local wipe = wipe
 
+local pricecache
 
 local frame
 local TAB_NAME = "Post"
@@ -218,13 +219,13 @@ function private.UpdateDisplay()
 	frame.CurItem.number = cNum
 	local oStack, oBid, oBuy, oReason, oLink = unpack(frame.detail)
 	local lStack = frame.stacks.size.lastSize or oStack
-	local total = GetItemCount(link) or 0
 	local duration = frame.duration.time.selected
 
-	if (total == 0) then
-		private.LoadItemLink()
-		return
-	end
+	local sig = AucAdvanced.API.GetSigFromLink(link)
+	if not sig then return private.LoadItemLink() end
+	local _, total, unpostable, _, _, reason = AucAdvanced.Post.CountAvailableItems(sig)
+	total = total - unpostable
+	if total < 1 then return private.LoadItemLink() end
 	private.SetIconCount(total)
 
 	local dBid = abs(cBid/lStack*oStack-oBid)
@@ -369,12 +370,12 @@ function private.UpdatePricing()
 	local mid, seen = 0,0
 	local stack = frame.stacks.size:GetNumber()
 	local _,_,_,_,_,_,_,stx = GetItemInfo(link)
-	local total = GetItemCount(link) or 0
 
-	if (total == 0) then
-		private.LoadItemLink()
-		return
-	end
+	local sig = AucAdvanced.API.GetSigFromLink(link)
+	if not sig then return private.LoadItemLink() end
+	local _, total, unpostable, _, _, reason = AucAdvanced.Post.CountAvailableItems(sig)
+	total = total - unpostable
+	if total < 1 then return private.LoadItemLink() end
 	private.SetIconCount(total)
 
 	stx = min(stx, total)
@@ -580,7 +581,7 @@ function private.CheckUpdate()
 			private.RemoveConfig()
 		end
 		private.UpdatePricing()
-		
+
 	end
 	if frame.CurItem.remember then
 		private.SaveConfig()
@@ -600,16 +601,32 @@ function private.IconClicked()
 end
 
 function private.LoadItemLink(itemLink, size)
-	empty(frame.CurItem)
+	wipe(frame.CurItem)
 	if itemLink then
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
+		if not itemName then return private.LoadItemLink() end
+		local sig = AucAdvanced.API.GetSigFromLink(itemLink)
+		if not sig then
+			print(itemLink.." cannot be posted: Not an item")
+			return private.LoadItemLink()
+		end
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
-		local itemCount = GetItemCount(itemLink)
 		frame.CurItem.link = itemLink
 		frame.CurItem.name = itemName
-		frame.CurItem.count = itemCount
 		frame.icon.itemLink = itemLink
 		frame.icon:SetNormalTexture(itemTexture)
+
+		local _, total, unpostable, _, _, reason = AucAdvanced.Post.CountAvailableItems(sig)
+		local itemCount = total - unpostable
+		if itemCount < 1 then
+			if reason == "Damaged" then
+				print(itemLink.." is damaged: you may be able to post it after repairing it")
+			else
+				print(itemLink.." cannot be posted: "..(AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"))
+			end
+			return private.LoadItemLink()
+		end
+		frame.CurItem.count = itemCount
 		private.SetIconCount(itemCount)
 
 		frame.name:SetText(itemName)
@@ -766,23 +783,24 @@ function private.ClearSetting()
 end
 
 function private.PostAuction()
-	if not frame.CurItem.link then
+	local link = frame.CurItem.link
+	if not link then
 		print("Posting Failed: No Item Selected")
 		return
 	end
-	local link = frame.CurItem.link
+	local sig = private.SigFromLink(link)
 	local number = frame.CurItem.number
 	local stack = frame.CurItem.stack
 	local bid = frame.CurItem.bid
 	local buy = frame.CurItem.buy
 	local duration = frame.CurItem.duration or 48
-	if frame.CurItem.count < (stack * number) then
-		print("Posting Failed: Not enough items available")
-		return
+	local success, reason = AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
+	if success then
+		print("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
+	else
+		reason = AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"
+		print("Posting Failed for "..link..": "..reason)
 	end
-	local sig = private.SigFromLink(link)
-	print("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
-	AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
 end
 
 function private.Refresh(background)
@@ -1054,7 +1072,7 @@ function private.CreateFrames()
 				private.LoadItemLink(link, size)
 				--see if double clicking to auto post is allowed
 				if (not get("util.simpleauc.clickhook.doubleclick")) then return end
-				
+
 				if not private.clickdata then private.clickdata = {} end
 				local last = private.clickdata
 				local now = GetTime()
