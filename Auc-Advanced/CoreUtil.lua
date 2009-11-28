@@ -40,11 +40,13 @@ local tooltip = LibStub("nTipHelper:1")
 -- "Module" functions for CoreUtil
 -- installed in private table, called via CoreModule
 
+--[[ OnLoad is not currently needed
 function private.OnLoad(addon)
 	if addon == "auc-advanced" then
-		private.createAuctionLength()
+
 	end
 end
+--]]
 
 function private.Processor(event, subevent)
 	if event == "auctionopen" then
@@ -212,15 +214,11 @@ end
 -- Creates the list of Auction Durations for use in deposit cost dropdowns
 -- Usage: gui:AddControl(id, "Selectbox",  column, indent, AucAdvanced.selectorAuctionLength, "util.modulename.deplength")
 do
-	local auctionlength
-	function private.createAuctionLength()
-		-- called from OnLoad, as localizations are not valid before that event
-		auctionlength = {
-			{12, lib.localizations("APPR_Interface_12Hours")},
-			{24, lib.localizations("APPR_Interface_24Hours")},
-			{48, lib.localizations("APPR_Interface_48Hours")},
+	local auctionlength = {
+			{12, FORMATED_HOURS:format(12)},
+			{24, FORMATED_HOURS:format(24)},
+			{48, FORMATED_HOURS:format(48)},
 		}
-	end
 	function lib.selectorAuctionLength()
 		return auctionlength
 	end
@@ -233,6 +231,26 @@ function lib.GetLinkQuality(...) return tooltip:GetLinkQuality(...) end
 function lib.ShowItemLink(...) return tooltip:ShowItemLink(...) end
 function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end
 lib.breakHyperlink = lib.BreakHyperlink
+
+do
+	local splitcache = {}
+	local localizedfactions = {
+		["Alliance"] = FACTION_ALLIANCE,
+		["Horde"] = FACTION_HORDE,
+		["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
+	}
+	function lib.SplitServerKey(serverKey)
+		local split = splitcache[serverKey]
+		if not split then
+			local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")
+			local transfaction = localizedfactions[faction]
+			if not transfaction then return end
+			split = {realm, faction, realm.." - "..transfaction}
+			splitcache[serverKey] = split
+		end
+		return split[1], split[2], split[3]
+	end
+end
 
 function lib.GetFaction()
 	local realmName = GetRealmName()
@@ -294,7 +312,7 @@ function lib.AddTab(tabButton, tabFrame)
 		--check that tab has not already been created, since we can optionally remove tabs now
 		if getglobal("AuctionFrameTab"..(tabCount)):GetName() == tabButton:GetName() then
 			lib.Print("Tab with that name already exists")
-			return 
+			return
 		end
 		tabCount = tabCount + 1;
 	end
@@ -342,7 +360,7 @@ function lib.RemoveTab(tabButton, tabFrame)
 	while (getglobal("AuctionFrameTab"..(tabCount+1))) do
 		tabCount = tabCount + 1;
 	end
-	
+
 	-- Find the correct location to remove the tab
 	local tabIndex, tabFound = 1
 	while getglobal("AuctionFrameTab"..(tabIndex)) do
@@ -352,16 +370,16 @@ function lib.RemoveTab(tabButton, tabFrame)
 		end
 		tabIndex = tabIndex + 1
 	end
-	
+
 	--if we did nto find the correct tab then end
 	if not tabFound then return end
-	
+
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button after removal.
 	if tabFound and (tabFound < tabCount) then
 		nextTabButton = getglobal("AuctionFrameTab"..(tabFound + 1))
 		nextTabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabFound - 1)):GetName(), "TOPRIGHT", -8, 0)
 	end
-	
+
 	-- Reduce count on tabs remaining
 	setglobal("AuctionFrameTab"..(tabFound), nil) --remove old tab from namespace
 	for index = tabFound, tabCount do
@@ -373,11 +391,11 @@ function lib.RemoveTab(tabButton, tabFrame)
 			setglobal("AuctionFrameTab"..(index), nil)
 		end
 	end
-	
+
 	-- Hide the frame.
 	tabFrame:Hide()
 	tabButton:Hide()
-	
+
 	-- Update the tab count.
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount - 1)
 end
@@ -427,7 +445,7 @@ Recommended method:
   local libType, libName = "myType", "myName"
   local lib,parent,private = AucAdvanced.NewModule(libType, libName)
   if not lib then return end
-  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+  local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 --]]
 
@@ -562,7 +580,6 @@ local coremodule = {
 	libName = "CoreModule",
 	GetName = function() return "CoreModule" end,
 	}
-lib.Modules.Util.CoreModule = coremodule
 
 function private.MakeCoreModuleFunction(func, newcore, nest)
 	local xname = "_"..func
@@ -592,7 +609,7 @@ function lib.CoreModuleOnLoad(addon)
 	local cores = {private, lib.API, lib.Buy, lib.Config, lib.Const, lib.Post, lib.Scan, lib.Settings}
 	local funcs = {"OnLoad", "Processor", "CommandHandler"}
 	local nested = {
-		ScanProcessors = {"begin", "update", "leave", "create", "delete", "complete"},
+		ScanProcessors = {"begin", "update", "leave", "create", "delete", "complete", "placebid", "newauc", "aucsold"},
 	}
 	local tables = {"LoadTriggers"}
 
@@ -624,7 +641,8 @@ function lib.CoreModuleOnLoad(addon)
 		end
 	end
 
-	-- fake our NewModule message
+	-- install as a Module
+	lib.Modules.Util.CoreModule = coremodule
 	lib.SendProcessorMessage("newmodule", "Util", "CoreModule")
 
 	-- do OnLoad
