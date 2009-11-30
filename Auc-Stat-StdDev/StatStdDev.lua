@@ -385,6 +385,7 @@ function lib.ClearItem(hyperlink, serverKey)
 			print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, serverKey))--- StdDev: clearing data for %s for {{%s}}
 			stats[property] = nil
 			SSDRealmData[serverKey][itemID] = private.PackStats(stats)
+			wipe(cache)
 		end
 	end
 end
