@@ -498,6 +498,40 @@ function private.ProcessTooltip(frame, name, link, quality, quantity, cost, addi
 	local ink = get("util.glypher.inks."..itemId..".ink") or 0
 	local count = get("util.glypher.inks."..itemId..".count") or 0
 	frame:AddLine("Ink: " .. ink .. " count: " .. count)
+
+	--the following was mostly just copy/pasted from another section to debug a situation with over-production of glyphs - solved
+	local name = UnitName("player")
+	local realm = GetRealmName()
+	local account = "Default"
+	local currentcharacter = format("%s.%s.%s", account, realm, name)
+	local altList = get("util.glypher.altlist")
+	local itemName = itemId
+	local history = get("util.glypher.history") --how far back in beancounter to look, in days
+	local HOURS_IN_DAY = 24
+	local MINUTES_IN_HOUR = 60;
+	local SECONDS_IN_MINUTE = 60;
+	local SECONDS_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
+	local historyTime = time() - (history * SECONDS_IN_DAY)
+
+	local bcSold = 0
+	local bcProfit = 0
+	if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
+		for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
+			if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
+				bcSold = bcSold + (BeanCounter.API.getAHSoldFailed(characterName, link, history) or 0)
+				bcProfit = bcProfit + (BeanCounter.API.getAHProfit(characterName, itemName, historyTime, time()) or 0)
+			end
+		end
+	else
+		bcSold = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) or 0
+		bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(UnitName("player"), itemName, historyTime, time()) or 0
+	end
+	frame:AddLine("bcSold: " .. bcSold)
+	local currentAuctions = stock
+	local stockdays = get("util.glypher.stockdays")
+	local make = floor(bcSold/history * stockdays + .5) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
+
+	frame:AddLine("Wanting to make " .. make .. " (" .. bcSold .. "/" .. history .. "*" .. stockdays .. " + .5)")
 end
 
 function private.sheetOnEnter(button, row, column)
@@ -745,7 +779,7 @@ function private.cofindGlyphs()
 				if worthPrice and (worthPrice - reagentCost) >= MinimumProfit and inkMatch then
 					local currentAuctions = private.GetStock(itemId)
 
-					local make = floor(bcSold/history * stockdays + .9) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
+					local make = floor(bcSold/history * stockdays + .5) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
 					local failed = 0
 					if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
 						for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
@@ -766,7 +800,7 @@ function private.cofindGlyphs()
 					end
 					local makemaxstock = get("util.glypher.makemaxstock")
 					if makemaxstock and (currentAuctions == 0) and (make < maxstock) then make = maxstock end
-					if (make + currentAuctions) < minstock then make = (minstock - currentAuctions) end
+					if (make > 0) and ((make + currentAuctions) < minstock) then make = (minstock - currentAuctions) end
 					if (make > 0) and (make < mincraft) then
 						--if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
 						--if (currentAuctions < minstock) or (currentAuctions == 0) then
@@ -784,7 +818,6 @@ function private.cofindGlyphs()
 						make = (maxstock - currentAuctions) 
 					end
 					if (make > 0) and (make < mincraft) then make = 0 end -- in this case we can't make mincraft because it would put us over the limit, so let's make none at all (this avoids repeatedly "topping off" stacks)
-					-- Weltmeister: but, if someone has a low maxstock and a relatively high mincraft, this might not work so well...need to warn the user I guess
 					if make > 0 then
 						local failedratio
 						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = failed end
