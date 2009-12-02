@@ -144,13 +144,15 @@ function lib.GetPrice(hyperlink, serverKey)
 		Rsn_WonBuy = _BC('UiWononBuyout')
 	end
 	
+	local sig = GetSigFromLink(hyperlink)
+	if not sig then return end
 	serverKey = serverKey or GetFaction()
-	local sig = serverKey..GetSigFromLink(hyperlink)
-	if pricecache[sig] == false then
+	local cachesig = serverKey..sig
+	local cached = pricecache[cachesig]
+	if cached == false then
 		return
-	end
-	if pricecache[sig] then
-		return unpack(pricecache[sig])
+	elseif cached then
+		return unpack(cached)
 	end
 	local settings = private.GetBCSearchSettings(serverKey)
 	if not settings then return end
@@ -159,7 +161,7 @@ function lib.GetPrice(hyperlink, serverKey)
 	local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	local reason, qty, priceper, thistime
 	--check for ignore date for current serverKey or all servers
-	local ignoreDate = SalesDB[sig] or SalesDB["All"..GetSigFromLink(hyperlink)] or 0
+	local ignoreDate = SalesDB[cachesig] or SalesDB["All"..sig] or 0
 	
 	if tbl then
 		for i,v in pairs(tbl) do
@@ -177,7 +179,7 @@ function lib.GetPrice(hyperlink, serverKey)
 			--10 0
 			--11 10387318
 			--12 1198401769
-			reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 0
+			reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 1
 			if priceper and qty and priceper>0 and qty>0 and thistime > ignoreDate then
 				if reason == Rsn_WonBuy  or reason == Rsn_WonBid  then
 					boughtqty = boughtqty + qty
@@ -213,7 +215,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
 		if soldqty7>0 then sold7 = sold7 / soldqty7 end
 	end
-	if (not sold or sold==0) and (not bought or bought==0) then pricecache[sig]=false; return end
+	if (not sold or sold==0) and (not bought or bought==0) then pricecache[cachesig]=false; return end
 	-- Start StdDev calculations
 	local mean = sold
 	-- Calculate Variance
@@ -221,8 +223,8 @@ function lib.GetPrice(hyperlink, serverKey)
 	local count = 0
 	
 	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-		reason, qty, priceper = v[2], v[6], v[7]
-		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success then
+		reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 1
+		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success and thistime>ignoreDate then
 			variance = variance + ((mean - priceper) ^ 2);
 			count = count + 1
 		end
@@ -236,8 +238,8 @@ function lib.GetPrice(hyperlink, serverKey)
 	local number = 0
 	local total = 0
 	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
-		reason, qty, priceper = v[2], v[6], v[7]
-		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success  then
+		reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 1
+		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success and thistime>ignoreDate then
 			if (abs(priceper - mean) < deviation) then
 				total = total + priceper * qty
 				number = number + qty
@@ -254,7 +256,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		confidence = private.GetCfromZ(confidence)
 	end
 	
-	pricecache[sig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
+	pricecache[cachesig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
 	return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
@@ -303,8 +305,10 @@ end
 
 function lib.ClearItem(hyperlink, serverKey)
 	print(_TRANS('ASAL_Interface_SlashHelpClearingData') )-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
-	serverKey = serverKey or "All"
-	local sig = serverKey..GetSigFromLink(hyperlink)
+	local sig = GetSigFromLink(hyperlink)
+	if not sig then return end
+	serverKey = serverKey or GetFaction()
+	sig = serverKey..sig
 	SalesDB[sig] = time()
 	wipe(pricecache)
 end
