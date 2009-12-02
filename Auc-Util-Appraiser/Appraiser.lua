@@ -265,6 +265,12 @@ function lib.CanSupplyMarket()
 	return false
 end
 
+function lib.ClearItem()
+	-- we only need this to clear caches
+	empty(tooltipcache)
+	if pricecache then empty(pricecache) end
+end
+
 function private.GetPriceCore(sig, link, serverKey, match)
 	local curModel, curModelText
 
