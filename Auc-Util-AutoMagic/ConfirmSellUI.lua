@@ -176,7 +176,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui:ClearAllPoints()
 	lib.confirmsellui:SetPoint("CENTER", UIParent, "CENTER", 1,1)
 	lib.confirmsellui:SetFrameStrata("DIALOG")
-	lib.confirmsellui:SetHeight(200)
+	lib.confirmsellui:SetHeight(220)
 	lib.confirmsellui:SetWidth(550)
 	lib.confirmsellui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -206,7 +206,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellheader:SetJustifyH("CENTER")
 	lib.confirmsellheader:SetWidth(200)
 	lib.confirmsellheader:SetHeight(10)
-	lib.confirmsellheader:SetPoint("TOPLEFT",  lib.confirmsellui, "TOPLEFT", 0, 0)
+	lib.confirmsellheader:SetPoint("TOPLEFT",  lib.confirmsellui, "TOPLEFT", 0, -10)
 	lib.confirmsellheader:SetPoint("TOPRIGHT", lib.confirmsellui, "TOPRIGHT", 0, 0)
 	lib.confirmsellui.confirmsellheader = lib.confirmsellheader
 
@@ -222,7 +222,7 @@ function lib.makeconfirmsellui()
 	})
 
 	lib.confirmsellui.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	lib.confirmsellui.resultlist:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 10, -10)
+	lib.confirmsellui.resultlist:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 10, -25)
 	lib.confirmsellui.resultlist:SetPoint("TOPRIGHT", lib.confirmsellui, "TOPRIGHT", -10, -10)
 	lib.confirmsellui.resultlist:SetPoint("BOTTOM", lib.confirmsellui, "BOTTOM", 0, 30)
 
@@ -277,6 +277,11 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.unignoreButton:SetText(("Un-Ignore Item"))
 	lib.confirmsellui.unignoreButton:SetScript("OnClick",  lib.ASCUnIgnoreItem)
 	lib.confirmsellui.unignoreButton:Disable()
+	
+	--Hide sales window
+	lib.confirmsellui.closeButton = CreateFrame("Button", nil, lib.confirmsellui, "UIPanelCloseButton")
+	lib.confirmsellui.closeButton:SetScript("OnClick", function() lib.confirmsellui:Hide() end)
+	lib.confirmsellui.closeButton:SetPoint("TOPRIGHT", lib.confirmsellui, "TOPRIGHT", 0,0)
 end
 
 lib.makeconfirmsellui()
