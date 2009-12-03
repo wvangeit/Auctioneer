@@ -51,26 +51,48 @@ end
 -- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
 function lib.ASCConfirmContinue()
 	for key, itemdata in pairs(lib.vendorlist) do
-		if (get("util.automagic.chatspam")) then
-			print("AutoMagic is selling:", itemdata[1], "reason:", itemdata[6])
+		local _, iID = decode( itemdata[1] ) --check if item is to be ignored
+		if not get("util.automagic.vidignored"..iID) then --will be nil if not on ignore list
+			
+			if (get("util.automagic.chatspam")) then
+				print("AutoMagic is selling:", itemdata[1], "reason:", itemdata[6])
+			end
+			
+			UseContainerItem(itemdata[4], itemdata[5])
 		end
-
-		UseContainerItem(itemdata[4], itemdata[5])
 		lib.vendorlist[key] = nil
 	end
 	lib.confirmsellui:Hide()
 end
 
 function lib.ASCRemoveItem()
-	--print("REMOVE ", selecteditem, selectedvendor, selectedappraiser, selectedwhy)
+	if selecteditem then
+		for key, itemdata in pairs(lib.vendorlist) do
+			if selecteditem ==  itemdata[1] then
+				lib.vendorlist[key] = nil
+				break
+			end
+		end
+	end
+	lib.ASCRefreshSheet()
 end
 
 function lib.ASCIgnoreItem()
-	--print("IGNORE ", selecteditem, selectedvendor, selectedappraiser, selectedwhy)
+	if selecteditem then
+		local _, iID = decode(selecteditem)
+		set("util.automagic.vidignored"..iID, true)
+	end
+	
+	lib.ASCRefreshSheet()
 end
 
 function lib.ASCUnIgnoreItem()
-	--print("UNIGNORE ", selecteditem, selectedvendor, selectedappraiser, selectedwhy)
+	if selecteditem then
+		local _, iID = decode(selecteditem)
+		set("util.automagic.vidignored"..iID, nil)
+	end
+	
+	lib.ASCRefreshSheet()
 end
 
 ---------------------------------------------------------
@@ -79,28 +101,30 @@ end
 -- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
 -- ASCtempstorage[index] = { link, vendorPrice, AppraiserPrice, reason, vendorIgnoreDisplay }
 function lib.ASCRefreshSheet()
-	local ASCtempstorage = {}
+	local ASCtempstorage, style = {}, {}
 	local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-	empty(ASCtempstorage) --Reset table to ensure fresh data
 	for k, v in pairs(lib.vendorlist) do
 		local itemLink, itemSig, count, bag, slot, reason = unpack(v)
 		local _, iID = decode(itemLink)
 		local vendor = GetSellValue and GetSellValue(iID) or 0
 		local abuy, abid = GetPrice(itemLink, nil, true)
-		local vendorignored = "no (will-sell)"
+		local vendorignored = "YES"
+		local styleColor = {0,1,0}
 		if get("util.automagic.vidignored"..iID) == true then
-			local vendorignored = "yes (no-sell)"
+			vendorignored = "NO"
+			styleColor = {1,0,0}
 		end
-
 		table.insert(ASCtempstorage,{
-			itemLink, --link form for mouseover tooltips to work
-			vendor,
-			tonumber(abuy) or tonumber(abid),
-			reason,
-			vendorignored,
+		itemLink, --link form for mouseover tooltips to work
+		vendor,
+		tonumber(abuy) or tonumber(abid),
+		reason,
+		vendorignored,
 		})
+		style[#ASCtempstorage] = {}
+		style[#ASCtempstorage][5] = {["textColor"] = styleColor}
 	end
-
+	
 	lib.confirmsellui.resultlist.sheet:SetData(ASCtempstorage, style) --Set the GUI scrollsheet
 end
 
@@ -115,17 +139,13 @@ function lib.ASCOnEnter(button, row, index)
 		end
 	end
 
-function lib.ASCOnLeave(button, row, index)
-	GameTooltip:Hide()
-end
 
 function lib.ASCOnClick()
 	--print("CLICK")
 end
 
-
 function lib.ASCSelect()
-	--if selected ~= lib.confirmsellui.resultlist.sheet.selected then
+	if lib.confirmsellui.resultlist.sheet.selected then
 		selected = lib.confirmsellui.resultlist.sheet.selected
 		selecteddata = lib.confirmsellui.resultlist.sheet:GetSelection()
 		selecteditem = selecteddata[1]
@@ -133,8 +153,16 @@ function lib.ASCSelect()
 		selectedappraiser = selecteddata[3]
 		selectedwhy = selecteddata[4]
 		selectedignored = selecteddata[5]
-		--print("Select: ", selecteditem, selectedvendor, selectedappraiser, selectedwhy, selectedignored)
-	--end
+		
+		lib.confirmsellui.ignoreButton:Enable()
+		lib.confirmsellui.removeButton:Enable()
+		lib.confirmsellui.unignoreButton:Enable()
+	else
+		selected, selecteditem, selectedvendor, selectedappraiser, selectedwhy, selectedignored = nil, nil, nil, nil, nil, nil
+		lib.confirmsellui.ignoreButton:Disable()
+		lib.confirmsellui.removeButton:Disable()
+		lib.confirmsellui.unignoreButton:Disable()
+	end
 end
 ---------------------------------------------------------
 -- Confirm AutoSell Interface
@@ -145,12 +173,11 @@ local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
 lib.confirmsellui = CreateFrame("Frame", "confirmsellui", UIParent); lib.confirmsellui:Hide()
 function lib.makeconfirmsellui()
-	--function lib.makeconfirmsellui()
 	lib.confirmsellui:ClearAllPoints()
 	lib.confirmsellui:SetPoint("CENTER", UIParent, "CENTER", 1,1)
 	lib.confirmsellui:SetFrameStrata("DIALOG")
 	lib.confirmsellui:SetHeight(200)
-	lib.confirmsellui:SetWidth(520)
+	lib.confirmsellui:SetWidth(550)
 	lib.confirmsellui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -204,10 +231,23 @@ function lib.makeconfirmsellui()
 		{ "Vendor", "COIN", 70 },
 		{ "Appraiser", "COIN", 70 },
 		{ "Selling for", "TEXT", 70 },
-		{ "Ignored?", "TEXT", 70,  { DESCENDING=true, DEFAULT=true } },
-	}, lib.ASCOnEnter, lib.ASCOnLeave, lib.ASCOnClick, nil, lib.ASCSelect)
+		{ "Will be Sold", "TEXT", 100,  { DESCENDING=true, DEFAULT=true } },
+	})
 
 	lib.confirmsellui.resultlist.sheet:EnableSelect(true)
+	
+	--After we have finished creating the scrollsheet and all saved settings have been applied set our event processor
+	function lib.confirmsellui.resultlist.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
+		if (callback == "OnEnterCell")  then
+			lib.ASCOnEnter(button, row, column)
+		elseif (callback == "OnLeaveCell") then
+			GameTooltip:Hide()
+		elseif (callback == "OnClickCell") then
+			lib.ASCOnClick(button, row, column)
+		elseif (callback == "OnMouseDownCell") then
+			lib.ASCSelect()
+		end
+	end
 
 	-- Continue with sales button
 	lib.confirmsellui.continueButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
@@ -217,7 +257,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.continueButton:SetScript("OnEnter", function() lib.buttonTooltips( lib.confirmsellui.continueButton, "Click to sell all listed items to vendor.") end)
 	lib.confirmsellui.continueButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-	--[[ Remove item from sales button
+	--Remove item from sales button
 	lib.confirmsellui.removeButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.removeButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.continueButton, "BOTTOMLEFT", -18, 0)
 	lib.confirmsellui.removeButton:SetText(("Remove Item"))
@@ -236,7 +276,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.unignoreButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.ignoreButton, "BOTTOMLEFT", -18, 0)
 	lib.confirmsellui.unignoreButton:SetText(("Un-Ignore Item"))
 	lib.confirmsellui.unignoreButton:SetScript("OnClick",  lib.ASCUnIgnoreItem)
-	lib.confirmsellui.unignoreButton:Disable()]]
+	lib.confirmsellui.unignoreButton:Disable()
 end
 
 lib.makeconfirmsellui()
