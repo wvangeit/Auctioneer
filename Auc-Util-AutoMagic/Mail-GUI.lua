@@ -81,6 +81,12 @@ function lib.makeMailGUI()
 	lib.mguiheader:SetPoint("TOPLEFT",  lib.ammailgui, "TOPLEFT", 0, 0)
 	lib.mguiheader:SetPoint("TOPRIGHT", lib.ammailgui, "TOPRIGHT", 0, 0)
 	lib.ammailgui.mguiheader = lib.mguiheader
+	
+	
+	--Hide mail window
+	lib.ammailgui.closeButton = CreateFrame("Button", nil, lib.ammailgui, "UIPanelCloseButton")
+	lib.ammailgui.closeButton:SetScript("OnClick", function() lib.ammailgui:Hide() end)
+	lib.ammailgui.closeButton:SetPoint("TOPRIGHT", lib.ammailgui, "TOPRIGHT", 0,0)
 
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 
