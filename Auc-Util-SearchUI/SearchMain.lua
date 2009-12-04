@@ -1847,7 +1847,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 				end
 				return true, item["profit"], value
 			end
-		elseif cost > maxprice and not enablemax then
+		elseif cost > maxprice and enablemax then
 			return false, "Price higher than maxprice"
 		else
 			return false, "Balance lower than reserve"
