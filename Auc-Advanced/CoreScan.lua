@@ -478,7 +478,7 @@ local function processStats(operation, curItem, oldItem)
 				end
 			else
 				if (nLog) then
-					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("AuctionFilter %s Returned Error %s"):format(engineLib.Getname(), errormsg))
+					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("AuctionFilter %s Returned Error %s"):format(engineLib.GetName(), errormsg))
 				end
 			end
 		end
@@ -501,7 +501,7 @@ local function processStats(operation, curItem, oldItem)
 			end
 			if (not pOK) then
 				if (nLog) then
-					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("ScanProcessor %s Returned Error %s"):format(engineLib.Getname(), errormsg))
+					nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("ScanProcessor %s Returned Error %s"):format(engineLib.GetName(), errormsg))
 				end
 			end
 		end
@@ -985,7 +985,7 @@ function private.FinishedPage(nextPage)
 			end
 		else
 			if (nLog) then
-				nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("FinishedPage %s Returned Error %s"):format(engineLib.Getname(), finished))
+				nLog.AddMessage("Auctioneer", "Scan", N_WARN, ("FinishedPage %s Returned Error %s"):format(engineLib.GetName(), finished))
 			end
 		end
 	end
