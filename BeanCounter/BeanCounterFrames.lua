@@ -441,11 +441,10 @@ function private.CreateFrames()
 	
 	--Edit box for changing UI reason codes
 	frame.reasonEditBox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-	frame.reasonEditBox:SetPoint("TOPLEFT", frame, "TOPLEFT", -200, -180)
+	frame.reasonEditBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
 	frame.reasonEditBox:SetAutoFocus(true)
 	frame.reasonEditBox:Hide()
 	frame.reasonEditBox:SetHeight(15)
-	frame.reasonEditBox:SetParent(frame)
 	frame.reasonEditBox:SetFrameStrata("DIALOG")
 	frame.reasonEditBox:SetWidth(30)
 	frame.reasonEditBox:SetScript("OnEscapePressed", function() frame.reasonEditBox:Hide() end)
@@ -524,7 +523,7 @@ function private.CreateFrames()
 		if not clickedFrame:IsVisible() then return end --Old data is still in the frames, just hidden
 		
 		local text = clickedFrame:GetText()
-		if not text then return end
+		if not text then text = "" end
 		
 		local columnName = self.labels[column]:GetText()
 		if columnName == _BC('UiNameHeader') then
@@ -539,8 +538,10 @@ function private.CreateFrames()
 		elseif columnName == _BC('UiReason') then
 			frame.reasonEditBox:ClearAllPoints()
 			frame.reasonEditBox:SetAllPoints(clickedFrame)
+			frame.reasonEditBox:ClearFocus() --clear focus then set so we highlight current text
 			frame.reasonEditBox:SetText(text)
 			frame.reasonEditBox:Show()
+			frame.reasonEditBox:SetFocus()
 			self.selectedForEdit = {self.sort[row + math.floor(self.panel.vPos)], row, column}
 			
 		end
@@ -609,7 +610,8 @@ function private.CreateFrames()
 			["failedauction"] = frame.auctionFailedCheck:GetChecked()
 			}
 	end
-
+	--set parent of the Reason edit box to the created scrollframe. This prevents overlaping.
+	frame.reasonEditBox:SetParent(frame.resultlist.sheet.content)
 	private.CreateMailFrames()
 
 end
