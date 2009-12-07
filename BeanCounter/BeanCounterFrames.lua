@@ -448,6 +448,7 @@ function private.CreateFrames()
 	frame.reasonEditBox:SetParent(frame)
 	frame.reasonEditBox:SetFrameStrata("DIALOG")
 	frame.reasonEditBox:SetWidth(30)
+	frame.reasonEditBox:SetScript("OnEscapePressed", function() frame.reasonEditBox:Hide() end)
 	frame.reasonEditBox:SetScript("OnEnterPressed", function()
 		local self = frame.resultlist.sheet
 		self.selected = self.selectedForEdit[1] --pass stored selection back to frame
