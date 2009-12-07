@@ -164,6 +164,10 @@ BeanCounterLocalizations = {
 		["Q_MailRecolor"]	= "Was ist Mail einfärben ?";
 
 		-- Section: HelpTooltip
+		["C_MaxDisplayedResults"]	= "Maximalen anzeigbaren such treffer (from jeder Datenbank)";
+		["TTDataExpireEnabled"]	= "Datensaetze aelter als die gewaehlte reichweite werden geloescht";
+		["TT_ColorizeSearch"]	= "Diese option aendert die farben der Item lininen im BeanCounter such fenster";
+		["TT_MaxDisplayedResults"]	= "Dies controliert die nummer der suchttreffer die im fenster angezeigt werden";
 		["TT_neutralCheck"]	= "Ergebnissanzeige für neutrales Schwarzmeer Auktionshaus";
 
 		-- Section: Mail
@@ -305,6 +309,7 @@ BeanCounterLocalizations = {
 		["TT_MaxDisplayedResults"]	= "This controls the total number of results displayed in the scroll frame.";
 		["TT_neutralCheck"]	= "Display results from the Neutral Blackwater Auction house";
 		["TT_OpacityLevel"]	= "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)";
+		["TT_sendtosearch"]	= "When entering a search in BeanCounter it will also add the string to the AH browse frame.";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
@@ -365,6 +370,7 @@ BeanCounterLocalizations = {
 		["UiPricePerHeader"]	= "Price Header";
 		["UiPurchases"]	= "Purchases";
 		["UiQuantityHeader"]	= "Qty";
+		["UiReason"]	= "Reason";
 		["UiSales"]	= "Sales";
 		["UiSearch"]	= "Search";
 		["UiSearchForLabel"]	= "Search for:";
@@ -679,6 +685,7 @@ BeanCounterLocalizations = {
 		["C_Resortascendingtime"]	= "시간순으로 모든 항목 재정렬";
 		["C_ResortDatabase"]	= "데이터베이스 재정렬";
 		["C_ScanDatabase"]	= "데이터베이스에서 오류를 검사합니다 : 콩순이 검색시 오류가 발생하면 사용하십시오. \n 사용하기 전에 콩순이의 SavedVariables을 백업해두십시오.";
+		["C_SearchConfiguration"]	= "검색 설정";
 		["C_ShowBeginnerTooltips"]	= "마우스를 가져다 대면 초보자를 위한 툴팁을 표시합니다.";
 		["C_ShowReasonPurchase"]	= "게임 툴팁에 구매사유를 보여줍니다.";
 		["C_ValidateDatabase"]	= "데이터베이스 검증";
@@ -788,8 +795,26 @@ BeanCounterLocalizations = {
 	nlNL = {
 
 		-- Section: Config Text
+		["C_BeanCounterConfig"]	= "BeanCounter configuratie";
 		["C_BeanCounterOptions"]	= "Beancounter opties";
+		["C_ColorizeSearch"]	= "Voeg een kleurverloop toe aan elk resultaat in het zoekvenster";
+		["C_DatabaseLength"]	= "Bepaald hoe lang BeanCounter Auction House transacties bewaard";
 		["C_DataMaintenance"]	= "Data Onderhoud";
+		["C_DateString"]	= "Datum formaat wat gebruikt moet worden:";
+		["C_DateStringExample"]	= "Voorbeeld datum:";
+		["C_ExtenalSearch"]	= "Sta externe addons toe om BeanCounters zoek te gebruiken";
+		["C_MailInvoiceTimeout"]	= "Post Factuur Timeout = %d seconden";
+		["C_MailRecolor"]	= "Post herkleur methode";
+		["C_ModTTShow"]	= "Toon de extra tooltip alleen als Alt is ingedrukt.";
+		["C_MonthsToKeep"]	= "Hoeveel maanden moeten de gegevens bewaard worden?";
+		["C_OpacityLevel"]	= "Doorzichtigheid niveau";
+		["C_Resortascendingtime"]	= "Sorteer alle items, met oplopende tijd";
+		["C_ResortDatabase"]	= "Sorteer de database";
+		["C_ScanDatabase"]	= "Scan de database voor fouten: Gebruik dit als je fouten hebt tijdens het zoeken met BeanCounter.¶\nBewaar BeanCounter's bewaarde variablen voordat je dit gebruikt. ";
+		["C_SearchConfiguration"]	= "Zoek configuratie";
+		["C_SendToSearch"]	= "BeanCounters gezochte items aan het hoofd Auction House venster toevoegen?";
+		["C_ShowBeginnerTooltips"]	= "Toon beginnerstooltips in mouse-over";
+		["C_ShowReasonPurchase"]	= "Toon de resen om te kopen in de tooltip";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Veiling";
@@ -960,6 +985,7 @@ BeanCounterLocalizations = {
 		["C_BeanCounterConfig"]	= "Опции BeanCounter";
 		["C_BeanCounterDatabaseMaintenance"]	= "Обслуживание базы данных";
 		["C_BeanCounterOptions"]	= "Опции BeanCounter";
+		["C_ColorizeSearch"]	= "Добавить градиент цвета для каждого результата в окне поиска";
 		["C_DataMaintenance"]	= "Обработка данных";
 		["C_DateString"]	= "Используемый формат даты:";
 		["C_DateStringExample"]	= "Пример даты:";
@@ -967,9 +993,11 @@ BeanCounterLocalizations = {
 		["C_MailInvoiceTimeout"]	= "Таймаут получения почты = %d секунд";
 		["C_MailRecolor"]	= "Способ окрашивания почты";
 		["C_ModTTShow"]	= "Отображать экстра-тултип только если зажат ALT";
+		["C_OpacityLevel"]	= "уровень прозрачности";
 		["C_Resortascendingtime"]	= "Сортировать записи по возрастанию времени";
 		["C_ResortDatabase"]	= "Сортировать базу данных";
 		["C_ScanDatabase"]	= "Проверка базы данных: воспользуйтесь, если при поиске возникают ошибки. \n Сохраните резервную копию данных перед использованием.";
+		["C_SearchConfiguration"]	= "Поиск Конфигурации";
 		["C_ShowBeginnerTooltips"]	= "Показывать всплывающие подсказки при наведении мыши.";
 		["C_ShowReasonPurchase"]	= "Показывать причину для приобретения во всплывающей подсказке.";
 		["C_ValidateDatabase"]	= "Проверка базы данных.";
@@ -1204,6 +1232,8 @@ BeanCounterLocalizations = {
 		["C_BeanCounterConfig"]	= "拍賣記錄器設定";
 		["C_BeanCounterDatabaseMaintenance"]	= "拍賣記錄器資料庫維護";
 		["C_BeanCounterOptions"]	= "拍賣記錄器選項";
+		["C_ColorizeSearch"]	= "增加漸變色彩到搜尋視窗中的每一個結果";
+		["C_DatabaseLength"]	= "設定多久之後 BeanCounter 將儲存拍賣場的資料。";
 		["C_DataMaintenance"]	= "資料庫維護";
 		["C_DateString"]	= "日期的格式";
 		["C_DateStringExample"]	= "例如日期：";
@@ -1211,9 +1241,13 @@ BeanCounterLocalizations = {
 		["C_MailInvoiceTimeout"]	= "郵件到期通知 = %d 秒";
 		["C_MailRecolor"]	= "信件重新上色方法";
 		["C_ModTTShow"]	= "當按下Alt的時候顯示額外提示";
+		["C_MonthsToKeep"]	= "要保留多少個月份的資料？";
+		["C_OpacityLevel"]	= "不透明度";
 		["C_Resortascendingtime"]	= "將所有資料依增序排列";
 		["C_ResortDatabase"]	= "資料庫重新排序";
 		["C_ScanDatabase"]	= "掃描數據庫的錯誤: 如果您在搜索BeanCounter時發生錯誤,請使用這選項.  \n 使用前請先備份BeanCounter的saved variables.";
+		["C_SearchConfiguration"]	= "搜尋設置";
+		["C_SendToSearch"]	= "是否要將 BeanCounter 搜尋過的物件加入到主拍賣場視窗？";
 		["C_ShowBeginnerTooltips"]	= "當鼠標停留時顯示beginner提示框.";
 		["C_ShowReasonPurchase"]	= "在提示框內顯示購買的原因.";
 		["C_ValidateDatabase"]	= "驗證數據庫";
@@ -1245,7 +1279,12 @@ BeanCounterLocalizations = {
 		["Q_MailRecolor"]	= "什麼是重新上色？";
 
 		-- Section: HelpTooltip
+		["C_MaxDisplayedResults"]	= "最大搜尋結果顯示量(從每個資料庫)";
+		["TTDataExpireEnabled"]	= "老於這個選擇過的時間區間的資料將會被[刪除]";
+		["TT_ColorizeSearch"]	= "這個選項將會改變 BeanCounter 搜尋視窗中的物件欄位色彩。";
+		["TT_MaxDisplayedResults"]	= "這將控制有多少數量的結果會顯示在卷軸框架上。";
 		["TT_neutralCheck"]	= "顯示中立的黑水灣拍賣場的結果";
+		["TT_OpacityLevel"]	= "這將控制 BeanCounter 搜尋窗中的色彩條的不透明度程度(如果已啟用的話)";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "聯盟拍賣場";
