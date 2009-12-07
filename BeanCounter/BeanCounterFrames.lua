@@ -308,7 +308,6 @@ function private.CreateFrames()
 	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, _BC("TT_SearchBox")) end) --"Enter search query's here or leave blank to search all"
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-
 	
 	--Search Button
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -440,6 +439,44 @@ function private.CreateFrames()
 	frame.DBItems:SetText("Entries: "..private.DBSumItems)
 	private.sumDatabase() --Sums database Done on first Start and Search of the session
 	
+	--Edit box for changing UI reason codes
+	frame.reasonEditBox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+	frame.reasonEditBox:SetPoint("TOPLEFT", frame, "TOPLEFT", -200, -180)
+	frame.reasonEditBox:SetAutoFocus(true)
+	frame.reasonEditBox:Hide()
+	frame.reasonEditBox:SetHeight(15)
+	frame.reasonEditBox:SetParent(frame)
+	frame.reasonEditBox:SetFrameStrata("DIALOG")
+	frame.reasonEditBox:SetWidth(30)
+	frame.reasonEditBox:SetScript("OnEnterPressed", function()
+		local self = frame.resultlist.sheet
+		self.selected = self.selectedForEdit[1] --pass stored selection back to frame
+
+		local data = frame.resultlist.sheet:GetSelection()
+		local newReason = frame.reasonEditBox:GetText()
+		if data then
+			local itemLink, bid, buy, net, quanity, seller, deposit, fee, currentReason, date = data[1], data[3], data[4], data[5], data[6], data[8], data[9], data[10], data[11], data[12]
+			lib.API.updatedReason(nil, newReason, itemLink, bid, buy, net, quanity, seller, deposit, fee, currentReason, date)
+		end
+
+		--update the current display data to reflect change
+		local rows = self.rows
+		local data = self.data
+		local sort = self.sort
+
+		local vPos = math.floor(self.panel.vPos)
+		local hSize = self.hSize
+		local rowNum = sort[vPos + self.selectedForEdit[2]]
+		local rowPos = (rowNum-1)*hSize  --
+		local pos = rowPos +  self.selectedForEdit[3]
+
+		self.data[pos] = newReason
+		self:Render()
+
+		frame.reasonEditBox:Hide()
+	end)
+
+
 	--Create the results window
 	frame.resultlist = CreateFrame("Frame", nil, frame)
 	frame.resultlist:SetBackdrop({
@@ -481,20 +518,33 @@ function private.CreateFrames()
 	end
 	--Allows user to shift click on itemlinks in beacounter to Chat or BeanCounters select box
 	function private.scrollSheetOnClick(button, row, column)
-		if column ~= 1 then return end
-		local link = frame.resultlist.sheet.rows[row][column]:GetText()
-		if not link then return end
+		local self = frame.resultlist.sheet
+		local clickedFrame = self.rows[row][column]
+		if not clickedFrame:IsVisible() then return end --Old data is still in the frames, just hidden
 		
-		local text = GetItemInfo(link)
-		if IsShiftKeyDown() then
-			ChatEdit_InsertLink(link)--sends to chat or auction house
-		elseif IsAltKeyDown() and text then -- Search for the item in BeanCounter
-			private.wipeSearchCache()
-			frame.searchBox:SetText(text)
-			private.startSearch(text, private.getCheckboxSettings())
+		local text = clickedFrame:GetText()
+		if not text then return end
+		
+		local columnName = self.labels[column]:GetText()
+		if columnName == _BC('UiNameHeader') then
+			if IsShiftKeyDown() then
+				ChatEdit_InsertLink(text)--sends to chat or auction house
+			elseif IsAltKeyDown() then -- Search for the item in BeanCounter
+				private.wipeSearchCache()
+				local _, text = lib.API.getItemString(text) --convert itemlink to plain text
+				frame.searchBox:SetText(text)
+				private.startSearch(text, private.getCheckboxSettings())
+			end
+		elseif columnName == _BC('UiReason') then
+			frame.reasonEditBox:ClearAllPoints()
+			frame.reasonEditBox:SetAllPoints(clickedFrame)
+			frame.reasonEditBox:SetText(text)
+			frame.reasonEditBox:Show()
+			self.selectedForEdit = {self.sort[row + math.floor(self.panel.vPos)], row, column}
+			
 		end
 	end
-	
+
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ _BC('UiNameHeader'), "TOOLTIP",  get("columnwidth.".._BC('UiNameHeader')) },

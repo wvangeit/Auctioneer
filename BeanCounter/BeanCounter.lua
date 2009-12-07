@@ -111,6 +111,7 @@ if AucAdvanced and AucAdvanced.NewModule then
 	end
 end
 
+-- lib.API.isLoaded  is false until DB is ready and all gui and API elements have been created
 lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB

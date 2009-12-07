@@ -34,6 +34,8 @@ local lib = BeanCounter
 lib.API = {}
 local private, print, get, set, _BC = lib.getLocals()
 
+--[[Use lib.API.isLoaded to check if beancounter is ready for use. It is false until DB is ready and all gui and API elements have been created]]
+
 local type,select,strsplit,strjoin,ipairs,pairs = type,select,strsplit,strjoin,ipairs,pairs
 local tostring,tonumber,strlower = tostring,tonumber,strlower
 local tinsert,tremove,sort = tinsert,tremove,sort
@@ -313,6 +315,39 @@ function lib.API.getAHSoldFailed(player, link, days, serverKey)
 	
 	return success, failed, sucessStack, failedStack
 end
+--[[Change or add a reason code to a transaction]]
+function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, stack, sellerName, deposit, fee, currentReason, Time)
+	--to string all number values for comparison to stored data
+	bid, buy, net, stack, deposit, fee, Time = tostring(bid), tostring(buy), tostring(net), tostring(stack), tostring(deposit), tostring(fee), tostring(Time)
+	--convert ... back to 0
+	if currentReason == "..." then currentReason = "0" end
+	if sellerName == "..." then sellerName = "0" end
+	--if no serverKey provided use current server
+	local server =  lib.API.SplitServerKey(serverKey) or private.realmName
+	local itemString = lib.API.getItemString(itemLink)
+	local itemID, suffix = lib.API.decodeLink(itemLink)
+	
+	for  player, playerData in pairs(BeanCounterDB[server]) do
+		for DB, data in pairs(playerData) do
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
+				if data[itemID] and data[itemID][itemString] then
+					for i, text in pairs(data[itemID][itemString]) do
+						local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, CURRENTREASON, LOCATION = private.unpackString(text)
+						if currentReason == CURRENTREASON and stack == STACK and sellerName == SELLERNAME and bid == BID and buy == BUY and net == NET and deposit == DEPOSIT and Time == TIME then
+							local newText = private.packString(STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, newReason, LOCATION)
+					
+							table.remove(data[itemID][itemString], i)
+							private.databaseAdd(DB, nil, itemString, newText)
+							private.wipeSearchCache() --clear cached searches
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 
 --**********************************************************************************************************************
 --ITEMLINK AND STRING API'S USE THESE IN PLACE OF LOCAL :MATCH() CALLS
@@ -438,6 +473,7 @@ local localizedfactions = {
 ["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
 }
 function lib.API.SplitServerKey(serverKey)
+	if not serverKey then return end
 	local split = splitcache[serverKey]
 	if not split then
 		local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")

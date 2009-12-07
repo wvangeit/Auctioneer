@@ -443,7 +443,7 @@ end
 
 				tonumber(uDeposit), --deposit
 				tonumber(uFee), --fee
-				tonumber(uReason), --reason bought
+				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
 			}
 	end
