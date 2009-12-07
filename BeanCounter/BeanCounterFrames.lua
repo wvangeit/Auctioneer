@@ -298,7 +298,12 @@ function private.CreateFrames()
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
 	frame.searchBox:SetScript("OnEnterPressed", function()
-		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
+		local itemName = frame.searchBox:GetText()
+		-- Allow beancounter searches to add the text to the AH frame
+		if AuctionFrame and get("sendSearchBrowseFrame") then
+			BrowseName:SetText(itemName)
+		end
+		private.startSearch(itemName, private.getCheckboxSettings())
 	end)
 	frame.searchBox:SetScript("OnEnter", function() private.buttonTooltips( frame.searchBox, _BC("TT_SearchBox")) end) --"Enter search query's here or leave blank to search all"
 	frame.searchBox:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -310,7 +315,12 @@ function private.CreateFrames()
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
 	frame.searchButton:SetText(_BC('UiSearch'))
 	frame.searchButton:SetScript("OnClick", function()
-		private.startSearch(frame.searchBox:GetText(), private.getCheckboxSettings())
+		local itemName = frame.searchBox:GetText()
+		-- Allow beancounter searches to add the text to the AH frame
+		if AuctionFrame and get("sendSearchBrowseFrame") then
+			BrowseName:SetText(itemName)
+		end
+		private.startSearch(itemName, private.getCheckboxSettings())
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
 	function private.ClickBagHook(_, _, self, button)

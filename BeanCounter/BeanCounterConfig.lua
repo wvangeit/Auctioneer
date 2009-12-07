@@ -398,6 +398,9 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "sendSearchBrowseFrame", _BC('C_SendToSearch')) --Add BeanCounter's searched item to the Main Auction House Window?
+	gui:AddTip(id, _BC('TT_SendToSearch')) --"When entering a search in BeanCounter it will also add the string to the AH browse frame.
 
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 20, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
@@ -412,17 +415,17 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
-	gui:AddControl(id, "Checkbox",   0, 1, "colorizeSearch", "Add a gradient color to each result in the search window")
-	gui:AddTip(id, "This option changes the color of the items lines in the BeanCounter search window.")
+	gui:AddControl(id, "Checkbox",   0, 1, "colorizeSearch", _BC('C_ColorizeSearch'))--Add a gradient color to each result in the search window
+	gui:AddTip(id, _BC('TT_ColorizeSearch'))--This option changes the color of the items lines in the BeanCounter search window.
 
-	gui:AddControl(id, "NumeriSlider", 0, 3, "colorizeSearchopacity",    0, 1, 0.1, "Opacity level")
-	gui:AddTip(id, "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)")
+	gui:AddControl(id, "NumeriSlider", 0, 3, "colorizeSearchopacity",    0, 1, 0.1,  _BC('C_OpacityLevel')) --Opacity level
+	gui:AddTip(id,  _BC('TT_OpacityLevel')) --This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)
 
 	
-	gui:AddControl(id, "Subhead",     0,    _BC('Search Configuration')) --
+	gui:AddControl(id, "Subhead",     0,    _BC('C_SearchConfiguration')) --Search Configuration
 	
-	gui:AddControl(id, "NumeriSlider", 0, 1, "numberofdisplayedsearchs",    500, 5000, 250, "Max displayed search results (from each database)")
-	gui:AddTip(id, "This controls the total number of results displayed in the scroll frame.")
+	gui:AddControl(id, "NumeriSlider", 0, 1, "numberofdisplayedsearchs",    500, 5000, 250,  _BC('C_MaxDisplayedResults')) --Max displayed search results (from each database)
+	gui:AddTip(id, _BC('TT_MaxDisplayedResults')) --This controls the total number of results displayed in the scroll frame.
 	
 	gui:AddHelp(id, "what is invoice",
 		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
