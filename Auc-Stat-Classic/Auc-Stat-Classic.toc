@@ -1,5 +1,5 @@
 ## Title: Auc:Stat:Classic
-## Interface: 30200
+## Interface: 30300
 ## Dependancies: Auc-Advanced
 ## OptionalDeps: Auctioneer
 ##
