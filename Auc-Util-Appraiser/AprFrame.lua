@@ -708,8 +708,7 @@ function private.CreateFrames()
 			frame.valuecache.stack = stackentry
 			frame.valuecache.stackentry = stackentry
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stackentry)
-		end
-		if number ~= frame.valuecache.number then
+		elseif number ~= frame.valuecache.number then
 			if number >= -2 and number < 0 then
 				if number == -2 then
 					frame.salebox.numberentry:SetText(_TRANS('APPR_Interface_Full') )--Full
