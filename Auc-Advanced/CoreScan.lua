@@ -525,11 +525,10 @@ function private.IsInQuery(curQuery, data)
 end
 
 local idLists = {}
-function private.BuildIDList(scandata, faction, realmName)
-	local sig = realmName.."-"..faction
-	if (idLists[sig]) then return idLists[sig] end
-	idLists[sig] = {}
-	local idList = idLists[sig]
+function private.BuildIDList(scandata, serverKey)
+	if (idLists[serverKey]) then return idLists[serverKey] end
+	idLists[serverKey] = {}
+	local idList = idLists[serverKey]
 
 	local id
 	for i = 1, #scandata.image do
@@ -553,17 +552,183 @@ function private.GetNextID(idList)
 	return first
 end
 
-function lib.GetScanData(faction, realmName)
-	faction = faction or AucAdvanced.GetFactionGroup()
-	realmName = realmName or GetRealmName()
+function lib.GetScanData(serverKey, reserved)
+	local faction, realmName, deprecated
+	if serverKey then
+		realmName, faction = AucAdvanced.SplitServerKey(serverKey)
+		if not realmName then
+			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
+				deprecated = true
+				faction = serverKey
+			else
+				error("Invalid serverKey passed to GetScanData")
+			end
+			if reserved then
+				realmName = reserved
+				deprecated = true
+			else
+				realmName = GetRealmName()
+			end
+			serverKey = realmName.."-"..faction
+			if deprecated then -- temporary deprecation alert: only triggered by incorrect parameters for the time being
+				AucAdvanced.API.ShowDeprecationAlert("AucAdvanced.Scan.GetScanData(serverKey)",
+					"Converted to use serverKey. Additionally this function is deprecated altogether outside Auctioneer Core")
+			end
+		end
+	else
+		serverKey, realmName, faction = AucAdvanced.GetFaction()
+	end
 	local AucScanData = private.LoadAuctionImage()
 	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
 	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, time=time()} end
+	if type(AucScanData.scans[realmName][faction].image) == "string" then
+		if AucAdvanced.Modules.Util.ScanData then
+			AucAdvanced.Modules.Util.ScanData.Unpack(realmName)
+		else -- unknown/corrupted?
+			AucScanData.scans[realmName][faction].image = {}
+		end
+	end
 	if not AucScanData.scans[realmName][faction].image then AucScanData.scans[realmName][faction].image = {} end
 	if AucScanData.scans[realmName][faction].nextID then AucScanData.scans[realmName][faction].nextID = nil end
-	local idList = private.BuildIDList(AucScanData.scans[realmName][faction], faction, realmName)
+	local idList = private.BuildIDList(AucScanData.scans[realmName][faction], serverKey)
 	return AucScanData.scans[realmName][faction], idList
 end
+
+
+private.scandataIndex = {}
+private.prevQuery = {}
+private.queryResults = {}
+-- private.prevQueryServerKey is nil initially
+
+function private.clearImageCaches(scanstats)
+	local serverKey = scanstats.query.qryinfo.serverKey
+	wipe(private.scandataIndex[serverKey])
+
+	private.prevQueryServerKey = nil
+end
+
+-- ensure home and neutral factions for current realm are always present
+-- unlike the tables for other serverKeys, these tables are *not* weak
+private.scandataIndex[GetRealmName().."-"..UnitFactionGroup("player")] = {}
+private.scandataIndex[GetRealmName().."-Neutral"] = {}
+local weaktablemeta = {__mode="kv"}
+function private.SubImageCache(itemId, serverKey)
+	local indexResults = private.scandataIndex[serverKey]
+	if not indexResults then
+		indexResults = setmetatable({}, weaktablemeta) -- use weak tables for other serverKeys
+		private.scandataIndex[serverKey] = indexResults
+	end
+
+	local itemResults = indexResults[itemId]
+	if not itemResults then
+		itemResults = {}
+		local scandata = AucAdvanced.Scan.GetScanData(serverKey)
+		for pos, data in ipairs(scandata.image) do
+			if data[Const.ITEMID] == itemId then
+				tinsert(itemResults, data)
+			end
+		end
+		indexResults[itemId] = itemResults
+	end
+
+	return itemResults
+end
+
+function lib.QueryImage(query, serverKey, reserved, ...)
+	serverKey = serverKey or AucAdvanced.GetFaction()
+	local prevQuery = private.prevQuery
+	local queryResults = private.queryResults
+
+	-- is this the same query as last time?
+	if serverKey == private.prevQueryServerKey then
+		local samequery = true
+		for k,v in pairs(prevQuery) do
+			if k ~= "page" and v ~= query[k] then
+				samequery = false
+				break
+			end
+		end
+		if samequery then
+			for k,v in pairs(query) do
+				if k ~= "page" and v ~= prevQuery[k] then
+					samequery = false
+					break
+				end
+			end
+			if samequery then
+				return queryResults
+			end
+		end
+	end
+
+	-- reset results and save a copy of query
+	wipe(queryResults)
+	wipe(prevQuery)
+	for k, v in pairs(query) do prevQuery[k] = v end
+	private.prevQueryServerKey = serverKey
+
+	-- get image to search - may be the whole snapshot or a subset
+	local image
+	if query.itemId then
+		image = private.SubImageCache(query.itemId, serverKey)
+	else
+		local scandata = lib.GetScanData(serverKey)
+		image = scandata.image
+	end
+
+	local saneQueryLink
+	if query.link then
+		saneQueryLink = SanitizeLink(query.link)
+	end
+
+	-- scan image to build a table of auctions that match query
+	local ptr, finish = 1, #image
+	while ptr <= finish do
+		repeat
+			local data = image[ptr]
+			ptr = ptr + 1
+			if not data then break end
+			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
+			if query.filter and query.filter(data, ...) then break end
+			if saneQueryLink and data[Const.LINK] ~= saneQueryLink then break end
+			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
+			if query.factor and data[Const.FACTOR] ~= query.factor then break end
+			if query.minUseLevel and data[Const.ULEVEL] < query.minUseLevel then break end
+			if query.maxUseLevel and data[Const.ULEVEL] > query.maxUseLevel then break end
+			if query.minItemLevel and data[Const.ILEVEL] < query.minItemLevel then break end
+			if query.maxItemLevel and data[Const.ILEVEL] > query.maxItemLevel then break end
+			if query.class and data[Const.ITYPE] ~= query.class then break end
+			if query.subclass and data[Const.ISUB] ~= query.subclass then break end
+			if query.quality and data[Const.QUALITY] ~= query.quality then break end
+			if query.invType and data[Const.IEQUIP] ~= query.invType then break end
+			if query.seller and data[Const.SELLER] ~= query.seller then break end
+			if query.name then
+				local name = data[Const.NAME]
+				if not (name and name:lower():find(query.name:lower(), 1, true)) then break end
+			end
+
+			local stack = data[Const.COUNT]
+			local nextBid = data[Const.PRICE]
+			local buyout = data[Const.BUYOUT]
+			if query.perItem and stack > 1 then
+				nextBid = ceil(nextBid / stack)
+				buyout = ceil(buyout / stack)
+			end
+			if query.minStack and stack < query.minStack then break end
+			if query.maxStack and stack > query.maxStack then break end
+			if query.minBid and nextBid < query.minBid then break end
+			if query.maxBid and nextBid > query.maxBid then break end
+			if query.minBuyout and buyout < query.minBuyout then break end
+			if query.maxBuyout and buyout > query.maxBuyout then break end
+
+			-- If we're still here, then we've got a winner
+			tinsert(queryResults, data)
+		until true
+	end
+
+	return queryResults
+end
+
 
 private.CommitQueue = {}
 
@@ -582,7 +747,6 @@ Commitfunction = function()
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
 	CommitRunning = true
-	local scandata, idList = lib.GetScanData()
 
 	--grab the first item in the commit queue, and bump everything else down
 	local TempcurCommit = tremove(private.CommitQueue)
@@ -598,6 +762,8 @@ Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
+	local serverKey = TempcurQuery.qryinfo.serverKey -- or AucAdvanced.GetFaction()
+	local scandata, idList = lib.GetScanData(serverKey)
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
@@ -912,16 +1078,29 @@ Commitfunction = function()
 		query = TempcurQuery,
 	}
 
-	if (not scandata.scanstats) then scandata.scanstats = {} end
-	-- keep 2 old copies for compatibility
-	scandata.scanstats[2] = scandata.scanstats[1]
-	scandata.scanstats[1] = scandata.scanstats[0]
-	scandata.scanstats[0] = TempcurScanStats
+	local scanstats = scandata.scanstats
+	if not scanstats then
+		scanstats = {}
+		scandata.scanstats = scanstats
+	end
 
+	scanstats.LastScan = now
+	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0  or numempty > 0 then
+		scanstats.ImageUpdated = now
+	end
+	if wasUnrestricted and not wasIncomplete then scanstats.LastFullScan = now end
+
+	-- keep 2 old copies for compatibility
+	scanstats[2] = scandata.scanstats[1]
+	scanstats[1] = scandata.scanstats[0]
+	scanstats[0] = TempcurScanStats
+
+	-- old version timestamps (deprecated)
 	scandata.time = now
 	if wasUnrestricted and not wasIncomplete then scandata.LastFullScan = now end
 
 	-- Tell everyone that our stats are updated
+	private.clearImageCaches(TempcurScanStats)
 	AucAdvanced.SendProcessorMessage("scanstats", TempcurScanStats)
 	AucAdvanced.Buy.FinishedSearch(TempcurQuery)
 
@@ -968,7 +1147,7 @@ function private.Commit(wasIncomplete, wasGetAll)
 	end
 end
 
-function private.QuerySent(query, isSearch, isNavigate, ...)
+function private.QuerySent(query, isSearch, ...)
 	-- Tell everyone that our stats are updated
 	AucAdvanced.SendProcessorMessage("querysent", query, isSearch, ...)
 	return ...
@@ -1460,6 +1639,12 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			query.subclass or "",
 			query.quality or "",
 			query.invType or "")
+
+		-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
+		-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
+		-- store the current return value - this will be used throughout processing to avoid problems
+		query.qryinfo.serverKey = AucAdvanced.GetFaction()
+
 		private.curQuery = query
 	else
 		query = private.curQuery

@@ -83,7 +83,6 @@ local GetItemInfo = GetItemInfo
 -- this is actually called from a dummy module in CoreUtil
 function lib.Processor(event, ...)
 	if event == "scanstats" then
-		private.clearCaches(...)
 		lib.ClearMarketCache()
 	elseif event == "configchanged" then
 		lib.ClearMarketCache()
@@ -380,140 +379,42 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	return
 end
 
-private.scandataIndex = {}
--- ensure home and neutral factions for current realm are always present
--- unlike the tables for other serverKeys, these tables are *not* weak
-private.scandataIndex[GetRealmName().."-"..UnitFactionGroup("player")] = {}
-private.scandataIndex[GetRealmName().."-Neutral"] = {}
-local weaktablemeta = {__mode="kv"}
-function private.GetSubImageById(itemId, faction, realm)
-	faction = faction or AucAdvanced.GetFactionGroup()
-	realm = realm or GetRealmName()
-	local serverKey = realm.."-"..faction
-
-	local indexResults = private.scandataIndex[serverKey]
-	if not indexResults then
-		indexResults = setmetatable({}, weaktablemeta) -- use weak tables for other serverKeys
-		private.scandataIndex[serverKey] = indexResults
-	end
-
-	local itemResults = indexResults[itemId]
-	if not itemResults then
-		itemResults = {}
-		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
-		for pos, data in ipairs(scandata.image) do
-			if data[Const.ITEMID] == itemId then
-				tinsert(itemResults, data)
+-- resultsTable = AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)
+-- {previous form was QueryImage(query, faction, realm, ...), this is deprecated, use 'serverKey' instead}
+-- 'reserved' should always be nil
+function lib.QueryImage(query, serverKey, reserved, ...)
+	if serverKey then
+		realmName, faction = AucAdvanced.SplitServerKey(serverKey) -- validate serverKey
+		if not AucAdvanced.SplitServerKey(serverKey) then
+			-- check for parameters in the old (deprecated) format
+			local faction, realmName, deprecated
+			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
+				deprecated = true
+				faction = serverKey
+			else
+				error("Invalid serverKey passed to GetScanData")
+			end
+			if reserved then
+				realmName = reserved
+				deprecated = true
+			else
+				realmName = GetRealmName()
+			end
+			serverKey = realmName.."-"..faction
+			if deprecated then
+				lib.ShowDeprecationAlert("AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)",
+					"The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter.")
 			end
 		end
-		indexResults[itemId] = itemResults
-	end
-
-	return itemResults
-end
-
-private.prevQuery = { empty = true }
-private.curResults = {}
-function lib.QueryImage(query, faction, realm, ...)
-	local prevQuery = private.prevQuery
-	local curResults = private.curResults
-
-	-- is this the same query as last time?
-	local samequery = true
-	for k,v in pairs(prevQuery) do
-		if k ~= "page" and v ~= query[k] then
-			samequery = false
-			break
-		end
-	end
-	if samequery then
-		for k,v in pairs(query) do
-			if k ~= "page" and v ~= prevQuery[k] then
-				samequery = false
-				break
-			end
-		end
-		if samequery then
-			return curResults
-		end
-	end
-
-	-- reset results and save a copy of query
-	wipe(curResults)
-	wipe(prevQuery)
-	for k, v in pairs(query) do prevQuery[k] = v end
-
-	-- get image to search - may be the whole snapshot or a subset
-	local image
-	if query.itemId then
-		image = private.GetSubImageById(query.itemId, faction, realm)
 	else
-		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
-		image = scandata.image
+		serverKey = AucAdvanced.GetFaction()
 	end
 
-	local saneQueryLink
-	if query.link then
-		saneQueryLink = SanitizeLink(query.link)
-	end
-
-	-- scan image to build a table of auctions that match query
-	local ptr, finish = 1, #image
-	while ptr <= finish do
-		repeat
-			local data = image[ptr]
-			ptr = ptr + 1
-			if not data then break end
-			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
-			if query.filter and query.filter(data, ...) then break end
-			if saneQueryLink and data[Const.LINK] ~= saneQueryLink then break end
-			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
-			if query.factor and data[Const.FACTOR] ~= query.factor then break end
-			if query.minUseLevel and data[Const.ULEVEL] < query.minUseLevel then break end
-			if query.maxUseLevel and data[Const.ULEVEL] > query.maxUseLevel then break end
-			if query.minItemLevel and data[Const.ILEVEL] < query.minItemLevel then break end
-			if query.maxItemLevel and data[Const.ILEVEL] > query.maxItemLevel then break end
-			if query.class and data[Const.ITYPE] ~= query.class then break end
-			if query.subclass and data[Const.ISUB] ~= query.subclass then break end
-			if query.quality and data[Const.QUALITY] ~= query.quality then break end
-			if query.invType and data[Const.IEQUIP] ~= query.invType then break end
-			if query.seller and data[Const.SELLER] ~= query.seller then break end
-			if query.name then
-				local name = data[Const.NAME]
-				if not (name and name:lower():find(query.name:lower(), 1, true)) then break end
-			end
-
-			local stack = data[Const.COUNT]
-			local nextBid = data[Const.PRICE]
-			local buyout = data[Const.BUYOUT]
-			if query.perItem and stack > 1 then
-				nextBid = ceil(nextBid / stack)
-				buyout = ceil(buyout / stack)
-			end
-			if query.minStack and stack < query.minStack then break end
-			if query.maxStack and stack > query.maxStack then break end
-			if query.minBid and nextBid < query.minBid then break end
-			if query.maxBid and nextBid > query.maxBid then break end
-			if query.minBuyout and buyout < query.minBuyout then break end
-			if query.maxBuyout and buyout > query.maxBuyout then break end
-
-			-- If we're still here, then we've got a winner
-			tinsert(curResults, data)
-		until true
-	end
-
-	return curResults
+	return AucAdvanced.Scan.QueryImage(query, serverKey, nil, ...)
 end
 
-function private.clearCaches(scanstats)
-	local serverKey = GetFaction()
-	wipe(private.scandataIndex[serverKey])
-
-	wipe(private.curResults)
-	wipe(private.prevQuery)
-	private.prevQuery.empty = true
-end
-
+-- unpackedTable = AucAdvanced.API.UnpackImageItem(imageItem)
+-- imageItem is one of the values in the table returned by QueryImage
 function lib.UnpackImageItem(item)
 	return AucAdvanced.Scan.UnpackImageItem(item)
 end
@@ -717,6 +618,7 @@ end
 -- Decodes an AucAdvanced signature into numerical values
 -- Can be compared to the return values from DecodeLink
 function lib.DecodeSig(sig)
+	if type(sig) ~= "string" then return end
 	local id, suffix, factor, enchant = strsplit(":", sig)
 	id = tonumber(id)
 	if not id or id == 0 then return end
@@ -832,7 +734,7 @@ do
 	            "Deprecated function call occurred in Auctioneer API:\n     {{{Deprecated Function:}}} "..functionName..
 	                "\n     {{{Source Module:}}} "..source:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
 	                "\n     {{{Calling Module:}}} "..caller:match("^(.+)%.[lLxX][uUmM][aAlL]:")..
-	                "\n     {{{Available Replacement:}}} "..replacementName..
+	                "\n     {{{Available Replacement:}}} "..(replacementName or "None")..
 	                (comments and "\n\n"..comments or "")
 			)
 		end
@@ -842,7 +744,5 @@ do
     end
 
 end
-
-
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
