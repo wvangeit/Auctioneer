@@ -384,7 +384,6 @@ end
 -- 'reserved' should always be nil
 function lib.QueryImage(query, serverKey, reserved, ...)
 	if serverKey then
-		realmName, faction = AucAdvanced.SplitServerKey(serverKey) -- validate serverKey
 		if not AucAdvanced.SplitServerKey(serverKey) then
 			-- check for parameters in the old (deprecated) format
 			local faction, realmName, deprecated
