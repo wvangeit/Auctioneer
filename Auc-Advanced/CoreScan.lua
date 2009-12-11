@@ -136,6 +136,10 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	if (NoSummary) then
 		query.qryinfo.nosummary = true
 	end
+	-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
+	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
+	-- store the current return value - this will be used throughout processing to avoid problems
+	query.qryinfo.serverKey = AucAdvanced.GetFaction()
 	private.querycount = private.querycount+1
 	if (nLog) then
 		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.sig))
@@ -602,7 +606,10 @@ private.queryResults = {}
 
 function private.clearImageCaches(scanstats)
 	local serverKey = scanstats.query.qryinfo.serverKey
-	wipe(private.scandataIndex[serverKey])
+	local cache = private.scandataIndex[serverKey]
+	if cache then
+		wipe(cache)
+	end
 
 	private.prevQueryServerKey = nil
 end
@@ -762,7 +769,7 @@ Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
-	local serverKey = TempcurQuery.qryinfo.serverKey -- or AucAdvanced.GetFaction()
+	local serverKey = TempcurQuery.qryinfo.serverKey or AucAdvanced.GetFaction()
 	local scandata, idList = lib.GetScanData(serverKey)
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
