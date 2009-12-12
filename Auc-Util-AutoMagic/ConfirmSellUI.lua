@@ -134,7 +134,8 @@ function lib.ASCOnEnter(button, row, index)
 		link = lib.confirmsellui.resultlist.sheet.rows[row][index]:GetText()
 		if link and link:find("\124Hitem:%d") then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			AucAdvanced.ShowItemLink(GameTooltip, link, count)
+			-- ccox - this was using count (undefined variable), but all similar code in Auc-Util-AutoMagic.lua uses a count of 1
+			AucAdvanced.ShowItemLink(GameTooltip, link, 1)
 			end
 		end
 	end
