@@ -936,6 +936,31 @@ local HERB_FIRESEED = 39969					-- milling added 3.0.8
 local HERB_FIRELEAF = 39970					-- milling added 3.0.8
 
 
+-- only currently used for autoloot in EnxAutoDisenchant.lua
+-- Blizz normally provides the reverse data in the pigment tooltip
+const.ReversePigmentList = {
+
+	-- common
+	[ALABASTER_PIGMENT] = 1,
+	[DUSKY_PIGMENT] = 1,
+	[GOLDEN_PIGMENT] = 1,
+	[EMERALD_PIGMENT] = 1,
+	[VIOLET_PIGMENT] = 1,
+	[SILVERY_PIGMENT] = 1,
+	[NETHER_PIGMENT] = 1,
+	[AZURE_PIGMENT] = 1,
+
+	-- rare
+	[VERDANT_PIGMENT] = 1,
+	[BURNT_PIGMENT] = 1,
+	[INDIGO_PIGMENT] = 1,
+	[RUBY_PIGMENT] = 1,
+	[SAPPHIRE_PIGMENT] = 1,
+	[EBON_PIGMENT] = 1,
+	[ICY_PIGMENT] = 1,
+
+}
+
 -- map groups to a string for now
 local	ALABASTER_PIGMENT_LOW = "ALABASTER_PIGMENT_LOW"
 local	DUSKY_PIGMENT_LOW =  "DUSKY_PIGMENT_LOW"

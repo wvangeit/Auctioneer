@@ -301,6 +301,32 @@ local function onEvent(...)
 				LootSlot(slot)
 			end
 			setState("loot")
+		else
+			-- see if the user wants to auto-loot their manual disenchants
+			if (Enchantrix.Settings.GetSetting('autoLootDE')) then
+				eventSpam(...)
+				
+				-- make sure all results are DE/prospect/milling results
+				for slot = 1, GetNumLootItems() do
+					if (not LootSlotIsItem(slot)) then return end
+					local link = GetLootSlotLink(slot)
+					local _, itemID = auto_de_tooltip:DecodeLink(link)
+					if (not itemID) then return end
+					
+					if ( not
+						(Enchantrix.Constants.ReverseDisenchantLevelList[itemID]
+						 or Enchantrix.Constants.ReverseProspectingSources[itemID]
+						 or Enchantrix.Constants.ReversePigmentList[itemID])) then
+						--eventSpam("item "..itemID.." not in our lists")
+						return		-- this is not a DE,prospect, or milling result
+					end
+				end
+				
+				for slot = 1, GetNumLootItems() do
+					LootSlot(slot)
+				end
+				
+			end
 		end
 	elseif event == "LOOT_CLOSED" then
 		if isState("loot") then
