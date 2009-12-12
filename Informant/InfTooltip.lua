@@ -55,6 +55,9 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	end
 	if (not itemInfo) then return end
 	Informant.itemInfo = itemInfo
+	
+	-- safety, some other addons can pass in strings for count by mistake
+	count = tonumber(count) or 1
 
 	itemInfo.itemName = name
 	itemInfo.itemLink = link

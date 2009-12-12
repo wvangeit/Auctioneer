@@ -681,7 +681,9 @@ function hookItemTooltip(tipFrame, item, count, name, link, quality)
 	
 	if itemType == "item" then
 		name = name or ""
-		itemTooltip(tooltip, name, link, itemType, itemId, quality, count or 1)
+		-- safety, some other addons pass in strings for count by mistake
+		count = tonumber(count) or 1
+		itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
 			enchantTooltip(tooltip, name, link, true)
 		end
