@@ -37,10 +37,23 @@ if not lib then return end
 
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local floor,min,max,ceil = floor,min,max,ceil
-local tonumber,tostring,next = tonumber,tostring,next
+local tonumber,tostring = tonumber,tostring
+local wipe = wipe
 
+local GetFaction = AucAdvanced.GetFaction
+local QueryImage = AucAdvanced.API.QueryImage
+local DecodeLink = AucAdvanced.DecodeLink
 
-local pricecache --only used for tooltip info, as that's the only place where we know that the starting price will remain the same
+local CONST_BUYOUT = AucAdvanced.Const.BUYOUT
+local CONST_COUNT = AucAdvanced.Const.COUNT
+local CONST_CURBID = AucAdvanced.Const.CURBID
+local CONST_MINBID = AucAdvanced.Const.MINBID
+local CONST_SELLER = AucAdvanced.Const.SELLER
+
+local playerName = UnitName("player")
+
+local tooltipCache = setmetatable({}, {__mode="v"})
+local matchArrayCache = {}
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -49,110 +62,95 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "config") then
 		--Called when you should build your Configator tab.
 		private.SetupConfigGui(...)
-	elseif (callbackType == "listupdate") then
-		--Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then
 		--Called when your config options (if Configator) have been changed.
-		lib.ClearMatchArrayCache()
-		pricecache = nil
+		private.clearMatchArrayCache()
+		private.clearTooltipCache()
 	elseif (callbackType == "scanstats") then
 		-- AH has been scanned
-		lib.ClearMatchArrayCache()
-		pricecache = nil
+		private.clearMatchArrayCache()
+		private.clearTooltipCache()
 	elseif callbackType == "auctionclose" then
-		lib.ClearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
+		private.clearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
 	end
 end
 
-local matchArrayCache = {}
-
-function lib.ClearMatchArrayCache()	-- called from processor
-	if next(matchArrayCache) then
-		matchArrayCache = {}
-	end
+function private.clearMatchArrayCache()	-- called from processor
+	wipe(matchArrayCache)
+end
+function private.clearTooltipCache()
+	wipe(tooltipCache)
 end
 
-local playerName = UnitName("player")
+local query = {itemId = 0, suffix = 0, factor = 0} -- resusable pre-created 3-element table
+function lib.GetMatchArray(hyperlink, marketprice, serverKey)
+	if not get("match.undercut.enable") then return end
+	local linkType, itemId, suffix, factor = DecodeLink(hyperlink)
+	if linkType ~= "item" then return end
+	serverKey = serverKey or GetFaction()
+	marketprice = marketprice or 0
 
-function lib.GetMatchArray(hyperlink, marketprice)
-	if not AucAdvanced.Settings.GetSetting("match.undercut.enable") then
-		return
-	end
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-
-	local cacheKey = itemId .."x".. property .. "x" .. factor .. "x" .. (marketprice or "0")
+	local cacheKey = serverKey .. itemId .."x".. suffix .."x".. factor .."x".. marketprice
 	if matchArrayCache[cacheKey] then return matchArrayCache[cacheKey] end
-	
-	
-	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
-	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
-	local usevalue = AucAdvanced.Settings.GetSetting("match.undercut.usevalue")
+
+	local overmarket = get("match.undermarket.overmarket")
+	local undermarket = get("match.undermarket.undermarket")
+	local usevalue = get("match.undercut.usevalue")
 	local undercut
 	if usevalue then
-		undercut = AucAdvanced.Settings.GetSetting("match.undercut.value")
+		undercut = get("match.undercut.value")
 	else
-		undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
+		undercut = get("match.undermarket.undercut")
 	end
 	local marketdiff = 0
 	local competing = 0
 	local matchprice = 0
 	local minprice = 0
 	local lowest = true
-	if not marketprice then marketprice = 0 end
 	if marketprice > 0 then
 		matchprice = floor(marketprice*(1+(overmarket/100)))
 		minprice = ceil(marketprice*(1+(undermarket/100)))
 	end
 
-	itemId = tonumber(itemId)
-	property = tonumber(property) or 0
-	factor = tonumber(factor) or 0
-
-	local data = AucAdvanced.API.QueryImage({
-		itemId = itemId,
-		suffix = property,
-		factor = factor,
-	})
+	query.itemId = itemId
+	query.suffix = suffix
+	query.factor = factor
+	local data = QueryImage(query, serverKey)
 	competing = #data
 	local lowestBidOnly = matchprice
 	for i = 1, #data do
-		local compet = AucAdvanced.API.UnpackImageItem(data[i])
-		local competname = compet.itemName or " "
-		local competseller = compet.sellerName or " "
-		local competcost = compet.buyoutPrice or 0
-		local competstack = compet.stackSize or 0
-		if compet.buyoutPrice<1 then
-			-- UCUT-8: Don't try to match bid-only auctions
-			lowestBidOnly = min(lowestBidOnly, (compet.curBid or compet.minBid)/compet.stackSize)
+		local item = data[i]
+		local buyout = item[CONST_BUYOUT]
+		local count = item[CONST_COUNT] -- should be non-nil and non-zero
+		if buyout < 1 then
+			local bid = item[CONST_CURBID] -- should be non-nil
+			if bid == 0 then bid = item[CONST_MINBID] end -- should be non-nil
+			bid = bid / count
+			if bid < lowestBidOnly then lowestBidOnly = bid end -- faster than calling 'min' with 2 parameters
+			--lowestBidOnly = min(lowestBidOnly, bid/count)
 		else
-			compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
+			buyout = buyout / count
 			if usevalue then
-				compet.buyoutPrice = compet.buyoutPrice - undercut
+				buyout = buyout - undercut
 			else
-				compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
+				buyout = floor(buyout*((100-undercut)/100))
 			end
-			if compet.buyoutPrice <= 0 then
-				compet.buyoutPrice = 1
+			if buyout <= 0 then
+				buyout = 1
 			end
-			if (compet.buyoutPrice < matchprice) then
-				if (compet.buyoutPrice > minprice) then
-					if (not (compet.sellerName == playerName)) then
-						matchprice = compet.buyoutPrice
+			if (buyout < matchprice) then
+				if (buyout > minprice) then
+					if item[CONST_SELLER] ~= playerName then
+						matchprice = buyout
 					end
-				elseif (compet.buyoutPrice > 0) then
+				elseif (buyout > 0) then
 					lowest = false
 				end
 			end
 		end
 	end
 	if (marketprice > 0) then
-		marketdiff = (((matchprice - marketprice)/marketprice)*100)
-		if (marketdiff-floor(marketdiff))<0.5 then
-			marketdiff = floor(marketdiff)
-		else
-			marketdiff = ceil(marketdiff)
-		end
+		marketdiff = floor((matchprice - marketprice) /marketprice *100 +0.5)
 	else
 		marketdiff = 0
 	end
@@ -173,33 +171,30 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	return matchArray
 end
 
-local array = {}
-
 function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
 	if not link then return end
 	if not get("match.undercut.tooltip") then return end
 	local model = get("match.undercut.model")
 	if not model then return end
 	local market
-	local matcharray
 
-	if pricecache and pricecache[link] then
-		matcharray = replicate(pricecache[link])
+	local matcharray = tooltipCache[link]
+	if matcharray then
 		market = matcharray.market
-	end
-	if not matcharray then
+	else
 		if model == "market" then
 			market = AucAdvanced.API.GetMarketValue(link)
 		else
 			market = AucAdvanced.API.GetAlgorithmValue(model, link)
 		end
+		if not market then return end
 		matcharray = lib.GetMatchArray(link, market)
 		if not matcharray then return end
-		if not pricecache then pricecache = {} end
-		pricecache[link] = replicate(matcharray)
-		pricecache[link]["market"] = market
+		matcharray = replicate(matcharray)
+		matcharray.market = market
+		tooltipCache[link] = matcharray
 	end
-	if not matcharray or not matcharray.value or matcharray.value <= 0 then return end
+	if not matcharray.value or matcharray.value <= 0 then return end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
 
@@ -218,10 +213,6 @@ function private.ProcessTooltip(tooltip, name, link, quality, quantity, cost, ad
 end
 
 function lib.OnLoad()
-	--This function is called when your variables have been loaded.
-	--You should also set your Configator defaults here
-
-	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	default("match.undercut.enable", true)
 	default("match.undermarket.undermarket", -20)
 	default("match.undermarket.overmarket", 10)
