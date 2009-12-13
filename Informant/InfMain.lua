@@ -165,13 +165,12 @@ function getItem(itemID, static)
 	if cache[itemID] then return cache[itemID] end
 	
 	local baseData = self.database[itemID]
-	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist
+	local buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
 
 	if (baseData) then
-		buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
+		buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
 		buy = tonumber(buy)
-		sell = tonumber(sell)
 	end
 	
 	-- work around a blizzard bug where honor tokens return stack size 2147483647
