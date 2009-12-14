@@ -444,7 +444,8 @@ function lib.IsBlocked()
 	return private.isBlocked == true
 end
 
---Market matcher APIs
+--[[ Market matcher APIs ]]--
+
 function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	local saneLink = SanitizeLink(itemLink)
 
@@ -460,39 +461,37 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
 
-    local faction = (serverKey or ""):match("^[^%-]+%-(.+)$") or GetFaction()
-	local realm = (serverKey or ""):match("^([^%-]+)%-.+$") or GetRealmName()
+	local price
+	if algorithm == "market" then
+		price = lib.GetMarketValue(saneLink, serverKey)
+	elseif type(algorithm) == "string" then
+		price = lib.GetAlgorithmValue(algorithm, saneLink, serverKey)
+	else
+		price = algorithm
+	end
+	if not price then return end
 
 	local matchers = lib.GetMatchers(saneLink)
-	local total, count, diff, _ = 0, 0, 0
+	local total, count, diff = 0, 0, 0
+	local infoString = ""
 
-
-	local priceArray = {}
-
-	if algorithm == "market" then
-		priceArray.price, priceArray.seen = lib.GetMarketValue(saneLink, serverKey)
-	elseif type(algorithm) == "string" then
-		_, _, priceArray = lib.GetAlgorithmValue(algorithm, saneLink, serverKey)
-	else
-		priceArray.price = algorithm
-	end
-
-	local InfoString = ""
-	if not priceArray or not priceArray.price then return end
 	for index, matcher in ipairs(matchers) do
-		if lib.IsValidMatcher(matcher, saneLink) then
-			local value, MatchpriceArray = lib.GetMatcherValue(matcher, saneLink, priceArray.price)
-			priceArray.price = value
+		if lib.IsValidMatcher(matcher, saneLink) then -- todo: shoudn't this already be valid from calling lib.GetMatchers(saneLink) ?
+			local value, MatchpriceArray = lib.GetMatcherValue(matcher, saneLink, price, serverKey)
+			price = value
 			count = count + 1
 			diff = diff + MatchpriceArray.diff
 			if MatchpriceArray.returnstring then
-				InfoString = strjoin("\n", InfoString, MatchpriceArray.returnstring)
+				infoString = infoString.."\n"..MatchpriceArray.returnstring -- using two .. is faster than calling strjoin
 			end
 		end
 	end
+	if count > 1 then
+		diff = diff / count
+	end
 
-	if (priceArray.price > 0) then
-		return priceArray.price, total, count, diff/count, InfoString
+	if price > 0 then
+		return price, total, count, diff, infoString
 	end
 end
 
@@ -564,14 +563,14 @@ function lib.IsValidMatcher(matcher, itemLink)
 	return false
 end
 
-function lib.GetMatcherValue(matcher, itemLink, price)
+function lib.GetMatcherValue(matcher, itemLink, price, serverKey)
 	local saneLink = SanitizeLink(itemLink)
 	if (type(matcher) == "string") then
 		matcher = lib.IsValidMatcher(matcher, saneLink)
 	end
 	if not matcher then return end
 	--If matcher is not a table at this point, the following code will throw an "attempt to index a <something> value" type error
-	local matchArray = matcher.GetMatchArray(saneLink, price)
+	local matchArray = matcher.GetMatchArray(saneLink, price, serverKey)
 	if not matchArray then
 		matchArray = {}
 		matchArray.value = price
