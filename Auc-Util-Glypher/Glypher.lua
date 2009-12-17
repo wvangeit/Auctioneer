@@ -351,10 +351,17 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.makefornew", 0, 20, 1, "%sMake New", private.makefornewFormat)
 	gui:AddTip(id, "Number of glyphs (newly learned or newly profitable) to make when there are zero sales and zero failures in history.")
 
+	gui:AddControl(id, "Subhead", 0, "Glyph Valuation Method")
+
 	local weightWords = "for evaluation of new or previously unprofitable glyphs."
 
-	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "Current model")
-	gui:AddTip(id, "Relative weight for the current pricing model set " .. weightWords)
+	if AucAdvanced.Modules.Util.Appraiser then
+		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "Current model")
+		gui:AddTip(id, "Relative weight for the current pricing model set " .. weightWords)
+	else
+		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "|caaaaaaaaCurrent model")
+		gui:AddTip(id, "Auc-Util-Appraiser is not enabled, so the current model weighting is disabled")
+	end
 
 	gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitBeancounter", 1, 100, 1, "Sales history")
 	gui:AddTip(id, "Relative weight for the Beancounter sales history, restricted by your consideration period, " .. weightWords)
@@ -730,7 +737,10 @@ function private.cofindGlyphs()
 				local profitBeancounter = get("util.glypher.profitBeancounter")
 
 				--local price = AucAdvanced.API.GetMarketValue(link)
-				local priceAppraiser = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, AucAdvanced.GetFaction()) or 0
+				local priceAppraiser = 0
+				if AucAdvanced.Modules.Util.Appraiser then
+					priceAppraiser = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, AucAdvanced.GetFaction()) or 0
+				end
 
 				if priceAppraiser == 0 then profitAppraiser = 0 end
 				local priceMarket = AucAdvanced.API.GetMarketValue(link) or 0
