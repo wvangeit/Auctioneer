@@ -120,6 +120,7 @@ function lib.OnLoad()
 	default("util.glypher.inks.found", false)
 	default("util.glypher.debugTooltip", false)
 	default("util.glypher.makemaxstock", false)
+	default("util.glypher.hardminstock", false)
 
 
 --Check to see if we've got a recent enough version of AucAdvanced
@@ -156,6 +157,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "help}} - this", libName, "help")
 		print(line, "show}} - show/hide the Glypher UI")
 		print(line, "makemaxstock}} - toggle the makemaxstock flag - Warning: advanced users only")
+		print(line, "hardminstock}} - toggle the hardminstock flag")
 	elseif (command == "show") then
 		private.SlideBarClick()
 	elseif (command == "makemaxstock") then
@@ -166,6 +168,15 @@ function lib.CommandHandler(command, ...)
 		else
 			set("util.glypher.makemaxstock", true)
 			print("makemaxstock is now ON")
+		end
+	elseif (command == "hardminstock") then
+		local hardminstock = get("util.glypher.hardminstock")
+		if hardminstock then
+			set("util.glypher.hardminstock", false)
+			print("hardminstock is now OFF")
+		else
+			set("util.glypher.hardminstock", true)
+			print("hardminstock is now ON")
 		end
 	end
 end
@@ -603,6 +614,7 @@ function private.cofindGlyphs()
 	local history = get("util.glypher.history") --how far back in beancounter to look, in days
 	local stockdays = get("util.glypher.stockdays")
 	local minstock = get("util.glypher.minstock")
+	local hardminstock = get("util.glypher.hardminstock")
 	local mincraft = get("util.glypher.mincraft")
 	--local mincraftthreshold = get("util.glypher.mincraftthreshold")
 	local maxstock = get("util.glypher.maxstock")
@@ -800,7 +812,7 @@ function private.cofindGlyphs()
 					end
 					local makemaxstock = get("util.glypher.makemaxstock")
 					if makemaxstock and (currentAuctions == 0) and (make < maxstock) then make = maxstock end
-					if (make > 0) and ((make + currentAuctions) < minstock) then make = (minstock - currentAuctions) end
+					if (make > 0 or hardminstock) and ((make + currentAuctions) < minstock) then make = (minstock - currentAuctions) end
 					if (make > 0) and (make < mincraft) then
 						--if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
 						--if (currentAuctions < minstock) or (currentAuctions == 0) then
