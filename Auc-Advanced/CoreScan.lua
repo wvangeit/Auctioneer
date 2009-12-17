@@ -48,8 +48,6 @@ local lib = AucAdvanced.Scan
 local private = {}
 lib.Private = private
 
-private.querycount = 0
-
 local Const = AucAdvanced.Const
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 private.Print = _print
@@ -100,54 +98,24 @@ function lib.GetImage()
 	return image
 end
 
-function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
+function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
 	if not private.scanStack then private.scanStack = {} end
-	local query = {}
-	name = name or ""
-	minUseLevel = tonumber(minUseLevel) or 0
-	maxUseLevel = tonumber(maxUseLevel) or 0
-	classIndex = tonumber(classIndex) or 0
-	subclassIndex = tonumber(subclassIndex) or 0
-	qualityIndex = tonumber(qualityIndex)
-	if (name and name ~= "") then query.name = name end
-	if (minUseLevel > 0) then query.minUseLevel = minUseLevel end
-	if (maxUseLevel > 0) then query.maxUseLevel = maxUseLevel end
-	if (classIndex > 0) then
-		query.class = private.ClassConvert(classIndex)
-		query.classIndex = classIndex
-	end
-	if (subclassIndex > 0) then
-		query.subclass = private.ClassConvert(classIndex, subclassIndex)
-		query.subclassIndex = subclassIndex
-	end
-	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
-	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.qryinfo = {}
-	query.qryinfo.page = -1;
-	query.qryinfo.id = private.querycount
-	query.qryinfo.sig = ("%s-%s-%s-%s-%s-%s-%s"):format(
-		query.name or "",
-		query.minUseLevel or "",
-		query.maxUseLevel or "",
-		query.class or "",
-		query.subclass or "",
-		query.quality or "",
-		query.invType or "")
-	if (NoSummary) then
-		query.qryinfo.nosummary = true
-	end
-	-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
-	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
-	-- store the current return value - this will be used throughout processing to avoid problems
-	query.qryinfo.serverKey = AucAdvanced.GetFaction()
-	private.querycount = private.querycount+1
+
+	name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex = private.QueryScrubParameters(
+		name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+
+	-- todo here: test for duplicates in the scan stack using private.QueryCompareParameters(query, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+
+	local query = private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	query.qryinfo.pushed = true
+	if NoSummary then query.qryinfo.nosummary = true end
+
 	if (nLog) then
-		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(private.curQuery.qryinfo.id, private.curQuery.qryinfo.sig))
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 	end
 
-	query.isUsable = isUsable
 	local now = GetTime()
-	table.insert(private.scanStack, {now, false, query, {}, {}, now, 0, now})
+	table.insert(private.scanStack, {time(), false, query, {}, {}, now, 0, now})
 end
 
 function lib.PushScan()
@@ -1461,9 +1429,9 @@ StorePageFunction = function()
 	BrowseSearchButton:Show()
 	if isGetAll then
 		isGetAll = false
-		--QueryAuctionItems("", "", "", nil, nil, nil, nil, nil, nil)
 		AucAdvanced.API.BlockUpdate(false)
-		QueryAuctionItems("Empty Page", "", "", nil, nil, nil, nil, nil, nil)--clear the getall output
+		-- Clear the getall output. We don't want to create a new query so use the hook
+		private.Hook.QueryAuctionItems("Empty Page", "", "", nil, nil, nil, nil, nil, nil)
 	end
 end
 
@@ -1478,28 +1446,117 @@ function lib.StorePage()
 	end
 end
 
-function private.ClassConvert(cid, sid)
-	if (sid) then
-		return Const.SUBCLASSES[cid][sid]
-	end
-	return Const.CLASSES[cid]
-end
-
-function private.SafeName (name)
-	-- ADV-397 : code to avoid disconnects because Blizzard's QueryAuctionItems can't handle strings over 63 bytes
-	-- Attempts to duplicate the truncation effect of Blizzard's BrowseName control
-	if type(name) == "string" then -- this gets called via a public API function - be safe
+function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	-- Converts the parameters that we will store in our scanQuery table into a consistent format:
+	-- converts each parameter to correct type;
+	-- converts all strings to lowercase;
+	-- converts all "" and 0 to nil;
+	-- converts any invalid parameters to nil.
+	if type(name) == "string" and #name > 0 then
 		if #name > 63 then
 			if name:byte(63) >= 192 then -- UTF-8 multibyte first byte
-				return name:sub(1, 62)
+				name = name:sub(1, 62)
 			elseif name:byte(62) >= 224 then -- UTF-8 triplebyte first byte
-				return name:sub(1, 61)
+				name = name:sub(1, 61)
+			else
+				name = name:sub(1, 63)
 			end
-			return name:sub(1, 63)
 		end
-		return name
+		name = name:lower()
+	else
+		name = nil
 	end
-	return ""
+	minLevel = tonumber(minLevel)
+	if minLevel and minLevel < 1 then minLevel = nil end
+	maxLevel = tonumber(maxLevel)
+	if maxLevel and maxLevel < 1 then maxLevel = nil end
+	classIndex = tonumber(classIndex)
+	if classIndex and classIndex < 1 then classIndex = nil end
+	if classIndex then
+		subclassIndex = tonumber(subclassIndex)
+		if subclassIndex and subclassIndex < 1 then subclassIndex = nil end
+	else
+		subclassIndex = nil -- subclassIndex is only valid if we have a classIndex
+	end
+	if subclassIndex then
+		invTypeIndex = tonumber(invTypeIndex)
+		if invTypeIndex and invTypeIndex < 1 then invTypeIndex = nil end
+	else
+		invTypeIndex = nil -- invTypeIndex is only valid if we have a subclassIndex
+	end
+	if isUsable and isUsable ~= 0 then
+		isUsable = 1
+	else
+		isUsable = nil
+	end
+	qualityIndex = tonumber(qualityIndex)
+	if qualityIndex and qualityIndex < 1 then qualityIndex = nil end
+
+	return name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex
+end
+
+function private.QueryCompareParameters(query, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	-- Returns true if the parameters are identical to the values stored in the scanQuery table
+	-- Use this function to avoid creating a duplicate scanQuery table
+	-- Parameters must have been scrubbed first
+	if query.name == name -- note: both already converted to lowercase when scrubbed
+	and query.minUseLevel == minLevel
+	and query.maxUseLevel == maxLevel
+	and query.classIndex == classIndex
+	and query.subclassIndex == subclassIndex
+	and query.quality == qualityIndex
+	and query.invType == invTypeIndex
+	and query.isUsable == isUsable
+	then
+		return true
+	end
+end
+
+private.querycount = 0
+
+function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	-- Assumes the parameters have already been scrubbed
+	local class, subclass
+	local query, qryinfo = {}, {}
+	query.qryinfo = qryinfo
+
+	query.name = name
+	query.minUseLevel = minLevel
+	query.maxUseLevel = maxLevel
+	query.invType = invTypeIndex
+	if classIndex then
+		class = Const.CLASSES[classIndex]
+		query.class = class
+		query.classIndex = classIndex
+	end
+	if subclassIndex then
+		subclass = Const.SUBCLASSES[classIndex][subclassIndex]
+		query.subclass = subclass
+		query.subclassIndex = subclassIndex
+	end
+	query.isUsable = isUsable
+	query.quality = qualityIndex
+
+	qryinfo.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
+	qryinfo.id = private.querycount
+	private.querycount = private.querycount+1
+	qryinfo.sig = ("%s#%s#%s#%s#%s#%s#%s#%s"):format(
+		name or "",
+		minLevel or "",
+		maxLevel or "",
+		invTypeIndex or "",
+		class or "",
+		subclass or "",
+		isUsable or "",
+		qualityIndex or ""
+	) -- can use strsplit("#", sig) to extract params
+
+	-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
+	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
+	-- store the current return value - this will be used throughout processing to avoid problems
+	qryinfo.serverKey = AucAdvanced.GetFaction()
+
+	return query
 end
 
 private.Hook = {}
@@ -1570,18 +1627,17 @@ end
 private.Hook.QueryAuctionItems = QueryAuctionItems
 
 local isSecure, taint = issecurevariable("CanSendAuctionQuery")
-if (isSecure) then
-	private.CanSend = CanSendAuctionQuery
-else
+if not isSecure then
 	private.warnTaint = taint
 end
+private.CanSend = CanSendAuctionQuery
 
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	if private.warnTaint then
 		private.Print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
 	end
-	if private.CanSend and not private.CanSend() then
+	if not private.CanSend() then
 		private.Print("Can't send query just at the moment")
 		return
 	end
@@ -1593,76 +1649,38 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		lib.StorePage()
 	end
 
-	local isSame = true
-	local query = {}
-	name = private.SafeName (name) 	-- ADV-397 : code to avoid disconnects because Blizzard's QueryAuctionItems can't handle strings over 63 bytes
-	minLevel = tonumber(minLevel) or 0
-	maxLevel = tonumber(maxLevel) or 0
-	classIndex = tonumber(classIndex) or 0
-	subclassIndex = tonumber(subclassIndex) or 0
-	qualityIndex = tonumber(qualityIndex)
-	page = tonumber(page) or 0
-	if (name and name ~= "") then query.name = name end
-	if (minLevel > 0) then query.minUseLevel = minLevel end
-	if (maxLevel > 0) then query.maxUseLevel = maxLevel end
-	if (classIndex > 0) then
-		query.class = private.ClassConvert(classIndex)
-		query.classIndex = classIndex
-	end
-	if (subclassIndex > 0) then
-		query.subclass = private.ClassConvert(classIndex, subclassIndex)
-		query.subclassIndex = subclassIndex
-	end
-	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
-	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.qryinfo = {}
-	query.qryinfo.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
-	query.isUsable = isUsable
+	name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex = private.QueryScrubParameters(
+		name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 
-	if (private.curQuery) then
-		for x, y in pairs(query) do
-			if (x~="qryinfo" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
-		end
-		for x, y in pairs(private.curQuery) do
-			if (x~="qryinfo" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
+	local query
+	if private.curQuery then
+		if private.QueryCompareParameters(private.curQuery, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
+			query = private.curQuery
+			if (nLog) then
+				nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending exisiting query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
+			end
+		else
+			private.Commit(true, false)
 		end
 	end
-
-	if (not isSame or not private.curQuery) then
-		private.Commit(true, false)
+	if not query then
+		query = private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 		private.scanStartTime = time()
 		private.scanStarted = GetTime()
 		private.totalPaused = 0
-
-		local startPage = 0
-		query.qryinfo.id = private.querycount
-		private.querycount = private.querycount+1
-
-		query.qryinfo.sig = ("%s-%s-%s-%s-%s-%s-%s"):format(
-			query.name or "",
-			query.minUseLevel or "",
-			query.maxUseLevel or "",
-			query.class or "",
-			query.subclass or "",
-			query.quality or "",
-			query.invType or "")
-
-		-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
-		-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
-		-- store the current return value - this will be used throughout processing to avoid problems
-		query.qryinfo.serverKey = AucAdvanced.GetFaction()
-
 		private.curQuery = query
-	else
-		query = private.curQuery
+		if (nLog) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending new query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
+		end
 	end
 
+	page = tonumber(page) or 0
 	private.sentQuery = true
 	lib.lastReq = GetTime()
 
 	return private.QuerySent(query, isSearch,
 		private.Hook.QueryAuctionItems(
-			name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex,
+			name or "", minLevel or "", maxLevel or "", invTypeIndex, classIndex, subclassIndex,
 			page, isUsable, qualityIndex, GetAll, ...))
 end
 
