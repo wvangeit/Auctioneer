@@ -1,7 +1,7 @@
 --[[
 	Up-to-date list of quest items and rewards for informant.
 	File courtesy of http://www.wowhead.com/
-	File generated at: 2009-12-15 15:48:29 Z
+	File generated at: 2009-12-17 21:10:06 Z
 --]]
 Informant.SetQuestStarts({
 	[1307]='123',

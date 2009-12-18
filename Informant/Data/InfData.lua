@@ -6506,8 +6506,8 @@ Informant.SetDatabase({
 	[3021]="0:2:3:1:Bow::1:0:", -- Ranger Bow
 	[3022]="0:4:2:1:Leather::1:0:", -- Bluegill Breeches
 	[3023]="3772:2:1:1:Gun::1:0:1297,1461,1686,3018,3053,3088,3322,4603,4889,5123,8131,9548,9551,11184,16274,16620,16735", -- Large Bore Blunderbuss
-	[3024]="7098:2:1:1:Gun::1:0:1297,1461,3018,3053,3322,4603,4889,5123,8131,9548,9551,11184,16620,16735", -- BKP 2700 ""Enforcer""
-	[3025]="18479:2:1:1:Gun::1:0:3322,8131,9548,11184,19836,22491,29945", -- BKP 42 ""Ultra""
+	[3024]="7098:2:1:1:Gun::1:0:1297,1461,3018,3053,3322,4603,4889,5123,8131,9548,9551,11184,16620,16735", -- BKP 2700 "Enforcer"
+	[3025]="18479:2:1:1:Gun::1:0:3322,8131,9548,11184,19836,22491,29945", -- BKP 42 "Ultra"
 	[3026]="3812:2:1:1:Bow::1:0:228,1297,1298,1459,1668,1687,2839,3015,3409,3410,3488,3951,4173,4203,4604,4892,5122,9548,9549,9551,9552,9553,9555,12029,14301,16263,16274,16619,16715,17667,19020,19561,27055", -- Reinforced Bow
 	[3027]="6349:2:1:1:Bow::1:0:228,1297,1298,2839,3015,3410,4173,4604,4892,5122,9548,9551,9552,9555,12029,14301,16263,16274,16619,16715,17667,19020,19561,27055", -- Heavy Recurve Bow
 	[3030]="300:6:1:1000:Arrow::200:0:227,228,734,789,1149,1285,1287,1297,1298,1448,1452,1462,2084,2401,2803,2806,2808,2820,2839,2908,3015,3313,3350,3410,3541,3625,3962,4170,4173,4241,4555,4602,4604,4876,4892,4896,5101,5122,5134,6028,7942,7976,8139,8362,9548,9551,9552,9555,11038,11555,12021,12027,12029,12246,12959,12960,14301,14624,15174,15397,16191,16263,16274,16619,16715,16732,16919,17489,17598,17667,19020,19561,27055", -- Razor Arrow
@@ -6517,8 +6517,8 @@ Informant.SetDatabase({
 	[3037]="0:2:2:1:Bow::1:0:", -- Whipwood Recurve Bow
 	[3039]="0:2:2:1:Bow::1:0:", -- Short Ash Bow
 	[3040]="0:2:2:1:Gun::1:0:", -- Hunter's Muzzle Loader
-	[3041]="0:2:2:1:Gun::1:0:", -- ""Mage-Eye"" Blunderbuss
-	[3042]="0:2:2:1:Gun::1:0:", -- BKP ""Sparrow"" Smallbore
+	[3041]="0:2:2:1:Gun::1:0:", -- "Mage-Eye" Blunderbuss
+	[3042]="0:2:2:1:Gun::1:0:", -- BKP "Sparrow" Smallbore
 	[3045]="0:4:2:1:Mail::1:0:", -- Lambent Scale Boots
 	[3047]="0:4:2:1:Mail::1:0:", -- Lambent Scale Gloves
 	[3048]="0:4:2:1:Mail::1:0:", -- Lambent Scale Legguards
@@ -11444,7 +11444,7 @@ Informant.SetDatabase({
 	[10577]="0:4:1:1:Trinket:202:1:0:", -- Goblin Mortar
 	[10578]="0:4:3:1:Cloth::1:0:", -- Thoughtcast Boots
 	[10579]="0:6:3:200:Arrow::1:0:", -- Explosive Arrow
-	[10580]="0:7:1:10:Explosive::1:0:", -- Goblin ""Boom"" Box
+	[10580]="0:7:1:10:Explosive::1:0:", -- Goblin "Boom" Box
 	[10581]="0:4:3:1:Cloth::1:0:", -- Death's Head Vestment
 	[10582]="0:4:3:1:Leather::1:0:", -- Briar Tredders
 	[10583]="0:4:3:1:Leather::1:0:", -- Quillward Harness
@@ -16115,7 +16115,7 @@ Informant.SetDatabase({
 	[18362]="0:12:3:1:::1:0:", -- Holy Bologna: What the Light Won't Tell You
 	[18363]="0:12:3:1:::1:0:", -- Frost Shock and You
 	[18364]="0:12:3:1:::1:0:", -- The Emerald Dream
-	[18365]="0:15:0:1:Junk::1:0:", -- A Thoroughly Read Copy of ""Nat Pagle's Extreme' Anglin.""
+	[18365]="0:15:0:1:Junk::1:0:", -- A Thoroughly Read Copy of "Nat Pagle's Extreme' Anglin."
 	[18366]="0:4:3:1:Plate::1:0:", -- Gordok's Handguards
 	[18367]="0:4:3:1:Mail::1:0:", -- Gordok's Gauntlets
 	[18368]="0:4:3:1:Leather::1:0:", -- Gordok's Gloves
@@ -21893,7 +21893,7 @@ Informant.SetDatabase({
 	[25456]="0:15:0:20:Junk::1:0:", -- Glowing Spores
 	[25457]="0:15:0:20:Junk::1:0:", -- Incandescent Spores
 	[25458]="0:15:1:1:Junk::1:0:", -- Mag'har Battle Standard
-	[25459]="0:12:1:1:::1:0:", -- ""Count"" Ungula's Mandible
+	[25459]="0:12:1:1:::1:0:", -- "Count" Ungula's Mandible
 	[25460]="0:12:1:20:::1:0:", -- Bleeding Hollow Supply Crate
 	[25461]="0:12:1:1:::1:0:", -- Book of Forgotten Names
 	[25462]="0:12:1:1:::1:0:", -- Tome of Dusk
@@ -22155,7 +22155,7 @@ Informant.SetDatabase({
 	[25763]="0:2:3:1:Dagger::1:0:", -- Ceremonial Warmaul Blood-blade
 	[25764]="0:2:3:1:FistWeapon::1:0:", -- Mag'hari Fury Brand
 	[25765]="0:12:1:1:::1:0:", -- Fel Orc Plans
-	[25766]="0:15:0:1:Junk::1:0:", -- ""Creatures That Owe Sal'salabim Golds""
+	[25766]="0:15:0:1:Junk::1:0:", -- "Creatures That Owe Sal'salabim Golds"
 	[25767]="0:12:1:1:::1:0:", -- Raliq's Debt
 	[25768]="0:12:1:1:::1:0:", -- Coosh'coosh's Debt
 	[25769]="0:12:1:1:::1:0:", -- Floon's Debt
@@ -25785,7 +25785,7 @@ Informant.SetDatabase({
 	[31442]="0:4:2:1:Cloth::1:0:", -- Metro's Slimming Legs
 	[31443]="0:4:2:1:Leather::1:0:", -- Nickwinkle's Harness Experiment
 	[31444]="0:4:2:1:Mail::1:0:", -- Party Hat Mistake
-	[31445]="0:4:2:1:Plate::1:0:", -- Last Year's ""In"" Belt
+	[31445]="0:4:2:1:Plate::1:0:", -- Last Year's "In" Belt
 	[31446]="0:2:2:1:Dagger::1:0:", -- Vibro Shanker
 	[31447]="0:2:2:1:Dagger::1:0:", -- Vibro Dagger
 	[31448]="0:2:2:1:OneHandSword::1:0:", -- Vibro Sword
@@ -27183,7 +27183,7 @@ Informant.SetDatabase({
 	[33233]="0:4:2:1:Cloth::1:0:", -- Cobalt-threaded Gloves
 	[33234]="4000:0:1:20:Consumable::5:0:14844", -- Iced Berry Slush
 	[33235]="0:4:2:1:Cloth::1:0:", -- Journeyman's Epaulets
-	[33236]="5600:0:1:20:Consumable::5:0:14844", -- Fizzy Faire Drink ""Classic""
+	[33236]="5600:0:1:20:Consumable::5:0:14844", -- Fizzy Faire Drink "Classic"
 	[33237]="0:4:2:1:Leather::1:0:", -- Brogg's Battle Harness
 	[33238]="0:12:1:5:::1:0:", -- Crow Meat
 	[33239]="0:4:2:1:Leather::1:0:", -- Marshwarden's Tunic
@@ -27826,7 +27826,7 @@ Informant.SetDatabase({
 	[33974]="0:4:4:1:Leather::1:0:18525", -- Grasp of the Moonkin
 	[33976]="100000:15:3:1:Mount::1:0:24468,24510", -- Brewfest Ram
 	[33977]="1000000:15:4:1:Mount::1:0:24468,24510", -- Swift Brewfest Ram
-	[33978]="0:12:1:1:::1:0:", -- ""Honorary Brewer"" Hand Stamp
+	[33978]="0:12:1:1:::1:0:", -- "Honorary Brewer" Hand Stamp
 	[33985]="0:12:1:1:::1:0:", -- Dreary Candle
 	[33993]="0:15:3:1:Companion::1:0:", -- Mojo
 	[33999]="20000000:15:4:1:FlyingMount::1:0:17904", -- Cenarion War Hippogryph
@@ -27853,7 +27853,7 @@ Informant.SetDatabase({
 	[34024]="0:0:1:1:Consumable::1:0:", -- Flask of Vrykul Blood
 	[34026]="0:12:1:1:::1:0:", -- Feathered Charm
 	[34027]="0:12:1:1:::1:0:", -- Eyes of the Eagle
-	[34028]="0:12:1:1:::1:0:", -- ""Honorary Brewer"" Hand Stamp
+	[34028]="0:12:1:1:::1:0:", -- "Honorary Brewer" Hand Stamp
 	[34029]="0:4:4:1:Trinket::1:0:", -- Tiny Voodoo Mask
 	[34031]="0:12:1:1:::1:0:", -- Harpoon Operation Manual
 	[34032]="0:12:1:1:::1:0:", -- Harpoon Control Mechanism
@@ -27913,7 +27913,7 @@ Informant.SetDatabase({
 	[34112]="0:12:1:5:::1:0:", -- Fjord Turkey
 	[34113]="0:15:1:5:CombatPet:202:1:0:", -- Field Repair Bot 110G
 	[34114]="0:9:2:1:Engineering::1:0:", -- Schematic: Field Repair Bot 110G
-	[34115]="0:12:1:1:::1:0:", -- ""Silvermoon"" Harry's Debt
+	[34115]="0:12:1:1:::1:0:", -- "Silvermoon" Harry's Debt
 	[34116]="0:12:1:1:::1:0:", -- Jack Adams' Debt
 	[34118]="0:12:1:1:::1:0:", -- Black Conrad's Treasure
 	[34119]="0:15:1:1:Junk::1:0:", -- Black Conrad's Treasure
@@ -29225,7 +29225,7 @@ Informant.SetDatabase({
 	[35828]="0:12:1:1:::1:0:", -- Totemic Beacon
 	[35829]="0:2:2:1:Bow::1:0:", -- Coldspike Longbow
 	[35830]="0:2:2:1:FistWeapon::1:0:", -- Worn Vrykul Smasher
-	[35831]="0:12:1:1:::1:0:", -- The Flesh of ""Two Huge Pincers""
+	[35831]="0:12:1:1:::1:0:", -- The Flesh of "Two Huge Pincers"
 	[35832]="0:4:2:1:Cloth::1:0:", -- Blauvelt's Special Occasion Gloves
 	[35833]="0:4:2:1:Leather::1:0:", -- Imperious Worghide Cap
 	[35834]="0:4:2:1:Mail::1:0:", -- Nimblefinger Scaled Gloves
@@ -30804,7 +30804,7 @@ Informant.SetDatabase({
 	[37568]="0:12:1:1:::1:0:", -- Renewing Tourniquet
 	[37569]="0:12:1:5:::1:0:", -- Murkweed
 	[37570]="0:12:1:1:::1:0:", -- Murkweed Elixir
-	[37571]="0:12:1:1:::1:0:", -- ""Brew of the Month"" Club Membership Form
+	[37571]="0:12:1:1:::1:0:", -- "Brew of the Month" Club Membership Form
 	[37572]="0:12:1:1:::1:0:", -- Cedar Chest
 	[37573]="0:4:2:1:Idol::1:0:", -- Idol of the Plainstalker
 	[37574]="0:4:2:1:Libram::1:0:", -- Libram of Furious Blows
@@ -30827,7 +30827,7 @@ Informant.SetDatabase({
 	[37594]="0:4:3:1:Cloth::1:0:", -- Elder Headpiece
 	[37595]="0:4:3:1:Amulet::1:0:", -- Necklace of Taldaram
 	[37597]="0:2:4:1:Dagger::1:0:", -- Direbrew's Shanker
-	[37599]="0:12:1:1:::1:0:", -- ""Brew of the Month"" Club Membership Form
+	[37599]="0:12:1:1:::1:0:", -- "Brew of the Month" Club Membership Form
 	[37601]="0:12:1:1:::1:0:", -- Flesh-bound Tome
 	[37602]="0:7:1:20:EnchArmor::1:0:", -- Armor Vellum II
 	[37603]="0:0:1:5:EnhPerm::1:0:", -- Scroll of Enchant Boots - Dexterity
@@ -30951,8 +30951,8 @@ Informant.SetDatabase({
 	[37733]="0:2:3:1:TwoHandMace::1:0:", -- Mojo Masked Crusher
 	[37734]="0:4:3:1:Trinket::1:0:", -- Talisman of Troll Divinity
 	[37735]="0:4:3:1:Plate::1:0:", -- Ziggurat Imprinted Chestguard
-	[37736]="0:12:1:1:::1:0:23710,27478", -- ""Brew of the Month"" Club Membership Form
-	[37737]="0:12:1:1:::1:0:24495,27489", -- ""Brew of the Month"" Club Membership Form
+	[37736]="0:12:1:1:::1:0:23710,27478", -- "Brew of the Month" Club Membership Form
+	[37737]="0:12:1:1:::1:0:24495,27489", -- "Brew of the Month" Club Membership Form
 	[37739]="0:2:4:1:Dagger::1:0:", -- Brutal Gladiator's Blade of Alacrity
 	[37740]="0:2:4:1:OneHandMace::1:0:", -- Brutal Gladiator's Swift Judgement
 	[37741]="0:12:1:1:::1:0:", -- Letter of Amnesty
@@ -31228,7 +31228,7 @@ Informant.SetDatabase({
 	[38073]="0:4:2:1:Trinket::1:0:", -- Will of the Red Dragonflight
 	[38080]="0:4:2:1:Trinket::1:0:", -- Automated Weapon Coater
 	[38081]="0:4:2:1:Trinket::1:0:", -- Scarab of Isanoth
-	[38082]="12000000:1:4:1:Bag::1:0:18756", -- ""Gigantique"" Bag
+	[38082]="12000000:1:4:1:Bag::1:0:18756", -- "Gigantique" Bag
 	[38083]="0:12:1:1:::1:0:", -- Dull Carving Knife
 	[38084]="0:4:2:1:Plate::1:0:", -- Crustacean Stompers
 	[38085]="0:4:2:1:Plate::1:0:", -- Belt of the Emerald Guardian
@@ -31424,7 +31424,7 @@ Informant.SetDatabase({
 	[38347]="0:1:3:1:MiningBag::1:0:", -- Mammoth Mining Bag
 	[38348]="0:15:0:20:Junk::1:0:", -- Damaged Eye
 	[38349]="0:12:1:10:::1:0:", -- Venture Co. Spare Parts
-	[38350]="0:0:1:10:FoodDrink::1:0:25206", -- Winterfin ""Depth Charge""
+	[38350]="0:0:1:10:FoodDrink::1:0:25206", -- Winterfin "Depth Charge"
 	[38351]="0:0:1:20:Potion::1:0:25206", -- Murliver Oil
 	[38353]="0:4:3:1:Cloak::1:0:27730,27760", -- Venture Bay Buccaneer's Cape
 	[38354]="0:4:3:1:Cloak::1:0:27730,27760", -- Oil-Stained Tarp
@@ -32568,7 +32568,7 @@ Informant.SetDatabase({
 	[39684]="9000:7:1:10:Part:202:1:0:1448,1694,2682,2683,2684,2685,2687,2688,3133,3413,3495,4453,4587,5175,5519,6730,6777,8678,8679,9544,9676,11185,14337,14637,16657,16782,17222,17421,18278,18484,18752,18775,19383,20890,26600,26898,27711,28722,28797,29688,29907,30345,30434,30825,31776,31781,33594,33634,33669,33677", -- Hair Trigger
 	[39685]="0:7:1:10:Part::1:0:", -- Indestructible Frame
 	[39686]="0:7:1:10:Part::1:0:", -- Neo-Dynamic Gear Assembly
-	[39688]="0:2:3:1:Gun::1:0:", -- Mark ""S"" Boomstick
+	[39688]="0:2:3:1:Gun::1:0:", -- Mark "S" Boomstick
 	[39689]="0:12:1:1:::1:0:", -- Crystal of the Frozen Grip
 	[39690]="0:7:1:20:Part:202:1:0:", -- Volatile Blasting Trigger
 	[39691]="0:0:1:20:FoodDrink::1:0:", -- Succulent Orca Stew
@@ -33831,7 +33831,7 @@ Informant.SetDatabase({
 	[41157]="0:4:4:1:Mail::1:0:33926,33928,35494,35495,35573,35574", -- Furious Gladiator's Chain Helm
 	[41158]="0:4:4:1:Mail::1:0:33924,33927", -- Relentless Gladiator's Chain Helm
 	[41160]="0:4:3:1:Mail::1:0:31580,31582", -- Savage Gladiator's Linked Leggings
-	[41161]="0:12:1:10:::1:0:", -- Drakuru ""Lock Opener""
+	[41161]="0:12:1:10:::1:0:", -- Drakuru "Lock Opener"
 	[41162]="0:4:4:1:Mail::1:0:31579,31581,33917,34061", -- Hateful Gladiator's Linked Leggings
 	[41163]="0:7:2:20:MetalStone:164,333,202,755,186:1:0:", -- Titanium Bar
 	[41164]="0:6:3:1000:Bullet::1:0:", -- Mammoth Cutters
@@ -35108,7 +35108,7 @@ Informant.SetDatabase({
 	[42768]="0:4:3:1:Plate::1:0:", -- Boots of the Unbowed Protector
 	[42769]="0:12:1:1:::1:0:", -- Spear of Hodir
 	[42770]="0:12:1:10:::1:0:", -- Forgotten Depths Venom Sac
-	[42772]="0:12:1:1:::1:0:", -- Dr. Terrible's ""Building a Better Flesh Giant""
+	[42772]="0:12:1:1:::1:0:", -- Dr. Terrible's "Building a Better Flesh Giant"
 	[42774]="0:12:1:1:::1:0:", -- Arngrim's Tooth
 	[42777]="11000:0:1:20:FoodDrink::5:0:30439,31115", -- Crusader's Waterskin
 	[42778]="16000:0:1:20:FoodDrink::5:0:30439,31115", -- Crusader's Rations
@@ -35145,7 +35145,7 @@ Informant.SetDatabase({
 	[42809]="0:4:2:1:Leather::1:0:", -- Bloodied Leather Gloves
 	[42810]="0:4:2:1:Mail::1:0:", -- Wooly Cowl
 	[42811]="0:2:2:1:Dagger::1:0:", -- Twisted Reflection
-	[42812]="0:4:2:1:Ring::1:0:", -- The ""D"" Ring
+	[42812]="0:4:2:1:Ring::1:0:", -- The "D" Ring
 	[42813]="0:4:2:1:Mail::1:0:", -- Chestplate of the Northern Ranger
 	[42814]="0:4:2:1:Mail::1:0:", -- Broken Chastity Belt
 	[42815]="0:4:2:1:Mail::1:0:", -- Mammoth Mukluks
