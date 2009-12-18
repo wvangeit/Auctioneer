@@ -176,18 +176,8 @@ function private.PushSearch()
 	local _, name, rarity, minlevel, itemType, itemSubType, stack, TypeID, SubTypeID
 	name, _, rarity, _, minlevel, itemType, itemSubType, stack = GetItemInfo(link)
 	nextRequest["itemname"] = name
-	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
-		if catName == itemType then
-			TypeID = catId
-			for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[TypeID]) do
-				if subName == itemSubType then
-					SubTypeID = subId
-					break
-				end
-			end
-			break
-		end
-	end
+	TypeID = AucAdvanced.Const.CLASSESREV[itemType]
+	if TypeID then SubTypeID = AucAdvanced.Const.SUBCLASSESREV[itemType][itemSubType] end
 	AucAdvanced.Scan.PushScan()
 	private.Searching = true
 	AucAdvanced.Scan.StartScan(name, minlevel, minlevel, nil, TypeID, SubTypeID, nil, rarity)
@@ -195,21 +185,21 @@ end
 
 function lib.FinishedSearch(query)
 	local queuecount = #private.BuyRequests
-	if queuecount > 0 then
-		local queryname = query.name
+	if queuecount > 0 and query.name then -- only check scans that include an item name
+		local querynamepattern = "^"..query.name -- lowercase and may have been truncated when query was created
 		local querylevel = query.minUseLevel
 		local queryquality = query.quality
 		for i = queuecount, 1, -1 do
 			local BuyRequest = private.BuyRequests[i]
-			local itemname = BuyRequest.itemname
-			if itemname == queryname then
+			local itemname = BuyRequest.itemname -- will be nil if we haven't called PushSearch on this request yet
+			if itemname and itemname:lower():match(querynamepattern) then
 				-- additional checks
 				local link = BuyRequest.link
 				local _, _, rarity, _, minlevel = GetItemInfo(link)
 				if minlevel == 0 then
 					minlevel = nil
 				end
-				if rarity == 0 then
+				if rarity and rarity < 1 then
 					rarity = nil
 				end
 				if rarity == queryquality and minlevel == querylevel then
