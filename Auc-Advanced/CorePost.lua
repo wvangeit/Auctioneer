@@ -761,7 +761,13 @@ function lib.Processor(event, ...)
 		end
 	elseif event == "auctionclose" then
 		if lib.GetQueueLen() > 0 then
-			StaticPopup_Show("CONFIRM_CANCEL_QUEUE_AH_CLOSED")
+			if AucAdvanced.Settings.GetSetting("post.clearonclose") then
+				if AucAdvanced.Settings.GetSetting("post.confirmonclose") then
+					StaticPopup_Show("POST_CANCEL_QUEUE_AH_CLOSED")
+				else
+					lib.CancelPostQueue()
+				end
+			end
 		end
 	end
 end
@@ -794,7 +800,7 @@ ScanTip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTempl
 ScanTip2 = _G["AppraiserTipTextLeft2"]
 ScanTip3 = _G["AppraiserTipTextLeft3"]
 
-StaticPopupDialogs["CONFIRM_CANCEL_QUEUE_AH_CLOSED"] = {
+StaticPopupDialogs["POST_CANCEL_QUEUE_AH_CLOSED"] = {
   text = "The Auctionhouse has closed. Do you want to clear the Posting queue?",
   button1 = YES,
   button2 = NO,

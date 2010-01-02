@@ -119,6 +119,8 @@ local settingDefaults = {
 	["ShowPurchaseDebug"] = true,
 	["SelectedLocale"] = GetLocale(),
 	["ModTTShow"] = false,
+	["post.clearonclose"] = true,
+	["post.confirmonclose"] = true,
 }
 
 local function getDefault(setting)
@@ -365,15 +367,17 @@ function lib.Hide()
 	end
 end
 
+--[[ disabled function: currently broken and must not be called
 function lib.UpdateGuiConfig()
 	if gui then
 		if gui:IsVisible() then
 			gui:Hide()
 		end
-		gui = nil
+		gui = nil -- note: the old gui cannot be garbage collected
 		lib.MakeGuiConfig()
 	end
 end
+--]]
 
 function lib.Toggle()
 	if (gui and gui:IsShown()) then
@@ -472,6 +476,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PurchasingOptions')) --"Purchasing Options"
 	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", _TRANS('ADV_Interface_ShowPurchaseDebug')) --"Show purchase queue info"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ShowPurchaseDebug')) --"Shows what is added to the purchase queue, and what is being purchased"
+	
+	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PostingOptions')) --"Posting Options"
+	gui:AddControl(id, "Checkbox",    0, 1,  "post.clearonclose", _TRANS('ADV_Interface_PostClearOnClose')) --"Clear the posting queue when the Auctionhouse is closed"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostClearOnClose')) --"When the Auctionhouse closes, cancels any auction requests queued up to be posted"
+	gui:AddControl(id, "Checkbox",    0, 2,  "post.confirmonclose", _TRANS('ADV_Interface_PostConfirmOnClose')) --"Ask before clearing the posting queue"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostConfirmOnClose')) --"When the Auctionhouse closes, presents a popup dialog asking if you really want to clear the posting queue"
 
 	gui:AddHelp(id, "what is scandata",
 		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
