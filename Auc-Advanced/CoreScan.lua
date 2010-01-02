@@ -305,7 +305,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			private.Commit(true, false)
+			private.Commit(true, false) -- sets private.curQuery to nil
 		end
 
 		private.isScanning = true
@@ -313,9 +313,15 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
+		if not private.curQuery then
+			-- private.curQuery will have been set if QueryAuctionItems succeeded
+			-- this should never fail? we checked CanSendAuctionQuery() earlier
+			message("Scan failed: unable to send query")
+			return
+		end
 		AuctionFrameBrowse.page = startPage
 		if (NoSummary) then
-			query.qryinfo.nosummary = true
+			private.curQuery.qryinfo.nosummary = true
 		end
 
 		--Show the progress indicator
@@ -1446,12 +1452,11 @@ function lib.StorePage()
 	end
 end
 
-function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-	-- Converts the parameters that we will store in our scanQuery table into a consistent format:
-	-- converts each parameter to correct type;
-	-- converts all strings to lowercase;
-	-- converts all "" and 0 to nil;
-	-- converts any invalid parameters to nil.
+--[[ AucAdvanced.Scan.QuerySafeName(name)
+	Library function to convert a name to the 'normalized' form used by scan querys
+	Note: performs truncation on names over 63 bytes as QueryAuctionItems cannot handle longer strings
+--]]
+function lib.QuerySafeName(name)
 	if type(name) == "string" and #name > 0 then
 		if #name > 63 then
 			if name:byte(63) >= 192 then -- UTF-8 multibyte first byte
@@ -1462,10 +1467,17 @@ function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, cl
 				name = name:sub(1, 63)
 			end
 		end
-		name = name:lower()
-	else
-		name = nil
+		return name:lower()
 	end
+end
+
+function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	-- Converts the parameters that we will store in our scanQuery table into a consistent format:
+	-- converts each parameter to correct type;
+	-- converts all strings to lowercase;
+	-- converts all "" and 0 to nil;
+	-- converts any invalid parameters to nil.
+	name = lib.QuerySafeName(name)
 	minLevel = tonumber(minLevel)
 	if minLevel and minLevel < 1 then minLevel = nil end
 	maxLevel = tonumber(maxLevel)
@@ -1478,12 +1490,8 @@ function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, cl
 	else
 		subclassIndex = nil -- subclassIndex is only valid if we have a classIndex
 	end
-	if subclassIndex then
-		invTypeIndex = tonumber(invTypeIndex)
-		if invTypeIndex and invTypeIndex < 1 then invTypeIndex = nil end
-	else
-		invTypeIndex = nil -- invTypeIndex is only valid if we have a subclassIndex
-	end
+	invTypeIndex = tonumber(invTypeIndex)
+	if invTypeIndex and invTypeIndex < 1 then invTypeIndex = nil end
 	if isUsable and isUsable ~= 0 then
 		isUsable = 1
 	else
