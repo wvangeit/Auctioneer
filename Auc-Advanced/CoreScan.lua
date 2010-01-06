@@ -51,6 +51,14 @@ lib.Private = private
 local Const = AucAdvanced.Const
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 private.Print = _print
+local GetFaction = AucAdvanced.GetFaction
+
+local tinsert, tremove = tinsert, tremove
+local bitand, bitor, bitnot = bit.band, bit.bor, bit.bnot
+local type, wipe = type, wipe
+local pairs, ipairs = pairs, ipairs
+local tonumber = tonumber
+
 local GetTime = GetTime
 
 private.isScanning = false
@@ -104,7 +112,17 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 	name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex = private.QueryScrubParameters(
 		name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 
-	-- todo here: test for duplicates in the scan stack using private.QueryCompareParameters(query, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	if private.scanStack then
+		for _, scan in ipairs(private.scanStack) do
+			if private.QueryCompareParameters(scan[3], name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
+				-- duplicate of exisiting queued query
+				if (nLog) then
+					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Duplicate pushed scan detected, cancelling duplicate")
+				end
+				return
+			end
+		end
+	end
 
 	local query = private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 	query.qryinfo.pushed = true
@@ -115,7 +133,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 	end
 
 	local now = GetTime()
-	table.insert(private.scanStack, {time(), false, query, {}, {}, now, 0, now})
+	tinsert(private.scanStack, {time(), false, query, {}, {}, now, 0, now})
 end
 
 function lib.PushScan()
@@ -125,7 +143,7 @@ function lib.PushScan()
 		end
 		-- private.Print(("Pausing current scan at page {{%d}}."):format(private.curQuery.qryinfo.page+1))
 		if not private.scanStack then private.scanStack = {} end
-		table.insert(private.scanStack, {
+		tinsert(private.scanStack, {
 			private.scanStartTime,
 			private.sentQuery,
 			private.curQuery,
@@ -160,7 +178,7 @@ function lib.PopScan()
 		private.scanStarted,
 		private.totalPaused,
 		pauseTime = unpack(private.scanStack[1])
-		table.remove(private.scanStack, 1)
+		tremove(private.scanStack, 1)
 
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
@@ -398,7 +416,7 @@ end
 function private.IsSameItem(focus, compare, onlyDirt)
 	if onlyDirt then
 		local flag = focus[Const.FLAG]
-		if not flag or bit.band(flag, Const.FLAG_DIRTY) == 0 then
+		if not flag or bitand(flag, Const.FLAG_DIRTY) == 0 then
 			return false
 		end
 	end
@@ -450,7 +468,7 @@ local function processStats(operation, curItem, oldItem)
 			local pOK, result=pcall(engineLib.AuctionFilter, operation, statItem)
 			if (pOK) then
 				if (result) then
-					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
+					curItem[Const.FLAG] = bitor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
 					filtered = true
 					break
 				end
@@ -460,7 +478,7 @@ local function processStats(operation, curItem, oldItem)
 				end
 			end
 		end
-	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+	elseif curItem and bitand(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 		-- This item is a filtered item
 		filtered = true
 	end
@@ -492,7 +510,7 @@ function private.IsInQuery(curQuery, data)
 			and (not curQuery.subclass or (curQuery.subclass == data[Const.ISUB]))
 			and (not curQuery.minUseLevel or (data[Const.ULEVEL] >= curQuery.minUseLevel))
 			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
-			and (not curQuery.name or (data[Const.NAME] and strfind(data[Const.NAME]:lower(), curQuery.name:lower(), 1, true)))
+			and (not curQuery.name or (data[Const.NAME] and data[Const.NAME]:lower():find(curQuery.name, 1, true))) -- curQuery.name is already lowercased
 			and (not curQuery.isUsable or (private.CanUse(data[Const.LINK])))
 			and (not curQuery.invType or (data[Const.IEQUIP] == curQuery.invType))
 			and (not curQuery.quality or (data[Const.QUALITY] >= curQuery.quality))
@@ -511,7 +529,7 @@ function private.BuildIDList(scandata, serverKey)
 	local id
 	for i = 1, #scandata.image do
 		id = scandata.image[i][Const.ID]
-		table.insert(idList, id)
+		tinsert(idList, id)
 	end
 	table.sort(idList)
 	return idList
@@ -522,7 +540,7 @@ function private.GetNextID(idList)
 	local second = idList[2]
 	while first and second and second == first + 1 do
 		first = second
-		table.remove(idList, 1)
+		tremove(idList, 1)
 		second = idList[2]
 	end
 	first = (first or 0) + 1 --Normalize it, since it will be nil if theres nothing in the tables.
@@ -554,7 +572,7 @@ function lib.GetScanData(serverKey, reserved)
 			end
 		end
 	else
-		serverKey, realmName, faction = AucAdvanced.GetFaction()
+		serverKey, realmName, faction = GetFaction()
 	end
 	local AucScanData = private.LoadAuctionImage()
 	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
@@ -616,7 +634,7 @@ function private.SubImageCache(itemId, serverKey)
 end
 
 function lib.QueryImage(query, serverKey, reserved, ...)
-	serverKey = serverKey or AucAdvanced.GetFaction()
+	serverKey = serverKey or GetFaction()
 	local prevQuery = private.prevQuery
 	local queryResults = private.queryResults
 
@@ -669,7 +687,7 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 			local data = image[ptr]
 			ptr = ptr + 1
 			if not data then break end
-			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
+			if bitand(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
 			if query.filter and query.filter(data, ...) then break end
 			if saneQueryLink and data[Const.LINK] ~= saneQueryLink then break end
 			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
@@ -743,7 +761,7 @@ Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
-	local serverKey = TempcurQuery.qryinfo.serverKey or AucAdvanced.GetFaction()
+	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
 	local scandata, idList = lib.GetScanData(serverKey)
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
@@ -774,7 +792,7 @@ Commitfunction = function()
 		if link then
 			if private.IsInQuery(TempcurQuery, data) then
 				-- Mark dirty
-				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_DIRTY)
+				data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_DIRTY)
 				dirtyCount = dirtyCount+1
 
 				-- Build lookup table
@@ -784,19 +802,20 @@ Commitfunction = function()
 				else
 					if (type(list) == "number") then
 						lut[link] = {}
-						table.insert(lut[link], list)
+						tinsert(lut[link], list)
 					end
-					table.insert(lut[link], pos)
+					tinsert(lut[link], pos)
 				end
 			else
 				-- Mark NOT dirty
-				data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
+				data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
 			end
 		end
 	end
 
 
 	--[[ *** Stage 2: Merge new scan into ScanData *** ]]
+	lib.ProgressBars(CommitProgressBar, 100*progresscounter/progresstotal, true, "AucAdv: Starting Stage 2") -- change displayed text for reporting purposes
 	processStats("begin")
 	for index, data in ipairs(TempcurScan) do
 		local itemPos
@@ -807,30 +826,30 @@ Commitfunction = function()
 			lastPause = GetTime()
 		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
-		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
-		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
+		data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
+		data[Const.FLAG] = bitand(data[Const.FLAG], bitnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
-			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			data[Const.FLAG] = bitand(oldItem[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
 			if data[Const.SELLER] == "" then -- unknown seller name in new data; copy the old name if it exists
 				data[Const.SELLER] = oldItem[Const.SELLER]
 			end
-			if (bit.band(data[Const.FLAG], Const.FLAG_FILTER)==Const.FLAG_FILTER) then
+			if (bitand(data[Const.FLAG], Const.FLAG_FILTER)==Const.FLAG_FILTER) then
 				filterOldCount = filterOldCount + 1
 			else
 				if not private.IsIdentical(oldItem, data) then
 					if processStats("update", data, oldItem) then
 						updateCount = updateCount + 1
 					end
-					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					if bitand(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
 						updateRecoveredCount = updateRecoveredCount + 1
 					end
 				else
 					if processStats("leave", data) then
 						sameCount = sameCount + 1
 					end
-					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					if bitand(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
 						sameRecoveredCount = sameRecoveredCount + 1
 					end
 				end
@@ -840,11 +859,11 @@ Commitfunction = function()
 			if (processStats("create", data)) then
 				newCount = newCount + 1
 			else -- processStats("create"...) filtered the auction: flag it
-				data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
+				data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
 				filterNewCount = filterNewCount + 1
 			end
 			data[Const.ID] = private.GetNextID(idList)
-			table.insert(scandata.image, replicate(data))
+			tinsert(scandata.image, replicate(data))
 		end
 	end
 
@@ -864,14 +883,14 @@ Commitfunction = function()
 			coroutine.yield()
 			lastPause = GetTime()
 		end
-		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
+		if (bitand(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
 			local dodelete = false
 
 			if data[Const.TIME] and (now - data[Const.TIME] > auctionmaxtime) then
 				-- delete items that have passed their expiry time - even if scan was incomplete
 				dodelete = true
-				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+				if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 					filterDeleteCount = filterDeleteCount + 1
 				else
 					expiredDeleteCount = expiredDeleteCount + 1
@@ -881,32 +900,32 @@ Commitfunction = function()
 			elseif wasOnePage then
 				-- a *completed* one-page scan should not have missed any auctions
 				dodelete = true
-				if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+				if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 					filterDeleteCount = filterDeleteCount + 1
 				else
 					earlyDeleteCount = earlyDeleteCount + 1
 				end
 			else
-				if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+				if bitand(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
 					dodelete = true
-					if bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+					if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 						filterDeleteCount = filterDeleteCount + 1
 					else
 						earlyDeleteCount = earlyDeleteCount + 1
 					end
 				else
-					data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
+					data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
 					missedCount = missedCount + 1
 				end
 			end
 			if dodelete then
-				if not (bit.band(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
+				if not (bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
 					processStats("delete", data)
 				end
-				table.remove(scandata.image, pos)
+				tremove(scandata.image, pos)
 			end
 		elseif not data[Const.LINK] then --if there isn't a link in the data, remove the entry
-			table.remove(scandata.image, pos)
+			tremove(scandata.image, pos)
 			numempty = numempty + 1
 		end
 	end
@@ -1029,7 +1048,11 @@ Commitfunction = function()
 			summary = summary.."\n"..summaryLine
 		end
 		if (missedCount > 0) then
-			summaryLine = "  {{"..missedCount.."}} missed items"
+			if (wasIncomplete) then
+				summaryLine = "  (Incomplete scan missed {{"..missedCount.."}} items)"
+			else
+				summaryLine = "  {{"..missedCount.."}} missed items"
+			end
 			if (printSummary) then private.Print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
@@ -1081,6 +1104,7 @@ Commitfunction = function()
 	if wasUnrestricted and not wasIncomplete then scandata.LastFullScan = now end
 
 	-- Tell everyone that our stats are updated
+	TempcurQuery.qryinfo.finished = true
 	private.clearImageCaches(TempcurScanStats)
 	AucAdvanced.SendProcessorMessage("scanstats", TempcurScanStats)
 	AucAdvanced.Buy.FinishedSearch(TempcurQuery)
@@ -1196,7 +1220,7 @@ function private.HasAllData()
 			local j = private.NoOwnerList[i]
 			if owner[j] then
 				-- Remove from the lookuptable
-				table.remove(private.NoOwnerList, i)
+				tremove(private.NoOwnerList, i)
 			end
 		end
 		if #private.NoOwnerList ~= 0 then
@@ -1290,7 +1314,7 @@ end
 
 local Getallstarttime = GetTime()
 StorePageFunction = function()
-	if (not private.curQuery) or (private.curQuery.name == "Empty Page") then
+	if (not private.curQuery) or (private.curQuery.name == "empty page") then
 		return
 	end
 	local now = GetTime()
@@ -1359,7 +1383,7 @@ StorePageFunction = function()
 --			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
 --			or legacyScanning() -- Is AucClassic scanning?
 --			or private.NoDupes(private.curScan, itemData) then
-				table.insert(private.curScan, itemData)
+				tinsert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
 		end
@@ -1437,7 +1461,7 @@ StorePageFunction = function()
 		isGetAll = false
 		AucAdvanced.API.BlockUpdate(false)
 		-- Clear the getall output. We don't want to create a new query so use the hook
-		private.Hook.QueryAuctionItems("Empty Page", "", "", nil, nil, nil, nil, nil, nil)
+		private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
 	end
 end
 
@@ -1507,6 +1531,7 @@ function private.QueryCompareParameters(query, name, minLevel, maxLevel, invType
 	-- Returns true if the parameters are identical to the values stored in the scanQuery table
 	-- Use this function to avoid creating a duplicate scanQuery table
 	-- Parameters must have been scrubbed first
+	-- Note: to compare two scanQuery tables for equality, just compare the sigs
 	if query.name == name -- note: both already converted to lowercase when scrubbed
 	and query.minUseLevel == minLevel
 	and query.maxUseLevel == maxLevel
@@ -1559,10 +1584,10 @@ function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classInde
 		qualityIndex or ""
 	) -- can use strsplit("#", sig) to extract params
 
-	-- the return value from AucAdvanced.GetFaction() can change when the Auctionhouse closes
+	-- the return value from GetFaction() can change when the Auctionhouse closes
 	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
 	-- store the current return value - this will be used throughout processing to avoid problems
-	qryinfo.serverKey = AucAdvanced.GetFaction()
+	qryinfo.serverKey = GetFaction()
 
 	return query
 end
@@ -1924,7 +1949,7 @@ local ItemUsableCached = {
 		local pattern = chatString
 		pattern = string.gsub(pattern, "(%%s)", "(.+)")
 		pattern = string.gsub(pattern, "(%%d)", "(.+)")
-		table.insert(this.patterns, pattern)
+		tinsert(this.patterns, pattern)
 	end,
 
 	CanUse = function(this, link)
