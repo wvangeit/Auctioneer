@@ -136,6 +136,65 @@ local isPigmentMats =
 	[39343] = true, 	-- AZURE_PIGMENT
 	[43109] = true, 	-- ICY_PIGMENT
 }
+-- This table is validating that each ID within it is a herb. Data from informant. This allows locale independent herbs
+local isHerb =
+	{
+	[765] = true, --  Silverleaf
+	[785] = true, --  Mageroyal
+	[2447] = true, --  Peacebloom
+	[2449] = true, --  Earthroot
+	[2450] = true, --  Briarthorn
+	[2452] = true, --  Swiftthistle
+	[2453] = true, --  Bruiseweed
+	[3355] = true, --  Wild Steelbloom
+	[3356] = true, --  Kingsblood
+	[3357] = true, --  Liferoot
+	[3358] = true, --  Khadgar's Whisker
+	[3369] = true, --  Grave Moss
+	[3818] = true, --  Fadeleaf
+	[3819] = true, --  Wintersbite
+	[3820] = true, --  Stranglekelp
+	[3821] = true, --  Goldthorn
+	[4625] = true, --  Firebloom
+	[8153] = true, --  Wildvine
+	[8831] = true, --  Purple Lotus
+	[8836] = true, --  Arthas' Tears
+	[8838] = true, --  Sungrass
+	[8839] = true, --  Blindweed
+	[8845] = true, --  Ghost Mushroom
+	[8846] = true, --  Gromsblood
+	[13463] = true, --  Dreamfoil
+	[13464] = true, --  Golden Sansam
+	[13465] = true, --  Mountain Silversage
+	[13466] = true, --  Plaguebloom
+	[13467] = true, --  Icecap
+	[13468] = true, --  Black Lotus
+	[19726] = true, --  Bloodvine
+	[19727] = true, --  Blood Scythe
+	[22710] = true, --  Bloodthistle
+	[22785] = true, --  Felweed
+	[22786] = true, --  Dreaming Glory
+	[22787] = true, --  Ragveil
+	[22788] = true, --  Flame Cap
+	[22789] = true, --  Terocone
+	[22790] = true, --  Ancient Lichen
+	[22791] = true, --  Netherbloom
+	[22792] = true, --  Nightmare Vine
+	[22793] = true, --  Mana Thistle
+	[22794] = true, --  Fel Lotus
+	[22797] = true, --  Nightmare Seed
+	[36901] = true, --  Goldclover
+	[36902] = true, --  Constrictor Grass
+	[36903] = true, --  Adder's Tongue
+	[36904] = true, --  Tiger Lily
+	[36905] = true, --  Lichbloom
+	[36906] = true, --  Icethorn
+	[36907] = true, --  Talandra's Rose
+	[36908] = true, --  Frost Lotus
+	[37921] = true, --  Deadnettle
+	[39970] = true, -- Fire Leaf
+	}
+	
 
 lib.vendorlist = {}
 function lib.vendorAction()
@@ -315,8 +374,8 @@ function lib.herbAction()
 				if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
 				if itemCount == nil then itemCount = 1 end
 				local _, itemID, _, _, _, _ = decode(itemLink)
-				local itemName, _, itemRarity, _, _, _, itemType, _, _, _ = GetItemInfo(itemLink)
-				if itemType == "Herb" then
+				local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
+				if isHerb[ itemID ] then
 					if (get("util.automagic.chatspam")) then
 						print("AutoMagic has loaded", itemName, " because it is a herb.")
 					end
