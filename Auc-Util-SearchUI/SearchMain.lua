@@ -58,6 +58,7 @@ local Const = AucAdvanced.Const
 local gui
 private.data = {}
 private.sheetData = {}
+private.sheetStyle = {}
 private.isSearching = false
 local coSearch
 local SettingCache = {}
@@ -613,9 +614,15 @@ function private.removeline()
 		end
 	end
 	tremove(private.sheetData, gui.sheet.selected)
+	--regenerate style elements, to match shorter data table
+	local total =  #private.sheetData
+	for i = gui.sheet.selected, total do
+		private.sheetStyle[i] = private.sheetStyle[i+1]
+		if i == total then private.sheetStyle[i+1] = nil end --remove extra style
+	end
 	--gui.frame.remove:Disable()
 	gui.sheet.selected = nil
-	gui.sheet:SetData(private.sheetData)
+	gui.sheet:SetData(private.sheetData, private.sheetStyle)
 	lib.UpdateControls()
 	gui.sheet.selected = gui.sheet.sort[selected]
 	gui.sheet:Render() --need to redraw, so the selection looks right
@@ -624,15 +631,16 @@ end
 
 function private.removeall()
 	empty(private.sheetData)
+	empty(private.sheetStyle)
 	gui.sheet.selected = nil
-	gui.sheet:SetData(private.sheetData)
+	gui.sheet:SetData(private.sheetData, private.sheetStyle)
 	gui.sheet:Render() --need to redraw, so the selection looks right
 	lib.UpdateControls()
 end
 
 function private.repaintSheet()
 	local wasEmpty = #gui.sheet.data < 1
-	gui.sheet:SetData(private.sheetData)
+	gui.sheet:SetData(private.sheetData, private.sheetStyle)
 	if wasEmpty then --sheet was empty, so select the just added auction
 		gui.sheet.selected = 1
 		gui.sheet:Render() --need to redraw, so the selection looks right
@@ -1318,7 +1326,7 @@ function lib.MakeGuiConfig()
 
 	gui.sheet = ScrollSheet:Create(gui.frame, {
 		{ "Item",   "TOOLTIP", lib.GetSetting("columnwidth.Item") }, --120
-		{ "Pct",    "TEXT", lib.GetSetting("columnwidth.Pct")   }, --30
+		{ "Pct",    "INT", lib.GetSetting("columnwidth.Pct")   }, --30
 		{ "Profit", "COIN", lib.GetSetting("columnwidth.Profit") , { DESCENDING=true } }, --85
 		{ "Stk",    "INT",  lib.GetSetting("columnwidth.Stk")  }, --30
 		{ "Buyout", "COIN", lib.GetSetting("columnwidth.Buyout"), { DESCENDING=true } }, --85
@@ -1789,6 +1797,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 
 				if not private.sheetData then
 					private.sheetData = {}
+					private.sheetStyle = {}
 				end
 				for j,k in pairs(private.sheetData) do
 					if (k[1] == item[Const.LINK]) and (k[7] == item["reason"]) then
@@ -1799,7 +1808,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 			end
 			if nodupes or (not isdupe) then
 				local level, _, r, g, b
-				local pctstring = ""
+				pct = tonumber(pct) --make sure its not a string
 				if not pct and AucAdvanced.Modules.Util.PriceLevel then
 					local valueper
 					if value and value > 0 then
@@ -1810,14 +1819,17 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 					else
 						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
 					end
-					if level then
-						r = r*255
-						g = g*255
-						b = b*255
-						--first color code here is for sorting purposes
-						pctstring = format("|cff%06d|cff%02x%02x%02x"..floor(level), 100*level, r, g, b)
-						pct = pctstring
+					if not r or not b or not g then
+					--print("price level failure in searchUI")
+					--print(r,g,b, item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
+					r,g,b = 1,1,1
 					end
+					local total = #private.sheetData+1
+					private.sheetStyle[total] = {}
+					private.sheetStyle[total][2] = {["textColor"] = {r, g, b}}
+					--private.sheetStyle[total][1] = {["rowColor"] = {r, g, b, 0, 0.2, "Horizontal"}} --allow row coloring, needs config options
+					level = level or 0
+					pct = floor(level)
 				end
 				item["pct"] = pct
 				item["cost"] = cost
