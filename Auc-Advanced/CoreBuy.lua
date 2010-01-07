@@ -165,17 +165,17 @@ end
 
 function private.PushSearch()
 	local nextRequest = private.BuyRequests[1]
-	local link = nextRequest["link"]
-	local canbuy, reason = lib.CanBuy(nextRequest["price"], nextRequest["sellername"])
+	local link = nextRequest.link
+	local canbuy, reason = lib.CanBuy(nextRequest.price, nextRequest.sellername)
 	if not canbuy then
 		print("AucAdv: Can't buy "..link.." : "..reason)
 		private.QueueRemove(1)
 		return
 	end
 
-	local _, name, rarity, minlevel, itemType, itemSubType, stack, TypeID, SubTypeID
-	name, _, rarity, _, minlevel, itemType, itemSubType, stack = GetItemInfo(link)
-	nextRequest["itemname"] = name
+	local _, name, rarity, minlevel, itemType, itemSubType, TypeID, SubTypeID
+	name, _, rarity, _, minlevel, itemType, itemSubType = GetItemInfo(link)
+	nextRequest.itemname = name:lower()
 	TypeID = AucAdvanced.Const.CLASSESREV[itemType]
 	if TypeID then SubTypeID = AucAdvanced.Const.SUBCLASSESREV[itemType][itemSubType] end
 	AucAdvanced.Scan.PushScan()
@@ -186,13 +186,14 @@ end
 function lib.FinishedSearch(query)
 	local queuecount = #private.BuyRequests
 	if queuecount > 0 and query.name then -- only check scans that include an item name
-		local querynamepattern = "^"..query.name -- lowercase and may have been truncated when query was created
+		local queryname = query.name -- lowercase and may have been truncated when query was created
 		local querylevel = query.minUseLevel
 		local queryquality = query.quality
 		for i = queuecount, 1, -1 do
 			local BuyRequest = private.BuyRequests[i]
-			local itemname = BuyRequest.itemname -- will be nil if we haven't called PushSearch on this request yet
-			if itemname and itemname:lower():match(querynamepattern) then
+			local itemname = BuyRequest.itemname -- will be lowercase already (if it exists)
+				-- (will be nil if we haven't called PushSearch on this request yet)
+			if itemname and itemname:find(queryname, 1, true) then -- plain text matching
 				-- additional checks
 				local link = BuyRequest.link
 				local _, _, rarity, _, minlevel = GetItemInfo(link)
