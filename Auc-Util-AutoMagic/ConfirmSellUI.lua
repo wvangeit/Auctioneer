@@ -261,21 +261,21 @@ function lib.makeconfirmsellui()
 	--Remove item from sales button
 	lib.confirmsellui.removeButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.removeButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.continueButton, "BOTTOMLEFT", -18, 0)
-	lib.confirmsellui.removeButton:SetText(("Remove Item"))
+	lib.confirmsellui.removeButton:SetText(("Remove"))
 	lib.confirmsellui.removeButton:SetScript("OnClick",  lib.ASCRemoveItem)
 	lib.confirmsellui.removeButton:Disable()
 
 	-- Ignore item from future sales
 	lib.confirmsellui.ignoreButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.ignoreButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.removeButton, "BOTTOMLEFT", -18, 0)
-	lib.confirmsellui.ignoreButton:SetText(("Ignore Item"))
+	lib.confirmsellui.ignoreButton:SetText(("Ignore"))
 	lib.confirmsellui.ignoreButton:SetScript("OnClick",  lib.ASCIgnoreItem)
 	lib.confirmsellui.ignoreButton:Disable()
 
 	-- Un-Ignore item from future sales
 	lib.confirmsellui.unignoreButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.unignoreButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui.ignoreButton, "BOTTOMLEFT", -18, 0)
-	lib.confirmsellui.unignoreButton:SetText(("Un-Ignore Item"))
+	lib.confirmsellui.unignoreButton:SetText(("Un-Ignore"))
 	lib.confirmsellui.unignoreButton:SetScript("OnClick",  lib.ASCUnIgnoreItem)
 	lib.confirmsellui.unignoreButton:Disable()
 	
