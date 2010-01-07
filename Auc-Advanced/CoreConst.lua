@@ -43,18 +43,18 @@ AucAdvanced.Const = {
 	AucMaxTimes = {
 		1800,  -- 30 mins
 		7200,  -- 2 hours
-		28800, -- 12 hours
+		43200, -- 12 hours
 		172800 -- 48 hours
 	},
 	AucTimes = {
 		0,
 		1800, -- 30 mins
 		7200, -- 2 hours
-		28800, -- 12 hours
+		43200, -- 12 hours
 		172800 -- 48 hours
 	},
-	
-	InvTypes = {
+
+	EquipEncode = { -- Converts "INVTYPE_*" strings to an internal number code; stored in scandata and used by Stat-iLevel
 		INVTYPE_HEAD = 1,
 		INVTYPE_NECK = 2,
 		INVTYPE_SHOULDER = 3,
@@ -82,6 +82,12 @@ AucAdvanced.Const = {
 		INVTYPE_THROWN = 25,
 		INVTYPE_RANGED = 26,
 	},
+	-- EquipDecode = <add a reverse lookup table here if we need it>
+
+	EquipLocToInvIndex = {}, -- converts "INVTYPE_*" strings to invTypeIndex for scan queries - only valid for Armour types
+	EquipCodeToInvIndex = {}, -- as above, but converts the EquipEncode'd number to invTypeIndex
+	-- InvIndexToEquipLoc = <add a reverse lookup table here if we need it>
+
 	LINK = 1,
 	ILEVEL = 2,
 	ITYPE = 3,
@@ -109,6 +115,7 @@ AucAdvanced.Const = {
 	FACTOR = 25,
 	ENCHANT = 26,
 	SEED = 27,
+	LASTENTRY = 27, -- Used to determine how many entries the table has when copying (some entries can be nil so # won't work)
 
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,
@@ -120,15 +127,38 @@ AucAdvanced.Const = {
 	SUBCLASSESREV = { }, -- Table mapping from CLASS and SUBCLASSES names to index number in SUBCLASSES
 }
 
+AucAdvanced.Const.InvTypes = AucAdvanced.Const.EquipEncode -- backward compatibility - deprecated entry
+
+
 for i = 1, #AucAdvanced.Const.CLASSES do
 	AucAdvanced.Const.CLASSESREV[AucAdvanced.Const.CLASSES[i]] = i
 	AucAdvanced.Const.SUBCLASSESREV[AucAdvanced.Const.CLASSES[i]] = {}
 	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
 	for j = 1, #AucAdvanced.Const.SUBCLASSES[i] do
-		AucAdvanced.Const.SUBCLASSESREV[AucAdvanced.Const.CLASSES[i]][AucAdvanced.Const.SUBCLASSES[i][j]] = j	
+		AucAdvanced.Const.SUBCLASSESREV[AucAdvanced.Const.CLASSES[i]][AucAdvanced.Const.SUBCLASSES[i][j]] = j
 	end
 end
 
+local function CompileInvTypes(...)
+	for i=1, select("#", ...), 2 do
+		-- each type has 2 args: token name(i), display in list(i+1)
+		local equipLoc = select(i, ...)
+		local invTypeIndex = (i+1)/2
+		local equipCode = AucAdvanced.Const.EquipEncode[equipLoc]
+
+		AucAdvanced.Const.EquipLocToInvIndex[equipLoc] = invTypeIndex
+		if equipCode then
+			AucAdvanced.Const.EquipCodeToInvIndex[equipCode] = invTypeIndex
+		else
+			-- All possible entries should exist in the table - warn if a missing entry is detected
+			print("AucAdvanced CoreConst error: missing EquipCode for Equip Location "..equipLoc)
+		end
+	end
+end
+
+CompileInvTypes(GetAuctionInvTypes(2, 1))
+
+-- todo: what is this used by?
 AucAdvanced.Defaults = {
 	Scanner = "Simple",
 }

@@ -52,6 +52,7 @@ local Const = AucAdvanced.Const
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 private.Print = _print
 local GetFaction = AucAdvanced.GetFaction
+local EquipCodeToInvIndex = AucAdvanced.Const.EquipCodeToInvIndex
 
 local tinsert, tremove = tinsert, tremove
 local bitand, bitor, bitnot = bit.band, bit.bor, bit.bnot
@@ -512,7 +513,7 @@ function private.IsInQuery(curQuery, data)
 			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
 			and (not curQuery.name or (data[Const.NAME] and data[Const.NAME]:lower():find(curQuery.name, 1, true))) -- curQuery.name is already lowercased
 			and (not curQuery.isUsable or (private.CanUse(data[Const.LINK])))
-			and (not curQuery.invType or (data[Const.IEQUIP] == curQuery.invType))
+			and (not curQuery.invType or (EquipCodeToInvIndex[data[Const.IEQUIP]] == curQuery.invType)) -- must convert iEquip code to invTypeIndex for comparison
 			and (not curQuery.quality or (data[Const.QUALITY] >= curQuery.quality))
 			then
 		return true
@@ -1514,7 +1515,7 @@ function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, cl
 	else
 		subclassIndex = nil -- subclassIndex is only valid if we have a classIndex
 	end
-	invTypeIndex = tonumber(invTypeIndex)
+	invTypeIndex = tonumber(invTypeIndex) or Const.EquipLocToInvIndex[invTypeIndex] -- accepts "INVTYPE_*" strings
 	if invTypeIndex and invTypeIndex < 1 then invTypeIndex = nil end
 	if isUsable and isUsable ~= 0 then
 		isUsable = 1
