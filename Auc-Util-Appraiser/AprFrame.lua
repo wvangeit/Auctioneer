@@ -327,25 +327,28 @@ function private.CreateFrames()
 			factor = factor,
 		})
 		local seen
+		local seentext = ""
 		if results[1] then
 			seen = results[1][Const.TIME]
 		end
 		if not seen then
-			local _, realm, faction = AucAdvanced.GetFaction()
-			if AucScanData and AucScanData["scans"] and AucScanData["scans"][realm] and AucScanData["scans"][realm][faction] then
-				seen = AucScanData["scans"][realm][faction]["LastFullScan"]
+			local scanstats = AucAdvanced.API.GetScanStats()
+			if scanstats then
+				seen = scanstats.LastFullScan
+				seentext = _TRANS("APPR_Interface_NotInScan")..". " --Not seen in current scan
 			end
 		end
 		if not seen then seen = 0 end
 		if (time() - seen) < 60 then
-			frame.age:SetText(_TRANS('APPR_Interface_Data1MinOld') )--Data is < 1 minute old
+			seentext = seentext .. _TRANS('APPR_Interface_Data1MinOld') --Data is < 1 minute old
 		elseif ((time() - seen) / 3600) <= 48 then
-			frame.age:SetText(_TRANS('APPR_Interface_DataIsXOld'):format(SecondsToTime(time() - seen, true)) )--Data is %s old
+			seentext = seentext .. _TRANS('APPR_Interface_DataIsXOld'):format(SecondsToTime(time() - seen, true)) --Data is %s old
 		elseif seen == 0 then
-			frame.age:SetText(_TRANS('APPR_Interface_NoDataFor').." "..string.sub(frame.salebox.name:GetText(), 12, -4))--No data for
+			seentext = _TRANS('APPR_Interface_NoDataFor').." "..string.sub(frame.salebox.name:GetText(), 12, -4) --No data for
 		else
-			frame.age:SetText(_TRANS('APPR_Interface_Data48HoursOld') )--Data is > 48 hours old
+			seentext = seentext .. _TRANS('APPR_Interface_Data48HoursOld') --Data is > 48 hours old
 		end
+		frame.age:SetText(seentext)
 
 		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 
@@ -415,120 +418,6 @@ function private.CreateFrames()
 		end
 		return rDef,gDef,bDef
 	end
-
-	--[[THIS FUNCTION IS NEVER USED? Only call to it is commented out Does it need to be removed?
-	function frame.SetPriceFromModel(curModel)
-		if not frame.salebox.sig then return end
-		if not curModel then
-			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
-		else
-			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
-		end
-		frame.salebox.warn:SetText("")
-		if curModel == "default" then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-			if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(frame.salebox.link)) or (AucAdvanced.API.GetMarketValue(frame.salebox.link) <= 0))) or
-			   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) <= 0))) then
-				curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
-			end
-			frame.salebox.model:SetText(_TRANS('APPR_Interface_Default').." ("..curModel..")")--Default
-		end
-
-		local newBuy, newBid
-		local match = frame.salebox.matcher:GetChecked()
-		if (frame.salebox.matcher:IsEnabled() == 0) then
-			match = false
-		end
-		if curModel == "fixed" then
-			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
-			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
-			if match and AucAdvanced.API.GetBestMatch(frame.salebox.link, newBuy) then
-				local _
-				local BidPercent = newBid/newBuy
-				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, newBuy)
-				newBid = newBuy * BidPercent
-			end
-		elseif curModel == "market" then
-			if match and AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel) then
-				local _
-				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
-			else
-				newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
-			end
-		else
-			if match and AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel) then
-				local _
-				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
-			else
-				newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
-			end
-		end
-
-		if curModel ~= "fixed" then
-			if not newBuy or newBuy <= 0 then
-				frame.salebox.warn:SetText(_TRANS('APPR_Interface_NoPriceAvailable'):format(curModel))--No %s price available!
-				MoneyInputFrame_ResetMoney(frame.salebox.bid)
-				MoneyInputFrame_ResetMoney(frame.salebox.buy)
-				frame.salebox.bid.modelvalue = 0
-				frame.salebox.buy.modelvalue = 0
-				return
-			end
-
-			if newBuy and not newBid then
-				local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-				local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-				local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-				if (deposit) then
-					local rate = AucAdvanced.depositRate or 0.05
-					local newfaction
-					if rate == .25 then newfaction = "neutral" end
-					deposit = GetDepositCost(frame.salebox.link, 12, newfaction)
-				end
-				if not deposit then
-					deposit = 0
-				end
-
-				-- Scale up for duration > 12 hours
-				if deposit > 0 then
-					local curDurationIdx = frame.salebox.duration:GetValue()
-					local duration = private.durations[curDurationIdx][1]
-					deposit = deposit * duration/720
-				end
-
-				markdown = newBuy * markdown
-
-				newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-			end
-
-			if GetSellValue and AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then
-				local vendor = (GetSellValue(frame.salebox.link) or 0)
-				if vendor and vendor>0 then
-					vendor = math.ceil(vendor / (1 - (AucAdvanced.cutRate or 0.05)))
-					if newBid < vendor then
-						newBid = vendor
-					end
-				end
-			end
-
-			if newBid and (not newBuy or newBid > newBuy) then
-				newBuy = newBid
-			end
-
-		end
-
-		newBid = math.floor((newBid or 0) + 0.5)
-		newBuy = math.floor((newBuy or 0) + 0.5)
-
-		MoneyInputFrame_ResetMoney(frame.salebox.bid)
-		MoneyInputFrame_ResetMoney(frame.salebox.buy)
-		MoneyInputFrame_SetCopper(frame.salebox.bid, newBid)
-		MoneyInputFrame_SetCopper(frame.salebox.buy, newBuy)
-		frame.valuecache.bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
-		frame.valuecache.buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
-		frame.salebox.bid.modelvalue = newBid
-		frame.salebox.buy.modelvalue = newBuy
-	end
-	--]]
 
 	function frame.InitControls()
 		frame.valuecache = {}
@@ -614,7 +503,7 @@ function private.CreateFrames()
 
 		local ignore = AucAdvanced.Settings.GetSetting("util.appraiser.item."..frame.salebox.sig..".ignore") or false
 		frame.salebox.ignore:SetChecked(ignore)
-		frame.valuecache.bulk = frame.salebox.ignore:GetChecked()
+		frame.valuecache.ignore = frame.salebox.ignore:GetChecked()
 
 		local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bulk") or false
 		frame.salebox.bulk:SetChecked(curBulk)
@@ -2587,7 +2476,7 @@ function private.CreateFrames()
 	})
 
 	frame.imageview.sheet:EnableSelect(true)
-	
+
 	frame.imageview.purchase = CreateFrame("Frame", nil, frame.imageview)
 	frame.imageview.purchase:SetPoint("TOPLEFT", frame.imageview, "BOTTOMLEFT", 0, 4)
 	frame.imageview.purchase:SetPoint("BOTTOMRIGHT", frame.imageview, "BOTTOMRIGHT", 0, -16)
@@ -2628,7 +2517,7 @@ function private.CreateFrames()
 	frame.ScanTab:SetText(_TRANS('APPR_Interface_Appraiser') )--Appraiser
 	frame.ScanTab:Show()
 	PanelTemplates_DeselectTab(frame.ScanTab)
-	
+
 	if get("util.appraiser.displayauctiontab") then
 		AucAdvanced.AddTab(frame.ScanTab, frame)
 	end
