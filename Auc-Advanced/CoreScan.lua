@@ -591,6 +591,13 @@ function lib.GetScanData(serverKey, reserved)
 	return AucScanData.scans[realmName][faction], idList
 end
 
+function lib.GetScanStats(serverKey)
+	local scandata = lib.GetScanData(serverKey or GetFaction())
+	if scandata then
+		return scandata.scanstats
+	end
+end
+
 
 private.scandataIndex = {}
 private.prevQuery = {}

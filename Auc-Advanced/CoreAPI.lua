@@ -418,6 +418,11 @@ function lib.UnpackImageItem(item)
 	return AucAdvanced.Scan.UnpackImageItem(item)
 end
 
+-- scanStats = AucAdvanced.API.GetScanStats(serverKey)
+-- Timestamps: scanstats.LastScan, scanstats.LastFullScan, scanstats.ImageUpdated
+-- Scan statistics tables: scanstats[0] (last scan), scanstats[1], scanstats[2] (two scans prior to last scan)
+lib.GetScanStats = AucAdvanced.Scan.GetScanStats
+
 function lib.ListUpdate()
 	if lib.IsBlocked() then return end
 	AucAdvanced.SendProcessorMessage("listupdate")
