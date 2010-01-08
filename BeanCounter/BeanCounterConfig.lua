@@ -107,6 +107,8 @@ private.settingDefaults = {
 	["util.beancounter.debugSearch"] = true,
 
 	["util.beacounter.invoicetime"] = 5,
+	["util.beacounter.headertime"] = 0,
+	
 	["util.beancounter.mailrecolor"] = "off",
 	["util.beancounter.externalSearch"] = true,
 
@@ -401,10 +403,11 @@ function lib.MakeGuiConfig()
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "sendSearchBrowseFrame", _BC('C_SendToSearch')) --Add BeanCounter's searched item to the Main Auction House Window?
 	gui:AddTip(id, _BC('TT_SendToSearch')) --"When entering a search in BeanCounter it will also add the string to the AH browse frame.
-
+	
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 20, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
-
+	
 	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
 	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
@@ -485,5 +488,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugAPI", "API")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugSearch", "Search")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugTidyUp", "TidyUp")
+	
+	gui:AddControl(id, "Subhead",    0,    "Possible Mail crash Fixer.")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "****Do not use unless you have crashes When you are checking the mailbox****")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "Can greatly slow things down if turned up too high")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.headertime",    0, 100, 5, _BC('Mail Header Delay Time = %d/100th seconds'))
+	gui:AddTip(id, _BC('This is how fast we will request mail from the server. If you experiance crashes when checking the mail box increase the slider.'))
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "***********************************")
 
 end

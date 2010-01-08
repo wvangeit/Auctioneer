@@ -39,6 +39,7 @@ local tonumber,tostring,format = tonumber,tostring,format
 local tinsert,tremove = tinsert,tremove
 local strsplit = strsplit
 local time = time
+local GetTime = GetTime
 local floor = floor
 
 local function debugPrint(...)
@@ -66,9 +67,12 @@ local reportTotalMail, reportAHMail, reportReadMail, reportAlreadyReadMail = 0, 
 
 local registeredAltaholicHook = false
 local registeredInboxFrameHook = false
+local Refreshed = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
-		private.updateInboxStart()
+
+		Refreshed = true --used to restart the coroutine if we get new mail.
+		private.coroutineResume()
 
 	elseif (event == "MAIL_SHOW") then
 		--Since Altoholic has an option to read mail this is a workaround for it. We call our read function before
@@ -94,45 +98,85 @@ function private.mailMonitor(event,arg1)
 	end
 end
 
---Mailbox Snapshots
-local HideMailGUI
-function private.updateInboxStart()
-	reportTotalMail = GetInboxNumItems()
-	for n = 1,GetInboxNumItems() do
-		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
-			local auctionHouse --A, H, N flag for which AH the trxn came from
-			if sender ==_BC('MailAllianceAuctionHouse') then
-				auctionHouse = "A"
-			elseif sender == _BC('MailHordeAuctionHouse') then
-				auctionHouse = "H"
-			elseif sender == _BC('MailNeutralAuctionHouse') then
-				auctionHouse = "N"
+
+private.lastCheckedMail = GetTime()
+function private.coroutineResume()
+	local status, result
+	if coroutine.status(private.processInboxCO) ~= "dead" then
+		if GetTime() > private.lastCheckedMail + (get("util.beacounter.headertime")/100) then
+			--print("resumed on updated Co")
+			status, result = coroutine.resume(private.processInboxCO)
+			if not status and result then
+				print("Error occurred in coroutine: "..result, nil, debugstack())
 			end
-			if auctionHouse then
-				reportAHMail = reportAHMail + 1
-				HideMailGUI = true
-				wasRead = wasRead or 0 --its nil unless its has been read
-				local itemLink = GetInboxItemLink(n, 1)
-				local _, _, stack, _, _ = GetInboxItem(n)
-				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
-				tinsert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft,
-						["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout,
-						["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
-						})
-				GetInboxText(n) --read message
-			end
-			reportReadMail = reportReadMail + 1
+		end
+	else
+		if Refreshed then
+			--print("created on update Co", Refreshed)
+			private.processInboxCO = coroutine.create(private.updateInboxStart)
+			coroutine.resume(private.processInboxCO)
 		end
 	end
-	if HideMailGUI == true then
+end
+--Mailbox Snapshots
+function private.updateInboxStart()
+	if not Refreshed then print("TERMINATE") return end --dont process unless we have opened teh mail and the inbox is ready
+
+	reportTotalMail = GetInboxNumItems()
+	for n = 1,GetInboxNumItems() do
+			private.lastCheckedMail = GetTime()
+			local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
+			if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+				local auctionHouse --A, H, N flag for which AH the trxn came from
+				if sender ==_BC('MailAllianceAuctionHouse') then
+					auctionHouse = "A"
+				elseif sender == _BC('MailHordeAuctionHouse') then
+					auctionHouse = "H"
+				elseif sender == _BC('MailNeutralAuctionHouse') then
+					auctionHouse = "N"
+				end
+				if auctionHouse then
+					reportAHMail = reportAHMail + 1
+					private.HideMailGUI(true)
+					wasRead = wasRead or 0 --its nil unless its has been read
+					local itemLink = GetInboxItemLink(n, 1)
+					local _, _, stack, _, _ = GetInboxItem(n)
+					local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
+					tinsert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft,
+							["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout,
+							["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
+							})
+					GetInboxText(n) --read message
+				end
+				reportReadMail = reportReadMail + 1
+			end
+		--print(n)
+		coroutine.yield()
+	end
+	Refreshed = nil
+	private.mailBoxColorStart()
+end
+--inbox check coroutine
+private.processInboxCO = coroutine.create(private.updateInboxStart)
+
+--New function to hide/unhide mail GUI. Needed for coroutine
+local HideMailGUI
+function private.HideMailGUI( hide )
+	if hide then
+		HideMailGUI = true
 		InboxCloseButton:Hide()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
 		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
+	else
+		HideMailGUI = false
+		InboxCloseButton:Show()
+		InboxFrame:Show()
+		MailFrameTab2:Show()
+		private.MailGUI:Hide()
+		private.sumDatabase() --Sum total fo DB for the display on browse pane
 	end
-	private.mailBoxColorStart()
 end
 
 function private.getInvoice(n, sender, subject)
@@ -152,8 +196,10 @@ function private.getInvoice(n, sender, subject)
 end
 
 function private.mailonUpdate()
-local count = 1
-local total = #private.inboxStart
+	private.coroutineResume() --check mail read coroutine and restart if necessary
+
+	local count = 1
+	local total = #private.inboxStart
 	for i, data in pairs(private.inboxStart) do
 		--update mail GUI Count
 		if count <= total then
@@ -185,14 +231,10 @@ local total = #private.inboxStart
 			tbl["invoiceType"], tbl["itemName"], tbl["Seller/buyer"], tbl['bid'], tbl["buyout"] , tbl["deposit"] , tbl["fee"], tbl["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
 		end
 	end
-	if (#private.inboxStart == 0) and (HideMailGUI == true) then
+	if (#private.inboxStart == 0) and (HideMailGUI == true) and (private.lastCheckedMail + 2 < GetTime() ) then --time delay added to prevent possible flicker
 		debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
 		reportTotalMail, reportAHMail, reportReadMail = 0, 0, 0
-		InboxCloseButton:Show()
-		InboxFrame:Show()
-		MailFrameTab2:Show()
-		private.MailGUI:Hide()
-		HideMailGUI = false
+		private.HideMailGUI( false )
 		private.mailBoxColorStart() --delay recolor system till we have had a chance to read the mail
 	end
 
@@ -250,7 +292,7 @@ function private.matchDB(text)
 			return itemID, itemLink
 		end
 	end
-	debugPrint("Searching DB for ItemID..", key, text, "Failed Item does not exist in the name array")
+	debugPrint("Searching DB for ItemID..", text, "Failed Item does not exist in the name array")
 	return nil
 end
 
@@ -269,7 +311,7 @@ function private.sortCompletedAuctions( i )
 				private.databaseAdd("completedAuctionsNeutral", itemLink, nil, value)
 			end
 		else
-			debugPrint("Failure for completedAuctions", itemID, itemLink, value, "index", private.reconcilePending[i].n)
+			debugPrint("Failure for completedAuctions", itemID, itemLink, "index", private.reconcilePending[i].n)
 		end
 	end
 	tremove(private.reconcilePending, i)
@@ -357,7 +399,7 @@ function private.sortCompletedBidsBuyouts( i )
 	local reason = private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
-		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
+		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], "", private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
 			private.databaseAdd("completedBidsBuyouts", private.reconcilePending[i]["itemLink"], nil, value)
 		else
@@ -365,14 +407,14 @@ function private.sortCompletedBidsBuyouts( i )
 		end
 		--debugPrint("databaseAdd completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"])
 	else
-		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
+		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
 	end
 
 	tremove(private.reconcilePending,i)
 end
 --Used only to clear postedBid entries so failed bids is less likely to miss
 function private.findCompletedBids(itemID, seller, bid, itemLink)
-	local buy, bid = tonumber(buy),tonumber(bid)
+	local bid = tonumber(bid)
 	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
 	--debugPrint("Starting search to remove posted Bid")
 	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
@@ -404,7 +446,7 @@ function private.sortFailedBids( i )
 		end
 		--debugPrint("databaseAdd failedBids", itemID, itemLink, value)
 	else
-		debugPrint("Failure for failedBids", itemID, itemLink, value, "index", private.reconcilePending[i].n)
+		debugPrint("Failure for failedBids", itemID, itemLink, "index", private.reconcilePending[i].n)
 	end
 	tremove(private.reconcilePending,i)
 end
