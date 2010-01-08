@@ -474,9 +474,17 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
+	
+	gui:AddControl(id, "Subhead",    0,    "Possible Mail crash Fixer.")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "****Do not use unless you have crashes When you are checking the mailbox****")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "Can greatly slow things down if turned up too high")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.headertime",    0, 100, 5, _BC('Mail Header Delay Time = %d/100th seconds'))
+	gui:AddTip(id, _BC('This is how fast we will request mail from the server. If you experiance crashes when checking the mail box increase the slider.'))
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "***********************************")
+	
 	gui:AddControl(id, "Subhead",    0,    "Reports From Specific Modules")
 
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging text. Dont check unless asked to do so")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugMail", "Mail")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugCore", "Core")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugConfig", "Config")
@@ -488,12 +496,6 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugAPI", "API")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugSearch", "Search")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugTidyUp", "TidyUp")
-	
-	gui:AddControl(id, "Subhead",    0,    "Possible Mail crash Fixer.")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "****Do not use unless you have crashes When you are checking the mailbox****")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "Can greatly slow things down if turned up too high")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.headertime",    0, 100, 5, _BC('Mail Header Delay Time = %d/100th seconds'))
-	gui:AddTip(id, _BC('This is how fast we will request mail from the server. If you experiance crashes when checking the mail box increase the slider.'))
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "***********************************")
+		
 
 end
