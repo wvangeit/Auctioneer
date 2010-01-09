@@ -70,9 +70,8 @@ local registeredInboxFrameHook = false
 local Refreshed = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
-
-		Refreshed = true --used to restart the coroutine if we get new mail.
-		private.coroutineResume()
+		private.updateInboxStart()
+		
 
 	elseif (event == "MAIL_SHOW") then
 		--Since Altoholic has an option to read mail this is a workaround for it. We call our read function before
@@ -98,6 +97,10 @@ function private.mailMonitor(event,arg1)
 	end
 end
 
+function private.updateInboxStart()
+	Refreshed = true --used to restart the coroutine if we get new mail.
+	private.coroutineResume()
+end
 
 private.lastCheckedMail = GetTime()
 function private.coroutineResume()
@@ -113,13 +116,13 @@ function private.coroutineResume()
 	else
 		if Refreshed then
 			--print("created on update Co", Refreshed)
-			private.processInboxCO = coroutine.create(private.updateInboxStart)
+			private.processInboxCO = coroutine.create(private.updateInbox)
 			coroutine.resume(private.processInboxCO)
 		end
 	end
 end
 --Mailbox Snapshots
-function private.updateInboxStart()
+function private.updateInbox()
 	if not Refreshed then print("TERMINATE") return end --dont process unless we have opened teh mail and the inbox is ready
 
 	reportTotalMail = GetInboxNumItems()
@@ -157,7 +160,7 @@ function private.updateInboxStart()
 	private.mailBoxColorStart()
 end
 --inbox check coroutine
-private.processInboxCO = coroutine.create(private.updateInboxStart)
+private.processInboxCO = coroutine.create(private.updateInbox)
 
 --New function to hide/unhide mail GUI. Needed for coroutine
 local HideMailGUI
