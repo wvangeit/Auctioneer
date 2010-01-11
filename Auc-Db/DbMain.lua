@@ -171,7 +171,7 @@ function lib.GetPriceArray(hyperlink)
 	local designation, portal, realm, faction = RealmDesignation()
 	faction = faction:lower()
 	
-	local sig = ("%d:%d:%d"):format(item, suffix, factor)
+	local sig = ("%d:%d"):format(item, suffix)
 	if (result.sig == sig) then return result end
 
 	local prefer = get('aucdb.prefer')
@@ -182,13 +182,13 @@ function lib.GetPriceArray(hyperlink)
 	result.sig=sig
 
 	local base = lib.Base
-	local lots,min,avg,max,std
+	local lots,min,avg,max,std,q1,q2,q3,iqr,iqm,mod
 	for i,r in ipairs({"realm", "global"}) do
 		for j,f in ipairs({"alliance", "horde", "neutral"}) do
 			for k,t in ipairs({"bid", "buy"}) do
 				lots,min,avg,max,std = 0,0,0,0,0
 				if base[r] and base[r][f] and base[r][f][t] and base[r][f][t][sig] then
-					lots,min,avg,max,std = strsplit(":", base[r][f][t][sig])
+					lots,min,avg,max,std,q1,q2,q3,iqr,iqm,mod = strsplit(":", base[r][f][t][sig])
 				end
 				
 				result[r..f..t.."seen"]=tonumber(lots) or 0
@@ -196,6 +196,12 @@ function lib.GetPriceArray(hyperlink)
 				result[r..f..t.."average"]=tonumber(avg)
 				result[r..f..t.."maximum"]=tonumber(max)
 				result[r..f..t.."deviation"]=tonumber(std)
+				result[r..f..t.."quartile1"]=tonumber(q1)
+				result[r..f..t.."quartile2"]=tonumber(q2)
+				result[r..f..t.."quartile3"]=tonumber(q3)
+				result[r..f..t.."interquartilerange"]=tonumber(iqr)
+				result[r..f..t.."interquartilemean"]=tonumber(iqm)
+				result[r..f..t.."mode"]=tonumber(mod)
 			end
 		end
 	end
