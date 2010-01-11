@@ -7,7 +7,7 @@
 ## Dependencies: Auc-Advanced
 ## SavedVariables: AucDbData
 ##
-## X-Revision: 121
+## X-Revision: 122
 ## URL: http://auctioneerdb.com/
 ## Author: Norganna's AddOns
 ##
