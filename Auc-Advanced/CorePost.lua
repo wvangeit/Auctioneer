@@ -38,12 +38,11 @@
 	This code helps modules that need to post things to do so in an extremely easy and
 	queueable fashion.
 
-	This code takes "sigs" as input to most of it's functions. A "sig" is simply a string that is a
-	colon seperated concatenation of itemId, suffixId, suffixFactor, enchantId and seedId.
-	A sig may be shortened by truncating trailing 0's in order to save storage space. Any missing
-	values at the end will be set to zero when the sig is decoded.
-	Also a zero seedId is special in that it will match all items regardless of seed, but a non-zero
-	seedId will only match an item with exactly the same seedId.
+	This code takes "sigs" as input to most of it's functions. A "sig" is a string containing
+	a colon seperated concatenation of itemId:suffixId:suffixFactor:enchantId
+	A sig must be shortened by truncating trailing 0's - this is required for equality testing
+	Any missing values at the end will be set to zero when the sig is decoded
+	The function AucAdvanced.API.GetSigFromLink(link) may be used to construct a valid sig
 ]]
 if not AucAdvanced then return end
 
@@ -65,49 +64,6 @@ local ScanTip
 local ScanTip2
 local ScanTip3
 
---[[
-    Errors that may be "thrown" by the below functions.
-
-	Note: We throw errors in the below functions instead of returning
-	so that we can return all the way out of the function stack up to
-	the controlling functions.
-
-	When you call a function that is capable of throwing an error, you
-	should do so using a pcall() and capture the success status and
-	deal with any errors that are thrown.
-]]
-local ERROR_NOITEM = "ItemId is empty"
-local ERROR_NOLOCAL = "Item is unknown"
-local ERROR_NOBLANK = "Requires a free bag slot that can hold a new stack of this item for posting"
-local ERROR_MAXSIZE = "Item cannot be stacked that high"
-local ERROR_AHCLOSED = "Auctionhouse is not open"
-local ERROR_NOTFOUND = "Item was not found in inventory"
-local ERROR_NOTENOUGH = "Not enough of item available"
-local ERROR_FAILRETRY = "Posting failed too many times"
-local ERROR_FAILTIMEOUT = "Timed out while waiting for posted item to clear from bags"
-
-local ConstErrors = {
-	ERROR_NOITEM = ERROR_NOITEM,
-	[ERROR_NOITEM] = "ERROR_NOITEM",
-	ERROR_NOLOCAL = ERROR_NOLOCAL,
-	[ERROR_NOLOCAL] = "ERROR_NOLOCAL",
-	ERROR_NOBLANK = ERROR_NOBLANK,
-	[ERROR_NOBLANK] = "ERROR_NOBLANK",
-	ERROR_MAXSIZE = ERROR_MAXSIZE,
-	[ERROR_MAXSIZE] = "ERROR_MAXSIZE",
-	ERROR_AHCLOSED = ERROR_AHCLOSED,
-	[ERROR_AHCLOSED] = "ERROR_AHCLOSED",
-	ERROR_NOTFOUND = ERROR_NOTFOUND,
-	[ERROR_NOTFOUND] = "ERROR_NOTFOUND",
-	ERROR_NOTENOUGH = ERROR_NOTENOUGH,
-	[ERROR_NOTENOUGH] = "ERROR_NOTENOUGH",
-	ERROR_FAILRETRY = ERROR_FAILRETRY,
-	[ERROR_FAILRETRY] = "ERROR_FAILRETRY",
-	ERROR_FAILTIMEOUT = ERROR_FAILTIMEOUT,
-	[ERROR_FAILTIMEOUT] = "ERROR_FAILTIMEOUT",
-}
-lib.Const = ConstErrors
-
 local BindTypes = {
 	[ITEM_SOULBOUND] = "Bound",
 	[ITEM_BIND_QUEST] = "Quest",
@@ -117,7 +73,7 @@ local BindTypes = {
 	[ITEM_BIND_TO_ACCOUNT] = "Accountbound",
 }
 
--- in OnLoad: auto-replace values with translations based on table key: "ADV_Help_PostError"..key - e.g. "ADV_Help_PostErrorBound"
+-- todo: in OnLoad auto-replace values with translations based on table key: "ADV_Help_PostError"..key - e.g. "ADV_Help_PostErrorBound"
 -- Some of these errors are only of use when debugging, so should probably not be translated. i.e. the "InvalidX" codes
 local ErrorText = {
 	Bound = "Cannot auction a Soulbound item",
@@ -135,6 +91,9 @@ local ErrorText = {
 	MaxSize = "Item cannot be stacked that high",
 	NotFound = "Item was not found in inventory",
 	NotEnough = "Not enough of item available",
+	NoBlank = "Requires a free bag slot that can hold a new stack of this item for posting",
+	FailRetry = "Posting failed too many times",
+	FailTimeout = "Timed out while waiting for posted item to clear from bags",
 }
 lib.ErrorText = ErrorText
 
@@ -284,6 +243,10 @@ end
 
 	This is the main entry point to the Post library for other AddOns, so has the strictest parameter checking
 	"multiple" is optional, defaulting to 1. All other parameters are required.
+
+	If successful it returns a table of post request ids; the id will be included in the "postresult" Processor message for each request
+	If a problem is detected it returns nil, reason
+		reason is an internal short text code; it can be converted to a displayable text message using lib.ErrorCodes[reason]
 ]]
 function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	local id = DecodeSig(sig)
@@ -350,8 +313,8 @@ end
     IsAuctionable(bag, slot)
     Returns:
 		true : if the item is possibly auctionable.
-		false, errorcode : if the item is not auctionable
-			errorcode will be an internal (non-localized) string code, use lib.ErrorText[errorcode] for a printable text string
+		false, reason : if the item is not auctionable
+			reason is an internal (non-localized) string code, use lib.ErrorText[errorcode] for a printable text string
 
     This function does not check everything, but if it says no,
     then the item is definately not auctionable.
@@ -486,10 +449,10 @@ function private.FindMatchesInBags(matchId, matchSuffix, matchFactor, matchEncha
 end
 
 --[[
-    FindOrMakeStack(sig, size)
-      Returns: bag, slot
-      Throws: ERROR_NOITEM, ERROR_NOLOCAL, ERROR_MAXSIZE, ERROR_NOTFOUND,
-	          ERROR_NOTENOUGH, ERROR_NOBLANK
+    PRIVATE: FindOrMakeStack(sig, size)
+      Returns: bag, slot ~ if successful
+	  Returns: nil, reason ~ if there are any errors
+	  Returns: nil, nil ~ if waiting for an event
 
       If it is possible to make a stack of the specified size, with items
       of the specified sig, this function will combine or split items to
@@ -532,10 +495,10 @@ function private.FindOrMakeStack(sig, size)
 
 	local itemId, suffix, factor, enchant, seed = DecodeSig(sig)
 	local _,link,_,_,_,_,_, maxSize = GetItemInfo(itemId)
-	if not link then return error(ERROR_NOLOCAL) end
+	if not link then return nil, "UnknownItem" end
 
 	if size > maxSize then
-		return error(ERROR_MAXSIZE)
+		return nil, "MaxSize"
 	end
 
 	local matches, total, blankBag, blankSlot, _, locked = private.FindMatchesInBags(itemId, suffix, factor, enchant, seed)
@@ -545,11 +508,11 @@ function private.FindOrMakeStack(sig, size)
 	end
 
 	if #matches == 0 then
-		return error(ERROR_NOTFOUND)
+		return nil, "NotFound"
 	end
 
 	if total < size then
-		return error(ERROR_NOTENOUGH)
+		return nil, "NotEnough"
 	end
 
 	-- Try to find a stack that's exactly the right size
@@ -568,7 +531,7 @@ function private.FindOrMakeStack(sig, size)
 		-- We will need to split it
 		if not blankBag then
 			-- Dang, no slots to split stuff into
-			return error(ERROR_NOBLANK)
+			return nil, "NoBlank"
 		end
 
 		SplitContainerItem(matches[1][1], matches[1][2], size)
@@ -617,8 +580,8 @@ end
 ]]
 local LAG_ADJUST = (3 / 1000)
 local POST_TIMEOUT = 6 -- seconds general timeout
-local POST_ERROR_PAUSE = 1 -- seconds pause after error
-local POST_THROTTLE = 0.1 -- time before starting to post the next item in the queue
+local POST_ERROR_PAUSE = 1 -- seconds pause after error before trying next request
+local POST_THROTTLE = 0 -- time before starting to post the next item in the queue
 function private.ProcessPosts(source)
 	if lib.GetQueueLen() <= 0 or not (AuctionFrame and AuctionFrame:IsVisible()) then
 		private.Wait() -- put timer to sleep
@@ -642,48 +605,37 @@ function private.ProcessPosts(source)
 		elseif GetTime() > request[REQ_TIMEOUT] then
 			-- Can't auction this item!
 			local _, itemCount = GetContainerItemInfo(request[REQ_BAG], request[REQ_SLOT])
-			local msg = ("Unable to confirm auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILTIMEOUT)
+			local msg = ("Unable to confirm auction for %s x%d: %s"):format(link, itemCount, ErrorText["FailTimeout"])
 			debugPrint(msg, "CorePost", "Posting timeout", "Warning")
 			private.QueueRemove()
 			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, ERROR_FAILTIMEOUT)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, "FailTimeout")
 			message(msg)
 		end
 		return
 	end
 
-	local success, bag, slot = pcall(private.FindOrMakeStack, request[REQ_SIG], request[REQ_COUNT])
-	if not success then
-		local err = bag:match(": (.*)")
+	local bag, slot = private.FindOrMakeStack(request[REQ_SIG], request[REQ_COUNT])
+	if not bag and slot then
+		local err = slot
 		local link, name = AucAdvanced.API.GetLinkFromSig(request[REQ_SIG])
-		local msg
-		if ConstErrors[err] then -- Check for our own special "errors"
-			private.Wait(POST_ERROR_PAUSE)
-			if err == ERROR_NOBLANK then -- special case
-				private.Wait(0)
-				if not request[REQ_FLAGNOSPACE] then
-					request[REQ_FLAGNOSPACE] = true
-					if private.QueueReorder() then
-						return
-					end
+		private.Wait(POST_ERROR_PAUSE)
+		if err == "NoBlank" then -- special case
+			private.Wait(0)
+			if not request[REQ_FLAGNOSPACE] then
+				request[REQ_FLAGNOSPACE] = true
+				if private.QueueReorder() then
+					return
 				end
 			end
-			msg = ("Aborting post request for %s x%d: %s"):format(link, request[REQ_COUNT], err)
-			debugPrint(msg, "CorePost", "Post request aborted", "Warning")
-			private.QueueRemove()
-			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, err)
-			message(msg)
-		else -- Unexpected (probably real) error
-			msg = ("Error during post request for %s x%d: %s"):format(link, request[REQ_COUNT], bag)
-			debugPrint(msg, "CorePost", "Unexpected error", "Error")
-			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, bag)
-			error(msg)
 		end
+		local msg = ("Aborting post request for %s x%d: %s"):format(link, request[REQ_COUNT], ErrorText[err])
+		debugPrint(msg, "CorePost", "Post request aborted", "Warning")
+		private.QueueRemove()
+		AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, err)
+		message(msg)
 		return
 	end
-
 	if bag then
 		local failed = request[REQ_FLAGPOSTFAIL]
 		if failed and GetTime() < request[REQ_TIMEOUT] then
@@ -700,11 +652,11 @@ function private.ProcessPosts(source)
 			if failed then
 				-- Auction posting has failed twice - abort this request
 				local _, itemCount = GetContainerItemInfo(bag,slot)
-				local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ERROR_FAILRETRY)
+				local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ErrorText["FailRetry"])
 				debugPrint(msg, "CorePost", "Posting Failure", "Warning")
 				private.QueueRemove()
 				private.Wait(POST_ERROR_PAUSE)
-				AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, ERROR_FAILRETRY)
+				AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, "FailRetry")
 				message(msg)
 				return
 			else
@@ -750,6 +702,15 @@ function private.Wait(delay)
 	end
 end
 
+private.updateFrame = CreateFrame("frame", nil, UIParent)
+private.updateFrame:Hide()
+private.updateFrame:SetScript("OnUpdate", function(obj, delay)
+	obj.timer = obj.timer - delay
+	if obj.timer <= 0 then
+		private.ProcessPosts("timer") -- obj.timer will be updated by ProcessPosts
+	end
+end)
+
 function lib.Processor(event, ...)
 	if event == "inventory" then
 		if private.updateFrame.timer then
@@ -780,20 +741,11 @@ function lib.OnLoad(addon)
 			local transkey = "ADV_Help_PostError"..code
 			local transtext = _TRANS(transkey)
 			if transtext ~= transkey then -- _TRANS returns transkey if there is no available translation
-				ErrorText = transtext
+				ErrorText[code] = transtext
 			end
 		end
 	end
 end
-
-private.updateFrame = CreateFrame("frame", nil, UIParent)
-private.updateFrame:Hide()
-private.updateFrame:SetScript("OnUpdate", function(obj, delay)
-	obj.timer = obj.timer - delay
-	if obj.timer <= 0 then
-		private.ProcessPosts("timer") -- obj.timer will be updated by ProcessPosts
-	end
-end)
 
 -- Local tooltip for getting soulbound line from tooltip contents
 ScanTip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
