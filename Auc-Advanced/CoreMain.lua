@@ -236,7 +236,7 @@ function private.OnLoad(addon)
 	end
 
 	-- Notify all processors that an auctioneer addon has loaded
-	if (auc == "auc" and sys and eng) or (addon == "auc-advanced") then
+	if auc == "auc" and sys and #sys > 0 then -- identifys names in both "auc-name" and "auc-system-name" formats
 		AucAdvanced.SendProcessorMessage("load", addon)
 	end
 end
@@ -251,12 +251,10 @@ end
 private.Schedule = {}
 function private.OnEvent(self, event, arg1, arg2, ...)
 	if (event == "ADDON_LOADED") then
-		local addon = string.lower(arg1)
-		if (addon:sub(1,4) == "auc-") then
-			private.OnLoad(addon)
-		end
-	--used as an alternative to "ADDON_LOADED", to delay loading scandata. as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event
-	elseif (event == "PLAYER_LOGIN") then 
+		private.OnLoad(arg1)
+	elseif (event == "PLAYER_LOGIN") then
+		-- (used as an alternative to "ADDON_LOADED", to delay loading scandata.
+		-- as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event)
 		-- Check to see if we need to load scandata
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
 			AucAdvanced.Scan.GetImage()
