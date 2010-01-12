@@ -739,12 +739,6 @@ end
 
 private.CommitQueue = {}
 
-private.CommitQueueScan = {}
-private.CommitQueueQuery = {}
-private.CommitQueuewasIncomplete = {}
-private.CommitQueuewasGetAll = {}
-
-
 local CommitRunning = false
 Commitfunction = function()
 	local speed = AucAdvanced.Settings.GetSetting("scancommit.speed")/100
@@ -1127,7 +1121,7 @@ Commitfunction = function()
 	end
 end
 
-local CoCommit = coroutine.create(Commitfunction)
+local CoCommit
 
 local function CoroutineResume(...)
 	local status, result = coroutine.resume(...)
@@ -1137,27 +1131,26 @@ local function CoroutineResume(...)
 	return status, result
 end
 
-
 function private.Commit(wasIncomplete, wasGetAll)
 	if not private.curScan then return end
-	local Queuelength = #private.CommitQueue
-	private.CommitQueue[Queuelength + 1] = {}
-	private.CommitQueue[Queuelength + 1]["Query"], private.curQuery = private.curQuery, private.CommitQueue[Queuelength + 1]["Query"]
-	private.CommitQueue[Queuelength + 1]["Scan"], private.curScan = private.curScan, private.CommitQueue[Queuelength + 1]["Scan"]
-	private.CommitQueue[Queuelength + 1]["wasIncomplete"] = wasIncomplete
-	private.CommitQueue[Queuelength + 1]["wasGetAll"] = wasGetAll
-	private.CommitQueue[Queuelength + 1]["scanStarted"] = private.scanStarted
-	private.CommitQueue[Queuelength + 1]["scanStartTime"] = private.scanStartTime
-	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
-	private["curQuery"] = nil
-	private["curScan"] = nil
+	tinsert(private.CommitQueue, {
+		Query = private.curQuery,
+		Scan = private.curScan,
+		wasIncomplete = wasIncomplete,
+		wasGetAll = wasGetAll,
+		scanStarted = private.scanStarted,
+		scanStartTime = private.scanStartTime,
+		totalPaused = private.totalPaused,
+	})
 
-	if coroutine.status(CoCommit) ~= "dead" then
-		CoroutineResume(CoCommit)
-	else
+	private.curQuery = nil
+	private.curScan = nil
+
+	if not CoCommit or coroutine.status(CoCommit) == "dead" then
 		CoCommit = coroutine.create(Commitfunction)
 		CoroutineResume(CoCommit)
 	end
+	-- in all other cases wait for the next update to resume CoCommit
 end
 
 function private.QuerySent(query, isSearch, ...)
@@ -1268,7 +1261,7 @@ function lib.GetAuctionItem(list, i)
 		]]
 		local timeLeft = GetAuctionItemTimeLeft(list, i)
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
-		local invType = Const.InvTypes[itemEquipLoc]
+		local invType = Const.EquipEncode[itemEquipLoc]
 		buyoutPrice = buyoutPrice or 0
 		minBid = minBid or 0
 
@@ -1739,12 +1732,17 @@ end
 private.unexpectedClose = false
 local flipb, flopb = false, false
 function private.OnUpdate(me, dur)
-	if coroutine.status(CoCommit) == "suspended" then
-		CoroutineResume(CoCommit)
-	else
-		if #private.CommitQueue > 0 then
-			CoCommit = coroutine.create(Commitfunction)
+	if CoCommit then
+		local costat = coroutine.status(CoCommit)
+		if costat == "suspended" then
 			CoroutineResume(CoCommit)
+		elseif costat == "dead" then
+			if #private.CommitQueue > 0 then
+				CoCommit = coroutine.create(Commitfunction)
+				CoroutineResume(CoCommit)
+			else
+				CoCommit = nil
+			end
 		end
 	end
 	local now = GetTime()
