@@ -311,6 +311,10 @@ BeanCounterLocalizations = {
 		["TT_OpacityLevel"]	= "This controls the level of opacity for the colored bars in the BeanCounter search window (if enabled)";
 		["TT_sendtosearch"]	= "When entering a search in BeanCounter it will also add the string to the AH browse frame.";
 
+		-- Section: Interface
+		["Cancelled"]	= "Cancelled";
+		["UiAucCancelled"]	= "Auc Cancelled";
+
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
@@ -717,6 +721,7 @@ BeanCounterLocalizations = {
 		["Q_MailRecolor"]	= "우편에 다시 색입히기 방법이란?";
 
 		-- Section: HelpTooltip
+		["TTDataExpireEnabled"]	= "선택된 시간보다 오래된 데이터가 삭제됩니다";
 		["TT_neutralCheck"]	= "중립 경매장 결과도 보기";
 
 		-- Section: Mail
@@ -1285,6 +1290,7 @@ BeanCounterLocalizations = {
 		["TT_MaxDisplayedResults"]	= "這將控制有多少數量的結果會顯示在卷軸框架上。";
 		["TT_neutralCheck"]	= "顯示中立的黑水灣拍賣場的結果";
 		["TT_OpacityLevel"]	= "這將控制 BeanCounter 搜尋窗中的色彩條的不透明度程度(如果已啟用的話)";
+		["TT_sendtosearch"]	= "當於 BeanCounter 中輸入一個搜尋字串名稱時這也會將該字串名稱加入拍賣場瀏覽頁面上。";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "聯盟拍賣場";
@@ -1345,6 +1351,7 @@ BeanCounterLocalizations = {
 		["UiPricePerHeader"]	= "價格標題";
 		["UiPurchases"]	= "購買";
 		["UiQuantityHeader"]	= "數量";
+		["UiReason"]	= "原因";
 		["UiSales"]	= "銷售";
 		["UiSearch"]	= "搜尋";
 		["UiSearchForLabel"]	= "搜尋";
