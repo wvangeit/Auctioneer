@@ -105,7 +105,8 @@ end
 private.lastCheckedMail = GetTime()
 function private.coroutineResume()
 	local status, result
-	if coroutine.status(private.processInboxCO) ~= "dead" then
+	--if coroutine.status(private.processInboxCO) ~= "dead" then
+	if coroutine.status(private.processInboxCO) == "suspended" then
 		if GetTime() > private.lastCheckedMail + (get("util.beacounter.headertime")/100) then
 			--print("resumed on updated Co")
 			status, result = coroutine.resume(private.processInboxCO)
@@ -113,7 +114,7 @@ function private.coroutineResume()
 				print("Error occurred in coroutine: "..result, nil, debugstack())
 			end
 		end
-	else
+	elseif coroutine.status(private.processInboxCO) == "dead" then
 		if Refreshed then
 			--print("created on update Co", Refreshed)
 			private.processInboxCO = coroutine.create(private.updateInbox)
