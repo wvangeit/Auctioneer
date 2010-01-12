@@ -273,14 +273,20 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	end
 
 	local name, _, count, _, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
-	local price = minBid
-	if curBid and curBid > 0 then
+	local price
+	if curBid > 0 then
 		price = curBid + minInc
+		if buyout > 0 and price > buyout then
+			price = buyout
+		end
+	elseif minBid > 0 then
+		price = minBid
 	else
-		curBid = 0
+		price = 1
 	end
 	local timeleft = GetAuctionItemTimeLeft("list", id)
 	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
+	iEquip = Const.EquipEncode[iEquip]
 	local _, itemid, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
 	local ItemTable = {}
 	-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
