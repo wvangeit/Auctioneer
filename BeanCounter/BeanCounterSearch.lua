@@ -290,6 +290,8 @@ local  function styleColors(database) --helper takes formated data table and loo
 		return 1, 1, 0
 	elseif database == _BC('UiOutbid') then
 		return 1, 1, 1
+	else --return default
+		return  1, .5, .1
 	end
 end
 function private.styleServerData(data)
@@ -357,6 +359,8 @@ end
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
+			local status =_BC('UiAucExpired')
+			if uReason == _BC('Cancelled') then status = _BC('UiAucCancelled') end --if its a cancel rather than true expired auction
 			
 			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
@@ -364,7 +368,7 @@ end
 
 			return {
 				itemLink, --itemname
-				_BC('UiAucExpired'), --status
+				status,
 
 				tonumber(uBid) or 0, --bid
 				tonumber(uBuyout) or 0, --buyout

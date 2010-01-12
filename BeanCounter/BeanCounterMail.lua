@@ -267,9 +267,8 @@ function private.mailSort()
 				private.sortFailedBids( i )
 
 			elseif private.reconcilePending[i].subject:match(cancelledLocale) then
-				--Need to add a filter to remove/record canceled
-				tremove(private.reconcilePending,i)
-
+				private.sortCancelledAuctions( i )
+	
 			elseif private.reconcilePending[i].subject:match(salePendingLocale) then
 				--ignore We dont care about this message
 				tremove(private.reconcilePending,i)
@@ -397,6 +396,50 @@ function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, e
 	end
 end
 
+--Cancled auctions are stored and treated as failed auctions with just cancelled added as the reason tag
+function private.sortCancelledAuctions( i )	
+	local itemID =  lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
+	if itemID then
+		local stack, bid, buyout, deposit = private.findStackCancelledAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
+		if stack then
+			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], _BC('Cancelled'), private.reconcilePending[i]["auctionHouse"])
+			if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
+				private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
+				--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
+			else
+				private.databaseAdd("failedAuctionsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+			end
+		else
+			debugPrint("Failure for cancelledAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
+		end
+	end
+	tremove(private.reconcilePending, i, private.reconcilePending[i]["itemLink"])
+end
+--find stack, bid and buy info for Cancelledauctions
+function private.findStackCancelledAuctions(key, itemID, itemLink, returnedStack, expiredTime)
+	if not private.playerData[key][itemID] then return end --if no keys present abort
+	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
+ 	for i,v in pairs (private.playerData[key][itemID]) do
+		if i:match(itemString) or i == itemString then --we still stack check and data range check but match should be assured by now
+ 			for index, text in pairs(v) do
+				if not text:match(".*USED.*") then
+					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
+					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
+						local timeAuctionPosted, timeCancelledAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Earrliest time we could have posted the auction
+						if (timeAuctionPosted - 7200) > (timeCancelledAuctionStarted) then --cancelled auctions could have just been posted so no way to age check beyond oldest possible
+							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
+							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Cancelled"
+							--debugPrint("postedAuction removed as Cancelled", itemID, itemLink )
+							return postStack, postBid, postBuy, postDeposit
+						end
+					end
+				
+				end
+ 			end
+		end
+	end
+end
+
  --No need to reconcile, all needed data has been provided in the invoice We do need to clear entries so outbid has less to wade through
 function private.sortCompletedBidsBuyouts( i )
 	local itemID = lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
@@ -471,7 +514,6 @@ function private.findFailedBids(itemID, itemLink, gold)
 			end
 		end
 	end
-
 end
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 local inboxHookMessage = false --Stops spam of the message.
