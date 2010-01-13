@@ -334,6 +334,7 @@ BeanCounterLocalizations = {
 		["TTValidateDatabase"]	= "This will scan Beancounter's Data and attempt to correct any errors it may find. Use if you are getting errors on search.";
 		["TT_AuctionCheck"]	= "Display items sold at the Auction House.";
 		["TT_AuctionFailedCheck"]	= "Display items you failed to sell.";
+		["TT_BeanCounterAHTab"]	= "Right click to display BeanCounter in a external window.";
 		["TT_BeanCounterSelectBox"]	= "Filter search results by server, player or faction.";
 		["TT_BidCheck"]	= "Display items bought from the Auction House.";
 		["TT_BidFailedCheck"]	= "Display items you were outbid on";

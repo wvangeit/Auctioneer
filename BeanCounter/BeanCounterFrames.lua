@@ -48,6 +48,9 @@ function private.AuctionUI()
 	--Create the TAB
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("BeanCounter")
+	frame.ScanTab:SetScript("OnEnter", function() private.buttonTooltips( frame.ScanTab, _BC('TT_BeanCounterAHTab')) end) -- Right click to display BeanCounter in a external window.
+	frame.ScanTab:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	frame.ScanTab:RegisterForClicks("LeftButtonUp" , "RightButtonUp")
 	frame.ScanTab:Show()
 	PanelTemplates_DeselectTab(frame.ScanTab)
 
@@ -56,10 +59,19 @@ function private.AuctionUI()
 	else
 		private.AddTab(frame.ScanTab, frame)
 	end
-
+	local last = 1
 	function frame.ScanTab.OnClick(self, button, index)
 		if not index then index = self:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
+		
+		if button == "RightButton" and tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter" then
+			local tab = getglobal("AuctionFrameTab"..last)
+			tab:Click() --use this so we stay on users currently selected tab
+			private.displayGUI(  )
+			return
+		end
+		last = index
+		
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
 			--Modified Textures
 			AuctionFrameTopLeft:SetTexture("Interface\\AddOns\\BeanCounter\\Textures\\BC-TopLeft")
@@ -487,9 +499,9 @@ function private.CreateFrames()
 	})
 
 	frame.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
-	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -3, 0)
-	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
+	frame.resultlist:SetPoint("TOPLEFT", frame, "TOPLEFT", 187, -32.5) --change anchors to allow for vert resize
+	frame.resultlist:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -3, 0)
+	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 35)
 
 	--Scripts that are executed when we mouse over a TOOLTIP frame
 	function private.scrollSheetOnEnter(button, row, index)
