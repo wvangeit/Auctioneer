@@ -598,6 +598,20 @@ function lib.GetScanStats(serverKey)
 	end
 end
 
+function lib.GetImageCopy(serverKey)
+	-- Create a fully independent copy of the image - intended for use by coroutines
+	local scandata = lib.GetScanData(serverKey or GetFaction())
+	if scandata then
+		local image = scandata.image
+		local size = Const.LASTENTRY
+		local copy = {}
+		for i = 1, #image do
+			tinsert(copy, {unpack(image[i], 1, size)})
+		end
+		return copy
+	end
+end
+
 
 private.scandataIndex = {}
 private.prevQuery = {}
