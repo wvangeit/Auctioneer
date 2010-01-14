@@ -335,7 +335,7 @@ function private.CreateFrames()
 			local scanstats = AucAdvanced.API.GetScanStats()
 			if scanstats then
 				seen = scanstats.LastFullScan
-				seentext = _TRANS("APPR_Interface_NotInScan")..". " --Not seen in current scan
+				seentext = _TRANS("APPR_Interface_NotInScan")..".  " --Not seen in current scan
 			end
 		end
 		if not seen then seen = 0 end
