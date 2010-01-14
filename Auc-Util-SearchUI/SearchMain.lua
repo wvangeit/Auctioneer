@@ -1880,7 +1880,8 @@ local PerformSearch = function()
 	end
 	gui:ClearFocus()
 	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
-	local scandata = replicate((AucAdvanced.Scan.GetScanData()))
+	local image = AucAdvanced.Scan.GetImageCopy()
+	local imagesize = #image
 	local speed = lib.GetSetting("processpriority") or 50
 	speed = (speed / 100)^2.5
 	local processingTime = speed * 0.1 + 0.02
@@ -1903,9 +1904,9 @@ local PerformSearch = function()
 	private.isSearching = true
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
-	for i, data in ipairs(scandata.image) do
+	for i, data in ipairs(image) do
 		if GetTime() > nextPause then
-			gui.frame.progressbar:SetValue((i/#scandata.image)*1000)
+			gui.frame.progressbar:SetValue((i/imagesize)*1000)
 
 			coroutine.yield()
 
