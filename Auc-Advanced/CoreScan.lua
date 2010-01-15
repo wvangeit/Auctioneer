@@ -523,30 +523,29 @@ end
 
 local idLists = {}
 function private.BuildIDList(scandata, serverKey)
-	if (idLists[serverKey]) then return idLists[serverKey] end
-	idLists[serverKey] = {}
 	local idList = idLists[serverKey]
-
-	local id
-	for i = 1, #scandata.image do
-		id = scandata.image[i][Const.ID]
-		tinsert(idList, id)
+	if idList then return idList end
+	idList = {}
+	idLists[serverKey] = idList
+	local image = scandata.image
+	for i = 1, #image do
+		tinsert(idList, image[i][Const.ID])
 	end
 	table.sort(idList)
+	if not idList[1] then idList[1] = 0 end
 	return idList
 end
 
 function private.GetNextID(idList)
-	local first = idList[1]
+	local nextId = idList[1] + 1
 	local second = idList[2]
-	while first and second and second == first + 1 do
-		first = second
+	while second == nextId do
+		nextId = second + 1
 		tremove(idList, 1)
 		second = idList[2]
 	end
-	first = (first or 0) + 1 --Normalize it, since it will be nil if theres nothing in the tables.
-	idList[1] = first
-	return first
+	idList[1] = nextId
+	return nextId
 end
 
 function lib.GetScanData(serverKey, reserved)
@@ -575,20 +574,32 @@ function lib.GetScanData(serverKey, reserved)
 	else
 		serverKey, realmName, faction = GetFaction()
 	end
+
 	local AucScanData = private.LoadAuctionImage()
-	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
-	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, time=time()} end
-	if type(AucScanData.scans[realmName][faction].image) == "string" then
-		if AucAdvanced.Modules.Util.ScanData then
-			AucAdvanced.Modules.Util.ScanData.Unpack(realmName)
-		else -- unknown/corrupted?
-			AucScanData.scans[realmName][faction].image = {}
-		end
+	local realmdata = AucScanData.scans[realmName]
+	if not realmdata then
+		realmdata = {}
+		AucScanData.scans[realmName] = realmdata
 	end
-	if not AucScanData.scans[realmName][faction].image then AucScanData.scans[realmName][faction].image = {} end
-	if AucScanData.scans[realmName][faction].nextID then AucScanData.scans[realmName][faction].nextID = nil end
-	local idList = private.BuildIDList(AucScanData.scans[realmName][faction], serverKey)
-	return AucScanData.scans[realmName][faction], idList
+	local scandata = realmdata[faction]
+	if scandata then
+		if not scandata.scanstats then
+			scandata.scanstats = {ImageUpdated = scandata.time or time()}
+		end
+		if type(scandata.image) == "string" then
+			if AucAdvanced.Modules.Util.ScanData and AucAdvanced.Modules.Util.ScanData.Unpack then
+				AucAdvanced.Modules.Util.ScanData.Unpack(realmName)
+			else -- unknown/corrupted?
+				scandata.image = {}
+				scandata.scanstats.ImageUpdated = time()
+			end
+		end
+	else
+		scandata = {image = {}, scanstats = {ImageUpdated = time()}, time=time()}
+		realmdata[faction] = scandata
+	end
+	scandata.nextID = nil -- delete obsolete entry
+	return scandata
 end
 
 function lib.GetScanStats(serverKey)
@@ -636,14 +647,16 @@ local weaktablemeta = {__mode="kv"}
 function private.SubImageCache(itemId, serverKey)
 	local indexResults = private.scandataIndex[serverKey]
 	if not indexResults then
+		if not AucAdvanced.SplitServerKey(serverKey) then return end -- valid serverKey format?
 		indexResults = setmetatable({}, weaktablemeta) -- use weak tables for other serverKeys
 		private.scandataIndex[serverKey] = indexResults
 	end
 
 	local itemResults = indexResults[itemId]
 	if not itemResults then
+		local scandata = lib.GetScanData(serverKey)
+		if not scandata then return end
 		itemResults = {}
-		local scandata = AucAdvanced.Scan.GetScanData(serverKey)
 		for pos, data in ipairs(scandata.image) do
 			if data[Const.ITEMID] == itemId then
 				tinsert(itemResults, data)
@@ -694,8 +707,11 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 		image = private.SubImageCache(query.itemId, serverKey)
 	else
 		local scandata = lib.GetScanData(serverKey)
-		image = scandata.image
+		if scandata then
+			image = scandata.image
+		end
 	end
+	if not image then return queryResults end -- return empty results table
 
 	local saneQueryLink
 	if query.link then
@@ -778,7 +794,9 @@ Commitfunction = function()
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
-	local scandata, idList = lib.GetScanData(serverKey)
+	local scandata = lib.GetScanData(serverKey)
+	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
+	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
@@ -2039,8 +2057,10 @@ end
 
 function lib.Logout()
 	private.Commit(true, false)
-	while coroutine.status(CoCommit) == "suspended" do
-		CoroutineResume(CoCommit)
+	if CoCommit then
+		while coroutine.status(CoCommit) == "suspended" do
+			CoroutineResume(CoCommit)
+		end
 	end
 end
 
