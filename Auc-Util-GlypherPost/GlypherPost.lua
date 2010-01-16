@@ -124,7 +124,7 @@ end
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName)
-    frame = gui.tabs[id].content
+    local frame = gui.tabs[id].content
     private.gui = gui
     private.id = id
     private.frame = frame
@@ -163,7 +163,7 @@ function private.SetupConfigGui(gui)
     --gui:AddControl(id, "MoneyFramePinned", 0.5, 1, "util.glypherpost.fixed.buy", 0, 101010, "Buy Each")
     --gui:AddTip(id, "Fixed buy amount. You should probably leave this blank.")
 
-	last = gui:GetLast(id)
+	local last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox", 0, 1, "util.glypherpost.numberonly", "Only")
 	gui:AddTip(id, "Have a maximum of the number of stacks selected on the auctionhouse at any time.")
 	gui:SetLast(id,last)
@@ -187,7 +187,7 @@ function private.SetupConfigGui(gui)
     --end
 
 
-	last = gui:GetLast(id)
+	local last = gui:GetLast(id)
 	gui:AddControl(id, "Slider", 0, 1, "util.glypherpost.duration", 1, 3, 1, "Duration: %s hours", private.durationFormat)
 	gui:AddTip(id, "The number of hours to post for.")
 	gui:SetLast(id,last)
@@ -283,6 +283,9 @@ function private.hoursFormat()
 	end
 	return format
 end	
+
+local coPG 
+local onupdateframe
 
 function private.postGlyphs()
     if (not coPG) or (coroutine.status(coPG) == "dead") then
