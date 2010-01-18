@@ -1177,6 +1177,7 @@ function private.Commit(wasIncomplete, wasGetAll)
 
 	private.curQuery = nil
 	private.curScan = nil
+	private.isScanning = false
 
 	if not CoCommit or coroutine.status(CoCommit) == "dead" then
 		CoCommit = coroutine.create(Commitfunction)
@@ -1456,7 +1457,6 @@ StorePageFunction = function()
 
 	if private.isScanning then
 		if isGetAll and (#(private.curScan) >= totalAuctions - 100) then
-			private.isScanning = false
 			private.Commit(false, true)
 		elseif (page+1 < maxPages) then
 			private.ScanPage(page + 1)
@@ -1465,7 +1465,6 @@ StorePageFunction = function()
 			if (#(private.curScan) < totalAuctions - 10) then -- we just got scan size above, so they should be close.
 				incomplete = true
 			end
-			private.isScanning = false
 			private.Commit(incomplete, false)
 		end
 	elseif isGetAll and (#(private.curScan) > totalAuctions - 100) then
