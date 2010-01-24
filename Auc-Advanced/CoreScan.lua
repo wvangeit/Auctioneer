@@ -328,6 +328,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		private.isScanning = true
+		private.isNoSummary = NoSummary
 		local startPage = 0
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
@@ -342,6 +343,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		if (NoSummary) then
 			private.curQuery.qryinfo.nosummary = true
 		end
+		private.isNoSummary = false
 
 		--Show the progress indicator
 		private.UpdateScanProgress(true, nil, nil, nil, nil, nil, private.curQuery)
@@ -847,7 +849,7 @@ Commitfunction = function()
 		end
 	end
 
-
+	
 	--[[ *** Stage 2: Merge new scan into ScanData *** ]]
 	lib.ProgressBars(CommitProgressBar, 100*progresscounter/progresstotal, true, "AucAdv: Starting Stage 2") -- change displayed text for reporting purposes
 	processStats("begin")
@@ -1001,17 +1003,20 @@ Commitfunction = function()
 	scanTimeMins = mod(scanTimeMins, 60)
 
 	--Hides the end of scan summary if user is not interested
-	local printSummary
+	local printSummary, scanSize = false, ""
+	scanSize = TempcurQuery.qryinfo.scanSize
+	if scanSize=="Full" then
+		printSummary = private.getOption("scandata.summaryonfull");
+	elseif scanSize=="Partial" then
+		printSummary = private.getOption("scandata.summaryonpartial")
+	else -- scanSize=="Micro"
+		printSummary = private.getOption("scandata.summaryonmicro")
+	end
 	if (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
-	elseif wasUnrestricted then
-		printSummary = private.getOption("scandata.summaryonfull");
-	elseif (TempcurQuery.name and TempcurQuery.class and TempcurQuery.subclass and TempcurQuery.quality) then
-		printSummary = private.getOption("scandata.summaryonmicro")
-	else
-		printSummary = private.getOption("scandata.summaryonpartial")
+		scanSize = "NoSum-"..scansize
 	end
-
+	
 	if (nLog or printSummary) then
 		local scanTime = " "
 		local summaryLine
@@ -1151,6 +1156,7 @@ Commitfunction = function()
 	if not private.curQuery then
 		private.ResetAll()
 	end
+	AucAdvanced.SendProcessorMessage("scanfinish", scanSize, TempcurQuery.qryinfo.sig, TempcurQuery.qryinfo, not wasIncomplete)
 end
 
 local CoCommit
@@ -1621,6 +1627,18 @@ function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classInde
 	-- store the current return value - this will be used throughout processing to avoid problems
 	qryinfo.serverKey = GetFaction()
 
+	local scanSize = false, ""
+	if ((not query.class) and (not query.subclass) and (not query.minUseLevel)
+			and (not query.maxUseLevel)
+			and (not query.name) and (not query.isUsable) 
+			and (not query.invType) and (not query.quality)) then
+		qryinfo.scanSize = "Full"
+	elseif (query.name and query.class and query.subclass and query.quality) then
+		qryinfo.scanSize = "Micro"
+	else
+		qryinfo.scanSize = "Partial"
+	end
+
 	return query
 end
 
@@ -1734,12 +1752,21 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.scanStarted = GetTime()
 		private.totalPaused = 0
 		private.curQuery = query
+	end
+
+	page = tonumber(page) or 0
+	if (page==0) then
+		local scanSize = query.qryinfo.scanSize
+		if (query.qryinfo.NoSummary) then
+			scanSize = "NoSum-"..scansize
+		end
+		AucAdvanced.SendProcessorMessage("scanstart", scanSize, query.qryinfo.sig, query)
 		if (nLog) then
 			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending new query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 		end
 	end
+	
 
-	page = tonumber(page) or 0
 	private.sentQuery = true
 	lib.lastReq = GetTime()
 

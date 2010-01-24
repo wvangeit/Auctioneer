@@ -338,6 +338,14 @@ end
 -- If test is false, the error message will be written to nLog and the user's
 -- default chat channel.
 --
+-- Brings the Level parameter into the auctioneer API fold.
+AucAdvanced.Debug.Level = DebugLib.Level
+
+-------------------------------------------------------------------------------
+-- Used to make sure that conditions are met within functions.
+-- If test is false, the error message will be written to nLog and the user's
+-- default chat channel.
+--
 -- syntax:
 --    assertion = assert(test, message)
 --

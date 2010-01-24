@@ -665,8 +665,12 @@ end
 
 function lib.SendProcessorMessage(...)
 	local modules = AucAdvanced.GetAllModules("Processor")
+	local good, msg
 	for pos, engineLib in ipairs(modules) do
-		engineLib.Processor(...)
+		good,msg=pcall(engineLib.Processor, ...)
+		if not good then
+			lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error", 0, "Debug")
+		end
 	end
 end
 
