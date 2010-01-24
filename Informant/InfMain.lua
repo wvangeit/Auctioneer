@@ -404,10 +404,10 @@ local function getInformantVendorInfo(id)
 	else
 		isLimited = false
 	end
-	itemCost = tonumber(itemData.buy)
-	toSell = tonumber(itemData.sell)
-	buyStack = tonumber(itemData.quantity)
-	maxStack = tonumber(itemData.stack)
+	itemCost = tonumber(itemData.buy) or 0
+	toSell = tonumber(itemData.sell) or 0
+	buyStack = tonumber(itemData.quantity) or 1
+	maxStack = tonumber(itemData.stack) or 1
 	return isVendored,isLimited,itemCost,toSell,buyStack,maxStack
 end
 
@@ -573,7 +573,7 @@ local function showItem(itemInfo)
 			end
 		end
 
-		if (itemInfo.stack > 1) then
+		if (itemInfo.stack and itemInfo.stack > 1) then
 			addLine(_TRANS('INF_Tooltip_StackSize'):format(itemInfo.stack))
 		end
 
