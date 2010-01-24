@@ -327,6 +327,7 @@ function private.play()
 		AucAdvanced.Scan.SetPaused(false)
 	elseif not AucAdvanced.Scan.IsScanning() then
 		if #queue == 0 then queue = private.checkedFrames() end --check for user selected frames
+		debugPrint(("play: queue count=%i"):format(#queue), "ScanButton", "play", 0, "Debug")
 		if #queue > 0  then
 			if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("Starting search on filter: |CFFFFFF00", CLASS_FILTERS[queue[1]]) end
 			AucAdvanced.Scan.StartScan("", "", "", nil, queue[1], nil, nil, nil)
@@ -335,7 +336,7 @@ function private.play()
 				queueFinished = true --Used to clear the selected filters/highlights AFTER the last queued scan has completed
 			end
 		else
-			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
+			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex, nil, nil, nil)
 		end
 	end
 	private.UpdateScanProgress()
@@ -387,12 +388,13 @@ function private.checkedFrames()
 			table.insert(queue, v[2])
 		end
 	end
+
 	return queue
 end
 
 function private.CreateSecondaryFilterButtons()
 local base, frame, prev = AuctionFrameBrowse, nil, nil
-private.AuctionFrameFilters_ClearSelection() --create the filter selection table
+	private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 	for i = 1,15 do
 		frame = "AuctioneerFilterButton"..i
 		prev = "AuctioneerFilterButton"..(i - 1)
@@ -404,7 +406,15 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 			base[frame]:SetAlpha(0)
 			base[frame]:SetScript("OnClick", function()
 									if IsControlKeyDown() then
-										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] then
+-- Test patch to clear AH settings when CTRL click is used just like we clear ours when non-ctrl is used
+if (AuctionFrameBrowse.selectedClassIndex) then
+	AuctionFrameBrowse.selectedClass = nil
+	AuctionFrameBrowse.selectedClassIndex = nil
+	AuctionFrameBrowse.selectedSubclass = nil
+	AuctionFrameBrowse.selectedSubclassIndex = nil
+	AuctionFrameFilters_Update()
+end
+ 										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] then
 											if  private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] == 1 then
 												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 0
 												 _G["AuctionFilterButton"..i]:UnlockHighlight()
@@ -414,8 +424,8 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											end
 										end
 									else
-										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i])
 										private.AuctionFrameFilters_ClearSelection()
+										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i])
 									end
 								end)
 		else
@@ -427,6 +437,14 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 			base[frame]:SetAlpha(0)
 			base[frame]:SetScript("OnClick", function()
 									if IsControlKeyDown() then
+-- Test patch to clear AH settings when CTRL click is used just like we clear ours when non-ctrl is used
+if (AuctionFrameBrowse.selectedClassIndex) then
+	AuctionFrameBrowse.selectedClass = nil
+	AuctionFrameBrowse.selectedClassIndex = nil
+	AuctionFrameBrowse.selectedSubclass = nil
+	AuctionFrameBrowse.selectedSubclassIndex = nil
+	AuctionFrameFilters_Update()
+end
 										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()] then
 											if  private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] == 1 then
 												private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] = 0
@@ -437,8 +455,8 @@ private.AuctionFrameFilters_ClearSelection() --create the filter selection table
 											end
 										end
 									else
-										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i])
 										private.AuctionFrameFilters_ClearSelection()
+										AuctionFrameFilter_OnClick(_G["AuctionFilterButton"..i])
 									end
 								end)
 		end
@@ -456,9 +474,9 @@ function private.AuctionFrameFilters_UpdateClasses()
 		button = _G["AuctioneerFilterButton"..i]
 
 		if ( getn(OPEN_FILTER_LIST) > NUM_FILTERS_TO_DISPLAY ) then
-			button:SetWidth(136)
+			button:SetWidth(126)
 		else
-			button:SetWidth(156)
+			button:SetWidth(126)
 		end
 		index = index + 1
 		if ( index <= getn(OPEN_FILTER_LIST) ) then
