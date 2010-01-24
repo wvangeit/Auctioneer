@@ -54,7 +54,9 @@ end
 
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
-private.scanProgressFormat = "Auctioneer: %s\nScanning page %d of %d (%.1f%% complete)\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
+--private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
+private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
+
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	--Check that we're enabled before passing on the callback
 	if not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")
@@ -134,12 +136,15 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 
 	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)
 
-	local totalPages = totalAuctions / numAuctionsPerPage
-	if (totalPages - math.floor(totalPages) > 0) then
-		totalPages = math.ceil(totalPages)
-	else
-		totalPages = math.floor(totalPages)
+	local totalPages = math.ceil(totalAuctions / numAuctionsPerPage)
+	if (totalPages < 1) then
+		totalPages = 1
 	end
+--	if (totalPages - math.floor(totalPages) > 0) then
+--		totalPages = math.ceil(totalPages)
+--	else
+--		totalPages = math.floor(totalPages)
+--	end
 
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
@@ -156,6 +161,7 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 			totalPages,
 			((currentPage+1)/totalPages)*100,
 			auctionsScannedPerSecond,
+			totalAuctions,
 			scannedAuctions,
 			secondsToScanCompletion,
 			SecondsToTime(secondsElapsed)
