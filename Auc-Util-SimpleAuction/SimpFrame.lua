@@ -1238,7 +1238,7 @@ function private.CreateFrames()
 	frame.scanbutton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0)
 	frame.scanbutton:SetScript("OnClick", function()
 		if not AucAdvanced.Scan.IsScanning() then
-			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex, nil, nil, nil)
+			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex, AuctionFrameBrowse.selectedInvtypeIndex, nil, nil)
 		end
 	end)
 
