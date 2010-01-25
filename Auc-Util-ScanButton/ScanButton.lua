@@ -336,7 +336,7 @@ function private.play()
 				queueFinished = true --Used to clear the selected filters/highlights AFTER the last queued scan has completed
 			end
 		else
-			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex, nil, nil, nil)
+			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex, AuctionFrameBrowse.selectedInvtypeIndex, nil, nil)
 		end
 	end
 	private.UpdateScanProgress()
@@ -412,6 +412,8 @@ if (AuctionFrameBrowse.selectedClassIndex) then
 	AuctionFrameBrowse.selectedClassIndex = nil
 	AuctionFrameBrowse.selectedSubclass = nil
 	AuctionFrameBrowse.selectedSubclassIndex = nil
+	AuctionFrameBrowse.selectedInvtype = nil
+	AuctionFrameBrowse.selectedInvtypeIndex = nil
 	AuctionFrameFilters_Update()
 end
  										if private.Filters[ _G["AuctionFilterButton"..i]:GetText()][1] then
