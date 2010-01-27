@@ -1186,6 +1186,7 @@ local function CoroutineResume(...)
 end
 
 function private.Commit(wasIncomplete, wasGetAll)
+	private.StopStorePage()
 	if not private.curScan then return end
 	tinsert(private.CommitQueue, {
 		Query = private.curQuery,
@@ -1414,12 +1415,15 @@ local StorePageFunction = function()
 
 
 	local storecount = 0
-	if (page > curQuery.qryinfo.page) then
+	if not private.breakStorePage and (page > curQuery.qryinfo.page) then
 
 		for i = 1, numBatchAuctions do
 			if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 				lib.ProgressBars(GetAllProgressBar, 100*i/numBatchAuctions, true)
 				coroutine.yield()
+				if private.breakStorePage then
+					break
+				end
 			end
 
 			local itemData = lib.GetAuctionItem("list", i)
@@ -1472,7 +1476,7 @@ local StorePageFunction = function()
 	end
 
 	--Send a Processor event to modules letting them know we are done with the page
-	AucAdvanced.SendProcessorMessage("pagefinished", pageNumber)
+	AucAdvanced.SendProcessorMessage("pagefinished", page)
 
 	-- Clear GetAll changes made by StartScan
 	if private.isGetAll then -- in theory private.isGetAll should be true iff (local) isGetAll is true -- unless total auctions <=50 (e.g. on PTR)
@@ -1483,10 +1487,14 @@ local StorePageFunction = function()
 	end
 
 	-- Send the next page query or finish scanning
-	if private.isScanning then
-		if isGetAll and (#curScan >= totalAuctions - 100) then
-			private.Commit(false, true)
-		elseif (page+1 < maxPages) then
+	if isGetAll then
+		if not private.breakStorePage then
+			private.Commit((#curScan < totalAuctions - 100), true)
+			-- Clear the getall output. We don't want to create a new query so use the hook
+			private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
+		end
+	elseif private.isScanning then
+		if (page+1 < maxPages) then
 			private.ScanPage(page + 1)
 		else
 			local incomplete = false
@@ -1495,8 +1503,6 @@ local StorePageFunction = function()
 			end
 			private.Commit(incomplete, false)
 		end
-	elseif isGetAll and (#curScan > totalAuctions - 100) then
-		private.Commit(false, true)
 	elseif (maxPages == page+1) then
 		local incomplete = false
 		for i = 0, maxPages-1 do
@@ -1507,10 +1513,18 @@ local StorePageFunction = function()
 		end
 		private.Commit(incomplete, false)
 	end
-	if isGetAll then
-		isGetAll = false
-		-- Clear the getall output. We don't want to create a new query so use the hook
-		private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
+end
+
+function private.StopStorePage(silent)
+	if not CoStore or coroutine.status(CoStore) ~= "suspended" then return end
+	-- flag to break out of the loop, or prevent the loop being entered, within the coroutine
+	private.breakStorePage = true
+	while coroutine.status(CoStore) == "suspended" do
+		CoroutineResume(CoStore)
+	end
+	private.breakStorePage = nil
+	if not silent then
+		message("Warning: GetAll scan is incomplete because it was interrupted")
 	end
 end
 
@@ -1886,7 +1900,18 @@ end
 
 function lib.Interrupt()
 	if private.curQuery and not AuctionFrame:IsVisible() then
-		if private.isScanning then
+		if private.isGetAll then
+			-- GetAll cannot be pushed/popped so we have to commit here instead
+			private.Commit(true, true)
+			private.sentQuery = false
+			if private.isGetAll then
+				-- If the StorePage function didn't run, we need to cleanup here instead
+				lib.ProgressBars(GetAllProgressBar, nil, false)
+				BrowseSearchButton:Show()
+				AucAdvanced.API.BlockUpdate(false)
+				private.isGetAll = nil
+			end
+		elseif private.isScanning then
 			private.unexpectedClose = true
 			lib.PushScan()
 		else
@@ -1904,6 +1929,7 @@ function lib.Abort()
 end
 
 function private.ResetAll()
+	private.StopStorePage(true)
 	if private.isGetAll then
 		-- Fallback in case private.isGetAll and related actions were not cleared during processing
 		lib.ProgressBars(GetAllProgressBar, nil, false)
