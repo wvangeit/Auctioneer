@@ -55,7 +55,7 @@ end
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
 --private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
-private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
+private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d (%3.1f%%)\n\nElapsed scan time: %s\nEstimated time left: %s"
 
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	--Check that we're enabled before passing on the callback
@@ -157,14 +157,12 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 	BrowseNoResultsText:SetText(
 		private.scanProgressFormat:format(
 			"Scanning auctions.",
-			currentPage + 1,
-			totalPages,
-			((currentPage+1)/totalPages)*100,
+			currentPage + 1, totalPages,
 			auctionsScannedPerSecond,
 			totalAuctions,
-			scannedAuctions,
-			secondsToScanCompletion,
-			SecondsToTime(secondsElapsed)
+			scannedAuctions, ((currentPage+1)/totalPages)*100,
+			SecondsToTime(secondsElapsed),
+			secondsToScanCompletion			
 		)
 	)
 end
