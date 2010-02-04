@@ -323,13 +323,14 @@ end
 
 --To simplify having two seperate search routines, the Data creation of each table has been made a local function
 	function private.COMPLETEDAUCTIONS(id, itemKey, text)
-			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
 			
 			local pricePer = 0
 			local stack = tonumber(uStack) or 0
-			if stack > 0 then pricePer =  (uMoney - uDeposit + uFee)/stack end
+			local profit =  (uMoney - uDeposit + uFee)
+			if stack > 0 then pricePer =  profit/stack end
 			
 			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
 			local itemLink =  lib.API.createItemLinkFromArray(itemID..":"..suffix, uniqueID)
@@ -342,21 +343,23 @@ end
 
 				tonumber(uBid) or 0,  --bid
 				tonumber(uBuyout) or 0,  --buyout
-				tonumber(uMoney), --Profit,
+				tonumber(uMoney), --Net
 				tonumber(stack),  --stacksize
 				tonumber(pricePer), --Profit/per
-
+			
 				uSeller,  --seller/seller
 
 				tonumber(uDeposit), --deposit
 				tonumber(uFee), --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
+				tonumber(profit), --Profit
+				uMeta,
 			}
 	end
 	--STACK; BUY; BID; DEPOSIT; TIME; DATE; WEALTH
 	function private.FAILEDAUCTIONS(id, itemKey, text)
-			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
 			local status =_BC('UiAucExpired')
@@ -375,30 +378,40 @@ end
 				0, --money,
 				tonumber(uStack) or 0,
 				0, --Profit/per
-
+								
 				uSeller,  --seller/buyer
 
 				tonumber(uDeposit) or 0, --deposit
 				0, --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
+				0, --Profit
+				uMeta,
 			}
 	end
 	function private.COMPLETEDBIDSBUYOUTS(id, itemKey, text)
 			--local value = "stack"], "money"], p"fee"], buyout"], "bid"], p"Seller/buyer"], ["time"], reason)
 		
-			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
-			--print("S=", uStack, "M=",uMoney, "D=",uDeposit , "F=",uFee, "Buy=",uBuyout , "Bid=",uBid, "Sell=",uSeller, "T=",uTime, "R=",uReason)
-			
+			--replace reason with DE info
+			local mat, count, value = uMeta:match("DE:(%d-):(%d-):(%d-)|")
+			if mat and count and value then
+				local _, link = GetItemInfo(mat)
+				uReason = link.." X "..count
+			end
+					
 			local pricePer, stack, text = 0, tonumber(uStack), _BC('UiWononBuyout')
+			local profit
 			--If the auction was won on bid change text, and adjust ProfitPer
 			if uBuyout ~= uBid then
 				text = _BC('UiWononBid')
-				if stack > 0 then pricePer = (uBid - uMoney + uFee)/stack end
+				profit = (uBid - uMoney + uFee)
+				if stack > 0 then pricePer = profit/stack end
 			else --Devide by BUY price if it was won on Buy
-				if stack > 0 then pricePer = (uBuyout - uMoney + uFee)/stack end
+				profit = (uBuyout - uMoney + uFee)
+				if stack > 0 then pricePer = profit/stack end
 			end
 
 			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
@@ -414,18 +427,20 @@ end
 				0, --money,
 				tonumber(stack),  --stacksize
 				tonumber(pricePer), --Profit/per
-
+	
 				uSeller,   --seller/buyer
 
 				tonumber(uDeposit), --deposit
 				tonumber(uFee), --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
+				tonumber(profit), --Profit/per
+				uMeta,
 			}
 	end
 	function private.FAILEDBIDS(id, itemKey, text)
 			
-			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason = private.unpackString(text)
+			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
 			
@@ -442,12 +457,14 @@ end
 				tonumber(uMoney), --money,
 				tonumber(uStack), --stack
 				0, --Profit/per
-
+			
 				uSeller,  --seller/buyer
 
 				tonumber(uDeposit), --deposit
 				tonumber(uFee), --fee
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
+				0, --Profit/per
+				uMeta,
 			}
 	end

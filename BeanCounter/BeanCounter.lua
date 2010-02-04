@@ -148,14 +148,17 @@ function lib.OnLoad(addon)
 	private.scriptframe:RegisterEvent("MERCHANT_SHOW")
 	private.scriptframe:RegisterEvent("MERCHANT_UPDATE")
 	private.scriptframe:RegisterEvent("MERCHANT_CLOSED")
+	private.scriptframe:RegisterEvent("UNIT_SPELLCAST_SENT")
 
 	private.scriptframe:SetScript("OnUpdate", private.onUpdate)
 
 	-- Hook all the methods we need
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
 	--mail
-	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook);
-	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook);
+	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook)
+	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook)
+	Stubby.RegisterFunctionHook("GetInboxText", -100, private.PreGetInboxTextHook)
+
 	--Bids
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, private.postPlaceAuctionBidHook)
 	--Posting
@@ -246,6 +249,106 @@ end
 function private.onUpdate()
 	private.mailonUpdate()
 end
+--register/unregister extra events used during DE
+local inState = false --this is used to alllow monitoring of disenchants, bassed off of enchantrix by ccox
+function private.registerDisenchantEvents(on)
+	if on then
+		--clear our stored bag data
+		inState = true
+		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_INTERRUPTED" )
+		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_SUCCEEDED" )
+		private.scriptframe:RegisterEvent( "LOOT_OPENED" )
+		private.scriptframe:RegisterEvent( "BAG_UPDATE" )
+		private.scriptframe:RegisterEvent( "LOOT_CLOSED" )
+	else
+		inState = false
+		private.scriptframe:UnregisterEvent( "UNIT_SPELLCAST_INTERRUPTED" )
+		private.scriptframe:UnregisterEvent( "UNIT_SPELLCAST_SUCCEEDED" )
+		private.scriptframe:UnregisterEvent( "LOOT_OPENED" )
+		private.scriptframe:UnregisterEvent( "BAG_UPDATE" )
+		private.scriptframe:UnregisterEvent( "LOOT_CLOSED" )
+	end
+end
+--scan bags after second scan compare and find DE item
+function private.scanBags(scan, finish)
+	local tab = private.bag[scan]
+	
+	for bag = 0,4 do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local link = GetContainerItemLink(bag, slot) or "NIL"
+			tab[link] = true
+		end
+	end
+	
+	if finish then
+		local itemLink
+		for link in pairs(private.bag[1]) do
+			if not private.bag[2][link] then
+				itemLink = link
+				break
+			end
+		end
+		local deMat, quantity =	private.bag["link"],  private.bag["quantity"]
+		--use average sell price or fall back and use auctionner if possible
+		local settings = {["selectbox"] = {"1", "server"} ,["auction"] = true}
+		local data = lib.API.search(deMat, settings, true)
+		local profit, count = 0, 0
+		local days =  7*24*60*60 --one week
+		if data and #data > 0 then
+			for i = #data, 1, -1 do
+				count = count + 1
+				profit =  profit + data[i][7]
+				if data[i][12] < time() - days then
+					--print(i,data[i][7], date("%c", data[i][12]), count)
+					break
+				end
+			end
+			profit = floor(profit/count)
+		end
+		--fall back to auctioneer
+		if AucAdvanced and AucAdvanced.API.GetMarketValue and profit < 1 then
+			profit = AucAdvanced.API.GetMarketValue(deMat)
+		end
+		--convert to itemID
+		deMat = lib.API.decodeLink(deMat)
+		--print("We Disnechnated ", itemLink, " into ", deMat, quantity, profit)
+		local meta = string.join(":", "DE", deMat, quantity, profit)
+		meta = meta.."|"
+		private.attachMeta( itemLink, meta )
+	end
+end
+
+function private.attachMeta( itemLink, meta )
+	local itemString = lib.API.getItemString(itemLink)
+	local itemID, suffix = lib.API.decodeLink(itemLink)
+	
+	for  player, playerData in pairs(private.serverData) do
+		for DB, data in pairs(playerData) do
+			if   DB == "completedBidsBuyouts" or DB == "completedBidsBuyoutsNeutral" then
+				if data[itemID] and data[itemID][itemString] then
+					for i, text in pairs(data[itemID][itemString]) do
+						local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, REASON, META = private.unpackString(text)
+						if not META:match("DE:(.-):(.-):(.-)|") then --no DE Meta so add
+							if META == 0 then
+								META = meta
+							else
+								META = META.."|"..meta								
+							end
+							
+							local newText = private.packString(STACK, NET, DEPOSIT, FEE, BUY, BID, SELLERNAME, TIME, REASON, META)
+						
+							table.remove(data[itemID][itemString], i)
+							private.databaseAdd(DB, nil, itemString, newText)
+							--print(newText)
+							private.wipeSearchCache() --clear cached searches
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+end
 
 function private.onEvent(frame, event, arg, ...)
 	if (event == "PLAYER_MONEY") then
@@ -275,6 +378,42 @@ function private.onEvent(frame, event, arg, ...)
 		   private.scriptframe:UnregisterEvent("ADDON_LOADED")
 		end
 	end
+	
+	--DE event
+	local spell = ...
+	if event == "UNIT_SPELLCAST_SENT" and arg == "player" and spell == "Disenchant" then
+		print(event)
+		private.registerDisenchantEvents(true)
+	end
+	--dont process any following events if not DEing
+	if not inState then return end
+	if event == "UNIT_SPELLCAST_INTERRUPTED" then
+		print(event)
+		private.registerDisenchantEvents(false)
+	
+	elseif event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == "Disenchant" then
+		print(event)
+		private.bag = {{},{}}
+		private.scanBags(1)
+		
+	elseif event == "LOOT_OPENED" then --what did it DE into
+		print(event)
+		for slot = 1, GetNumLootItems() do
+			local link = GetLootSlotLink(slot)
+			local _, _, quantity = GetLootSlotInfo(slot)
+			private.bag["link"] = link
+			private.bag["quantity"] = quantity
+		end
+	
+	elseif event == "LOOT_CLOSED" then --looted DE mats items will be removed and we can find out what got DE'ed
+		print(event)
+		inState = "waiting on bag"
+	elseif event ==  "BAG_UPDATE" and inState == "waiting on bag" then
+		print(event)
+		private.scanBags(2, true)
+		private.registerDisenchantEvents(false)
+	end
+		
 end
 
 

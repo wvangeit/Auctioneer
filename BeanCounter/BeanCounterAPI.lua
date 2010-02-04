@@ -141,8 +141,17 @@ end
 If no player name is supplied then the entire server profit will be totaled
 if no item name is provided then all items will be returned
 if no date range is supplied then a sufficently large range to cover the entire BeanCounter History will be used.
+The meta data option mean s we will add in the estimated value from an items discenchant.
+This really only works when looking ONLY at the bid/buy datasets. When looking at sales as well you will end up with higher than expected profits
 ]]
-function lib.API.getAHProfit(player, item, lowDate, highDate)
+local function addDEValue(meta)
+	local mat, count, value = meta:match("DE:(%d-):(%d-):(%d-)|")
+	if mat and count and value then
+		return value*count
+	end
+	return 0
+end
+function lib.API.getAHProfit(player, item, lowDate, highDate, includeMeta)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 	
@@ -179,8 +188,14 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 				sum = sum - v[9] --subtract failed deposits
 			elseif v[2] == _BC('UiWononBid') then
 				sum = sum - v[3] --subtract bought items
+				if includeMeta then
+					sum = sum + addDEValue(v[14]) --meta data is the exact mats/count/and market value at time of de
+				end
 			elseif v[2] == _BC('UiWononBuyout') then
 				sum = sum - v[4]
+				if includeMeta then
+					sum = sum + addDEValue(v[14])
+				end
 			end
 		end
 	end
@@ -329,7 +344,7 @@ function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, s
 	
 	for  player, playerData in pairs(BeanCounterDB[server]) do
 		for DB, data in pairs(playerData) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
+			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutral" then
 				if data[itemID] and data[itemID][itemString] then
 					for i, text in pairs(data[itemID][itemString]) do
 						local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, CURRENTREASON, LOCATION = private.unpackString(text)
