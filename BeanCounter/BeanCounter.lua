@@ -253,8 +253,8 @@ end
 local inState = false --this is used to alllow monitoring of disenchants, bassed off of enchantrix by ccox
 function private.registerDisenchantEvents(on)
 	if on then
-		--clear our stored bag data
-		inState = true
+		--state could be waiting on the bag event. Even thou we have started a new DE cast.  So dont overwrite state unless its false
+		if not inState then inState = true end 
 		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_INTERRUPTED" )
 		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_SUCCEEDED" )
 		private.scriptframe:RegisterEvent( "LOOT_OPENED" )
@@ -382,22 +382,23 @@ function private.onEvent(frame, event, arg, ...)
 	--DE event
 	local spell = ...
 	if event == "UNIT_SPELLCAST_SENT" and arg == "player" and spell == "Disenchant" then
-		print(event)
+		--print(event, inState)
+		if inState then inState = "waiting on next" end --when another DE event is started before last finishes
 		private.registerDisenchantEvents(true)
 	end
 	--dont process any following events if not DEing
 	if not inState then return end
 	if event == "UNIT_SPELLCAST_INTERRUPTED" then
-		print(event)
+		--print(event, inState)
 		private.registerDisenchantEvents(false)
 	
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == "Disenchant" then
-		print(event)
+		--print(event, inState)
 		private.bag = {{},{}}
 		private.scanBags(1)
 		
 	elseif event == "LOOT_OPENED" then --what did it DE into
-		print(event)
+		--print(event, inState)
 		for slot = 1, GetNumLootItems() do
 			local link = GetLootSlotLink(slot)
 			local _, _, quantity = GetLootSlotInfo(slot)
@@ -406,12 +407,14 @@ function private.onEvent(frame, event, arg, ...)
 		end
 	
 	elseif event == "LOOT_CLOSED" then --looted DE mats items will be removed and we can find out what got DE'ed
-		print(event)
+		--print(event, inState)
 		inState = "waiting on bag"
-	elseif event ==  "BAG_UPDATE" and inState == "waiting on bag" then
-		print(event)
+	elseif event ==  "BAG_UPDATE" and (inState == "waiting on bag" or inState == "waiting on next") then
+		--print(event, inState)
 		private.scanBags(2, true)
-		private.registerDisenchantEvents(false)
+		if inState == "waiting on bag" then
+			private.registerDisenchantEvents(false)
+		end
 	end
 		
 end
