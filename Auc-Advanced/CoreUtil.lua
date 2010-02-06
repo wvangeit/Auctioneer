@@ -248,6 +248,7 @@ do
 	function lib.SplitServerKey(serverKey)
 		local split = splitcache[serverKey]
 		if not split then
+			if type(serverKey) ~= "string" then return end
 			local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")
 			local transfaction = localizedfactions[faction]
 			if not transfaction then return end
