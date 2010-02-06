@@ -543,14 +543,13 @@ local idLists = {}
 function private.BuildIDList(scandata, serverKey)
 	local idList = idLists[serverKey]
 	if idList then return idList end
-	idList = {}
+	idList = {0} -- dummy entry ensures that list is never empty and that counting starts from 1
 	idLists[serverKey] = idList
 	local image = scandata.image
 	for i = 1, #image do
 		tinsert(idList, image[i][Const.ID])
 	end
 	table.sort(idList)
-	if not idList[1] then idList[1] = 0 end
 	return idList
 end
 
