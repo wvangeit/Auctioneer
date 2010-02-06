@@ -391,7 +391,7 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 				deprecated = true
 				faction = serverKey
 			else
-				error("Invalid serverKey passed to GetScanData")
+				error("Invalid serverKey passed to AucAdvanced.API.QueryImage")
 			end
 			if reserved then
 				realmName = reserved
@@ -413,15 +413,19 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 end
 
 -- unpackedTable = AucAdvanced.API.UnpackImageItem(imageItem)
--- imageItem is one of the values in the table returned by QueryImage
+-- imageItem is one of the values (subtables) in the table returned by QueryImage or GetImageCopy
 function lib.UnpackImageItem(item)
 	return AucAdvanced.Scan.UnpackImageItem(item)
 end
 
--- scanStats = AucAdvanced.API.GetScanStats(serverKey)
+-- scanStatsTable = AucAdvanced.API.GetScanStats(serverKey)
 -- Timestamps: scanstats.LastScan, scanstats.LastFullScan, scanstats.ImageUpdated
--- Scan statistics tables: scanstats[0] (last scan), scanstats[1], scanstats[2] (two scans prior to last scan)
+-- Scan statistics subtables: scanstats[0] (last scan), scanstats[1], scanstats[2] (two scans prior to last scan)
 lib.GetScanStats = AucAdvanced.Scan.GetScanStats
+
+-- imageTable = AucAdvanced.API.GetImageCopy(serverKey)
+-- Generates an independent copy of the current scan data image for the specified serverKey
+lib.GetImageCopy = AucAdvanced.Scan.GetImageCopy
 
 function lib.ListUpdate()
 	if lib.IsBlocked() then return end
