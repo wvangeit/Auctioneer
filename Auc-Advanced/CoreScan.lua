@@ -106,6 +106,9 @@ function lib.GetImage()
 	local image = private.LoadAuctionImage()
 	return image
 end
+function lib.LoadScanData()
+	private.LoadAuctionImage()
+end
 
 function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
 	if not private.scanStack then private.scanStack = {} end
@@ -565,10 +568,11 @@ function private.GetNextID(idList)
 	return nextId
 end
 
+-- Library wrapper for private.GetScanData. Deals with parameter checking, warning messages and deprecation alerts
 function lib.GetScanData(serverKey, reserved)
-	local faction, realmName, deprecated
 	if serverKey then
-		realmName, faction = AucAdvanced.SplitServerKey(serverKey)
+		local deprecated
+		local realmName, faction = AucAdvanced.SplitServerKey(serverKey)
 		if not realmName then
 			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
 				deprecated = true
@@ -589,7 +593,19 @@ function lib.GetScanData(serverKey, reserved)
 			end
 		end
 	else
-		serverKey, realmName, faction = GetFaction()
+		serverKey = GetFaction()
+	end
+	return private.GetScanData(serverKey)
+end
+
+-- scandataTable = private.GetScanData(serverKey)
+-- Specifications:
+-- serverKey is required; there is no default
+-- the returned scandataTable will contain the subtables 'image' and 'scanstats'
+function private.GetScanData(serverKey)
+	local realmName, faction = AucAdvanced.SplitServerKey(serverKey)
+	if not realmName then
+		error("Invalid serverKey passed to GetScanData") -- future: demote to nLog warning or remove altogether
 	end
 
 	local AucScanData = private.LoadAuctionImage()
@@ -620,7 +636,7 @@ function lib.GetScanData(serverKey, reserved)
 end
 
 function lib.GetScanStats(serverKey)
-	local scandata = lib.GetScanData(serverKey or GetFaction())
+	local scandata = private.GetScanData(serverKey or GetFaction())
 	if scandata then
 		return scandata.scanstats
 	end
@@ -628,7 +644,7 @@ end
 
 function lib.GetImageCopy(serverKey)
 	-- Create a fully independent copy of the image - intended for use by coroutines
-	local scandata = lib.GetScanData(serverKey or GetFaction())
+	local scandata = private.GetScanData(serverKey or GetFaction())
 	if scandata then
 		local image = scandata.image
 		local size = Const.LASTENTRY
@@ -637,6 +653,22 @@ function lib.GetImageCopy(serverKey)
 			tinsert(copy, {unpack(image[i], 1, size)})
 		end
 		return copy
+	end
+end
+
+function lib.GetImageSize(serverKey)
+	local scandata = private.GetScanData(serverKey or GetFaction())
+	if scandata then
+		return #scandata.image
+	end
+end
+
+function lib.GetImageItem(index, serverKey, reserved)
+	-- reserved flag for possible future expansion
+	local scandata = private.GetScanData(serverKey or GetFaction())
+	if scandata then
+		local item = scandata.image[index]
+		if item then return {unpack(item, 1, Const.LASTENTRY)} end
 	end
 end
 
@@ -671,7 +703,7 @@ function private.SubImageCache(itemId, serverKey)
 
 	local itemResults = indexResults[itemId]
 	if not itemResults then
-		local scandata = lib.GetScanData(serverKey)
+		local scandata = private.GetScanData(serverKey)
 		if not scandata then return end
 		itemResults = {}
 		for pos, data in ipairs(scandata.image) do
@@ -723,7 +755,7 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 	if query.itemId then
 		image = private.SubImageCache(query.itemId, serverKey)
 	else
-		local scandata = lib.GetScanData(serverKey)
+		local scandata = private.GetScanData(serverKey)
 		if scandata then
 			image = scandata.image
 		end
@@ -811,7 +843,7 @@ local Commitfunction = function()
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
-	local scandata = lib.GetScanData(serverKey)
+	local scandata = private.GetScanData(serverKey)
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
 	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
@@ -1152,10 +1184,6 @@ local Commitfunction = function()
 	scanstats[2] = scandata.scanstats[1]
 	scanstats[1] = scandata.scanstats[0]
 	scanstats[0] = TempcurScanStats
-
-	-- old version timestamps (deprecated)
-	scandata.time = now
-	if wasUnrestricted and not wasIncomplete then scandata.LastFullScan = now end
 
 	-- Tell everyone that our stats are updated
 	TempcurQuery.qryinfo.finished = true
