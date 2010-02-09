@@ -50,6 +50,7 @@ end
 ---------------------------------------------------------
 -- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
 function lib.ASCConfirmContinue()
+	lib.confirmsellui:Hide() --hide gui before selling so our bag update events are not registered
 	for key, itemdata in pairs(lib.vendorlist) do
 		local _, iID = decode( itemdata[1] ) --check if item is to be ignored
 		if not get("util.automagic.vidignored"..iID) then --will be nil if not on ignore list
@@ -62,7 +63,6 @@ function lib.ASCConfirmContinue()
 		end
 		lib.vendorlist[key] = nil
 	end
-	lib.confirmsellui:Hide()
 end
 
 function lib.ASCRemoveItem()
@@ -189,7 +189,6 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui:EnableMouse(true)
 	lib.confirmsellui:SetMovable(true)
 	lib.confirmsellui:SetClampedToScreen(true)
-
 	-- Make highlightable drag bar
 	lib.confirmsellui.Drag = CreateFrame("Button", "", lib.confirmsellui)
 	lib.confirmsellui.Drag:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 10,-5)

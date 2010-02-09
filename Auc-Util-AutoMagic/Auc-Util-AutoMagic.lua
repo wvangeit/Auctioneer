@@ -115,6 +115,7 @@ function lib.onEventDo(this, event)
 	if event == 'MAIL_SHOW' 			then lib.mailShow() 					end
 	if event == 'MAIL_CLOSED' 		then lib.mailClosed() 					end
 	if event == 'UI_ERROR_MESSAGE'	then set("util.automagic.uierrormsg", 1) 	end
+	if event == 'BAG_UPDATE'  then if lib.confirmsellui:IsVisible()  then lib.vendorAction() end	end --bags changed make sure vendor items are in order
 end
 
 function lib.SetupConfigGui(gui)
@@ -181,6 +182,7 @@ function lib.buttonTooltips(self, text)
 end
 
 function lib.merchantShow()
+	private.eventframe:RegisterEvent("BAG_UPDATE")
 	if (get("util.automagic.autovendor")) then
 		lib.vendorAction()
 --~ 		TODO: IMPLEMENT AUTO SELL. Commented out since we do not autosell at this moment so we can never open vendor
@@ -196,6 +198,7 @@ end
 
 
 function lib.merchantClosed()
+	private.eventframe:UnregisterEvent("BAG_UPDATE")
 	if lib.confirmsellui:IsVisible() then lib.confirmsellui:Hide() end
 end
 
@@ -618,6 +621,7 @@ lib.makeautosellgui()
 
 local tooltip = CreateFrame("GameTooltip")
 local eventframe = CreateFrame("Frame") -- used for Events and for timer (via Update)
+private.eventframe = eventframe
 local timercounter = 0
 local refreshlist
 
