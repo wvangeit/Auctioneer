@@ -87,7 +87,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 
 	-- Check to see if we need to load scandata
 	if AucAdvanced.Settings.GetSetting("scandata.tooltip.display") then
-		AucAdvanced.Scan.GetImage()
+		AucAdvanced.Scan.LoadScanData()
 	end
 
 	local saneLink = AucAdvanced.SanitizeLink(hyperlink)
@@ -257,7 +257,7 @@ function private.OnEvent(self, event, arg1, arg2, ...)
 		-- as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event)
 		-- Check to see if we need to load scandata
 		if AucAdvanced.Settings.GetSetting("scandata.force") then
-			AucAdvanced.Scan.GetImage()
+			AucAdvanced.Scan.LoadScanData()
 		end
 	elseif (event == "AUCTION_HOUSE_SHOW") then
 		AucAdvanced.SendProcessorMessage("auctionopen")

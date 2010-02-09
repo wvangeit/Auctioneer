@@ -1112,7 +1112,7 @@ function private.CreateFrames()
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight")
 			AuctionFrameMoneyFrame:Show()
 			frame:Show()
-			AucAdvanced.Scan.GetImage()
+			AucAdvanced.Scan.LoadScanData()
 			--frame.GenerateList(true)
 		else
 			AuctionFrameMoneyFrame:Show()

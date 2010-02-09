@@ -2538,7 +2538,7 @@ function private.CreateFrames()
 				AuctionDressUpFrame.reshow = true
 			end
 			frame:Show()
-			AucAdvanced.Scan.GetImage()
+			AucAdvanced.Scan.LoadScanData()
 			frame.GenerateList(true)
 		else
 			if (AuctionDressUpFrame.reshow) then
