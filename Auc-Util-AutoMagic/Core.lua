@@ -74,6 +74,13 @@ local isGem =
 	[36930] = true,--MONARCHTOPAZ
 	[36933] = true,---FORESTEMERALD
 	[36921] = true,--AUTUMNSGLOW
+	--EPIC 80
+	[36919] = true,--CARDNIALRUBY
+	[36922] = true,--KING'S AMBER
+	[36925] = true,--Majestic Zircon
+	[36928] = true,--DREADSTONE
+	[36931] = true,--AMETRINE
+	[36934] = true,--EYE OF ZUL
 }
 
 -- This table is validating that each ID within it is a mat from disenchanting.
