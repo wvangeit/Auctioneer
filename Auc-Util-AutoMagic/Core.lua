@@ -204,7 +204,7 @@ local isHerb =
 	
 
 lib.vendorlist = {}
-function lib.vendorAction()
+function lib.vendorAction(autovendor)
 	empty(lib.vendorlist) --this needs to be cleared on every vendor open
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
@@ -218,11 +218,12 @@ function lib.vendorAction()
 					local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
 					local key = bag..":"..slot -- key needs to be unique, but is not currently used for anything. future: rethink if this can be made useful
 
+					--autovendor  is used to sell without confirmation we only allow this on gray and sell list items
 					if lib.autoSellList[ itemID ] then
 						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
 					elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
 						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
-					else --look for btmScan or SearchUI reason codes if above fails
+					elseif not autovendor then --look for btmScan or SearchUI reason codes if above fails
 						local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
 						if reason and text then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}
@@ -232,7 +233,11 @@ function lib.vendorAction()
 			end
 		end
 	end
-	lib.ASCPrompt()
+	if autovendor then
+		lib.ASCConfirmContinue()
+	else
+		lib.ASCPrompt()
+	end
 end
 
 function lib.disenchantAction()

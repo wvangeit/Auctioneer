@@ -158,7 +158,11 @@ function lib.SetupConfigGui(gui)
 
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", _TRANS('AAMU_Interface_AutoSellGrey')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGrey')) --'Auto-sell grey level items at the vendor.'
-
+		
+		gui:AddControl(id, "Checkbox",		0, 5, 	"util.automagic.autosellgreynoprompt", _TRANS('AAMU_Interface_AutoSellGreyNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'Auto-sell grey level items at the vendor.'
+		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+		
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Button",     0, 1, "util.automagic.autosellgui", _TRANS('AAMU_Interface_AutoSellList')) --"Auto-Sell List"
@@ -184,8 +188,12 @@ end
 function lib.merchantShow()
 	private.eventframe:RegisterEvent("BAG_UPDATE")
 	if (get("util.automagic.autovendor")) then
+		--first lib.vendorAction call will sell all grays, bypassing promopt. Run lib.vendorAction to add anything remaining to the prompt window
+		if (get("util.automagic.autosellgreynoprompt")) then
+			lib.vendorAction(true)
+		end
 		lib.vendorAction()
---~ 		TODO: IMPLEMENT AUTO SELL. Commented out since we do not autosell at this moment so we can never open vendor
+
 --~ 		A better option is to auto close vendor when user hits confirm button window
 --~ 		if (get("util.automagic.autoclosemerchant")) then
 --~ 			if (get("util.automagic.chatspam")) then
