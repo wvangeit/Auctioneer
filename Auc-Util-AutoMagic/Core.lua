@@ -201,29 +201,109 @@ local isHerb =
 	[37921] = true, --  Deadnettle
 	[39970] = true, -- Fire Leaf
 	}
+
+--this set of tables allows us to match the locale dependet itemtype to the gear a player class can use
+local isGear = {
+	--armor
+	["cloth"] = GetSpellInfo(9078),
+	["leather"] = GetSpellInfo(9077),
+	["mail"] = GetSpellInfo(8737),
+	["plate"] = GetSpellInfo(750),
+	["shield"] = GetSpellInfo(9116),
+	--weapons
+	["bows"] = GetSpellInfo(264),
+	["crossbows"] = GetSpellInfo(5011),
+	["daggers"] = GetSpellInfo(1180),
+	["fist weapons"] = GetSpellInfo(15590),
+	["guns"] = GetSpellInfo(266),
+	["one-handed axes"] = GetSpellInfo(196),
+	["one-handed maces"] = GetSpellInfo(198),
+	["one-handed swords"] = GetSpellInfo(201),
+	["polearms"] = GetSpellInfo(200),
+	["staves"] = GetSpellInfo(227),
+	["thrown"] = GetSpellInfo(2567),
+	["two-handed axes"] = GetSpellInfo(197),
+	["two-handed maces"] = GetSpellInfo(199),
+	["two-handed swords"] = GetSpellInfo(202),
+	["wands"] = GetSpellInfo(5009),
+}
+--what gear each class CANNOT use
+local isClass = {
+	["DEATHKNIGHT"] = "shield|thrown|staves|crossbows|bows|fist weapons|leather|mail|guns|cloth|wands|daggers",
+	["SHAMAN"] = "one-handed swords|thrown|staves|crossbows|plate|bows|two-handed swords|leather|guns|polearms|cloth|wands",
+	["MAGE"] = "two-handed maces|shield|thrown|crossbows|plate|one-handed maces|one-handed axes|bows|fist weapons|two-handed swords|leather|mail|guns|polearms|two-handed axes",
+	["PRIEST"] = "one-handed swords|two-handed maces|shield|thrown|crossbows|plate|one-handed axes|bows|fist weapons|two-handed swords|leather|mail|guns|polearms|two-handed axes",
+	["WARLOCK"] = "two-handed maces|shield|thrown|crossbows|plate|one-handed maces|one-handed axes|bows|fist weapons|two-handed swords|leather|mail|guns|polearms|two-handed axes",
+	["DRUID"] = "one-handed swords|shield|thrown|crossbows|plate|one-handed axes|bows|fist weapons|two-handed swords|mail|guns|polearms|cloth|wands|two-handed axes",
+	["ROGUE"] = "two-handed maces|shield|staves|plate|two-handed swords|mail|polearms|cloth|wands|two-handed axes",
+	--lvl 40
+	["WARRIOR"] = "leather|mail|cloth|wands",
+	["WARRIORLOW"] = "leather|plate|cloth|wands",
+	["HUNTER"] = "two-handed maces|shield|plate|one-handed maces|leather|cloth|wands",
+	["HUNTERLOW"] = "two-handed maces|shield|plate|one-handed maces|mail|cloth|wands",
+	["PALADIN"] = "thrown|staves|crossbows|bows|fist weapons|leather|mail|guns|cloth|wands|daggers",
+	["PALADINLOW"] = "thrown|staves|crossbows|plate|bows|fist weapons|leather|guns|cloth|wands|daggers",
+	}
+
+local playerClassEquipment
+function classexpand()
+	local _, class =  UnitClass("player")
+	local level = UnitLevel("player")
+	if not isClass[class] then print("Unknown player class..", class) return end
 	
+	if level < 40 and (class == "WARRIOR" or class == "PALADIN" or class == "HUNTER") then
+		class = class.."LOW"
+	end
+	
+	local temp = {}
+	for usable in isClass[class]:gmatch("(.-)|") do
+		local skill = isGear[usable]
+		if skill then
+			temp[skill] = usable
+		end
+	end
+	return temp
+end
+--Taken from auc core, used to find soulbound state
+local BindTypes = {
+	[ITEM_SOULBOUND] = "Bound",
+	[ITEM_BIND_ON_PICKUP] = "Bound",
+}
+--Auc Core tooltip scanner
+local ScanTip  = AppraiserTip
+local ScanTip2  = AppraiserTipTextLeft2
+local ScanTip3 = AppraiserTipTextLeft3
 
 lib.vendorlist = {}
 function lib.vendorAction(autovendor)
+	if not playerClassEquipment then 
+		 playerClassEquipment = classexpand()--create the players localized usable gear list
+	end
 	empty(lib.vendorlist) --this needs to be cleared on every vendor open
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
-				local itemLink, itemCount = GetContainerItemLink(bag,slot)
+				local itemLink, itemCount, _, _ , _, lootable = GetContainerItemLink(bag,slot)
 				if itemLink then
-					if itemCount == nil then _, itemCount = GetContainerItemInfo(bag, slot) end
-					if itemCount == nil then itemCount = 1 end
+					if not itemCount then itemCount = 1 end
 					local _, itemID, _, _, _, _ = decode(itemLink)
 					local itemSig = AucAdvanced.API.GetSigFromLink(itemLink) -- future plan is to use itemSig in place of itemID throughout - to eliminate problems for items with suffixes
-					local itemName, _, itemRarity, _, _, _, _, _, _, _ = GetItemInfo(itemLink)
+					local itemName, _, itemRarity, _, _, itemType, itemSubType = GetItemInfo(itemLink)
 					local key = bag..":"..slot -- key needs to be unique, but is not currently used for anything. future: rethink if this can be made useful
-
+					--tooltip checks soulbound status
+					ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
+					ScanTip:ClearLines()
+					ScanTip:SetBagItem(bag, slot)
+					local soulbound = BindTypes[ScanTip2:GetText()] or BindTypes[ScanTip3:GetText()]
+					ScanTip:Hide()
 					--autovendor  is used to sell without confirmation we only allow this on gray and sell list items
 					if lib.autoSellList[ itemID ] then
 						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
 					elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
 						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
-					elseif not autovendor then --look for btmScan or SearchUI reason codes if above fails
+					elseif not autovendor and get("util.automagic.vendorunusablebop") and soulbound and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
+						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
+					elseif not autovendor then--look for btmScan or SearchUI reason codes if above fails
 						local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
 						if reason and text then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}

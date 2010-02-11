@@ -163,6 +163,9 @@ function lib.SetupConfigGui(gui)
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'Auto-sell grey level items at the vendor.'
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 		
+		gui:AddControl(id, "Checkbox",		0, 1, "util.automagic.vendorunusablebop", _TRANS('AAMU_Interface_AutoSellBOP')) --"Allow AutoMagic to auto-sell unusable soulbound gear"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellBOP')) --'Auto-sell unusable soulbound gear'
+		
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
 		gui:AddControl(id, "Header", 0, "") --Spacer for options
 		gui:AddControl(id, "Button",     0, 1, "util.automagic.autosellgui", _TRANS('AAMU_Interface_AutoSellList')) --"Auto-Sell List"
