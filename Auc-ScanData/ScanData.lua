@@ -37,6 +37,9 @@ local libType, libName = "Util", "ScanData"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
+local DATABASE_VERSION = 1.3
+local INTERFACE_VERSION = "A" -- must match CoreScan's SCANDATA_VERSION
+
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 private.distributionCache = {}
@@ -45,6 +48,10 @@ private.worthCache = {}
 local Const = AucAdvanced.Const
 local QueryImage = AucAdvanced.API.QueryImage
 local PriceCalcLevel = AucAdvanced.Modules.Util.PriceLevel and AucAdvanced.Modules.Util.PriceLevel.CalcLevel
+
+local HomeRealm = GetRealmName()
+local HomeKey = HomeRealm.."-"..UnitFactionGroup("player")
+local NeutralKey = HomeRealm.."-Neutral"
 
 local type = type
 local pairs = pairs
@@ -69,13 +76,13 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "scanstats") then
 		wipe(private.distributionCache)
 		wipe(private.worthCache)
-	--[[ under development
 	elseif callbackType == "load" then
 		local addon = ...
 		if addon == "auc-scandata" then
-			print("AucAdvanced: {{Auc-ScanData}} Loaded")
+			if private.OnLoad then
+				private.OnLoad()
+			end
 		end
-	--]]
 	end
 end
 
@@ -287,36 +294,144 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 end
 
 --[[ DATABASE FUNCTIONS ]]--
+function lib.GetAddOnInfo()
+	return private.isLoaded, INTERFACE_VERSION
+end
 
---[[ Old Version ]]
-function lib.Unpack(realm)
-	if not (AucScanData and AucScanData.scans) then return end
-	if not realm then realm = GetRealmName() end
-	local sData = AucScanData.scans[realm]
-	if not sData then return end
+private.dataCache = {}
+function lib.GetScanData(serverKey)
+	local cache = private.dataCache[serverKey]
+	if cache then return cache end
 
-	for faction, fData in pairs(sData) do
-		if fData.image and type(fData.image) == "string" then
-			if fData.image ~= "rope" then
-				fData.ropes = { fData.image }
-			end
+	local realm, faction = AucAdvanced.SplitServerKey(serverKey)
+	if not realm then
+		debugPrint("AucScanData: invalid serverKey passed to GetScanData: "..tostring(serverKey), "ScanData", "Invalid serverKey", "Error")
+		return
+	end
 
-			fData.image = {}
-			for pos, rope in ipairs(fData.ropes) do
-				local loader, err = loadstring(rope)
-				if (loader) then
-					local items = loader()
+	local realmdata = AucScanData.scans[realm]
+	if not realmdata then return end -- not in database
+
+	local livedata = serverKey == HomeKey or serverKey == NeutralKey -- 'live' data can be changed by scanning
+	local scandata = realmdata[faction]
+	if scandata then
+		if not livedata then
+			-- Copy scandata info into a clone table and call Unpack on that
+			-- The original does not get unpacked, so does not need repacking
+			local clone = {
+				image = scandata.image, -- will be overwritten by unpack
+				ropes = scandata.ropes, -- will be deleted by unpack
+				scanstats = replicate(scandata.scanstats)
+			}
+			scandata = clone
+		end
+		if type(scandata.scanstats) ~= "table" then
+			scandata.scanstats = {ImageUpdated = scandata.time or time()}
+		end
+		if not scandata.image then
+			scandata.image = {}
+			scandata.scanstats.ImageUpdated = time()
+		end
+		-- delete obsolete entries
+		scandata.nextID = nil
+		scandata.time = nil
+		scandata.LastFullScan = nil
+		scandata.LastGetAll = nil
+	else
+		scandata = {image = {}, scanstats = {ImageUpdated = time()} }
+		if livedata then
+			realmdata[faction] = scandata
+		end
+	end
+
+	private.Unpack(scandata)
+	private.dataCache[serverKey] = scandata
+	return scandata
+end
+
+function lib.ClearScanData(key)
+	if key == "ALL" then
+		wipe(AucScanData.scans)
+	elseif AucScanData.scans[key] then -- it's a realm name
+		AucScanData.scans[key] = nil
+	else
+		-- is it a serverKey?
+		local realm, faction = AucAdvanced.SplitServerKey(key)
+		if faction and AucScanData.scans[realm] then
+			AucScanData.scans[realm][faction] = nil
+		end
+	end
+	wipe(private.dataCache)
+	-- Our functions expect home faction to exist - create a new one if it has just been deleted
+	if not AucScanData.scans[HomeRealm] then AucScanData.scans[HomeRealm] = {} end
+	lib.GetScanData(HomeKey) -- force create (if needed) and put back in cache
+end
+
+function private.Unpack(scandata)
+	if type(scandata.image) == "string" then
+		if scandata.image ~= "rope" then
+			scandata.ropes = { scandata.image }
+		end
+
+		scandata.image = {}
+		for pos, rope in ipairs(scandata.ropes) do
+			local loader, err = loadstring(rope)
+			if loader then
+				local test, items = pcall(loader)
+				if test then
 					for pos, item in ipairs(items) do
-						tinsert(fData.image, item)
+						tinsert(scandata.image, item)
 					end
+					err = nil
 				else
-					print("Error loading scan image: {{", err, "}}")
-					fData.image = nil --clear the image, so we're not left with a string where we expect a table.
+					err = items
 				end
 			end
-
-			collectgarbage()
+			if err then
+				print("Error loading scan image: {{", err, "}}")
+				-- if we get an error from any rope, assume the whole packed image is corrupt
+				scandata.image = {}
+				scandata.scanstats.ImageUpdated = time()
+				break
+			end
 		end
+	elseif type(scandata.image) ~= "table" then
+		scandata.image = {}
+		scandata.scanstats.ImageUpdated = time()
+	end
+	scandata.ropes = nil
+end
+
+function private.OnLoad()
+	private.OnLoad = nil
+	private.UpgradeDB()
+	if not AucScanData.scans[HomeRealm] then AucScanData.scans[HomeRealm] = {} end
+	lib.GetScanData(HomeKey) -- force unpack of home faction data
+	private.isLoaded = true
+end
+
+function private.UpgradeDB()
+	private.UpgradeDB = nil
+
+	if AucScanData then
+		if type(AucScanData.scans) ~= "table" then AucScanData.scans = {} end
+		if AucScanData.Version == DATABASE_VERSION then return end
+
+		if AucScanData.Version == "1.2" then
+			-- version "1.2" to version 1.3
+			-- Database structure is virtually the same, we won't try to update the whole database here
+			-- Each time GetScanData is called it will check/update that record as needed
+			print("Auc-ScanData is upgrading database version 1.2 to 1.3")
+			AucScanData.Version = DATABASE_VERSION
+			return
+		end
+
+		-- Unknown version - wipe and start from fresh
+		print("Auc-ScanData database error: unknown version, resetting database")
+		wipe(AucScanData.scans)
+		AucScanData.Version = DATABASE_VERSION
+	else
+		AucScanData = { Version = DATABASE_VERSION, scans = {} }
 	end
 end
 

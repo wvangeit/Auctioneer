@@ -41,8 +41,7 @@ if not AucAdvanced then return end
 
 if (not AucAdvanced.Scan) then AucAdvanced.Scan = {} end
 
--- Increment every time scandata format changes:
-local SCANDATA_VERSION = "1.2"
+local SCANDATA_VERSION = "A" -- must match Auc-ScanData INTERFACE_VERSION
 
 local lib = AucAdvanced.Scan
 local private = {}
@@ -63,51 +62,93 @@ local tonumber = tonumber
 local GetTime = GetTime
 
 private.isScanning = false
-local LclAucScanData = nil
-function private.LoadAuctionImage()
-	if (LclAucScanData) then return LclAucScanData end
-	local loaded, reason = LoadAddOn("Auc-ScanData")
-	if not loaded then
-		message("The Auc-ScanData storage module could not be loaded: "..reason)
-	elseif AucAdvanced.Modules
-	and AucAdvanced.Modules.Util
-	and AucAdvanced.Modules.Util.ScanData
-	and AucAdvanced.Modules.Util.ScanData.Unpack then
-		AucAdvanced.Modules.Util.ScanData.Unpack()
+
+function private.LoadScanData()
+	if not private.loadingScanData then
+		local _, _, _, enabled, load, reason = GetAddOnInfo("Auc-ScanData")
+		if not (enabled and load) then
+			private.loadingScanData = "fallback"
+			message("The Auc-ScanData storage module could not be loaded: "..(reason or "Unknown reason"))
+		elseif IsAddOnLoaded("Auc-ScanData") then
+			-- if another AddOn has force-loaded Auc-ScanData
+			private.loadingScanData = "loading"
+		else
+			private.loadingScanData = "block" -- prevents re-entry to this function during the LoadAddOn call
+			debugPrint("CoreScan: calling LoadAddOn for Auc-ScanData")
+			load, reason = LoadAddOn("Auc-ScanData")
+			if load then
+				private.loadingScanData = "loading"
+			elseif reason then
+				private.loadingScanData = "fallback"
+				message("The Auc-ScanData storage module could not be loaded: "..reason)
+			else
+				-- LoadAddOn sometimes returns nil, nil if called too early during game startup
+				-- assume it needs to be called again at a later stage
+				private.loadingScanData = nil
+			end
+		end
 	end
-
-	if (AucAdvancedData.ScanData) then
-		private.Print("Warning, Overwriting AucScanData with AucAdvancedData.ScanData")
-		AucScanData = AucAdvancedData.ScanData
-		if (loaded) then AucAdvancedData.ScanData = nil end
+	if private.loadingScanData == "loading" then
+		local ready, version
+		local scanmodule = AucAdvanced.Modules.Util.ScanData
+		if scanmodule and scanmodule.GetAddOnInfo then
+			ready, version = scanmodule.GetAddOnInfo()
+		end
+		if version ~= SCANDATA_VERSION then
+			private.loadingScanData = "fallback"
+			message("The Auc-ScanData storage module could not be loaded: ".."Incorrect version")
+		elseif ready then
+			-- install functions from Auc-ScanData
+			private.GetScanData = scanmodule.GetScanData
+			-- todo: install scanmodule.ClearScanData
+			-- cleanup
+			private.loadingScanData = nil
+			private.LoadScanData = nil
+			-- signal success
+			return private.GetScanData
+		end
 	end
-
-	if (not AucScanData) then
-		LoadAddOn("Auc-Scan-Simple")
-		private.Print("Warning, Overwriting AucScanData with AucAdvancedScanSimpleData")
-		AucScanData = AucAdvancedScanSimpleData
-		AucAdvancedScanSimpleData = nil
+	if private.loadingScanData == "fallback" then
+		-- cannot load Auc-ScanData, go to fallback image handler
+		local fallbackscandata = {}
+		private.GetScanData = function(serverKey)
+			local scandata = fallbackscandata[serverKey]
+			if scandata then return scandata end
+			local test = AucAdvanced.SplitServerKey(serverKey)
+			if not test then return end
+			scandata = {image = {}, scanstats = {ImageUpdated = time()}}
+			fallbackscandata[serverKey] = scandata
+			return scandata
+		end
+		-- cleanup
+		private.loadingScanData = nil
+		private.LoadScanData = nil
+		-- signal success
+		return private.GetScanData
 	end
-
-	if AucScanData and (not AucScanData.Version or AucScanData.Version < SCANDATA_VERSION) then
-		AucScanData = nil
-		private.Print("Note: ScanData format upgrade (to {{v"..SCANDATA_VERSION.."}}), please rescan auction house as soon as possible.")
-	end
-
-	if not AucScanData then AucScanData = {Version = SCANDATA_VERSION} end
-	if not AucScanData.scans then AucScanData.scans = {} end
-	if not loaded then AucAdvancedData.Scandata = AucScanData end
-	LclAucScanData = AucScanData
-
-	return LclAucScanData
 end
 
 function lib.GetImage()
-	local image = private.LoadAuctionImage()
-	return image
+	-- Deprecated
+	if private.LoadScanData then private.LoadScanData() end
 end
+
 function lib.LoadScanData()
-	private.LoadAuctionImage()
+	if private.LoadScanData then private.LoadScanData() end
+end
+
+-- scandataTable = private.GetScanData(serverKey)
+-- parameter: serverKey (required)
+-- returns: scandataTable = {image = imageTable, scanstats = scanstatsTable} for the specified serverKey
+-- returns: nil if there is no data for serverKey (or if serverKey is invalid)
+-- CAUTION: the following is a stub function, which will be overloaded with the real function by LoadScanData
+function private.GetScanData(serverKey)
+	if private.LoadScanData then
+		local newfunc = private.LoadScanData()
+		if newfunc then
+			return newfunc(serverKey)
+		end
+	end
 end
 
 function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
@@ -598,43 +639,6 @@ function lib.GetScanData(serverKey, reserved)
 	return private.GetScanData(serverKey)
 end
 
--- scandataTable = private.GetScanData(serverKey)
--- Specifications:
--- serverKey is required; there is no default
--- the returned scandataTable will contain the subtables 'image' and 'scanstats'
-function private.GetScanData(serverKey)
-	local realmName, faction = AucAdvanced.SplitServerKey(serverKey)
-	if not realmName then
-		error("Invalid serverKey passed to GetScanData") -- future: demote to nLog warning or remove altogether
-	end
-
-	local AucScanData = private.LoadAuctionImage()
-	local realmdata = AucScanData.scans[realmName]
-	if not realmdata then
-		realmdata = {}
-		AucScanData.scans[realmName] = realmdata
-	end
-	local scandata = realmdata[faction]
-	if scandata then
-		if not scandata.scanstats then
-			scandata.scanstats = {ImageUpdated = scandata.time or time()}
-		end
-		if type(scandata.image) == "string" then
-			if AucAdvanced.Modules.Util.ScanData and AucAdvanced.Modules.Util.ScanData.Unpack then
-				AucAdvanced.Modules.Util.ScanData.Unpack(realmName)
-			else -- unknown/corrupted?
-				scandata.image = {}
-				scandata.scanstats.ImageUpdated = time()
-			end
-		end
-	else
-		scandata = {image = {}, scanstats = {ImageUpdated = time()}, time=time()}
-		realmdata[faction] = scandata
-	end
-	scandata.nextID = nil -- delete obsolete entry
-	return scandata
-end
-
 function lib.GetScanStats(serverKey)
 	local scandata = private.GetScanData(serverKey or GetFaction())
 	if scandata then
@@ -820,7 +824,7 @@ private.CommitQueue = {}
 
 local CommitRunning = false
 local Commitfunction = function()
-	local speed = AucAdvanced.Settings.GetSetting("scancommit.speed")/100
+	local speed = get("scancommit.speed")/100
 	speed = speed^2.5
 	local processingTime = speed * 0.1 + 0.015
 		-- Min (1): 0.02s (~50 fps)      --    Max (100): 0.12s  (~8 fps).   Default (50):  0.037s (~25 fps)
@@ -847,7 +851,7 @@ local Commitfunction = function()
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
 	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
-	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
+	if get("scancommit.progressbar") then
 		lib.ProgressBars(CommitProgressBar, 0, true)
 	end
 	local oldCount = #scandata.image
@@ -1053,11 +1057,11 @@ local Commitfunction = function()
 	local printSummary, scanSize = false, ""
 	scanSize = TempcurQuery.qryinfo.scanSize
 	if scanSize=="Full" then
-		printSummary = private.getOption("scandata.summaryonfull");
+		printSummary = get("scandata.summaryonfull");
 	elseif scanSize=="Partial" then
-		printSummary = private.getOption("scandata.summaryonpartial")
+		printSummary = get("scandata.summaryonpartial")
 	else -- scanSize=="Micro"
-		printSummary = private.getOption("scandata.summaryonmicro")
+		printSummary = get("scandata.summaryonmicro")
 	end
 	if (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
@@ -1438,7 +1442,7 @@ local StorePageFunction = function()
 	private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+1, maxPages, curQuery) --page starts at 0 so we need to add +1
 
 	local curTime = time()
-	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
+	local getallspeed = get("GetAllSpeed") or 500
 
 
 	local storecount = 0
@@ -1987,10 +1991,6 @@ function private.ResetAll()
 	--Hide the progress indicator
 	private.UpdateScanProgress(false, nil, nil, nil, nil, nil, oldquery)
 end
---Did not have a way of easily retrieving options for corescan  Kandoko
-function private.getOption(option)
-	return AucAdvanced.Settings.GetSetting(option)
-end
 
 -- In the absence of a proper API function to do it, it's necessary to inspect an item's tooltip to
 -- figure out if it's usable by the player
@@ -2156,6 +2156,7 @@ function lib.AHClosed()
 end
 
 function lib.Logout()
+	AucAdvancedData.Scandata = nil -- delete obsolete data. it's here because CoreScan doesn't have an OnLoad processor
 	private.Commit(true, false)
 	if CoCommit then
 		while coroutine.status(CoCommit) == "suspended" do
