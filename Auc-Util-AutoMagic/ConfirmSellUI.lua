@@ -235,13 +235,13 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui.resultlist:SetPoint("BOTTOM", lib.confirmsellui, "BOTTOM", 0, 30)
 
 	lib.confirmsellui.resultlist.sheet = ScrollSheet:Create(lib.confirmsellui.resultlist, {
-		{ ('Item:'), "TOOLTIP", 170 },
+		{ ('Item:'), "TOOLTIP", 170, { DESCENDING=false, DEFAULT=true }  },
 		{ "Vendor", "COIN", 70 },
 		{ "Appraiser", "COIN", 70 },
 		{ "Selling for", "TEXT", 70 },
-		{ "Will be Sold", "TEXT", 100,  { DESCENDING=true, DEFAULT=true } },
+		{ "Will be Sold", "TEXT", 100},
 	})
-
+	lib.confirmsellui.resultlist.sheet:EnableVerticalScrollReset(false)
 	lib.confirmsellui.resultlist.sheet:EnableSelect(true)
 	
 	--After we have finished creating the scrollsheet and all saved settings have been applied set our event processor
@@ -256,7 +256,9 @@ function lib.makeconfirmsellui()
 			lib.ASCSelect()
 		end
 	end
-
+	--use our custom sort method not scrollsheets
+	lib.confirmsellui.resultlist.sheet.CustomSort = lib.CustomSort
+	
 	-- Continue with sales button
 	lib.confirmsellui.continueButton = CreateFrame("Button", nil, lib.confirmsellui, "OptionsButtonTemplate")
 	lib.confirmsellui.continueButton:SetPoint("BOTTOMRIGHT", lib.confirmsellui, "BOTTOMRIGHT", -18, 10)

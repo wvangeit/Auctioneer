@@ -120,6 +120,27 @@ function lib.onEventDo(this, event)
 	if event == 'BAG_UPDATE'  then if lib.confirmsellui:IsVisible()  then lib.vendorAction() end	end --bags changed make sure vendor items are in order
 end
 
+--This will be used to sort our list's rather than the default scrollsheet method.
+function lib.CustomSort(data, sort, width, column, dir)
+		assert(column <= width)
+		assert(dir == -1 or dir == 1)
+		table.sort(sort, function(a,b)
+			local aPos = (a-1)*width+column
+			local bPos = (b-1)*width+column
+			local dataA, dataB = data[aPos], data[bPos]
+			local colorA, nameA = string.match(dataA, "^|cff(%x+)|Hitem.+|h%[(.*)%]|h|r")
+			local colorB, nameB = string.match(dataB, "^|cff(%x+)|Hitem.+|h%[(.*)%]|h|r")
+			if colorA and nameA and colorB and nameB then --hyperlink check
+				dataA = colorA..nameA
+				dataB = colorB..nameB
+			end
+			if dir < 0 then
+				return (dataA > dataB) or (dataA == dataB and a > b)
+			end
+				return (dataA < dataB) or (dataA == dataB and a < b)
+		end)
+end
+
 function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
@@ -603,7 +624,8 @@ function lib.makeautosellgui()
 		{ "Vendor", "COIN", 70 },
 		{ "Appraiser", "COIN", 70 },
 	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClickAutoSellSheet)
-
+	--use our custom sort method not scrollsheets
+	autosellframe.resultlist.sheet.CustomSort = lib.CustomSort
 	--Create the bag contents frame
 	autosellframe.baglist = CreateFrame("Frame", nil, autosellframe)
 	autosellframe.baglist:SetBackdrop({
@@ -629,6 +651,8 @@ function lib.makeautosellgui()
 		{ ('BTM Rule'), "TEXT", 70 },
 		{ "Appraiser", "COIN", 70 },
 	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClickBagSheet)
+	--use our custom sort method not scrollsheets
+	autosellframe.baglist.sheet.CustomSort = lib.CustomSort
 end
 lib.makeautosellgui()
 
@@ -681,5 +705,6 @@ function lib.ClientItemCacheRefresh(link)
 	end
 	refreshlist[link] = true
 end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
