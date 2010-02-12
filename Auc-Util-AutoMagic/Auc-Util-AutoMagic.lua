@@ -93,6 +93,7 @@ function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 
 	default("util.automagic.autovendor", false) -- DO NOT SET TRUE ALL AUTOMAGIC OPTIONS SHOULD BE TURNED ON MANUALLY BY END USER!!!!!!!
+	default("util.automagic.autostopafter12", true) --stops autovendor after 12 items are sold. Want it to be on
 	default("util.automagic.autosellgrey", false)
 	default("util.automagic.autocloseenable", false) -- Enables auto close of vendor window after autosale completion
 	default("util.automagic.showmailgui", false)
@@ -104,6 +105,7 @@ function lib.OnLoad()
 	default("util.automagic.uierrormsg", 0) --Keeps track of ui error msg's
 	default("util.automagic.deplength", 48)
 	default("util.automagic.overidebtmmail", false) -- Item AI for mail rule instead of BTM rule.
+	
 
 	default("util.automagic.displaybeginerTooltips", true)
 end
@@ -155,15 +157,18 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Header",     0,    _TRANS('AAMU_Interface_VendorOptions')) --" Vendor Options"
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", _TRANS('AAMU_Interface_Vendoring')) --"Enable AutoMagic vendoring (W A R N I N G: READ HELP!) "
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_Vendoring')) --'Enable the auto-vendor options.'
+		
+		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.autostopafter12", _TRANS('AAMU_Interface_AutoStop12')) --"Only sell 12 items to vendor before stopping."
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoStop12')) --'This allows you to buy back an accidental sale, since the server saves the last 12 sales to the vendor'
 
-		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", _TRANS('AAMU_Interface_AutoSellGrey')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
+		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autosellgrey", _TRANS('AAMU_Interface_AutoSellGrey')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGrey')) --'Auto-sell grey level items at the vendor.'
 		
-		gui:AddControl(id, "Checkbox",		0, 5, 	"util.automagic.autosellgreynoprompt", _TRANS('AAMU_Interface_AutoSellGreyNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'Auto-sell grey level items at the vendor.'
+		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellgreynoprompt", _TRANS('AAMU_Interface_AutoSellGreyNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'Do not prompt to Auto-sell grey level items at the vendor.'
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 		
-		gui:AddControl(id, "Checkbox",		0, 1, "util.automagic.vendorunusablebop", _TRANS('AAMU_Interface_AutoSellBOP')) --"Allow AutoMagic to auto-sell unusable soulbound gear"
+		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.vendorunusablebop", _TRANS('AAMU_Interface_AutoSellBOP')) --"Allow AutoMagic to auto-sell unusable soulbound gear"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellBOP')) --'Auto-sell unusable soulbound gear'
 		
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")

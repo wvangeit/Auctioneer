@@ -51,7 +51,15 @@ end
 -- lib.vendorlist[key] = { link, sig, count, bag, slot, reason }
 function lib.ASCConfirmContinue()
 	lib.confirmsellui:Hide() --hide gui before selling so our bag update events are not registered
+	local count = 0
 	for key, itemdata in pairs(lib.vendorlist) do
+		count = count +1
+		--if stop after 12 then recheck whats left to vendor and re-prompt for a new round. 
+		if get("util.automagic.autostopafter12") and count > 12 then --stop after 12 sells so use can buy back a accidental sale
+			lib.vendorAction()
+			return
+		end
+		
 		local _, iID = decode( itemdata[1] ) --check if item is to be ignored
 		if not get("util.automagic.vidignored"..iID) then --will be nil if not on ignore list
 			
