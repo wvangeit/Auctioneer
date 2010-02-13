@@ -312,6 +312,8 @@ function private.scanBags(scan, finish)
 		--convert to itemID
 		deMat = lib.API.decodeLink(deMat)
 		--print("We Disnechnated ", itemLink, " into ", deMat, quantity, profit)
+		if not deMat or not quantity or not profit then return end
+		
 		local meta = string.join(":", "DE", deMat, quantity, profit)
 		meta = meta.."|"
 		private.attachMeta( itemLink, meta )
@@ -383,7 +385,7 @@ function private.onEvent(frame, event, arg, ...)
 	local spell = ...
 	if event == "UNIT_SPELLCAST_SENT" and arg == "player" and spell == "Disenchant" then
 		--print(event, inState)
-		if inState then inState = "waiting on next" end --when another DE event is started before last finishes
+		--if inState then inState = "waiting on next" end --when another DE event is started before last finishes --Has issues with emotying mail and de at same time
 		private.registerDisenchantEvents(true)
 	end
 	--dont process any following events if not DEing
