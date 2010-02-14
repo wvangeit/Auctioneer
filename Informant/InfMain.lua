@@ -847,6 +847,48 @@ local function doUpdateMerchant()
 end
 
 
+-- cleanup data errors
+-- INF-77 - duplicate merchant IDs crept in, blowing the length of the string
+local function scrubLocalUpdateInfo()
+
+	if (InformantLocalUpdates and InformantLocalUpdates.items
+		and not InformantLocalUpdates.scrubbedForDupeMerchants) then
+		
+		for itemID, itemInfo in pairs(InformantLocalUpdates.items) do
+			if (itemInfo.merchants) then
+				
+				-- make sure vendor IDs are unique by regenerating the list into a table
+				local newTable = {}
+				local merchList = split(itemInfo.merchants, ",")
+				for pos, merchID in pairs(merchList) do
+					newTable[ tonumber( merchID ) ] = true
+				end
+				
+				-- then converting that table back into our string format
+				local first = true
+				local newList
+				for merchID, _ in pairs(newTable) do
+					if (first) then
+						newList = tostring( merchID )
+					else
+						newList = newList..","..tostring( merchID )
+					end
+					first = false
+				end
+				
+				-- finally, replace the existing info with scrubbed info
+				itemInfo.merchants = newList
+				InformantLocalUpdates.items[ itemID ] = itemInfo
+				
+			end
+		end
+		
+		InformantLocalUpdates.scrubbedForDupeMerchants = true;	-- we should only do this once
+	end
+
+end
+
+
 function onQuit()
 	if (not InformantConfig.position) then
 		InformantConfig.position = { }
@@ -981,14 +1023,11 @@ function onEvent(event, addon)
 	if (event == "ADDON_LOADED" and addon:lower() == "informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
+		scrubLocalUpdateInfo()		-- to fix up data errors
 	end
 
 	if( event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE" ) then
-		doUpdateMerchant();
-	end
-
-	if( event == "MERCHANT_SHOW" or event == "MERCHANT_UPDATE" ) then
-		doUpdateMerchant();
+		doUpdateMerchant()
 	end
 	
 end
