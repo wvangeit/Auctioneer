@@ -772,19 +772,31 @@ local function updateBuyPricesFromMerchant( vendorID )
 					end
 				end
 
-				-- if no vendor are known, or this vendor isn't on the list, add this vendor
+				-- if no vendors are known, or this vendor isn't on the list, add this vendor
 				if (not foundMerchant) then
 					local newItemInfo = InformantLocalUpdates.items[ itemid ]
 					if (not newItemInfo) then newItemInfo = {} end
 					local oldList = newItemInfo.merchants
-
+					
 					if (oldList) then
-						newItemInfo.merchants = oldList..","..tostring( vendorID )
-					else
-						newItemInfo.merchants = tostring( vendorID )
+						local moreMerch = split(oldList, ",")
+						for pos, merchID in pairs(moreMerch) do
+							if (tonumber(merchID) == vendorID) then
+								foundMerchant = true
+								break
+							end
+						end
 					end
-
-					InformantLocalUpdates.items[ itemid ] = newItemInfo
+					
+					if (not foundMerchant) then
+						if (oldList) then
+							newItemInfo.merchants = oldList..","..tostring( vendorID )
+						else
+							newItemInfo.merchants = tostring( vendorID )
+						end
+	
+						InformantLocalUpdates.items[ itemid ] = newItemInfo
+					end
 				end
 
 			end	-- if info
