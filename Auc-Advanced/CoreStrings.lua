@@ -1580,6 +1580,7 @@ AuctioneerLocalizations = {
 		["AAMU_HelpTooltip_AutoSellListItems"]	= "Auto-sell items on the always vendor list.";
 		["AAMU_HelpTooltip_AutoSellListNoPrompt"]	= "No confirmation window will be shown for items on the always vendor list";
 		["AAMU_HelpTooltip_AutoSellReason"]	= "Auto-sell items purchased using the vendor searcher";
+		["AAMU_HelpTooltip_AutoSellReasonNoPrompt"]	= "No confirmation window will be shown for items with a purchased for vendor reason tag";
 		["AAMU_HelpTooltip_AutoStop12"]	= "This allows you to buy back an accidental sale, since the server saves the last 12 sales to the vendor";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Display the beginner tooltips on mouseover.";
 		["AAMU_HelpTooltip_Chatspam"]	= "Display chat messages from AutoMagic.";
