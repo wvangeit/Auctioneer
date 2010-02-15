@@ -177,39 +177,31 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Header",     0,    _TRANS('AAMU_Interface_VendorOptions')) --" Vendor Options"
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", _TRANS('AAMU_Interface_Vendoring')) --"Enable AutoMagic vendoring (W A R N I N G: READ HELP!) "
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_Vendoring')) --'Enable the auto-vendor options.'
-		
-		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.autostopafter12", _TRANS('AAMU_Interface_AutoStop12')) --"Only sell 12 items to vendor before stopping."
+
+		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.autostopafter12", _TRANS('AAMU_Interface_AutoStop12')) --"Pause after selling 12 items."
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoStop12')) --'This allows you to buy back an accidental sale, since the server saves the last 12 sales to the vendor'
 
 		gui:AddControl(id, "Subhead",     0,   "Which categories will be vendored?")
-		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autosellgrey", _TRANS('AAMU_Interface_AutoSellGrey')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
+
+		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autosellgrey", _TRANS('AAMU_Interface_AutoSellGrey')) --"Auto-sell grey items quality items"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGrey')) --'Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autoselllist", _TRANS('AAMU_Interface_AutoSellListItems')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellListItems')) --'Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autosellreason", _TRANS('AAMU_Interface_AutoSellReason')) --"Allow AutoMagic to auto-sell grey items in addition to bought for vendor items"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellReason')) --'Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.vendorunusablebop", _TRANS('AAMU_Interface_AutoSellBOP')) --"Allow AutoMagic to auto-sell unusable soulbound gear"
+		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellgreynoprompt", _TRANS('AAMU_Interface_AutoNoPrompt')) --"...without confirmation prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'No confirmation window will be shown for vendoring grey (trash) items.'
+
+		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autosellreason", _TRANS('AAMU_Interface_AutoSellReason')) --"Auto-sell items purchased using the vendor searcher"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellReason')) --'Auto-sell items purchased using the vendor searcher'
+		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellreasonnoprompt", _TRANS('AAMU_Interface_AutoNoPrompt')) --"...without confirmation prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellReasonNoPrompt')) --'No confirmation window will be shown for items with a purchased for vendor reason tag'
+
+		gui:AddControl(id, "Checkbox",		0, 4, "util.automagic.vendorunusablebop", _TRANS('AAMU_Interface_AutoSellBOP')) --"Auto-sell unusable soulbound gear"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellBOP')) --'Auto-sell unusable soulbound gear'
+		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellbopnoprompt", _TRANS('AAMU_Interface_AutoNoPrompt')) --"...without confirmation prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellBOPNoPrompt')) --'No confirmation window will be shown for selling soulbound items the players class cannot equip.'	
 		
-		--gui:AddControl(id, "Label",       0, 1, nil, "Which items are allowed to be sold without a prompt window?")
-		gui:AddControl(id, "Subhead",     0,   "Which items are allowed to be sold without a prompt window?")
-		
-		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellgreynoprompt", _TRANS('AAMU_Interface_AutoSellGreyNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellGreyNoPrompt')) --'Do not prompt to Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autoselllistnoprompt", _TRANS('AAMU_Interface_AutoSellListNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellListNoPrompt')) --'Do not prompt to Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellreasonnoprompt", _TRANS('AAMU_Interface_AutoSellReasonNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellReasonNoPrompt')) --'Do not prompt to Auto-sell grey level items at the vendor.'
-		
-		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autosellbopnoprompt", _TRANS('AAMU_Interface_AutoSellBOPNoPrompt')) --"grey level items and items on the sell list will be sold without a prompt"
-		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellBOPNoPrompt')) --'Do not prompt to Auto-sell grey level items at the vendor.'
-		
-		
+		gui:AddControl(id, "Checkbox",		0, 4, 	"util.automagic.autoselllist", _TRANS('AAMU_Interface_AutoSellListItems')) --"Auto-sell items on the always vendor list"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellListItems')) --'Auto-sell items on the always vendor list.'
+		gui:AddControl(id, "Checkbox",		0, 6, 	"util.automagic.autoselllistnoprompt", _TRANS('AAMU_Interface_AutoNoPrompt')) --"...without confirmation prompt"
+		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_AutoSellListNoPrompt')) --'No confirmation window will be shown for items on the always vendor list'
 		
 		--gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
