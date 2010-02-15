@@ -238,11 +238,11 @@ local isClass = {
 	["ROGUE"] = "two-handed maces|shield|staves|plate|two-handed swords|mail|polearms|cloth|wands|two-handed axes",
 	--lvl 40
 	["WARRIOR"] = "leather|mail|cloth|wands",
-	["WARRIORLOW"] = "leather|plate|cloth|wands",
+	["WARRIORLOW"] = "leather|cloth|wands", --warriors and paladins plate does not appear before 40,
 	["HUNTER"] = "two-handed maces|shield|plate|one-handed maces|leather|cloth|wands",
 	["HUNTERLOW"] = "two-handed maces|shield|plate|one-handed maces|mail|cloth|wands",
 	["PALADIN"] = "thrown|staves|crossbows|bows|fist weapons|leather|mail|guns|cloth|wands|daggers",
-	["PALADINLOW"] = "thrown|staves|crossbows|plate|bows|fist weapons|leather|guns|cloth|wands|daggers",
+	["PALADINLOW"] = "thrown|staves|crossbows|bows|fist weapons|leather|guns|cloth|wands|daggers",
 	}
 
 local playerClassEquipment
@@ -283,8 +283,9 @@ function lib.vendorAction(autovendor)
 	for bag=0,4 do
 		for slot=1,GetContainerNumSlots(bag) do
 			if (GetContainerItemLink(bag,slot)) then
-				local itemLink, itemCount, _, _ , _, lootable = GetContainerItemLink(bag,slot)
-				if itemLink then
+				local itemLink = GetContainerItemLink(bag,slot)
+				local texture, itemCount, locked, _, lootable = GetContainerItemInfo(bag, slot) --items that have been vedored but are still in players bag (lag) will be locked by server.
+				if itemLink and not locked then
 					if not itemCount then itemCount = 1 end
 					local _, itemID, _, _, _, _ = decode(itemLink)
 					local itemSig = AucAdvanced.API.GetSigFromLink(itemLink) -- future plan is to use itemSig in place of itemID throughout - to eliminate problems for items with suffixes
@@ -296,17 +297,32 @@ function lib.vendorAction(autovendor)
 					ScanTip:SetBagItem(bag, slot)
 					local soulbound = BindTypes[ScanTip2:GetText()] or BindTypes[ScanTip3:GetText()]
 					ScanTip:Hide()
-					--autovendor  is used to sell without confirmation we only allow this on gray and sell list items
-					if lib.autoSellList[ itemID ] then
-						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
-					elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
-						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
-					elseif not autovendor and get("util.automagic.vendorunusablebop") and soulbound and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
-						lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
-					elseif not autovendor then--look for btmScan or SearchUI reason codes if above fails
-						local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
-						if reason and text then
-							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}
+					--autovendor  is used to sell without confirmation.
+					if autovendor then
+						if get("util.automagic.autoselllist") and get("util.automagic.autoselllistnoprompt") and lib.autoSellList[ itemID ] then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
+						elseif itemRarity == 0 and get("util.automagic.autosellgrey") and get("util.automagic.autosellgreynoprompt") then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
+						elseif soulbound and get("util.automagic.vendorunusablebop") and get("util.automagic.autosellbopnoprompt") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
+						elseif get("util.automagic.autosellreason") and get("util.automagic.autosellreasonnoprompt") then
+							local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
+							if reason and text then
+								lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}
+							end
+						end
+					else
+						if get("util.automagic.autoselllist") and lib.autoSellList[ itemID ] then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
+						elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
+						elseif soulbound and get("util.automagic.vendorunusablebop") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
+							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
+						elseif get("util.automagic.autosellreason") then
+							local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
+							if reason and text then
+								lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, text}
+							end
 						end
 					end
 				end

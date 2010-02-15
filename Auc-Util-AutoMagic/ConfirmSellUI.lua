@@ -41,8 +41,8 @@ local selecteddata = {}
 function lib.ASCPrompt()
 	if next(lib.vendorlist) then
 		lib.confirmsellui:Show()
-		lib.ASCRefreshSheet()
 	end
+	lib.ASCRefreshSheet() --Always refresh the sheet or it can appear we have items left in GUI after the autosell function
 end
 
 ---------------------------------------------------------
