@@ -1574,9 +1574,13 @@ AuctioneerLocalizations = {
 
 		-- Section: HelpTooltip
 		["AAMU_HelpTooltip_AutoSellBOP"]	= "Auto-sell unusable soulbound gear";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "No confirmation window will be shown for selling soulbound items the players class cannot equip.";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Auto-sell grey quality items at the vendor.";
-		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "Do not prompt to Auto-sell grey level items at the vendor.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Check the box to view the Auto-Sell configuration GUI.";
+		["AAMU_HelpTooltip_AutoSellListItems"]	= "Auto-sell items on the always vendor list.";
+		["AAMU_HelpTooltip_AutoSellListNoPrompt"]	= "No confirmation window will be shown for items on the always vendor list";
+		["AAMU_HelpTooltip_AutoSellReason"]	= "Auto-sell items purchased using the vendor searcher";
+		["AAMU_HelpTooltip_AutoStop12"]	= "This allows you to buy back an accidental sale, since the server saves the last 12 sales to the vendor";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Display the beginner tooltips on mouseover.";
 		["AAMU_HelpTooltip_Chatspam"]	= "Display chat messages from AutoMagic.";
 		["AAMU_HelpTooltip_DepositLength"]	= "Select the auction length deposit cost you want to display in the tooltip.";
@@ -1765,10 +1769,14 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Note: WOWEcon already shows this by default, this may produce redundant information in your tooltip";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "No confirmation window will be shown for vendoring grey (trash) items.";
+		["AAMU_Interface_AutoNoPrompt"]	= "...without confirmation prompt";
 		["AAMU_Interface_AutoSellBOP"]	= "Allow AutoMagic to auto-sell unusable soulbound gear";
-		["AAMU_Interface_AutoSellGrey"]	= "Allow AutoMagic to add grey items to the vendor prompt window, in addition to those bought for sale to the vendors.";
-		["AAMU_Interface_AutoSellGreyNoPrompt"]	= "grey level items and items on the sell list will be sold without a prompt";
+		["AAMU_Interface_AutoSellGrey"]	= "Auto-sell grey items quality items.";
 		["AAMU_Interface_AutoSellList"]	= "Auto-Sell List";
+		["AAMU_Interface_AutoSellListItems"]	= "Auto-sell items on the always vendor list";
+		["AAMU_Interface_AutoSellReason"]	= "Auto-sell items purchased using the vendor searcher";
+		["AAMU_Interface_AutoStop12"]	= "Pause after selling 12 items.";
 		["AAMU_Interface_BeginnerTooltip"]	= "Enable AutoMagic beginner tooltips";
 		["AAMU_Interface_Chatspam"]	= "Enable AutoMagic chat spam";
 		["AAMU_Interface_DepositLength"]	= "Base deposits on what length of auction:";
@@ -1832,6 +1840,7 @@ AuctioneerLocalizations = {
 		["AHWC_Interface_WindowMovementOptions"]	= "Window Movement Options";
 		["AHWC_Interface_WindowProtectionOptions"]	= "Window Protection Options";
 		["AHWC_Interface_WindowSizeOptions"]	= "Window Size Options";
+		["AMU_Interface_AutoStop12"]	= "Only sell 12 items to vendor before stopping.";
 		["APPR_Interface_12Hours"]	= "12 hours";
 		["APPR_Interface_24Hours"]	= "24 hours";
 		["APPR_Interface_25x"]	= "25x";
