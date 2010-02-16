@@ -74,7 +74,6 @@ function private.LoadScanData()
 			private.loadingScanData = "loading"
 		else
 			private.loadingScanData = "block" -- prevents re-entry to this function during the LoadAddOn call
-			debugPrint("CoreScan: calling LoadAddOn for Auc-ScanData")
 			load, reason = LoadAddOn("Auc-ScanData")
 			if load then
 				private.loadingScanData = "loading"
@@ -100,7 +99,7 @@ function private.LoadScanData()
 		elseif ready then
 			-- install functions from Auc-ScanData
 			private.GetScanData = scanmodule.GetScanData
-			-- todo: install scanmodule.ClearScanData
+			lib.ClearScanData = scanmodule.ClearScanData
 			-- cleanup
 			private.loadingScanData = nil
 			private.LoadScanData = nil
@@ -149,6 +148,16 @@ function private.GetScanData(serverKey)
 			return newfunc(serverKey)
 		end
 	end
+end
+
+-- AucAdvanced.Scan.ClearScanData(serverKey)
+-- AucAdvanced.Scan.ClearScanData(realmName)
+-- AucAdvanced.Scan.ClearScanData("SERVER") -- all data for current server
+-- AucAdvanced.Scan.ClearScanData("FACTION") -- data for current faction (as determined by AucAdvanced.GetFaction())
+-- AucAdvanced.Scan.ClearScanData("ALL")
+-- CAUTION: the following is a stub function, which will be overloaded with the real function by LoadScanData
+function lib.ClearScanData(key)
+	private.Print("Scan Data cannot be cleared because {{Auc-ScanData}} is not loaded")
 end
 
 function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
