@@ -352,6 +352,11 @@ end
 function lib.ClearScanData(key)
 	if key == "ALL" then
 		wipe(AucScanData.scans)
+	elseif key == "SERVER" then
+		AucScanData.scans[HomeRealm] = nil
+	elseif key == "FACTION" then
+		local _, realm, faction = AucAdvanced.GetFaction()
+		AucScanData.scans[realm][faction] = nil
 	elseif AucScanData.scans[key] then -- it's a realm name
 		AucScanData.scans[key] = nil
 	else
