@@ -688,7 +688,7 @@ end
 
 private.scandataIndex = {}
 private.prevQuery = {}
-private.queryResults = {}
+-- private.queryResults is nil initially
 -- private.prevQueryServerKey is nil initially
 
 function private.clearImageCaches(scanstats)
@@ -699,6 +699,7 @@ function private.clearImageCaches(scanstats)
 	end
 
 	private.prevQueryServerKey = nil
+	private.queryResults = nil -- not required but frees some memory
 end
 
 -- ensure home and neutral factions for current realm are always present
@@ -739,14 +740,14 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 	if serverKey == private.prevQueryServerKey then
 		local samequery = true
 		for k,v in pairs(prevQuery) do
-			if k ~= "page" and v ~= query[k] then
+			if v ~= query[k] then
 				samequery = false
 				break
 			end
 		end
 		if samequery then
 			for k,v in pairs(query) do
-				if k ~= "page" and v ~= prevQuery[k] then
+				if v ~= prevQuery[k] then
 					samequery = false
 					break
 				end
@@ -758,7 +759,8 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 	end
 
 	-- reset results and save a copy of query
-	wipe(queryResults)
+	queryResults = {} -- cannot use wipe; needs to be a new table here {ADV-534}
+	private.queryResults = queryResults
 	wipe(prevQuery)
 	for k, v in pairs(query) do prevQuery[k] = v end
 	private.prevQueryServerKey = serverKey
@@ -778,6 +780,11 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 	local saneQueryLink
 	if query.link then
 		saneQueryLink = SanitizeLink(query.link)
+	end
+
+	local lowerName
+	if query.name then
+		lowerName = query.name:lower()
 	end
 
 	-- scan image to build a table of auctions that match query
@@ -801,9 +808,9 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 			if query.quality and data[Const.QUALITY] ~= query.quality then break end
 			if query.invType and data[Const.IEQUIP] ~= query.invType then break end
 			if query.seller and data[Const.SELLER] ~= query.seller then break end
-			if query.name then
+			if lowerName then
 				local name = data[Const.NAME]
-				if not (name and name:lower():find(query.name:lower(), 1, true)) then break end
+				if not (name and name:lower():find(lowerName, 1, true)) then break end
 			end
 
 			local stack = data[Const.COUNT]
