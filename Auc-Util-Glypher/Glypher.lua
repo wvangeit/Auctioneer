@@ -646,17 +646,10 @@ function private.cofindGlyphs()
     local historyTime = time() - (history * SECONDS_IN_DAY)
     local qtyInk = 0
 
-    local milldata = Enchantrix.Storage.GetItemMilling(36904) -- get probability data on Tiger Lily
-    if not milldata then
-        return
-    end
-
     local inkCost
-    for result, resProb in pairs(milldata) do
-        if result == 39343 then -- goldclover
-            inkCost = ((herbprice * 5) / resProb) * 2 -- 5 herbs divided by the average pigments you get, 2 to make ink of the sea
-        end
-    end
+    local resProb = 2.5
+    inkCost = ((herbprice * 5) / resProb) * 2 -- 5 herbs divided by the average pigments you get, 2 to make ink of the sea
+
     if not inkCost then
         print("Error in inkCost - returned nill!!!!!!!")
     else
