@@ -46,10 +46,8 @@ local lib = AucAdvanced.Buy
 local private = {}
 lib.Private = private
 
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = AucAdvanced.Const
-local empty = table.wipe
-lib.Print = print
 local highlight = "|cffff7f3f"
 
 private.BuyRequests = {}
@@ -86,7 +84,7 @@ end
 	GetQueueStatus returns:
 	number of items in queue
 	total cost of items in queue
-	string showing link and number of items if Prompt is open, false/nil otherwise [todo: confirm which]
+	string showing link and number of items if Prompt is open, nil otherwise
 	cost of item(s) in Prompt, or 0 if closed
 --]]
 function lib.GetQueueStatus()
@@ -106,16 +104,11 @@ end
 	if prompt is true, cancels the Buy Prompt (without sending a "bidcancelled" message)
 --]]
 function lib.CancelBuyQueue(prompt)
-
 	if prompt and private.Prompt:IsShown() then
-		private.Searching = false
-		private.CurAuction = nil
-		private.Prompt:Hide()
-		AucAdvanced.Scan.SetPaused(false)
+		private.HidePrompt(true) -- silent
 	end
-
-	empty(private.BuyRequests)
-
+	private.Searching = false
+	wipe(private.BuyRequests)
 	private.QueueReport()
 end
 
@@ -124,12 +117,12 @@ end
 	AucAdvanced.Buy.QueueBuy(link, seller, count, minbid, buyout, price)
 	price = price to pay
 	AucAdv will buy the first auction it sees fitting the specifics at price.
-	If item cannot be found in current scandata, entry is removed.
+	If item cannot be found on Auctionhouse, entry is removed.
 ]]
 function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 	local canbuy, problem = lib.CanBuy(price, seller)
 	if not canbuy then
-		print("AucAdv: Can't buy "..link.." : "..problem)
+		aucPrint("AucAdv: Can't buy "..link.." : "..problem)
 		return
 	end
 	link = AucAdvanced.SanitizeLink(link)
@@ -138,12 +131,13 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 	end
 	if get("ShowPurchaseDebug") then
 		if buyout > 0 and price >= buyout then
-			print("AucAdv: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+			aucPrint("AucAdv: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
 		else
-			print("AucAdv: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+			aucPrint("AucAdv: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
 		end
 	end
 	private.QueueInsert({link = link, sellername=seller, count=count, minbid=minbid, buyout=buyout, price=price, reason = reason})
+	private.ActivateEvents()
 	lib.ScanPage()
 end
 
@@ -164,11 +158,12 @@ function lib.CanBuy(price, seller)
 end
 
 function private.PushSearch()
+	if AucAdvanced.Scan.IsPaused() then return end
 	local nextRequest = private.BuyRequests[1]
 	local link = nextRequest.link
 	local canbuy, reason = lib.CanBuy(nextRequest.price, nextRequest.sellername)
 	if not canbuy then
-		print("AucAdv: Can't buy "..link.." : "..reason)
+		aucPrint("AucAdv: Can't buy "..link.." : "..reason)
 		private.QueueRemove(1)
 		return
 	end
@@ -179,6 +174,7 @@ function private.PushSearch()
 	TypeID = AucAdvanced.Const.CLASSESREV[itemType]
 	if TypeID then SubTypeID = AucAdvanced.Const.SUBCLASSESREV[itemType][itemSubType] end
 	AucAdvanced.Scan.PushScan()
+	if AucAdvanced.Scan.IsScanning() then return end -- check that PushScan succeeded
 	private.Searching = true
 	AucAdvanced.Scan.StartScan(name, minlevel, minlevel, nil, TypeID, SubTypeID, nil, rarity)
 end
@@ -204,7 +200,7 @@ function lib.FinishedSearch(query)
 					rarity = nil
 				end
 				if rarity == queryquality and minlevel == querylevel then
-					print("AucAdv: Auction for "..link.." no longer exists")
+					aucPrint("AucAdv: Auction for "..link.." no longer exists")
 					private.QueueRemove(i)
 				end
 			end
@@ -215,36 +211,38 @@ end
 
 function private.PromptPurchase(thisAuction)
 	if type(thisAuction.price) ~= "number" then
-		AucAdvanced.Print(highlight.."Cancelling bid: invalid price: "..type(thisAuction.price)..":"..tostring(thisAuction.price))
+		aucPrint(highlight.."Cancelling bid: invalid price: "..type(thisAuction.price)..":"..tostring(thisAuction.price))
 		return
 	elseif type(thisAuction.index) ~= "number" then
-		AucAdvanced.Print(highlight.."Cancelling bid: invalid index: "..type(thisAuction.index)..":"..tostring(thisAuction.index))
+		aucPrint(highlight.."Cancelling bid: invalid index: "..type(thisAuction.index)..":"..tostring(thisAuction.index))
 		return
 	end
-	private.CurAuction = thisAuction
 	AucAdvanced.Scan.SetPaused(true)
+	private.CurAuction = thisAuction
 	private.Prompt:Show()
-	if (private.CurAuction["price"] < private.CurAuction["buyout"]) or (private.CurAuction["buyout"] == 0) then
+	if (thisAuction.price < thisAuction.buyout) or (thisAuction.buyout == 0) then
 		private.Prompt.Text:SetText("Are you sure you want to bid on")
 	else
 		private.Prompt.Text:SetText("Are you sure you want to buyout")
 	end
-	if private.CurAuction["count"] == 1 then
-		private.Prompt.Value:SetText(private.CurAuction["link"].." for "..AucAdvanced.Coins(private.CurAuction["price"],true).."?")
+	if thisAuction.count == 1 then
+		private.Prompt.Value:SetText(thisAuction.link.." for "..AucAdvanced.Coins(thisAuction.price,true).."?")
 	else
-		private.Prompt.Value:SetText(private.CurAuction["count"].."x "..private.CurAuction["link"].." for "..AucAdvanced.Coins(private.CurAuction["price"],true).."?")
+		private.Prompt.Value:SetText(thisAuction.count.."x "..thisAuction.link.." for "..AucAdvanced.Coins(thisAuction.price,true).."?")
 	end
-	private.Prompt.Item.tex:SetTexture(private.CurAuction["texture"])
-	private.Prompt.Reason:SetText(private.CurAuction["reason"] or "")
+	private.Prompt.Item.tex:SetTexture(thisAuction.texture)
+	private.Prompt.Reason:SetText(thisAuction.reason or "")
 	local width = private.Prompt.Value:GetStringWidth() or 0
-	private.Prompt.Frame:SetWidth(math.max((width + 70), 400))
+	private.Prompt.Frame:SetWidth(max((width + 70), 400))
 	private.QueueReport()
 end
 
-function private.HidePrompt()
+function private.HidePrompt(silent)
 	private.Prompt:Hide()
 	private.CurAuction = nil
-	private.QueueReport()
+	if not silent then
+		private.QueueReport()
+	end
 	AucAdvanced.Scan.SetPaused(false)
 end
 
@@ -260,27 +258,27 @@ function lib.ScanPage(startat)
 		link = AucAdvanced.SanitizeLink(link)
 		for j = #private.BuyRequests, 1, -1 do -- must check in reverse order as there are table removes inside the loop
 			local BuyRequest = private.BuyRequests[j]
-			if link == BuyRequest["link"] then
-				local price = BuyRequest["price"]
-				local buy = BuyRequest["buyout"]
+			if link == BuyRequest.link then
+				local price = BuyRequest.price
+				local buy = BuyRequest.buyout
 				local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", i)
 				if ishigh and ((not buy) or (buy <= 0) or (price < buy)) then
-					print("Unable to bid on "..link..". Already highest bidder")
+					aucPrint("Unable to bid on "..link..". Already highest bidder")
 					private.QueueRemove(j)
 				else
 					local brSeller = BuyRequest.sellername
 					if ((not owner) or (not brSeller) or (brSeller == "") or (owner == brSeller))
-					and (count == BuyRequest["count"])
-					and (minBid == BuyRequest["minbid"])
-					and (buyout == BuyRequest["buyout"]) then --found the auction we were looking for
-						if (BuyRequest["price"] >= (curBid + minIncrement)) or (BuyRequest["price"] >= buyout) then
+					and (count == BuyRequest.count)
+					and (minBid == BuyRequest.minbid)
+					and (buyout == BuyRequest.buyout) then --found the auction we were looking for
+						if (BuyRequest.price >= (curBid + minIncrement)) or (BuyRequest.price >= buyout) then
 							BuyRequest.index = i
 							BuyRequest.texture = texture
 							private.QueueRemove(j)
 							private.PromptPurchase(BuyRequest)
 							return
 						else
-							print(highlight.."Unable to bid on "..link..". Price invalid")
+							aucPrint(highlight.."Unable to bid on "..link..". Price invalid")
 							private.QueueRemove(j)
 						end
 					end
@@ -291,10 +289,10 @@ function lib.ScanPage(startat)
 end
 
 --Cancels the current auction
---Also sends out a Callback with a callback string of "<link>;<price>"
+--Also sends out a Callback with a callback string of "<link>;<price>;<count>"
 function private.CancelPurchase()
 	private.Searching = false
-	local CallBackString = string.join(";", tostring(private.CurAuction["link"]), tostring(private.CurAuction["price"]), tostring(private.CurAuction["count"]))
+	local CallBackString = strjoin(";", tostringall(private.CurAuction.link, private.CurAuction.price, private.CurAuction.count))
 	AucAdvanced.SendProcessorMessage("bidcancelled", CallBackString)
 	private.HidePrompt()
 	--scan the page again for other auctions
@@ -305,14 +303,14 @@ function private.PerformPurchase()
 	if not private.CurAuction then return end
 	private.Searching = false
 	--first, do some Sanity Checking
-	local index = private.CurAuction["index"]
-	local price = private.CurAuction["price"]
+	local index = private.CurAuction.index
+	local price = private.CurAuction.price
 	if type(price)~="number" then
-		AucAdvanced.Print(highlight.."Cancelling bid: invalid price: "..type(price)..":"..tostring(price))
+		aucPrint(highlight.."Cancelling bid: invalid price: "..type(price)..":"..tostring(price))
 		private.HidePrompt()
 		return
 	elseif type(index) ~= "number" then
-		AucAdvanced.Print(highlight.."Cancelling bid: invalid index: "..type(index)..":"..tostring(index))
+		aucPrint(highlight.."Cancelling bid: invalid index: "..type(index)..":"..tostring(index))
 		private.HidePrompt()
 		return
 	end
@@ -320,37 +318,37 @@ function private.PerformPurchase()
 	link = AucAdvanced.SanitizeLink(link)
 	local name, texture, count, _, _, _, minBid, minIncrement, buyout, curBid, ishigh, owner = GetAuctionItemInfo("list", index)
 
-	if (private.CurAuction["link"] ~= link) then
-		AucAdvanced.Print(highlight.."Cancelling bid: "..tostring(index).." not found")
+	if (private.CurAuction.link ~= link) then
+		aucPrint(highlight.."Cancelling bid: "..tostring(index).." not found")
 		private.HidePrompt()
 		return
 	elseif (price < minBid) then
-		AucAdvanced.Print(highlight.."Cancelling bid: Bid below minimum bid: "..AucAdvanced.Coins(price))
+		aucPrint(highlight.."Cancelling bid: Bid below minimum bid: "..AucAdvanced.Coins(price))
 		private.HidePrompt()
 		return
 	elseif (curBid and curBid > 0 and price < curBid + minIncrement and price < buyout) then
-		AucAdvanced.Print(highlight.."Cancelling bid: Already higher bidder")
+		aucPrint(highlight.."Cancelling bid: Already higher bidder")
 		private.HidePrompt()
 		return
 	end
 	if get("ShowPurchaseDebug") then
 		if buyout > 0 and price >= buyout then
-			print("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(price))
+			aucPrint("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(price))
 		else
-			print("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(price))
+			aucPrint("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(price))
 		end
 	end
 
 	PlaceAuctionBid("list", index, price)
 
-	private.CurAuction["reason"] = private.Prompt.Reason:GetText()
+	private.CurAuction.reason = private.Prompt.Reason:GetText()
 	--Add bid to list of bids we're watching for
 	local pendingBid = replicate(private.CurAuction)
 	tinsert(private.PendingBids, pendingBid)
 	--register for the Response events if this is the first pending bid
 	if (#private.PendingBids == 1) then
-		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
-		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "AucAdv_CoreBuy", private.onEventHookBid)
+		private.updateFrame:RegisterEvent("CHAT_MSG_SYSTEM")
+		private.updateFrame:RegisterEvent("UI_ERROR_MESSAGE")
 	end
 
 	--get ready for next bid action
@@ -364,26 +362,8 @@ function private.removePendingBid()
 
 		--Unregister events if no more bids pending
 		if (#private.PendingBids == 0) then
-			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "AucAdv_CoreBuy", private.onEventHookBid)
-			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "AucAdv_CoreBuy", private.onEventHookBid)
-		end
-	end
-end
-
-function private.onEventHookBid(_, event, arg1)
-	if (event == "CHAT_MSG_SYSTEM" and arg1) then
-		if (arg1 == ERR_AUCTION_BID_PLACED) then
-		 	private.onBidAccepted()
-		end
-	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		if (arg1 == ERR_ITEM_NOT_FOUND or
-			arg1 == ERR_NOT_ENOUGH_MONEY or
-			arg1 == ERR_AUCTION_BID_OWN or
-			arg1 == ERR_AUCTION_HIGHER_BID or
-			arg1 == ERR_AUCTION_BID_INCREMENT or
-			arg1 == ERR_AUCTION_MIN_BID or
-			arg1 == ERR_ITEM_MAX_COUNT) then
-			private.onBidFailed(arg1)
+			private.updateFrame:UnregisterEvent("CHAT_MSG_SYSTEM")
+			private.updateFrame:UnregisterEvent("UI_ERROR_MESSAGE")
 		end
 	end
 end
@@ -401,54 +381,77 @@ end
 --purpose is to output to chat the reason for the failure, and then pass the Bid on to private.removePendingBid()
 --The output may duplicate some client output.  If so, those lines need to be removed.
 function private.onBidFailed(arg1)
-	print(highlight.."Bid Failed: "..arg1)
+	aucPrint(highlight.."Bid Failed: "..arg1)
 	private.removePendingBid()
 end
 
-function private.OnUpdate()
-	if AuctionFrame and AuctionFrame:IsVisible() then
-		if (not private.Prompt:IsShown()) --if we have a prompt, we don't need to look any more
-			and (not private.Searching)
-			and (#private.BuyRequests > 0) then
-				private.PushSearch()
+--[[ Timer, Event Handler and Message Processor ]]--
+
+function private.ActivateEvents()
+	-- Called when a new auction is queued, or when the Auctionhouse is opened
+	if not private.isActivated and #private.BuyRequests > 0 then
+		private.isActivated = true
+		private.updateFrame:Show() -- start timer
+		private.updateFrame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	end
+end
+
+function private.DeactivateEvents()
+	-- Called when there are no items left in the buy requests list, or when the Auctionhouse is closed
+	private.Searching = false
+	if private.isActivated then
+		private.isActivated = nil
+		private.updateFrame:Hide() -- stop timer
+		private.updateFrame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	end
+end
+
+local function OnUpdate()
+	if not (private.Searching or private.CurAuction) then
+		if #private.BuyRequests > 0 then
+			private.PushSearch()
+		else
+			private.DeactivateEvents()
 		end
-	elseif private.CurAuction then --AH was closed, so reinsert current request back into the queue
-		private.Prompt:Hide()
-		private.QueueInsert(private.CurAuction, 1)
-		private.Searching = false
-		private.CurAuction = nil
-		AucAdvanced.Scan.SetPaused(false)
-	else
-		private.Searching = false
 	end
 end
 
---[[
-    Our frames for feeding event functions
-]]
-
-function private.OnEvent(...)
-	if (event == "AUCTION_ITEM_LIST_UPDATE") then
+local function OnEvent(frame, event, arg1, ...)
+	if event == "AUCTION_ITEM_LIST_UPDATE" then
 		lib.ScanPage()
+	elseif event == "AUCTION_HOUSE_SHOW" then
+		private.ActivateEvents()
+	elseif event == "AUCTION_HOUSE_CLOSED" then
+		if private.CurAuction then -- prompt is open: cancel prompt and requeue auction
+			private.QueueInsert(private.CurAuction, 1)
+			private.HidePrompt(true) -- silent
+		end
+		private.DeactivateEvents()
+	elseif event == "CHAT_MSG_SYSTEM" then
+		if arg1 == ERR_AUCTION_BID_PLACED then
+		 	private.onBidAccepted()
+		end
+	elseif event == "UI_ERROR_MESSAGE" then
+		if (arg1 == ERR_ITEM_NOT_FOUND or
+			arg1 == ERR_NOT_ENOUGH_MONEY or
+			arg1 == ERR_AUCTION_BID_OWN or
+			arg1 == ERR_AUCTION_HIGHER_BID or
+			arg1 == ERR_AUCTION_BID_INCREMENT or
+			arg1 == ERR_AUCTION_MIN_BID or
+			arg1 == ERR_ITEM_MAX_COUNT) then
+			private.onBidFailed(arg1)
+		end
 	end
 end
 
-function private.ShowTooltip()
-	GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
-	GameTooltip:SetHyperlink(private.CurAuction["link"])
-	GameTooltip:ClearAllPoints()
-	GameTooltip:SetPoint("TOPRIGHT", private.Prompt.Item, "TOPLEFT", -10, -20)
-end
+private.updateFrame = CreateFrame("Frame")
+private.updateFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
+private.updateFrame:RegisterEvent("AUCTION_HOUSE_CLOSED")
+private.updateFrame:SetScript("OnUpdate", OnUpdate)
+private.updateFrame:SetScript("OnEvent", OnEvent)
+private.updateFrame:Hide()
 
-function private.HideTooltip()
-	GameTooltip:Hide()
-end
-
--- Simple timer to keep actions up-to-date even if an event misfires
-private.updateFrame = CreateFrame("frame", nil, UIParent)
-private.updateFrame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-private.updateFrame:SetScript("OnUpdate", private.OnUpdate)
-private.updateFrame:SetScript("OnEvent", private.OnEvent)
+--[[ Prompt Frame ]]--
 
 --this is a anchor frame that never changes size
 private.Prompt = CreateFrame("frame", "AucAdvancedBuyPrompt", UIParent)
@@ -476,14 +479,34 @@ private.Prompt.Frame:SetBackdrop({
 })
 private.Prompt.Frame:SetBackdropColor(0,0,0,0.8)
 
+-- Helper functions
+local function ShowTooltip()
+	GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
+	GameTooltip:SetHyperlink(private.CurAuction["link"])
+	GameTooltip:ClearAllPoints()
+	GameTooltip:SetPoint("TOPRIGHT", private.Prompt.Item, "TOPLEFT", -10, -20)
+end
+local function HideTooltip()
+	GameTooltip:Hide()
+end
+local function ClearReasonFocus()
+	private.Prompt.Reason:ClearFocus()
+end
+local function DragStart()
+	private.Prompt:StartMoving()
+end
+local function DragStop()
+	private.Prompt:StopMovingOrSizing()
+end
+
 private.Prompt.Item = CreateFrame("Button", "AucAdvancedBuyPromptItem", private.Prompt)
 private.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
 private.Prompt.Item:GetNormalTexture():SetTexCoord(0,0.640625, 0, 0.640625)
 private.Prompt.Item:SetPoint("TOPLEFT", private.Prompt.Frame, "TOPLEFT", 15, -15)
 private.Prompt.Item:SetHeight(37)
 private.Prompt.Item:SetWidth(37)
-private.Prompt.Item:SetScript("OnEnter", private.ShowTooltip)
-private.Prompt.Item:SetScript("OnLeave", private.HideTooltip)
+private.Prompt.Item:SetScript("OnEnter", ShowTooltip)
+private.Prompt.Item:SetScript("OnLeave", HideTooltip)
 private.Prompt.Item.tex = private.Prompt.Item:CreateTexture(nil, "OVERLAY")
 private.Prompt.Item.tex:SetPoint("TOPLEFT", private.Prompt.Item, "TOPLEFT", 0, 0)
 private.Prompt.Item.tex:SetPoint("BOTTOMRIGHT", private.Prompt.Item, "BOTTOMRIGHT", 0, 0)
@@ -501,9 +524,7 @@ private.Prompt.Reason:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 150, -55)
 private.Prompt.Reason:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -30, -55)
 private.Prompt.Reason:SetHeight(20)
 private.Prompt.Reason:SetAutoFocus(false)
-private.Prompt.Reason:SetScript("OnEnterPressed", function()
-	private.Prompt.Reason:ClearFocus()
-	end)
+private.Prompt.Reason:SetScript("OnEnterPressed", ClearReasonFocus)
 private.Prompt.Reason:SetText("")
 
 private.Prompt.Reason.Label = private.Prompt.Reason:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -527,15 +548,15 @@ private.Prompt.DragTop:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 10, -5)
 private.Prompt.DragTop:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -10, -5)
 private.Prompt.DragTop:SetHeight(6)
 private.Prompt.DragTop:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-private.Prompt.DragTop:SetScript("OnMouseDown", function() private.Prompt:StartMoving() end)
-private.Prompt.DragTop:SetScript("OnMouseUp", function() private.Prompt:StopMovingOrSizing() end)
+private.Prompt.DragTop:SetScript("OnMouseDown", DragStart)
+private.Prompt.DragTop:SetScript("OnMouseUp", DragStop)
 
 private.Prompt.DragBottom = CreateFrame("Button", nil, private.Prompt)
 private.Prompt.DragBottom:SetPoint("BOTTOMLEFT", private.Prompt, "BOTTOMLEFT", 10, 5)
 private.Prompt.DragBottom:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -10, 5)
 private.Prompt.DragBottom:SetHeight(6)
 private.Prompt.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-private.Prompt.DragBottom:SetScript("OnMouseDown", function() private.Prompt:StartMoving() end)
-private.Prompt.DragBottom:SetScript("OnMouseUp", function() private.Prompt:StopMovingOrSizing() end)
+private.Prompt.DragBottom:SetScript("OnMouseDown", DragStart)
+private.Prompt.DragBottom:SetScript("OnMouseUp", DragStop)
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
