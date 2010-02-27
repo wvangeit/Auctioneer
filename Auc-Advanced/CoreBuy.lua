@@ -116,29 +116,58 @@ end
 	to add an auction to the Queue:
 	AucAdvanced.Buy.QueueBuy(link, seller, count, minbid, buyout, price)
 	price = price to pay
-	AucAdv will buy the first auction it sees fitting the specifics at price.
+	Auctioneer will buy the first auction it sees fitting the specifics at price.
 	If item cannot be found on Auctionhouse, entry is removed.
 ]]
 function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
+	if not (link and count and minbid and buyout) then return end
 	local canbuy, problem = lib.CanBuy(price, seller)
 	if not canbuy then
-		aucPrint("AucAdv: Can't buy "..link.." : "..problem)
+		aucPrint("Auctioneer: Can't buy "..link.." : "..problem)
 		return
 	end
 	link = AucAdvanced.SanitizeLink(link)
 	if buyout > 0 and price > buyout then
 		price = buyout
+	elseif buyout < 0 then
+		buyout = 0
 	end
+	local name, _, quality, _, minlevel, classname, subclassname = GetItemInfo(link)
+	if not name then
+		aucPrint("Auctioneer: Can't buy "..link.." : ".."Unable to find info for this item")
+		return
+	end
+	if quality and quality < 1 then quality = nil end
+	local classindex = AucAdvanced.Const.CLASSESREV[classname]
+	local subclassindex
+	if classindex then subclassindex = AucAdvanced.Const.SUBCLASSESREV[classname][subclassname] end
+	local isbid = buyout == 0 or price < buyout
+	--
 	if get("ShowPurchaseDebug") then
-		if buyout > 0 and price >= buyout then
-			aucPrint("AucAdv: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+		if isbid then
+			aucPrint("Auctioneer: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
 		else
-			aucPrint("AucAdv: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
+			aucPrint("Auctioneer: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
 		end
 	end
-	private.QueueInsert({link = link, sellername=seller, count=count, minbid=minbid, buyout=buyout, price=price, reason = reason})
+	private.QueueInsert({
+		link = link,
+		sellername = seller or "",
+		count = count,
+		minbid = minbid,
+		buyout = buyout,
+		price = price,
+		reason = reason,
+		itemname = name:lower(),
+		uselevel = minlevel,
+		classindex = classindex,
+		subclassindex = subclassindex,
+		quality = quality,
+		isbid = isbid,
+	})
 	private.ActivateEvents()
 	lib.ScanPage()
+	return true
 end
 
 --[[
@@ -160,23 +189,18 @@ end
 function private.PushSearch()
 	if AucAdvanced.Scan.IsPaused() then return end
 	local nextRequest = private.BuyRequests[1]
-	local link = nextRequest.link
 	local canbuy, reason = lib.CanBuy(nextRequest.price, nextRequest.sellername)
 	if not canbuy then
-		aucPrint("AucAdv: Can't buy "..link.." : "..reason)
+		aucPrint("Auctioneer: Can't buy "..nextRequest.link.." : "..reason)
 		private.QueueRemove(1)
 		return
 	end
 
-	local _, name, rarity, minlevel, itemType, itemSubType, TypeID, SubTypeID
-	name, _, rarity, _, minlevel, itemType, itemSubType = GetItemInfo(link)
-	nextRequest.itemname = name:lower()
-	TypeID = AucAdvanced.Const.CLASSESREV[itemType]
-	if TypeID then SubTypeID = AucAdvanced.Const.SUBCLASSESREV[itemType][itemSubType] end
 	AucAdvanced.Scan.PushScan()
 	if AucAdvanced.Scan.IsScanning() then return end -- check that PushScan succeeded
 	private.Searching = true
-	AucAdvanced.Scan.StartScan(name, minlevel, minlevel, nil, TypeID, SubTypeID, nil, rarity)
+	AucAdvanced.Scan.StartScan(nextRequest.itemname, nextRequest.uselevel, nextRequest.uselevel, nil,
+		nextRequest.classindex, nextRequest.subclassindex, nil, nextRequest.quality)
 end
 
 function lib.FinishedSearch(query)
@@ -187,20 +211,16 @@ function lib.FinishedSearch(query)
 		local queryquality = query.quality
 		for i = queuecount, 1, -1 do
 			local BuyRequest = private.BuyRequests[i]
-			local itemname = BuyRequest.itemname -- will be lowercase already (if it exists)
-				-- (will be nil if we haven't called PushSearch on this request yet)
+			local itemname = BuyRequest.itemname -- already lowercased
 			if itemname and itemname:find(queryname, 1, true) then -- plain text matching
 				-- additional checks
-				local link = BuyRequest.link
-				local _, _, rarity, _, minlevel = GetItemInfo(link)
+				local quality = BuyRequest.quality
+				local minlevel = BuyRequest.uselevel
 				if minlevel == 0 then
 					minlevel = nil
 				end
-				if rarity and rarity < 1 then
-					rarity = nil
-				end
-				if rarity == queryquality and minlevel == querylevel then
-					aucPrint("AucAdv: Auction for "..link.." no longer exists")
+				if quality == queryquality and minlevel == querylevel then
+					aucPrint("Auctioneer: Auction for "..BuyRequest.link.." no longer exists")
 					private.QueueRemove(i)
 				end
 			end
@@ -333,9 +353,9 @@ function private.PerformPurchase()
 	end
 	if get("ShowPurchaseDebug") then
 		if buyout > 0 and price >= buyout then
-			aucPrint("AucAdv: Buying out "..link.." for "..AucAdvanced.Coins(price))
+			aucPrint("Auctioneer: Buying out "..link.." for "..AucAdvanced.Coins(price))
 		else
-			aucPrint("AucAdv: Bidding on "..link.." for "..AucAdvanced.Coins(price))
+			aucPrint("Auctioneer: Bidding on "..link.." for "..AucAdvanced.Coins(price))
 		end
 	end
 
