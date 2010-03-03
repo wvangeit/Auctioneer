@@ -45,12 +45,15 @@ end
 -------------------------------------------------------------------------------
 -- Called before StartAuction()
 -------------------------------------------------------------------------------
-function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
+local itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti --these store the last auction for the new Multi auction processor added in wow 3.3.3
+function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, stackNumber)
+	--REMOVE 3.3.3 we dont use this count value it is multistack related not the actual stack value being created only name is still used
+	local name, texture, countDepreciated, quality, canUse, price = GetAuctionSellItemInfo() 
+	--debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name, count)
 	
-	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
-	--debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name)
-	
-	if (name and count and price) then
+	--REMOVE 3.3.3 Shim  we will get the count passed via the function hook. This is just to let bean work in 3.3.2 and 3.3.3
+	if not count then count = countDepreciated end --REMOVE
+	if (name and count) then
 		--Look in the bags find the locked item so we can get the itemlink
 		local itemLink
 		for bagID = 0, 4 do
@@ -64,6 +67,7 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
 		end
 				
 		local deposit = CalculateAuctionDeposit(runTime)
+		itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = itemLink, name, count, minBid, buyoutPrice, runTime, deposit
 		private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
 	end
 end
@@ -127,7 +131,7 @@ function private.onAuctionCreated()
 		
 		--debugPrint("3", post.minBid, post.buyoutPrice, #private.PendingPosts,  "Added", post.itemLink, "to the postedAuctions DB")
 	elseif post and not post.itemLink then
-		debugPrint("ItemLink failure for teh following auction.")
+		debugPrint("ItemLink failure for the following auction.")
 		debugPrint(post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit)
 	end
 end
@@ -138,18 +142,36 @@ end
 function private.onPostFailed()
 	private.removePendingPost()
 end
+--------------------------------------------------------------------------------
+-- Called when the Multi auction feature is used in patch 3.3.3
+--------------------------------------------------------------------------------
+function private.onMultiPost(current, total)
+	if current > 1 then --first has already been handled by the function hook. We add each additional post here
+		--print("added", current, "of", total, itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
+		private.addPendingPost(itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Use event scripts instead of function hooks to know when a auction has been accepted
 -- OnEvent handler these are unhooked when not needed
 -------------------------------------------------------------------------------
-function private.postEvent(_, event, message)
+function private.postEvent(_, event, message, ...)
 	if event == "CHAT_MSG_SYSTEM" and message == ERR_AUCTION_STARTED and private.PendingPosts then
 		private.onAuctionCreated()
 	elseif event == "UI_ERROR_MESSAGE" and message == ERR_NOT_ENOUGH_MONEY then
 		private.onPostFailed()
+	elseif event =="AUCTION_MULTISELL_UPDATE" then
+		private.onMultiPost(message, ...)
+	--elseif event =="AUCTION_MULTISELL_FAILURE" then
+	--so far no need for this event, this can occur before the last posted item has cleared beancounter
 	end
+	
+	
+	print(event, message, ...)
 end
 private.postEventFrame = CreateFrame("Frame")
 private.postEventFrame:SetScript("OnEvent", private.postEvent)
-
+--private.postEventFrame:RegisterEvent("AUCTION_MULTISELL_START")
+private.postEventFrame:RegisterEvent("AUCTION_MULTISELL_UPDATE")
+--private.postEventFrame:RegisterEvent("AUCTION_MULTISELL_FAILURE")
