@@ -166,9 +166,6 @@ function private.postEvent(_, event, message, ...)
 	--elseif event =="AUCTION_MULTISELL_FAILURE" then
 	--so far no need for this event, this can occur before the last posted item has cleared beancounter
 	end
-	
-	
-	print(event, message, ...)
 end
 private.postEventFrame = CreateFrame("Frame")
 private.postEventFrame:SetScript("OnEvent", private.postEvent)
