@@ -124,7 +124,7 @@ function private.coroutineResume()
 end
 --Mailbox Snapshots
 function private.updateInbox()
-	if not Refreshed then print("TERMINATE") return end --dont process unless we have opened teh mail and the inbox is ready
+	if not Refreshed then return end --dont process unless we have opened teh mail and the inbox is ready
 
 	reportTotalMail = GetInboxNumItems()
 	for n = 1,GetInboxNumItems() do
