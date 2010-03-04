@@ -399,7 +399,9 @@ end
 			local mat, count, value = uMeta:match("DE:(%d-):(%d-):(%d-)|")
 			if mat and count and value then
 				local _, link = GetItemInfo(mat)
-				uReason = link.." X "..count
+				if link then
+					uReason = link.." X "..count
+				end
 			end
 					
 			local pricePer, stack, text = 0, tonumber(uStack), _BC('UiWononBuyout')
