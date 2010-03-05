@@ -113,36 +113,45 @@ function lib.CancelBuyQueue(prompt)
 end
 
 --[[
-	to add an auction to the Queue:
-	AucAdvanced.Buy.QueueBuy(link, seller, count, minbid, buyout, price)
-	price = price to pay
+	Add an auction to the Buy Queue:
+	AucAdvanced.Buy.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosearch)
+	This is the main entry point for the lib, and so contains the most parameter checks
+	link = (string) 'sanitized' link
+	seller = (string, optional) name of seller
+	count = (number) stack count
+	minbid = (number) original min bid
+	buyout = (number) buyout price
+	price = (number) price to pay
+	reason = (string, optional) reason to display in the buy prompt dialog
+	nosearch = (boolean, optional) flag specifying that the auction is on the current page - if not found there, no search will be triggered
 	Auctioneer will buy the first auction it sees fitting the specifics at price.
-	If item cannot be found on Auctionhouse, entry is removed.
+	If item cannot be found on Auctionhouse, will output a warning message to chat
 ]]
-function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
-	if not (link and count and minbid and buyout) then return end
-	local canbuy, problem = lib.CanBuy(price, seller)
-	if not canbuy then
-		aucPrint("Auctioneer: Can't buy "..link.." : "..problem)
-		return
-	end
+local function QueueBuyErrorHelper(link, reason)
+	aucPrint(format("Auctioner: Unable to buy %s : %s", link, reason))
+	return false, reason -- note: under development: the specific return strings may be changed
+end
+function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosearch)
+	if type(link) ~= "string" then return QueueBuyErrorHelper("\""..tostring(link).."\"", "Invalid link") end
+	if seller ~= nil and type(seller) ~= "string" then return QueueBuyErrorHelper(link, "Invalid seller") end
+	count = tonumber(count)
+	if not count or count < 1 then return QueueBuyErrorHelper(link, "Invalid count") end
+	minbid = tonumber(minbid)
+	if not minbid or minbid < 0 then return QueueBuyErrorHelper(link, "Invalid minbid") end -- it is sometimes possible for auctions to report minbid == 0
+	buyout = tonumber(buyout)
+	if not buyout or buyout < 0 then return QueueBuyErrorHelper(link, "Invalid buyout") end
+	price = tonumber(price)
+	local canbuy, problem = lib.CanBuy(price, seller, minbid, buyout)
+	if not canbuy then return QueueBuyErrorHelper(link, problem) end
 	link = AucAdvanced.SanitizeLink(link)
-	if buyout > 0 and price > buyout then
-		price = buyout
-	elseif buyout < 0 then
-		buyout = 0
-	end
 	local name, _, quality, _, minlevel, classname, subclassname = GetItemInfo(link)
-	if not name then
-		aucPrint("Auctioneer: Can't buy "..link.." : ".."Unable to find info for this item")
-		return
+	if not name then return QueueBuyErrorHelper(link, "Unable to find info for this item")
 	end
-	if quality and quality < 1 then quality = nil end
 	local classindex = AucAdvanced.Const.CLASSESREV[classname]
 	local subclassindex
 	if classindex then subclassindex = AucAdvanced.Const.SUBCLASSESREV[classname][subclassname] end
 	local isbid = buyout == 0 or price < buyout
-	--
+
 	if get("ShowPurchaseDebug") then
 		if isbid then
 			aucPrint("Auctioneer: Queueing Bid of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
@@ -150,6 +159,7 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 			aucPrint("Auctioneer: Queueing Buyout of "..link.." from seller "..tostring(seller).." for "..AucAdvanced.Coins(price))
 		end
 	end
+
 	private.QueueInsert({
 		link = link,
 		sellername = seller or "",
@@ -157,13 +167,14 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason)
 		minbid = minbid,
 		buyout = buyout,
 		price = price,
-		reason = reason,
+		reason = tostring(reason or ""),
 		itemname = name:lower(),
-		uselevel = minlevel,
+		uselevel = minlevel or 0,
 		classindex = classindex,
 		subclassindex = subclassindex,
-		quality = quality,
+		quality = quality or 0,
 		isbid = isbid,
+		nosearch = not not nosearch, -- double 'not' to force boolean type
 	})
 	private.ActivateEvents()
 	lib.ScanPage()
@@ -174,12 +185,21 @@ end
 	This function will return false, reason if an auction by seller at price cannot be bought
 	Else it will return true.
 	Note that this will not catch all, but if it says you can't, you can't
+	Parameter 'price' is required, all others are optional
 ]]
-function lib.CanBuy(price, seller)
-	if not price or price == 0 then
+function lib.CanBuy(price, seller, minbid, buyout)
+	if type(price) ~= "number" then
 		return false, "no price given"
+	elseif floor(price) ~= price then
+		return false, "price must be an integer"
+	elseif price < 1 then
+		return false, "price cannot be less than 1"
 	elseif GetMoney() < price then
 		return false, "not enough money"
+	elseif minbid and price < minbid then
+		return false, "price below minimum bid"
+	elseif buyout and buyout > 0 and price > buyout then
+		return false, "price higher than buyout"
 	elseif seller and AucAdvancedConfig["users."..GetRealmName().."."..seller] then
 		return false, "own auction"
 	end
@@ -189,6 +209,10 @@ end
 function private.PushSearch()
 	if AucAdvanced.Scan.IsPaused() then return end
 	local nextRequest = private.BuyRequests[1]
+	if nextRequest.nosearch then -- backup check (should have been removed by ScanPage)
+		private.QueueRemove(1)
+		return
+	end
 	local canbuy, reason = lib.CanBuy(nextRequest.price, nextRequest.sellername)
 	if not canbuy then
 		aucPrint("Auctioneer: Can't buy "..nextRequest.link.." : "..reason)
@@ -203,26 +227,30 @@ function private.PushSearch()
 		nextRequest.classindex, nextRequest.subclassindex, nil, nextRequest.quality)
 end
 
-function lib.FinishedSearch(query)
+function lib.FinishedSearch() end -- temporary dummy function
+function private.FinishedSearch(scanstats)
+	if not scanstats or scanstats.wasIncomplete then return end
+	local query = scanstats.query
+	if not query or query.isUsable or query.invType or not query.name then return end
 	local queuecount = #private.BuyRequests
-	if queuecount > 0 and query.name then -- only check scans that include an item name
+	if queuecount > 0 then
 		local queryname = query.name -- lowercase and may have been truncated when query was created
-		local querylevel = query.minUseLevel
+		local queryminlevel = query.minUseLevel
+		local querymaxlevel = query.maxUseLevel
 		local queryquality = query.quality
-		for i = queuecount, 1, -1 do
-			local BuyRequest = private.BuyRequests[i]
-			local itemname = BuyRequest.itemname -- already lowercased
-			if itemname and itemname:find(queryname, 1, true) then -- plain text matching
-				-- additional checks
-				local quality = BuyRequest.quality
-				local minlevel = BuyRequest.uselevel
-				if minlevel == 0 then
-					minlevel = nil
-				end
-				if quality == queryquality and minlevel == querylevel then
-					aucPrint("Auctioneer: Auction for "..BuyRequest.link.." no longer exists")
-					private.QueueRemove(i)
-				end
+		local queryclassindex = query.classIndex
+		local querysubclassindex = query.subclassIndex
+		for ind = queuecount, 1, -1 do
+			local request = private.BuyRequests[ind]
+			if request.itemname:find(queryname, 1, true) -- already lowercased/plain text matching
+			and (not queryminlevel or request.uselevel >= queryminlevel)
+			and (not querymaxlevel or request.uselevel <= querymaxlevel)
+			and (not queryquality or request.quality >= queryquality)
+			and (not queryclassindex or request.classindex == queryclassindex)
+			and (not querysubclassindex or request.subclassindex == querysubclassindex)
+			then
+				aucPrint("Auctioneer: Auction for "..request.link.." no longer exists")
+				private.QueueRemove(ind)
 			end
 		end
 	end
@@ -287,11 +315,11 @@ function lib.ScanPage(startat)
 					private.QueueRemove(j)
 				else
 					local brSeller = BuyRequest.sellername
-					if ((not owner) or (not brSeller) or (brSeller == "") or (owner == brSeller))
+					if (not owner or brSeller == "" or owner == brSeller)
 					and (count == BuyRequest.count)
 					and (minBid == BuyRequest.minbid)
 					and (buyout == BuyRequest.buyout) then --found the auction we were looking for
-						if (BuyRequest.price >= (curBid + minIncrement)) or (BuyRequest.price >= buyout) then
+						if (BuyRequest.price >= (curBid + minIncrement)) or (BuyRequest.price == buyout) then
 							BuyRequest.index = i
 							BuyRequest.texture = texture
 							private.QueueRemove(j)
@@ -304,6 +332,18 @@ function lib.ScanPage(startat)
 					end
 				end
 			end
+		end
+	end
+	-- check for nosearch flags
+	for j = #private.BuyRequests, 1, -1 do
+		local BuyRequest = private.BuyRequests[j]
+		if BuyRequest.nosearch then
+			if startat then
+				-- we need to be *certain* the whole batch has been scanned before deciding this item is not there.
+				-- recurse with no restriction. should only be needed rarely.
+				return lib.ScanPage()
+			end
+			private.QueueRemove(j)
 		end
 	end
 end
@@ -461,6 +501,12 @@ local function OnEvent(frame, event, arg1, ...)
 			arg1 == ERR_ITEM_MAX_COUNT) then
 			private.onBidFailed(arg1)
 		end
+	end
+end
+
+function lib.Processor(event, ...)
+	if event == "scanstats" then
+		private.FinishedSearch(...)
 	end
 end
 
