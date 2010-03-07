@@ -2107,8 +2107,11 @@ local ItemUsableCached = {
 
 	RegisterChatString = function(this, chatString)
 		local pattern = chatString
-		pattern = string.gsub(pattern, "(%%s)", "(.+)")
-		pattern = string.gsub(pattern, "(%%d)", "(.+)")
+		pattern = gsub(pattern, "%%s", ".+")
+		pattern = gsub(pattern, "%%d", ".+")
+		pattern = gsub(pattern, "%%%d+%$s", ".+")
+		pattern = gsub(pattern, "%%%d+%$d", ".+")
+		pattern = gsub(pattern, "|3%-%d+%(%%s%)", ".+")
 		tinsert(this.patterns, pattern)
 	end,
 
