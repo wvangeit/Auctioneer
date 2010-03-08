@@ -40,7 +40,7 @@ if not lib then return end
 local DATABASE_VERSION = 1.3
 local INTERFACE_VERSION = "A" -- must match CoreScan's SCANDATA_VERSION
 
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 
 private.distributionCache = {}
 private.worthCache = {}
@@ -350,26 +350,47 @@ function lib.GetScanData(serverKey)
 end
 
 function lib.ClearScanData(key)
+	local report, serverKey
 	if key == "ALL" then
 		wipe(AucScanData.scans)
+		report = "all realms"
 	elseif key == "SERVER" then
 		AucScanData.scans[HomeRealm] = nil
+		report = HomeRealm
 	elseif key == "FACTION" then
-		local _, realm, faction = AucAdvanced.GetFaction()
+		local sKey, realm, faction = AucAdvanced.GetFaction()
 		AucScanData.scans[realm][faction] = nil
+		local _, _, text = AucAdvanced.SplitServerKey(sKey)
+		report = text
+		serverKey = sKey
 	elseif AucScanData.scans[key] then -- it's a realm name
 		AucScanData.scans[key] = nil
+		report = key
 	else
 		-- is it a serverKey?
-		local realm, faction = AucAdvanced.SplitServerKey(key)
+		local realm, faction, text = AucAdvanced.SplitServerKey(key)
 		if faction and AucScanData.scans[realm] then
 			AucScanData.scans[realm][faction] = nil
+			report = text
+			serverKey = key
 		end
 	end
 	wipe(private.dataCache)
 	-- Our functions expect home faction to exist - create a new one if it has just been deleted
 	if not AucScanData.scans[HomeRealm] then AucScanData.scans[HomeRealm] = {} end
 	lib.GetScanData(HomeKey) -- force create (if needed) and put back in cache
+	if report then
+		aucPrint("Auctioneer: ScanData cleared for {{"..report.."}}.")
+		local clearstats = {
+			source = "clear",
+			clearRequest = key,
+			clearReport = report,
+			serverKey = serverKey,
+		}
+		AucAdvanced.SendProcessorMessage("scanstats", clearstats)
+	else
+		aucPrint("Auctioneer: Cannot clear ScanData for \""..tostring(key).."\"")
+	end
 end
 
 function private.Unpack(scandata)
@@ -393,7 +414,7 @@ function private.Unpack(scandata)
 				end
 			end
 			if err then
-				print("Error loading scan image: {{", err, "}}")
+				aucPrint("Error loading scan image: {{", err, "}}")
 				-- if we get an error from any rope, assume the whole packed image is corrupt
 				scandata.image = {}
 				scandata.scanstats.ImageUpdated = time()
@@ -426,13 +447,13 @@ function private.UpgradeDB()
 			-- version "1.2" to version 1.3
 			-- Database structure is virtually the same, we won't try to update the whole database here
 			-- Each time GetScanData is called it will check/update that record as needed
-			print("Auc-ScanData is upgrading database version 1.2 to 1.3")
+			aucPrint("Auc-ScanData is upgrading database version 1.2 to 1.3")
 			AucScanData.Version = DATABASE_VERSION
 			return
 		end
 
 		-- Unknown version - wipe and start from fresh
-		print("Auc-ScanData database error: unknown version, resetting database")
+		aucPrint("Auc-ScanData database error: unknown version, resetting database")
 		wipe(AucScanData.scans)
 		AucScanData.Version = DATABASE_VERSION
 	else
