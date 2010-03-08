@@ -618,29 +618,23 @@ function private.GetNextID(idList)
 	return nextId
 end
 
--- Library wrapper for private.GetScanData. Deals with parameter checking, warning messages and deprecation alerts
+-- Library wrapper for private.GetScanData. Deprecated function
 function lib.GetScanData(serverKey, reserved)
+	AucAdvanced.API.ShowDeprecationAlert(nil, "Direct access to the ScanData image is deprecated. Instead QueryImage, GetImageCopy or GetImageItem should be used")
 	if serverKey then
-		local deprecated
 		local realmName, faction = AucAdvanced.SplitServerKey(serverKey)
 		if not realmName then
 			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
-				deprecated = true
 				faction = serverKey
 			else
 				error("Invalid serverKey passed to GetScanData")
 			end
 			if reserved then
 				realmName = reserved
-				deprecated = true
 			else
 				realmName = GetRealmName()
 			end
 			serverKey = realmName.."-"..faction
-			if deprecated then -- temporary deprecation alert: only triggered by incorrect parameters for the time being
-				AucAdvanced.API.ShowDeprecationAlert("AucAdvanced.Scan.GetScanData(serverKey)",
-					"Converted to use serverKey. Additionally this function is deprecated altogether outside Auctioneer Core")
-			end
 		end
 	else
 		serverKey = GetFaction()
