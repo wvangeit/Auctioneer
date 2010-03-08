@@ -94,6 +94,7 @@ local ErrorText = {
 	NoBlank = "Requires a free bag slot that can hold a new stack of this item for posting",
 	FailRetry = "Posting failed too many times",
 	FailTimeout = "Timed out while waiting for posted item to clear from bags",
+	FailSlot = "Unable to place item in the Auction slot",
 }
 lib.ErrorText = ErrorText
 
@@ -643,8 +644,35 @@ function private.ProcessPosts(source)
 			return
 		end
 		local link = GetContainerItemLink(bag,slot)
+		if GetAuctionSellItemInfo() then
+			-- auction slot is already occupied, try to clear it
+			ClickAuctionSellItemButton()
+			ClearCursor()
+			if GetAuctionSellItemInfo() then
+				-- it's locked, wait for it to clear
+				return
+			end
+		end
+
 		PickupContainerItem(bag, slot)
+		if not CursorHasItem() then
+			-- failed to pick up from bags, probably due to some unfinished operation; wait for another cycle
+			return
+		end
+
 		ClickAuctionSellItemButton()
+		if not GetAuctionSellItemInfo() then
+			-- failed to drop item in auction slot, probably because item is not auctionable (but was missed by our checks)
+			local _, itemCount = GetContainerItemInfo(bag,slot)
+			local msg = ("Unable to create auction for %s x%d: %s"):format(link, itemCount, ErrorText["FailSlot"])
+			debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+			private.QueueRemove()
+			private.Wait(POST_ERROR_PAUSE)
+			AucAdvanced.SendProcessorMessage("postresult", false, request[REQ_ID], request, "FailSlot")
+			message(msg)
+			return
+		end
+
 		StartAuction(request[REQ_BID], request[REQ_BUYOUT], request[REQ_DURATION])
 		ClickAuctionSellItemButton()
 		if (CursorHasItem()) then -- Didn't auction successfully
