@@ -562,14 +562,19 @@ end
 ]]
 function GetDepositCost(item, duration, faction, count)
 	-- Die if unable to complete function
-	if not (item and GetSellValue) then return end
+	if not item then return end
 
 	-- Set up function defaults if not specifically provided
 	if duration == 12 then duration = 1 elseif duration == 48 then duration = 4 else duration = 2 end
 	if faction == "neutral" or faction == "Neutral" then faction = .75 else faction = .15 end
 	count = count or 1
 
-	local gsv = GetSellValue(item)
+	local _,_,_,_,_,_,_,_,_,_,gsv = GetItemInfo(item)
+	if not gsv and GetSellValue then
+		-- if item is not in local cache, fallback to GetSellValue
+		-- some people may still be using a GetSellValue provider with a price database
+		gsv = GetSellValue(item)
+	end
 	if gsv then
 		return math.floor(faction * gsv * count) * duration
 	end
