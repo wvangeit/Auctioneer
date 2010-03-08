@@ -52,7 +52,10 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
 		private.clearcache()
-		private.UpdatePricing()
+		if private.frame then
+			-- fix as "scanstats" can now be called before frame is created
+			private.UpdatePricing()
+		end
 	elseif (callbackType == "postresult") then
 		private.clearcache()
 	end
@@ -93,7 +96,7 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 		market = 0
 		reason = "No data"
 	end
-	
+
 	local coinsBid, coinsBuy, coinsBidEa, coinsBuyEa = "no","no","no","no"
 	if market > 0 then
 		coinsBid = private.coins(market*0.8*quantity)
@@ -116,7 +119,7 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 		fixbid = ceil(fixbid/stack)
 		fixbuy = ceil(fixbuy/stack)
 	end
-	
+
 	if fixbid then
 		coinsBuy = "no"
 		coinsBid = private.coins(fixbid*quantity)
@@ -189,7 +192,7 @@ function private.UpdateConfig(setting, value)
 				showing = false
 			end
 		end
-		
+
 		if showing then
 			frame.scanbutton:Show()
 		else
@@ -217,11 +220,11 @@ function private.SetupConfigGui(gui)
 		"It won't get you maximium profit, or ultimate configurability, but the values it provides are reasonable in most circumstances and it is primarily very easy to use.\n")
 
 	gui:AddControl(id, "Header",       0,    lib.libName.." options")
-	
+
 	gui:AddControl(id, "Subhead",      0,    "")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.displayauctiontab", "Show Post tab at the Auction House")
 	gui:AddTip(id, "Shows simple post tab on the auction house")
-	
+
 	gui:AddControl(id, "Subhead",      0,    "Tooltip")
 	gui:AddControl(id, "Checkbox",     0, 1, "util.simpleauc.tooltip", "Show prices in tooltip")
 	gui:AddTip(id, "Shows market price for the current item in the tooltip")
