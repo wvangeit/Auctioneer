@@ -52,10 +52,7 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "inventory") then
 	elseif (callbackType == "scanstats") then
 		private.clearcache()
-		if private.frame then
-			-- fix as "scanstats" can now be called before frame is created
-			private.UpdatePricing()
-		end
+		private.delayedUpdatePricing = true -- Note: calling private.UpdatePricing is unsafe inside "scanstats"
 	elseif (callbackType == "postresult") then
 		private.clearcache()
 	end

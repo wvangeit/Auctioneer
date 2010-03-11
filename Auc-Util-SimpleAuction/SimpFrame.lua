@@ -131,6 +131,7 @@ end
 --lBuy: buy undercutting competition by 1c
 --aSeen: number of items in competing auctions
 --aBuy: average price for current competing auctions
+local query = {}
 function private.GetItems(link)
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 	local aSeen, lBid, lBuy, uBid, uBuy, aBuy, aveBuy = 0
@@ -142,7 +143,10 @@ function private.GetItems(link)
 		uBid, uBuy, lBid, lBuy, aSeen, aveBuy = tonumber(uBid), tonumber(uBuy), tonumber(lBid), tonumber(lBuy), tonumber(aSeen), tonumber(aveBuy)
 		return #pricecache[sig][2], pricecache[sig][2], uBid, uBuy, lBid, lBuy, aSeen, aveBuy
 	end
-	local matching = AucAdvanced.API.QueryImage({ itemId = id })
+	query.itemId = id
+	query.suffix = suffix
+	query.factor = factor
+	local matching = AucAdvanced.API.QueryImage(query)
 
 	local live = false
 	if AuctionFrame and AuctionFrame:IsVisible() then
@@ -680,11 +684,17 @@ function private.UndoTooltip()
 	GameTooltip:Hide()
 end
 
---we check for valuechanged on update,  so that multiple controls changing at once will only yield one check
 function private.OnUpdate()
+	-- check for valuechanged on update,  so that multiple controls changing at once will only yield one check
 	if frame.CurItem.valuechanged then
 		frame.CurItem.valuechanged = nil
 		private.CheckUpdate()
+	end
+	-- delayed call to UpdatePricing triggered by "scanstats" (note: UpdatePricing is unsafe from within "scanstats")
+	-- also avoids unnecessary processing while the frame is hidden
+	if private.delayedUpdatePricing then
+		private.delayedUpdatePricing = nil
+		private.UpdatePricing()
 	end
 end
 
