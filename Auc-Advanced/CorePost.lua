@@ -262,7 +262,14 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 		return nil, "InvalidBid"
 	elseif type(buyout) ~= "number" or (buyout < bid and buyout ~= 0) then
 		return nil, "InvalidBuyout"
-	elseif duration ~= 720 and duration ~= 1440 and duration ~= 2880 then
+	--duration used to be passed as a time instead of the 1 2 3 value added in WOW patch 3.3.  So check and convert if needed
+	elseif duration == 720 then
+		duration = 1
+	elseif duration == 1440 then
+		duration = 2
+	elseif duration == 2880 then
+		duration = 3
+	elseif duration < 1 or duration > 3 then
 		return nil, "InvalidDuration"
 	end
 
