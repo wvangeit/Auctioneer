@@ -67,6 +67,11 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 		end
 				
 		local deposit = CalculateAuctionDeposit(runTime)
+		--TEMP PATCH to fix run time changes till I can change teh mail lua to work with new system
+		if runTime == 1 then runTime = 720 end
+		if runTime == 2 then runTime = 1440 end
+		if runTime == 3 then runTime = 2880 end
+		
 		itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = itemLink, name, count, minBid, buyoutPrice, runTime, deposit
 		private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
 	end
