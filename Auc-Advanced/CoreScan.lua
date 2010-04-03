@@ -1603,6 +1603,14 @@ function lib.QuerySafeName(name)
 	end
 end
 
+--[[ AucAdvanced.Scan.CreateQuerySig(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	Library function to allow other modules to obtain a query sig
+	Returns the sig that would be used in a scan with the specified parameters
+--]]
+function lib.CreateQuerySig(...)
+	return private.CreateQuerySig(private.QueryScrubParameters(...))
+end
+
 function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 	-- Converts the parameters that we will store in our scanQuery table into a consistent format:
 	-- converts each parameter to correct type;
@@ -1635,8 +1643,21 @@ function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, cl
 	return name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex
 end
 
+function private.CreateQuerySig(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	return strjoin("#",
+		name or "",
+		minLevel or "",
+		maxLevel or "",
+		invTypeIndex or "",
+		classIndex or "",
+		subclassIndex or "",
+		isUsable or "",
+		qualityIndex or ""
+	) -- can use strsplit("#", sig) to extract params
+end
+
 function private.QueryCompareParameters(query, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-	-- Returns true if the parameters are identical to the values stored in the scanQuery table
+	-- Returns true if the parameters are identical to the values stored in the specified scanQuery table
 	-- Use this function to avoid creating a duplicate scanQuery table
 	-- Parameters must have been scrubbed first
 	-- Note: to compare two scanQuery tables for equality, just compare the sigs
@@ -1681,16 +1702,7 @@ function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classInde
 	qryinfo.page = -1 -- use this to store highest page seen by query, and we haven't seen any yet.
 	qryinfo.id = private.querycount
 	private.querycount = private.querycount+1
-	qryinfo.sig = ("%s#%s#%s#%s#%s#%s#%s#%s"):format(
-		name or "",
-		minLevel or "",
-		maxLevel or "",
-		invTypeIndex or "",
-		class or "",
-		subclass or "",
-		isUsable or "",
-		qualityIndex or ""
-	) -- can use strsplit("#", sig) to extract params
+	qryinfo.sig = private.CreateQuerySig(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 
 	-- the return value from GetFaction() can change when the Auctionhouse closes
 	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
