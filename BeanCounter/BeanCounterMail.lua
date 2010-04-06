@@ -107,7 +107,6 @@ GetInboxText = private.PreGetInboxTextHook
 --New function to hide/unhide mail GUI.
 local HideMailGUI
 function private.HideMailGUI( hide )
-	print("?")
 	if hide then
 		HideMailGUI = true
 		InboxCloseButton:Hide()
