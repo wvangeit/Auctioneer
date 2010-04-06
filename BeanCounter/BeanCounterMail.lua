@@ -91,7 +91,7 @@ end
 
 --[[Watch who reads the mail. and what they read. Use this to play nicely with altaholic and other addons]]
 private.mailReadOveride = {}
-function private.PreGetInboxTextHook(n)
+function private.PreGetInboxTextHook(n, ...)
 	if n and n > 0 then
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
 		if sender and subject and not wasRead then
@@ -101,7 +101,7 @@ function private.PreGetInboxTextHook(n)
 			--print("Already read", n, sender, subject) 
 		end
 	end
-	return private.GetInboxText(n)
+	return private.GetInboxText(n, ...)
 end
 --hook and replace GetInboxText()
 private.GetInboxText = GetInboxText
