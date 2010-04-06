@@ -81,10 +81,7 @@ function private.mailMonitor(event,arg1)
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
 
 	elseif (event == "MAIL_CLOSED") then
-		InboxCloseButton:Show()
-		InboxFrame:Show()
-		MailFrameTab2:Show()
-		private.MailGUI:Hide()
+		private.HideMailGUI()
 		private.sumDatabase() --Sum total fo DB for the display on browse pane
 	end
 end
@@ -110,12 +107,20 @@ GetInboxText = private.PreGetInboxTextHook
 --New function to hide/unhide mail GUI.
 local HideMailGUI
 function private.HideMailGUI( hide )
+	print("?")
 	if hide then
 		HideMailGUI = true
 		InboxCloseButton:Hide()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
+		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
+	else
+		HideMailGUI = false
+		InboxCloseButton:Show()
+		InboxFrame:Show()
+		MailFrameTab2:Show()
+		private.MailGUI:Hide()
 		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 	end
 end
