@@ -70,14 +70,8 @@ local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
 		private.updateInboxStart()
-
+			
 	elseif (event == "MAIL_SHOW") then
-		--Since Altoholic has an option to read mail this is a workaround for it. We call our read function before
-		if Altoholic and not registeredAltaholicHook and Altoholic.Mail.Scan then
-			registeredAltaholicHook = true
-			Stubby.RegisterFunctionHook("Altoholic.Mail.Scan", -10, private.updateInboxStart)
-		end
-		
 		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
 		if not registeredInboxFrameHook then --make sure we only ever register this hook once
 			registeredInboxFrameHook = true
@@ -95,13 +89,42 @@ function private.mailMonitor(event,arg1)
 	end
 end
 
---Mailbox Snapshots
+--[[Watch who reads the mail. and what they read. Use this to play nicely with altaholic and other addons]]
+private.mailReadOveride = {}
+function private.PreGetInboxTextHook(n)
+	if n and n > 0 then
+		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
+		if sender and subject and not wasRead then
+			--print("they read", n, sender, subject)
+			private.mailReadOveride[n] = sender..n
+		elseif wasRead then
+			--print("Already read", n, sender, subject) 
+		end
+	end
+	return private.GetInboxText(n)
+end
+--hook and replace GetInboxText()
+private.GetInboxText = GetInboxText
+GetInboxText = private.PreGetInboxTextHook
+
+--New function to hide/unhide mail GUI.
 local HideMailGUI
+function private.HideMailGUI( hide )
+	if hide then
+		HideMailGUI = true
+		InboxCloseButton:Hide()
+		InboxFrame:Hide()
+		MailFrameTab2:Hide()
+		private.MailGUI:Show()
+		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
+	end
+end
+--Mailbox Snapshots
 function private.updateInboxStart()
 	reportTotalMail = GetInboxNumItems()
-	for n = 1,GetInboxNumItems() do
+	for n = reportTotalMail, 1, -1 do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+		if sender and subject and (not wasRead or private.mailReadOveride[n]) then
 			local auctionHouse --A, H, N flag for which AH the trxn came from
 			if sender ==_BC('MailAllianceAuctionHouse') then
 				auctionHouse = "A"
@@ -111,8 +134,8 @@ function private.updateInboxStart()
 				auctionHouse = "N"
 			end
 			if auctionHouse then
+				private.HideMailGUI(true)
 				reportAHMail = reportAHMail + 1
-				HideMailGUI = true
 				wasRead = wasRead or 0 --its nil unless its has been read
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
@@ -121,19 +144,14 @@ function private.updateInboxStart()
 						["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout,
 						["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
 						})
-				GetInboxText(n) --read message
+				private.GetInboxText(n) --read message
 			end
 			reportReadMail = reportReadMail + 1
 		end
+		private.lastCheckedMail = GetTime() --this keeps us from hiding the mail UI to early and causing flicker
 	end
-	if HideMailGUI == true then
-		InboxCloseButton:Hide()
-		InboxFrame:Hide()
-		MailFrameTab2:Hide()
-		private.MailGUI:Show()
-		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
-	end
-	private.mailBoxColorStart()
+	private.mailReadOveride = {}
+	private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 end
 
 function private.getInvoice(n, sender, subject)
@@ -152,48 +170,47 @@ function private.getInvoice(n, sender, subject)
 	return
 end
 
+private.lastCheckedMail = GetTime()
 function private.mailonUpdate()
-local count = 1
-local total = #private.inboxStart
-	for i, data in pairs(private.inboxStart) do
-		--update mail GUI Count
-		if count <= total then
-			private.CountGUI:SetText("Recording: "..count.." of "..total.." items")
-			count = count + 1
-		end
+	local total = #private.inboxStart
+	if total > 0 then
+		for i = total, 1, -1 do -- in pairs(private.inboxStart) do
+			--update mail GUI Count
+			local count = #private.inboxStart
+			private.CountGUI:SetText("Recording: "..total-count.." of "..total.." items")
+					
+			local data = private.inboxStart[i]
+			if not data.retrieved then --Send non invoiceable mails through
+				tinsert(private.reconcilePending, data)
+				--private.inboxStart[i] = nil
+				tremove(private.inboxStart, i)
+				--debugPrint("not a invoice mail type", i)
 
-		local tbl = private.inboxStart[i]
-		if not data.retrieved then --Send non invoiceable mails through
-			tinsert(private.reconcilePending, data)
-			private.inboxStart[i] = nil
-			--debugPrint("not a invoice mail type")
+			elseif  data.retrieved == "failed" then
+				tinsert(private.reconcilePending, data)
+				--private.inboxStart[i] = nil
+				tremove(private.inboxStart, i)
+				--debugPrint("data.retrieved == failed", i)
 
-		elseif  data.retrieved == "failed" then
-			tinsert(private.reconcilePending, data)
-			private.inboxStart[i] = nil
-			--debugPrint("data.retrieved == failed")
+			elseif  data.retrieved == "yes" then
+				tinsert(private.reconcilePending, data)
+				--private.inboxStart[i] = nil
+				tremove(private.inboxStart, i)
+				--debugPrint("data.retrieved == yes", i)
 
-		elseif  data.retrieved == "yes" then
-			tinsert(private.reconcilePending, data)
-			private.inboxStart[i] = nil
-			--debugPrint("data.retrieved == yes")
-
-		elseif  time() - data.startTime > get("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
-			debugPrint("time to retrieve invoice exceeded, most likely waiting on players name if this is blank>..", tbl["Seller/buyer"])
-			tbl["retrieved"] = "failed" --time to get invoice exceded
-		else
-			--debugPrint("Invoice retieve attempt",tbl["subject"])
-			tbl["invoiceType"], tbl["itemName"], tbl["Seller/buyer"], tbl['bid'], tbl["buyout"] , tbl["deposit"] , tbl["fee"], tbl["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
+			elseif  time() - data.startTime > get("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
+				debugPrint("time to retrieve invoice exceeded, most likely waiting on players name if this is blank>..", data["Seller/buyer"], i)
+				data["retrieved"] = "failed" --time to get invoice exceded
+			else
+				--debugPrint("Invoice retieve attempt",data["subject"])
+				data["invoiceType"], data["itemName"], data["Seller/buyer"], data['bid'], data["buyout"] , data["deposit"] , data["fee"], data["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
+			end
 		end
 	end
-	if (#private.inboxStart == 0) and (HideMailGUI == true) then
-		debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
+	if (#private.inboxStart == 0) and (HideMailGUI == true) and (private.lastCheckedMail + 1 < GetTime() ) then --time delay added to prevent possible flicker
+		--debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
 		reportTotalMail, reportAHMail, reportReadMail = 0, 0, 0
-		InboxCloseButton:Show()
-		InboxFrame:Show()
-		MailFrameTab2:Show()
-		private.MailGUI:Hide()
-		HideMailGUI = false
+		private.HideMailGUI( )
 		private.mailBoxColorStart() --delay recolor system till we have had a chance to read the mail
 	end
 

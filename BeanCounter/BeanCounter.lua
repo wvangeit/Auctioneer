@@ -157,8 +157,7 @@ function lib.OnLoad(addon)
 	--mail
 	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook)
 	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook)
-	Stubby.RegisterFunctionHook("GetInboxText", -100, private.PreGetInboxTextHook)
-
+	
 	--Bids
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, private.postPlaceAuctionBidHook)
 	--Posting
