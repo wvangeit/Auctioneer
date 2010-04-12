@@ -248,75 +248,44 @@ end
 function private.onUpdate()
 	private.mailonUpdate()
 end
---register/unregister extra events used during DE
-local inState = false --this is used to alllow monitoring of disenchants, bassed off of enchantrix by ccox
-function private.registerDisenchantEvents(on)
-	if on then
-		--state could be waiting on the bag event. Even thou we have started a new DE cast.  So dont overwrite state unless its false
-		if not inState then inState = true end 
-		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_INTERRUPTED" )
-		private.scriptframe:RegisterEvent( "UNIT_SPELLCAST_SUCCEEDED" )
-		private.scriptframe:RegisterEvent( "LOOT_OPENED" )
-		private.scriptframe:RegisterEvent( "BAG_UPDATE" )
-		private.scriptframe:RegisterEvent( "LOOT_CLOSED" )
-	else
-		inState = false
-		private.scriptframe:UnregisterEvent( "UNIT_SPELLCAST_INTERRUPTED" )
-		private.scriptframe:UnregisterEvent( "UNIT_SPELLCAST_SUCCEEDED" )
-		private.scriptframe:UnregisterEvent( "LOOT_OPENED" )
-		private.scriptframe:UnregisterEvent( "BAG_UPDATE" )
-		private.scriptframe:UnregisterEvent( "LOOT_CLOSED" )
-	end
-end
---scan bags after second scan compare and find DE item
-function private.scanBags(scan, finish)
-	local tab = private.bag[scan]
-	
-	for bag = 0,4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local link = GetContainerItemLink(bag, slot) or "NIL"
-			tab[link] = true
-		end
+
+--sum the Mats value
+function private.sumDEValue()
+	local deMat, quantity =	private.bag["link"],  private.bag["quantity"]
+	local itemLink = private.bag["DElink"]
+	if not itemLink or not deMat or not quantity then 
+		debugPrint("Missing data for DE event", itemLink, deMat, quantity) 
+		return
 	end
 	
-	if finish then
-		local itemLink
-		for link in pairs(private.bag[1]) do
-			if not private.bag[2][link] then
-				itemLink = link
+	--use average sell price or fall back and use auctionner if possible
+	local settings = {["selectbox"] = {"1", "server"} ,["auction"] = true}
+	local data = lib.API.search(deMat, settings, true)
+	local profit, count = 0, 0
+	local days =  7*24*60*60 --one week
+	if data and #data > 0 then
+		for i = #data, 1, -1 do
+			count = count + 1
+			profit =  profit + data[i][7]
+			if data[i][12] < time() - days then
+				--print(i,data[i][7], date("%c", data[i][12]), count)
 				break
 			end
 		end
-		local deMat, quantity =	private.bag["link"],  private.bag["quantity"]
-		--use average sell price or fall back and use auctionner if possible
-		local settings = {["selectbox"] = {"1", "server"} ,["auction"] = true}
-		local data = lib.API.search(deMat, settings, true)
-		local profit, count = 0, 0
-		local days =  7*24*60*60 --one week
-		if data and #data > 0 then
-			for i = #data, 1, -1 do
-				count = count + 1
-				profit =  profit + data[i][7]
-				if data[i][12] < time() - days then
-					--print(i,data[i][7], date("%c", data[i][12]), count)
-					break
-				end
-			end
-			profit = floor(profit/count)
-		end
-		--fall back to auctioneer
-		if AucAdvanced and AucAdvanced.API.GetMarketValue and profit < 1 then
-			profit = AucAdvanced.API.GetMarketValue(deMat)
-		end
-		--convert to itemID
-		deMat = lib.API.decodeLink(deMat)
-		--print("We Disnechnated ", itemLink, " into ", deMat, quantity, profit)
-		if not deMat or not quantity or not profit then return end
-		
-		local meta = string.join(":", "DE", deMat, quantity, profit)
-		meta = meta.."|"
-		private.attachMeta( itemLink, meta )
+		profit = floor(profit/count)
 	end
+	--fall back to auctioneer
+	if AucAdvanced and AucAdvanced.API.GetMarketValue and profit < 1 then
+		profit = AucAdvanced.API.GetMarketValue(deMat)
+	end
+	--convert to itemID
+	deMat = lib.API.decodeLink(deMat)
+	--print("We Disnechnated ", itemLink, " into ", deMat, quantity, profit)
+	if not deMat or not quantity or not profit then return end
+	
+	local meta = string.join(":", "DE", deMat, quantity, profit)
+	meta = meta.."|"
+	private.attachMeta( itemLink, meta )
 end
 
 function private.attachMeta( itemLink, meta )
@@ -378,48 +347,29 @@ function private.onEvent(frame, event, arg, ...)
 		   lib.OnLoad()
 		   private.scriptframe:UnregisterEvent("ADDON_LOADED")
 		end
-	end
-	
-	--DE event
-	local spell = ...
-	if event == "UNIT_SPELLCAST_SENT" and arg == "player" and spell == "Disenchant" then
-		--print(event, inState)
-		--if inState then inState = "waiting on next" end --when another DE event is started before last finishes --Has issues with emotying mail and de at same time
-		private.registerDisenchantEvents(true)
-	end
-	--dont process any following events if not DEing
-	if not inState then return end
-	if event == "UNIT_SPELLCAST_INTERRUPTED" then
-		--print(event, inState)
-		private.registerDisenchantEvents(false)
-	
-	elseif event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == "Disenchant" then
-		--print(event, inState)
-		private.bag = {{},{}}
-		private.scanBags(1)
-		
-	elseif event == "LOOT_OPENED" then --what did it DE into
-		--print(event, inState)
+	end		
+end
+--scripts that handle recording DE events
+local inDEState = false
+function private.onEventDisenchant(frame, event, arg, spell, ...)
+	if event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == "Disenchant" then
+		inDEState = true
+		private.bag = {}
+	elseif event == "ITEM_LOCK_CHANGED" and inDEState then
+		local bagID, slot = arg, spell
+		local link = GetContainerItemLink(bagID, slot)
+		private.bag["DElink"] = link
+	elseif event == "LOOT_OPENED" and inDEState then --what did it DE into
 		for slot = 1, GetNumLootItems() do
 			local link = GetLootSlotLink(slot)
 			local _, _, quantity = GetLootSlotInfo(slot)
 			private.bag["link"] = link
 			private.bag["quantity"] = quantity
 		end
-	
-	elseif event == "LOOT_CLOSED" then --looted DE mats items will be removed and we can find out what got DE'ed
-		--print(event, inState)
-		inState = "waiting on bag"
-	elseif event ==  "BAG_UPDATE" and (inState == "waiting on bag" or inState == "waiting on next") then
-		--print(event, inState)
-		private.scanBags(2, true)
-		if inState == "waiting on bag" then
-			private.registerDisenchantEvents(false)
-		end
-	end
-		
+		private.sumDEValue()
+		inDEState =  false
+	end		
 end
-
 
 --[[ Utility Functions]]--
 --External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
@@ -589,6 +539,13 @@ function private.debugPrint(...)
 		print(...)
 	end
 end
+
+--[[DE event frame]]
+private.DisenchantScriptframe = CreateFrame("Frame")
+private.DisenchantScriptframe:RegisterEvent( "UNIT_SPELLCAST_SUCCEEDED" ) --Start watching for DE results
+private.DisenchantScriptframe:RegisterEvent( "LOOT_OPENED" ) --record what teh DE result is
+private.DisenchantScriptframe:RegisterEvent("ITEM_LOCK_CHANGED") --get item that was DE
+private.DisenchantScriptframe:SetScript("OnEvent", private.onEventDisenchant)
 
 --[[Bootstrap Code]]
 private.scriptframe = CreateFrame("Frame")
