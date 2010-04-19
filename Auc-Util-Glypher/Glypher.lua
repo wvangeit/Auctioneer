@@ -1089,7 +1089,8 @@ function private.GetStock(itemId)
             end
         end
         if gVault ~= "" then
-            local guildCount =  DataStore:GetGuildBankItemCount(itemId, gVault, realm, account) or 0
+            local guildKey = account .. "." .. realm .. "." .. gVault
+            local guildCount =  DataStore:GetGuildBankItemCount(guildKey, itemId) or 0
             stockCount = stockCount + guildCount    
             if guildCount > 0 then table.insert(tooltip, "  Vault " .. gVault .. " = " .. guildCount) end
         end
