@@ -309,7 +309,8 @@ function lib.ScanPage()
 							private.ItemTable[Const.MINBID],
 							private.ItemTable[Const.BUYOUT],
 							private.ItemTable["cost"],
-							AucSearchUI.Private.cropreason(private.ItemTable["reason"])
+							AucSearchUI.Private.cropreason(private.ItemTable["reason"]),
+							true -- do not trigger a search if CoreBuy is unable to find this auction
 							)
 					else
 						AucSearchUI.Private.repaintSheet()
