@@ -1337,7 +1337,7 @@ function private.CreateFrames()
 		elseif (number > 0 and number * stack > total) and not numberOnly then
 			print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 			return
-		elseif (number == -2) and (stack > total) then
+		elseif (number ~= -1) and (stack > total) then
 			print(_TRANS('APPR_Help_SkippingStackLargerAvailable'):format(link) )--Skipping %s: Stack size larger than available
 			return
 		end
