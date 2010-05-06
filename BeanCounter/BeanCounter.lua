@@ -351,8 +351,9 @@ function private.onEvent(frame, event, arg, ...)
 end
 --scripts that handle recording DE events
 local inDEState = false
+local DisenchantLocale = GetSpellInfo(13262) or "Disenchant" --localized Spell name for Disenchant
 function private.onEventDisenchant(frame, event, arg, spell, ...)
-	if event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == "Disenchant" then
+	if event == "UNIT_SPELLCAST_SUCCEEDED" and arg == "player" and spell == DisenchantLocale then
 		inDEState = true
 		private.bag = {}
 	elseif event == "ITEM_LOCK_CHANGED" and inDEState then
