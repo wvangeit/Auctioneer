@@ -136,7 +136,17 @@ function lib.OnLoad()
     if LibStub then
         local SlideBar = LibStub:GetLibrary("SlideBar", true)
         if SlideBar then
-            sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
+			local embedded = false
+			for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+				if module == "Auc-Util-Glypher" then
+					embedded = true
+				end
+			end
+			if embedded then
+				sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher")
+			else
+            	sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
+			end
             sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp") --What type of click you want to respond to
             sideIcon:SetScript("OnClick", private.SlideBarClick) --same function that the addons current minimap button calls
             sideIcon.tip = {
@@ -1068,7 +1078,8 @@ function private.GetStock(itemId)
     if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
         for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
             if string.find(":" .. name .. ":" .. altList .. ":", ":" .. characterName .. ":") then
-                local add = (DataStore:GetAuctionHouseItemCount(character, itemId) or 0)
+		local characterKey = account .. "." .. realm .. "." .. character
+                local add = (DataStore:GetAuctionHouseItemCount(characterKey, itemId) or 0)
                 stockCount = stockCount + add
 --(DataStore:GetAuctionHouseItemCount(character, itemId) or 0)
                 if add > 0 then table.insert(tooltip, "  Auctions " .. characterName .. " = " .. add) end
