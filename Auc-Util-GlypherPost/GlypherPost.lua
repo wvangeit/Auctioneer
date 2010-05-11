@@ -499,6 +499,10 @@ print("pos: " .. pos)
 				set("util.appraiser.item."..sig..".ignore", ignore)
 				set("util.appraiser.item."..sig..".match", match)
 				set("util.appraiser.item."..sig..".model", model)
+				if numberonly then
+					number = number - mycurrent
+					if number < 0 then number = 0 end
+				end
 				set("util.appraiser.item."..sig..".number", number)
 				set("util.appraiser.item."..sig..".numberonly", false)
 				set("util.appraiser.item."..sig..".stack", stack)
@@ -507,10 +511,9 @@ print("pos: " .. pos)
 					set("util.appraiser.item."..sig..".numberonly", numberonly)
 					--print("posted " .. link)
 					--print("number: " .. number)
-				elseif numberonly then
-					set("util.appraiser.item."..sig..".numberonly", numberonly)
-					set("util.appraiser.item."..sig..".number", GPnumber)
 				end
+				set("util.appraiser.item."..sig..".numberonly", numberonly)
+				set("util.appraiser.item."..sig..".number", GPnumber)
 				-- then restore old settings
 private.Timer("starting settings restore")
 				--for pos = 1, #(settings) do
