@@ -284,6 +284,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 	else
 		price = 1
 	end
+	owner = owner or ""
 	local timeleft = GetAuctionItemTimeLeft("list", id)
 	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
 	iEquip = Const.EquipEncode[iEquip]
