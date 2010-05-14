@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - EasyBuyout Utility Module
-	Version: 1.2.4 (GhostfromTexas)
+	Version: 1.2.5 (GhostfromTexas)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -63,6 +63,9 @@ end
 
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	
+	-- Silent Mode Option
+	AucAdvanced.Settings.SetDefault("util.EasyBuyout.silentmode", false);
 
 	-- EasyBuyout Default Settings
 	AucAdvanced.Settings.SetDefault("util.EasyBuyout.active", false)
@@ -157,6 +160,11 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBid.active", "Enable EasyGoldLimit for EasyBid")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBid")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBid.limit", 0, 999999999, "Set EasyBid Limit")
+	
+	-- Silent Mode
+	gui:AddControl(id, "Header",		0,		"Other Options")
+	gui:AddControl(id, "Subhead", 0, "This section lists other options for this module.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.EasyBuyout.silentmode", "Enable Silent Mode");
 
 	-- help sections
     gui:AddHelp(id, "What is EasyBuyout?",
@@ -174,6 +182,11 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "What is EasyGoldLimit?",
 		"What is EasyGoldLimit",
 		"This does exactly what the name implies, it places a limit on the amount of gold that will be allowed to be used when bidding or buying an auction. It helps prevent spending more than intended on an auction.")
+	
+	gui:AddHelp(id, "What is Silent Mode?",
+		"What is Silent Mode?",
+		"Enabling Silent Mode will disable all text output to the chat frame from this module, whether it's apart of EasyBuyout, EasyBid, EasyCancel, or EasyGoldLimit")
+	
 end
 
 function private.BrowseButton_OnClick(...)
@@ -193,7 +206,7 @@ function private.BrowseButton_OnClick(...)
         elseif (selection == 2) and IsShiftKeyDown() and IsAltKeyDown() then
             ebModifier = true;
         else
-			ChatFrame1:AddMessage("|cffff5511EasyBuyout - Modifier Key " .. private.EBConvertModifierToText(selection) .. " is set, but not pressed!");
+			private.EBMessage("|cffff5511EasyBuyout - Modifier Key " .. private.EBConvertModifierToText(selection) .. " is set, but not pressed!");
             return orig_AB_OC(...)
         end
     end
@@ -210,9 +223,9 @@ function private.BrowseButton_OnClick(...)
 		local link = GetAuctionItemLink("list", id)
 		if link then
             local _,_,count = GetAuctionItemInfo("list", id)
-            ChatFrame1:AddMessage("Rightclick - buying auction of " .. (count or "?") .. "x" .. link)
+            private.EBMessage("Rightclick - buying auction of " .. (count or "?") .. "x" .. link)
         else
-            ChatFrame1:AddMessage("Rightclick - not finding anything to buy. If you are mass clicking - try going from the bottom up!")
+            private.EBMessage("Rightclick - not finding anything to buy. If you are mass clicking - try going from the bottom up!")
             return
         end
         SetSelectedAuctionItem("list", id);
@@ -252,7 +265,7 @@ function private.EasyBuyoutAuction()
 	-- Easy Gold Limit for EasyBuyout
 	if get("util.EasyBuyout.EGL.EBuy.active") then
 		if EasyBuyoutPrice > get("util.EasyBuyout.EGL.EBuy.limit") then
-			ChatFrame1:AddMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBuyout!")
+			private.EBMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBuyout!")
 			return;
 		end
 	end
@@ -291,7 +304,7 @@ local function NewOnClick(self, button) -- used for EasyCancel
 		private.EasyCancel(self, button)
 	else
 		if active and button == "RightButton" then
-			ChatFrame1:AddMessage("|cffff5511EasyCancel - Modifier Key " .. private.EBConvertModifierToText(modselect) .. " is set, but not pressed!");
+			private.EBMessage("|cffff5511EasyCancel - Modifier Key " .. private.EBConvertModifierToText(modselect) .. " is set, but not pressed!");
 		end
 		OrigAuctionOnClick(self, button)
 	end
@@ -314,9 +327,9 @@ function private.EasyCancel(self, button)
 	local link = GetAuctionItemLink("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
 	if link then
 		local _,_,count = GetAuctionItemInfo("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame))
-		ChatFrame1:AddMessage("Rightclick - cancelling auction of " .. (count or "?") .. "x" .. link)
+		private.EBMessage("Rightclick - cancelling auction of " .. (count or "?") .. "x" .. link)
 	else
-		return ChatFrame1:AddMessage("Rightclick - not finding anything to cancel. If you are mass clicking - try going from the bottom up!")
+		return private.EBMessage("Rightclick - not finding anything to cancel. If you are mass clicking - try going from the bottom up!")
 	end
 
 	SetSelectedAuctionItem("owner", self:GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame));
@@ -326,8 +339,6 @@ function private.EasyCancel(self, button)
 end
 
 -- EasyBid Function - This section listed below is for EasyBid: the utility that allows users to easily bid on an item simply by double clicking on it.
-
-
 function private.NewOnDoubleClick(self, button)
 	-- check for EBid enabled
     if not get("util.EasyBuyout.EBid.active") then
@@ -343,14 +354,14 @@ function private.NewOnDoubleClick(self, button)
 	local link = GetAuctionItemLink("list", id)
 	if button == 'LeftButton' then
 		if (select(11, GetAuctionItemInfo("list", id))) then
-			ChatFrame1:AddMessage("You are already the highest bidder on this item!")
+			private.EBMessage("You are already the highest bidder on this item!")
 			return
 		end
 		if link then
 			local _,_,count = GetAuctionItemInfo("list", id)
-			ChatFrame1:AddMessage("Doubleclick - bidding on auction of " .. (count or "?") .. "x" .. link)
+			private.EBMessage("Doubleclick - bidding on auction of " .. (count or "?") .. "x" .. link)
 		else
-			ChatFrame1:AddMessage("Doubleclick - not finding anything to bid on. If you are mass clicking - try going from the bottom up!")
+			private.EBMessage("Doubleclick - not finding anything to bid on. If you are mass clicking - try going from the bottom up!")
 			return
 		end
 	SetSelectedAuctionItem("list", self:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame));
@@ -359,6 +370,7 @@ function private.NewOnDoubleClick(self, button)
 	end
 end
 
+-- Function to place a bid on a specific auction using EasyBid
 function private.EasyBidAuction(getID)
     local EasyBidPrice = select(10, GetAuctionItemInfo("list", getID)) + select(8, GetAuctionItemInfo("list", getID))
 	if EasyBidPrice == 0 then
@@ -368,7 +380,7 @@ function private.EasyBidAuction(getID)
 	-- Easy Gold Limit for EasyBid
 	if get("util.EasyBuyout.EGL.EBid.active") then
 		if EasyBidPrice > get("util.EasyBuyout.EGL.EBid.limit") then
-			ChatFrame1:AddMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBid!")
+			private.EBMessage("|cffCC1100EasyGoldLimit - Auction is over your set limit for EasyBid!")
 			return;
 		end
 	end
@@ -377,9 +389,18 @@ function private.EasyBidAuction(getID)
     CloseAuctionStaticPopups();
 end
 
+-- function added in AUEB-18 to convert a selction to text for chatframe output
 function private.EBConvertModifierToText(selection)
 	if selection == 0 then return "<Shift>" end
 	if selection == 1 then return "<Alt>" end
 	if selection == 2 then return "<Shift + Alt>" end
 end
+
+-- function added in AUEB-19 - Central location, specifically designed to handle the silent mode option
+function private.EBMessage(messageString)
+	if get("util.EasyBuyout.silentmode") then return end
+	-- else
+	print(messageString)
+end
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
