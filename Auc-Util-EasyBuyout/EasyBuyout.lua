@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - EasyBuyout Utility Module
-	Version: <%version%> (<%codename%>)
+	Version: 1.2.3 (GhostfromTexas)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -86,7 +86,6 @@ function lib.OnLoad()
 end
 
 --[[ Local functions ]]--
-
 function private.AHLoaded()
 	if AucAdvanced.Modules.Util.CompactUI and AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick and get("util.compactui.activated") then
 		orig_AB_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
@@ -94,9 +93,15 @@ function private.AHLoaded()
 		CompactUImode = true
 	else
 		assert(BrowseButton_OnClick, "BrowseButton_OnClick doesn't exist yet")
-		orig_AB_OC = BrowseButton_OnClick
-		BrowseButton_OnClick = private.BrowseButton_OnClick
+		orig_AB_OC = function() end -- fake function or it will error when you do return orig_AB_OC(...)    since this is not needed or created with the method we used
 		CompactUImode = false
+		--go though the AH buttons and hook each ones script - Added by Kandoko on May 14, 2010 to fix AUEB-17
+		for i = 1, 8 do
+			local button = _G["BrowseButton"..i] --This is the same as  the global variable named  BrowseButton1, BrowseButton2 ..etc
+				button:HookScript("OnClick", function(self, button, ...) --HookScript is a secure script hook function provided by blizzard
+						private.BrowseButton_OnClick(self, button, ...)
+				end)
+		end
 	end
 end
 
@@ -172,7 +177,6 @@ function private.SetupConfigGui(gui)
 end
 
 function private.BrowseButton_OnClick(...)
-
     -- check for EB enabled
     if not get("util.EasyBuyout.active") then
         return orig_AB_OC(...)
@@ -181,10 +185,13 @@ function private.BrowseButton_OnClick(...)
      -- check and assign modifier
     if get("util.EasyBuyout.modifier.active") then
         if (get("util.EasyBuyout.modifier.select") == 0) and IsShiftKeyDown() then
+			ChatFrame1:AddMessage("IsShift");
             ebModifier = true;
         elseif (get("util.EasyBuyout.modifier.select") == 1) and IsAltKeyDown() then
+			ChatFrame1:AddMessage("IsAlt");
             ebModifier = true;
         elseif (get("util.EasyBuyout.modifier.select") == 2) and IsShiftKeyDown() and IsAltKeyDown() then
+			ChatFrame1:AddMessage("IsShift and IsAlt");
             ebModifier = true;
         else
             return orig_AB_OC(...)
@@ -250,6 +257,7 @@ function private.EasyBuyoutAuction()
 		end
 	end
 
+	-- ready to buy auction
     PlaceAuctionBid("list", EasyBuyoutIndex, EasyBuyoutPrice)
     CloseAuctionStaticPopups();
 end
@@ -257,7 +265,7 @@ end
 
 --[[ EasyCancel Function - Easy Auction Cancel is a lot simpler to incorporate everything in it's own section
 	 rather than incorporating it into everything else coded before this comment. EasyCancel does not need to be
-	 hooked like EasyBuyout does with compactUI
+	 tested for compactUI like EasyBuyout does
 --]]
 
 local function OrigAuctionOnClick(...)
