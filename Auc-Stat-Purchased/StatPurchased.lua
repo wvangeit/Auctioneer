@@ -71,7 +71,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(serverKey) ) --clear current {{%s}} Purchased price database
 		print(line, "push}} - ".._TRANS('PURC_Help_SlashHelp4'):format(serverKey) ) --force the {{%s}} Purchased daily stats to archive (start a new day)
 	elseif (command == _TRANS('clear') ) then
-		private.ClearData(...)
+		lib.ClearData(...)
 	elseif (command == _TRANS('push') ) then
 		print(_TRANS('PURC_Help_SlashHelp5'):format(serverKey) ) --Archiving {{%s}} daily stats and starting a new day
 		private.PushStats(serverKey)
@@ -354,17 +354,17 @@ function private.SetupConfigGui(gui)
 			_TRANS('PURC_Help_SaferPrices') ,--How are the \'safer\' prices computed?
 			_TRANS('PURC_Help_SaferPricesAnswer') )--For anything seen more than 100 times and selling more than 10 items per day (on average), we simply use the 3 day average.\n\nFor others, we value the 7-day average at 50%, and the 3- and 14-day averages at between 0--50% and 50--0%, respectively, depending on how many are seen per day (between 1 and 7).
 
-		
+
 		gui:AddControl(id, "Header",     0,    libName.." options")
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-			
+
 		gui:AddControl(id, "Checkbox",   0, 1, "stat.purchased.enable", _TRANS('PURC_Interface_EnablePurchasedStats') )--Enable Purchased Stats
 		gui:AddTip(id, _TRANS('PURC_HelpTooltip_EnablePurchasedStats') )--Allow Stat Purchased to gather and return price data
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
+
 		gui:AddControl(id, "Checkbox",   0, 4, "stat.purchased.tooltip", _TRANS('PURC_Interface_ShowPurchased') )--Show purchased stats in the tooltips?
 		gui:AddTip(id, _TRANS('PURC_HelpTooltip_ShowPurchased') )--Toggle display of stats from the Purchased module on or off
-		
+
 		gui:AddControl(id, "Checkbox",   0, 6, "stat.purchased.avg3", _TRANS('PURC_Interface_Toggle3Day') )--Display Moving 3 Day Average
 		gui:AddTip(id, _TRANS('PURC_HelpTooltip_Toggle3Day') )--Toggle display of 3-Day average from the Purchased module on or off
 		gui:AddControl(id, "Checkbox",   0, 6, "stat.purchased.avg7", _TRANS('PURC_Interface_Toggle7Day') )--Display Moving 7 Day Average
@@ -382,7 +382,7 @@ function private.SetupConfigGui(gui)
 	end
 	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
-	
+
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
 	if tooltipID then private.addTooltipControls(tooltipID) end
@@ -531,10 +531,16 @@ function private.UpgradeDb()
 	AucAdvancedStatPurchasedData = newSave
 end
 
-function private.ClearData(serverKey)
+function lib.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
-	if SPRealmData[serverKey] then
-		print(_TRANS('PURC_Interface_ClearingPurchased').." {{"..serverKey.."}}")--Clearing Purchased stats for
+	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
+		SPRealmData = {}
+		AucAdvancedStatPurchasedData.RealmData = SPRealmData
+		print(_TRANS('PURC_Interface_ClearingPurchased').." {{All realms}}") --Clearing Purchased stats for
+		private.ClearCache()
+	elseif SPRealmData[serverKey] then
+		local _,_,text = AucAdvanced.SplitServerKey(serverKey)
+		print(_TRANS('PURC_Interface_ClearingPurchased').." {{"..text.."}}")--Clearing Purchased stats for
 		SPRealmData[serverKey] = nil
 		private.ClearCache()
 	end
@@ -578,7 +584,7 @@ end
 function private.GetPriceData(serverKey)
 	local data = SPRealmData[serverKey]
 	if not data then
-		if type(serverKey) ~= "string" or not strmatch(serverKey, ".%-%u%l") then
+		if not AucAdvanced.SplitServerKey(serverKey) then
 			error("Invalid serverKey passed to Stat-Purchased")
 		end
 		data = {means = {}, daily = {created = time()}}
