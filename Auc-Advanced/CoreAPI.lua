@@ -285,6 +285,73 @@ function lib.ClearItem(itemLink, serverKey)
 	lib.ClearMarketCache()
 end
 
+--[[ AucAdvanced.API.IsKeyword(testword [, keyword])
+	Determine whether testword is equal to or an alias of keyword
+	Returns the keyword if it matches, nil otherwise
+	For case-insensitive keywords, tries both unmodified and lowercase
+	Note: default cases must be handled separately
+--]]
+do
+	-- allowable keywords (so far): ALL, faction, server
+	local keywords = { -- entry: alias = keyword,
+		ALL = "ALL",
+		faction = "faction",
+		server = "server",
+		realm = "server",
+	}
+	-- todo: functions to add new keywords, and to add new aliases for keywords
+	function lib.IsKeyword(testword, keyword)
+		if type(testword) ~= "string" then return end
+		local key = keywords[testword] or keywords[testword:lower()] -- try unmodified and lowercased
+		if key then
+			if not keyword or keyword == key then
+				return key
+			end
+		end
+	end
+end
+
+function lib.ClearData(key)
+	local serverKey1, serverKey2, serverKey3
+	if not key or key == "" then key = "faction" end -- default
+	if type(key) == "string" then
+		key = strtrim(key)
+		local keyword = lib.IsKeyword(key)
+		local realmName
+		if keyword == "ALL" then
+			serverKey1 = key
+		elseif keyword == "faction" then
+			serverKey1 = GetFaction()
+		elseif keyword == "server" then
+			local _, name = GetFaction()
+			realmName = name
+		elseif AucAdvanced.SplitServerKey(key) then -- it's a valid serverKey
+			serverKey1 = key
+		else -- assume it's a realm
+			realmName = key
+		end
+		if realmName then
+			serverKey1 = realmName.."-Alliance"
+			serverKey2 = realmName.."-Horde"
+			serverKey3 = realmName.."-Neutral"
+		end
+	end
+	if serverKey1 then
+		local modules = AucAdvanced.GetAllModules("ClearData")
+		for pos, lib in ipairs(modules) do
+			lib.ClearData(serverKey1)
+			if serverKey2 then
+				lib.ClearData(serverKey2)
+				lib.ClearData(serverKey3)
+			end
+		end
+		lib.ClearMarketCache()
+	else
+		lib.Print("Auctioneer: Unrecognized parameter for ClearData")
+	end
+end
+
+
 function lib.GetAlgorithms(itemLink)
 	local saneLink = SanitizeLink(itemLink)
 	local engines = {}
@@ -606,8 +673,6 @@ function lib.GetSigFromLink(link)
 		else
 			sig = tostring(id)
 		end
-	else
-		lib.Print("Link is not item")
 	end
 	return sig
 end
