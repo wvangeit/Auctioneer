@@ -467,12 +467,12 @@ print("pos: " .. pos)
    		            end
 --print("auctioncount: " .. auctioncount)
 --print("number: " .. GPnumber)
-					if numberonly and (auctioncount < (GPnumber * stack)) then
-						number = floor(((GPnumber * stack) - auctioncount) / stack)
+					--if numberonly and (auctioncount < (GPnumber * stack)) then
+					--	number = floor(((GPnumber * stack) - auctioncount) / stack)
 --print("post: " .. number)
-					else
-						number = GPnumber
-					end
+					--else
+						--number = GPnumber end
+					--end
 				end	
 
 				if smartonly then
@@ -494,19 +494,21 @@ print("pos: " .. pos)
                     number = floor(stock/stack)
                 end
 
+				if numberonly then number = GPnumber end
+
 				set("util.appraiser.item."..sig..".bulk", bulk)
 				set("util.appraiser.item."..sig..".duration", duration)
 				set("util.appraiser.item."..sig..".ignore", ignore)
 				set("util.appraiser.item."..sig..".match", match)
 				set("util.appraiser.item."..sig..".model", model)
 				set("util.appraiser.item."..sig..".number", number)
-				set("util.appraiser.item."..sig..".numberonly", false)
+				set("util.appraiser.item."..sig..".numberonly", numberonly)
 				set("util.appraiser.item."..sig..".stack", stack)
 				if number > 0 then
-                    aprframe.PostBySig(sig)
-					set("util.appraiser.item."..sig..".numberonly", numberonly)
-					--print("posted " .. link)
-					--print("number: " .. number)
+					aprframe.PostBySig(sig)
+					--set("util.appraiser.item."..sig..".numberonly", numberonly)
+					print("posted " .. link)
+					print("number: " .. number)
 				elseif numberonly then
 					set("util.appraiser.item."..sig..".numberonly", numberonly)
 					set("util.appraiser.item."..sig..".number", GPnumber)
