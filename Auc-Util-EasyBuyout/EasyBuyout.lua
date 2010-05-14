@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - EasyBuyout Utility Module
-	Version: 1.2.3 (GhostfromTexas)
+	Version: 1.2.4 (GhostfromTexas)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -184,16 +184,16 @@ function private.BrowseButton_OnClick(...)
 
      -- check and assign modifier
     if get("util.EasyBuyout.modifier.active") then
-        if (get("util.EasyBuyout.modifier.select") == 0) and IsShiftKeyDown() then
-			ChatFrame1:AddMessage("IsShift");
+		local selection = get("util.EasyBuyout.modifier.select");
+    
+        if (selection == 0) and IsShiftKeyDown() then
             ebModifier = true;
-        elseif (get("util.EasyBuyout.modifier.select") == 1) and IsAltKeyDown() then
-			ChatFrame1:AddMessage("IsAlt");
+        elseif (selection == 1) and IsAltKeyDown() then
             ebModifier = true;
-        elseif (get("util.EasyBuyout.modifier.select") == 2) and IsShiftKeyDown() and IsAltKeyDown() then
-			ChatFrame1:AddMessage("IsShift and IsAlt");
+        elseif (selection == 2) and IsShiftKeyDown() and IsAltKeyDown() then
             ebModifier = true;
         else
+			ChatFrame1:AddMessage("|cffff5511EasyBuyout - Modifier Key " .. private.EBConvertModifierToText(selection) .. " is set, but not pressed!");
             return orig_AB_OC(...)
         end
     end
@@ -276,12 +276,12 @@ local function OrigAuctionOnClick(...)
 	end
 end
 -- handler for modifiers
-local function NewOnClick(self, button)
+local function NewOnClick(self, button) -- used for EasyCancel
 	local active = get("util.EasyBuyout.EC.active")
 	local modified = get("util.EasyBuyout.EC.modifier.active")
 	local modselect = get("util.EasyBuyout.EC.modifier.select")
 
-	if active and button=="RightButton" and
+	if active and button == "RightButton" and
 			(
 			(not modified)
 			or (modified and modselect == 0 and IsShiftKeyDown())
@@ -290,6 +290,9 @@ local function NewOnClick(self, button)
 			)	then
 		private.EasyCancel(self, button)
 	else
+		if active and button == "RightButton" then
+			ChatFrame1:AddMessage("|cffff5511EasyCancel - Modifier Key " .. private.EBConvertModifierToText(modselect) .. " is set, but not pressed!");
+		end
 		OrigAuctionOnClick(self, button)
 	end
 
@@ -374,4 +377,9 @@ function private.EasyBidAuction(getID)
     CloseAuctionStaticPopups();
 end
 
+function private.EBConvertModifierToText(selection)
+	if selection == 0 then return "<Shift>" end
+	if selection == 1 then return "<Alt>" end
+	if selection == 2 then return "<Shift + Alt>" end
+end
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
