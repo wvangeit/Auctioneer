@@ -59,8 +59,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "help}} - ".._TRANS('ILVL_Help_SlashHelp2') ) -- this iLevel help
 		print(line, "clear}} - ".._TRANS('ILVL_Help_SlashHelp3'):format(serverKey) ) --clear current %s iLevel price database
 	elseif (command ==_TRANS( 'clear') ) then
-		print(_TRANS('ILVL_Help_SlashHelp5').." {{", serverKey, "}}") --Clearing iLevel stats for
-		private.ClearData(serverKey)
+		lib.ClearData(serverKey)
 	end
 end
 
@@ -185,7 +184,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		if (stack < 1) then stack = 1 end
 		datapoints_price[i] = price
 		datapoints_stack[i] = stack
-		total = total + tonumber(price)
+		total = total + price
 		number = number + stack
 	end
 	mean = total / number
@@ -358,6 +357,10 @@ function lib.OnLoad(addon)
 	if private.InitData then private.InitData() end
 end
 
+function lib.OnUnload()
+	private.RepackStats()
+end
+
 function lib.ClearItem(hyperlink, serverKey)
 	local itemSig, iLevel, equipPos, quality = private.GetItemDetail(hyperlink)
 	if not itemSig then return end
@@ -386,9 +389,19 @@ function private.InitData()
 
 end
 
-function private.ClearData(serverKey)
-	ILRealmData[serverKey] = nil
-	unpacked[serverKey] = nil
+function lib.ClearData(serverKey)
+	serverKey = serverKey or GetFaction()
+	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
+		print(_TRANS('ILVL_Help_SlashHelp5').." {{All realms}}") --Clearing iLevel stats for
+		wipe(ILRealmData)
+		wipe(unpacked)
+		wipe(updated)
+	elseif ILRealmData[serverKey] then
+		local _, _, text = AucAdvanced.SplitServerKey(serverKey)
+		print(_TRANS('ILVL_Help_SlashHelp5').." {{"..text.."}}") --Clearing iLevel stats for
+		ILRealmData[serverKey] = nil
+		unpacked[serverKey] = nil
+	end
 end
 
 --[[
@@ -424,7 +437,7 @@ function private.GetUnpackedStats(serverKey, itemSig, writing)
 
 	local realmdata = ILRealmData[serverKey]
 	if not realmdata then
-		if type(serverKey) ~= "string" or not strmatch(serverKey, ".%-%u%l") then
+		if not AucAdvanced.SplitServerKey(serverKey) then
 			error("Invalid serverKey passed to Stat-iLevel")
 		end
 		realmdata = {}
@@ -447,6 +460,7 @@ RepackStats()
 Write any changed tables in the unpacked cache back to ILRealmData
 --]]
 function private.RepackStats()
+	if not next(updated) then return end -- bail out if no updated entries
 	for serverKey, realmData in pairs(unpacked) do
 		for item, stats in pairs(realmData) do
 			if updated[stats] then
@@ -459,7 +473,7 @@ function private.RepackStats()
 			end
 		end
 	end
-	updated = {}
+	wipe(updated)
 end
 
 --[[ Subfunctions ]]--
