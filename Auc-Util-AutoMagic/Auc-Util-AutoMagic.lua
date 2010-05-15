@@ -296,49 +296,56 @@ end
 local sideIcon
 function lib.slidebar()
 	if LibStub then
-		local SlideBar = LibStub:GetLibrary("SlideBar", true)
-		if SlideBar then
-			local embedded = false
-			for _, module in ipairs(AucAdvanced.EmbeddedModules) do
-				if module == "Auc-Util-AutoMagic"  then
-					embedded = true
-				end
+		--Need to figure out if we're embedded first
+		local embedded = false
+		for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+			if module == "Auc-Util-AutoMagic"  then
+				embedded = true
 			end
-			function lib.sideIconEnter()
-				local SlideBar = LibStub:GetLibrary("SlideBar", true)
-				if embedded then
-					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIcon")
-				else
-					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon")
-				end
+		end
+		local sideIcon, sideIconE
+		if embedded then
+			sideIcon = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIcon"
+			sideIconE = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE" 
+		else
+			sideIcon =  "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIcon"
+			sideIconE = "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE"
+		end
+		
+		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-AutoMagic", {
+					type = "launcher",
+					icon = sideIcon,
+					OnClick = function(self, button) lib.autosellslidebar(self, button) end,
+				})
+		
+		function private.LDBButton:OnTooltipShow()
+			self:AddLine("AutoMagic: Auto-Sell Config",  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Left-Click|r to open the 'Auto-Sell' list.",  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Right-Click|r to edit the configuration.",  1,1,0.5, 1)
+		end
+		--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
+		function private.LDBButton:OnEnter()
+			if self.icon and type(self.icon) == "table" then
+				self.icon:SetTexture(sideIconE)
 			end
-			function lib.sideIconLeave()
-				local SlideBar = LibStub:GetLibrary("SlideBar", true)
-				if embedded then
-					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
-				else
-					sideIcon.icon:SetTexture("Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
-				end
+			
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			private.LDBButton.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+		end
+		
+		function private.LDBButton:OnLeave()
+			if self.icon and type(self.icon) == "table" then
+				self.icon:SetTexture(sideIcon)
 			end
-			if embedded then
-				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-AutoMagic\\Images\\amagicIconE")
-			else
-				sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\amagicIconE")
-			end
-			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-			sideIcon.OnEnter = lib.sideIconEnter
-			sideIcon.OnLeave = lib.sideIconLeave
-			sideIcon:SetScript("OnClick", lib.autosellslidebar)
-			sideIcon.tip = {
-				"AutoMagic: Auto-Sell Config",
-				"",
-				"{{Left-Click}} to open the 'Auto-Sell' list.",
-				"{{Right-Click}} to edit the configuration.",
-			}
+			GameTooltip:Hide()
 		end
 	end
 end
-
+	
 local myworkingtable = {}
 function lib.setWorkingItem(link)
 	if link == nil then return end

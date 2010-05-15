@@ -1,7 +1,7 @@
 ## Title: Auc:Util:AutoMagic
 ## Interface: 30300
 ## Dependancies: Auc-Advanced
-## OptionalDependencies: Auc-Util-Appraiser Enchantrix Auc-Util-ItemSuggest
+## OptionalDependencies: Auc-Util-Appraiser, Enchantrix, Auc-Util-ItemSuggest, LibDataBroker
 ##
 ## Version: <%version%> (<%codename%>)
 ## URL: http://auctioneeraddon.com/
