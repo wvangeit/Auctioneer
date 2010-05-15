@@ -233,6 +233,15 @@ function private.CreateFrames()
 				}
 			end
 		end
+		
+		-- SHIFT CLICK HANDLER - Added by GhostfromTexas May 16, 2010 for APPR-170
+		if IsShiftKeyDown() then
+			if ChatFrameEditBox and ChatFrameEditBox:IsVisible() then
+			   ChatFrameEditBox:Insert(item[7]);
+			end
+			return -- do not continue after this point
+		end
+		
 		frame.selected = sig
 		frame.selectedPos = pos
 		frame.selectedObj = obj
