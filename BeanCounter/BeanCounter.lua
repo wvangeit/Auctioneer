@@ -229,17 +229,36 @@ end
 local sideIcon
 function private.slidebar()
 	if LibStub then
-		local SlideBar = LibStub:GetLibrary("SlideBar", true)
-		if SlideBar then
-			sideIcon = SlideBar.AddButton("BeanCounter", "Interface\\AddOns\\BeanCounter\\Textures\\BeanCounterIcon")
-			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-			sideIcon:SetScript("OnClick", private.GUI)
-			sideIcon.tip = {
-				"BeanCounter",
-				"BeanCounter tracks your trading activities so that you may review your expenditures and income, perform searches and use this data to determine your successes and failures.",
-				"{{Click}} to view your activity report.",
-				"{{Right-Click}} to edit the configuration.",
-			}
+		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		private.LDBButton = LibDataBroker:NewDataObject("BeanCounter", {
+					type = "launcher",
+					icon = "Interface\\AddOns\\BeanCounter\\Textures\\BeanCounterIcon",
+					OnClick = function(self, button)
+						private.GUI(self, button)
+					end,
+				})
+				
+		function private.LDBButton:OnTooltipShow()
+			local count, items = private.DBSumEntry or 0, private.DBSumItems or 0
+			self:AddLine("BeanCounter",  1,1,0.5, 1)
+			self:AddLine("Tracks your trading activities so that you may review your expenditures and income, perform searches and use this data to determine your successes and failures.",  1,1,0.5, 1)
+			self:AddLine(string.format("Items:|CFF00FFF1 %s |r", count),  1,1,0.5, 1 )
+			self:AddLine(string.format("Entries:|CFF00FFF1 %s |r", items),  1,1,0.5, 1 )
+			self:AddLine("|cff1fb3ff".."Click|r to view your activity report.",  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Right-Click|r to edit the configuration",  1,1,0.5, 1)
+		end
+		
+		function private.LDBButton:OnEnter()
+			--print(self)
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			private.LDBButton.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+	end
+		function private.LDBButton:OnLeave()
+		--print(self)
+			GameTooltip:Hide()
 		end
 	end
 end
