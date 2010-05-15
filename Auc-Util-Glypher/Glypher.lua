@@ -140,11 +140,13 @@ function lib.OnLoad()
 				embedded = true
 			end
 		end
-		local sideIcon
+		local sideIcon, sideIconE
 		if embedded then
-			sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher")
+			sideIcon = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher"
+			sideIconE = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\GlypherE" 
 		else
-			sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
+			sideIcon = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher"
+			sideIconE = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\GlypherE" 
 		end
 			
 		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-Glypher", {
@@ -157,7 +159,11 @@ function lib.OnLoad()
 			self:AddLine("Auc-Util-Glypher",  1,1,0.5, 1)
 			self:AddLine("Open the glypher gui",  1,1,0.5, 1)
 		end
+		--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
 		function private.LDBButton:OnEnter()
+			if self.icon and type(self.icon) == "table" then
+				self.icon:SetTexture(sideIconE)
+			end
 			GameTooltip:SetOwner(self, "ANCHOR_NONE")
 			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
 			GameTooltip:ClearLines()
@@ -165,6 +171,9 @@ function lib.OnLoad()
 			GameTooltip:Show()
 		end
 		function private.LDBButton:OnLeave()
+			if self.icon and type(self.icon) == "table" then
+				self.icon:SetTexture(sideIcon)
+			end
 			GameTooltip:Hide()
 		end
 	end	
