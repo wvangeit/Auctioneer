@@ -557,19 +557,29 @@ function lib.MakeGuiConfig()
 	AucAdvanced.SendProcessorMessage("config", gui)
 end
 
-local sideIcon
 if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar", true)
-	if SlideBar then
-		sideIcon = SlideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
-		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-		sideIcon:SetScript("OnClick", lib.Toggle)
-		sideIcon.tip = {
-			"Auctioneer",
-			"Auctioneer allows you to scan the auction house and collect statistics about prices.",
-			"It also provides a framework for creating auction related addons.",
-			"{{Click}} to edit the configuration.",
-		}
+	local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	private.LDBButton = LibDataBroker:NewDataObject("AucAdvanced", {
+				type = "launcher",
+				icon = "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon",
+				OnClick = function(self, button) lib.Toggle(self, button) end,
+			})
+	
+	function private.LDBButton:OnTooltipShow()
+		self:AddLine("Auctioneer",  1,1,0.5, 1)
+		self:AddLine("Auctioneer allows you to scan the auction house and collect statistics about prices.",  1,1,0.5, 1)
+		self:AddLine("It also provides a framework for creating auction related addons.",  1,1,0.5, 1)
+		self:AddLine("|cff1fb3ff".."Click|r to edit the configuration.",  1,1,0.5, 1)
+	end
+	function private.LDBButton:OnEnter()
+		GameTooltip:SetOwner(self, "ANCHOR_NONE")
+		GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+		GameTooltip:ClearLines()
+		private.LDBButton.OnTooltipShow(GameTooltip)
+		GameTooltip:Show()
+	end
+	function private.LDBButton:OnLeave()
+		GameTooltip:Hide()
 	end
 end
 
