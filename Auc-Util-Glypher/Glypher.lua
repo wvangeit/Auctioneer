@@ -132,32 +132,42 @@ function lib.OnLoad()
         DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
     end
 
-    local sideIcon
     if LibStub then
-        local SlideBar = LibStub:GetLibrary("SlideBar", true)
-        if SlideBar then
-			local embedded = false
-			for _, module in ipairs(AucAdvanced.EmbeddedModules) do
-				if module == "Auc-Util-Glypher" then
-					embedded = true
-				end
+		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		local embedded = false
+		for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+			if module == "Auc-Util-Glypher" then
+				embedded = true
 			end
-			if embedded then
-				sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher")
-			else
-            	sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
-			end
-            sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp") --What type of click you want to respond to
-            sideIcon:SetScript("OnClick", private.SlideBarClick) --same function that the addons current minimap button calls
-            sideIcon.tip = {
-            "Auc-Util-Glypher",
-            "Open the glypher gui",
-            --"{{Click}} Open the glypher gui",
-            --"{{Right-Click}} BUTTON MOUSEOVER CLICK DESCRIPTION IF WANTED",--remove lines if not wanted
-            }
-        end
-    end
-    private.sideIcon = sideIcon
+		end
+		local sideIcon
+		if embedded then
+			sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher")
+		else
+			sideIcon = SlideBar.AddButton("Glypher", "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher")
+		end
+			
+		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-Glypher", {
+					type = "launcher",
+					icon = sideIcon,
+					OnClick = function(self, button) private.SlideBarClick(self, button) end,
+				})
+		
+		function private.LDBButton:OnTooltipShow()
+			self:AddLine("Auc-Util-Glypher",  1,1,0.5, 1)
+			self:AddLine("Open the glypher gui",  1,1,0.5, 1)
+		end
+		function private.LDBButton:OnEnter()
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			private.LDBButton.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+		end
+		function private.LDBButton:OnLeave()
+			GameTooltip:Hide()
+		end
+	end	
 end
 
 function lib.CommandHandler(command, ...)
