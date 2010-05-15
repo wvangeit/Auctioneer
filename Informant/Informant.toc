@@ -4,7 +4,7 @@
 ## Interface: 30300
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
-## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar, LibExtraTip, TipHelper
+## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar, LibExtraTip, TipHelper, LibDataBroker
 ## SavedVariables: InformantConfig, InformantLocalUpdates
 ##
 ## Version: <%version%> (<%codename%>)

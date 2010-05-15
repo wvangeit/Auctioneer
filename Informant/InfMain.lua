@@ -907,19 +907,29 @@ local function slidebarclickhandler(_, button)
 	end
 end
 
-local sideIcon
 local function slidebar()
 	if LibStub then
-		local SlideBar = LibStub:GetLibrary("SlideBar", true)
-		if SlideBar then
-			sideIcon = SlideBar.AddButton("Informant", "Interface\\AddOns\\Informant\\inficon")
-			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-			sideIcon:SetScript("OnClick", slidebarclickhandler)
-			sideIcon.tip = {
-				"Informant Configuration",
-			}
+		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		local LDBButton = LibDataBroker:NewDataObject("Informant", {
+					type = "launcher",
+					icon = "Interface\\AddOns\\Informant\\inficon",
+					OnClick = function(self, button) slidebarclickhandler(self, button) end,
+					})
+		
+		function LDBButton:OnTooltipShow()
+			self:AddLine("Informant Configuration",  1,1,0.5, 1)
 		end
-	end
+		function LDBButton:OnEnter()
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			LDBButton.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+		end
+		function LDBButton:OnLeave()
+			GameTooltip:Hide()
+		end
+	end	
 end
 
 function onLoad()
