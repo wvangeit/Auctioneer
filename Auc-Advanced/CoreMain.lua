@@ -206,7 +206,9 @@ function private.OnLoad(addon)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 
 		private.HookTT()
-
+		--updated saved variables format 
+		if not AucAdvancedConfig["version"] then AucAdvanced.Settings.upgradeSavedVariables() end
+		
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)

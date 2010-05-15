@@ -65,17 +65,10 @@ end
 local Babylonian = LibStub("Babylonian")
 assert(Babylonian, "Babylonian is not installed")
 local babylonian = Babylonian(AuctioneerLocalizations)
-function lib.localizations(stringKey, locale)
-	locale =  lib.Settings.GetSetting("SelectedLocale")--locales are user choosable
-	if (locale) then
-		if (type(locale) == "string") then
-			return babylonian(locale, stringKey) or stringKey
-		else
-			return babylonian(GetLocale(), stringKey)
-		end
-	else
-		return babylonian[stringKey] or stringKey
-	end
+function lib.localizations(stringKey)
+	local locale = lib.Settings.GetSetting("SelectedLocale")--locales are user choose-able
+	-- translated key or english Key or Raw Key
+	return babylonian(locale, stringKey) or babylonian[stringKey] or stringKey
 end
 
 --The following function will build tables correlating Chat Frame names with their index numbers, and return different formats according to an option passed in.
