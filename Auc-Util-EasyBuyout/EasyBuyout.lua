@@ -205,8 +205,11 @@ function private.BrowseButton_OnClick(...)
             ebModifier = true;
         elseif (selection == 2) and IsShiftKeyDown() and IsAltKeyDown() then
             ebModifier = true;
-        else
-			private.EBMessage("|cffff5511EasyBuyout - Modifier Key " .. private.EBConvertModifierToText(selection) .. " is set, but not pressed!");
+        else	
+        	if(arg1 == "RightButton") then -- only warn of modifier key if the right mouse button is set
+				private.EBMessage("|cffff5511EasyBuyout - Modifier Key " .. private.EBConvertModifierToText(selection) .. " is set, but not pressed!");
+			end
+			
             return orig_AB_OC(...)
         end
     end
