@@ -1665,9 +1665,7 @@ function lib.MakeGuiConfig()
 	gui:ActivateTab(gui.aboutTab)
 end
 
-local sideIcon
-local SlideBar = LibStub:GetLibrary("SlideBar", true)
-if SlideBar then
+if LibStub then
 	--Need to figure out if we're embedded first
 	local embedded = false
 	for _, module in ipairs(AucAdvanced.EmbeddedModules) do
@@ -1675,18 +1673,37 @@ if SlideBar then
 			embedded = true
 		end
 	end
+	local sideIcon
 	if embedded then
-		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
+		sideIcon = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-SearchUI\\Textures\\SearchUIIcon"
 	else
-		sideIcon = SlideBar.AddButton("Auc-Util-SearchUI", "Interface\\AddOns\\Auc-Util-SearchUI\\Textures\\SearchUIIcon", 300)
+		sideIcon = "Interface\\AddOns\\Auc-Util-SearchUI\\Textures\\SearchUIIcon"
 	end
-	sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-	sideIcon:SetScript("OnClick", lib.Toggle)
-	sideIcon.tip = {
-		"Auction SearchUI",
-		"Allows you to perform searches on the Auctioneer auction cache snapshot, even when away from the Auction House",
-		"{{Click}} to open the Search UI.",
-	}
+	
+	local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+	private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-SearchUI", {
+				type = "launcher",
+				icon = sideIcon,
+				OnClick = function(self, button) lib.Toggle(self, button) end,
+			})
+	
+	function private.LDBButton:OnTooltipShow()
+		self:AddLine("Auction SearchUI",  1,1,0.5, 1)
+		self:AddLine("Allows you to perform searches on the Auctioneer auction cache snapshot, even when away from the Auction House",  1,1,0.5, 1)
+		self:AddLine("|cff1fb3ff".."Click|r to open the Search UI.",  1,1,0.5, 1)
+	end
+	
+	function private.LDBButton:OnEnter()
+		GameTooltip:SetOwner(self, "ANCHOR_NONE")
+		GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+		GameTooltip:ClearLines()
+		private.LDBButton.OnTooltipShow(GameTooltip)
+		GameTooltip:Show()
+	end
+	
+	function private.LDBButton:OnLeave()
+		GameTooltip:Hide()
+	end
 end
 
 function private.FindSearcher(item)
@@ -1834,7 +1851,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 					local total = #private.sheetData+1
 					private.sheetStyle[total] = {}
 					private.sheetStyle[total][2] = {["textColor"] = {r, g, b}}
-					--private.sheetStyle[total][1] = {["rowColor"] = {r, g, b, 0, 0.2, "Horizontal"}} --allow row coloring, needs config options
+					private.sheetStyle[total][1] = {["rowColor"] = {r, g, b, 0, 0.2, "Horizontal"}} --allow row coloring, needs config options
 					level = level or 0
 					pct = floor(level)
 				end
