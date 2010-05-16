@@ -156,10 +156,12 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBuy.active", "Enable EasyGoldLimit for EasyBuyout")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBuyout")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBuy.limit", 0, 999999999, "Set EasyBuyout Limit")
+	gui:AddTip(id, "Use this box to set the max amount of gold you want to spend when using EasyBuyout")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBid.active", "Enable EasyGoldLimit for EasyBid")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBid")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBid.limit", 0, 999999999, "Set EasyBid Limit")
+	gui:AddTip(id, "Use this box to set the max amount of gold you want to spend when using EasyBid")
 	
 	-- Silent Mode
 	gui:AddControl(id, "Header",		0,		"Other Options")
