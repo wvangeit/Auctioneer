@@ -37,23 +37,17 @@ local libType, libName = "Stat", "Debug"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-  
+
 local data
 
 function lib.CommandHandler(command, ...)
-	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - this", libName, "help")
-		print(line, "clear}} - clear current", myFaction, libName, "price database")
-		print(line, "push}} - force the", myFaction, libName, "daily stats to archive (start a new day)")
+		print(line, "help}} - show this help")
+		print(line, "clear}} - clear current price database")
 	elseif (command == "clear") then
-		print("Clearing Simple stats for {{", myFaction, "}}")
-		private.ClearData()
-	elseif (command == "push") then
-		print("Archiving {{", myFaction, "}} daily stats and starting a new day")
-		private.PushStats(myFaction)
+		lib.ClearData()
 	end
 end
 
@@ -106,17 +100,16 @@ end
 
 local array = {}
 function lib.GetPriceArray(hyperlink)
-	-- Clean out the old array
-	while (#array > 0) do table.remove(array) end
+	local data = private.GetPriceData()
+	if not data then return end
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 
 	local id = strjoin(":", itemId, property, factor)
-	local data = private.GetPriceData()
-	if not data then return end
 	if not data[id] then return end
 
+	wipe(array)
 	array.seen = #data[id]
 	array.price = data[id][array.seen]
 	array.pricelist = data[id]
@@ -163,6 +156,24 @@ function private.SetupConfigGui(gui)
 
 end
 
+function lib.ClearData(serverKey)
+	-- Stat-Debug ignores serverKeys, so this function always clears ALL.
+	print("Clearing all "..libName.." stats")
+	private.ClearAllData()
+end
+
+function lib.ClearItem(hyperlink, serverKey)
+	-- serverKey is ignored
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then return end
+
+	local id = strjoin(":", itemId, property, factor)
+	local data = private.GetPriceData()
+	if not data[id] then return end
+	print("Clearing "..libName.." stats for "..hyperlink)
+	data[id] = nil
+end
+
 --[[ Local functions ]]--
 
 function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
@@ -196,10 +207,9 @@ function private.LoadData()
 	private.DataLoaded()
 end
 
-function private.ClearData(faction, realmName)
+function private.ClearAllData()
 	if (not StatData) then private.LoadData() end
-	print("Clearing "..libName.." stats")
-	StatData.Data =  {}
+	wipe(StatData.Data)
 end
 
 function private.GetPriceData()
