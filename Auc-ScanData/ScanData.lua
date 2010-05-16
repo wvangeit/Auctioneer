@@ -351,28 +351,33 @@ end
 
 function lib.ClearScanData(key)
 	local report, serverKey
-	if key == "ALL" then
-		wipe(AucScanData.scans)
-		report = "all realms"
-	elseif key == "SERVER" then
-		AucScanData.scans[HomeRealm] = nil
-		report = HomeRealm
-	elseif key == "FACTION" then
-		local sKey, realm, faction = AucAdvanced.GetFaction()
-		AucScanData.scans[realm][faction] = nil
-		local _, _, text = AucAdvanced.SplitServerKey(sKey)
-		report = text
-		serverKey = sKey
-	elseif AucScanData.scans[key] then -- it's a realm name
-		AucScanData.scans[key] = nil
-		report = key
-	else
-		-- is it a serverKey?
-		local realm, faction, text = AucAdvanced.SplitServerKey(key)
-		if faction and AucScanData.scans[realm] then
+	key = key or "faction" -- default
+	if type(key) == "string" then
+		key = strtrim(key)
+		local keyword = AucAdvanced.API.IsKeyword(key)
+		if keyword == "ALL" then
+			wipe(AucScanData.scans)
+			report = "All realms"
+		elseif keyword == "server" then
+			AucScanData.scans[HomeRealm] = nil
+			report = HomeRealm
+		elseif keyword == "faction" then
+			local sKey, realm, faction = AucAdvanced.GetFaction()
 			AucScanData.scans[realm][faction] = nil
+			local _, _, text = AucAdvanced.SplitServerKey(sKey)
 			report = text
-			serverKey = key
+			serverKey = sKey
+		elseif AucScanData.scans[key] then -- it's a realm name
+			AucScanData.scans[key] = nil
+			report = key
+		else
+			-- is it a serverKey?
+			local realm, faction, text = AucAdvanced.SplitServerKey(key)
+			if faction and AucScanData.scans[realm] then
+				AucScanData.scans[realm][faction] = nil
+				report = text
+				serverKey = key
+			end
 		end
 	end
 	wipe(private.dataCache)
@@ -383,6 +388,7 @@ function lib.ClearScanData(key)
 		aucPrint("Auctioneer: ScanData cleared for {{"..report.."}}.")
 		local clearstats = {
 			source = "clear",
+			clearType = "scandata",
 			clearRequest = key,
 			clearReport = report,
 			serverKey = serverKey,
