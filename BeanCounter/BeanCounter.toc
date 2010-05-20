@@ -3,7 +3,7 @@
 ##
 ## Interface: 30300
 ## Dependencies: Stubby
-## OptionalDeps: !nLog, Babylonian, DebugLib, SlideBar, Auc-Advanced, Configator, LibExtraTip, TipHelper
+## OptionalDeps: !nLog, Babylonian, DebugLib, SlideBar, Auc-Advanced, Configator, LibExtraTip, TipHelper, LibDataBroker
 ## SavedVariables: BeanCounterDB, BeanCounterAccountDB
 ##
 ## Version: <%version%> (<%codename%>)
