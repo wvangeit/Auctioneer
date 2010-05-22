@@ -44,6 +44,8 @@ local min,max,abs,ceil,floor = min,max,abs,ceil,floor
 local concat = table.concat
 local wipe,unpack = wipe,unpack
 
+local GetFaction = AucAdvanced.GetFaction
+
 local data
 local totaldata
 local stattable = {}
@@ -55,15 +57,14 @@ local pricecache
 
 function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
-	local myFaction = AucAdvanced.GetFaction()
+	local myFaction = GetFaction()
 	if (command == "help") then
 		print(_TRANS('SHTG_Help_SlashHelp1') )--Help for Auctioneer - Histogram
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - ".._TRANS('SHTG_Help_SlashHelp2') ) -- this Histogram help
 		print(line, "clear}} - ".._TRANS('SHTG_Help_SlashHelp3'):format(myFaction) ) --clear current %s Histogram price database
 	elseif (command == "clear") then
-		print(_TRANS('SHTG_Help_SlashHelp5').." {{", myFaction, "}}") --Clearing Histogram stats for
-		data[myFaction] = nil
+		lib.ClearData(myFaction)
 	end
 end
 
@@ -78,7 +79,7 @@ function lib.Processor(callbackType, ...)
 		lib.OnLoad(...)
 	elseif (callbackType == "scanstats") then
 		pricecache = nil
-	elseif callbackType == "auctionclose" then		
+	elseif callbackType == "auctionclose" then
 		pricecache = nil	-- not actually needed, just conserving RAM
 	end
 end
@@ -157,7 +158,7 @@ function lib.GetPrice(link, faction)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
+	if not faction then faction = GetFaction() end
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
 		debugPrint("GetPrice: No data", libType.."-"..libName, "Info")
 		return
@@ -223,7 +224,7 @@ function lib.GetItemPDF(link, faction)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
+	if not faction then faction = GetFaction() end
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
 	if not data[faction][itemId][property] then return end
@@ -245,12 +246,12 @@ function lib.GetItemPDF(link, faction)
 	if not count or count == 0 then
 		return
 	end
-	
+
 	if not pricecache then pricecache = {} end
 	if not pricecache[faction] then pricecache[faction] = {} end
 	if not pricecache[faction][itemId] then pricecache[faction][itemId] = {} end
 	pricecache[faction][itemId][property] = {median or false, Qone or false, Qthree or false, step or false, count or false}
-	
+
 	local curcount = 0
 	local area = 0
 	local targetarea = min(1, count/30) --if count is less than thirty, we're not very sure about the price
@@ -302,7 +303,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 	wipe(stattable)
-	local faction = AucAdvanced.GetFaction()
+	local faction = GetFaction()
 	if not data[faction] then data[faction] = {} end
 	if not data[faction][itemId] then data[faction][itemId] = {} end
 	if data[faction][itemId][property] then
@@ -372,10 +373,10 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what disadvantage",
 		_TRANS('SHTG_Help_WhatDisadvantagesHistogram') ,--What disadvantages does Histogram have?
 		_TRANS('SHTG_Help_WhatDisadvantagesHistogramAnswer') )--Histogram rounds prices slightly to help store them, so there is a slight precision loss. However, it is precise to 1/250th of market price. (an item with market price 250g will have prices stored to the nearest 1g)
-	
+
 	frame = gui.tabs[id].content
 	private.frame = frame
-	
+
 	frame.slot = frame:CreateTexture(nil, "BORDER")
 	frame.slot:SetDrawLayer("Artwork") -- or the border shades it
 	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, -210)
@@ -409,7 +410,7 @@ function private.SetupConfigGui(gui)
 			GameTooltip:SetHyperlink(frame.link)
 		end)
 	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	frame.name = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.name:SetPoint("TOPLEFT", frame.slot, "TOPRIGHT", 5,-2)
 	frame.name:SetPoint("RIGHT", frame, "RIGHT", -15)
@@ -468,7 +469,7 @@ function private.SetupConfigGui(gui)
 	frame.key:SetJustifyH("RIGHT")
 	frame.key:SetJustifyV("TOP")
 	frame.key:SetText("|cff3fff3fRaw Data   |cffff3f3fMedian   |cff3f3fffPrice Probability")
-	
+
 	frame.med = frame.bargraph:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.med:SetPoint("TOP", frame.bargraph, "BOTTOM", -50, -10)
 	frame.med:SetPoint("BOTTOM", frame.bargraph, "BOTTOM", -50, -25)
@@ -477,7 +478,7 @@ function private.SetupConfigGui(gui)
 	frame.max = frame.bargraph:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.max:SetPoint("TOPRIGHT", frame.bargraph, "BOTTOMRIGHT", 0, -10)
 	frame.max:SetPoint("BOTTOMLEFT", frame.bargraph, "BOTTOMRIGHT", -150, -25)
-	
+
 	--all options in here will be duplicated in the tooltip frame
 	function private.addTooltipControls(id)
 		gui:AddControl(id, "Header",     0,    _TRANS('SHTG_Interface_HistogramOptions') )--Histogram options
@@ -485,7 +486,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",   0, 1, "stat.histogram.enable", _TRANS('SHTG_Interface_EnableHistogram') )--Enable Histogram Stats
 		gui:AddTip(id, _TRANS('SHTG_HelpTooltip_EnableHistogram') )--Allow Histogram to gather and return price data
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
+
 		gui:AddControl(id, "Checkbox",   0, 4, "stat.histogram.tooltip", _TRANS('SHTG_Interface_ShowHistogramTooltips') )--Show Histogram stats in the tooltips?
 		gui:AddTip(id, _TRANS('SHTG_HelpTooltip_ShowHistogramTooltips') )--Toggle display of stats from the Histogram module on or off
 		gui:AddControl(id, "Checkbox",   0, 6, "stat.histogram.median", _TRANS('SHTG_Interface_DisplayMedian') )--Display Median
@@ -497,7 +498,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 		gui:AddControl(id, "Checkbox",   0, 4, "stat.histogram.quantmul", _TRANS('SHTG_Interface_MultiplyStack') )--Multiply by Stack Size
 		gui:AddTip(id, _TRANS('SHTG_HelpTooltip_MultiplyStack') )--Multiplies by current Stack Size if on
-		
+
 		gui:AddHelp(id, "what median",
 			_TRANS('SHTG_Help_WhatMedian') ,--What is the median?
 			_TRANS('SHTG_Help_WhatMedianAnswer') )--The median value is the value where half of the prices seen are above, and half are below.
@@ -508,15 +509,15 @@ function private.SetupConfigGui(gui)
 	end
 	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
-	
+
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
 	if tooltipID then private.addTooltipControls(tooltipID) end
-	
+
 	gui:MakeScrollable(id)
-			
+
 	gui:AddControl(id, "Subhead",    0,    _TRANS('SHTG_Interface_ItemDataViewer') )--Item Data Viewer
-	
+
 end
 
 function lib.SetWorkingItem(link)
@@ -529,7 +530,7 @@ function lib.SetWorkingItem(link)
 		frame.bargraph.bars[i]:SetTexture(0.2, 0.8, 0.2)
 		frame.bargraph.pdf[i]:SetValue(0)
 	end
-	
+
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(link)
 	if (linkType ~= "item") then return end
 	local name, _, _, _, _, _, _, _, _, texture = GetItemInfo(link)
@@ -537,17 +538,17 @@ function lib.SetWorkingItem(link)
 	frame.name:SetText(link)
 	frame.link = link
 	frame.icon:SetNormalTexture(texture) --set icon texture
-	
+
 	wipe(stattable)
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	local faction = AucAdvanced.GetFaction()
+	local faction = GetFaction()
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
 		debugPrint("SetWorkingItem: No data", libType.."-"..libName, "Info")
 		return
 	end
 	private.UnpackStats(data[faction][itemId][property])
-	
+
 	local maxvalue = 0
 	local indexes = 0
 	local count = stattable["count"]
@@ -567,7 +568,7 @@ function lib.SetWorkingItem(link)
 	for i = stattable["min"], stattable["max"] do
 		frame.bargraph.bars[i]:SetValue(stattable[i]/maxvalue)
 	end
-	
+
 	--now show the PD curve
 	wipe(PDcurve)
 	PDcurve["step"] = stattable["step"]
@@ -590,7 +591,7 @@ function lib.SetWorkingItem(link)
 	for i = PDcurve["min"], PDcurve["max"] do
 		PDcurve[i]= (PDcurve[i] or 0)
 	end
-	
+
 	for i = 1,300 do
 		if (i >= PDcurve["min"]) and (i <= PDcurve["max"]) then
 			frame.bargraph.pdf[i]:SetValue(PDcurve[i])
@@ -654,11 +655,25 @@ function lib.ClearItem(hyperlink, faction)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
+	if not faction then faction = GetFaction() end
 	if not data[faction] then return end
 	if not data[faction][itemId] then return end
 	data[faction][itemId][property] = nil
-	print(libType.._TRANS('SHTG_Interface_ClearingData'):format(hyperlink, faction))--- Histogram: clearing data for %s for {{%s}}	
+	print(libType.._TRANS('SHTG_Interface_ClearingData'):format(hyperlink, faction))--- Histogram: clearing data for %s for {{%s}}
+end
+
+function lib.ClearData(serverKey)
+	serverKey = serverKey or GetFaction()
+	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
+		print(_TRANS('SHTG_Help_SlashHelp5').." {{All realms}}") --Clearing Histogram stats for
+		local version = data.version -- save this so it doesn't get lost in the wipe
+		wipe(data)
+		data.version = version
+	elseif data[serverKey] then
+		local _,_,text = AucAdvanced.SplitServerKey(serverKey)
+		print(_TRANS('SHTG_Help_SlashHelp5').." {{"..text.."}}") --Clearing Histogram stats for
+		data[serverKey] = nil
+	end
 end
 
 --[[ Local functions ]]--
@@ -749,13 +764,13 @@ local meta0 = { __index = function(tbl,key) return 0 end }
 function private.PackStats()
 
 	setmetatable(stattable, meta0)	-- Instead of looping through and checking for nil->0. /Mikk
-	
+
 	local values = concat(stattable, ",", stattable.min, stattable.max)
-	
+
 	local ret = strjoin(";",stattable.min, stattable.max, stattable.step, stattable.count, values)
-	
+
 	setmetatable(stattable, nil)	-- I'm not even sure if this needs to be unset, but I don't want to change the behavior of code I don't fully understand, so unsetting it. /Mikk
-	
+
 	return ret
 end
 
