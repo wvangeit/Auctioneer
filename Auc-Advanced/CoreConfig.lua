@@ -98,6 +98,16 @@ function private.CommandHandler(editbox, command, subcommand, ...)
 			subcommand = string.join(" ", subcommand, ...)
 		end
 		AucAdvanced.API.ClearItem(subcommand)
+	elseif command == "cleardata" then
+		if ... then
+			subcommand = string.join(" ", subcommand, ...)
+		end
+		AucAdvanced.API.ClearData(subcommand)
+	elseif command == "clearscan" then
+		if ... then
+			subcommand = string.join(" ", subcommand, ...)
+		end
+		AucAdvanced.Scan.ClearScanData(subcommand)
 	elseif command == "about" then
 		lib.About(subcommand, ...)
 	elseif command == "getallspeed" then
