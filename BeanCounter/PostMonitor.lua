@@ -77,7 +77,7 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 		
 		itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = itemLink, name, count, minBid, buyoutPrice, runTime, deposit
 		
-		if stackNumber > 1 then
+		if stackNumber and stackNumber > 1 then
 			private.multipostStart(itemLink, count, stackNumber, selectedStackCount)
 		else
 			private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
