@@ -48,9 +48,12 @@ end
 local itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti --these store the last auction for the new Multi auction processor added in wow 3.3.3
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, stackNumber)
 	--REMOVE 3.3.3 we dont use this count value it is multistack related not the actual stack value being created only name is still used
-	local name = GetAuctionSellItemInfo()
+	local name, texture, countDepreciated, quality, canUse, price = GetAuctionSellItemInfo() 
 	--debugPrint("1",minBid, buyoutPrice,"Prehook Fired, starting auction creation", name, count)
 
+	--REMOVE 3.3.3 Shim  we will get the count passed via the function hook. This is just to let bean work in 3.3.2 and 3.3.3
+	--Still needed for compatibility with auction addons that dont passs a count/not multisell aware
+	if not count then count = countDepreciated end --REMOVE
 	if (name and count) then
 		--Look in the bags find the locked item so we can get the itemlink, we also check if this is a multipost can this stack cover it
 		local itemLink, selectedStackCount
