@@ -1289,17 +1289,18 @@ function private.CreateFrames()
 	end
 
 	function frame.PostAuctions(obj)
+		
 		local postType = obj.postType
 		if postType == "single" then
 			frame.PostBySig(frame.salebox.sig)
 		elseif postType == "batch" then
-			if not IsModifierKeyDown() then
+			if not IsModifierKeyDown() and GetMouseButtonClicked() ~= "RightButton" then -- Modified by GhostfromTexas APPR-288
 				message(_TRANS('APPR_Interface_BatchButtonCombination') )--This button requires you to press a combination of keys when clicked.\nSee help printed in the chat frame for further details.
 				print(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
 				print(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
 				print("  ".._TRANS('APPR_Help_BatchPostHelp3') )--- Alt = Auto-refresh all batch postable items.
 				print("  ".._TRANS('APPR_Help_BatchPostHelp4') )--- Shift = List all auctions that would be posted without actually posting them.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- Control+Alt+Shift = Auto-post all batch postable items.
+				print("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- RightClick = Auto-post all batch postable items.
 				return
 			end
 
@@ -1308,7 +1309,9 @@ function private.CreateFrames()
 			local c = IsControlKeyDown()
 
 			local mode
-			if a and c and s then mode = "autopost" end
+			
+			-- Keeping old ability for Ctrl+Alt+Shift for users used to using this modifer setup.
+			if (a and c and s) or (GetMouseButtonClicked() == "RightButton") then mode = "autopost" end  -- Modified by GhostfromTexas APPR-288
 			if a and not c and not s then mode = "refresh" end
 			if not a and not c and s then mode = "list" end
 
@@ -2207,7 +2210,8 @@ function private.CreateFrames()
 	frame.gobatch:SetText(_TRANS('APPR_Interface_BatchPost') )--Batch post
 	frame.gobatch:SetWidth(80)
 	frame.gobatch:SetScript("OnClick", frame.PostAuctions)
-	frame.gobatch:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RefreshesCurrentBatch') ) end)--Alt: Refreshes batch post items Shift: Lists current batch post items Ctrl+Alt+Shift: Posts batch post items
+	frame.gobatch:RegisterForClicks("LeftButtonUp", "RightButtonUp") -- Added by GhostfromTexas for APPR-288
+	frame.gobatch:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RefreshesCurrentBatch') ) end)--Alt: Refreshes batch post items Shift: Lists current batch post items RightClick: Posts batch post items
 	frame.gobatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.gobatch.postType = "batch"
 	frame.gobatch:Enable()
