@@ -158,6 +158,7 @@ end
 
 function lib.ClearData(serverKey)
 	-- Stat-Debug ignores serverKeys, so this function always clears ALL.
+	if not next(private.GetPriceData()) then return end -- bail if data is already empty
 	print("Clearing all "..libName.." stats")
 	private.ClearAllData()
 end
