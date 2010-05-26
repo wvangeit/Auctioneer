@@ -87,7 +87,8 @@ function lib.Processor(callbackType, ...)
 		end
 		empty(tooltipcache)
 	elseif (callbackType == "postresult") then
-		private.frame.Reselect(select(3, ...))
+		private.SelectNextOnPost(select(3, ...))
+		--private.frame.Reselect(select(3, ...))
 	elseif callbackType == "postqueue" then
 		if private.UpdatePostQueueProgress then private.UpdatePostQueueProgress(...) end
 	elseif callbackType == "searchbegin" then
