@@ -710,6 +710,9 @@ function private.CreateFrames()
 				bulk = "off"
 			end
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".bulk", bulk)
+
+			frame.GenerateList() -- Add by GhostfromTexas APPR-301
+
 		end
 		if duration ~= frame.valuecache.duration then
 			frame.valuecache.duration = duration
@@ -1519,8 +1522,10 @@ function private.CreateFrames()
 			if item then
 				local curIgnore = item.ignore
 				local curAuction = item.auction
+				local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false -- Added by GhostfromTexas APPR-301
 
 				button.icon:SetTexture(item[3])
+				button.icon:SetDrawLayer("ARTWORK");
 				button.icon:SetDesaturated(curIgnore)
 
 				local _,_,_, hex = GetItemQualityColor(item[4])
@@ -1534,7 +1539,15 @@ function private.CreateFrames()
 					stackX = hex..stackX
 				end
 
+                -- Added by GhostfromTexas APPR-301
+				if curBulk then
+				    button.batchTex:Show();
+				else
+				    button.batchTex:Hide();
+				end
+				
 				button.name:SetText(hex.."["..item[2].."]|r")
+				
 				button.size:SetText(stackX..item[6])
 
 				if curAuction then
@@ -1551,20 +1564,24 @@ function private.CreateFrames()
 						info = AucAdvanced.Modules.Util.ScanData.Colored(true, dist, nil, true)	-- use shortened format
 					end
 				end
+
 				button.info:SetText(info)
 
 				local background = button.bg
 				local alpha = 0.2
+				
 				if curAuction then
 					background:SetVertexColor(0.9,0.3,0) -- very dark red
 				else
 					background:SetVertexColor(1,1,1)
 				end
+				
 				if (item[1] == frame.selected) then
 					alpha = 0.6
 				elseif curIgnore then
 					alpha = 0.1
-				end
+    			end
+    			
 				background:SetAlpha(alpha)
 				background:SetDesaturated(curIgnore)
 
@@ -1728,6 +1745,7 @@ function private.CreateFrames()
 	for i=1, NUM_ITEMS do
 		local item = CreateFrame("Button", nil, frame.itembox)
 		frame.items[i] = item
+		
 		item:SetScript("OnClick", itemButtonClick)
 		if (i == 1) then
 			item:SetPoint("TOPLEFT", frame.itembox, "TOPLEFT", 5,-8 )
@@ -1738,6 +1756,7 @@ function private.CreateFrames()
 		item:SetHeight(26)
 
 		item.id = i
+
 
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
@@ -1751,6 +1770,17 @@ function private.CreateFrames()
 		item.icon:SetPoint("TOPLEFT", item.iconbutton, "TOPLEFT", 0,0)
 		item.icon:SetPoint("BOTTOMRIGHT", item.iconbutton, "BOTTOMRIGHT", 0,0)
 		item.icon:SetTexture("Interface\\InventoryItems\\WoWUnknownItem01")
+		
+		-- Section Added by GhostfromTexas APPR-301 Source:Kandoko
+    	-- This section is for the Batch Post texture that shows up when an item has the batch post option set
+		item.batchTex = item.iconbutton:CreateTexture()
+		item.batchTex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
+		item.batchTex:SetPoint("TOP", item.icon, "TOP", 0,-15)
+		item.batchTex:SetPoint("LEFT", item.icon, "LEFT", 0,0)
+		item.batchTex:SetPoint("RIGHT", item.icon, "RIGHT", -13,0)
+		item.batchTex:SetPoint("BOTTOM", item.icon, "BOTTOM", 0,2)
+		item.batchTex:SetDrawLayer("OVERLAY")
+		item.batchTex:Hide()
 
 		item.name = item:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 		item.name:SetJustifyH("LEFT")
