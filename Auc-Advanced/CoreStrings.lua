@@ -49,32 +49,93 @@ AuctioneerLocalizations = {
 		["AHWC_Help_RemberLastPosition"]	= "Zapamatovat si umístění okna";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "Bez potvrďovacieho okna pri predaji šedých (odpadových) vecí.";
+		["AAMU_Interface_AutoNoPrompt"]	= "... bez potvrďovacej otázky";
+		["AAMU_Interface_AutoSellBOP"]	= "Automatický predaj nepoužiteľného naviazaného zbroja";
+		["AAMU_Interface_AutoSellGrey"]	= "Automatický predaj šedých vecí.";
 		["AAMU_Interface_AutoSellList"]	= "Seznam automatického prodeje";
+		["AAMU_Interface_AutoSellListItems"]	= "Automatický predaj vecí na zozname automatického prodeje";
+		["AAMU_Interface_AutoSellReason"]	= "Automatický predaj vecí nakúpených cez hľadač predajcov.";
+		["AAMU_Interface_AutoStop12"]	= "Zastav po predaji 12 vecí.";
+		["AAMU_Interface_BeginnerTooltip"]	= "Povoľ začiatočnícke bublinky AutoMagic";
+		["AAMU_Interface_Chatspam"]	= "Povoľ AutoMagic spamovanie chatu";
+		["AAMU_Interface_DepositLength"]	= "Minimálne úschovy podľa dľžky aukcie:";
+		["AAMU_Interface_DepositTooltip"]	= "Zakáž ceny úschov v bublinke";
 		["AAMU_Interface_GeneralOptions"]	= "Všeobecné nastavení";
 		["AAMU_Interface_GUIOptions"]	= "Nastavení GUI";
+		["AAMU_Interface_MailGUI"]	= "Povoľ GUI správ pre prídavné funkcie";
+		["AAMU_Interface_OverrideSUIMail"]	= "Použi ItemSuggest hodnoty namiesto dôvodov hľadacieho UI pre čítač správ";
+		["AAMU_Interface_Vendoring"]	= "Povoľ AutoMagic predaj (POZOR: Prečítaj si Pomoc!)";
 		["AAMU_Interface_VendorOptions"]	= "Nastavení vendora";
 		["ADV_Interface_ActivateProfile"]	= "Aktivovat současný profil";
+		["ADV_Interface_AlwaysHomeFaction"]	= "Ukáž hodnoty domácej strany vždy, iba že v neutrálnej AH";
 		["ADV_Interface_AucOptions"]	= "Hlavní nastavení Auctioneera";
+		["ADV_Interface_ControlsShowHideTooltip"]	= "Ovládače na ukázanie alebo schovanie informácii v bublinke. \nNa úplné zapnutie alebo vypnutie modulu použite prosím príslušnú modulovú konfiguráciu. ";
 		["ADV_Interface_CopyProfile"]	= "Kopírovat";
 		["ADV_Interface_CreateProfile"]	= "Vytvořit nebo nahradit profil";
 		["ADV_Interface_Delete"]	= "Smazat";
 		["ADV_Interface_Down"]	= "Dolů";
 		["ADV_Interface_General"]	= "Všeobecné";
+		["ADV_Interface_MarketValueAccuracy"]	= "Chyba v obchodnom cenníku: %5.3f%%";
+		["ADV_Interface_MatchOrder"]	= "Poradie zhôd";
+		["ADV_Interface_MktPriceOptions"]	= "Možnosti obchodného cenníka";
+		["ADV_Interface_MktPriceShow"]	= "Ukáž obochodný cenník v bublinke";
+		["ADV_Interface_ModTTShow"]	= "Ukáž bublinku Auctioneera iba pri stačení altu.";
+		["ADV_Interface_MultiplyStack"]	= "Vynásob veľkosťou zväzku";
 		["ADV_Interface_NewProfile"]	= "Nový";
+		["ADV_Interface_PostClearOnClose"]	= "Vymaž pridávací rad keď je aukčný dom zavretý";
+		["ADV_Interface_PostConfirmOnClose"]	= "Opýtať pred zmazaním pridávacieho radu";
+		["ADV_Interface_PostingOptions"]	= "Možnosti pridávania aukcií";
 		["ADV_Interface_PreferredLanguage"]	= "Upřednostňovaný jazyk";
+		["ADV_Interface_PreferredOutputFrame"]	= "Upřednostňované číslo okna";
+		["ADV_Interface_ProcessingPriority"]	= "Prednosť procesu: %d ";
 		["ADV_Interface_ProfileName"]	= "Jméno nového profilu:";
+		["ADV_Interface_ProgressBar"]	= "Povoľ tabuľku priebehu";
+		["ADV_Interface_PurchasingOptions"]	= "Možnosti nákupu";
 		["ADV_Interface_ResetProfile"]	= "Resetovat";
 		["ADV_Interface_SaveProfile"]	= "Uložit";
+		["ADV_Interface_ScanDataDisplay"]	= "Zobraz bublinku ScanData";
+		["ADV_Interface_ScanDataForce"]	= "Prikáž načítanie ScanData";
+		["ADV_Interface_ScanDataModifier"]	= "Ukáž presnú zhodu len pre stačení shiftu";
+		["ADV_Interface_ScanDataSummary"]	= "Povoľ zobrazenie súhrnu po skene";
+		["ADV_Interface_ScanDataSummaryFull"]	= "Povoľ zobrazenie súhrnu po úplnom skene.";
+		["ADV_Interface_ScanDataSummaryMicro"]	= "Povoľ zobrazenie súhrnu po skene jednej veci.";
+		["ADV_Interface_ScanDataSummaryPartial"]	= "Povoľ zobrazenie súhrnu po skene viac než jednej veci.";
+		["ADV_Interface_SearchingClickHooks"]	= "Povoľ zastavenie hľadania klikom";
+		["ADV_Interface_SetupProfile"]	= "Vytvor, nastav a upravuj profily";
+		["ADV_Interface_ShowPurchaseDebug"]	= "Ukáž informáciu o rade nákupu";
+		["ADV_Interface_TooltipDisplayOptionsOptions"]	= "Nastavenia bublinky";
 		["ADV_Interface_Up"]	= "Nahoru";
+		["AHWC_Interface_AllowMovable"]	= "Povoľ zmenu polohy aukčného okna";
 		["AHWC_Interface_Always"]	= "Vždy";
+		["AHWC_Interface_AuctionHouseScale"]	= "Mierka aukčného okna";
+		["AHWC_Interface_CompactUIFontScale"]	= "Veľkosť písma aukčného okna";
 		["AHWC_Interface_Never"]	= "Nikdy";
+		["AHWC_Interface_PreventClosingAuctionHouse"]	= "Nedovoľ aby aukčné okno bolo zavreté iným";
+		["AHWC_Interface_ProtectAuctionWindow"]	= "Ochraňuj aukčné okno";
+		["AHWC_Interface_ProtectProcessing"]	= "Zaháčkni na ochranu aukčného okna počas výkonu";
 		["AHWC_Interface_RemberLastPosition"]	= "Zapamatovat si umístění okna";
-		["AHWC_Interface_WindowProtectionOptions"]	= "窗口保护选项";
-		["AHWC_Interface_WindowSizeOptions"]	= "窗口尺寸选项";
+		["AHWC_Interface_Scanning"]	= "Počas prehľadávania";
+		["AHWC_Interface_SearchUIScale"]	= "Mierka hľadacieho okna";
+		["AHWC_Interface_WindowMovementOptions"]	= "Vlastnosti presúvania okien";
+		["AHWC_Interface_WindowProtectionOptions"]	= "Vlastnosti ochrany okien";
+		["AHWC_Interface_WindowSizeOptions"]	= "Vlastnosti veľkosti okien";
+		["AMU_Interface_AutoStop12"]	= "Prestaň predávať po 12 veciach.";
 		["APPR_Interface_12Hours"]	= "12 hodin";
 		["APPR_Interface_24Hours"]	= "24 hodin";
+		["APPR_Interface_25x"]	= "25x";
 		["APPR_Interface_48Hours"]	= "48 hodin";
+		["APPR_Interface_AddPlayerIgnore"]	= "Pridaj hráča do ignoračného listu %s%s";
 		["APPR_Interface_All"]	= "Všichni";
+		["APPR_Interface_AlsoShowBid"]	= "Ukáž aj začínajúcu ponuku";
+		["APPR_Interface_AltClickingAppraiserSetting"]	= "Povoľ alt-klik na veci pre zmenu nastavení Appraisera.";
+		["APPR_Interface_AlternatePricingModel"]	= "Alternatívny cenový model";
+		["APPR_Interface_AlternatePricingModelSelectBox"]	= "Alternatívny cenový model pre Appraiser";
+		["APPR_Interface_Appraiser"]	= "Appraiser";
+		["APPR_Interface_AppraiserAuctionPostingInterface"]	= "Appraiser: Rozhranie na vytváranie aukcií";
+		["APPR_Interface_AppraiserOptions"]	= "Vlastnosti Appraisera";
+		["APPR_Interface_AuctionDetail"]	= "Detail aukcií:";
+		["APPR_Interface_Auctions"]	= "Aukcie";
 		["APPR_Interface_Configure"]	= "Nastavení";
 		["APPR_Interface_Default"]	= "Standardní";
 		["APPR_Interface_Duration: %s"]	= "Trvání: %s";
@@ -110,6 +171,66 @@ AuctioneerLocalizations = {
 		["BASC_Interface_IgnoreList"]	= "Ignorace";
 		["COMP_Interface_Options"]	= "Nastavení";
 		["SBTN_Interface_Options"]	= "Nastavení";
+
+		-- Section: Tooltip
+		["APPR_Tooltip_AppraiserCurModel"]	= "Appraiser ({{%s}}x{{%s}} ";
+		["APPR_Tooltip_PostedCount"]	= "Vystavené %2d za avg/ea %s ";
+		["APPR_Tooltip_StartingBid"]	= "Začiatočná ponuka x {{%d}}";
+		["ASAL_Tooltip_ StdDeviation"]	= "Štand. odchylka";
+		["ASAL_Tooltip_3DaysBought"]	= "Priemerne kúpene za {{%s}} v posledných 3 dňoch";
+		["ASAL_Tooltip_3DaysSold"]	= "Priemerne predané za {{%s}} v posledných 3 dňoch";
+		["ASAL_Tooltip_7DaysBought"]	= "Priemerne kúpene za {{%s}} v posledných 7 dňoch";
+		["ASAL_Tooltip_7DaysSold"]	= "Priemerne predané za {{%s}} v posledných 7 dňoch";
+		["ASAL_Tooltip_Confidence"]	= "Dôvernosť:";
+		["ASAL_Tooltip_Individually"]	= "(alebo jednotlivo)";
+		["ASAL_Tooltip_NormalizedStack"]	= "Normalizované (zväzok)";
+		["ASAL_Tooltip_SalesPrices"]	= "Predajné ceny:";
+		["ASAL_Tooltip_TotalBought"]	= "Dokopy kúpené v priemere za {{%s}} každý";
+		["ASAL_Tooltip_TotalSold"]	= "Dokopy predané v priemere za {{%s}} každý";
+		["ILVL_Tooltip_Confidence"]	= "Dôvernosť: %s";
+		["ILVL_Tooltip_iLevelPrices"]	= "iLevel ceny(%s points):";
+		["ILVL_Tooltip_Individually"]	= "(alebo jednotlivo)";
+		["ILVL_Tooltip_MeanPrice"]	= "Priemerná cena";
+		["ILVL_Tooltip_Normalized"]	= "Normalizované";
+		["ILVL_Tooltip_StdDeviation"]	= "Štandartná odchýlka";
+		["PURC_Tooltip_14DayAverage"]	= "14-dňový priemer:";
+		["PURC_Tooltip_3DayAverage"]	= "3-dňový priemer:";
+		["PURC_Tooltip_7DayAverage"]	= "7-dňový priemer:";
+		["PURC_Tooltip_PurchasedPrices"]	= "Nákupné ceny:";
+		["PURC_Tooltip_SeenNumberDays"]	= "Nájdené {{%s}}-krát počas {{%s}} dní: ";
+		["PURC_Tooltip_SeenToday"]	= "Nájdené {{%s}}-krát dnes";
+		["SDEV_Tooltip_Confidence"]	= "Dôvernosť:";
+		["SDEV_Tooltip_Individually"]	= "(alebo jednotlivo)";
+		["SDEV_Tooltip_MeanPrice"]	= "Stredná cena";
+		["SDEV_Tooltip_Normalized"]	= "Normalizované";
+		["SDEV_Tooltip_PricesPoints"]	= "Štand. Deviácia cien {{%d}} bodov:";
+		["SDEV_Tooltip_StdDeviation"]	= "Štand. Deviácia";
+		["SHTG_Tooltip_Individually"]	= "(alebo jednotlivo)";
+		["SHTG_Tooltip_IQR"]	= "IQR";
+		["SHTG_Tooltip_Median"]	= "priemer:";
+		["SHTG_Tooltip_Precision"]	= "presnosť:";
+		["SHTG_Tooltip_Prices"]	= "Histogramové ceny x {{%s}}) : (nájdené {{%s}})";
+		["SHTG_Tooltip_PricesSeenOnce"]	= "Histogramové ceny: (nájdené {{%s}})";
+		["SIMP_Tooltip_14DayAverage"]	= "14-dňový priemer";
+		["SIMP_Tooltip_3DayAverage"]	= "3-dňový priemer";
+		["SIMP_Tooltip_7DayAverage"]	= "7-dňový priemer";
+		["SIMP_Tooltip_AverageMBO"]	= "Priemerne MBO";
+		["SIMP_Tooltip_SeenNumberDays"]	= "Nájdené {{%s}}-krát počas {{%s}} dni:";
+		["SIMP_Tooltip_SeenToday"]	= "Nájdené {{%s}}-krát dnes:";
+		["SIMP_Tooltip_SimplePrices"]	= "Jednoduchá cena:";
+		["SIMP_Tooltip_TodaysMBO"]	= "Dnešné MBO";
+		["UCUT_Tooltip_CannotUndercut"]	= "Podťať: %s Nemožno podťať";
+		["UCUT_Tooltip_CompetitionAbove"]	= "Podťať: %s Konkurencia nad trhom";
+		["UCUT_Tooltip_MovingPrice"]	= "Pohyblivá cena";
+		["UCUT_Tooltip_NoCompetition"]	= "Podťať: %s Bez konkurencie";
+		["UCUT_Tooltip_Undercutting"]	= "Podťať: %s Podťatie konkurencie";
+		["WECN_Tooltip_GlobalPrice"]	= "Globálna cena:";
+		["WECN_Tooltip_GlobalSeen"]	= "Celkovo nájdené {{%s}}:";
+		["WECN_Tooltip_Individually"]	= "(alebo jednotlivo)";
+		["WECN_Tooltip_NeverSeen"]	= "Doteraz nenájdené na servri";
+		["WECN_Tooltip_PricesSeen"]	= "WOWEcon ceny nájdené:";
+		["WECN_Tooltip_ServerPrice"]	= "Cena na servri:";
+		["WECN_Tooltip_ServerSeen"]	= "Nájdené na servri {{%s}}: ";
 
 	};
 
@@ -579,7 +700,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Ihr müsst eine der folgenden Tasten gedrückt halten, wenn Ihr auf den Button klickt:";
 		["APPR_Help_BatchPostHelp3"]	= "- ALT = Automatische Auffrischung sämtlicher Gegenstände, die als Posten einstellbar sind.";
 		["APPR_Help_BatchPostHelp4"]	= "- UMSCHALTTASTE = Listet sämtliche Auktionen auf, die eingestellt werden sollen ohne sie tatsächlich einzustellen.";
-		["APPR_Help_BatchPostHelp5"]	= "- STRG + ALT + UMSCHALTTASTE = Automatische Einstellung sämtlicher Gegenstände, die als Posten einstellbar sind.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Automatische Einstellung sämtlicher Gegenstände, die als Posten einstellbar sind.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Es wurde während des Klickens des Posteneinstellungsbuttons eine unbekannte Tastenkombination gedrückt.";
 		["APPR_Help_CannotPostAuctions"]	= "Die Auktion kann nicht eingestellt werden:";
 		["APPR_Help_Duration"]	= "- Dauer: {{%d hours}}";
@@ -744,6 +865,8 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "WoWEcon gibt Euch die Möglichkeit, Server-spezifische Preise zu verstecken, wenn diese weniger als eine bestimmte Anzahl Sichtungen aufweisen. Aber auch, wenn diese Preise im Tooltip versteckt werden, so werden sie doch an den Appraiser weitergegeben. Wenn Ihr also nicht die Globalpreisoption benutzt, solltet Ihr sicherstellen, daß der Preis nicht ein versteckter Server-spezifischer ist, mit nur einer geringen Zahl von Sichtungen.";
 
 		-- Section: HelpTooltip
+		["AAMU_HelpTooltip_AutoSellBOP"]	= "Unbenutzbare seelengebundene Gegenstände automatisch verkaufen";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "Es wird keine Bestätigung für den Verkauf von seelengebundenen Gegenständen erscheinen, die diese Spielerklasse nicht benutzen kann. ";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Graue Gegenstände automatisch beim Händler verkaufen.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Markiere die Box, um die Auto-Sell Einstellungen anzupassen.";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Anfänger-Tooltips anzeigen.";
@@ -811,7 +934,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "Dies legt fest, in welche Richtung der obige Farbverlauf des Appraiser-Fensters verläuft (wenn aktiviert)";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "Erstellt Auktion für diesen Gegenstand";
 		["APPR_HelpTooltip_PricingMethod"]	= "Wechsle zwischen 'pro Item' und 'pro Stapel' Preis.";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: aktualisiert batch-post Gegenstände Shift: zeigt die aktuellen batch-post Gegenstände Ctrl+Alt+Shift: Stellt die batch-post Gegenstände ein";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: aktualisiert batch-post Gegenstände Shift: zeigt die aktuellen batch-post Gegenstände RightClick: Stellt die batch-post Gegenstände ein\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "Normal: Aktualisiert den gegenwärtigen Gegenstand Alt: aktualisiert die komplette Liste";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "Entfernt diesen Gegenstand aus der Gegenstandsliste";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "Begrenzt die aktiven Auktionen auf den Wert 'number'";
@@ -934,8 +1057,12 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Hinweis: WOWEcon zeigt dies bereits als Standard an, es kann zu doppelten Informationen im Tooltip kommen";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "Beim Verkaufen von grauen (Müll-)Gegenständen wird kein Bestätigungsfenster angezeigt.";
+		["AAMU_Interface_AutoNoPrompt"]	= "...ohne Bestätigungsfenster";
+		["AAMU_Interface_AutoSellBOP"]	= "Unbenutzbare seelengebundene Gegenstände automatisch verkaufen";
 		["AAMU_Interface_AutoSellGrey"]	= "Erlaubt AutoMagic zusätzlich zu den zum Verkauf beim Händler gekauften Gegenständen, auch graue Gegenstände die sich im Inventar befinden zu verkaufen.";
 		["AAMU_Interface_AutoSellList"]	= "Auto-Verkaufsliste";
+		["AAMU_Interface_AutoStop12"]	= "Pausiere nach 12 verkauften Gegenständen.";
 		["AAMU_Interface_BeginnerTooltip"]	= "Aktiviert die AutoMagic Anfänger-Tooltips";
 		["AAMU_Interface_Chatspam"]	= "AutoMagic Chat-Nachrichten aktivieren";
 		["AAMU_Interface_DepositLength"]	= "Beziehe Einstellgebühren auf welche Auktionslänge:";
@@ -1408,7 +1535,8 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "You must hold down one of the following keys when you click the button:";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = Auto-refresh all batch postable items.";
 		["APPR_Help_BatchPostHelp4"]	= "- Shift = List all auctions that would be posted without actually posting them.";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift = Auto-post all batch postable items.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Auto-post all batch postable items.";
+		["APPR_Help_BatchPostHelp6"]	= "- Alt+RightClick an item to toggle Batch post on/off";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Unknown key combination pressed while clicking batch post button.";
 		["APPR_Help_CannotPostAuctions"]	= "Cannot post auctions:";
 		["APPR_Help_Duration"]	= "- Duration: {{%d hours}}";
@@ -1647,7 +1775,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "This determines the direction that the above gradient is drawn in for the Appraiser Browse window (if enabled).";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "Posts current item";
 		["APPR_HelpTooltip_PricingMethod"]	= "Switch between 'Per Item' and 'Per Stack' pricing.";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Refreshes batch post items\nShift: Lists current batch post items\nCtrl+Alt+Shift: Posts batch post items";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Refreshes batch post items\nShift: Lists current batch post items\nRightClick: Posts batch post items\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "Normal: Refreshes current item Alt: Refreshes whole item list";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "Removes this item from the item listing";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "Restrict active auctions to the 'number' value";
@@ -1772,8 +1900,8 @@ AuctioneerLocalizations = {
 		-- Section: Interface
 		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "No confirmation window will be shown for vendoring grey (trash) items.";
 		["AAMU_Interface_AutoNoPrompt"]	= "...without confirmation prompt";
-		["AAMU_Interface_AutoSellBOP"]	= "Allow AutoMagic to auto-sell unusable soulbound gear";
-		["AAMU_Interface_AutoSellGrey"]	= "Auto-sell grey items quality items.";
+		["AAMU_Interface_AutoSellBOP"]	= "Auto-sell unusable soulbound gear";
+		["AAMU_Interface_AutoSellGrey"]	= "Auto-sell grey quality items.";
 		["AAMU_Interface_AutoSellList"]	= "Auto-Sell List";
 		["AAMU_Interface_AutoSellListItems"]	= "Auto-sell items on the always vendor list";
 		["AAMU_Interface_AutoSellReason"]	= "Auto-sell items purchased using the vendor searcher";
@@ -2217,7 +2345,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Debes mantener presionada una de las sigueintes teclas cuando haces click con el raton:";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = Auto-refrescar todos los objetos subastables en grupo.";
 		["APPR_Help_BatchPostHelp4"]	= "-Shift = Hacer una lista con todas las subastas que deberian ser posteadas sin realmente postearlas";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift = Auto-postear todos los objetos en grupo posibles.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Auto-postear todos los objetos en grupo posibles.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Combinacion de teclas presionadas desconocida mientras clickeaba el boton de postear en grupo.";
 		["APPR_Help_CannotPostAuctions"]	= "No se pueden poner subastas.";
 		["APPR_Help_Duration"]	= "- Duracion: {{%d horas}} ";
@@ -2319,7 +2447,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "Determina la dirección del gradiente en la pestaña del Evaluador (Si esta habilitado).";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "Crea una subasta del objeto actual.";
 		["APPR_HelpTooltip_PricingMethod"]	= "Cambiar entre precios 'Por Objeto' y 'Por Paquete' ";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Refresca los datos de los objetos encolados.\nShift: Lista los objetos que están encolados.\nCtrl+Alt+Shift: Crea las subastas de los objetos encolados.";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Refresca los datos de los objetos encolados.\nShift: Lista los objetos que están encolados.\nRightClick: Crea las subastas de los objetos encolados.\nAlt+RightClick: Toggle an item's batch post option on/off.";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "Normal: Refresca el objeto actual.\nAlt: Refresca todos los objetos de la lista.";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "Elimina este objeto de la lista.";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "Restringe las subastas activas al valor indicado.";
@@ -2387,8 +2515,14 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Nota: WOWEcon ya muestra esta información por defecto, esto podría producir información redudante en el tooltip. ";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "No se mostrará la ventana de confirmacion para la venta de objetos grises (Chatarra).";
+		["AAMU_Interface_AutoNoPrompt"]	= "...sin preguntar por confirmación.";
+		["AAMU_Interface_AutoSellBOP"]	= "Auto vender equipamiento ligado no usable.";
 		["AAMU_Interface_AutoSellGrey"]	= "Permitir AutoMagic vender los objetos grises además de los comprados a los vendedores";
 		["AAMU_Interface_AutoSellList"]	= "Lista de Auto-Venta";
+		["AAMU_Interface_AutoSellListItems"]	= "Auto vender objetos en la lista de vender siempre.";
+		["AAMU_Interface_AutoSellReason"]	= "Auto vender objetos comprados usando el buscador vendedor";
+		["AAMU_Interface_AutoStop12"]	= "Pausar después de vender 12 objetos.";
 		["AAMU_Interface_BeginnerTooltip"]	= "Activar AutoMagic tooltips para principiantes";
 		["AAMU_Interface_Chatspam"]	= "Activar spam de chat de AutoMagic";
 		["AAMU_Interface_DepositLength"]	= "Depósito base en que duración de la subasta:";
@@ -2412,7 +2546,11 @@ AuctioneerLocalizations = {
 		["ADV_Interface_MatchOrder"]	= "Orden de Relevancia";
 		["ADV_Interface_MktPriceShow"]	= "Mostrar precio de mercado en el tooltip";
 		["ADV_Interface_ModTTShow"]	= "Mostrar el tooltip extra de Auctioneer solo cuando Alt está pulsado.";
+		["ADV_Interface_MultiplyStack"]	= "Multiplicar por el tamaño de lote";
 		["ADV_Interface_NewProfile"]	= "Nueva";
+		["ADV_Interface_PostClearOnClose"]	= "Borrar la cola de subastas cuando la ventana de la casa de subastas se cierra";
+		["ADV_Interface_PostConfirmOnClose"]	= "Preguntar antes de borrar la cola de subastas";
+		["ADV_Interface_PostingOptions"]	= "Opciones de encolado";
 		["ADV_Interface_PreferredLanguage"]	= "Idioma preferido";
 		["ADV_Interface_PreferredOutputFrame"]	= "Ventana de salida preferida";
 		["ADV_Interface_ProcessingPriority"]	= "Prioridad de Procesamiento: %d ";
@@ -2447,6 +2585,7 @@ AuctioneerLocalizations = {
 		["AHWC_Interface_WindowMovementOptions"]	= "Opciones de movimiento de ventana";
 		["AHWC_Interface_WindowProtectionOptions"]	= "Opciones de protección de ventana";
 		["AHWC_Interface_WindowSizeOptions"]	= "Opciones de tamaño de ventana";
+		["AMU_Interface_AutoStop12"]	= "Vender solo 12 objetos al vendedor antes de parar.";
 		["APPR_Interface_12Hours"]	= "12 horas";
 		["APPR_Interface_24Hours"]	= "24 horas";
 		["APPR_Interface_25x"]	= "25x";
@@ -2459,6 +2598,7 @@ AuctioneerLocalizations = {
 		["APPR_Interface_AlternatePricingModelSelectBox"]	= "Modelo de preciación alternativo usado para valoraciones";
 		["APPR_Interface_Appraiser"]	= "Evaluador";
 		["APPR_Interface_AppraiserAuctionPostingInterface"]	= "Evaluador: Interfaz para colgar subastas";
+		["APPR_Interface_AppraiserFrameColoration"]	= "Color del marco del Evaluador";
 		["APPR_Interface_AppraiserOptions"]	= "Opciones de Evaluador";
 		["APPR_Interface_AuctionDetail"]	= "Detalles de la subasta:";
 		["APPR_Interface_Auctions"]	= "Subastas";
@@ -2555,6 +2695,7 @@ AuctioneerLocalizations = {
 		["APPR_Interface_Seller"]	= "Vendedor";
 		["APPR_Interface_Show"]	= "Mostrar:";
 		["APPR_Interface_ShowAppraisalTooltips"]	= "Mostrar valoración en el tooltip";
+		["APPR_Interface_ShowAppraiserTab"]	= "Mostrar la pestaña del Evaluador en la casa de subastas";
 		["APPR_Interface_ShowOwnAuctionsTooltips"]	= "Mostrar subastas propias en el tooltip";
 		["APPR_Interface_ShowTooltipControls"]	= "Mostrar ayuda de información sobre los controles";
 		["APPR_Interface_SimpleView"]	= "Vista simple";
@@ -2926,7 +3067,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Vous devez maintenir enfoncées l'une des touches suivantes lorsque vous cliquez sur le bouton :";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = Rafraichit automatiquement les objets en mise en vente groupée. ";
 		["APPR_Help_BatchPostHelp4"]	= "- Shift = Liste toutes les enchères qui pourraient être lancées, sans les lancer.";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift = Met en ventes tous les objets groupés";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Met en ventes tous les objets groupés";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Combinaison de touches inconnue tout en cliquant sur le bouton \"mise en ventes groupée\".";
 		["APPR_Help_CannotPostAuctions"]	= "Impossible de mettre ces objets en vente :";
 		["APPR_Help_Duration"]	= "- Durée : {{%d hours}} ";
@@ -3091,8 +3232,13 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "Wowecon vous donne la possibilité de cacher des prix spécifiques au serveur si ils n'ont été vu qu'un nombre donné de fois. Bien que ces prix soient cachés dans la bulle d'aide, ils sont encore rapportés à Appraiser. Si vous n'employez pas l'option globale des prix ici, vous devriez vérifier pour s'assurer qu'il n'y a pas un prix caché spécifique à votre serveur, avec seulement un nombre de fois vues limité. ";
 
 		-- Section: HelpTooltip
+		["AAMU_HelpTooltip_AutoSellBOP"]	= "Vendre automatiquement les objets liés inutilisable";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "Aucune fenêtre de confirmation ne sera affichée pour la vente d'un objet lié que le joueur ne peut pas équiper";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Vend automatiquement les objets de qualité Grise à un marchand.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Cochez cette case pour voir l'interface de configuration de l'Auto-Sell.";
+		["AAMU_HelpTooltip_AutoSellReason"]	= "Vendre automatiquement au marchand les objets achetés à l'Hôtel des Ventes en utilisant la recherche Vendor";
+		["AAMU_HelpTooltip_AutoSellReasonNoPrompt"]	= "Aucune fenêtre de confirmation ne sera affichée pour la vente au marchand d'un objet acheté à l'Hôtel de ventes via la recherche Vendor";
+		["AAMU_HelpTooltip_AutoStop12"]	= "Cela vous autorise à racheter une vente accidentelle, depuis que le serveur sauvegarde les 12 dernières vente au marchand";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Affiche l'infobulle pour débutant lorsque la souris est positionnée au-dessus.";
 		["AAMU_HelpTooltip_Chatspam"]	= "Affiche les messages de l'AutoMagic";
 		["AAMU_HelpTooltip_DepositLength"]	= "Choisissez le coût de dépôt de la durée de vente que vous voulez voir affichée dans le menu d'aide contextuel.";
@@ -3113,7 +3259,7 @@ AuctioneerLocalizations = {
 		["ADV_HelpTooltip_PreferredLanguage"]	= "Sélectionne le langage qu'Auctionner utilisera. Requiert une \"/console reloadui\" ou une déco/reco pour prendre effet.";
 		["ADV_HelpTooltip_ProcessPriority"]	= "Définie la priorité attribuée au scanning des données. Une valeur plus élevée réduira le temps requis, mais augmentera le lag.";
 		["ADV_HelpTooltip_ProgressBar"]	= "Affiche une barre de progression quand Auctioneer traite les données.";
-		["ADV_HelpTooltip_ResetProfile"]	= "Remets à zéro les reglages du profil en cours aux valeurs par défaut.";
+		["ADV_HelpTooltip_ResetProfile"]	= "Remets à zéro les réglages du profil en cours aux valeurs par défaut.";
 		["ADV_HelpTooltip_ScanDataDisplay"]	= "Active l'affichage du nombre total d'objets similaires à l'objet sélectionné contenus dans l'image du scan.";
 		["ADV_HelpTooltip_ScanDataForce"]	= "Oblige ScanData à se charger en mémoire initialement avec Auctioneer, plutôt qu'à la demande en tant que de besoin.";
 		["ADV_HelpTooltip_ScanDataModifier"]	= "N'affiche que les données de scan matchant exactement la donnée initiale, à moins que la touche Maj ne soit appuyée.";
@@ -3140,8 +3286,8 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_BidSelectedAuction"]	= "Place une enchère sur l'objet sélectionné.";
 		["APPR_HelpTooltip_BuyoutSelectedAuction"]	= "Achète l'objet sélectionné.";
 		["APPR_HelpTooltip_ClearsPostQueue"]	= "Efface la file d'attente des objets mis en vente.";
-		["APPR_HelpTooltip_ColorAppraiserPriceLevel"]	= "Cette option permettra d'utiliser PriceLevel pour comparer facilement le montant des enchères affichées avec celui du modèle de réference selectioné, par le biais d'une palette de couleurs (du rouge = plus cher au bleu = moins cher).";
-		["APPR_HelpTooltip_ColorManifestByPriceLevel"]	= "Cette option permettra d'utiliser PriceLevel pour colorier le prix par enchere et par achat de vos lots dans un panneau latéral amovible sur le côté droit de la fenêtre.";
+		["APPR_HelpTooltip_ColorAppraiserPriceLevel"]	= "Cette option permettra d'utiliser PriceLevel pour comparer facilement le montant des enchères affichées avec celui du modèle de référence sélectionné, par le biais d'une palette de couleurs (du rouge = plus cher au bleu = moins cher).";
+		["APPR_HelpTooltip_ColorManifestByPriceLevel"]	= "Cette option permettra d'utiliser PriceLevel pour colorier le prix par enchère et par achat de vos lots dans un panneau latéral amovible sur le côté droit de la fenêtre.";
 		["APPR_HelpTooltip_DefaultListingDuration"]	= "Vous pouvez définir une durée par défaut pour le temps d'enchère des objets qui n'en ont pas une spécifiquement attribuée.";
 		["APPR_HelpTooltip_DefaultModelAppraisals"]	= "Vous pouvez choisir un modèle de prix alternatif par défaut pour les objets dont le modèle n'est pas défini.";
 		["APPR_HelpTooltip_DefaultNumberStacks"]	= "Remplir avec un nombre soit 'maxfull' soit 'maxplus' pour définir la taille des lots par défaut. 'maxfull' = tous les lots complets, 'maxplus' = tous les lots, même incomplets.";
@@ -3156,9 +3302,9 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_IncludeItemsHiddenListing"]	= "Ajoute les objets \"cachés\" dans la liste de recherche.";
 		["APPR_HelpTooltip_MarkdownBy"]	= "Le montant 'markdown' est le montant en pourcentage par lequel la valeur calculée d'un objet sera diminuée pour produire la valeur d'enchère finale.";
 		["APPR_HelpTooltip_PickGradientDirection"]	= "Ceci détermine la direction de la gradation utilisée dans la fenêtre de recherche d'Appraiser (si activé).";
-		["APPR_HelpTooltip_PostsCurrentItem"]	= "Mets en vente l'objet selectionné.";
+		["APPR_HelpTooltip_PostsCurrentItem"]	= "Mets en vente l'objet sélectionné.";
 		["APPR_HelpTooltip_PricingMethod"]	= "Commute entre le \"Prix par objet\" et le \"Prix par lot\".";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt : Rafraichi les objets actuellement en vente automatique¶\nMaj: Liste les objets actuellement en vente automatique¶\nCtrl+Alt+Maj: Mets en vente les objets actuellement en vente automatique";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt : Rafraichi les objets actuellement en vente automatique¶\nMaj: Liste les objets actuellement en vente automatique¶\nRightClick: Mets en vente les objets actuellement en vente automatique\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "Normale: Rafraichi l'objet actuel Alt: Rafraichi l'ensemble de la liste des objets";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "Retire cet objet de la liste de recherche";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "Restreint les enchères actives à cette valeur";
@@ -3191,7 +3337,7 @@ AuctioneerLocalizations = {
 		["ASAL_HelpTooltip_Display3DayMean"]	= "Active/inactive l'affichage de la moyenne sur 3 j du module de Ventes.";
 		["ASAL_HelpTooltip_Display7DayMean"]	= "Active/inactive l'affichage de la moyenne sur 7 j du module de Ventes.";
 		["ASAL_HelpTooltip_DisplayConfidence"]	= "Active/inactive l'affichage du calcul de 'Confiance' dans l'info-bulle.";
-		["ASAL_HelpTooltip_DisplayNormalized"]	= "Active/inactive l'affichage du calcul de 'Narmalité\" dans l'info-bulle.";
+		["ASAL_HelpTooltip_DisplayNormalized"]	= "Active/inactive l'affichage du calcul de 'Normalité\" dans l'info-bulle.";
 		["ASAL_HelpTooltip_DisplayOverallMean"]	= "Active/inactive l'affichage de la moyenne permanente du module de Ventes.";
 		["ASAL_HelpTooltip_DisplayStdDeviation"]	= "Active/inactive l'affichage du calcul de 'Déviation Standard' dans l'info-bulle.";
 		["ASAL_HelpTooltip_EnableSalesStats"]	= "Prends en compte les ventes pour le calcul du prix de marché";
@@ -3281,8 +3427,14 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Note: WOWEcon affiche déjà cette information par défaut et pourrait produire de l'information redondante dans l'info-bulle.";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "Aucune fenêtre de confirmation ne sera afficher pour la vente d'objet gris";
+		["AAMU_Interface_AutoNoPrompt"]	= "...sans invitation de confirmation";
+		["AAMU_Interface_AutoSellBOP"]	= "Vente-Auto matériel inutilisable";
 		["AAMU_Interface_AutoSellGrey"]	= "Autoriser AutoMagic à vendre automatiquement les objets gris, en plus de ceux achetés pour vente aux vendeurs";
 		["AAMU_Interface_AutoSellList"]	= "Liste Vente-Auto";
+		["AAMU_Interface_AutoSellListItems"]	= "Vente-Auto des objets toujours sur la liste de vendeurs";
+		["AAMU_Interface_AutoSellReason"]	= "Vendre automatiquement les objets achetés en utilisant la recherche vendor";
+		["AAMU_Interface_AutoStop12"]	= "Faire une pause après avoir vendu 12 objets";
 		["AAMU_Interface_BeginnerTooltip"]	= "Activer les infobulles AutoMagic pour les débutants";
 		["AAMU_Interface_Chatspam"]	= "Activer le spam de discussion AutoMagic";
 		["AAMU_Interface_DepositLength"]	= "Se baser sur la durée d'une enchère pour le dépôt";
@@ -3309,7 +3461,7 @@ AuctioneerLocalizations = {
 		["ADV_Interface_ModTTShow"]	= "Afficher l'infobulle d'Auctioneer uniquement si Alt est enfoncé.";
 		["ADV_Interface_MultiplyStack"]	= "Multiplier par taille de la pile";
 		["ADV_Interface_NewProfile"]	= "Nouveau";
-		["ADV_Interface_PostClearOnClose"]	= "Désactivez la file d'attente d'affectation, lorsque les Auctionhouse est fermé";
+		["ADV_Interface_PostClearOnClose"]	= "Effacer la file d'attente lorsque la fenêtre de l'Hôtel des Ventes est fermée";
 		["ADV_Interface_PostConfirmOnClose"]	= "Demandez avant d'effacer la file d'attente annonce";
 		["ADV_Interface_PostingOptions"]	= "Options d'affichage";
 		["ADV_Interface_PreferredLanguage"]	= "Langue préférée";
@@ -3346,6 +3498,7 @@ AuctioneerLocalizations = {
 		["AHWC_Interface_WindowMovementOptions"]	= "Options de déplacement de la fenêtre";
 		["AHWC_Interface_WindowProtectionOptions"]	= "Options de protection de la fenêtre";
 		["AHWC_Interface_WindowSizeOptions"]	= "Options des dimensions de la fenêtre";
+		["AMU_Interface_AutoStop12"]	= "Vendre seulement 12 objets au vendeur avant de stopper";
 		["APPR_Interface_12Hours"]	= "12 heures";
 		["APPR_Interface_24Hours"]	= "24 heures";
 		["APPR_Interface_25x"]	= "25x";
@@ -3990,7 +4143,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_IncludeItemsHiddenListing"]	= "아이템 목록에 '숨김' 탭을 추가합니다.";
 		["APPR_HelpTooltip_MarkdownBy"]	= "가격인하 총액은 입찰가격을 계산하여 인하될 아이템 가격의 총액 비율입니다.";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "현재 아이템 등록";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "알트: 일괄 등록 아이템 갱신\n쉬프트: 일괄 등록 아이템 목록\n콘트롤+알트+쉬프트: 일괄 등록 아이템 등록";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "알트: 일괄 등록 아이템 갱신\n쉬프트: 일괄 등록 아이템 목록\nRightClick: 일괄 등록 아이템 등록\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "일반: 현재 아이템 다시보기 알트: 전체 아이템 목록 다시보기";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "현재 아이템을 아이템 목록에서 삭제";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "낱개 판매가 활발히 이루어지는 경매에만 사용";
@@ -4432,7 +4585,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "U moet een van de volgende toetsen ingedrukt houden als u op de knop klikt:";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = Auto-verversen van alle te verkopen batch items.";
 		["APPR_Help_BatchPostHelp4"]	= "- Shift = Geeft alle auctions weer die gepost zouden worden zonder ze daadwerkelijk te posten.";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift = Auto-post alle postbare batch items.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Auto-post alle postbare batch items.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Ongekende toetscombinatie ingedrukt tijdens het klikken van de batchpost knop.";
 		["APPR_Help_CannotPostAuctions"]	= "Kan auctions niet verzenden:";
 		["APPR_Help_Duration"]	= "- Tijd: {{%d uren}}";
@@ -4922,7 +5075,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Musisz wcisnąć i przytrzymać następujące klawisze kiedy klikniesz na przycisk:";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = auto odświeżanie wszystkich wsadowo wystawianych przedmiotów.";
 		["APPR_Help_BatchPostHelp4"]	= "- Shift = Lista wszystkich aukcji które mogły być wystawione, bez ich właściwego wystawiania.";
-		["APPR_Help_BatchPostHelp5"]	= "- Ctrl+Alt+Shift = Auto wystawienie wszystkich wsadowo postowalnych przedmiotów.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Auto wystawienie wszystkich wsadowo postowalnych przedmiotów.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Nieznana kombinacja klawiszy została użyta podczas kliknięcia na przycisk wystawiania wsadowego.";
 		["APPR_Help_CannotPostAuctions"]	= "Nie można wystawić następujących aukcji:";
 		["APPR_Help_Duration"]	= "- czas: : {{%d hours}} ";
@@ -5360,6 +5513,7 @@ AuctioneerLocalizations = {
 		["ADV_Help_WhatPreferredLanguageAnswer"]	= "Они позволят выбрать один из поддерживаемых языков интерфейса Auctioneer'a. После смены требуется перезапуск аддона или введите команду /console reloadui. ";
 		["ADV_Help_WhatPriority"]	= "Что такое приоритет обработки данных?";
 		["ADV_Help_WhatPriorityAnswer"]	= "Устанавливает скорость обработки данных в конце сканирования. Низкое значение увеличивает время обработки, но позволяет продолжить игру, без лагов. Высокий приоритет сокращает время записи образа, но увеличивает нагрузку на ресурсы компьютера\" до момента окончания записи. В последнем случае игра может тормозить.";
+		["ADV_Help_WhyForceLoad"]	= "Почему вы хотите, чтобы данные сканирования загружались?";
 		["ADV_Help_WhyForceLoadAnswer"]	= "Если Вы будете использовать данные образ во время игры, то некоторые предпочитают увеличение времени загрузки игры, чем лаги возникающие на несколько секунд при первом обращении к образу.";
 		["ADV_Help_WhyShowSummation"]	= "Что такое отчет после сканирования?";
 		["ADV_Help_WhyShowSummationAnswer"]	= "После сканирования отчет отображает количество новых, обновленных или оставшихся без изменений торгов.";
@@ -5380,7 +5534,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Вы должны держать зажатой одну из следующих комбинаций, когда нажимаете на кнопку:";
 		["APPR_Help_BatchPostHelp3"]	= "- Alt = Авто-обновление всех отправленных вещей.";
 		["APPR_Help_BatchPostHelp4"]	= "- Shift = Показать все аукционы которые были-бы объявлены, не объявляя их.";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift = Авто-обьявление всех возможных автоматизированных аукционов.";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Авто-обьявление всех возможных автоматизированных аукционов.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Зажата неизвестная комбинация кнопок при нажатии кнопки отправки.";
 		["APPR_Help_CannotPostAuctions"]	= "Невозможно объявить аукцион:";
 		["APPR_Help_Duration"]	= "- Продолжительность: {{%d часов}}";
@@ -5416,13 +5570,23 @@ AuctioneerLocalizations = {
 		["ASAL_Help_StatSales"]	= "Что такое статистика продаж?";
 		["ASAL_Help_StatSalesAnswer"]	= "Статистика продаж, это числа полученный модулем отвечающим за продажи из базы данных BeanCounter. Это средние из всех цен на вещи, которые Вы продали.";
 		["ASKP_Help_WhatAskPrice"]	= "Что такое AskPrice?";
+		["ASKP_Help_WhatTriggers"]	= "Что такое триггеры и как они используются?";
 		["BASC_Help_IgnoreOwnAuctionsAnswer"]	= "Активация этой функции отключает видимость ваших аукционов в моментальном снимке.";
 		["BASC_Help_WhatBasicFilter"]	= "Что такое Basic Filter (Простейший Фильтр) ?";
+		["COMP_Help_HowToIgnore"]	= "Как я могу игнорировать аукционы продавца?";
+		["COMP_Help_HowToIgnoreAnswer"]	= "Щелкните на продавца, которого вы хотите игнорировать, с зажатой клавишей Alt и выберите \"Игнорировать\". Имя продавца будет отмечено красным цветом и помещено в список игнорируемых.";
+		["COMP_Help_HowToUnignore"]	= "Как снять игнорирование аукционов продавца?";
+		["COMP_Help_WhatCompactUI"]	= "Что такое CompactUI?";
 		["ILVL_Help_SlashHelp1"]	= "Помощь для Auctioneer Advanced - iLevel ";
 		["ILVL_Help_SlashHelp2"]	= "это помощь iLevel";
+		["ILVL_Help_WhatConfidence"]	= "Что означает уверенность?";
 		["ILVL_Help_WhatNormalized"]	= "Что такое нормальный расчет?";
 		["ILVL_Help_WhatStdDev"]	= "Что такое стандартное отклонение расчетов?";
+		["PURC_Help_MultiplyStack"]	= "Почему есть возможность умножить размер стека?";
+		["SDEV_Help_Confidence"]	= "Что означает уверенность?";
 		["SHTG_Help_WhatIQR"]	= "Что такое IQR?";
+		["SIMP_Help_MinimumBuyout"]	= "Зачем мне знать минимальный размер выкупа?";
+		["SIMP_Help_SlashHelp2"]	= "Эта простая помощь";
 		["SIMP_Help_SlashHelp6"]	= "Архивация {{%s}} дневной статистики и начало нового дня";
 		["SPRG_Help_WhatScanProgress"]	= "Что такое индикатор прогресса сканирования?";
 		["UCUT_Help_WhatUndercut"]	= "Что делает модуль Сбивания цен?";
@@ -5438,8 +5602,11 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "WOWEcon дает вам возможность прятать серверные цены на товары если количество собранных данных меньше заданного предела. Хотя эти цены убраны из подсказки, они все равно передаются Оценщику. Если вы не используете глобальные цены, вы должны включить эту опцию, что бы быть уверены, что Оценщик не использует недостоверные серверные цены.";
 
 		-- Section: HelpTooltip
+		["AAMU_HelpTooltip_AutoSellBOP"]	= "Автоматически продавать неподходящие персональные вещи";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "При продаже неподходящих персональных вещей не будет показано окно подтверждения.";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Автоматически продавать серые предметы торговцам.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Открыть окно настройки автоматической продажи.";
+		["AAMU_HelpTooltip_AutoSellListItems"]	= "Автоматически продавать вещи из списка автопродажи.";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Показывать обучающие подсказки при наведении мыши.";
 		["AAMU_HelpTooltip_Chatspam"]	= "Показывать сообщения от AutoMagic в чате.";
 		["AAMU_HelpTooltip_DepositLength"]	= "Выберите длину цены депозита аукциона для отображения в подсказке ";
@@ -5505,7 +5672,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "Определяет направление градиента (если включен) в окне просмотра.";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "Выставить на аукцион";
 		["APPR_HelpTooltip_PricingMethod"]	= "Переключиться с цен за штуку на цены за пачку. ";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Обновить текущие выставления партией предметы\nShift: Показать текущие выставления партией предметы\nCtrl+Alt+Shift: Выставить помеченные для выставления партией предметы";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt: Обновить текущие выставления партией предметы\nShift: Показать текущие выставления партией предметы\nRightClick: Выставить помеченные для выставления партией предметы\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "Normal: Обновить текущий предмет Alt: Обновить весь список";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "Скрывает предмет в списке предметов слева";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "Ограничить активные аукционы до числа 'number'";
@@ -5521,8 +5688,9 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_ShowAppraisalTooltips"]	= "Эта настройка позволяет показывать цену продажи предмета, вычисленную по текущей модели, в его всплывающей подсказке";
 		["APPR_HelpTooltip_SidebarINF_Tooltip_AdditionalInfo"]	= "Открыть/Закрыть боковую панель с дополнительной информацией о цене.";
 		["ASAL_HelpTooltip_ShowSalesStat"]	= "Включить/выключить показ статистики из модуля Sales";
+		["BASC_HelpTooltip_MinimumQualityCommon"]	= "Обычное";
 		["BASC_HelpTooltip_MinimumQualityEpic"]	= "Превосходное";
-		["BASC_HelpTooltip_MinimumQualityJunk"]	= "серое";
+		["BASC_HelpTooltip_MinimumQualityJunk"]	= "Хлам";
 		["BASC_HelpTooltip_MinimumQualityRare"]	= "Редкое";
 		["BASC_HelpTooltip_MinimumQualityUncommon"]	= "Необычное";
 		["ILVL_HelpTooltip_EnableILevelStats"]	= "Разрешить модулю iLevel собирать и возвращать данные о ценах";
@@ -5543,11 +5711,17 @@ AuctioneerLocalizations = {
 		["UCUT_HelpTooltip_EnableUndercut"]	= "Включает модуль функции.";
 		["WECN_HelpTooltip_AlwaysGlobalPrice"]	= "Включение использования Wowecon'ом цен сервера, если они существуют";
 		["WECN_HelpTooltip_EnableWOWEconStats"]	= "Разрешить модулю WOWEcon собирать и возвращать данные о ценах";
+		["WECN_HelpTooltip_SanitizeWOWEcon"]	= "Удалить из ссылки узкоспециализированную информацию об объекте перед выдачей запроса на цену";
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "Заметка: WOWEcon по умолчанию уже показывает это, поэтому в подсказках может появится лишняя информация";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "При продаже \"серых\" вещей (мусора) окно подтверждения показано не будет";
+		["AAMU_Interface_AutoNoPrompt"]	= "...без запроса подтверждения";
+		["AAMU_Interface_AutoSellBOP"]	= "Автоматическая продажа неиспользуемых персональных вещей";
 		["AAMU_Interface_AutoSellGrey"]	= "Разрешить автоматическую продажу \"серых\" предметов";
 		["AAMU_Interface_AutoSellList"]	= "Список авто-продажи";
+		["AAMU_Interface_AutoSellListItems"]	= "Авто-продажа вещей продавцам из \"постоянного\" списка";
+		["AAMU_Interface_AutoStop12"]	= "Пауза после продажи 12 предметов";
 		["AAMU_Interface_BeginnerTooltip"]	= "Включить подсказки для новичков";
 		["AAMU_Interface_Chatspam"]	= "Сообщения AutoMagic";
 		["AAMU_Interface_DepositLength"]	= "Базовый депозит для аукциона с такой продолжительностью:";
@@ -6294,7 +6468,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "当你点击这个按钮时你必须按住以下按键:";
 		["APPR_Help_BatchPostHelp3"]	= "Alt=自动刷新所有批次可拍卖物品.";
 		["APPR_Help_BatchPostHelp4"]	= "Shift=列出所有将被拍卖的清单而不会被实际拍卖.";
-		["APPR_Help_BatchPostHelp5"]	= "- Control+Alt+Shift=自动拍卖所有批次可拍卖物品。";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick=自动拍卖所有批次可拍卖物品。";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "未知的组合键当点击一组拍卖按钮时按下.";
 		["APPR_Help_CannotPostAuctions"]	= "不能拍卖这些拍卖品:";
 		["APPR_Help_Duration"]	= "持续:{{%d 小时}} ";
@@ -6523,7 +6697,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "这个为估价师浏览窗口(如果已开启)决定了上部收缩方向";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "拍卖当前物品";
 		["APPR_HelpTooltip_PricingMethod"]	= "切换“每个物品”和“每个堆叠”的价格";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "ALT:更新批量拍卖物品\nShift:列举当前批量拍卖物品\nCtrl+Alt+Shift:发布批量拍卖物品\n";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "ALT:更新批量拍卖物品\nShift:列举当前批量拍卖物品\nRightClick:发布批量拍卖物品\nAlt+RightClick: Toggle an item's batch post option on/off ";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "正常:更新当前物品 ALT:更新全部物品列表";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "从物品列表中删除这件物品";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "限制激活拍卖到'number'值";
@@ -7091,7 +7265,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "當您按下滑鼠左鍵時，您還必須按住下列其中一個鍵盤按鍵：";
 		["APPR_Help_BatchPostHelp3"]	= "-Alt = 自動更新所有批次上架的拍賣物件。";
 		["APPR_Help_BatchPostHelp4"]	= "-Shift = 列出所有將要自動批次上架但還沒上架的拍賣物件。";
-		["APPR_Help_BatchPostHelp5"]	= "-Ctrl+Alt+Shift = 自動批次上架所有的拍賣物件。";
+		["APPR_Help_BatchPostHelp5"]	= "- RightClick = 自動批次上架所有的拍賣物件。";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "在按下批次上架功能鈕時偵測到未知的按鍵組合。";
 		["APPR_Help_CannotPostAuctions"]	= "無法上架拍賣物品：";
 		["APPR_Help_Duration"]	= "- 拍賣時間：{{%d hours}}";
@@ -7256,8 +7430,15 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "若特定物品出現次數低於所給予的次數時，WOWEcon 將會提供您隱藏伺服器專屬價格的選項。即使這些價格被隱藏而不會顯示於提示窗中，估價器仍會去參考這些資料。若您尚未使用公定價格選項的話，您應該要檢查確認它不是一個您伺服器中隱藏的伺服器專屬價格，雖然僅僅只出現過幾次。";
 
 		-- Section: HelpTooltip
+		["AAMU_HelpTooltip_AutoSellBOP"]	= "自動賣掉無法使用的靈魂綁定裝備";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "將玩家角色職業無法裝備時的靈魂綁定裝備賣給商人時將不會有確認視窗出現。";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "自動將灰色物品賣給商人。";
-		["AAMU_HelpTooltip_AutoSellList"]	= "核選此方塊以顯示 Auto-Sell 的圖形設定介面。";
+		["AAMU_HelpTooltip_AutoSellList"]	= "核選此方塊以顯示 Auto-Sell(自動賣出助手) 的圖形設定介面。";
+		["AAMU_HelpTooltip_AutoSellListItems"]	= "自動賣掉在商人列表中的物品";
+		["AAMU_HelpTooltip_AutoSellListNoPrompt"]	= "將有出現在商人列表中的物品賣給商人時將不會有確認視窗出現。";
+		["AAMU_HelpTooltip_AutoSellReason"]	= "自動賣掉使用商人搜尋器來購買的物品";
+		["AAMU_HelpTooltip_AutoSellReasonNoPrompt"]	= "將把使用商人搜尋器來購買的物品賣給商人時將不會有確認視窗出現。";
+		["AAMU_HelpTooltip_AutoStop12"]	= "這將允許你買回意外賣給商人的物品，自從伺服器將會紀錄最後12樣賣給商人的物品。";
 		["AAMU_HelpTooltip_BeginnerTooltip"]	= "當滑鼠指標放置時顯示初學者提示窗。";
 		["AAMU_HelpTooltip_Chatspam"]	= "顯示 AutoMagic 的聊天訊息。";
 		["AAMU_HelpTooltip_DepositLength"]	= "選擇您想要在提示窗中顯示特定拍賣時間的保證金。";
@@ -7323,7 +7504,7 @@ AuctioneerLocalizations = {
 		["APPR_HelpTooltip_PickGradientDirection"]	= "這個為估價師瀏覽窗口(如果已開啟)決定了上部收縮方向";
 		["APPR_HelpTooltip_PostsCurrentItem"]	= "張貼目前物品";
 		["APPR_HelpTooltip_PricingMethod"]	= "交換每個物品和每疊物品的價格";
-		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt:更新批量拍賣物品\nShift:列舉目前批量拍賣物品\nCtrl+Alt+Shift:發佈批量拍賣物品";
+		["APPR_HelpTooltip_RefreshesCurrentBatch"]	= "Alt:更新批量拍賣物品\nShift:列舉目前批量拍賣物品\nRightClick:發佈批量拍賣物品\nAlt+RightClick: Toggle an item's batch post option on/off";
 		["APPR_HelpTooltip_RefreshesCurrentItem"]	= "正常:更新當前物品 Alt:更新全部物品列表";
 		["APPR_HelpTooltip_RemovesItemListing"]	= "從物品列表中移除這一項";
 		["APPR_HelpTooltip_RestrictActiveAuctions"]	= "限制拍賣中的物品到'number'值";
@@ -7446,8 +7627,14 @@ AuctioneerLocalizations = {
 		["WECN_HelpTooltip_ShowWOWEconTooltip"]	= "注意：WOWEcon 預設已經設定為顯示，這也許會在您的提示窗中產生多餘的資訊";
 
 		-- Section: Interface
+		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "將灰色名稱物品賣給商人時將不會有確認視窗出現。";
+		["AAMU_Interface_AutoNoPrompt"]	= "...沒有確認提示";
+		["AAMU_Interface_AutoSellBOP"]	= "自動賣掉無法使用的靈魂綁定裝備";
 		["AAMU_Interface_AutoSellGrey"]	= "允許 AutoMagic 自動販賣灰色物品。";
 		["AAMU_Interface_AutoSellList"]	= "自動販賣列表";
+		["AAMU_Interface_AutoSellListItems"]	= "自動賣掉在商人列表中的物品";
+		["AAMU_Interface_AutoSellReason"]	= "自動賣掉使用商人搜尋器來購買的物品";
+		["AAMU_Interface_AutoStop12"]	= "在賣掉12個物品後暫停。";
 		["AAMU_Interface_BeginnerTooltip"]	= "啟用AutoMagic新手提示";
 		["AAMU_Interface_Chatspam"]	= "啟用AutoMagic聊天信息發送";
 		["AAMU_Interface_DepositLength"]	= "哪個拍賣時間的保證金顯示：";
@@ -7511,6 +7698,7 @@ AuctioneerLocalizations = {
 		["AHWC_Interface_WindowMovementOptions"]	= "視窗移動選項";
 		["AHWC_Interface_WindowProtectionOptions"]	= "視窗保護選項";
 		["AHWC_Interface_WindowSizeOptions"]	= "視窗尺寸選項";
+		["AMU_Interface_AutoStop12"]	= "只賣出12樣物品後就停止。";
 		["APPR_Interface_12Hours"]	= "12小時";
 		["APPR_Interface_24Hours"]	= "24小時";
 		["APPR_Interface_25x"]	= "25x";
