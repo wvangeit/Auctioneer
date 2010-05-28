@@ -1789,8 +1789,8 @@ function private.CreateFrames()
 		end
 		
 		item.batchTex:SetPoint("TOP", item.icon, "TOP", 0,-15)
-		item.batchTex:SetPoint("LEFT", item.icon, "LEFT", 0,0)
-		item.batchTex:SetPoint("RIGHT", item.icon, "RIGHT", -13,0)
+		item.batchTex:SetPoint("LEFT", item.icon, "LEFT", 10,0)
+		item.batchTex:SetPoint("RIGHT", item.icon, "RIGHT", -3,0)
 		item.batchTex:SetPoint("BOTTOM", item.icon, "BOTTOM", 0,2)
 		item.batchTex:SetDrawLayer("OVERLAY")
 		item.batchTex:Hide()
