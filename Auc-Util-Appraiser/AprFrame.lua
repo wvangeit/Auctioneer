@@ -1756,8 +1756,15 @@ function private.CreateFrames()
 		item:SetHeight(26)
 
 		item.id = i
-
-
+		
+		-- Check to see if we are embedded or not
+		local embedded = false
+		for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+			if module == "Auc-Util-AutoMagic" then
+				embedded = true
+			end
+		end
+		
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
 		item.iconbutton:SetWidth(26)
@@ -1774,7 +1781,13 @@ function private.CreateFrames()
 		-- Section Added by GhostfromTexas APPR-301 Source:Kandoko
     	-- This section is for the Batch Post texture that shows up when an item has the batch post option set
 		item.batchTex = item.iconbutton:CreateTexture()
-		item.batchTex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
+		
+		if embedded then
+			item.batchTex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
+		else
+			item.batchTex:SetTexture("Interface\\AddOns\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
+		end
+		
 		item.batchTex:SetPoint("TOP", item.icon, "TOP", 0,-15)
 		item.batchTex:SetPoint("LEFT", item.icon, "LEFT", 0,0)
 		item.batchTex:SetPoint("RIGHT", item.icon, "RIGHT", -13,0)
