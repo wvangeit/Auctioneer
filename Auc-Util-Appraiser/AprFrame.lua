@@ -43,6 +43,14 @@ local NUM_ITEMS = 12
 local SigFromLink = AucAdvanced.API.GetSigFromLink
 local GetDistribution -- to be filled in when ScanData loads
 
+-- Check to see if we are embedded or not
+local embedded = false
+for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+	if module == "Auc-Util-Appraiser" then
+		embedded = true
+	end
+end
+
 function private.CreateFrames()
 	private.CreateFrames = nil
 
@@ -1735,7 +1743,7 @@ function private.CreateFrames()
 					-- SHIFT CLICK HANDLER - Added by GhostfromTexas May 16, 2010 for APPR-170
 					-- relocated during work on [APPR-273]
 					if ChatFrameEditBox and ChatFrameEditBox:IsVisible() and GetMouseButtonClicked() == "LeftButton" then -- added by GhostfromTexas left button handler since APPR-302 is registering right clicks now
-					   ChatFrameEditBox:Insert(item[7])           AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stack)
+					   ChatFrameEditBox:Insert(item[7])
 					end
 					return
 				end
@@ -1778,14 +1786,6 @@ function private.CreateFrames()
 		
 		item:RegisterForClicks("LeftButtonUp", "RightButtonUp"); -- Added for right click functionality on the items in appraiser. GhostfromTexas APPR-302
 		
-		-- Check to see if we are embedded or not
-		local embedded = false
-		for _, module in ipairs(AucAdvanced.EmbeddedModules) do
-			if module == "Auc-Util-AutoMagic" then
-				embedded = true
-			end
-		end
-		
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
 		item.iconbutton:SetWidth(26)
@@ -1802,7 +1802,7 @@ function private.CreateFrames()
 		-- Section Added by GhostfromTexas APPR-301 Source:Kandoko
     	-- This section is for the Batch Post texture that shows up when an item has the batch post option set
 		item.batchTex = item.iconbutton:CreateTexture()
-		
+	
 		if embedded then
 			item.batchTex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
 		else
