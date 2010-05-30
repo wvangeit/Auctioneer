@@ -70,14 +70,19 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 		end
 				
 		local deposit = CalculateAuctionDeposit(runTime)
+		debugPrint("Deposit before", deposit)
+		deposit = CalculateAuctionDeposit (runTime, stackNumber)
+		debugPrint(itemLink, "deposit", deposit, "for", count, "x", stackNumber, "for", runTime, "minutes") 
+		
 		--TEMP PATCH to fix run time changes till I can change teh mail lua to work with new system
 		if runTime == 1 then runTime = 720 end
 		if runTime == 2 then runTime = 1440 end
 		if runTime == 3 then runTime = 2880 end
 		
 		itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = itemLink, name, count, minBid, buyoutPrice, runTime, deposit
-		
-		if stackNumber and stackNumber > 1 then
+		--Multipost is used when more than 1 stack is posted or when the selected stack is too small to post the stacksize
+		if stackNumber and (stackNumber > 1 or count > selectedStackCount) then
+			debugPrint("Using the multipost route stackNumber=", stackNumber, "count=", count , "selectedStackCount=", selectedStackCount)
 			private.multipostStart(itemLink, count, stackNumber, selectedStackCount)
 		else
 			private.addPendingPost(itemLink, name, count, minBid, buyoutPrice, runTime, deposit)
@@ -209,6 +214,11 @@ function private.multipostStart(itemLink, count, stack, selectedStackCount)
 			debugPrint("|CFFF0AA00",i,v)
 		end
 		--now we have a formatted table
+		--If there is only 1 stack to post but the stack choosen is too small we need to force it throu No Multipost events for this situation
+		if count > selectedStackCount and stack == 1 then
+			--in this case multipost never fires a event
+			private.onMultiPost(1, 1)
+		end
 	end
 end
 private.multipostScan1 = {}
