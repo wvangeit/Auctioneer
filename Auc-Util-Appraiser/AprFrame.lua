@@ -719,7 +719,7 @@ function private.CreateFrames()
 			end
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".bulk", bulk)
 
-			frame.GenerateList() -- Add by GhostfromTexas APPR-301
+			frame.GenerateList()
 
 		end
 		if duration ~= frame.valuecache.duration then
@@ -1305,7 +1305,7 @@ function private.CreateFrames()
 		if postType == "single" then
 			frame.PostBySig(frame.salebox.sig)
 		elseif postType == "batch" then
-			if not IsModifierKeyDown() and GetMouseButtonClicked() ~= "RightButton" then -- Modified by GhostfromTexas APPR-288
+			if not IsModifierKeyDown() and GetMouseButtonClicked() ~= "RightButton" then
 				message(_TRANS('APPR_Interface_BatchButtonCombination') )--This button requires you to press a combination of keys when clicked.\nSee help printed in the chat frame for further details.
 				print(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
 				print(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
@@ -1323,7 +1323,7 @@ function private.CreateFrames()
 			local mode
 			
 			-- Keeping old ability for Ctrl+Alt+Shift for users used to using this modifer setup.
-			if (a and c and s) or (GetMouseButtonClicked() == "RightButton") then mode = "autopost" end  -- Modified by GhostfromTexas APPR-288
+			if (a and c and s) or (GetMouseButtonClicked() == "RightButton") then mode = "autopost" end
 			if a and not c and not s then mode = "refresh" end
 			if not a and not c and s then mode = "list" end
 
@@ -1531,7 +1531,7 @@ function private.CreateFrames()
 			if item then
 				local curIgnore = item.ignore
 				local curAuction = item.auction
-				local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false -- Added by GhostfromTexas APPR-301
+				local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false
 
 				button.icon:SetTexture(item[3])
 				button.icon:SetDrawLayer("ARTWORK");
@@ -1548,7 +1548,6 @@ function private.CreateFrames()
 					stackX = hex..stackX
 				end
 
-                -- Added by GhostfromTexas APPR-301
 				if curBulk then
 				    button.batchTex:Show();
 				else
@@ -1727,29 +1726,27 @@ function private.CreateFrames()
 	frame.items = {}
 	local function itemButtonClick(self, button)
 		-- when adding new mod-key combinations, rearrange lines in the the nested 'if' structure as appropriate
-		local item = frame.list[floor(frame.scroller:GetValue()) + self.id] -- moved here to make available in new function below: APPR-305
+		local item = frame.list[floor(frame.scroller:GetValue()) + self.id]
 		
 		if IsShiftKeyDown() and not IsControlKeyDown() then
 			if IsAltKeyDown() then -- shift/alt
 				if item then
-					if GetMouseButtonClicked() == "LeftButton" then -- Added by GhostfromTexas: Used to distinguish that the left button was used, since the right button is now registered in APPR-302
-						frame.PostBySig(item[1])
+					if GetMouseButtonClicked() == "LeftButton" then
 					end
 					
 					return
 				end
 			else -- shift
 				if item then
-					-- SHIFT CLICK HANDLER - Added by GhostfromTexas May 16, 2010 for APPR-170
 					-- relocated during work on [APPR-273]
-					if ChatFrameEditBox and ChatFrameEditBox:IsVisible() and GetMouseButtonClicked() == "LeftButton" then -- added by GhostfromTexas left button handler since APPR-302 is registering right clicks now
-					   ChatFrameEditBox:Insert(item[7])
+					if ChatFrameEditBox and ChatFrameEditBox:IsVisible() and GetMouseButtonClicked() == "LeftButton" then
+						ChatFrameEditBox:Insert(item[7])
 					end
 					return
 				end
 
 			end
-		elseif GetMouseButtonClicked() == "RightButton" then -- Added by GhostfromTexas for APPR-302
+		elseif GetMouseButtonClicked() == "RightButton" then
 			if IsAltKeyDown() then -- Alt+RightClick
 				 local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false
 				 
@@ -1784,7 +1781,7 @@ function private.CreateFrames()
 
 		item.id = i
 		
-		item:RegisterForClicks("LeftButtonUp", "RightButtonUp"); -- Added for right click functionality on the items in appraiser. GhostfromTexas APPR-302
+		item:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 		
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
@@ -1799,7 +1796,7 @@ function private.CreateFrames()
 		item.icon:SetPoint("BOTTOMRIGHT", item.iconbutton, "BOTTOMRIGHT", 0,0)
 		item.icon:SetTexture("Interface\\InventoryItems\\WoWUnknownItem01")
 		
-		-- Section Added by GhostfromTexas APPR-301 Source:Kandoko
+
     	-- This section is for the Batch Post texture that shows up when an item has the batch post option set
 		item.batchTex = item.iconbutton:CreateTexture()
 	
@@ -2274,7 +2271,7 @@ function private.CreateFrames()
 	frame.gobatch:SetText(_TRANS('APPR_Interface_BatchPost') )--Batch post
 	frame.gobatch:SetWidth(80)
 	frame.gobatch:SetScript("OnClick", frame.PostAuctions)
-	frame.gobatch:RegisterForClicks("LeftButtonUp", "RightButtonUp") -- Added by GhostfromTexas for APPR-288
+	frame.gobatch:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	frame.gobatch:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RefreshesCurrentBatch') ) end)--Alt: Refreshes batch post items Shift: Lists current batch post items RightClick: Posts batch post items Alt+RightClick: Toggles an item's batch post option on/off
 	frame.gobatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.gobatch.postType = "batch"
