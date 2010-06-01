@@ -71,7 +71,7 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 				
 		local deposit = CalculateAuctionDeposit(runTime)
 		debugPrint("Deposit before", deposit)
-		deposit = CalculateAuctionDeposit (runTime, stackNumber)
+		deposit = CalculateAuctionDeposit (runTime, count)
 		debugPrint(itemLink, "deposit", deposit, "for", count, "x", stackNumber, "for", runTime, "minutes") 
 		
 		--TEMP PATCH to fix run time changes till I can change teh mail lua to work with new system
