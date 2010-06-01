@@ -9,6 +9,5 @@
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer
 ##
-## SavedVariables: Auc-Util-ItemSuggest.lua
 
 Embed.xml
