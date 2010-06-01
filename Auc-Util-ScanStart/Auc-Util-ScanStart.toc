@@ -3,7 +3,7 @@
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Util-ScanStart.toc 4382 2009-08-06 15:26:25Z Nechckn $
+## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer - Scan Start module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: ScanFinish.lua 3576 2008-10-10 03:07:13Z aesir $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer module that adds a few event functionalities
@@ -212,4 +212,4 @@ function private.ConfigChanged()
 	if AucAdvanced.Settings.GetSetting("util.scanstart.debug") then blnDebug = true end
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Util-ScanFinish/ScanFinish.lua $", "$Rev: 3576 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
