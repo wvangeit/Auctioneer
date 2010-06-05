@@ -161,8 +161,25 @@ function lib.GetPrice(hyperlink, serverKey)
 	local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	local reason, qty, priceper, thistime
 	--check for ignore date for current serverKey or all servers
-	local ignoreDate = SalesDB[cachesig] or SalesDB["All"..sig] or 0
+	local ignoreDate = 0
+	 --/auc clear itemlink command used
+	local itemIgnoreDate = SalesDB[cachesig] or SalesDB["ALL"..sig] or 0
+	 --/auc cleardata command used
+	local globalIgnoreDateAll = SalesDB["ALL"] or 0
+	local globalIgnoreDateFaction = SalesDB[serverKey] or 0
+	--now which clear date is most recent it has priority
+	if (globalIgnoreDateAll > itemIgnoreDate) and (globalIgnoreDateAll > globalIgnoreDateFaction) then
+		
+		ignoreDate = globalIgnoreDateAll
 	
+	elseif (globalIgnoreDateFaction > itemIgnoreDate) and (globalIgnoreDateFaction > globalIgnoreDateAll) then
+		
+		ignoreDate = globalIgnoreDateFaction
+	
+	elseif (itemIgnoreDate > globalIgnoreDateFaction) and (itemIgnoreDate > globalIgnoreDateAll) then
+		
+		ignoreDate = itemIgnoreDate
+	end
 	if tbl then
 		for i,v in pairs(tbl) do
 			-- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
@@ -310,6 +327,13 @@ function lib.ClearItem(hyperlink, serverKey)
 	serverKey = serverKey or GetFaction()
 	sig = serverKey..sig
 	SalesDB[sig] = time()
+	wipe(pricecache)
+end
+
+function lib.ClearData(serverKey)
+	print(_TRANS('ASAL_Interface_SlashHelpClearingData') , serverKey)-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
+	serverKey = serverKey or GetFaction()
+	SalesDB[serverKey] = time()
 	wipe(pricecache)
 end
 
