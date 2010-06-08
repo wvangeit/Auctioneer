@@ -67,17 +67,17 @@ function lib.GetItemPDF(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
 	-- Get the data
 	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
-	
+
 	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
 	-- the std dev is 100% of the mean divided by square root of number of views
 	if stddev == 0 then stddev = mean / sqrt(soldqty); end
-	
+
 	if not (mean and stddev) or mean == 0 or stddev == 0 then
 		return nil;                 -- No data, cannot determine pricing
 	end
-	
+
 	local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
-	
+
 	-- Build the PDF based on standard deviation & mean
 	BellCurve:SetParameters(mean, stddev);
 	return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
@@ -118,7 +118,7 @@ do
 		local keysettings = keycache[serverKey]
 		if not keysettings then
 			-- only split each unique serverKey once, and cache the results
-			local realmName, factionName = strmatch(serverKey, "^(.+)%-(%u%l+)$")
+			local realmName, factionName = AucAdvanced.SplitServerKey(serverKey)
 			local sbox = faction2selectbox[factionName]
 			if not sbox then -- Invalid faction
 				return
@@ -143,7 +143,7 @@ function lib.GetPrice(hyperlink, serverKey)
 		Rsn_WonBid = _BC('UiWononBid')
 		Rsn_WonBuy = _BC('UiWononBuyout')
 	end
-	
+
 	local sig = GetSigFromLink(hyperlink)
 	if not sig then return end
 	serverKey = serverKey or GetFaction()
@@ -156,30 +156,17 @@ function lib.GetPrice(hyperlink, serverKey)
 	end
 	local settings = private.GetBCSearchSettings(serverKey)
 	if not settings then return end
-	
+
 	local tbl = BeanCounter.API.search(hyperlink, settings, true, 99999)
 	local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	local reason, qty, priceper, thistime
-	--check for ignore date for current serverKey or all servers
-	local ignoreDate = 0
-	 --/auc clear itemlink command used
-	local itemIgnoreDate = SalesDB[cachesig] or SalesDB["ALL"..sig] or 0
-	 --/auc cleardata command used
-	local globalIgnoreDateAll = SalesDB["ALL"] or 0
-	local globalIgnoreDateFaction = SalesDB[serverKey] or 0
-	--now which clear date is most recent it has priority
-	if (globalIgnoreDateAll > itemIgnoreDate) and (globalIgnoreDateAll > globalIgnoreDateFaction) then
-		
-		ignoreDate = globalIgnoreDateAll
-	
-	elseif (globalIgnoreDateFaction > itemIgnoreDate) and (globalIgnoreDateFaction > globalIgnoreDateAll) then
-		
-		ignoreDate = globalIgnoreDateFaction
-	
-	elseif (itemIgnoreDate > globalIgnoreDateFaction) and (itemIgnoreDate > globalIgnoreDateAll) then
-		
-		ignoreDate = itemIgnoreDate
-	end
+	--check for ignore date for current sig or serverKey or all servers
+	local ignoreDate = SalesDB[cachesig] or SalesDB[serverKey] or SalesDB.ALL or 0
+	--[[
+		The test for ["ALL"..sig] won't work like this; temporarily removed as it's not used for any Auctioneer functions
+	local ignoreDate = SalesDB[cachesig] or SalesDB["ALL"..sig] or SalesDB[serverKey] or SalesDB.ALL or 0
+	--]]
+
 	if tbl then
 		for i,v in pairs(tbl) do
 			-- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
@@ -238,7 +225,7 @@ function lib.GetPrice(hyperlink, serverKey)
 	-- Calculate Variance
 	local variance = 0
 	local count = 0
-	
+
 	for i,v in pairs(tbl) do -- We do multiple passes, but creating a slimmer table would be more memory manipulation and not necessarily faster
 		reason, qty, priceper, thistime = v[2], v[6], v[7], v[12] or 1
 		if priceper and qty and priceper>0 and qty>0 and reason == Rsn_Success and thistime>ignoreDate then
@@ -248,9 +235,9 @@ function lib.GetPrice(hyperlink, serverKey)
 	end
 	variance = variance / count;
 	local stdev = variance ^ 0.5
-	
+
 	local deviation = 1.5 * stdev
-	
+
 	-- Trim down to those within 1.5 stddev
 	local number = 0
 	local total = 0
@@ -263,16 +250,16 @@ function lib.GetPrice(hyperlink, serverKey)
 			end
 		end
 	end
-	
+
 	local confidence = .01
-	
+
 	local average
 	if (number > 0) then
 		average = total / number
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-	
+
 	pricecache[cachesig] = {average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
 	return average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
@@ -287,7 +274,7 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	if not get("stat.sales.enable") then return end
 	if not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end
 	-- no need to clean out array; we will just overwrite all entries with new values
-	
+
 	-- Get our statistics
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
 	if not bought and not sold then return end
@@ -299,7 +286,7 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	array.mean = mean
 	array.deviation = stdev
 	array.variance = variance
-	
+
 	array.boughtseen = boughtseen
 	array.soldseen = soldseen
 	array.bought = bought
@@ -316,10 +303,14 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	array.sold7 = sold7
 	array.boughtqty7 = boughtqty7
 	array.soldqty7 = soldqty7
-	
+
 	return array
 end
 
+--[[
+	Calling ClearItem or ClearData does not remove anything from the BeanCounter database.
+	Instead we record the time, and GetPrice will ignore entries with timestamps earlier than that time
+--]]
 function lib.ClearItem(hyperlink, serverKey)
 	print(_TRANS('ASAL_Interface_SlashHelpClearingData') )-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
 	local sig = GetSigFromLink(hyperlink)
@@ -331,13 +322,25 @@ function lib.ClearItem(hyperlink, serverKey)
 end
 
 function lib.ClearData(serverKey)
-	print(_TRANS('ASAL_Interface_SlashHelpClearingData') , serverKey)-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
+	print(_TRANS('ASAL_Interface_SlashHelpClearingData') )-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
 	serverKey = serverKey or GetFaction()
-	SalesDB[serverKey] = time()
+	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
+		-- "ALL" overrides all pre-existing entries in the table. Eliminate those "dead" entries.
+		wipe(SalesDB)
+		SalesDB.ALL = time()
+	elseif AucAdvanced.SplitServerKey(serverKey) then -- looks like a valid serverKey
+		-- Any pre-existing entries *containing* this serverKey are overridden by the new entry for this serverKey; remove them
+		for key, value in pairs(SalesDB) do
+			if key:find(serverKey, 1, true) then -- plain text matching
+				SalesDB[key] = nil
+			end
+		end
+		SalesDB[serverKey] = time()
+	end
 	wipe(pricecache)
 end
 
-function lib.OnLoad(addon)
+function lib.OnLoad()
 	default("stat.sales.tooltip", false)
 	default("stat.sales.avg", true)
 	default("stat.sales.avg3", false)
@@ -346,12 +349,12 @@ function lib.OnLoad(addon)
 	default("stat.sales.stddev", false)
 	default("stat.sales.confidence", false)
 	default("stat.sales.enable", true)
-	
-	if not get("stat.sales.ignoredsigs") then
-		set("stat.sales.ignoredsigs", {} )
-	end
-	--AucAdvancedStatSalesData
+
 	SalesDB = get("stat.sales.ignoredsigs")
+	if not SalesDB then
+		SalesDB = {}
+		set("stat.sales.ignoredsigs", SalesDB)
+	end
 end
 
 function lib.Processor(callbackType, ...)
@@ -367,14 +370,14 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
-	
+
 	if not get("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
-	
+
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
 	if not bought and not sold then return end
 	if (boughtseen+soldseen>0) then
 		tooltip:AddLine(_TRANS('ASAL_Tooltip_SalesPrices'))--Sales prices:
-		
+
 		if get("stat.sales.avg") then
 			if (boughtseen > 0) then
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_TotalBought'):format(boughtqty), bought) --Total Bought {{%s}} at avg each
@@ -416,26 +419,26 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 				tooltip:AddLine("  ".._TRANS('ASAL_Tooltip_Confidence')..(floor(confidence*1000))/1000)--Confidence:
 			end
 		end
-		
+
 	end
 end
 
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
-	
+
 	gui:AddHelp(id, "what sales stats",
 	_TRANS('ASAL_Help_StatSales') ,--What are sales stats?'
 	_TRANS('ASAL_Help_StatSalesAnswer') )--Sales stats are the numbers that are generated by the sales module from the BeanCounter database. It averages all of the prices for items that you have sold
-		
+
 	--all options in here will be duplicated in the tooltip frame
 	function private.addTooltipControls(id)
 		gui:AddControl(id, "Header",     0,    _TRANS('ASAL_Interface_SalesOptions') )--Sales options
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
+
 		gui:AddControl(id, "Checkbox",   0, 1, "stat.sales.enable", _TRANS('ASAL_Interface_EnableSalesStats') )--Enable Sales Stats
 		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_EnableSalesStats') )--Allow Sales to contribute to Market Price.
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
+
 		gui:AddControl(id, "Checkbox",   0, 4, "stat.sales.tooltip", _TRANS('ASAL_Interface_ShowSalesStat') )--Show sales stats in the tooltips?
 		gui:AddTip(id, _TRANS('ASAL_HelpTooltip_ShowSalesStat') )--Toggle display of stats from the Sales module on or off
 		gui:AddControl(id, "Checkbox",   0, 6, "stat.sales.avg3", _TRANS('ASAL_Interface_Display3DayMean') )--Display Moving 3 Day Mean
@@ -454,7 +457,7 @@ function private.SetupConfigGui(gui)
 	end
 	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
-	
+
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
 	if tooltipID then private.addTooltipControls(tooltipID) end
