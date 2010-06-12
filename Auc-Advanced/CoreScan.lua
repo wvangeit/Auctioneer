@@ -263,8 +263,8 @@ function lib.PopScan()
 end
 
 --[[Generate the progress bars we will use to display state data.
-These are 5 generic bars that will be assigned to display as needed.]]
-local NumGenericBars = 5
+These are generic bars that will be assigned to display as needed.]]
+local NumGenericBars = 5 --constant: How many bars to create for use
 for i = 1, NumGenericBars do
 	local bar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
 	bar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
@@ -299,10 +299,11 @@ for i = 1, NumGenericBars do
 end
 
 --controls the display, anchor, and text of our progress bars
-local availableBars = {}
+lib.availableBars = {} --temp just to access teh table while in game
+local availableBars = lib.availableBars
 function lib.ProgressBars(name, value, show, text, color)
 	--setup parent so we can display even if AH is closed
-	if AuctionFrame:IsShown() then
+	if AuctionFrame and AuctionFrame:IsShown() then
 		AucAdvanced.Scan.GenericProgressBar1:SetParent(AuctionFrame)
 		AucAdvanced.Scan.GenericProgressBar1:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5)
 	else
@@ -325,12 +326,22 @@ function lib.ProgressBars(name, value, show, text, color)
 	else
 		--hiding so free up this generic bar and drop all  other active bars by 1 place
 		self:Hide()
+		self.text:SetText("") --Remove any text so we are ready for next use
 		--remove  bar being hidden
-		table.remove(availableBars, availableBars[name])
+		table.remove(availableBars, ID)
 		availableBars[name] = nil
 		--rearrange remaining bars
-		for i,v in pairs(availableBars) do
-			if type(i) == "string" and availableBars[i] > 1 then
+		for i = 1, NumGenericBars do
+			local name = availableBars[i]
+			if name then
+				availableBars[name] = i
+			else
+				AucAdvanced.Scan["GenericProgressBar"..i]:Hide()
+			end
+		end
+		
+		for i,v in ipairs(availableBars) do
+			if type(i) == "string" and availableBars[i] > 1 and availableBars[i] > IDRemoved then
 				AucAdvanced.Scan["GenericProgressBar"..availableBars[i]]:Hide()
 				--reduce by 1
 				availableBars[i] = v-1
@@ -352,6 +363,8 @@ function lib.ProgressBars(name, value, show, text, color)
 		if r and g and b then
 			self:SetStatusBarColor(r, g, b, 0.6)
 		end
+	else
+		self:SetStatusBarColor(0.6, 0, 0, 0.6) --light red
 	end
 end
 
@@ -384,7 +397,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			lib.ProgressBars("GetAllProgressBar", 0, true)
+			lib.ProgressBars("GetAllProgressBar", 0, true, "")
 			private.isGetAll = true -- indicates that certain functions must take special action, and that the above changes need to be undone
 
 			private.LastGetAll = now
@@ -412,7 +425,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			-- this should never fail? we checked CanSendAuctionQuery() earlier
 			message("Scan failed: unable to send query")
 			if private.isGetAll then
-				lib.ProgressBars("GetAllProgressBar", nil, false)
+				lib.ProgressBars("GetAllProgressBar", nil, false, "")
 				BrowseSearchButton:Show()
 				AucAdvanced.API.BlockUpdate(false)
 				private.isGetAll = nil
@@ -882,7 +895,7 @@ local Commitfunction = function()
 	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
 	if get("scancommit.progressbar") then
-		lib.ProgressBars("CommitProgressBar", 0, true)
+		lib.ProgressBars("CommitProgressBar", 0, true, "")
 	end
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan

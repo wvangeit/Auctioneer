@@ -519,7 +519,18 @@ end
 function lib.IsBlocked()
 	return private.isBlocked == true
 end
+--[[Progress bars that are usable by any addon.
+name = string - unique bar name
+value =  0-100   the % the bar should be filled
+show =  boolean  true will keep bar displayed, false will hide the bar and free it for use by another addon
+text =  string - the text to display on the bar
+color  = string = R|G|B   red, green, blue values seperated by |     ex:    "1|0|0"
 
+value, text, and color are all optional variables
+]]
+function lib.ProgressBars(name, value, show, text, color)
+	 AucAdvanced.Scan.ProgressBars(name, value, show, text, color)
+end
 --[[ Market matcher APIs ]]--
 
 function lib.GetBestMatch(itemLink, algorithm, serverKey, reserved)
