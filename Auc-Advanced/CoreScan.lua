@@ -264,10 +264,13 @@ end
 
 --[[Generate the progress bars we will use to display state data.
 These are generic bars that will be assigned to display as needed.]]
-local NumGenericBars = 5 --constant: How many bars to create for use
-for i = 1, NumGenericBars do
-	local bar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
-	bar = CreateFrame("STATUSBAR", "$parentHealthBar", UIParent, "TextStatusBar")
+
+--controls the display, anchor, and text of our progress bars
+lib.availableBars = {} --temp just to access teh table while in game
+local availableBars = lib.availableBars
+local NumGenericBars = 0
+local function newBar()
+	local bar = CreateFrame("STATUSBAR", nil, UIParent, "TextStatusBar")
 	bar:SetWidth(300)
 	bar:SetHeight(18)
 	bar:SetBackdrop({
@@ -290,17 +293,16 @@ for i = 1, NumGenericBars do
 	bar.text:SetText("Auctioneer: Processing")
 	bar.text:SetTextColor(1,1,1)
 		
-	if i == 1 then
+	if NumGenericBars < 1 then
 		bar:SetPoint("CENTER", UIParent, "CENTER", -5,5)
 	else--attach to previous bar
-		bar:SetPoint("BOTTOM", lib["GenericProgressBar"..i -1], "TOP", 0, 0)
+		bar:SetPoint("BOTTOM", lib["GenericProgressBar"..NumGenericBars], "TOP", 0, 0)
 	end
-	lib["GenericProgressBar"..i] = bar
+	NumGenericBars = NumGenericBars + 1
+	lib["GenericProgressBar"..(NumGenericBars)] = bar
 end
-
---controls the display, anchor, and text of our progress bars
-lib.availableBars = {} --temp just to access teh table while in game
-local availableBars = lib.availableBars
+--create 1 bar to start
+newBar()
 function lib.ProgressBars(name, value, show, text, color)
 	--setup parent so we can display even if AH is closed
 	if AuctionFrame and AuctionFrame:IsShown() then
@@ -317,6 +319,10 @@ function lib.ProgressBars(name, value, show, text, color)
 		availableBars[name] =  ID
 	else
 		ID = availableBars[name]
+	end
+	--do we need more bars than what we currently have available?
+	if not AucAdvanced.Scan["GenericProgressBar"..ID] then
+		newBar()
 	end
 	
 	local self = AucAdvanced.Scan["GenericProgressBar"..ID]
