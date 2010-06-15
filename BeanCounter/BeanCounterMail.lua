@@ -249,7 +249,7 @@ function private.mailSort()
 				--ignore We dont care about this message
 				tremove(private.reconcilePending,i)
 			else
-				debugPrint("We had an Auction mail that failed mailsort()", private.reconcilePending[i].subject)
+				debugPrint("We had an Auction mail that failed mailsort()", private.reconcilePending[i].subject, i)
 				tremove(private.reconcilePending,i)
 			end
 		else --if its not AH do we care? We need to record cash arrival from other toons
@@ -299,7 +299,7 @@ end
 function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, soldBuy, soldTime)
 	if not private.playerData[key][itemID] then return end --if no keys present abort
 
-	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 173400) --48H 15min oldest we will go back
+	local soldDeposit, soldBuy, soldTime ,oldestPossible = tonumber(soldDeposit), tonumber(soldBuy), tonumber(soldTime), tonumber(soldTime - 208800) --58H 15min oldest we will go back
 	--ItemLink will be used minus its unique ID
 	local itemString  =  lib.API.getItemString(itemLink)
 	itemString = itemString:match("(item:.+):.-:.-")-- ignore Unique ID
@@ -358,7 +358,7 @@ function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, e
 				local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
 						local timeAuctionPosted, timeFailedAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Time this message should have been posted
-						if (timeAuctionPosted - 7200) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 7200) then
+						if (timeAuctionPosted - 21600) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 21600) then
 							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
 							--debugPrint("postedAuction removed as Failed", itemID, itemLink )
@@ -402,7 +402,7 @@ function private.findStackCancelledAuctions(key, itemID, itemLink, returnedStack
 					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
 						local timeAuctionPosted, timeCancelledAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Earrliest time we could have posted the auction
-						if (timeAuctionPosted - 7200) > (timeCancelledAuctionStarted) then --cancelled auctions could have just been posted so no way to age check beyond oldest possible
+						if (timeAuctionPosted - 21600) > (timeCancelledAuctionStarted) then --cancelled auctions could have just been posted so no way to age check beyond oldest possible
 							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Cancelled"
 							--debugPrint("postedAuction removed as Cancelled", itemID, itemLink )
