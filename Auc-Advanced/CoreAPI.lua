@@ -446,44 +446,17 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	return
 end
 
--- resultsTable = AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)
--- {previous form was QueryImage(query, faction, realm, ...), this is deprecated, use 'serverKey' instead}
--- 'reserved' should always be nil
-function lib.QueryImage(query, serverKey, reserved, ...)
-	if serverKey then
-		if not AucAdvanced.SplitServerKey(serverKey) then
-			-- check for parameters in the old (deprecated) format
-			local faction, realmName, deprecated
-			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
-				deprecated = true
-				faction = serverKey
-			else
-				error("Invalid serverKey passed to AucAdvanced.API.QueryImage")
-			end
-			if reserved then
-				realmName = reserved
-				deprecated = true
-			else
-				realmName = GetRealmName()
-			end
-			serverKey = realmName.."-"..faction
-			if deprecated then
-				lib.ShowDeprecationAlert("AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)",
-					"The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter.")
-			end
-		end
-	else
-		serverKey = AucAdvanced.GetFaction()
-	end
-
-	return AucAdvanced.Scan.QueryImage(query, serverKey, nil, ...)
-end
+--[[ resultsTable = AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)
+	'queryTable' specifies the query to perform
+	'serverKey' defaults to the current faction
+	'reserved' must always be nil
+	The working code can be viewed in CoreScan.lua for more details.
+--]]
+lib.QueryImage = AucAdvanced.Scan.QueryImage
 
 -- unpackedTable = AucAdvanced.API.UnpackImageItem(imageItem)
 -- imageItem is one of the values (subtables) in the table returned by QueryImage or GetImageCopy
-function lib.UnpackImageItem(item)
-	return AucAdvanced.Scan.UnpackImageItem(item)
-end
+lib.UnpackImageItem = AucAdvanced.Scan.UnpackImageItem
 
 -- scanStatsTable = AucAdvanced.API.GetScanStats(serverKey)
 -- Timestamps: scanstats.LastScan, scanstats.LastFullScan, scanstats.ImageUpdated
