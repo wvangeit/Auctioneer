@@ -501,8 +501,8 @@ color  = string = R|G|B   red, green, blue values seperated by |     ex:    "1|0
 
 value, text, and color are all optional variables
 ]]
-function lib.ProgressBars(name, value, show, text, color)
-	 AucAdvanced.Scan.ProgressBars(name, value, show, text, color)
+function lib.ProgressBars(name, value, show, text, options)
+	 AucAdvanced.Scan.ProgressBars(name, value, show, text, options)
 end
 --[[ Market matcher APIs ]]--
 

@@ -290,7 +290,6 @@ local function newBar()
 	bar.text:SetPoint("CENTER", bar, "CENTER")
 	bar.text:SetJustifyH("CENTER")
 	bar.text:SetJustifyV("CENTER")
-	bar.text:SetText("Auctioneer: Processing")
 	bar.text:SetTextColor(1,1,1)
 		
 	if NumGenericBars < 1 then
@@ -303,7 +302,7 @@ local function newBar()
 end
 --create 1 bar to start
 newBar()
-function lib.ProgressBars(name, value, show, text, color)
+function lib.ProgressBars(name, value, show, text, options)
 	--setup parent so we can display even if AH is closed
 	if AuctionFrame and AuctionFrame:IsShown() then
 		AucAdvanced.Scan.GenericProgressBar1:SetParent(AuctionFrame)
@@ -333,6 +332,8 @@ function lib.ProgressBars(name, value, show, text, color)
 		--hiding so free up this generic bar and drop all  other active bars by 1 place
 		self:Hide()
 		self.text:SetText("") --Remove any text so we are ready for next use
+		self:SetStatusBarColor(0.6, 0, 0, 0.6) --light red color
+		self.text:SetTextColor(1, 1, 1, 1)
 		--remove  bar being hidden
 		table.remove(availableBars, ID)
 		availableBars[name] = nil
@@ -363,15 +364,29 @@ function lib.ProgressBars(name, value, show, text, color)
 	if text then
 		self.text:SetText(text)
 	end
+	--[[options is a table that contains, "tweaks" ie text or bar color changes
+	Nothing below this line will be processed unless an options table is passed]]
+	if not options or type(options) ~= "table" then return end
+		
 	--change bars color
-	if color then
-		local r,g,b = strsplit("|",color)
+	local barColor = options.barColor
+	if barColor then
+		local r, g, b, a = barColor[1],barColor[2], barColor[3], barColor[4]
 		if r and g and b then
-			self:SetStatusBarColor(r, g, b, 0.6)
+			a = a or 0.6
+			self:SetStatusBarColor(r, g, b, a)
 		end
-	else
-		self:SetStatusBarColor(0.6, 0, 0, 0.6) --light red
 	end
+	--change text color
+	local textColor = options.textColor
+	if textColor then
+		local r, g, b, a = textColor[1],textColor[2], textColor[3], textColor[4]
+		if r and g and b then
+			a = a or 0.6
+			self.text:SetTextColor(r, g, b, a)
+		end
+	end
+
 end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
@@ -403,7 +418,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			lib.ProgressBars("GetAllProgressBar", 0, true, "")
+			lib.ProgressBars("GetAllProgressBar", 0, true, "Auctioneer: Scanning")
 			private.isGetAll = true -- indicates that certain functions must take special action, and that the above changes need to be undone
 
 			private.LastGetAll = now
@@ -431,7 +446,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			-- this should never fail? we checked CanSendAuctionQuery() earlier
 			message("Scan failed: unable to send query")
 			if private.isGetAll then
-				lib.ProgressBars("GetAllProgressBar", nil, false, "")
+				lib.ProgressBars("GetAllProgressBar", nil, false)
 				BrowseSearchButton:Show()
 				AucAdvanced.API.BlockUpdate(false)
 				private.isGetAll = nil
@@ -901,7 +916,7 @@ local Commitfunction = function()
 	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
 	if get("scancommit.progressbar") then
-		lib.ProgressBars("CommitProgressBar", 0, true, "")
+		lib.ProgressBars("CommitProgressBar", 0, true)
 	end
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
