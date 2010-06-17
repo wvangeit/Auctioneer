@@ -382,7 +382,7 @@ function lib.ProgressBars(name, value, show, text, options)
 	if textColor then
 		local r, g, b, a = textColor[1],textColor[2], textColor[3], textColor[4]
 		if r and g and b then
-			a = a or 0.6
+			a = a or 1
 			self.text:SetTextColor(r, g, b, a)
 		end
 	end
