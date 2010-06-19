@@ -37,7 +37,7 @@ local libType, libName = "Stat", "Simple"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local GetFaction = AucAdvanced.GetFaction
 
@@ -60,18 +60,19 @@ local strsplit,strfind=strsplit,strfind
 local SSRealmData
 
 function lib.CommandHandler(command, ...)
-	local myFaction = GetFaction()
+	local serverKey = GetFaction()
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
-		print(_TRANS('SIMP_Help_SlashHelp1') ) --Help for Auctioneer Advanced - Simple
+		aucPrint(_TRANS('SIMP_Help_SlashHelp1') ) --Help for Auctioneer Advanced - Simple
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - ".._TRANS('SIMP_Help_SlashHelp2') ) --this Simple help
-		print(line, "clear}} - ".._TRANS('SIMP_Help_SlashHelp3'):format(myFaction) ) --clear current %s Simple price database
-		print(line, "push}} - ".._TRANS('SIMP_Help_SlashHelp4'):format(myFaction) ) --force the %s Simple daily stats to archive (start a new day)
+		aucPrint(line, "help}} - ".._TRANS('SIMP_Help_SlashHelp2') ) --this Simple help
+		aucPrint(line, "clear}} - ".._TRANS('SIMP_Help_SlashHelp3'):format(keyText) ) --clear current %s Simple price database
+		aucPrint(line, "push}} - ".._TRANS('SIMP_Help_SlashHelp4'):format(keyText) ) --force the %s Simple daily stats to archive (start a new day)
 	elseif (command == "clear") then
-		lib.ClearData(...)
+		lib.ClearData(serverKey)
 	elseif (command == "push") then
-		print(_TRANS('SIMP_Help_SlashHelp6'):format(myFaction) ) --Archiving {{%s}} daily stats and starting a new day
-		private.PushStats(myFaction)
+		aucPrint(_TRANS('SIMP_Help_SlashHelp6'):format(keyText) ) --Archiving {{%s}} daily stats and starting a new day
+		private.PushStats(serverKey)
 	end
 end
 
@@ -320,7 +321,8 @@ function lib.ClearItem(hyperlink, serverKey)
 	end
 
 	if cleareditem then
-		print(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, serverKey)) --%s - Simple: clearing data for %s for {{%s}}
+		local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('SIMP_Help_SlashHelpClearingData'):format(libType, hyperlink, keyText)) --%s - Simple: clearing data for %s for {{%s}}
 	end
 end
 
@@ -589,13 +591,13 @@ end
 function lib.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
-		SSRealmData = {}
-		AucAdvancedStatSimpleData.RealmData = SSRealmData
-		print(_TRANS('SIMP_Interface_ClearingSimple').." {{All realms}}") --Clearing Simple stats for
+		wipe(SSRealmData)
+		aucPrint(_TRANS('SIMP_Interface_ClearingSimple').." {{".._TRANS("ADV_Interface_AllRealms").."}}") --Clearing Simple stats for // All realms
 	elseif SSRealmData[serverKey] then
-		local _,_,text = AucAdvanced.SplitServerKey(serverKey)
-		print(_TRANS('SIMP_Interface_ClearingSimple').." {{"..text.."}}") --Clearing Simple stats for
+		local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
+		keyText = keyText or tostring(serverKey) -- avoid display error if database entry is not a valid serverKey (due to minor database corruption)
 		SSRealmData[serverKey] = nil
+		aucPrint(_TRANS('SIMP_Interface_ClearingSimple').." {{"..keyText.."}}") --Clearing Simple stats for
 	end
 end
 
@@ -619,7 +621,7 @@ function private.InitData()
 	SSRealmData = AucAdvancedStatSimpleData.RealmData
 	if not SSRealmData then
 		SSRealmData = {} -- dummy value to avoid more errors - will not get saved
-		error(SSRealmData, "Error loading or creating StatSimple database")
+		error("Error loading or creating StatSimple database")
 	end
 
 	-- Note: database errors can occur if user tries to run an older version of StatSimple after the database is upgraded.
