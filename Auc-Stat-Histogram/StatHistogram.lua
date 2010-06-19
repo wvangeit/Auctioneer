@@ -37,7 +37,7 @@ local libType, libName = "Stat", "Histogram"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local tonumber,pairs,type,setmetatable=tonumber,pairs,type,setmetatable
 local strsplit,strjoin = strsplit,strjoin
 local min,max,abs,ceil,floor = min,max,abs,ceil,floor
@@ -57,14 +57,15 @@ local pricecache
 
 function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
-	local myFaction = GetFaction()
+	local serverKey = GetFaction()
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
-		print(_TRANS('SHTG_Help_SlashHelp1') )--Help for Auctioneer - Histogram
+		aucPrint(_TRANS('SHTG_Help_SlashHelp1') )--Help for Auctioneer - Histogram
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - ".._TRANS('SHTG_Help_SlashHelp2') ) -- this Histogram help
-		print(line, "clear}} - ".._TRANS('SHTG_Help_SlashHelp3'):format(myFaction) ) --clear current %s Histogram price database
+		aucPrint(line, "help}} - ".._TRANS('SHTG_Help_SlashHelp2') ) -- this Histogram help
+		aucPrint(line, "clear}} - ".._TRANS('SHTG_Help_SlashHelp3'):format(keyText) ) --clear current %s Histogram price database
 	elseif (command == "clear") then
-		lib.ClearData(myFaction)
+		lib.ClearData(serverKey)
 	end
 end
 
@@ -650,29 +651,31 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.histogram.enable", true)
 end
 
-function lib.ClearItem(hyperlink, faction)
+function lib.ClearItem(hyperlink, serverKey)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor and factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = GetFaction() end
-	if not data[faction] then return end
-	if not data[faction][itemId] then return end
-	data[faction][itemId][property] = nil
-	print(libType.._TRANS('SHTG_Interface_ClearingData'):format(hyperlink, faction))--- Histogram: clearing data for %s for {{%s}}
+	if not serverKey then serverKey = GetFaction() end
+	if not data[serverKey] then return end
+	if not data[serverKey][itemId] then return end
+	if not data[serverKey][itemId][property] then return end
+	data[serverKey][itemId][property] = nil
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
+	aucPrint(libType.._TRANS('SHTG_Interface_ClearingData'):format(hyperlink, keyText))--- Histogram: clearing data for %s for {{%s}}
 end
 
 function lib.ClearData(serverKey)
-	serverKey = serverKey or GetFaction()
+	if not serverKey then serverKey = GetFaction() end
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
-		print(_TRANS('SHTG_Help_SlashHelp5').." {{All realms}}") --Clearing Histogram stats for
 		local version = data.version -- save this so it doesn't get lost in the wipe
 		wipe(data)
 		data.version = version
+		aucPrint(_TRANS('SHTG_Help_SlashHelp5').." {{".._TRANS("ADV_Interface_AllRealms").."}}") --Clearing Histogram stats for // All realms
 	elseif data[serverKey] then
-		local _,_,text = AucAdvanced.SplitServerKey(serverKey)
-		print(_TRANS('SHTG_Help_SlashHelp5').." {{"..text.."}}") --Clearing Histogram stats for
 		data[serverKey] = nil
+		local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('SHTG_Help_SlashHelp5').." {{"..keyText.."}}") --Clearing Histogram stats for
 	end
 end
 
@@ -685,7 +688,7 @@ function private.DataLoaded()
 	local VERSION = 2
 	if (data["version"]) and (data["version"] >= VERSION) then return end
 	local function findallprices()
-		print("Auc-Stat-Histogram: Updating database.  Please be patient")
+		aucPrint("Auc-Stat-Histogram: Updating database.  Please be patient")
 		local i = 1
 		for faction, itemlist in pairs(data) do
 			if type(itemlist) == "table" then
@@ -705,7 +708,7 @@ function private.DataLoaded()
 				end
 			end
 		end
-		print("Auc-Stat-Histogram: Database is updated.  Thank You for your patience")
+		aucPrint("Auc-Stat-Histogram: Database is updated.  Thank You for your patience")
 		data["version"] = VERSION
 	end
 	local co = coroutine.create(findallprices)
@@ -749,7 +752,7 @@ function private.UnpackStats(dataItem)
 		stattable["count"] = tonumber(count)
 		local index = stattable["min"]
 		if not index then
-			print(dataItem)
+			aucPrint(dataItem)
 		end
 		for n in newdataItem:gmatch("[0-9]+") do
 			stattable[index] = tonumber(n)
