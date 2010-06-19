@@ -38,7 +38,7 @@ local libType, libName = "Stat", "StdDev"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local tonumber,strsplit,select,pairs=tonumber,strsplit,select,pairs
 local setmetatable=setmetatable
 local wipe=wipe
@@ -56,14 +56,15 @@ local cache = {} -- setmetatable({}, {__mode="v"})
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
 function lib.CommandHandler(command, ...)
-	local myFaction = GetFaction()
+	local serverKey = GetFaction()
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
-		print(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer - StdDev
+		aucPrint(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer - StdDev
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - ".._TRANS('SDEV_Help_SlashHelp2') ) --this StdDev help
-		print(line, "clear}} - ".._TRANS('SDEV_Help_SlashHelp3'):format(myFaction) ) --clear current %s StdDev price database
+		aucPrint(line, "help}} - ".._TRANS('SDEV_Help_SlashHelp2') ) --this StdDev help
+		aucPrint(line, "clear}} - ".._TRANS('SDEV_Help_SlashHelp3'):format(keyText) ) --clear current %s StdDev price database
 	elseif (command == "clear") then
-		lib.ClearData(myFaction)
+		lib.ClearData(serverKey)
 	end
 end
 
@@ -381,25 +382,26 @@ function lib.ClearItem(hyperlink, serverKey)
 	if SSDRealmData[serverKey] and SSDRealmData[serverKey][itemID] then
 		local stats = private.UnpackStats(SSDRealmData[serverKey][itemID])
 		if stats[property] then
-			print(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, serverKey))--- StdDev: clearing data for %s for {{%s}}
 			stats[property] = nil
 			SSDRealmData[serverKey][itemID] = private.PackStats(stats)
 			wipe(cache)
+			local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+			aucPrint(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, keyText))--- StdDev: clearing data for %s for {{%s}}
 		end
 	end
 end
 
 function lib.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
-	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
-		print(_TRANS('SDEV_Help_SlashHelp4').." {{All realms}}") --Clearing StdDev stats for
-		wipe(SSDRealmData)
-	elseif SSDRealmData[serverKey] then
-		local _, _, text = AucAdvanced.SplitServerKey(serverKey)
-		print(_TRANS('SDEV_Help_SlashHelp4').." {{"..text.."}}") --Clearing StdDev stats for
-		SSDRealmData[serverKey] = nil
-	end
 	wipe(cache)
+	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
+		wipe(SSDRealmData)
+		aucPrint(_TRANS('SDEV_Help_SlashHelp4').." {{".._TRANS("ADV_Interface_AllRealms").."}}") --Clearing StdDev stats for // All realms
+	elseif SSDRealmData[serverKey] then
+		SSDRealmData[serverKey] = nil
+		local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('SDEV_Help_SlashHelp4').." {{"..keyText.."}}") --Clearing StdDev stats for
+	end
 end
 
 --[[ Local functions ]]--
