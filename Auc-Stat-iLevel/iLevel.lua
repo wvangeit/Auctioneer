@@ -36,7 +36,7 @@ if not AucAdvanced then return end
 local libType, libName = "Stat", "iLevel"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local select,next,pairs,ipairs,type,unpack,wipe = select,next,pairs,ipairs,type,unpack,wipe
 local tonumber,tostring,strsplit,strjoin = tonumber,tostring,strsplit,strjoin
@@ -53,11 +53,12 @@ local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .75
 
 function lib.CommandHandler(command, ...)
 	local serverKey = GetFaction()
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
-		print(_TRANS('ILVL_Help_SlashHelp1') )--Help for Auctioneer Advanced - iLevel
+		aucPrint(_TRANS('ILVL_Help_SlashHelp1') )--Help for Auctioneer Advanced - iLevel
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - ".._TRANS('ILVL_Help_SlashHelp2') ) -- this iLevel help
-		print(line, "clear}} - ".._TRANS('ILVL_Help_SlashHelp3'):format(serverKey) ) --clear current %s iLevel price database
+		aucPrint(line, "help}} - ".._TRANS('ILVL_Help_SlashHelp2') ) -- this iLevel help
+		aucPrint(line, "clear}} - ".._TRANS('ILVL_Help_SlashHelp3'):format(keyText) ) --clear current %s iLevel price database
 	elseif (command ==_TRANS( 'clear') ) then
 		lib.ClearData(serverKey)
 	end
@@ -368,16 +369,17 @@ function lib.ClearItem(hyperlink, serverKey)
 	if not serverKey then serverKey = GetFaction() end
 	local stats = private.GetUnpackedStats(serverKey, itemSig, true)
 	if stats[iLevel] then
-		print(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, serverKey))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
 		stats[iLevel] = nil
 		private.RepackStats()
 		private.ResetCache()
+		local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('ILVL_Interface_ClearingItems'):format(iLevel, quality, equipPos, keyText))--Stat-iLevel: clearing data for iLevel=%d/quality=%d/equip=%d items for {{%s}}
 		return
 	end
-	print(_TRANS('ILVL_Interface_ItemNotFound') )--Stat-iLevel: item is not in database
+	aucPrint(_TRANS('ILVL_Interface_ItemNotFound') )--Stat-iLevel: item is not in database
 end
 
---[[ Internal functions ]]--
+--[[ Database Management functions ]]--
 
 local ILRealmData
 local unpacked, updated = {}, {}
@@ -386,21 +388,22 @@ function private.InitData()
 	private.InitData = nil
 	if not AucAdvancedStat_iLevelData then AucAdvancedStat_iLevelData = {} end
 	ILRealmData = AucAdvancedStat_iLevelData
-
 end
 
 function lib.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
+	private.ResetCache()
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
-		print(_TRANS('ILVL_Help_SlashHelp5').." {{All realms}}") --Clearing iLevel stats for
 		wipe(ILRealmData)
 		wipe(unpacked)
 		wipe(updated)
+		aucPrint(_TRANS('ILVL_Help_SlashHelp5').." {{".._TRANS("ADV_Interface_AllRealms").."}}") --Clearing iLevel stats for // All realms
 	elseif ILRealmData[serverKey] then
-		local _, _, text = AucAdvanced.SplitServerKey(serverKey)
-		print(_TRANS('ILVL_Help_SlashHelp5').." {{"..text.."}}") --Clearing iLevel stats for
 		ILRealmData[serverKey] = nil
 		unpacked[serverKey] = nil
+		-- 'updated' may contain orphaned entries - these will be cleaned up in next RepackStats
+		local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('ILVL_Help_SlashHelp5').." {{"..keyText.."}}") --Clearing iLevel stats for
 	end
 end
 
