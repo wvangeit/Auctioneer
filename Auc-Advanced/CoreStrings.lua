@@ -700,7 +700,7 @@ AuctioneerLocalizations = {
 		["APPR_Help_BatchPostHelp2"]	= "Ihr müsst eine der folgenden Tasten gedrückt halten, wenn Ihr auf den Button klickt:";
 		["APPR_Help_BatchPostHelp3"]	= "- ALT = Automatische Auffrischung sämtlicher Gegenstände, die als Posten einstellbar sind.";
 		["APPR_Help_BatchPostHelp4"]	= "- UMSCHALTTASTE = Listet sämtliche Auktionen auf, die eingestellt werden sollen ohne sie tatsächlich einzustellen.";
-		["APPR_Help_BatchPostHelp5"]	= "- RightClick = Automatische Einstellung sämtlicher Gegenstände, die als Posten einstellbar sind.";
+		["APPR_Help_BatchPostHelp5"]	= "- Rechtsklick = Automatische Einstellung sämtlicher Gegenstände, die als Posten einstellbar sind.";
 		["APPR_Help_BatchUnknownKeyCombo"]	= "Es wurde während des Klickens des Posteneinstellungsbuttons eine unbekannte Tastenkombination gedrückt.";
 		["APPR_Help_CannotPostAuctions"]	= "Die Auktion kann nicht eingestellt werden:";
 		["APPR_Help_Duration"]	= "- Dauer: {{%d hours}}";
@@ -1917,6 +1917,7 @@ AuctioneerLocalizations = {
 		["AAMU_Interface_Vendoring"]	= "Enable AutoMagic vendoring (W A R N I N G: READ HELP!)";
 		["AAMU_Interface_VendorOptions"]	= "Vendor Options";
 		["ADV_Interface_ActivateProfile"]	= "Activate a current profile";
+		["ADV_Interface_AllRealms"]	= "All realms";
 		["ADV_Interface_AlwaysHomeFaction"]	= "See home faction data everywhere, unless at a neutral AH";
 		["ADV_Interface_AucOptions"]	= "Main Auctioneer Options";
 		["ADV_Interface_ControlsShowHideTooltip"]	= "Controls to show or hide tooltip information. \nTo activate or deactivate a module completely, please use that modules configuration.";
@@ -3232,7 +3233,7 @@ AuctioneerLocalizations = {
 		["WECN_Help_WoweconNoMatchAnswer "]	= "Wowecon vous donne la possibilité de cacher des prix spécifiques au serveur si ils n'ont été vu qu'un nombre donné de fois. Bien que ces prix soient cachés dans la bulle d'aide, ils sont encore rapportés à Appraiser. Si vous n'employez pas l'option globale des prix ici, vous devriez vérifier pour s'assurer qu'il n'y a pas un prix caché spécifique à votre serveur, avec seulement un nombre de fois vues limité. ";
 
 		-- Section: HelpTooltip
-		["AAMU_HelpTooltip_AutoSellBOP"]	= "Vendre automatiquement les objets liés inutilisable";
+		["AAMU_HelpTooltip_AutoSellBOP"]	= "Vendre automatiquement les objets liés inutilisables";
 		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "Aucune fenêtre de confirmation ne sera affichée pour la vente d'un objet lié que le joueur ne peut pas équiper";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Vend automatiquement les objets de qualité Grise à un marchand.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Cochez cette case pour voir l'interface de configuration de l'Auto-Sell.";
@@ -3356,7 +3357,7 @@ AuctioneerLocalizations = {
 		["BASC_HelpTooltip_MinimumQualityEpic"]	= "Epique";
 		["BASC_HelpTooltip_MinimumQualityJunk"]	= "Sans intérêt";
 		["BASC_HelpTooltip_MinimumQualityRare"]	= "Rare";
-		["BASC_HelpTooltip_MinimumQualityUncommon"]	= "Non commune";
+		["BASC_HelpTooltip_MinimumQualityUncommon"]	= "Inhabituel";
 		["COMP_HelpTooltip_BrowseOverRide"]	= "Activer cette option permettra à CompactUI d'afficher les données des ventes même si un autre module est installé afin de masquer les enchères pendant un scan.";
 		["COMP_HelpTooltip_CompActivated"]	= "Changer cette case autorise CompactUI à prendre en charge votre fenêtre de recherche d'enchères après avoir rechargé votre console.";
 		["COMP_HelpTooltip_CompBidRequired"]	= "Sélectionner cette option modifie le comportement de l'interface compacte pour afficher la mise d'enchère requise.";
@@ -3446,6 +3447,7 @@ AuctioneerLocalizations = {
 		["AAMU_Interface_Vendoring"]	= "Activer la vente AutoMagic (ATTENTION : LIRE L'AIDE !)";
 		["AAMU_Interface_VendorOptions"]	= "Options Vendeur";
 		["ADV_Interface_ActivateProfile"]	= "Activer un profil courant";
+		["ADV_Interface_AllRealms"]	= "Tous les royaumes";
 		["ADV_Interface_AlwaysHomeFaction"]	= "Voir les données de prix de sa faction partout sauf dans les hôtels des ventes neutres.";
 		["ADV_Interface_AucOptions"]	= "Options principales Auctioneer";
 		["ADV_Interface_ControlsShowHideTooltip"]	= "Activer ou désactiver les bulles d'informations.\nPour activer ou désactiver entièrement un module, utiliser ce module de configuration";
