@@ -38,7 +38,7 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
 -- AucAdvanced locals
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local Const = AucAdvanced.Const
 local GetFaction = AucAdvanced.GetFaction
 
@@ -64,16 +64,17 @@ end
 
 function lib.CommandHandler(command, ...)
 	local serverKey = GetFaction()
+	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
-		print(_TRANS('PURC_Help_SlashHelp1') )--Help for Auctioneer - Purchased
+		aucPrint(_TRANS('PURC_Help_SlashHelp1') )--Help for Auctioneer - Purchased
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
-		print(line, "help}} - ".._TRANS('PURC_Help_SlashHelp2') ) --this Purchased help
-		print(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(serverKey) ) --clear current {{%s}} Purchased price database
-		print(line, "push}} - ".._TRANS('PURC_Help_SlashHelp4'):format(serverKey) ) --force the {{%s}} Purchased daily stats to archive (start a new day)
+		aucPrint(line, "help}} - ".._TRANS('PURC_Help_SlashHelp2') ) --this Purchased help
+		aucPrint(line, "clear}} - ".._TRANS('PURC_Help_SlashHelp3'):format(keyText) ) --clear current {{%s}} Purchased price database
+		aucPrint(line, "push}} - ".._TRANS('PURC_Help_SlashHelp4'):format(keyText) ) --force the {{%s}} Purchased daily stats to archive (start a new day)
 	elseif (command == _TRANS('clear') ) then
-		lib.ClearData(...)
+		lib.ClearData(serverKey)
 	elseif (command == _TRANS('push') ) then
-		print(_TRANS('PURC_Help_SlashHelp5'):format(serverKey) ) --Archiving {{%s}} daily stats and starting a new day
+		aucPrint(_TRANS('PURC_Help_SlashHelp5'):format(keyText) ) --Archiving {{%s}} daily stats and starting a new day
 		private.PushStats(serverKey)
 	end
 end
@@ -162,7 +163,7 @@ function private.EstimateStandardDeviation(hyperlink, serverKey)
     end
 
     if count == 0 then                               -- No data
-         print(_TRANS('PURC_Interface_WarningPurchasedEmpty'):format(hyperlink) )--Warning: Purchased dataset for %s is empty.
+         aucPrint(_TRANS('PURC_Interface_WarningPurchasedEmpty'):format(hyperlink) )--Warning: Purchased dataset for %s is empty.
         return
     end
 
@@ -206,10 +207,10 @@ function lib.GetItemPDF(hyperlink, serverKey)
     end
 
     if not count or count == 0 then
-	    print(mean)
-	    print(stddev)
-	    print(count)
-	    print(_TRANS('PURC_Interface_CountBroken') ..hyperlink)--count broken! for
+	    aucPrint(mean)
+	    aucPrint(stddev)
+	    aucPrint(count)
+	    aucPrint(_TRANS('PURC_Interface_CountBroken') ..hyperlink)--count broken! for
 	    count = 1
     end
     -- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
@@ -280,20 +281,20 @@ function lib.GetPriceArray(hyperlink, serverKey)
 		-- Safe mode: prefer longer-running averages for low-volume items
 		if seenCount>100 and seenCount > seenDays*10 then
 			pricearray.price = avg3 or dayAverage
-			-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
+			-- aucPrint(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg3")
 		else
 			local a3 = avg3 or dayAverage
 			local a7 = avg7 or a3
 			local a14 = avg14 or a7
 			if seenCount >= seenDays*7 then
 				pricearray.price = (a3+a7)/2
-				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
+				-- aucPrint(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. going with avg(a3,a7)")
 			else
 				local mix3 = seenCount / (seenDays*7*2) -- 0.07 for 1/1, 0.5 for 7/1
 				local mix14 = 0.5-mix3
 				local mix7 = 1-mix3-mix14	-- actually always==0.5 :-)
 				pricearray.price = a3*mix3 + a7*mix7 + a14*mix14
-				-- print(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
+				-- aucPrint(hyperlink..": seen "..seenCount.." over "..seenDays.. "days. mix3="..mix3.." mix7="..mix7.." mix14="..mix14)
 			end
 		end
 	end
@@ -534,15 +535,14 @@ end
 function lib.ClearData(serverKey)
 	serverKey = serverKey or GetFaction()
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
-		SPRealmData = {}
-		AucAdvancedStatPurchasedData.RealmData = SPRealmData
-		print(_TRANS('PURC_Interface_ClearingPurchased').." {{All realms}}") --Clearing Purchased stats for
+		wipe(SPRealmData)
 		private.ClearCache()
+		aucPrint(_TRANS('PURC_Interface_ClearingPurchased').." {{".._TRANS("ADV_Interface_AllRealms").."}}") --Clearing Purchased stats for // All realms
 	elseif SPRealmData[serverKey] then
-		local _,_,text = AucAdvanced.SplitServerKey(serverKey)
-		print(_TRANS('PURC_Interface_ClearingPurchased').." {{"..text.."}}")--Clearing Purchased stats for
+		local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 		SPRealmData[serverKey] = nil
 		private.ClearCache()
+		aucPrint(_TRANS('PURC_Interface_ClearingPurchased').." {{"..keyText.."}}")--Clearing Purchased stats for
 	end
 end
 
@@ -576,7 +576,8 @@ function lib.ClearItem(hyperlink, serverKey)
 	end
 
 	if cleareditem then
-		print(_TRANS('PURC_Interface_ClearingPurchasedLink'):format(hyperlink, serverKey) )--Stat - Purchased: clearing data for {{%s}} for {{%s}}
+		local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
+		aucPrint(_TRANS('PURC_Interface_ClearingPurchasedLink'):format(hyperlink, keyText) )--Stat - Purchased: clearing data for {{%s}} for {{%s}}
 		private.ClearCache()
 	end
 end
