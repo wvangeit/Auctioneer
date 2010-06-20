@@ -179,12 +179,16 @@ function private.CreateFrames()
 		local item
 		local sig = frame.selected
 		if sig then
+			local selected = frame.selectedItem
+			local wasAuction = selected and selected.auction
 			for i = 1, listLen do
 				local itm = ItemList[i]
 				if itm[1] == sig then
 					pos = i
 					item = itm
-					break
+					if not wasAuction or item.auction then
+						break
+					end
 				end
 			end
 		end
@@ -1732,19 +1736,17 @@ function private.CreateFrames()
 			if IsAltKeyDown() then -- shift/alt
 				if item then
 					if GetMouseButtonClicked() == "LeftButton" then
+						frame.PostBySig(item[1])
 					end
-					
 					return
 				end
 			else -- shift
 				if item then
-					-- relocated during work on [APPR-273]
 					if ChatFrameEditBox and ChatFrameEditBox:IsVisible() and GetMouseButtonClicked() == "LeftButton" then
 						ChatFrameEditBox:Insert(item[7])
 					end
 					return
 				end
-
 			end
 		elseif GetMouseButtonClicked() == "RightButton" then
 			if IsAltKeyDown() then -- Alt+RightClick
@@ -1755,7 +1757,6 @@ function private.CreateFrames()
 				 else
 				 	AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", true)
 				 end
-				 
 				 frame.GenerateList() -- refresh the list and frame after toggling the bulk option.
 				 return
 			end
