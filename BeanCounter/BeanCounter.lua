@@ -230,6 +230,7 @@ local sideIcon
 function private.slidebar()
 	if LibStub then
 		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
+		if not LibDataBroker then return end
 		private.LDBButton = LibDataBroker:NewDataObject("BeanCounter", {
 					type = "launcher",
 					icon = "Interface\\AddOns\\BeanCounter\\Textures\\BeanCounterIcon",
