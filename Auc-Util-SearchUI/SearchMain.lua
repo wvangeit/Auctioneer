@@ -1681,28 +1681,30 @@ if LibStub then
 	end
 	
 	local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-	private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-SearchUI", {
-				type = "launcher",
-				icon = sideIcon,
-				OnClick = function(self, button) lib.Toggle(self, button) end,
-			})
-	
-	function private.LDBButton:OnTooltipShow()
-		self:AddLine("Auction SearchUI",  1,1,0.5, 1)
-		self:AddLine("Allows you to perform searches on the Auctioneer auction cache snapshot, even when away from the Auction House",  1,1,0.5, 1)
-		self:AddLine("|cff1fb3ff".."Click|r to open the Search UI.",  1,1,0.5, 1)
-	end
-	
-	function private.LDBButton:OnEnter()
-		GameTooltip:SetOwner(self, "ANCHOR_NONE")
-		GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-		GameTooltip:ClearLines()
-		private.LDBButton.OnTooltipShow(GameTooltip)
-		GameTooltip:Show()
-	end
-	
-	function private.LDBButton:OnLeave()
-		GameTooltip:Hide()
+	if LibDataBroker then
+		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-SearchUI", {
+					type = "launcher",
+					icon = sideIcon,
+					OnClick = function(self, button) lib.Toggle(self, button) end,
+				})
+		
+		function private.LDBButton:OnTooltipShow()
+			self:AddLine("Auction SearchUI",  1,1,0.5, 1)
+			self:AddLine("Allows you to perform searches on the Auctioneer auction cache snapshot, even when away from the Auction House",  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Click|r to open the Search UI.",  1,1,0.5, 1)
+		end
+		
+		function private.LDBButton:OnEnter()
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			private.LDBButton.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+		end
+		
+		function private.LDBButton:OnLeave()
+			GameTooltip:Hide()
+		end
 	end
 end
 
