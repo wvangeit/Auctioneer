@@ -313,35 +313,37 @@ function lib.slidebar()
 		end
 		
 		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-AutoMagic", {
-					type = "launcher",
-					icon = sideIcon,
-					OnClick = function(self, button) lib.autosellslidebar(self, button) end,
-				})
-		
-		function private.LDBButton:OnTooltipShow()
-			self:AddLine("AutoMagic: Auto-Sell Config",  1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Left-Click|r to open the 'Auto-Sell' list.",  1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Right-Click|r to edit the configuration.",  1,1,0.5, 1)
-		end
-		--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
-		function private.LDBButton:OnEnter()
-			if self.icon and type(self.icon) == "table" then
-				self.icon:SetTexture(sideIconE)
+		if LibDataBroker then
+			private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-AutoMagic", {
+						type = "launcher",
+						icon = sideIcon,
+						OnClick = function(self, button) lib.autosellslidebar(self, button) end,
+					})
+			
+			function private.LDBButton:OnTooltipShow()
+				self:AddLine("AutoMagic: Auto-Sell Config",  1,1,0.5, 1)
+				self:AddLine("|cff1fb3ff".."Left-Click|r to open the 'Auto-Sell' list.",  1,1,0.5, 1)
+				self:AddLine("|cff1fb3ff".."Right-Click|r to edit the configuration.",  1,1,0.5, 1)
+			end
+			--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
+			function private.LDBButton:OnEnter()
+				if self.icon and type(self.icon) == "table" then
+					self.icon:SetTexture(sideIconE)
+				end
+				
+				GameTooltip:SetOwner(self, "ANCHOR_NONE")
+				GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+				GameTooltip:ClearLines()
+				private.LDBButton.OnTooltipShow(GameTooltip)
+				GameTooltip:Show()
 			end
 			
-			GameTooltip:SetOwner(self, "ANCHOR_NONE")
-			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-			GameTooltip:ClearLines()
-			private.LDBButton.OnTooltipShow(GameTooltip)
-			GameTooltip:Show()
-		end
-		
-		function private.LDBButton:OnLeave()
-			if self.icon and type(self.icon) == "table" then
-				self.icon:SetTexture(sideIcon)
+			function private.LDBButton:OnLeave()
+				if self.icon and type(self.icon) == "table" then
+					self.icon:SetTexture(sideIcon)
+				end
+				GameTooltip:Hide()
 			end
-			GameTooltip:Hide()
 		end
 	end
 end
