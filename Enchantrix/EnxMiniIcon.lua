@@ -157,29 +157,30 @@ local SlideBar
 if LibStub then
 	SlideBar = LibStub:GetLibrary("SlideBar", true)
 	local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-	
-	sideIcon = LibDataBroker:NewDataObject("Enchantrix", {
-				type = "launcher",
-				icon = "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb",
-				OnClick = function(self, button) click(self, button) end,
-				})
-	-- TODO - localize these strings!
-	function sideIcon:OnTooltipShow()
-		self:AddLine("Enchantrix",  1,1,0.5, 1)
-		self:AddLine("Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer to allow pricing and purchasing decisions to be made.",  1,1,0.5, 1)
-		self:AddLine("|cff1fb3ff".."Click".."|r ".."to open the Enchanting window.", 1,1,0.5, 1)
-		self:AddLine("|cff1fb3ff".."Shift-Click".."|r ".."to open Jewel Crafting.", 1,1,0.5, 1)
-		self:AddLine("|cff1fb3ff".."Right-Click".."|r ".."to edit the configuration.", 1,1,0.5, 1)
-	end
-	function sideIcon:OnEnter()
-		GameTooltip:SetOwner(self, "ANCHOR_NONE")
-		GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-		GameTooltip:ClearLines()
-		sideIcon.OnTooltipShow(GameTooltip)
-		GameTooltip:Show()
-	end
-	function sideIcon:OnLeave()
-		GameTooltip:Hide()
+	if LibDataBroker then
+		sideIcon = LibDataBroker:NewDataObject("Enchantrix", {
+					type = "launcher",
+					icon = "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb",
+					OnClick = function(self, button) click(self, button) end,
+					})
+		-- TODO - localize these strings!
+		function sideIcon:OnTooltipShow()
+			self:AddLine("Enchantrix",  1,1,0.5, 1)
+			self:AddLine("Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer to allow pricing and purchasing decisions to be made.",  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Click".."|r ".."to open the Enchanting window.", 1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Shift-Click".."|r ".."to open Jewel Crafting.", 1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".."Right-Click".."|r ".."to edit the configuration.", 1,1,0.5, 1)
+		end
+		function sideIcon:OnEnter()
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+			GameTooltip:ClearLines()
+			sideIcon.OnTooltipShow(GameTooltip)
+			GameTooltip:Show()
+		end
+		function sideIcon:OnLeave()
+			GameTooltip:Hide()
+		end
 	end
 end
 
