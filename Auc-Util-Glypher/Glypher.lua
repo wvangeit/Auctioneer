@@ -134,47 +134,49 @@ function lib.OnLoad()
 
     if LibStub then
 		local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-		local embedded = false
-		for _, module in ipairs(AucAdvanced.EmbeddedModules) do
-			if module == "Auc-Util-Glypher" then
-				embedded = true
+		if LibDataBroker then
+			local embedded = false
+			for _, module in ipairs(AucAdvanced.EmbeddedModules) do
+				if module == "Auc-Util-Glypher" then
+					embedded = true
+				end
 			end
-		end
-		local sideIcon, sideIconE
-		if embedded then
-			sideIcon = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher"
-			sideIconE = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\GlypherE" 
-		else
-			sideIcon = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher"
-			sideIconE = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\GlypherE" 
-		end
+			local sideIcon, sideIconE
+			if embedded then
+				sideIcon = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\Glypher"
+				sideIconE = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Glypher\\Images\\GlypherE" 
+			else
+				sideIcon = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\Glypher"
+				sideIconE = "Interface\\AddOns\\Auc-Util-Glypher\\Images\\GlypherE" 
+			end
+				
+			private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-Glypher", {
+						type = "launcher",
+						icon = sideIcon,
+						OnClick = function(self, button) private.SlideBarClick(self, button) end,
+					})
 			
-		private.LDBButton = LibDataBroker:NewDataObject("Auc-Util-Glypher", {
-					type = "launcher",
-					icon = sideIcon,
-					OnClick = function(self, button) private.SlideBarClick(self, button) end,
-				})
-		
-		function private.LDBButton:OnTooltipShow()
-			self:AddLine("Auc-Util-Glypher",  1,1,0.5, 1)
-			self:AddLine("Open the glypher gui",  1,1,0.5, 1)
-		end
-		--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
-		function private.LDBButton:OnEnter()
-			if self.icon and type(self.icon) == "table" then
-				self.icon:SetTexture(sideIconE)
+			function private.LDBButton:OnTooltipShow()
+				self:AddLine("Auc-Util-Glypher",  1,1,0.5, 1)
+				self:AddLine("Open the glypher gui",  1,1,0.5, 1)
 			end
-			GameTooltip:SetOwner(self, "ANCHOR_NONE")
-			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-			GameTooltip:ClearLines()
-			private.LDBButton.OnTooltipShow(GameTooltip)
-			GameTooltip:Show()
-		end
-		function private.LDBButton:OnLeave()
-			if self.icon and type(self.icon) == "table" then
-				self.icon:SetTexture(sideIcon)
+			--we use a slight hack to LDB to animate our icon on Enter as well as tooltip display. The Tooltip will be hidden by slidebar but will show for other addons
+			function private.LDBButton:OnEnter()
+				if self.icon and type(self.icon) == "table" then
+					self.icon:SetTexture(sideIconE)
+				end
+				GameTooltip:SetOwner(self, "ANCHOR_NONE")
+				GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+				GameTooltip:ClearLines()
+				private.LDBButton.OnTooltipShow(GameTooltip)
+				GameTooltip:Show()
 			end
-			GameTooltip:Hide()
+			function private.LDBButton:OnLeave()
+				if self.icon and type(self.icon) == "table" then
+					self.icon:SetTexture(sideIcon)
+				end
+				GameTooltip:Hide()
+			end
 		end
 	end	
 end
