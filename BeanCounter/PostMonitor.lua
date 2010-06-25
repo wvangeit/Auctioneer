@@ -45,7 +45,7 @@ end
 -------------------------------------------------------------------------------
 -- Called before StartAuction()
 -------------------------------------------------------------------------------
-local itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti --these store the last auction for the new Multi auction processor added in wow 3.3.3
+local nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti --these store the last auction for the new Multi auction processor added in wow 3.3.3
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, stackNumber)
 	--REMOVE 3.3.3 we dont use this count value it is multistack related not the actual stack value being created only name is still used
 	local name, texture, countDepreciated, quality, canUse, price = GetAuctionSellItemInfo() 
@@ -68,10 +68,8 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 				end
 			end
 		end
-				
-		local deposit = CalculateAuctionDeposit(runTime)
-		debugPrint("Deposit before", deposit)
-		deposit = CalculateAuctionDeposit (runTime, count)
+	
+		local deposit = CalculateAuctionDeposit (runTime, count)
 		debugPrint(itemLink, "deposit", deposit, "for", count, "x", stackNumber, "for", runTime, "minutes") 
 		
 		--TEMP PATCH to fix run time changes till I can change teh mail lua to work with new system
@@ -79,7 +77,7 @@ function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime, count, 
 		if runTime == 2 then runTime = 1440 end
 		if runTime == 3 then runTime = 2880 end
 		
-		itemLinkMulti, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = itemLink, name, count, minBid, buyoutPrice, runTime, deposit
+		nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti = name, count, minBid, buyoutPrice, runTime, deposit
 		--Multipost is used when more than 1 stack is posted or when the selected stack is too small to post the stacksize
 		if stackNumber and (stackNumber > 1 or count > selectedStackCount) then
 			debugPrint("Using the multipost route stackNumber=", stackNumber, "count=", count , "selectedStackCount=", selectedStackCount)
@@ -164,12 +162,12 @@ end
 -- Called when the Multi auction feature is used in patch 3.3.3
 --------------------------------------------------------------------------------
 function private.onMultiPost(current, total)
-		if private.multipostScan2 and #private.multipostScan2 > 0 then
-			local link = private.multipostScan2[1]
-			debugPrint(#private.multipostScan2, "added", current, "of", total, link, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
-			private.addPendingPost(link, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
-			table.remove (private.multipostScan2, 1)
-		end
+	if private.multipostScan2 and #private.multipostScan2 > 0 then
+		local link = private.multipostScan2[1]
+		debugPrint(#private.multipostScan2, "added", current, "of", total, link, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
+		private.addPendingPost(link, nameMulti, countMulti, minBidMulti, buyoutPriceMulti, runTimeMulti, depositMulti)
+		table.remove (private.multipostScan2, 1)
+	end
 end
 
 -------------------------------------------------------------------------------
