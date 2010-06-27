@@ -63,7 +63,7 @@ local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("%%s", "(.+)")
 local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("%%s", "(.+)")
 local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "(.+)")
 ]]
-local reportTotalMail, reportAHMail, reportReadMail, reportAlreadyReadMail = 0, 0, 0, 0 --Used as a debug check on mail scanning engine
+local reportTotalMail, reportReadMail = 0, 0 --Used as a debug check on mail scanning engine
 
 local registeredAltaholicHook = false
 local registeredInboxFrameHook = false
@@ -137,9 +137,10 @@ function private.updateInboxStart()
 			elseif sender == _BC('MailNeutralAuctionHouse') then
 				auctionHouse = "N"
 			end
-			if auctionHouse then
+			if subject == "" then debugPrint("Skipping mail #", n, "The server is not sending the subject data. Mail will be left unread and we will retry") end
+			
+			if auctionHouse and subject ~= "" then -- subject ~= "" when the server fails, this will prevent us from reading the mail giving the server more time to get its shit togather
 				private.HideMailGUI(true)
-				reportAHMail = reportAHMail + 1
 				wasRead = wasRead or 0 --its nil unless its has been read
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
@@ -149,8 +150,8 @@ function private.updateInboxStart()
 						["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
 						})
 				private.GetInboxText(n) --read message
+				reportReadMail = reportReadMail + 1
 			end
-			reportReadMail = reportReadMail + 1
 		end
 		private.lastCheckedMail = GetTime() --this keeps us from hiding the mail UI to early and causing flicker
 	end
@@ -181,8 +182,8 @@ function private.mailonUpdate()
 		for i = total, 1, -1 do -- in pairs(private.inboxStart) do
 			--update mail GUI Count
 			local count = #private.inboxStart
-			private.CountGUI:SetText("Recording: "..total-count.." of "..total.." items")
-					
+			--private.CountGUI:SetText("Recording: "..total-count.." of "..total.." items")
+			private.CountGUI:SetText("Recording: "..reportReadMail.." items, Please wait")--not happy, would like a better count	
 			local data = private.inboxStart[i]
 			if not data.retrieved then --Send non invoiceable mails through
 				tinsert(private.reconcilePending, data)
@@ -212,8 +213,8 @@ function private.mailonUpdate()
 		end
 	end
 	if (#private.inboxStart == 0) and (HideMailGUI == true) and (private.lastCheckedMail + 1 < GetTime() ) then --time delay added to prevent possible flicker
-		--debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Had alredy been read:{{", reportAlreadyReadMail, "}}Mails to read:{{",reportReadMail, "}}Mail from AH:{{", reportAHMail, "}}")
-		reportTotalMail, reportAHMail, reportReadMail = 0, 0, 0
+		debugPrint("Total Mail in inbox:{{", reportTotalMail, "}}Reading:{{",reportReadMail, "}}new AH mails")
+		reportTotalMail, reportReadMail = 0, 0
 		private.HideMailGUI( )
 		private.mailBoxColorStart() --delay recolor system till we have had a chance to read the mail
 	end
@@ -249,7 +250,7 @@ function private.mailSort()
 				--ignore We dont care about this message
 				tremove(private.reconcilePending,i)
 			else
-				debugPrint("We had an Auction mail that failed mailsort()", private.reconcilePending[i].subject, i)
+				debugPrint("We had an Auction mail that failed mailsort(). Subject:", private.reconcilePending[i].subject, "at index", i)
 				tremove(private.reconcilePending,i)
 			end
 		else --if its not AH do we care? We need to record cash arrival from other toons
