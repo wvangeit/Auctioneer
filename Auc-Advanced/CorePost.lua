@@ -596,7 +596,11 @@ function GetDepositCost(item, duration, faction, count)
 		gsv = GetSellValue(item)
 	end
 	if gsv then
-		return floor(faction * gsv * count) * duration
+		local deposit = floor(faction * gsv * count) * duration
+		if deposit < 100 then
+			deposit = 100
+		end
+		return deposit
 	end
 end
 
