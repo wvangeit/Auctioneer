@@ -337,14 +337,9 @@ function private.GetPriceCore(sig, link, serverKey, match)
 				local rate = AucAdvanced.depositRate or 0.05
 				local newfaction
 				if rate == .25 then newfaction = "neutral" end
-				deposit = GetDepositCost(link, 12, newfaction)
+				deposit = GetDepositCost(link, duration/60, newfaction)
 			end
 			if (not deposit) then deposit = 0 end
-
-			--scale up for duration > 12 hours
-			if deposit > 0 then
-				deposit = deposit * duration/720
-			end
 
 			markdown = newBuy * markdown
 			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
