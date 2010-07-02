@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local lib = AucAdvanced.Modules.Util.SimpleAuction
 local private = lib.Private
 local const = AucAdvanced.Const
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = const
 local wipe = wipe
 
@@ -305,15 +305,13 @@ function private.UpdateDisplay()
 	if AucAdvanced.GetFactionGroup() == "Neutral" then
 		faction = "neutral"
 	end
-	local deposit = GetDepositCost(oLink, duration, faction, 1)
+	local deposit = GetDepositCost(oLink, duration, faction, cStack)
 	if not deposit then
 		frame.fees:SetText("Unknown deposit cost")
-	elseif deposit <= 0 then
-		frame.fees:SetText("No deposit")
 	elseif cNum > 1 then
-		frame.fees:SetText(("Deposit: %s, %s/stack \n%s/ea"):format(coins(deposit*cStack*cNum), coins(deposit*cStack), coins(deposit)))
+		frame.fees:SetText(("Deposit: %s, %s/stack \n~%s/ea"):format(coins(deposit*cNum), coins(deposit), coins(ceil(deposit/cStack))))
 	elseif cStack > 1 then
-		frame.fees:SetText(("Deposit: %s/stack \n%s/ea"):format(coins(deposit*cStack), coins(deposit)))
+		frame.fees:SetText(("Deposit: %s/stack \n~%s/ea"):format(coins(deposit), coins(ceil(deposit/cStack))))
 	else
 		frame.fees:SetText(("Deposit: %s"):format(coins(deposit)))
 	end
@@ -611,7 +609,7 @@ function private.LoadItemLink(itemLink, size)
 		if not itemName then return private.LoadItemLink() end
 		local sig = AucAdvanced.API.GetSigFromLink(itemLink)
 		if not sig then
-			print(itemLink.." cannot be posted: Not an item")
+			aucPrint(itemLink.." cannot be posted: Not an item")
 			return private.LoadItemLink()
 		end
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
@@ -624,9 +622,9 @@ function private.LoadItemLink(itemLink, size)
 		local itemCount = total - unpostable
 		if itemCount < 1 then
 			if reason == "Damaged" then
-				print(itemLink.." is damaged: you may be able to post it after repairing it")
+				aucPrint(itemLink.." is damaged: you may be able to post it after repairing it")
 			else
-				print(itemLink.." cannot be posted: "..(AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"))
+				aucPrint(itemLink.." cannot be posted: "..(AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"))
 			end
 			return private.LoadItemLink()
 		end
@@ -795,7 +793,7 @@ end
 function private.PostAuction()
 	local link = frame.CurItem.link
 	if not link then
-		print("Posting Failed: No Item Selected")
+		aucPrint("Posting Failed: No Item Selected")
 		return
 	end
 	local sig = private.SigFromLink(link)
@@ -806,10 +804,10 @@ function private.PostAuction()
 	local duration = frame.CurItem.duration or 48
 	local success, reason = AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
 	if success then
-		print("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
+		aucPrint("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
 	else
 		reason = AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"
-		print("Posting Failed for "..link..": "..reason)
+		aucPrint("Posting Failed for "..link..": "..reason)
 	end
 end
 
@@ -830,7 +828,7 @@ function private.Refresh(background)
 			break
 		end
 	end
-	print(("Refreshing view of {{%s}}"):format(name))--Refreshing view of {{%s}}
+	aucPrint(("Refreshing view of {{%s}}"):format(name))--Refreshing view of {{%s}}
 	if background and type(background) == 'boolean' then
 		AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
 	else
@@ -1088,7 +1086,7 @@ function private.CreateFrames()
 				local now = GetTime()
 				if last[1] == bag and last[2] == slot and now - last[3] < 0.5 then
 					-- Is a double click
-					print("Auto auctioning double-alt-clicked item")
+					aucPrint("Auto auctioning double-alt-clicked item")
 					if not frame.options.remember:GetChecked() then
 						frame.options.undercut:SetChecked(true)
 					end
