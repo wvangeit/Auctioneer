@@ -509,6 +509,8 @@ function private.CreateFrames()
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
 		frame.salebox.stackentry:SetNumber(curStack)
+		frame.valuecache.stack = frame.salebox.stack:GetValue()
+		frame.valuecache.stackentry = frame.salebox.stackentry:GetNumber()
 
 		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
 		if defStack == "maxplus" then
@@ -536,6 +538,8 @@ function private.CreateFrames()
 		else
 			frame.salebox.numberentry:SetNumber(curNumber)
 		end
+		frame.valuecache.number = frame.salebox.number:GetAdjustedValue()
+		frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
 		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
@@ -575,7 +579,6 @@ function private.CreateFrames()
 		frame.salebox.model.value = curModel
 		frame.salebox.model:UpdateValue()
 		frame.valuecache.model = curModel
-		--frame.SetPriceFromModel(curModel)
 
 		frame.UpdatePricing()
 		frame.UpdateDisplay()
@@ -618,11 +621,8 @@ function private.CreateFrames()
 			frame.CheckUpdates()
 		end
 		if frame.scanstatsEvent then
-			frame.scanstatsEvent = false
 			frame.GenerateList()
-			--frame.UpdatePricing()
-			--frame.UpdateDisplay()
-			--frame.UpdateImage()
+			frame.scanstatsEvent = false
 		end
 	end
 
@@ -633,19 +633,11 @@ function private.CreateFrames()
 	function frame.CheckUpdates()
 		frame.updated = nil
 		if not frame.salebox.sig then return end
+
 		local stack = frame.salebox.stack:GetValue()
 		local stackentry = frame.salebox.stackentry:GetNumber()
 		local number = frame.salebox.number:GetAdjustedValue()
 		local numberentry = frame.salebox.numberentry:GetText()
-		local numberonly = frame.salebox.numberonly:GetChecked()
-		local duration = frame.salebox.duration:GetValue()
-		local matcher = frame.salebox.matcher:GetChecked()
-		local ignore = frame.salebox.ignore:GetChecked()
-		local bulk = frame.salebox.bulk:GetChecked()
-		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
-		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
-		local model = frame.salebox.model.value
-
 		if stack ~= frame.valuecache.stack then
 			frame.valuecache.stack = stack
 			frame.valuecache.stackentry = stack
@@ -695,6 +687,8 @@ function private.CreateFrames()
 			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 			frame.valuecache.number = frame.salebox.number:GetAdjustedValue()
 		end
+
+		local numberonly = frame.salebox.numberonly:GetChecked()
 		if numberonly ~= frame.valuecache.numberonly then
 			frame.valuecache.numberonly = numberonly
 			if numberonly then
@@ -704,6 +698,8 @@ function private.CreateFrames()
 			end
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".numberonly", numberonly)
 		end
+
+		local ignore = frame.salebox.ignore:GetChecked()
 		if ignore ~= frame.valuecache.ignore then
 			frame.valuecache.ignore = ignore
 			if ignore then
@@ -714,6 +710,8 @@ function private.CreateFrames()
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".ignore", ignore)
 			frame.GenerateList()
 		end
+
+		local bulk = frame.salebox.bulk:GetChecked()
 		if bulk ~= frame.valuecache.bulk then
 			frame.valuecache.bulk = bulk
 			if bulk then
@@ -726,6 +724,12 @@ function private.CreateFrames()
 			frame.GenerateList()
 
 		end
+
+		local duration = frame.salebox.duration:GetValue()
+		local matcher = frame.salebox.matcher:GetChecked()
+		local bid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		local buy = MoneyInputFrame_GetCopper(frame.salebox.buy)
+		local model = frame.salebox.model.value
 		if duration ~= frame.valuecache.duration then
 			frame.valuecache.duration = duration
 			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", private.durations[duration][1])
@@ -965,11 +969,7 @@ function private.CreateFrames()
 					extra = "  |cffffaa40" .. _TRANS('APPR_Interface_NumberGreaterAvailable') --(Number > Available)
 				end
 				frame.salebox.stack.label:SetText(_TRANS('APPR_Interface_StackSize'):format(curSize)..extra)--Stack size: %d
-				if frame.salebox.stacksize > 1 then
-					frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
-				else
-					frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
-				end
+				frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
 				if (curNumber >= -2 and curNumber < 0) then
 					if (curNumber == -2) then
 						frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberAllFullStacks'):format(maxStax, fullPop))--Number: All full stacks (%d) = %d
@@ -1304,7 +1304,7 @@ function private.CreateFrames()
 	end
 
 	function frame.PostAuctions(obj)
-		
+
 		local postType = obj.postType
 		if postType == "single" then
 			frame.PostBySig(frame.salebox.sig)
@@ -1325,7 +1325,7 @@ function private.CreateFrames()
 			local c = IsControlKeyDown()
 
 			local mode
-			
+
 			-- Keeping old ability for Ctrl+Alt+Shift for users used to using this modifer setup.
 			if (a and c and s) or (GetMouseButtonClicked() == "RightButton") then mode = "autopost" end
 			if a and not c and not s then mode = "refresh" end
@@ -1557,9 +1557,9 @@ function private.CreateFrames()
 				else
 				    button.batchTex:Hide();
 				end
-				
+
 				button.name:SetText(hex.."["..item[2].."]|r")
-				
+
 				button.size:SetText(stackX..item[6])
 
 				if curAuction then
@@ -1581,19 +1581,19 @@ function private.CreateFrames()
 
 				local background = button.bg
 				local alpha = 0.2
-				
+
 				if curAuction then
 					background:SetVertexColor(0.9,0.3,0) -- very dark red
 				else
 					background:SetVertexColor(1,1,1)
 				end
-				
+
 				if (item[1] == frame.selected) then
 					alpha = 0.6
 				elseif curIgnore then
 					alpha = 0.1
     			end
-    			
+
 				background:SetAlpha(alpha)
 				background:SetDesaturated(curIgnore)
 
@@ -1731,7 +1731,7 @@ function private.CreateFrames()
 	local function itemButtonClick(self, button)
 		-- when adding new mod-key combinations, rearrange lines in the the nested 'if' structure as appropriate
 		local item = frame.list[floor(frame.scroller:GetValue()) + self.id]
-		
+
 		if IsShiftKeyDown() and not IsControlKeyDown() then
 			if IsAltKeyDown() then -- shift/alt
 				if item then
@@ -1751,7 +1751,7 @@ function private.CreateFrames()
 		elseif GetMouseButtonClicked() == "RightButton" then
 			if IsAltKeyDown() then -- Alt+RightClick
 				 local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false
-				 
+
 				 if curBulk then
 				 	AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", false)
 				 else
@@ -1761,7 +1761,7 @@ function private.CreateFrames()
 				 return
 			end
 		end
-		
+
 		frame.SelectItem(self, button)
 	end
 	local function itemIconClick(self, button)
@@ -1770,7 +1770,7 @@ function private.CreateFrames()
 	for i=1, NUM_ITEMS do
 		local item = CreateFrame("Button", nil, frame.itembox)
 		frame.items[i] = item
-		
+
 		item:SetScript("OnClick", itemButtonClick)
 		if (i == 1) then
 			item:SetPoint("TOPLEFT", frame.itembox, "TOPLEFT", 5,-8 )
@@ -1781,9 +1781,9 @@ function private.CreateFrames()
 		item:SetHeight(26)
 
 		item.id = i
-		
+
 		item:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-		
+
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
 		item.iconbutton:SetWidth(26)
@@ -1796,17 +1796,17 @@ function private.CreateFrames()
 		item.icon:SetPoint("TOPLEFT", item.iconbutton, "TOPLEFT", 0,0)
 		item.icon:SetPoint("BOTTOMRIGHT", item.iconbutton, "BOTTOMRIGHT", 0,0)
 		item.icon:SetTexture("Interface\\InventoryItems\\WoWUnknownItem01")
-		
+
 
     	-- This section is for the Batch Post texture that shows up when an item has the batch post option set
 		item.batchTex = item.iconbutton:CreateTexture()
-	
+
 		if embedded then
 			item.batchTex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
 		else
 			item.batchTex:SetTexture("Interface\\AddOns\\Auc-Util-Appraiser\\Images\\BatchPostTriangle")
 		end
-		
+
 		item.batchTex:SetPoint("TOP", item.icon, "TOP", 0,-15)
 		item.batchTex:SetPoint("LEFT", item.icon, "LEFT", 10,0)
 		item.batchTex:SetPoint("RIGHT", item.icon, "RIGHT", -3,0)
