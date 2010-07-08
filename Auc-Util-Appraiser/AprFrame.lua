@@ -1731,34 +1731,32 @@ function private.CreateFrames()
 	local function itemButtonClick(self, button)
 		-- when adding new mod-key combinations, rearrange lines in the the nested 'if' structure as appropriate
 		local item = frame.list[floor(frame.scroller:GetValue()) + self.id]
+		local mouseButton = GetMouseButtonClicked()
 
-		if IsShiftKeyDown() and not IsControlKeyDown() then
-			if IsAltKeyDown() then -- shift/alt
-				if item then
-					if GetMouseButtonClicked() == "LeftButton" then
+		if mouseButton == "LeftButton" then
+			if IsShiftKeyDown() and not IsControlKeyDown() then
+				if IsAltKeyDown() then -- shift/alt
+					if item then
 						frame.PostBySig(item[1])
+						return
 					end
-					return
-				end
-			else -- shift
-				if item then
-					if ChatFrameEditBox and ChatFrameEditBox:IsVisible() and GetMouseButtonClicked() == "LeftButton" then
-						ChatFrameEditBox:Insert(item[7])
+				else -- shift only
+					if item then
+						ChatEdit_InsertLink(item[7])
+						return
 					end
-					return
 				end
 			end
-		elseif GetMouseButtonClicked() == "RightButton" then
-			if IsAltKeyDown() then -- Alt+RightClick
-				 local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false
-
-				 if curBulk then
-				 	AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", false)
-				 else
-				 	AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", true)
-				 end
-				 frame.GenerateList() -- refresh the list and frame after toggling the bulk option.
-				 return
+		elseif mouseButton == "RightButton" then
+			if IsAltKeyDown() and not IsShiftKeyDown() and not IsControlKeyDown() then -- Alt+RightClick
+				if item then
+					local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk")
+					AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", not curBulk)
+					frame.GenerateList() -- refresh the list and frame after toggling the bulk option.
+					return
+				else
+					debugPrint("item fail")
+				end
 			end
 		end
 
@@ -1782,7 +1780,7 @@ function private.CreateFrames()
 
 		item.id = i
 
-		item:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		item:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 		item.iconbutton = CreateFrame("Button", nil, item)
 		item.iconbutton:SetHeight(26)
@@ -1791,6 +1789,7 @@ function private.CreateFrames()
 		item.iconbutton:SetScript("OnClick", itemIconClick)
 		item.iconbutton:SetScript("OnEnter", frame.DoTooltip)
 		item.iconbutton:SetScript("OnLeave", frame.UndoTooltip)
+		item.iconbutton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 		item.icon = item.iconbutton:CreateTexture(nil, "OVERLAY")
 		item.icon:SetPoint("TOPLEFT", item.iconbutton, "TOPLEFT", 0,0)
