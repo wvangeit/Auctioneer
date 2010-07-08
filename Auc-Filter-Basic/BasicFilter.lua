@@ -273,31 +273,30 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	button2 = CANCEL,
 	hasEditBox = 1,
 	maxLetters = 12,
-	OnAccept = function()
-		local editBox = getglobal(this:GetParent():GetName().."EditBox");
-		BF_IgnoreList_Add(editBox:GetText());
+
+	OnAccept = function(self)
+		BF_IgnoreList_Add(self.editBox:GetText())
 	end,
-	OnShow = function()
-		getglobal(this:GetName().."EditBox"):SetFocus();
+	OnShow = function(self)
+		self.editBox:SetFocus()
 	end,
-	OnHide = function()
-		if ( ChatFrameEditBox:IsShown() ) then
-			ChatFrameEditBox:SetFocus();
-		end
-		getglobal(this:GetName().."EditBox"):SetText("");
+	OnHide = function(self)
+		ChatEdit_FocusActiveWindow();
+		self.editBox:SetText("");
 	end,
-	EditBoxOnEnterPressed = function()
-		local name = getglobal(this:GetParent():GetName().."EditBox"):GetText();
-		this:GetParent():Hide();
-		BF_IgnoreList_Add(name);
+	EditBoxOnEnterPressed = function(self)
+		local parent = self:GetParent()
+		BF_IgnoreList_Add(parent.editBox:GetText())
+		parent:Hide()
 	end,
-	EditBoxOnEscapePressed = function()
-		this:GetParent():Hide();
+	EditBoxOnEscapePressed = function(self)
+		self:GetParent():Hide();
 	end,
+
 	timeout = 0,
 	exclusive = 1,
 	whileDead = 1,
 	hideOnEscape = 1
-};
+}
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
