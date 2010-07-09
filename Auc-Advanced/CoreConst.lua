@@ -34,6 +34,10 @@
 if not AucAdvanced then return end
 
 AucAdvanced.Const = {
+	PlayerName = UnitName("player"),
+	PlayerRealm = GetRealmName(),
+	PlayerFaction = UnitFactionGroup("player"),
+
 	AucMinTimes = {
 		0,
 		1800, -- 30 mins
@@ -129,6 +133,14 @@ AucAdvanced.Const = {
 
 AucAdvanced.Const.InvTypes = AucAdvanced.Const.EquipEncode -- backward compatibility - deprecated entry
 
+AucAdvanced.Const.ServerKeyHome = AucAdvanced.Const.PlayerRealm .."-".. AucAdvanced.Const.PlayerFaction
+AucAdvanced.Const.ServerKeyNeutral = AucAdvanced.Const.PlayerRealm .."-Neutral"
+if AucAdvanced.Const.PlayerFaction == "Alliance" then
+	AucAdvanced.Const.OpposingFaction = "Horde"
+else
+	AucAdvanced.Const.OpposingFaction = "Alliance"
+end
+AucAdvanced.Const.ServerKeyOpposing = AucAdvanced.Const.PlayerRealm .."-".. AucAdvanced.Const.OpposingFaction
 
 for i = 1, #AucAdvanced.Const.CLASSES do
 	AucAdvanced.Const.CLASSESREV[AucAdvanced.Const.CLASSES[i]] = i

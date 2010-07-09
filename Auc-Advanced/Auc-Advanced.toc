@@ -19,10 +19,10 @@ CoreManifest.lua
 Libs\Load.xml
 
 CoreStrings.lua
+CoreConst.lua
 
 CoreMain.lua
 CoreUtil.lua
-CoreConst.lua
 CoreConfig.lua
 CorePost.lua
 CoreSettings.lua
