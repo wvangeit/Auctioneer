@@ -371,15 +371,21 @@ function private.GetPriceCore(sig, link, serverKey, match)
 	-- other return values
 	local stack = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".stack") or AucAdvanced.Settings.GetSetting("util.appraiser.stack")
 	local number = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".number") or AucAdvanced.Settings.GetSetting("util.appraiser.number")
-	if stack == "max" then
-		_, _, _, _, _, _, _, stack = GetItemInfo(link)
+	local  _, _, _, _, _, _, _, maxStack = GetItemInfo(link)
+	 --we only officially accept "max" or a number, but user could have input any random string, so add some sanitization
+	stack = tonumber(stack)
+	if stack then
+		if stack > maxStack then
+			stack = maxStack --never alow a saved stack value larger than the item can really stack to
+		end
+	else
+		stack = maxStack
 	end
 	if number == "maxplus" then
 		number = -1
 	elseif number == "maxfull" then
 		number = -2
 	end
-	stack = tonumber(stack)
 	number = tonumber(number)
 
 	-- Caution: this is NOT the same return order as GetPrice
