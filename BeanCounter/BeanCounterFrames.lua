@@ -576,6 +576,8 @@ function private.CreateFrames()
 		{ _BC("UiFee"), "COIN", get("columnwidth.".._BC("UiFee")) },
 		{ _BC('UiReason'), "TEXT", get("columnwidth.".._BC('UiReason')) },
 		{ _BC('UiDateHeader'), "TEXT", get("columnwidth.".._BC('UiDateHeader')) },
+		{ _BC('Profit'), "COIN", get("columnwidth.".._BC('UiProfit')) },
+		{"", "TEXT", 0.001 }, --metadata thats not used in visual display
 	} )
 
 	--Add tooltip help to the scrollframe headers

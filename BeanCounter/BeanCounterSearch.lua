@@ -87,7 +87,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 			local _, name = strsplit(";", data)
 			if name:lower() == itemName:lower() then
 				local itemID = strsplit(":", i) or ""
-				itemTexture = select(2, private.getItemInfo(itemID, "name"))
+				_, itemTexture = private.getItemInfo(itemID, "name")
 				break
 			end
 		end
@@ -128,7 +128,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	
 	--check if we have a cache of this search
 	local cached = private.checkSearchCache(classic or tbl[1], serverName, playerName)
-	if  cached then
+	if cached then
 		data = cached
 	else
 		data = private.searchServerData(serverName, data, tbl, settings)
@@ -163,7 +163,7 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	
 	style = private.styleServerData(data) --create a style sheet for this data
 	
-	--Adds itemtexture to display box and if possible the gan/loss on the item
+	--Adds itemtexture to display box and if possible the gain/loss on the item
 	if itemTexture then
 		private.frame.icon:SetNormalTexture(itemTexture)
 	else
@@ -354,7 +354,7 @@ end
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
 				tonumber(profit), --Profit
-				uMeta,
+				uMeta or "",
 			}
 	end
 	--STACK; BUY; BID; DEPOSIT; TIME; DATE; WEALTH
@@ -386,7 +386,7 @@ end
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
 				0, --Profit
-				uMeta,
+				uMeta or "",
 			}
 	end
 	function private.COMPLETEDBIDSBUYOUTS(id, itemKey, text)
@@ -395,14 +395,6 @@ end
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)
 			if uSeller == "0" then uSeller = "..." end
 			if uReason == "0" then uReason = "..." end
-			--replace reason with DE info
-			local mat, count, value = uMeta:match("DE:(%d-):(%d-):(%d-)|")
-			if mat and count and value then
-				local _, link = GetItemInfo(mat)
-				if link then
-					uReason = link.." X "..count
-				end
-			end
 					
 			local pricePer, stack, text = 0, tonumber(uStack), _BC('UiWononBuyout')
 			local profit
@@ -414,6 +406,18 @@ end
 			else --Devide by BUY price if it was won on Buy
 				profit = (uBuyout - uMoney + uFee)
 				if stack > 0 then pricePer = profit/stack end
+			end
+
+			--replace reason with DE info
+			if not uMeta then uMeta = "" end
+			local mat, count, value = uMeta:match("DE:(%d-):(%d-):(%d-)|")
+			if mat and count and value then
+				local _, link = GetItemInfo(mat)
+				if link then
+					uReason = link.." X "..count
+					--change the profit to be the diff between bought and what we DE into
+					profit = count*value - profit
+				end
 			end
 
 			local itemID, suffix, uniqueID = lib.API.decodeLink(itemKey)
@@ -467,6 +471,6 @@ end
 				uReason, --reason bought
 				tonumber(uTime), --time, --Make this a user choosable option.
 				0, --Profit/per
-				uMeta,
+				uMeta or "",
 			}
 	end
