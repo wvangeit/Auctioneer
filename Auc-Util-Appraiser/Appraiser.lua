@@ -98,6 +98,80 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	if private.CreateFrames then private.CreateFrames(...) end
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	local change, value = ... --get the reason if its a scrollframe color change re-render the window
+	if private.frame then
+		private.frame.salebox.config = true
+		--	private.frame.SetPriceFromModel()
+		private.frame.UpdatePricing()
+		private.frame.UpdateDisplay()
+		--	private.frame.salebox.config = nil
+		if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
+			private.frame.UpdateImage()
+		end
+		--show/hide the appraiser tab on the AH
+		if change == "util.appraiser.displayauctiontab" then
+			if value then
+				AucAdvanced.AddTab(private.frame.ScanTab, private.frame)
+			else
+				AucAdvanced.RemoveTab(private.frame.ScanTab, private.frame)
+			end
+		end
+	end
+	if change:sub(1, 20) == "util.appraiser.round" then
+		private.updateRoundExample()
+	end
+	-- clear cache for any changes, as we can't always predict what will change our cached values
+	empty(tooltipcache)
+end
+
+function lib.Processors.inventory(callbackType, ...)
+	if private.frame and private.frame:IsVisible() then
+		private.frame.GenerateList()
+	end
+end
+
+function lib.Processors.scanstats(callbackType, ...)
+	if private.frame then
+		private.frame.cache = {}
+		-- caution: other modules may not yet have flushed their caches
+		-- flag to update our display next OnUpdate
+		private.frame.scanstatsEvent = true
+	end
+	empty(tooltipcache)
+end
+
+function lib.Processors.postresult(callbackType, ...)
+	private.frame.Reselect(select(3, ...))
+end
+
+function lib.Processors.postqueue(callbackType, ...)
+	if private.UpdatePostQueueProgress then private.UpdatePostQueueProgress(...) end
+end
+
+function lib.Processors.searchbegin(callbackType, ...)
+	pricecache = {} -- use cache when SearchUI is running a search
+end
+
+function lib.Processors.searchcomplete(callbackType, ...)
+	pricecache = nil -- stop using cache when search ends
+end
+
+
+
 -- For backwards compatibility, leave these here. This is now a capability of the core API
 lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
 lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;

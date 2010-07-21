@@ -32,13 +32,15 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 if not AucAdvanced then return end
+local coremodule = AucAdvanced.GetCoreModule("CoreConfig")
+if not coremodule then return end -- Someone has explicitely broken us
 
 AucAdvanced.Config = {}
 local lib = AucAdvanced.Config
 local private = {}
 private.Print = AucAdvanced.Print
 
-function private.CommandHandler(editbox, command, subcommand, ...)
+function coremodule.CommandHandler(editbox, command, subcommand, ...)
 	command = command:lower()
 	if (command == "help") then
 		local pos, cmdList, cmdL, cmd, cmdFunc = 0,"", "", "", nil

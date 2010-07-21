@@ -369,6 +369,35 @@ function lib.Processor(event, subevent, setting)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.config(event, subevent, setting)
+	if subevent == "loaded" or subevent == "reset" or subevent == "deleted" then
+		--saved search has changed, so reload our private ignorelist
+		private.snatchList = get("snatch.itemsList")
+		--if there was no saved snatchList, create an empty table
+		if not private.snatchList then
+			private.snatchList = {}
+			set("snatch.itemsList", private.snatchList) -- Caution: this causes a Processor("config", "changed", ...) event
+		end
+		private.refreshDisplay()
+	elseif subevent == "changed" and setting == "snatch.price.model" then -- this is the only "change" that requires a refresh
+		private.refreshDisplay()
+	end
+end
+
+function lib.Processors.selecttab(event, subevent, setting)
+	if subevent == lib.tabname then
+		if private.doValidation then
+			private.doValidation()
+		end
+		private.refreshDisplay() -- redraw whenever tab is selected
+	end
+end
+
+function lib.Processors.postscanupdate(event, subevent, setting)
+	private.refreshDisplay() -- redraw whenever valuations may have changed
+end
+
 function private.OnEnterSnatch(button, row, index)
 	if frame.snatchlist.sheet.rows[row][index]:IsShown() then --Hide tooltip for hidden cells
 		local link = frame.snatchlist.sheet.rows[row][index]:GetText()

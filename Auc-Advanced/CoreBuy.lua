@@ -39,6 +39,8 @@
 	queueable fashion.
 ]]
 if not AucAdvanced then return end
+local coremodule, internalStore = AucAdvanced.GetCoreModule("CoreUtil")
+if not coremodule then return end -- Someone has explicitely broken us
 
 if (not AucAdvanced.Buy) then AucAdvanced.Buy = {} end
 
@@ -504,11 +506,16 @@ local function OnEvent(frame, event, arg1, ...)
 	end
 end
 
-function lib.Processor(event, ...)
+function coremodule.Processor(event, ...)
 	if event == "scanstats" then
 		private.FinishedSearch(...)
 	end
 end
+coremodule.Processors = {}
+function coremodule.Processors.scanstats(event, ...)
+	private.FinishedSearch(...)
+end
+
 
 private.updateFrame = CreateFrame("Frame")
 private.updateFrame:RegisterEvent("AUCTION_HOUSE_SHOW")

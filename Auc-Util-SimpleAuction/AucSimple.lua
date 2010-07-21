@@ -58,6 +58,32 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	private.CreateFrames(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.UpdateConfig(...)
+end
+
+function lib.Processors.scanstats(callbackType, ...)
+	private.clearcache()
+	private.delayedUpdatePricing = true -- Note: calling private.UpdatePricing is unsafe inside "scanstats"
+end
+
+function lib.Processors.postresult(callbackType, ...)
+	private.clearcache()
+end
+
 local function whitespace(length)
 	local spaces = ""
 	for index = length, 0, -1 do

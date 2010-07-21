@@ -62,6 +62,22 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	private.ProcessTooltip(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.load(callbackType, ...)
+	lib.OnLoad(...)
+end
+
+
+
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)

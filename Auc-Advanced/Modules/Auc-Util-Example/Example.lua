@@ -85,6 +85,13 @@ function lib.Processor(callbackType, ...)
 		--Called when your config options (if Configator) have been changed.
 	end
 end
+lib.Processors = {}
+lib.Processors.tooltip = lib.Processor
+lib.Processors.config = lib.Processor
+lib.Processors.listupdate = lib.Processor
+lib.Processors.configchanged = lib.Processor
+
+
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so

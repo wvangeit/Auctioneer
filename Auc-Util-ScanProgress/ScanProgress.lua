@@ -46,6 +46,21 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.scanprogress(callbackType, ...)
+	private.UpdateScanProgress(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.ConfigChanged(...)
+end
+
+
+
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.scanprogress.activated", true)
@@ -91,22 +106,30 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elaps
 	end
 end
 
+local initShown = false
 function private.ShowScanProgressUI(totalAuctions)
+	if (nLog) then nLog.AddMessage("Auctioneer", "ScanProgress", N_INFO, "ShowScanProgressUI Called") end
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		_G["BrowseButton"..i]:Hide()
 	end
 	BrowseNoResultsText:Show()
 	private.scanStartTime = time()
+	local msg
 	if totalAuctions and totalAuctions > 0 then
-		BrowseNoResultsText:SetText(("Scanning %d items..."):format(totalAuctions))
+		msg = ("Scanning %d items..."):format(totalAuctions)
 	else
-		BrowseNoResultsText:SetText("Scanning...")
+		msg = "Scanning..."
 	end
+	BrowseNoResultsText:SetText(msg)
+	initShown = msg.." DONE"
 	AucAdvanced.API.BlockUpdate(true, true)
 end
 
 function private.HideScanProgressUI()
+	if (nLog) then nLog.AddMessage("Auctioneer", "ScanProgress", N_INFO, "HideScanProgressUI Called") end
+
 	if (AucAdvanced.Settings.GetSetting("util.scanprogress.leaveshown")) then
+		if (initShown) then BrowseNoResultsText:SetText(initShown) end
 		AucAdvanced.API.BlockUpdate(false, false)
 	else
 		BrowseNoResultsText:Hide()
@@ -124,11 +147,13 @@ function private.HideScanProgressUI()
 		end
 		AucAdvanced.API.BlockUpdate(false, true)
 	end
+	initShown = nil
 end
 
 function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
+	if (nLog) then nLog.AddMessage("Auctioneer", "ScanProgress", N_INFO, "UpdateScanProgressUI Called") end
 	local numAuctionsPerPage = NUM_AUCTION_ITEMS_PER_PAGE
-
+	initShown = false
 	-- Prefer the elapsed time which is provided by core and excludes paused time.
 	local secondsElapsed = elapsedTime or (time() - private.scanStartTime)
 

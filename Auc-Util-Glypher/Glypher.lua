@@ -38,6 +38,32 @@ function lib.Processor(callbackType, ...)
     end
 end
 
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.tooltip(callbackType, ...)
+	private.ProcessTooltip(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.ConfigChanged(...)
+	if private.gui then private.gui:Refresh() end
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	private.auctionHook() ---When AuctionHouse loads hook the auction function we need
+end
+
+function lib.Processors.scanprogress(callbackType, ...)
+	private.ScanProgressReceiver(...)
+end
+
+function lib.Processors.scanstats(callbackType, ...)
+	private.ScanComplete(...)
+end
+
 --after Auction House Loads Hook the Window Display event
 function private.auctionHook()
     hooksecurefunc("AuctionFrameAuctions_Update", private.storeCurrentAuctions)

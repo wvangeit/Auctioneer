@@ -64,6 +64,27 @@ function lib.Processor(callbackType, ...)
 		lib.ClearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
 	end
 end
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	--Called when the tooltip is being drawn.
+	private.ProcessTooltip(...)
+end
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+function lib.Processors.configchanged(callbackType, ...)
+	--Called when your config options (if Configator) have been changed.
+	lib.ClearMatchArrayCache()
+end
+function lib.Processors.scanstats(callbackType, ...)
+	-- AH has been scanned
+	lib.ClearMatchArrayCache()
+end
+function lib.Processors.auctionclose(callbackType, ...)
+	lib.ClearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
+end
+
 
 
 local frame = CreateFrame("Frame", "MatchBeanCountHelperFrame")

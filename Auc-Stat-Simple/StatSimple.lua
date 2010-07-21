@@ -1,6 +1,6 @@
 --[[
 Auctioneer - StatSimple
-Version: <%version%> (<%codename%>)
+Version: 5.7.4568 (KillerKoala)
 Revision: $Id$
 URL: http://auctioneeraddon.com/
 
@@ -84,6 +84,10 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	end
 end
+
+lib.Processors = {}
+lib.Processors.tooltip = lib.Processor
+lib.Processors.config = lib.Processor
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)

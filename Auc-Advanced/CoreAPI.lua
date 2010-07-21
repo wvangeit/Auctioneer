@@ -33,6 +33,9 @@
 ]]
 if not AucAdvanced then return end
 local AucAdvanced = AucAdvanced
+local coremodule = AucAdvanced.GetCoreModule("CoreAPI")
+if not coremodule then return end -- Someone has explicitely broken us
+
 
 AucAdvanced.API = {}
 local lib = AucAdvanced.API
@@ -81,7 +84,7 @@ local GetItemInfo = GetItemInfo
 ]]
 
 -- this is actually called from a dummy module in CoreUtil
-function lib.Processor(event, ...)
+function coremodule.Processor(event, ...)
 	if event == "scanstats" then
 		lib.ClearMarketCache()
 	elseif event == "configchanged" then
@@ -90,6 +93,17 @@ function lib.Processor(event, ...)
 		private.ClearEngineCache()
 		lib.ClearMarketCache()
 	end
+end
+coremodule.Processors = {}
+function coremodule.Processors.scanstats(event, ...)
+	lib.ClearMarketCache()
+end
+function coremodule.Processors.configchanged(event, ...)
+	lib.ClearMarketCache()
+end
+function coremodule.Processors.newmodule(event, ...)
+	private.ClearEngineCache()
+	lib.ClearMarketCache()
 end
 
 do

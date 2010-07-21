@@ -64,6 +64,23 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.auctionui(callbackType, ...)
+	private.auctionHook() ---When AuctionHouse loads hook the auction function we need
+	private.MoveFrame() --Set position back to previous session if options set
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.MoveFrame()
+	private.AdjustProtection()
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+
+
 function lib.OnLoad(addon)
 	default("util.mover.activated", true)
 	default("util.mover.rememberlastpos", true)

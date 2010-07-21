@@ -58,6 +58,10 @@ function lib.Processor(callbackType, ...)
 		private.ConfigChanged(...)
 	end
 end
+lib.Processors = {}
+lib.Processors.scanstart = lib.Processor
+lib.Processors.config = lib.Processor
+lib.Processors.configchanged = lib.Processor
 
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -111,8 +115,6 @@ function private.ScanStart(scanSize, querysig, query)
 			debugPrint(AucAdvanced.Settings.GetSetting("util.scanstart."..scanId..".afk.text"), "ScanStart Handler", "Setting AFK", 0, "Debug")
 			if not UnitIsAFK("player") then SendChatMessage(AucAdvanced.Settings.GetSetting("util.scanstart."..scanId..".afk.text"), "AFK") end
 		end
-	else
-			debugPrint(msg, "ScanStart Handler", "Unhandled Scan Size", 0, "Debug")
 	end
 end
 

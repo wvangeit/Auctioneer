@@ -73,6 +73,24 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.toolip(callbackType, ...)
+	--Called when the tooltip is being drawn.
+	lib.ProcessTooltip(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	--Called when your config options (if Configator) have been changed.
+	if private.gui then private.gui:Refresh() end
+end
+
+
+
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should

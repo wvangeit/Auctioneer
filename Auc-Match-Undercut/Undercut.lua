@@ -75,6 +75,35 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	--Called when the tooltip is being drawn.
+	private.ProcessTooltip(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	--Called when your config options (if Configator) have been changed.
+	private.clearMatchArrayCache()
+	private.clearTooltipCache()
+end
+
+function lib.Processors.scanstats(callbackType, ...)
+	-- AH has been scanned
+	private.clearMatchArrayCache()
+	private.clearTooltipCache()
+end
+
+function lib.Processors.auctionclose(callbackType, ...)
+	private.clearMatchArrayCache()	-- this is mostly to conserve RAM, we don't really need to wipe the cache here
+end
+
+
+
 function private.clearMatchArrayCache()	-- called from processor
 	wipe(matchArrayCache)
 end

@@ -257,6 +257,66 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.load(callbackType, ...)
+	private.ResetPriceModelEnx()
+end
+
+function lib.Processors.auctionclose(callbackType, ...)
+	if private.isAttached then
+		lib.DetachFromAH()
+	end
+	flagResourcesUpdateRequired = true
+end
+
+function lib.Processors.auctionopen(callbackType, ...)
+	flagResourcesUpdateRequired = true
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	if lib.Searchers.RealTime then
+		lib.Searchers.RealTime.HookAH()
+	end
+
+	--we need to make sure that the GUI is made by the time the AH opens, as RealTime could be trying to add lines to it.
+	if not gui then
+		lib.MakeGuiConfig()
+	end
+
+	lib.CreateAuctionFrames()
+end
+
+function lib.Processors.pagefinished(callbackType, ...)
+	if lib.Searchers.RealTime then
+		lib.Searchers.RealTime.FinishedPage(...)
+	end
+end
+
+function lib.Processors.bidcancelled(callbackType, ...)
+	private.bidcancelled(...)
+end
+
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+
+function lib.Processors.scanstats(callbackType, ...)
+	-- pass the message in next OnUpdate
+	flagScanStats = true
+end
+
+function lib.Processors.scanprogress(callbackType, ...)
+	if private.UpdateScanProgress then
+		private.UpdateScanProgress(...)
+	end
+end
+
+function lib.Processors.buyqueue(callbackType, ...)
+	if private.UpdateBuyQueue then
+		private.UpdateBuyQueue()
+	end
+end
+
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not additional or additional.event ~= "SetAuctionItem" then
 		--this isn't an auction, so we're not interested

@@ -133,6 +133,22 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.load(callbackType, ...)
+	lib.OnLoad(...)
+end
+
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+
+
+
 function private.SetupConfigGui(gui)
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 

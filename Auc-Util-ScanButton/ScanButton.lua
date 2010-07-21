@@ -48,6 +48,25 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.scanprogress(callbackType, ...)
+	private.UpdateScanProgress(...)
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	private.HookAH(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.ConfigChanged(...)
+end
+
+
+
 function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanbutton.enabled", true)
 	AucAdvanced.Settings.SetDefault("util.scanbutton.message", true)

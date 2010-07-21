@@ -83,6 +83,26 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	private.ProcessTooltip(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	local setting, value = ...
+	if setting == "aucdb.enabled.market"
+	or setting == "aucdb.enabled.stats" then
+		AucAdvanced.API.ClearMarketCache()
+	end
+end
+
+
+
+
 lib.LoadTriggers = { ["auc-db"] = true }
 function lib.OnLoad()
 	if not AucDbData then AucDbData = {} end

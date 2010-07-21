@@ -67,6 +67,14 @@ function lib.Processor(event, subevent)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.selecttab(event, subevent)
+	if subevent == lib.tabname and private.doValidation then
+		private.doValidation()
+	end
+end
+
+
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls

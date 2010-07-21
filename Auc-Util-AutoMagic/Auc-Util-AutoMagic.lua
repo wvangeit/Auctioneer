@@ -60,6 +60,22 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
+end
+
+function lib.Processors.config(callbackType, ...)
+	lib.SetupConfigGui(...) --Called when you should build your Configator tab.
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	if (get("util.automagic.autosellgui")) then
+		lib.autoSellGUI()
+		set("util.automagic.autosellgui", false) -- Resetting our toggle switch
+	end
+end
+
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not (get("util.automagic.depositTT")) then
 		if hyperlink then

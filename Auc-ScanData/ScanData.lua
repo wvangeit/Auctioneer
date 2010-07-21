@@ -86,6 +86,24 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	private.ProcessTooltip(...)
+end
+function lib.Processors.scanstats(callbackType, ...)
+	wipe(private.distributionCache)
+	wipe(private.worthCache)
+end
+function lib.Processors.load(callbackType, ...)
+	local addon = ...
+	if addon == "auc-scandata" then
+		if private.OnLoad then
+			private.OnLoad()
+		end
+	end
+end
+
+
 local tmp = {}
 function lib.Colored(doIt, counts, alt, shorten)
 	local n=0

@@ -109,6 +109,22 @@ if AucAdvanced and AucAdvanced.NewModule then
 			private.storeReasonForBid(...)
 		end
 	end
+	private.AucModule.Processors = {}
+	function private.AucModule.Processors.querysent(callbackType, ...)
+		if lib.API.isLoaded then
+			local item = ...
+			if item.name then
+				if item.name ~= "" then
+					lib.API.search(item.name)
+				end
+			end
+		end
+	end
+	function private.AucModule.Processors.bidplaced(callbackType, ...)
+		if lib.API.isLoaded then
+			private.storeReasonForBid(...)
+		end
+	end		
 end
 
 -- lib.API.isLoaded  is false until DB is ready and all gui and API elements have been created

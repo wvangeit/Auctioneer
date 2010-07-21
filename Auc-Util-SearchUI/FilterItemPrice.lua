@@ -83,6 +83,25 @@ function lib.Processor(msg, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.config(msg, ...)
+	ignorelist = get("ignoreitemprice.ignorelist")
+	if not ignorelist then
+		ignorelist = {}
+	end
+	empty(private.sheetdata)
+	for item, cost in pairs(ignorelist) do
+		local link = AucAdvanced.API.GetLinkFromSig(item)
+		if not link then
+			link = item
+		end
+		table.insert(private.sheetdata, {link, cost})
+	end
+	if private.ignorelistGUI and private.ignorelistGUI.sheet then
+		private.ignorelistGUI.sheet:SetData(private.sheetdata)
+	end
+end
+
 --lib.AddIgnore(sig, price, temp)
 --this function adds an item to the ignorelist at copper price
 --if temp is true then item will be added to the temp list, which doesn't last across sessions

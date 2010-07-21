@@ -73,6 +73,15 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+function lib.Processors.auctionui(callbackType, ...)
+	private.HookAH(...)
+end
+
+
 function lib.OnLoad()
 	--This function is called when your variables have been loaded.
 	--You should also set your Configator defaults here

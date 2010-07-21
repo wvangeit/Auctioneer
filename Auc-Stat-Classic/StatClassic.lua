@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - AucClassic Statistics module
-	Version: <%version%> (<%codename%>)
+	Version: 5.7.4568 (KillerKoala)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -70,6 +70,22 @@ function lib.Processor(callbackType, ...)
 		lib.OnLoad(...)
 	end
 end
+
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	if (not data) then private.makeData() end
+	lib.ProcessTooltip(...)
+end
+function lib.Processors.config(callbackType, ...)
+	if (not data) then private.makeData() end
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+function lib.Processors.load(callbackType, ...)
+	if (not data) then private.makeData() end
+	lib.OnLoad(...)
+end
+
 
 do
     -- Inverse Z table

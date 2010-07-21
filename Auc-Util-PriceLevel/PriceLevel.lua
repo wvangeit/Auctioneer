@@ -53,6 +53,26 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.listupdate(callbackType, ...)
+	private.ListUpdate(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	if (AuctionFrameBrowse_Update) then
+		AuctionFrameBrowse_Update()
+	end
+end
+
+
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should

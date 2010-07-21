@@ -61,6 +61,27 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.lastupdate(callbackType, ...)
+	private.EasyCancelMain()
+	private.EasyBuyout()
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	private.AHLoaded()
+	private.EasyBuyout()
+	private.EasyCancelMain()
+end
+
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	private.EasyBuyout()
+	private.EasyCancelMain()
+end
+
 function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	

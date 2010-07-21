@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - StatPurchased
-	Version: <%version%> (<%codename%>)
+	Version: 5.7.4568 (KillerKoala)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -89,6 +89,19 @@ function lib.Processor(callbackType, ...)
 		private.ClearCache()
 	end
 end
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	private.ProcessTooltip(...)
+end
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+function lib.Processors.scanstats(callbackType, ...)
+	private.ClearCache()
+end
+
+
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.delete(operation, itemData, oldData)
@@ -102,12 +115,17 @@ function lib.ScanProcessors.delete(operation, itemData, oldData)
 			-- assume bought out
 			price = buy
 		end
-	elseif (itemData.timeLeft <= 1) then     -- Auction deleted later than earliest expected expiry time and was seen close to its end (last 30 mins)
+	--[[ disabled code
+	-- bid detection code temporarily disabled
+	-- assumed bids should probably not be treated the same as assumed buyouts with respect to market price
+	-- needs further development
+	else -- Auction deleted later than earliest expected expiry time
 		local bid = itemData.curBid
 		if bid and bid > 0 then
-			-- assume won on last bid we saw, but since there isn't much more time, it should be close.
+			-- assume won on last bid we saw
 			price = bid
 		end
+	-- end disabled code]]
 	end
 
 	if not price then return end

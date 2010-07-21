@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - BasicFilter
-	Version: <%version%> (<%codename%>)
+	Version: 5.7.4568 (KillerKoala)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -48,6 +48,11 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	end
 end
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
 
 function lib.AuctionFilter(operation, itemData)
 	local active = get("filter.basic.activated")

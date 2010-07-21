@@ -64,6 +64,17 @@ function lib.Processor(event, subevent)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.selecttab(event, subevent)
+	if subevent == lib.tabname and private.validationRequired then
+		if not resources.isValidPriceModel(get("resale.model")) then
+			message("Resale Searcher Warning!\nCurrent price model setting ("..get("resale.model")..") is not valid. Select a new price model")
+		else
+			private.validationRequired = nil
+		end
+	end
+end
+
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
 	-- Get our tab and populate it with our controls

@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - Histogram Statistics module
-	Version: <%version%> (<%codename%>)
+	Version: 5.7.4568 (KillerKoala)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -84,6 +84,30 @@ function lib.Processor(callbackType, ...)
 		pricecache = nil	-- not actually needed, just conserving RAM
 	end
 end
+
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	if (not data) then private.makeData() end
+	lib.ProcessTooltip(...)
+end
+function lib.Processors.config(callbackType, ...)
+	if (not data) then private.makeData() end
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+function lib.Processors.load(callbackType, ...)
+	if (not data) then private.makeData() end
+	lib.OnLoad(...)
+end
+function lib.Processors.scanstats(callbackType, ...)
+	if (not data) then private.makeData() end
+	pricecache = nil
+end
+function lib.Processors.auctionclose(callbackType, ...)
+	if (not data) then private.makeData() end
+	pricecache = nil	-- not actually needed, just conserving RAM
+end
+
 
 function private.GetPriceData()
 	if not stattable["count"] then

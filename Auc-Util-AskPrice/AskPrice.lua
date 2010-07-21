@@ -53,6 +53,12 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+
 function lib.OnLoad(addon)
 	private.frame = CreateFrame("Frame")
 

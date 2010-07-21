@@ -148,6 +148,76 @@ function lib.Processor(event, subevent, ...)
 	end
 end
 
+lib.Processors = {}
+function lib.Processors.search(event, subevent, ...)
+	if subevent == "complete" and private.factionUpdateRequired then
+		-- something changed during a search - complete the update now the search has finished
+		private.factionUpdateRequired = nil
+		private.SetCurrentFaction()
+	end
+end
+
+function lib.Processors.selecttab(event, subevent, ...)
+	if subevent == lib.tabname and private.doValidation then
+		private.doValidation()
+	end
+end
+
+function lib.Processors.config(event, subevent, ...)
+	-- update private variables, but only if a relevant setting may have changed
+	if subevent == "changed" then
+		local setting = ...
+		if setting and setting:match("^arbitrage") then
+			private.SetCurrentFaction()
+		end
+	elseif subevent == "loaded" or subevent == "reset" or subevent == "deleted" then
+		private.SetCurrentFaction()
+	end
+end
+
+function lib.Processors.resources(event, subevent, ...)
+	if subevent == "faction" then
+		private.SetCurrentFaction()
+	end
+end
+
+function lib.Processors.onload(event, subevent, ...)
+	if subevent == "auc-util-searchui" then
+		if private.createRealmList then
+			private.createRealmList()
+		end
+	end
+end
+
+function lib.Processors.selecttab(event, subevent, ...)
+	if event == "search" and subevent == "complete" and private.factionUpdateRequired then
+		-- something changed during a search - complete the update now the search has finished
+		private.factionUpdateRequired = nil
+		private.SetCurrentFaction()
+	elseif event == "selecttab" then
+		if subevent == lib.tabname and private.doValidation then
+			private.doValidation()
+		end
+	elseif event == "config" then
+		-- update private variables, but only if a relevant setting may have changed
+		if subevent == "changed" then
+			local setting = ...
+			if setting and setting:match("^arbitrage") then
+				private.SetCurrentFaction()
+			end
+		elseif subevent == "loaded" or subevent == "reset" or subevent == "deleted" then
+			private.SetCurrentFaction()
+		end
+	elseif event == "resources" and subevent == "faction" then
+		private.SetCurrentFaction()
+	elseif event == "onload" and subevent == "auc-util-searchui" then
+		if private.createRealmList then
+			private.createRealmList()
+		end
+	end
+end
+
+
 -- Keep our internal settings up to date with any changes, so that Search can just use the values
 function private.SetCurrentFaction()
 	if parent.IsSearching() then

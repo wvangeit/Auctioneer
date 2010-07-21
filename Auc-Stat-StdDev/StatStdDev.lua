@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - Standard Deviation Statistics module
-	Version: <%version%> (<%codename%>)
+	Version: 5.7.4568 (KillerKoala)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -78,6 +78,19 @@ function lib.Processor(callbackType, ...)
 		wipe(cache)
 	end
 end
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, ...)
+	lib.ProcessTooltip(...)
+end
+function lib.Processors.config(callbackType, ...)
+	--Called when you should build your Configator tab.
+	private.SetupConfigGui(...)
+end
+function lib.Processors.scanstats(callbackType, ...)
+	wipe(cache)
+end
+
+
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)

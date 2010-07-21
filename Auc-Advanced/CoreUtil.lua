@@ -35,6 +35,8 @@ if not AucAdvanced then return end
 
 local lib = AucAdvanced
 local private = {}
+local coremodule = AucAdvanced.GetCoreModule("CoreUtil")
+if not coremodule then return end -- Someone has explicitely broken us
 local tooltip = LibStub("nTipHelper:1")
 
 -- "Module" functions for CoreUtil
@@ -48,7 +50,7 @@ function private.OnLoad(addon)
 end
 --]]
 
-function private.Processor(event, subevent)
+function coremodule.Processor(event, subevent)
 	if event == "auctionopen" then
 		private.isAHOpen = true
 	elseif event == "auctionclose" then
@@ -59,6 +61,19 @@ function private.Processor(event, subevent)
 		private.modulecache = nil
 		private.resetPriceModels()
 	end
+end
+coremodule.Processors = {}
+function coremodule.Processors.auctionopen(event, subevent)
+	private.isAHOpen = true
+end
+function coremodule.Processors.auctionclose(event, subevent)
+	private.isAHOpen = false
+end
+function coremodule.Processors.newmodule(event, subevent)
+	-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
+	-- as long as they correctly send a "newmodule" message when created
+	private.modulecache = nil
+	private.resetPriceModels()
 end
 
 --Localization via babylonian
@@ -571,101 +586,64 @@ function lib.GetAllModules(having, findSystem, findEngine)
 	return modules
 end
 
---[[ CoreModule
-	A dummy module representing the core of Auc-Advanced
-	Used to catch messages and pass them on to elements of the core
---]]
-local coremodule = {
-	libType = "Util",
-	libName = "CoreModule",
-	GetName = function() return "CoreModule" end,
-	}
-
-function private.MakeCoreModuleFunction(func, newcore, nest)
-	local xname = "_"..func
-	local base
-	if nest then
-		if not coremodule[nest] then
-			coremodule[nest] = {}
-		end
-		base = coremodule[nest]
-	else
-		base = coremodule
-	end
-	if not base[func] then
-		base[func] = function(...)
-			for _, core in ipairs(base[xname]) do
-				core[func](...)
-			end
-		end
-		base[xname] = {}
-	end
-	tinsert(base[xname], newcore)
-end
-
--- called from CoreMain's private OnLoad function
-function lib.CoreModuleOnLoad(addon)
-	-- work from temporary tables; easy to modify if new core elements or new functions need to be added
-	local cores = {private, lib.API, lib.Buy, lib.Config, lib.Const, lib.Post, lib.Scan, lib.Settings}
-	local funcs = {"OnLoad", "Processor", "CommandHandler"}
-	local nested = {
-		ScanProcessors = {"begin", "update", "leave", "create", "delete", "complete", "placebid", "newauc", "aucsold"},
-	}
-	local tables = {"LoadTriggers"}
-
-	-- install the functions and supporting values
-	for _, core in ipairs(cores) do
-		for _, func in ipairs(funcs) do
-			if core[func] then
-				private.MakeCoreModuleFunction(func, core)
-			end
-		end
-		for nest, subfuncs in pairs(nested) do
-			if core[nest] then
-				for _, func in ipairs(subfuncs) do
-					if core[nest][func] then
-						private.MakeCoreModuleFunction(func, core, nest)
-					end
-				end
-			end
-		end
-		for _, tab in ipairs(tables) do
-			if core[tab] then
-				if not coremodule[tab] then
-					coremodule[tab] = {}
-				end
-				for k, v in pairs(core[tab]) do
-					coremodule[tab][k] = v
-				end
-			end
-		end
-	end
-
-	-- install as a Module
-	lib.Modules.Util.CoreModule = coremodule
-	lib.SendProcessorMessage("newmodule", "Util", "CoreModule")
-
-	-- do OnLoad
-	if coremodule.OnLoad then
-		coremodule.OnLoad(addon)
-	end
-
-	-- delete the initialization code as we only need it once
-	lib.CoreModuleOnLoad = nil
-	private.MakeCoreModuleFunction = nil
-end
 
 --[[ End of CoreModule ]]--
 
-function lib.SendProcessorMessage(...)
-	local modules = AucAdvanced.GetAllModules("Processor")
-	local good, msg
-	for pos, engineLib in ipairs(modules) do
-		good,msg=pcall(engineLib.Processor, ...)
-		if not good then
-			lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error", 0, "Debug")
+local spmArray = {}
+function lib.SendProcessorMessage(spmMsg, ...)
+	local spmp = spmArray[spmMsg]
+	if (spmp) then
+		for i=1,#spmp do
+			local x = spmp[i]
+			local f = x.Func
+--if (nLog) then nLog.AddMessage("Auctioneer", "Coreutil", N_INFO, ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg), ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg)) end
+
+			good,msg=pcall(f, spmMsg, ...)
+			if not good then
+				lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error in "..(x.Name or "??"), 0, "Debug")
+			end
+		end	
+	else
+		spmp = {}
+		spmArray[spmMsg] = spmp
+		
+		local modules = AucAdvanced.GetAllModules("Processors")
+		local good, msg
+		for pos, engineLib in ipairs(modules) do
+			local f = engineLib.Processors[spmMsg]
+			if f then
+				local x = {}
+				x.Name = engineLib.GetName()
+				x.Func = f
+				table.insert(spmp, x)
+--if (nLog) then nLog.AddMessage("Auctioneer", "Coreutil", N_INFO, ("SendProcessorMessage Called %s For %s (using Processors)"):format(x.Name, spmMsg), ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg)) end
+				good,msg=pcall(f, spmMsg, ...)
+				if not good then
+					lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error in "..(x.Name or "??"), 0, "Debug")
+				end
+			end
+		end
+		
+		modules = AucAdvanced.GetAllModules("Processor")
+		local good, msg
+		for pos, engineLib in ipairs(modules) do
+			if (not engineLib.Processors) then
+				local x = {}
+				x.Name = engineLib.GetName()
+				x.Func = engineLib.Processor
+				lib.Debug.DebugPrint("Module Using Deprecated Processor to recieve "..(spmMsg or "Unknown").." processor messages.", "SendProcessorMessage", "Deprecated Function Seen in "..(x.Name or "??"), 0, "Warning")
+				table.insert(spmp, x)
+				good,msg=pcall(engineLib.Processor, spmMsg, ...)
+				if not good then
+					lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error in "..(x.Name or "??"), 0, "Debug")
+				end
+			end
 		end
 	end
+end
+
+function lib.ResetSPMArray()
+	spmArray = {}
 end
 
 -- Returns the tooltip helper

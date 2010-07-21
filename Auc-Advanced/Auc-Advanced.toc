@@ -17,7 +17,7 @@
 Support\Load.xml
 CoreManifest.lua
 Libs\Load.xml
-
+CoreModule.lua
 CoreStrings.lua
 CoreConst.lua
 
@@ -29,5 +29,4 @@ CoreSettings.lua
 CoreBuy.lua
 CoreScan.lua
 CoreAPI.lua
-
 Modules\Active.xml

@@ -56,6 +56,29 @@ function lib.Processor(callbackType, ...)
 		private.cache = {}
 	end
 end
+
+lib.Processors = {}
+function lib.Processors.config(callbackType, ...)
+	private.SetupConfigGui(...)
+end
+
+function lib.Processors.auctionui(callbackType, ...)
+	private.HookAH(...)
+end
+
+function lib.Processors.configchanged(callbackType, ...)
+	if (private.Active) then
+		private.MyAuctionFrameUpdate()
+	end
+end
+
+lib.Processors.blockupdate = lib.Processors.configchanged
+
+function lib.Processors.scanstats(callbackType, ...)
+	private.cache = {}
+end
+
+
 local OldSortAuctionApplySort
 
 function lib.OnLoad()

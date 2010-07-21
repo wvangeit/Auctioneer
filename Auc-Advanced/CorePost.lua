@@ -45,7 +45,10 @@
 	The function AucAdvanced.API.GetSigFromLink(link) may be used to construct a valid sig
 ]]
 if not AucAdvanced then return end
-
+local coremodule, internal = AucAdvanced.GetCoreModule("CorePost")
+-- internal is a shared space only accessible to code that can call GetCoreModule, 
+-- which is only the .lua files in Auc-Advanced.  Basically, we have an internal use only area.
+if not coremodule then return end -- Someone has explicitely broken us
 if (not AucAdvanced.Post) then AucAdvanced.Post = {} end
 
 local lib = AucAdvanced.Post
@@ -53,6 +56,7 @@ local private = {}
 lib.Private = private
 
 lib.Print = AucAdvanced.Print
+local print = lib.Print
 local Const = AucAdvanced.Const
 local debugPrint = AucAdvanced.Debug.DebugPrint
 local _TRANS = AucAdvanced.localizations
@@ -1016,7 +1020,7 @@ EventFrame:RegisterEvent("BAG_UPDATE")
 EventFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
 EventFrame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 
-function lib.OnLoad(addon)
+function coremodule.OnLoad(addon)
 	if addon == "auc-advanced" then
 		-- Install values into locals/tables, that are not available until Auctioneer is fully loaded
 		DecodeSig = AucAdvanced.API.DecodeSig

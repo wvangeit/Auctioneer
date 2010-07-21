@@ -67,6 +67,12 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
+lib.Processors = {}
+lib.Processors.scanfinish = lib.Processor
+lib.Processors.scanstart = lib.Processor
+lib.Processors.config = lib.Processor
+lib.Processors.configchanged = lib.Processor
+
 function lib.OnLoad()
 	print("Auctioneer: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
