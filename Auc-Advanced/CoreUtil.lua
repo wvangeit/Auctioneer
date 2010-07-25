@@ -614,7 +614,18 @@ function lib.SendProcessorMessage(spmMsg, ...)
 			if f then
 				local x = {}
 				x.Name = engineLib.GetName()
-				x.Func = f
+				if (spmMsg=="tooltip") then
+					local f1 = f
+					x.Func = function(spmMsg, ...)
+						-- TODO: Make these defaults configurable
+						tooltip:SetColor(0.3, 0.9, 0.8)
+						tooltip:SetMoneyAsText(false)
+						tooltip:SetEmbed(false)
+						f1(spmMsg, ...)
+					end
+				else
+					x.Func = f
+				end
 				table.insert(spmp, x)
 --if (nLog) then nLog.AddMessage("Auctioneer", "Coreutil", N_INFO, ("SendProcessorMessage Called %s For %s (using Processors)"):format(x.Name, spmMsg), ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg)) end
 				good,msg=pcall(f, spmMsg, ...)

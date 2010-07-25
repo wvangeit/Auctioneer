@@ -133,16 +133,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		end
 	end
 
-	for pos, engineLib in ipairs(modules) do
-		if (engineLib.Processor) then
-			-- TODO: Make these defaults configurable
-			tooltip:SetColor(0.3, 0.9, 0.8)
-			tooltip:SetMoneyAsText(false)
-			tooltip:SetEmbed(false)
-
-			engineLib.Processor("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
-		end
-	end
+	AucAdvanced.SendProcessorMessage("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
 	tooltip:ClearFrame(tip)
 end
 
