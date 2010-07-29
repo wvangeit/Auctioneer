@@ -40,7 +40,7 @@ local lib = AucAdvanced.Config
 local private = {}
 private.Print = AucAdvanced.Print
 
-function coremodule.CommandHandler(editbox, command, subcommand, ...)
+function private.CommandHandler(editbox, command, subcommand, ...)
 	command = command:lower()
 	if (command == "help") then
 		local pos, cmdList, cmdL, cmd, cmdFunc = 0,"", "", "", nil
