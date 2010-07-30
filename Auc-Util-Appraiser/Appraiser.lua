@@ -34,10 +34,21 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "Appraiser"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
-local empty = wipe
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
+-- reduce global lookups
+local wipe, tinsert = wipe, tinsert
+local floor, ceil, max = floor, ceil, max
+local tonumber = tonumber
+local AucAdvanced = AucAdvanced
 local GetFaction = AucAdvanced.GetFaction
+local SplitServerKey = AucAdvanced.SplitServerKey
+local GetMarketValue = AucAdvanced.API.GetMarketValue
+local GetAlgorithmValue = AucAdvanced.API.GetAlgorithmValue
+local GetBestMatch = AucAdvanced.API.GetBestMatch
+local GetSigFromLink = AucAdvanced.API.GetSigFromLink
+local GetDepositCost = GetDepositCost
+local GetItemInfo = GetItemInfo
 
 local pricecache -- cache for GetPrice; only used in certain circumstances
 local tooltipcache = {} -- cache for ProcessTooltip
@@ -73,7 +84,7 @@ function lib.Processor(callbackType, ...)
 			private.updateRoundExample()
 		end
 		-- clear cache for any changes, as we can't always predict what will change our cached values
-		empty(tooltipcache)
+		wipe(tooltipcache)
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
 			private.frame.GenerateList()
@@ -85,7 +96,7 @@ function lib.Processor(callbackType, ...)
 			-- flag to update our display next OnUpdate
 			private.frame.scanstatsEvent = true
 		end
-		empty(tooltipcache)
+		wipe(tooltipcache)
 	elseif (callbackType == "postresult") then
 		private.SelectNextOnPost(select(3, ...))
 		--private.frame.Reselect(select(3, ...))
@@ -135,7 +146,7 @@ function lib.Processors.configchanged(callbackType, ...)
 		private.updateRoundExample()
 	end
 	-- clear cache for any changes, as we can't always predict what will change our cached values
-	empty(tooltipcache)
+	wipe(tooltipcache)
 end
 
 function lib.Processors.inventory(callbackType, ...)
@@ -151,7 +162,7 @@ function lib.Processors.scanstats(callbackType, ...)
 		-- flag to update our display next OnUpdate
 		private.frame.scanstatsEvent = true
 	end
-	empty(tooltipcache)
+	wipe(tooltipcache)
 end
 
 function lib.Processors.postresult(callbackType, ...)
@@ -172,14 +183,14 @@ end
 
 
 
--- For backwards compatibility, leave these here. This is now a capability of the core API
-lib.GetSigFromLink = AucAdvanced.API.GetSigFromLink;
-lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig;
+-- Deprecated. For backwards compatibility, leave these here. This is now a capability of the core API
+lib.GetSigFromLink = GetSigFromLink
+lib.GetLinkFromSig = AucAdvanced.API.GetLinkFromSig
 
 function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
-	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
-	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
-	local sig = lib.GetSigFromLink(hyperlink)
+	if not get("util.appraiser.enable") then return end
+	if not get("util.appraiser.model") then return end
+	local sig = GetSigFromLink(hyperlink)
 	if not sig then return end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
@@ -197,11 +208,11 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 
 	if value then
 		tooltip:AddLine(_TRANS('APPR_Tooltip_AppraiserCurModel'):format(curModel, quantity) , value * quantity)--Appraiser ({{%s}}x{{%s}}
-		if AucAdvanced.Settings.GetSetting("util.appraiser.bidtooltip") then
+		if get("util.appraiser.bidtooltip") then
 			tooltip:AddLine("  ".._TRANS('APPR_Tooltip_StartingBid'):format(quantity), bid * quantity)--Starting bid x {{%d}}
 		end
 	end
-    if AucAdvanced.Settings.GetSetting("util.appraiser.ownauctions") then
+    if get("util.appraiser.ownauctions") then
         local itemName = name
 
         local colored = get('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel
@@ -233,17 +244,12 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 end
 
 function lib.GetPrice(link, serverKey)
-	local sig = lib.GetSigFromLink(link)
+	local sig = GetSigFromLink(link)
 	if not sig then
        	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
-	local match = true
-	local currentKey = GetFaction()
 	if not serverKey then
-		serverKey = currentKey
-	elseif serverKey ~= currentKey then
-		-- Matching API cannot handle serverKey correctly, only works for currentKey
-		match = false
+		serverKey = GetFaction()
 	end
 	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 
@@ -252,18 +258,18 @@ function lib.GetPrice(link, serverKey)
 		if pricecache[cacheSig] then
 			newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = unpack(pricecache[cacheSig], 1, 8) -- some values may be nil
 		else
-			newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, match)
+			newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, true)
 			pricecache[cacheSig] = {newBuy, newBid, seen, curModelText, MatchString, stack, number, duration}
 		end
 	else
-		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, match)
+		newBuy, newBid, seen, curModelText, MatchString, stack, number, duration = private.GetPriceCore(sig, link, serverKey, true)
 	end
 
 	return newBuy, newBid, false, seen, curModelText, MatchString, stack, number, duration
 end
 
 function lib.GetPriceUnmatched(link, serverKey)
-	local sig = lib.GetSigFromLink(link)
+	local sig = GetSigFromLink(link)
 	if not sig then
        	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
@@ -280,7 +286,7 @@ end
 local array = {}
 --returns pricing and posting settings
 function lib.GetPriceArray(link, serverKey)
-	empty(array)
+	wipe(array)
 
 	local newBuy, newBid, _, seen, curModelText, MatchString, stack, number, duration = lib.GetPrice(link, serverKey)
 
@@ -342,115 +348,82 @@ end
 
 function lib.ClearItem()
 	-- we only need this to clear caches
-	empty(tooltipcache)
-	if pricecache then empty(pricecache) end
+	wipe(tooltipcache)
+	if pricecache then wipe(pricecache) end
 end
+lib.ClearData = lib.ClearItem
 
 function private.GetPriceCore(sig, link, serverKey, match)
-	local curModel, curModelText
+	local newBuy, newBid, seen, DiffFromModel, MatchString
 
-	curModel = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".model") or "default"
-	curModelText = curModel
-	local duration = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".duration") or AucAdvanced.Settings.GetSetting("util.appraiser.duration")
+	local curModel = get("util.appraiser.item."..sig..".model") or "default"
+	local curModelText = curModel
+	local duration = get("util.appraiser.item."..sig..".duration") or get("util.appraiser.duration")
 
 	-- valuation
-	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "default" then
-		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+		curModel = get("util.appraiser.model") or "market"
 		if curModel == "market" then
-			newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
+			newBuy, seen = GetMarketValue(link, serverKey)
 		else
-			newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
+			newBuy, seen = GetAlgorithmValue(curModel, link, serverKey)
 		end
 		if (not newBuy) or (newBuy == 0) then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
+			curModel = get("util.appraiser.altModel")
 			if curModel == "market" then
-				newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
+				newBuy, seen = GetMarketValue(link, serverKey)
 			else
-				newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
+				newBuy, seen = GetAlgorithmValue(curModel, link, serverKey)
 			end
 		end
 		curModelText = curModelText.."("..curModel..")"
 	elseif curModel == "fixed" then
-		newBuy = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.buy")
-		newBid = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.bid")
+		newBuy = get("util.appraiser.item."..sig..".fixed.buy")
+		newBid = get("util.appraiser.item."..sig..".fixed.bid")
 		seen = 99
 	elseif curModel == "market" then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(link, serverKey)
+		newBuy, seen = GetMarketValue(link, serverKey)
 	else
-		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link, serverKey)
+		newBuy, seen = GetAlgorithmValue(curModel, link, serverKey)
 	end
 
 	-- matching
 	if match then
-		match = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".match")
+		match = get("util.appraiser.item."..sig..".match")
 		if match == nil then
-			match = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+			match = get("util.appraiser.match")
 		end
-	end
-	if match then
-		local biddown
-		if curModel == "fixed" then
-			if newBuy and newBuy > 0 then
-				biddown = newBid/newBuy
-				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy, serverKey)
-				newBid = newBuy * biddown
-			end
-		else
-			newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, newBuy, serverKey)
-		end
-	end
-
-	-- generate bid value
-	if curModel ~= "fixed" then
-		if newBuy and not newBid then
-			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-			if deposit then
-				local rate = AucAdvanced.depositRate or 0.05
-				local newfaction
-				if rate == .25 then newfaction = "neutral" end
-				deposit = GetDepositCost(link, duration/60, newfaction)
-			end
-			if (not deposit) then deposit = 0 end
-
-			markdown = newBuy * markdown
-			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-		end
-
-		if not newBid then
-			newBid = 0
-		end
-		if GetSellValue and AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then
-			local vendor = (GetSellValue(link) or 0)
-			if vendor and vendor>0 then
-				vendor = math.ceil(vendor / (1 - (AucAdvanced.cutRate or 0.05)))
-				if newBid < vendor then
-					newBid = vendor
+		if match then
+			if curModel == "fixed" then
+				if newBuy and newBuy > 0 then
+					local tBuy, _, _, tDiff, tString = GetBestMatch(link, newBuy, serverKey)
+					if newBid then
+						newBid = newBid * tBuy / newBuy
+					end
+					newBuy = tBuy
+					DiffFromModel = tDiff
+					MatchString = tString
 				end
+			else
+				local tBuy, _, _, tDiff, tString = GetBestMatch(link, newBuy, serverKey)
+				newBuy = tBuy
+				DiffFromModel = tDiff
+				MatchString = tString
 			end
 		end
-
-
-		if newBid and (not newBuy or newBid > newBuy) then
-			newBuy = newBid
-		end
 	end
-
-	-- pricing: final checks
-	newBid = math.floor((newBid or 0) + 0.5)
-	newBuy = math.floor((newBuy or 0) + 0.5)
 
 	-- other return values
-	local stack = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".stack") or AucAdvanced.Settings.GetSetting("util.appraiser.stack")
-	local number = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".number") or AucAdvanced.Settings.GetSetting("util.appraiser.number")
+	local stack = get("util.appraiser.item."..sig..".stack") or get("util.appraiser.stack")
+	local number = get("util.appraiser.item."..sig..".number") or get("util.appraiser.number")
 	local  _, _, _, _, _, _, _, maxStack = GetItemInfo(link)
-	 --we only officially accept "max" or a number, but user could have input any random string, so add some sanitization
+	--we only officially accept "max" or a number, but user could have input any random string, so add some sanitization
 	stack = tonumber(stack)
 	if stack then
 		if stack > maxStack then
-			stack = maxStack --never alow a saved stack value larger than the item can really stack to
+			stack = maxStack --never allow a saved stack value larger than the item can really stack to
+		elseif stack < 1 then
+			stack = 1
 		end
 	else
 		stack = maxStack
@@ -462,6 +435,45 @@ function private.GetPriceCore(sig, link, serverKey, match)
 	end
 	number = tonumber(number)
 
+	-- generate bid value
+	if curModel ~= "fixed" and newBuy then
+		if not newBid then
+			local markdown = newBuy * (get("util.appraiser.bid.markdown") or 0)/100
+			local subtract = get("util.appraiser.bid.subtract") or 0
+			local deposit = 0
+			if get("util.appraiser.bid.deposit") then
+				local _, faction = SplitServerKey(serverKey)
+				local dep = GetDepositCost(link, duration, faction, stack)
+				if dep then
+					deposit = dep / stack
+				end
+			end
+
+			newBid = newBuy - markdown - subtract - deposit
+			if newBid < 1 then
+				newBid = 1
+			end
+		end
+
+		if GetSellValue and get("util.appraiser.bid.vendor") then
+			local vendor = GetSellValue(link)
+			if vendor and vendor>0 then
+				vendor = ceil(vendor / (1 - (AucAdvanced.cutRate or 0.05)))
+				if newBid < vendor then
+					newBid = vendor
+				end
+			end
+		end
+
+		if newBid > newBuy then
+			newBuy = newBid
+		end
+	end
+
+	-- pricing: final checks
+	newBid = floor((newBid or 0) + 0.5)
+	newBuy = floor((newBuy or 0) + 0.5)
+
 	-- Caution: this is NOT the same return order as GetPrice
 	return newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 end
@@ -471,8 +483,8 @@ lib.ownCounts = {}
 function lib.GetOwnAuctionDetails()
 	local results = lib.ownResults
 	local counts = lib.ownCounts
-	empty(results)
-	empty(counts)
+	wipe(results)
+	wipe(counts)
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
 	if totalAuctions >0 then
 		for i=1, totalAuctions do
