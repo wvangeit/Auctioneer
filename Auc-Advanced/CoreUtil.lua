@@ -38,14 +38,15 @@ local private = {}
 local coremodule = AucAdvanced.GetCoreModule("CoreUtil")
 if not coremodule then return end -- Someone has explicitely broken us
 local tooltip = LibStub("nTipHelper:1")
+local Const = lib.Const
 
 -- "Module" functions for CoreUtil
 -- installed in private table, called via CoreModule
 
 --[[ OnLoad is not currently needed
-function private.OnLoad(addon)
+function coremodule.OnLoad(addon)
 	if addon == "auc-advanced" then
-
+		private.FactionOnLoad()
 	end
 end
 --]]
@@ -246,7 +247,7 @@ function lib.ShowItemLink(...) return tooltip:ShowItemLink(...) end
 function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end
 lib.breakHyperlink = lib.BreakHyperlink
 
-do
+do -- Faction and ServerKey related functions
 	local splitcache = {}
 	local localizedfactions = {
 		["Alliance"] = FACTION_ALLIANCE,
@@ -265,46 +266,70 @@ do
 		end
 		return split[1], split[2], split[3]
 	end
-end
 
-function lib.GetFaction()
-	local realmName = GetRealmName()
-	local factionGroup = lib.GetFactionGroup()
-	if not factionGroup then return end
-
-	if (factionGroup == "Neutral") then
-		AucAdvanced.cutRate = 0.15
-		AucAdvanced.depositRate = 0.25
-	else
-		AucAdvanced.cutRate = 0.05
-		AucAdvanced.depositRate = 0.05
-	end
-	AucAdvanced.curFaction = realmName.."-"..factionGroup
-	return AucAdvanced.curFaction, realmName, factionGroup
-end
-
-private.PlayerFaction = UnitFactionGroup("player")
-private.factions = {}
-function lib.GetFactionGroup()
-	local factionGroup = "Faction" --Save only "Faction" or "Neutral", as non-neutral zones should always display the home faction's data
-
-	if private.isAHOpen or not AucAdvanced.Settings.GetSetting("alwaysHomeFaction") then
-		local currentZone = GetMinimapZoneText()
-		if private.factions[currentZone] then
-			factionGroup = private.factions[currentZone]
-		else
-			SetMapToCurrentZone()
-			local map = GetMapInfo()
-			if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
-				factionGroup = "Neutral"
-			end
-			private.factions[currentZone] = factionGroup
+	local lookupfaction = {
+		["alliance"] = "Alliance",
+		[FACTION_ALLIANCE:lower()] = "Alliance",
+		["horde"] = "Horde",
+		[FACTION_HORDE:lower()] = "Horde",
+		["neutral"] = "Neutral",
+		[COMBATLOG_FILTER_STRING_NEUTRAL_UNITS:lower()] = "Neutral", -- again, this may not be the correct context? see above
+	}
+	-- Used to check user text input for some form of a faction name; returns standardized form if found
+	-- Possible results are "Alliance", "Horde", "Neutral" or nil if not found
+	-- *** need to confirm this does really work correctly on non-English clients, particularly Russian and Chinese ***
+	function lib.IsFaction(faction)
+		if type(faction) == "string" then
+			return lookupfaction[faction:lower()]
 		end
 	end
-	if factionGroup == "Faction" then
-		factionGroup = private.PlayerFaction
+
+	function lib.GetFaction()
+		local factionGroup = lib.GetFactionGroup()
+		if not factionGroup then return end
+		if factionGroup ~= lib.curFactionGroup then
+			local curFaction
+			if (factionGroup == "Neutral") then
+				lib.cutRate = 0.15
+				lib.depositRate = 0.25 -- deprecated
+				curFaction = Const.ServerKeyNeutral
+			else
+				lib.cutRate = 0.05
+				lib.depositRate = 0.05 -- deprecated
+				curFaction = Const.ServerKeyHome
+			end
+			lib.curFaction = curFaction -- deprecated (it's a serverKey, so calling it curFaction is confusing)
+			lib.curFactionGroup = factionGroup
+			lib.curServerKey = curFaction
+		end
+		return lib.curServerKey, Const.PlayerRealm, factionGroup
 	end
-	return factionGroup
+
+	local zonefactions = {}
+	function lib.GetFactionGroup()
+		if private.isAHOpen or not lib.Settings.GetSetting("alwaysHomeFaction") then
+			local currentZone = GetMinimapZoneText()
+			local factionGroup = zonefactions[currentZone]
+			if not factionGroup then
+				SetMapToCurrentZone()
+				local map = GetMapInfo()
+				if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+					factionGroup = "Neutral"
+				else
+					factionGroup = Const.PlayerFaction
+				end
+				zonefactions[currentZone] = factionGroup
+			end
+			return factionGroup
+		end
+		return Const.PlayerFaction
+	end
+
+	--[[
+	function private.FactionOnLoad()
+		-- localizations will now be available
+	end
+	--]]
 end
 
 function private.relevelFrame(frame)
@@ -432,12 +457,11 @@ local function replicate(source, depth, history)
 	return dest
 end
 local function empty(item)
-	if type(item) ~= 'table' then return end
-	for k,v in pairs(item) do item[k] = nil end
+	if type(item) == 'table' then wipe(item) end
 end
 local function fill(item, ...)
 	if type(item) ~= 'table' then return end
-	if (#item > 0) then empty(item) end
+	wipe(item)
 	local n = select('#', ...)
 	for i = 1,n do item[i] = select(i, ...) end
 end
@@ -602,11 +626,11 @@ function lib.SendProcessorMessage(spmMsg, ...)
 			if not good then
 				lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error in "..(x.Name or "??"), 0, "Debug")
 			end
-		end	
+		end
 	else
 		spmp = {}
 		spmArray[spmMsg] = spmp
-		
+
 		local modules = AucAdvanced.GetAllModules("Processors")
 		local good, msg
 		for pos, engineLib in ipairs(modules) do
@@ -634,7 +658,7 @@ function lib.SendProcessorMessage(spmMsg, ...)
 				end
 			end
 		end
-		
+
 		modules = AucAdvanced.GetAllModules("Processor")
 		local good, msg
 		for pos, engineLib in ipairs(modules) do
