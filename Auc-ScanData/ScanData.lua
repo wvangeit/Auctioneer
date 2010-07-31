@@ -49,10 +49,6 @@ local Const = AucAdvanced.Const
 local QueryImage = AucAdvanced.API.QueryImage
 local PriceCalcLevel = AucAdvanced.Modules.Util.PriceLevel and AucAdvanced.Modules.Util.PriceLevel.CalcLevel
 
-local HomeRealm = GetRealmName()
-local HomeKey = HomeRealm.."-"..UnitFactionGroup("player")
-local NeutralKey = HomeRealm.."-Neutral"
-
 local type = type
 local pairs = pairs
 local format = format
@@ -70,32 +66,17 @@ local colorDist = {
 
 --[[ MODULE FUNCTIONS ]]--
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		private.ProcessTooltip(...)
-	elseif (callbackType == "scanstats") then
-		wipe(private.distributionCache)
-		wipe(private.worthCache)
-	elseif callbackType == "load" then
-		local addon = ...
-		if addon == "auc-scandata" then
-			if private.OnLoad then
-				private.OnLoad()
-			end
-		end
-	end
-end
-
 lib.Processors = {}
+--[[
 function lib.Processors.tooltip(callbackType, ...)
 	private.ProcessTooltip(...)
 end
-function lib.Processors.scanstats(callbackType, ...)
+--]]
+function lib.Processors.scanstats()
 	wipe(private.distributionCache)
 	wipe(private.worthCache)
 end
-function lib.Processors.load(callbackType, ...)
-	local addon = ...
+function lib.Processors.load(callbackType, addon)
 	if addon == "auc-scandata" then
 		if private.OnLoad then
 			private.OnLoad()
@@ -274,7 +255,7 @@ function lib.GetDistribution(hyperlink)
 	return exact, suffix, base, myColors
 end
 
-function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
+function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost)
 	if not get("scandata.tooltip.display") then return  end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
@@ -330,7 +311,7 @@ function lib.GetScanData(serverKey)
 	local realmdata = AucScanData.scans[realm]
 	if not realmdata then return end -- not in database
 
-	local livedata = serverKey == HomeKey or serverKey == NeutralKey -- 'live' data can be changed by scanning
+	local livedata = serverKey == Const.ServerKeyHome or serverKey == Const.ServerKeyNeutral -- 'live' data can be changed by scanning
 	local scandata = realmdata[faction]
 	if scandata then
 		if not livedata then
@@ -367,53 +348,69 @@ function lib.GetScanData(serverKey)
 	return scandata
 end
 
-function lib.ClearScanData(key)
+function lib.ClearScanData(command)
 	local report, serverKey
-	key = key or "faction" -- default
-	if type(key) == "string" then
-		key = strtrim(key)
-		local keyword = AucAdvanced.API.IsKeyword(key)
-		if keyword == "ALL" then
+	local keyword, extra = "faction", "" -- default
+
+	if type(command) == "string" then
+		local _, ind, key = strfind(command, "(%S+)")
+		if key then
+			key = AucAdvanced.API.IsKeyword(key)
+			if key then
+				keyword = key -- recognised keyword
+				extra = strtrim(strsub(command, ind+1))
+			else
+				extra = strtrim(command) -- processor will try to resolve whole command
+			end
+		end
+	elseif command then -- only valid types are string or nil
+		error("Unrecognised parameter type to ClearScanData: "..type(command)..":"..tostring(command))
+	end
+
+	if keyword == "ALL" then
+		if extra == "" then
 			wipe(AucScanData.scans)
 			report = "All realms"
-		elseif keyword == "server" then
-			AucScanData.scans[HomeRealm] = nil
-			report = HomeRealm
+		end
+	else
+		if keyword == "server" then
+			if extra == "" then extra = Const.PlayerRealm end
 		elseif keyword == "faction" then
-			local sKey, realm, faction = AucAdvanced.GetFaction()
-			AucScanData.scans[realm][faction] = nil
-			local _, _, text = AucAdvanced.SplitServerKey(sKey)
-			report = text
-			serverKey = sKey
-		elseif AucScanData.scans[key] then -- it's a realm name
-			AucScanData.scans[key] = nil
-			report = key
+			if extra == "" then extra = AucAdvanced.GetFaction() end
+		end
+		if AucScanData.scans[extra] then -- it's a realm name in our database
+			AucScanData.scans[extra] = nil
+			report = extra
 		else
-			-- is it a serverKey?
-			local realm, faction, text = AucAdvanced.SplitServerKey(key)
+			local fac = AucAdvanced.IsFaction(extra)
+			if fac then -- convert faction group to serverKey
+				extra = Const.PlayerRealm.."-"..fac
+			end
+			local realm, faction, text = AucAdvanced.SplitServerKey(extra)
 			if faction and AucScanData.scans[realm] then
 				AucScanData.scans[realm][faction] = nil
 				report = text
-				serverKey = key
+				serverKey = extra
 			end
 		end
 	end
+
 	wipe(private.dataCache)
 	-- Our functions expect home faction to exist - create a new one if it has just been deleted
-	if not AucScanData.scans[HomeRealm] then AucScanData.scans[HomeRealm] = {} end
-	lib.GetScanData(HomeKey) -- force create (if needed) and put back in cache
+	if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
+	lib.GetScanData(Const.ServerKeyHome) -- force create (if needed) and put back in cache
 	if report then
 		aucPrint("Auctioneer: ScanData cleared for {{"..report.."}}.")
 		local clearstats = {
 			source = "clear",
 			clearType = "scandata",
-			clearRequest = key,
+			clearRequest = command,
 			clearReport = report,
 			serverKey = serverKey,
 		}
-		AucAdvanced.SendProcessorMessage("scanstats", clearstats)
+		AucAdvanced.SendProcessorMessage("scanstats", clearstats) -- notify modules to flush caches
 	else
-		aucPrint("Auctioneer: Cannot clear ScanData for \""..tostring(key).."\"")
+		aucPrint("Auctioneer: Unable to clear ScanData for {{"..command.."}}")
 	end
 end
 
@@ -455,8 +452,8 @@ end
 function private.OnLoad()
 	private.OnLoad = nil
 	private.UpgradeDB()
-	if not AucScanData.scans[HomeRealm] then AucScanData.scans[HomeRealm] = {} end
-	lib.GetScanData(HomeKey) -- force unpack of home faction data
+	if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
+	lib.GetScanData(Const.ServerKeyHome) -- force unpack of home faction data
 	private.isLoaded = true
 end
 
