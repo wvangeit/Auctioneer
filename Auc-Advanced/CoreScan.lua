@@ -188,7 +188,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 	end
 
 	local now = GetTime()
-	tinsert(private.scanStack, {time(), false, query, {}, {}, now, 0, now})
+	tinsert(private.scanStack, {time(), false, query, {}, {}, now, 0, now, 0})
 end
 
 function lib.PushScan()
@@ -282,19 +282,19 @@ local function newBar()
 				tile=1, tileSize=10, edgeSize=10,
 				insets={left=1, right=1, top=1, bottom=1}
 			})
-	
+
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	bar:SetStatusBarColor(0.6,0,0,0.6)
 	bar:SetMinMaxValues(0,100)
 	bar:SetValue(50)
 	bar:Hide()
-	
+
 	bar.text = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	bar.text:SetPoint("CENTER", bar, "CENTER")
 	bar.text:SetJustifyH("CENTER")
 	bar.text:SetJustifyV("CENTER")
 	bar.text:SetTextColor(1,1,1)
-		
+
 	if NumGenericBars < 1 then
 		bar:SetPoint("CENTER", UIParent, "CENTER", -5,5)
 	else--attach to previous bar
@@ -326,7 +326,7 @@ function lib.ProgressBars(name, value, show, text, options)
 	if not AucAdvanced.Scan["GenericProgressBar"..ID] then
 		newBar()
 	end
-	
+
 	local self = AucAdvanced.Scan["GenericProgressBar"..ID]
 	--turn bar on/off
 	if show then
@@ -349,7 +349,7 @@ function lib.ProgressBars(name, value, show, text, options)
 				AucAdvanced.Scan["GenericProgressBar"..i]:Hide()
 			end
 		end
-		
+
 		for i,v in ipairs(availableBars) do
 			if type(i) == "string" and availableBars[i] > 1 and availableBars[i] > IDRemoved then
 				AucAdvanced.Scan["GenericProgressBar"..availableBars[i]]:Hide()
@@ -370,7 +370,7 @@ function lib.ProgressBars(name, value, show, text, options)
 	--[[options is a table that contains, "tweaks" ie text or bar color changes
 	Nothing below this line will be processed unless an options table is passed]]
 	if not options or type(options) ~= "table" then return end
-		
+
 	--change bars color
 	local barColor = options.barColor
 	if barColor then
@@ -428,8 +428,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		else
 			if not CanQuery then
 				private.queueScan = {
-					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
+					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary
 				}
+				private.queueScanParams = 10 -- must match the number of entries we put into the table, including nils. Used when unpacking
 				return
 			end
 		end
@@ -628,7 +629,7 @@ local function processStats(processors, operation, curItem, oldItem)
 			if (not pOK) then
 				if (nLog) then nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "ScanProcessor Error", ("ScanProcessor %s Returned Error %s"):format(x and x.Name or "??", errormsg)) end
 			end
-		end	
+		end
 	end
 	return true
 end
@@ -900,7 +901,7 @@ local Commitfunction = function()
 	local lastPause = startTime
 	local totalProcessingTime = 0
 	local speed = get("scancommit.speed")/100
-		
+
 	speed = speed^2.5
 	local processingTime = speed * 0.1 + 0.015
 		-- Min (1): 0.02s (~50 fps)      --    Max (100): 0.12s  (~8 fps).   Default (50):  0.037s (~25 fps)
@@ -999,7 +1000,7 @@ local Commitfunction = function()
 			table.insert(processors[op], x)
 		end
 	end
-	
+
 	--[[ *** Stage 2: Merge new scan into ScanData *** ]]
 	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 2") -- change displayed text for reporting purposes
 	processStats(processors, "begin")
@@ -1171,7 +1172,7 @@ local Commitfunction = function()
 		scanSize = "NoSum-"..scansize
 	end
 
-	if (nLog or printSummary) then	
+	if (nLog or printSummary) then
 		totalProcessingTime = totalProcessingTime + (GetTime() - lastPause)
 
 		local scanTime = " "
@@ -1251,15 +1252,15 @@ local Commitfunction = function()
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
-		if (nLog) then 
+		if (nLog) then
 			local eTime = GetTime()
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, 
-			"Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed", 
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO,
+			"Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed",
 			summary..("\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f\nTotal Commit Coroutine Execution Time (excluding yields): %f"):format(eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-startTime, totalProcessingTime))
 		end
 	end
 
-	
+
 	local TempcurScanStats = {
 		source = "scan",
 		serverKey = serverKey,
@@ -1537,8 +1538,8 @@ local StorePageFunction = function()
 		private.curPages = {}
 	end
 
-	if (nLog) then 
-		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Started %fs after Query Start"):format(startTime - queryStarted), ("StorePage Called %f seconds from query to be called"):format(startTime - queryStarted)) 
+	if (nLog) then
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Started %fs after Query Start"):format(startTime - queryStarted), ("StorePage Called %f seconds from query to be called"):format(startTime - queryStarted))
 	end
 
 	local curQuery, curScan, curPages = private.curQuery, private.curScan, private.curPages
@@ -1546,8 +1547,8 @@ local StorePageFunction = function()
 	local speed = get("scancommit.speed")/100
 	speed = speed^2.5
 	local processingTime = speed * 0.1 + 0.015
-	
-	
+
+
 	local EventFramesRegistered = {}
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local maxPages = ceil(totalAuctions / 50)
@@ -1578,7 +1579,7 @@ local StorePageFunction = function()
 	local curTime = time()
 	local getallspeed = (get("GetAllSpeed") or 500)*4
 
-	
+
 	local storecount = 0
 	if not private.breakStorePage and (page > curQuery.qryinfo.page) then
 
@@ -1590,7 +1591,7 @@ local StorePageFunction = function()
 					localRunTime = localRunTime + GetTime()-lastPause
 					coroutine.yield()
 					lastPause = GetTime()
-					if private.breakStorePage then 
+					if private.breakStorePage then
 						break
 					end
 				end
@@ -1687,8 +1688,8 @@ local StorePageFunction = function()
 	local endTime = GetTime()
 	localRunTime = localRunTime + endTime-lastPause
 	private.storeTime = (private.storeTime or 0) + localRunTime
-	if (nLog) then 
-		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage %fs"):format(localRunTime), ("StorePage Took %f seconds from request to complete, %f seconds of that was to store, and %f seconds of the time to store was processing time"):format(endTime-queryStarted, endTime-startTime, localRunTime)) 
+	if (nLog) then
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage %fs"):format(localRunTime), ("StorePage Took %f seconds from request to complete, %f seconds of that was to store, and %f seconds of the time to store was processing time"):format(endTime-queryStarted, endTime-startTime, localRunTime))
 	end
 end
 
@@ -2032,7 +2033,7 @@ function private.OnUpdate(me, dur)
 		if CanSendAuctionQuery() and (not private.CanSend or private.CanSend()) then
 			local queued = private.queueScan
 			private.queueScan = nil
-			lib.StartScan(unpack(queued))
+			lib.StartScan(unpack(queued, 1, private.queueScanParams)) -- explicit start and end points as some entries may be nil
 		end
 		return
 	end
@@ -2343,18 +2344,18 @@ end
 internal.Scan = {}
 function internal.Scan.NotifyItemListUpdated()
 	if private.scanStarted then
-		if (nLog) then 
+		if (nLog) then
 			local startTime = GetTime()
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyItemListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyItemListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted)) 
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyItemListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyItemListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted))
 		end
 	end
 end
 
 function internal.Scan.NotifyOwnedListUpdated()
 	if private.scanStarted then
-		if (nLog) then 
+		if (nLog) then
 			local startTime = GetTime()
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyOwnedListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyOwnedListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted)) 
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyOwnedListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyOwnedListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted))
 		end
 	end
 end
