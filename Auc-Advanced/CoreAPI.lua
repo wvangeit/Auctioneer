@@ -58,50 +58,14 @@ local GetItemInfo = GetItemInfo
 -- GLOBALS: nLog, N_NOTICE, N_WARNING, N_ERROR
 
 
---[[
-	The following functions are defined for modules's exposed methods:
-
-	GetName()         (ALL*)  Should return this module's full name
-	OnLoad()          (ALL*)  Receives load message for all modules
-	Processor()       (ALL)   Processes messages sent by Auctioneer
-	CommandHandler()  (ALL)   Slash command handler for this module
-	ScanProcessor {}  (ALL)   Processes items from the scan manager
-	GetPrice()        (STAT*) Returns estimated price for item link
-	GetPriceColumns() (STAT)  Returns the column names for GetPrice
-	StartScan()       (SCAN*) Begins an AH scan session
-	IsScanning()      (SCAN*) Indicates an AH scan is in session
-	AbortScan()       (SCAN)  Cancels the currently running scan
-	Hook { }          (ALL)   Functions that are hooked by the module
-    GetItemPDF()      (STAT*) Provides a probability distribution function for an item price
-
-
-	Module type in parentheses to describe which ones provide.
-	Possible Module Types are STAT, UTIL, SCAN.  ALL is a shorthand for all three.
-	A * after the module type states the function is REQUIRED.
-
-	Please visit http://norganna.org/wiki/Auctioneer/5.0/Modules_API for a
-	more complete specification.
-]]
-
--- this is actually called from a dummy module in CoreUtil
-function coremodule.Processor(event, ...)
-	if event == "scanstats" then
-		lib.ClearMarketCache()
-	elseif event == "configchanged" then
-		lib.ClearMarketCache()
-	elseif event == "newmodule" then
-		private.ClearEngineCache()
-		lib.ClearMarketCache()
-	end
-end
 coremodule.Processors = {}
-function coremodule.Processors.scanstats(event, ...)
+function coremodule.Processors.scanstats()
 	lib.ClearMarketCache()
 end
-function coremodule.Processors.configchanged(event, ...)
+function coremodule.Processors.configchanged()
 	lib.ClearMarketCache()
 end
-function coremodule.Processors.newmodule(event, ...)
+function coremodule.Processors.newmodule()
 	private.ClearEngineCache()
 	lib.ClearMarketCache()
 end
@@ -325,31 +289,50 @@ do
 	end
 end
 
-function lib.ClearData(key)
+function lib.ClearData(command)
 	local serverKey1, serverKey2, serverKey3
-	if not key or key == "" then key = "faction" end -- default
-	if type(key) == "string" then
-		key = strtrim(key)
-		local keyword = lib.IsKeyword(key)
-		local realmName
-		if keyword == "ALL" then
-			serverKey1 = key
-		elseif keyword == "faction" then
-			serverKey1 = GetFaction()
-		elseif keyword == "server" then
-			local _, name = GetFaction()
-			realmName = name
-		elseif AucAdvanced.SplitServerKey(key) then -- it's a valid serverKey
-			serverKey1 = key
-		else -- assume it's a realm
-			realmName = key
+
+	-- split command into keyword and extra parts
+	local keyword, extra = "faction", "" -- default
+	if type(command) == "string" then
+		local _, ind, key = strfind(command, "(%S+)")
+		if key then
+			key = lib.IsKeyword(key)
+			if key then
+				keyword = key -- recognised keyword
+				extra = strtrim(strsub(command, ind+1))
+			else
+				extra = strtrim(command) -- try to resolve whole command (as a "faction")
+			end
 		end
-		if realmName then
-			serverKey1 = realmName.."-Alliance"
-			serverKey2 = realmName.."-Horde"
-			serverKey3 = realmName.."-Neutral"
+	elseif command then -- only valid types are string or nil
+		error("Unrecognised parameter type to ClearData: "..type(command)..":"..tostring(command))
+	end
+
+	-- At this point keyword should be one of the strings in the following if-block
+	-- extra should be a string, where 'no extra information' is denoted by ""
+	if keyword == "ALL" then
+		if extra == "" then serverKey1 = "ALL" end
+	elseif keyword == "server" then
+		if extra == "" then extra = Const.PlayerRealm end
+		-- otherwise assume the user typed the server name correctly
+		-- modules should silently ignore unrecognised serverKeys
+		serverKey1 = extra.."-Alliance"
+		serverKey2 = extra.."-Horde"
+		serverKey3 = extra.."-Neutral"
+	elseif keyword == "faction" then
+		if extra == "" then
+			serverKey1 = GetFaction()
+		elseif AucAdvanced.SplitServerKey(extra) then -- it's a valid serverKey
+			serverKey1 = extra
+		else
+			local fac = AucAdvanced.IsFaction(extra) -- it's a valid faction group
+			if fac then
+				serverKey1 = Const.PlayerRealm.."-"..fac
+			end
 		end
 	end
+
 	if serverKey1 then
 		local modules = AucAdvanced.GetAllModules("ClearData")
 		for pos, lib in ipairs(modules) do
@@ -361,7 +344,7 @@ function lib.ClearData(key)
 		end
 		lib.ClearMarketCache()
 	else
-		lib.Print("Auctioneer: Unrecognized parameter for ClearData")
+		lib.Print("Auctioneer: Unrecognized keyword or faction for ClearData {{"..command.."}}")
 	end
 end
 
