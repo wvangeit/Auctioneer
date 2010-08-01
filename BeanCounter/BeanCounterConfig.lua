@@ -141,6 +141,8 @@ private.settingDefaults = {
 	["columnwidth.".._BC("UiFee")] = 70,
 	["columnwidth.".._BC('UiReason')] = 70,
 	["columnwidth.".._BC('UiDateHeader')] = 250,
+	
+	["columnwidth.".._BC('UiProfit')] = 65, 
 	["ModTTShow"] = false,
     }
 
