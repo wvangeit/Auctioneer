@@ -322,12 +322,12 @@ function lib.ClearItem(hyperlink, serverKey)
 end
 
 function lib.ClearData(serverKey)
-	print(_TRANS('ASAL_Interface_SlashHelpClearingData') )-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
 	serverKey = serverKey or GetFaction()
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
 		-- "ALL" overrides all pre-existing entries in the table. Eliminate those "dead" entries.
 		wipe(SalesDB)
 		SalesDB.ALL = time()
+		print(_TRANS('ASAL_Interface_SlashHelpClearingData').." {{".._TRANS("ADV_Interface_AllRealms").."}}.")-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
 	elseif AucAdvanced.SplitServerKey(serverKey) then -- looks like a valid serverKey
 		-- Any pre-existing entries *containing* this serverKey are overridden by the new entry for this serverKey; remove them
 		for key, value in pairs(SalesDB) do
@@ -336,6 +336,8 @@ function lib.ClearData(serverKey)
 			end
 		end
 		SalesDB[serverKey] = time()
+		local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
+		print(_TRANS('ASAL_Interface_SlashHelpClearingData').." {{"..keyText.."}}.")-- Sales does not store data itself. It uses your Beancounter data. BeanCounter data before todays date will be ignored.
 	end
 	wipe(pricecache)
 end
@@ -357,32 +359,14 @@ function lib.OnLoad()
 	end
 end
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		private.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	end
-end
 
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
-	private.ProcessTooltip(...)
-end
 
 function lib.Processors.config(callbackType, ...)
-	--Called when you should build your Configator tab.
-	private.SetupConfigGui(...)
+	if private.SetupConfigGui then private.SetupConfigGui(...) end
 end
 
-
-
-function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
-	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
-	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
-	-- display in the tooltip.
-
+function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost)
 	if not get("stat.sales.tooltip") or not (BeanCounter) or not (BeanCounter.API) or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
 
 	local average, mean, stdev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
@@ -436,6 +420,7 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 end
 
 function private.SetupConfigGui(gui)
+	private.SetupConfigGui = nil
 	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what sales stats",
