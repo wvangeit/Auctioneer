@@ -420,7 +420,7 @@ function private.GetPriceCore(sig, link, serverKey, match)
 	--we only officially accept "max" or a number, but user could have input any random string, so add some sanitization
 	stack = tonumber(stack)
 	if stack then
-		if stack > maxStack then
+		if maxStack and stack > maxStack then
 			stack = maxStack --never allow a saved stack value larger than the item can really stack to
 		elseif stack < 1 then
 			stack = 1
@@ -444,7 +444,7 @@ function private.GetPriceCore(sig, link, serverKey, match)
 			if get("util.appraiser.bid.deposit") then
 				local _, faction = SplitServerKey(serverKey)
 				local dep = GetDepositCost(link, duration, faction, stack)
-				if dep then
+				if dep and stack then
 					deposit = dep / stack
 				end
 			end
