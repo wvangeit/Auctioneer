@@ -46,7 +46,7 @@
 ]]
 if not AucAdvanced then return end
 local coremodule, internal = AucAdvanced.GetCoreModule("CorePost")
--- internal is a shared space only accessible to code that can call GetCoreModule, 
+-- internal is a shared space only accessible to code that can call GetCoreModule,
 -- which is only the .lua files in Auc-Advanced.  Basically, we have an internal use only area.
 if not coremodule then return end -- Someone has explicitely broken us
 if (not AucAdvanced.Post) then AucAdvanced.Post = {} end
@@ -278,6 +278,21 @@ do
 	end
 end --of Post Request Queue section
 
+local AuctionDurationCode = {
+	1, --[1]
+	2, --[2]
+	3, --[3]
+	[12] = 1, -- hours
+	[24] = 2,
+	[48] = 3,
+	[720] = 1, -- minutes
+	[1440] = 2,
+	[2880] = 3,
+}
+function lib.ValidateAuctionDuration(duration)
+	return AuctionDurationCode[duration]
+end
+
 --[[
     PostAuction(sig, size, bid, buyout, duration, [multiple])
 
@@ -303,14 +318,9 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 		return nil, "InvalidBid"
 	elseif type(buyout) ~= "number" or (buyout < bid and buyout ~= 0) then
 		return nil, "InvalidBuyout"
-	--duration used to be passed as a time instead of the 1 2 3 value added in WOW patch 3.3.3 so check and convert if needed
-	elseif duration == 720 then
-		duration = 1
-	elseif duration == 1440 then
-		duration = 2
-	elseif duration == 2880 then
-		duration = 3
-	elseif duration < 1 or duration > 3 then
+	end
+	duration = AuctionDurationCode[duration]
+	if not duration then
 		return nil, "InvalidDuration"
 	end
 
@@ -327,7 +337,9 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	end
 	local available, total, _, _, _, reason = lib.CountAvailableItems(sig)
 	if total == 0 then
-		return nil, reason or "NotFound"
+		return nil, "NotFound"
+	elseif available == 0 and reason then
+		return nil, reason
 	elseif available < size * multiple then
 		return nil, "NotEnough"
 	end
