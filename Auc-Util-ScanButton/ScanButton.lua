@@ -199,7 +199,7 @@ function private.HookAH()
 
 	private.UpdateScanProgress()
 end
-
+local progressBarOptions = {barColor = {0,0.6,0}}
 function private.UpdateScanProgress(state, _, _, _, _, _, _, scansQueued)
 	local scanning, paused = false, false
 	if AucAdvanced and AucAdvanced.Scan then
@@ -224,11 +224,19 @@ function private.UpdateScanProgress(state, _, _, _, _, _, _, scansQueued)
 		if pending ~= private.lastpending then
 			private.lastpending = pending
 			private.buttons.stop.count:SetText(pending)
+			--store highest pending
+			if not progressBarOptions.pending or progressBarOptions.pending < pending then
+				progressBarOptions.pending = pending or 0
+			end
+			local value = (100 - pending * 100 / progressBarOptions.pending) or 0
+			AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount", value, true, pending.." scans remaining", progressBarOptions)
 		end
 	end
 	--handle when we are on the last scan and no more queued when that scan completes set remaining to 0
 	if scansQueued == 0 and state == false then
 		private.buttons.stop.count:SetText(pending)
+		progressBarOptions.pending = 0
+		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount")--hide progress bar
 	end
 	
 	private.blink = nil
@@ -331,8 +339,14 @@ end
 function private.stop()
 	--this just makes the scan queue count decrease by 1 until the next processor event  sets it to a proper # helpfull if user is spamming stop button
 	local count = tonumber(private.buttons.stop.count:GetText() )
-	if count > 0 then	count = count -1 end
+	if count > 0 then 
+		count = count -1
+		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount", 100, true, count.." scans remaining", "0|0.6|0")
+	else
+		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount")
+	end
 	private.buttons.stop.count:SetText(count)
+	
 	
 	AucAdvanced.Scan.SetPaused(false)
 	AucAdvanced.Scan.Cancel()
