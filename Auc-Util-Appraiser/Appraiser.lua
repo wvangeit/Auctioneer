@@ -166,7 +166,7 @@ function lib.Processors.scanstats(callbackType, ...)
 end
 
 function lib.Processors.postresult(callbackType, ...)
-	private.frame.Reselect(select(3, ...))
+	private.SelectNextOnPost(...)
 end
 
 function lib.Processors.postqueue(callbackType, ...)

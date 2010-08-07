@@ -356,7 +356,7 @@ function private.CreateFrames()
 		end
 	end
 
-	function private.SelectNextOnPost(postresult)
+	function private.SelectNextOnPost(success, id, postresult, errcode)
 		--[[ todo: add settings option to enable this feature
 		local sig = postresult.sig or postresult[1]
 		if sig == frame.selected then
@@ -2315,7 +2315,7 @@ function private.CreateFrames()
 	frame.cancel.label:SetTextColor(1, 0.8, 0)
 	frame.cancel.label:SetText("")
 	frame.cancel.label:SetJustifyH("LEFT")
-	
+
 	local lastPostProgress = 0
 	local progressBarOptions = {barColor = {0,0,.6}}
 	function private.UpdatePostQueueProgress(postnum)
@@ -2324,7 +2324,7 @@ function private.CreateFrames()
 		if postnum > lastPostProgress then lastPostProgress = postnum end
 		local value = (100 - postnum * 100 / lastPostProgress) or 0
 		AucAdvanced.API.ProgressBars("AppraiserBar", value, true, "Appraiser has "..postnum.." more items to post", progressBarOptions)
-		
+
 		if (postnum > 0) and (frame.cancel:IsEnabled() == 0) then
 			frame.cancel:Enable()
 			frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
