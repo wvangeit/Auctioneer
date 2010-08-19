@@ -169,7 +169,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 
 	if private.scanStack then
 		for _, scan in ipairs(private.scanStack) do
-			if private.QueryCompareParameters(scan[3], name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
+			if not scan[8] and private.QueryCompareParameters(scan[3], name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
 				-- duplicate of exisiting queued query
 				if (nLog) then
 					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Duplicate pushed scan detected, cancelling duplicate")
@@ -187,8 +187,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Starting pushed scan %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 	end
 
-	local now = GetTime()
-	tinsert(private.scanStack, {time(), false, query, {}, {}, now, 0, now, 0})
+	tinsert(private.scanStack, {time(), false, query, {}, {}, GetTime(), 0, false, 0})
 end
 
 function lib.PushScan()
@@ -242,7 +241,7 @@ function lib.PopScan()
 		private.storeTime = unpack(private.scanStack[1])
 		tremove(private.scanStack, 1)
 
-		local elapsed = now - pauseTime
+		local elapsed = pauseTime and (now - pauseTime) or 0
 		if elapsed > 300 then
 			-- 5 minutes old
 			--_print("Paused scan is older than 5 minutes, commiting what we have and aborting")
