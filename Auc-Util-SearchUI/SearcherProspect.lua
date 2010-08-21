@@ -124,8 +124,9 @@ function lib.Search(item)
 	if not resources.isEnchantrixLoaded then
 		return false, "Enchantrix not detected"
 	end
-	if item[Const.QUALITY] ~= 1 then -- All prospectable ores are "Common" quality
-		return false, "Item not prospectable"
+	local quality = item[Const.QUALITY]
+	if quality < 1 or quality > 2 then -- Ores are common or uncommon quality
+		return false, "Wrong quality for prospecting"
 	end
 
 	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
@@ -162,7 +163,7 @@ function lib.Search(item)
 	end
 
 	local market, deposit = 0, 0
-	
+
 	-- prep locals to speed up access inside the loop
 	local depositAucLength, depositRelistTimes, depositFaction
 	local includeDeposit = get("prospect.adjust.deposit")
@@ -190,7 +191,7 @@ function lib.Search(item)
 		market = market * resources.CutAdjust
 	end
 	market = market - deposit
-	
+
 	-- Adjust for stack size and note that yield is per stack of 5
 	market = market* item[Const.COUNT] / 5
 	local value = min (market*(100-get("prospect.profit.pct"))/100, market-get("prospect.profit.min"))
