@@ -45,7 +45,7 @@ do -- limit scope of locals
 		return styles
 	end
 
-	factions = {
+	local factions = {
 			"Neutral",
 			"Alliance",
 			"Horde",
