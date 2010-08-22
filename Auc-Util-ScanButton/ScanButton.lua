@@ -341,7 +341,7 @@ function private.stop()
 	local count = tonumber(private.buttons.stop.count:GetText() )
 	if count > 0 then 
 		count = count -1
-		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount", 100, true, count.." scans remaining", "0|0.6|0")
+		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount", 100, true, count.." scans remaining", progressBarOptions)
 	else
 		AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount")
 	end
