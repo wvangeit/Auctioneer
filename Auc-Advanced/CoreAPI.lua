@@ -622,7 +622,6 @@ function lib.ProgressBars(name, value, show, text, options)
 		for ID = 1, NumGenericBars do
 			if availableBars[ID] then
 				barData = availableBars[ID]
-				print(i,barData[1])
 				renderBars(ID, barData[1], barData[2], barData[3], barData[4])			
 			else--blank bars
 				renderBars(ID)	
