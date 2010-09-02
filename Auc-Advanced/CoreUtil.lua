@@ -348,9 +348,9 @@ function lib.AddTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs (including the tab we are going
 	-- to insert).
 	local tabCount = 1;
-	while (getglobal("AuctionFrameTab"..(tabCount))) do
+	while (_G["AuctionFrameTab"..(tabCount)]) do
 		--check that tab has not already been created, since we can optionally remove tabs now
-		if getglobal("AuctionFrameTab"..(tabCount)):GetName() == tabButton:GetName() then
+		if _G["AuctionFrameTab"..(tabCount)]:GetName() == tabButton:GetName() then
 			lib.Print("Tab with that name already exists")
 			return
 		end
@@ -361,15 +361,15 @@ function lib.AddTab(tabButton, tabFrame)
 	-- tabs. We want to insert them at the end or before BeanCounter's
 	-- Transactions tab.
 	local tabIndex = 1;
-	while (getglobal("AuctionFrameTab"..(tabIndex)) and
-		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabUtilBeanCounter") do
+	while (_G["AuctionFrameTab"..(tabIndex)] and
+		   _G["AuctionFrameTab"..(tabIndex)]:GetName() ~= "AuctionFrameTabUtilBeanCounter") do
 		tabIndex = tabIndex + 1;
 	end
 
 	-- Make room for the tab, if needed.
 	for index = tabCount, tabIndex + 1, -1  do
-		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
-		getglobal("AuctionFrameTab"..(index)):SetID(index);
+		_G["AuctionFrameTab"..(index)] = _G["AuctionFrameTab"..(index - 1)];
+		_G["AuctionFrameTab"..(index)]:SetID(index);
 	end
 
 	-- Configure the frame.
@@ -378,15 +378,15 @@ function lib.AddTab(tabButton, tabFrame)
 	private.relevelFrame(tabFrame);
 
 	-- Configure the tab button.
-	setglobal("AuctionFrameTab"..tabIndex, tabButton);
+	_G["AuctionFrameTab"..tabIndex] = tabButton;
 	tabButton:SetParent("AuctionFrame");
-	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
+	tabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabIndex - 1)]:GetName(), "TOPRIGHT", -8, 0);
 	tabButton:SetID(tabIndex);
 	tabButton:Show();
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
 	if (tabIndex < tabCount) then
-		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
+		nextTabButton = _G["AuctionFrameTab"..(tabIndex + 1)];
 		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
 	end
 
@@ -397,14 +397,14 @@ end
 function lib.RemoveTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs.
 	local tabCount = 0
-	while (getglobal("AuctionFrameTab"..(tabCount+1))) do
+	while (_G["AuctionFrameTab"..(tabCount+1)]) do
 		tabCount = tabCount + 1;
 	end
 
 	-- Find the correct location to remove the tab
 	local tabIndex, tabFound = 1
-	while getglobal("AuctionFrameTab"..(tabIndex)) do
-		if getglobal("AuctionFrameTab"..(tabIndex)):GetName() == tabButton:GetName() then
+	while _G["AuctionFrameTab"..(tabIndex)] do
+		if _G["AuctionFrameTab"..(tabIndex)]:GetName() == tabButton:GetName() then
 			tabFound = tabIndex
 			break
 		end
@@ -416,19 +416,19 @@ function lib.RemoveTab(tabButton, tabFrame)
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button after removal.
 	if tabFound and (tabFound < tabCount) then
-		nextTabButton = getglobal("AuctionFrameTab"..(tabFound + 1))
-		nextTabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabFound - 1)):GetName(), "TOPRIGHT", -8, 0)
+		nextTabButton = _G["AuctionFrameTab"..(tabFound + 1)]
+		nextTabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabFound - 1)]:GetName(), "TOPRIGHT", -8, 0)
 	end
 
 	-- Reduce count on tabs remaining
-	setglobal("AuctionFrameTab"..(tabFound), nil) --remove old tab from namespace
+	_G["AuctionFrameTab"..(tabFound)] = nil --remove old tab from namespace
 	for index = tabFound, tabCount do
-		local tab = getglobal("AuctionFrameTab"..(index + 1))
+		local tab = _G["AuctionFrameTab"..(index + 1)]
 		if tab then
-			setglobal("AuctionFrameTab"..(index),  tab)
-			getglobal("AuctionFrameTab"..(index)):SetID(index)
+			_G["AuctionFrameTab"..(index)] =  tab
+			_G["AuctionFrameTab"..(index)]:SetID(index)
 		else --last tab index needs to be removed
-			setglobal("AuctionFrameTab"..(index), nil)
+			_G["AuctionFrameTab"..(index)] = nil
 		end
 	end
 
