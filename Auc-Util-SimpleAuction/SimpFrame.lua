@@ -1069,10 +1069,10 @@ function private.CreateFrames()
 	frame.options:AddOption("undercut", "Undercut competitors")
 	frame.options:AddOption("remember", "Remember fixed price")
 
-	function frame.ClickBagHook(_,_,obj,button)
+	function frame.ClickBagHook(_,_,self,button)
 		if (not get("util.simpleauc.clickhook")) then return end
-		local bag = this:GetParent():GetID()
-		local slot = this:GetID()
+		local bag = self:GetParent():GetID()
+		local slot = self:GetID()
 		local link = GetContainerItemLink(bag, slot)
 		local _, size = GetContainerItemInfo(bag, slot)
 		if link then
@@ -1108,9 +1108,9 @@ function private.CreateFrames()
 		AucAdvanced.AddTab(frame.tab, frame)
 	end
 
-	function frame.tab.OnClick(_, _, index)
-		if not index then index = this:GetID() end
-		local tab = getglobal("AuctionFrameTab"..index)
+	function frame.tab.OnClick(self, _, index)
+		if not index then index = self:GetID() end
+		local tab = _G["AuctionFrameTab"..index]
 		if (tab and tab:GetName() == "AuctionFrameTabUtilSimple") then
 			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft")
 			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top")
