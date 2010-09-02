@@ -62,10 +62,10 @@ function private.AuctionUI()
 	local last = 1
 	function frame.ScanTab.OnClick(self, button, index)
 		if not index then index = self:GetID() end
-		local tab = getglobal("AuctionFrameTab"..index)
+		local tab = _G["AuctionFrameTab"..index]
 		
 		if button == "RightButton" and tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter" then
-			local tab = getglobal("AuctionFrameTab"..last)
+			local tab = _G["AuctionFrameTab"..last]
 			tab:Click() --use this so we stay on users currently selected tab
 			private.displayGUI(  )
 			return
@@ -374,7 +374,7 @@ function private.CreateFrames()
 	frame.exactCheck:SetChecked(get("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
 	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) private.wipeSearchCache() end)
-	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
+	_G["BeancounterexactCheckText"]:SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, _BC('TT_ExactCheck')) end) --"Only match the Exact text in the search box"
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
@@ -382,7 +382,7 @@ function private.CreateFrames()
 	frame.neutralCheck = CreateFrame("CheckButton", "BeancounterneutralCheck", frame, "OptionsCheckButtonTemplate")
 	frame.neutralCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
 	frame.neutralCheck:SetScript("OnClick", function() local on if frame.neutralCheck:GetChecked() then on = true end set("util.beancounter.ButtonneutralCheck", on) private.wipeSearchCache() end)
-	getglobal("BeancounterneutralCheckText"):SetText(_BC('UiNeutralCheckBox'))
+	_G["BeancounterneutralCheckText"]:SetText(_BC('UiNeutralCheckBox'))
 	frame.neutralCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
 	frame.neutralCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.neutralCheck, _BC('TT_neutralCheck')) end) --"Display results from BeanCounter Classic Database"
 	frame.neutralCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -393,7 +393,7 @@ function private.CreateFrames()
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(get("util.beancounter.ButtonBidCheck"))
 	frame.bidCheck:SetScript("OnClick", function() local on if frame.bidCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidCheck", on) private.wipeSearchCache() end)
-	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
+	_G["BeancounterbidCheckText"]:SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
 	frame.bidCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, _BC('TT_BidCheck')) end) --"Display items bought from the Auction House"
@@ -405,7 +405,7 @@ function private.CreateFrames()
 	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
 	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) private.wipeSearchCache() end)
 	frame.bidFailedCheck:SetScale(0.85)
-	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
+	_G["BeancounterbidFailedCheckText"]:SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidFailedCheck, _BC('TT_BidFailedCheck')) end) --"Display items you were outbided on."
 	frame.bidFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -414,7 +414,7 @@ function private.CreateFrames()
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(get("util.beancounter.ButtonAuctionCheck"))
 	frame.auctionCheck:SetScript("OnClick", function() local on if frame.auctionCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionCheck", on) private.wipeSearchCache() end)
-	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
+	_G["BeancounterauctionCheckText"]:SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
 	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, _BC('TT_AuctionCheck')) end) --"Display items sold at the Auction House"
@@ -426,7 +426,7 @@ function private.CreateFrames()
 	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
 	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) private.wipeSearchCache() end)
 	frame.auctionFailedCheck:SetScale(0.85)
-	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions'))
+	_G["BeancounterauctionFailedCheckText"]:SetText(_BC('UiFailedAuctions'))
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
 	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, _BC('TT_AuctionFailedCheck')) end) --Display items you failed to sell.
 	frame.auctionFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -434,12 +434,12 @@ function private.CreateFrames()
 	--[[search Purchases (vendor/trade)
 	frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
 	frame.buyCheck:SetChecked(true)
-	getglobal(BeancounterbuyCheck:GetName().."Text"):SetText("Buys")
+	_G[BeancounterbuyCheck:GetName().."Text"]:SetText("Buys")
 	frame.buyCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -255)
 	--search Sold (vendor/trade)
 	frame.sellCheck = CreateFrame("CheckButton", "BeancountersellCheck", frame, "OptionsCheckButtonTemplate")
 	frame.sellCheck:SetChecked(true)
-	getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
+	_G[BeancountersellCheck:GetName().."Text"]:SetText("Sold")
 	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
 	--creates teh report text that tells info on # of entries
 	frame.DBCount = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -743,34 +743,31 @@ function private.AddTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs (including the tab we are going
 	-- to insert).
 	local tabCount = 1;
-	while (getglobal("AuctionFrameTab"..(tabCount))) do
-		tabCount = tabCount + 1;
+	while (_G["AuctionFrameTab"..(tabCount)]) do
+		tabCount = tabCount + 1
 	end
 
-	-- Find the correct location to insert our Search Auctions and Post Auctions
-	-- tabs. We want to insert them at the end or before BeanCounter's
-	-- Transactions tab.
-	local tabIndex = 1;
-	while (getglobal("AuctionFrameTab"..(tabIndex)) and
-		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
-		tabIndex = tabIndex + 1;
+	-- Find the correct location to insert our tab
+	local tabIndex = 1
+	while _G["AuctionFrameTab"..(tabIndex)] do
+		tabIndex = tabIndex + 1
 	end
 
 	-- Make room for the tab, if needed.
 	for index = tabCount, tabIndex + 1, -1  do
-		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
-		getglobal("AuctionFrameTab"..(index)):SetID(index);
+		_G["AuctionFrameTab"..(index)] =  _G["AuctionFrameTab"..(index - 1)]
+		_G["AuctionFrameTab"..(index)]:SetID(index)
 	end
 
 	-- Configure the frame.
-	tabFrame:SetParent("AuctionFrame");
-	tabFrame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0);
+	tabFrame:SetParent("AuctionFrame")
+	tabFrame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
 	private.relevelFrame(tabFrame);
 
 	-- Configure the tab button.
-	setglobal("AuctionFrameTab"..tabIndex, tabButton);
+	_G["AuctionFrameTab"..tabIndex] = tabButton
 	tabButton:SetParent("AuctionFrame");
-	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
+	tabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabIndex - 1)]:GetName(), "TOPRIGHT", -8, 0);
 	tabButton:SetID(tabIndex);
 	tabButton:Show();
 
