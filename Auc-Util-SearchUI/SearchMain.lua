@@ -1078,7 +1078,7 @@ function lib.CreateAuctionFrames()
 
 	function frame.tab.OnClick(self, button, down)
 		local index = self:GetID()
-		local tab = getglobal("AuctionFrameTab"..index)
+		local tab = _G["AuctionFrameTab"..index]
 		if (tab and tab:GetName() == myTabName) then
 			AuctionFrameTopLeft:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameTopLeft")
 			AuctionFrameTop:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\AuctionFrameTopMid")
