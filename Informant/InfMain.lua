@@ -935,17 +935,17 @@ local function slidebar()
 end
 
 function onLoad()
-	this:RegisterEvent("ADDON_LOADED")
+	InformantFrame:RegisterEvent("ADDON_LOADED")
 	
 	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
 	
-	this:RegisterEvent("MERCHANT_SHOW");
-	this:RegisterEvent("MERCHANT_UPDATE");
+	InformantFrame:RegisterEvent("MERCHANT_SHOW");
+	InformantFrame:RegisterEvent("MERCHANT_UPDATE");
 
 	Informant_ScanTooltip:SetScript("OnTooltipAddMoney", OnTooltipAddMoney);
 
-	this:RegisterEvent("MERCHANT_SHOW");
-	this:RegisterEvent("MERCHANT_UPDATE");
+	InformantFrame:RegisterEvent("MERCHANT_SHOW");
+	InformantFrame:RegisterEvent("MERCHANT_UPDATE");
 
 	InformantFrameTitle:SetText(_TRANS('INF_Interface_InfWinTitle'))
 	slidebar()
@@ -1034,7 +1034,7 @@ function onEvent(event, addon)
 
 	if (event == "ADDON_LOADED" and addon:lower() == "informant") then
 		onVariablesLoaded()
-		this:UnregisterEvent("ADDON_LOADED")
+		InformantFrame:UnregisterEvent("ADDON_LOADED")
 		scrubLocalUpdateInfo()		-- to fix up data errors
 	end
 

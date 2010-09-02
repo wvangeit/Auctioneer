@@ -35,7 +35,7 @@
 	<GameTooltip name="Informant_ScanTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
 		<Scripts>
 			<Onload>
-				this:SetOwner( UIParent, "ANCHOR_NONE" )
+				self:SetOwner( UIParent, "ANCHOR_NONE" )
 			</Onload>
 		</Scripts>
 	</GameTooltip>
