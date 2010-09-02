@@ -168,7 +168,7 @@ function BF_IgnoreList_Update()
 	local ignoreIndex;
 	for i=1, numIgnoreButtons, 1 do
 		ignoreIndex = i + ignoreOffset;
-		ignoreButton = getglobal("BasicFilter_IgnoreList_IgnoreButton"..i);
+		ignoreButton = _G["BasicFilter_IgnoreList_IgnoreButton"..i];
 		ignoreButton:SetText(IgnoreList[ignoreIndex] or "");
 		ignoreButton:SetID(ignoreIndex);
 		-- Update the highlight
