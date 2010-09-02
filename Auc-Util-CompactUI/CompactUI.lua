@@ -142,7 +142,7 @@ function private.HookAH()
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
 		if (i <= NUM_BROWSE_TO_DISPLAY) then
-			origButton = getglobal("BrowseButton"..i)
+			origButton = _G["BrowseButton"..i]
 			origButton:Hide()
 			_G["BrowseButton"..i] = nil
 		else
