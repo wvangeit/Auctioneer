@@ -55,6 +55,7 @@ local wipe = wipe
 local ceil,floor,max,abs = ceil,floor,max,abs
 local tostring,tonumber,strjoin,strsplit,format = tostring,tonumber,strjoin,strsplit,format
 local GetItemInfo = GetItemInfo
+local time = time
 -- GLOBALS: nLog, N_NOTICE, N_WARNING, N_ERROR
 
 
@@ -379,9 +380,11 @@ function lib.IsValidAlgorithm(algorithm, itemLink)
 	return false
 end
 
+--store the last data request and just return a cache value for the next 5 secs (5 secs is just arbitrary)
+local LastAlgorithmSig, LastAlgorithmTime, LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
 function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
-        if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
+		if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
 		return
 	end
 	if type(itemLink) == "number" then
@@ -393,16 +396,22 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 		return
 	end
 
-    if reserved then
-        lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
-            "The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
-        );
+	if reserved then
+		lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
+		"The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
+		);
 
-        serverKey = reserved.."-"..serverKey;
-    end
-    serverKey = serverKey or GetFaction()
+		serverKey = reserved.."-"..serverKey;
+	end
+	serverKey = serverKey or GetFaction()
 
 	local saneLink = SanitizeLink(itemLink)
+	--check if this was just retrieved and return that value
+	local algosig = strjoin(":", algorithm, saneLink, serverKey)
+	if algosig == LastAlgorithmSig and LastAlgorithmTime + 5 > time() then
+		return LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
+	end
+
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -411,7 +420,6 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 				return
 			end
 			
-
 			local price, seen, array
 			if (engineLib.GetPriceArray) then
 				array = engineLib.GetPriceArray(saneLink, serverKey)
@@ -422,6 +430,9 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 			else
 				price = engineLib.GetPrice(saneLink, serverKey)
 			end
+			LastAlgorithmSig = algosig
+			LastAlgorithmTime = time()
+			LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray = price, seen, array
 			return price, seen, array
 		end
 	end
