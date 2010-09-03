@@ -40,37 +40,21 @@ if not coremodule then return end -- Someone has explicitely broken us
 local tooltip = LibStub("nTipHelper:1")
 local Const = lib.Const
 
--- "Module" functions for CoreUtil
--- installed in private table, called via CoreModule
 
---[[ OnLoad is not currently needed
 function coremodule.OnLoad(addon)
 	if addon == "auc-advanced" then
 		private.FactionOnLoad()
 	end
 end
---]]
 
-function coremodule.Processor(event, subevent)
-	if event == "auctionopen" then
-		private.isAHOpen = true
-	elseif event == "auctionclose" then
-		private.isAHOpen = false
-	elseif event == "newmodule" then
-		-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
-		-- as long as they correctly send a "newmodule" message when created
-		private.modulecache = nil
-		private.resetPriceModels()
-	end
-end
 coremodule.Processors = {}
-function coremodule.Processors.auctionopen(event, subevent)
+function coremodule.Processors.auctionopen()
 	private.isAHOpen = true
 end
-function coremodule.Processors.auctionclose(event, subevent)
+function coremodule.Processors.auctionclose()
 	private.isAHOpen = false
 end
-function coremodule.Processors.newmodule(event, subevent)
+function coremodule.Processors.newmodule(event, libType, libName)
 	-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
 	-- as long as they correctly send a "newmodule" message when created
 	private.modulecache = nil
@@ -250,9 +234,10 @@ lib.breakHyperlink = lib.BreakHyperlink
 do -- Faction and ServerKey related functions
 	local splitcache = {}
 	local localizedfactions = {
-		["Alliance"] = FACTION_ALLIANCE,
-		["Horde"] = FACTION_HORDE,
-		["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
+		-- the following entries are placeholders
+		["Alliance"] = "Alliance",
+		["Horde"] = "Horde",
+		["Neutral"] = "Neutral",
 	}
 	function lib.SplitServerKey(serverKey)
 		local split = splitcache[serverKey]
@@ -273,11 +258,9 @@ do -- Faction and ServerKey related functions
 		["horde"] = "Horde",
 		[FACTION_HORDE:lower()] = "Horde",
 		["neutral"] = "Neutral",
-		[COMBATLOG_FILTER_STRING_NEUTRAL_UNITS:lower()] = "Neutral", -- again, this may not be the correct context? see above
 	}
 	-- Used to check user text input for some form of a faction name; returns standardized form if found
 	-- Possible results are "Alliance", "Horde", "Neutral" or nil if not found
-	-- *** need to confirm this does really work correctly on non-English clients, particularly Russian and Chinese ***
 	function lib.IsFaction(faction)
 		if type(faction) == "string" then
 			return lookupfaction[faction:lower()]
@@ -325,11 +308,21 @@ do -- Faction and ServerKey related functions
 		return Const.PlayerFaction
 	end
 
-	--[[
 	function private.FactionOnLoad()
-		-- localizations will now be available
+		local alliance = lib.localizations("ADV_Interface_FactionAlliance")
+		local horde = lib.localizations("ADV_Interface_FactionHorde")
+		local neutral = lib.localizations("ADV_Interface_FactionNeutral")
+
+		localizedfactions.Alliance = alliance
+		localizedfactions.Horde = horde
+		localizedfactions.Neutral = neutral
+
+		lookupfaction[alliance:lower()] = "Alliance"
+		lookupfaction[horde:lower()] = "Horde"
+		lookupfaction[neutral:lower()] = "Neutral"
+
+		wipe(splitcache)
 	end
-	--]]
 end
 
 function private.relevelFrame(frame)
