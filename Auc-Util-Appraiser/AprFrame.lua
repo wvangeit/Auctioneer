@@ -1935,8 +1935,8 @@ function private.CreateFrames()
 	frame.salebox.stack:Hide()
 
 	frame.salebox.stack:EnableMouseWheel(1)
-	frame.salebox.stack:SetScript("OnMouseWheel", function()
-		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -arg1)
+	frame.salebox.stack:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -delta)
 	end)
 
 	AppraiserSaleboxStackLow:SetText("")
@@ -1996,8 +1996,8 @@ function private.CreateFrames()
 	end
 
 	frame.salebox.number:EnableMouseWheel(1)
-	frame.salebox.number:SetScript("OnMouseWheel", function()
-		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -arg1)
+	frame.salebox.number:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -delta)
 	end)
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2037,8 +2037,8 @@ function private.CreateFrames()
 	AppraiserSaleboxDurationHigh:SetText("")
 
 	frame.salebox.duration:EnableMouseWheel(1)
-	frame.salebox.duration:SetScript("OnMouseWheel", function()
-		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - arg1)
+	frame.salebox.duration:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - delta)
 	end)
 
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
