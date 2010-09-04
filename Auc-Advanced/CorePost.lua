@@ -55,8 +55,7 @@ local lib = AucAdvanced.Post
 local private = {}
 lib.Private = private
 
-lib.Print = AucAdvanced.Print
-local print = lib.Print
+local aucPrint = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local debugPrint = AucAdvanced.Debug.DebugPrint
 local _TRANS = AucAdvanced.localizations
@@ -689,14 +688,17 @@ function private.TrackPostingMultisellFail()
 	private.LockSig(request)
 	private.QueueRemove()
 	private.Wait(POST_ERROR_PAUSE)
-	local msg = ("Failed to post all requested auctions of %s (posted %d)"):format(private.RequestDisplayString(request, link), request.posted)
-	if private.lastUIError then
-		msg = msg.."\nAdditional info: "..private.lastUIError
-	end
-	debugPrint(msg, "CorePost", "Posting Failure", "Warning")
 	AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "FailMultisell")
-	if not request.cancelled then -- don't display message if multisell was aborted by user
-		--message(msg)
+
+	if request.cancelled and not private.lastUIError then
+		-- cancelled by user: display a chat message instead of throwing an error
+		aucPrint(("Multisell batch of %s was cancelled. %d were posted."):format(private.RequestDisplayString(request, link), request.posted))
+	else
+		local msg = ("Failed to post all requested auctions of %s (posted %d)"):format(private.RequestDisplayString(request, link), request.posted)
+		if private.lastUIError then
+			msg = msg.."\nAdditional info: "..private.lastUIError
+		end
+		debugPrint(msg, "CorePost", "Posting Failure", "Warning")
 		geterrorhandler()(msg)
 	end
 end
@@ -1018,6 +1020,9 @@ local function EventHandler(self, event, arg1, arg2)
 					lib.CancelPostQueue()
 				end
 			end
+
+			-- if currently multiselling, it will fail - treat as deliberate cancel to suppress error
+			private.TrackCancelSell()
 		end
 	end
 end
