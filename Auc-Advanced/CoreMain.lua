@@ -140,9 +140,9 @@ end
 function private.ClickBagHook(hookParams, returnValue, self, button, ignoreShift)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-
-	local bag = this:GetParent():GetID()
-	local slot = this:GetID()
+	
+	local bag = self:GetParent():GetID()
+	local slot = self:GetID()
 
 	local link = GetContainerItemLink(bag, slot)
 
