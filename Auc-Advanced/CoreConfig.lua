@@ -61,8 +61,8 @@ function private.CommandHandler(editbox, command, subcommand, ...)
 			cmdList = cmdList..", or "..cmdL
 		elseif (cmdL~="") then
 			cmdList = cmdList.." or ".. cmdL
-		end		
-		local cmd = strsplit(" ", editbox:GetText())		
+		end
+		local cmd = strsplit(" ", editbox:GetText())
 		private.Print("Auctioneer Help ("..cmdList..")")
 		private.Print("  {{"..cmd.." help}} - Show this help")
 		private.Print("  {{"..cmd.." begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
@@ -73,6 +73,8 @@ function private.CommandHandler(editbox, command, subcommand, ...)
 		private.Print("  {{"..cmd.." end}} - Stop scanning the auctionhouse, commit current data")
 		private.Print("  {{"..cmd.." abort}} - Stop scanning the auctionhouse, discard current data")
 		private.Print("  {{"..cmd.." clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
+		private.Print("  {{"..cmd.." cleardata faction||server||ALL}} - Clears data from the stat modules for current faction, server or all data")
+		private.Print("  {{"..cmd.." clearscan faction||server||ALL}} - Clears the scan snapshot for current faction, server or all servers")
 		private.Print("  {{"..cmd.." about [all]}} - Shows the currenly running version of Auctioneer, if all is specified, also shows the version for every file in the package")
 
 		for system in pairs(AucAdvanced.Modules) do
