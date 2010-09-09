@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local Const = AucAdvanced.Const
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local frame
 
@@ -59,7 +59,6 @@ function private.CreateFrames()
 
 	frame = CreateFrame("Frame", "AucAdvAppraiserFrame", AuctionFrame)
 	private.frame = frame
-	private.realmKey, private.realm = AucAdvanced.GetFaction()
 	local DiffFromModel = 0
 	local MatchString = ""
 	frame.list = {}
@@ -1249,14 +1248,14 @@ function private.CreateFrames()
 			link = frame.salebox.link
 			if not link then
 				-- The user attempted a single-item refresh without selecting anything, just re-enable the button and return.
-			    print(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
+			    aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
 				frame.refresh:Enable()
 				return
 			-- else
-				-- print(("Got link from salebox: {{%s}}"):format(link))
+				-- aucPrint(("Got link from salebox: {{%s}}"):format(link))
 			end
 		-- else
-			-- print(("Got link from parameter: {{%s}}"):format(link))
+			-- aucPrint(("Got link from parameter: {{%s}}"):format(link))
 		end
 		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack = GetItemInfo(link)
 		local itemTypeId, itemSubId
@@ -1272,7 +1271,7 @@ function private.CreateFrames()
 				break
 			end
 		end
-		print(_TRANS('APPR_Interface_RefreshingView') :format(name))--Refreshing view of {{%s}}
+		aucPrint(_TRANS('APPR_Interface_RefreshingView') :format(name))--Refreshing view of {{%s}}
 		if background and type(background) == 'boolean' then
 			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
 		else
@@ -1311,12 +1310,12 @@ function private.CreateFrames()
 		elseif postType == "batch" then
 			if not IsModifierKeyDown() and GetMouseButtonClicked() ~= "RightButton" then
 				message(_TRANS('APPR_Interface_BatchButtonCombination') )--This button requires you to press a combination of keys when clicked.\nSee help printed in the chat frame for further details.
-				print(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
-				print(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
-				print("  ".._TRANS('APPR_Help_BatchPostHelp3') )--- Alt = Auto-refresh all batch postable items.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp4') )--- Shift = List all auctions that would be posted without actually posting them.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- RightClick = Auto-post all batch postable items.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp6') )--- Alt+RightClick on an item to toggle batch post on/off
+				aucPrint(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
+				aucPrint(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp3') )--- Alt = Auto-refresh all batch postable items.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp4') )--- Shift = List all auctions that would be posted without actually posting them.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- RightClick = Auto-post all batch postable items.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp6') )--- Alt+RightClick on an item to toggle batch post on/off
 				return
 			end
 
@@ -1337,7 +1336,7 @@ function private.CreateFrames()
 			end
 
 			if mode == "list" then
-				print(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted:
+				aucPrint(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted:
 			end
 
 			local bg = false
@@ -1370,7 +1369,7 @@ function private.CreateFrames()
 		local total, _, unpostable = AucAdvanced.Post.CountAvailableItems(sig)
 		if not (link and total) then
 			UIErrorsFrame:AddMessage(_TRANS('APPR_Interface_UnablePostAuctions') )--Unable to post auctions at this time
-			print(_TRANS('APPR_Help_CannotPostAuctions'), "Invalid item sig")--Cannot post auctions:
+			aucPrint(_TRANS('APPR_Help_CannotPostAuctions'), "Invalid item sig")--Cannot post auctions:
 			return
 		end
 		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, nil, true)
@@ -1380,33 +1379,33 @@ function private.CreateFrames()
 		-- Just a quick bit of sanity checking first
 
 		if not (stack and stack >= 1) then
-			print(_TRANS('APPR_Help_SkippingNoStackSize'):format(link) )--Skipping %s: no stack size set
+			aucPrint(_TRANS('APPR_Help_SkippingNoStackSize'):format(link) )--Skipping %s: no stack size set
 			return
 		elseif (not number) or number < -2 or number == 0 then
-			print(_TRANS('APPR_Help_SkippingInvalidNumberStacks'):format(link) )--Skipping %s: invalid number of stacks/items set
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidNumberStacks'):format(link) )--Skipping %s: invalid number of stacks/items set
 			return
 		elseif (not itemBid) or itemBid <= 0 then
-			print(_TRANS('APPR_Help_SkippingNoBidValue'):format(link) )--Skipping %s: no bid value set
+			aucPrint(_TRANS('APPR_Help_SkippingNoBidValue'):format(link) )--Skipping %s: no bid value set
 			return
 		elseif not (itemBuy and (itemBuy == 0 or itemBuy >= itemBid)) then
-			print(_TRANS('APPR_Help_SkippingInvalidBuyoutValue'):format(link) )--Skipping %s: invalid buyout value
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidBuyoutValue'):format(link) )--Skipping %s: invalid buyout value
 			return
 		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
-			print(_TRANS('APPR_Help_SkippingInvalidDuration'):format(link).." "..tostring(duration) )--Skipping %s: invalid duration:
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidDuration'):format(link).." "..tostring(duration) )--Skipping %s: invalid duration:
 			return
 		elseif total == 0 then
 			if unpostable > 0 then
-				print(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(link) )--Skipping %s: no auctionable item in bags.  May need to repair item
+				aucPrint(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(link) )--Skipping %s: no auctionable item in bags.  May need to repair item
 				return
 			else
-				print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
+				aucPrint(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 				return
 			end
 		elseif (number > 0 and number * stack > total) and not numberOnly then
-			print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
+			aucPrint(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 			return
 		elseif (number ~= -1) and (stack > total) then
-			print(_TRANS('APPR_Help_SkippingStackLargerAvailable'):format(link) )--Skipping %s: Stack size larger than available
+			aucPrint(_TRANS('APPR_Help_SkippingStackLargerAvailable'):format(link) )--Skipping %s: Stack size larger than available
 			return
 		end
         if numberOnly and number>0 then
@@ -1423,18 +1422,18 @@ function private.CreateFrames()
             -- reduce number to post by existing amount
             number = number - currentStackCount
             if number < 1 then
-                print(_TRANS('APPR_Help_StacksAreadyPosted'):format(currentStackCount, link))--%d stacks of %s already posted.
+                aucPrint(_TRANS('APPR_Help_StacksAreadyPosted'):format(currentStackCount, link))--%d stacks of %s already posted.
                 return
             end
             if number*stack > total then
-                print(_TRANS('APPR_Help_NeedOnlyHavePosting'):format(number*stack, link, total, math.floor(total/stack)*stack))--Need %d of %s only have %d, posting %d
+                aucPrint(_TRANS('APPR_Help_NeedOnlyHavePosting'):format(number*stack, link, total, math.floor(total/stack)*stack))--Need %d of %s only have %d, posting %d
                 number = math.floor(total/stack)
             end
         end
 
-		print(_TRANS('APPR_Help_PostingBatch'):format(link))--Posting batch of: %s
+		aucPrint(_TRANS('APPR_Help_PostingBatch'):format(link))--Posting batch of: %s
 
-		print("  ".._TRANS('APPR_Help_Duration'):format(duration/60))--- Duration: {{%d hours}}
+		aucPrint("  ".._TRANS('APPR_Help_Duration'):format(duration/60))--- Duration: {{%d hours}}
 
 		local bidVal, buyVal
 		local totalBid, totalBuy, totalNum = 0,0,0
@@ -1450,9 +1449,9 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * remain)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 					else
-						print(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
+						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
 						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
 					end
 
@@ -1465,9 +1464,9 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * stack)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 					else
-						print(" ".._TRANS('APPR_Help_QueueingLots'):format(fullStacks, stack))--- Queueing {{%d}} lots of {{%d}}
+						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(fullStacks, stack))--- Queueing {{%d}} lots of {{%d}}
 						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
 					end
 
@@ -1480,9 +1479,9 @@ function private.CreateFrames()
 				buyVal = lib.RoundBuy(itemBuy * stack)
 				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 				if dryRun then
-					print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+					aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 				else
-					print(" ".._TRANS('APPR_Help_QueueingLots'):format(number, stack))--- Queueing {{%d}} lots of {{%d}}
+					aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(number, stack))--- Queueing {{%d}} lots of {{%d}}
 					AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
 				end
 
@@ -1496,9 +1495,9 @@ function private.CreateFrames()
 			buyVal = lib.RoundBuy(itemBuy)
 			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 			if dryRun then
-				print(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+				aucPrint(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 			else
-				print(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
+				aucPrint(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
 				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
 			end
 
@@ -1507,25 +1506,16 @@ function private.CreateFrames()
 			totalNum = totalNum + number
 		end
 
-		print("-----------------------------------")
+		aucPrint("-----------------------------------")
 		if dryRun then
-			print(_TRANS('APPR_Help_PretendedItems'):format(totalNum))--Pretended {{%d}} items
+			aucPrint(_TRANS('APPR_Help_PretendedItems'):format(totalNum))--Pretended {{%d}} items
 		else
-			print(_TRANS('APPR_Help_QueuedUpItems'):format(totalNum))--Queued up {{%d}} items
+			aucPrint(_TRANS('APPR_Help_QueuedUpItems'):format(totalNum))--Queued up {{%d}} items
 		end
-		print(_TRANS('APPR_Help_TotalMinbidValue'):format(AucAdvanced.Coins(totalBid, true)))--Total minbid value: %s'
-		print(_TRANS('APPR_Help_TotalBuyoutValue'):format(AucAdvanced.Coins(totalBuy, true)))--Total buyout value: %s
-		print("-----------------------------------")
+		aucPrint(_TRANS('APPR_Help_TotalMinbidValue'):format(AucAdvanced.Coins(totalBid, true)))--Total minbid value: %s'
+		aucPrint(_TRANS('APPR_Help_TotalBuyoutValue'):format(AucAdvanced.Coins(totalBuy, true)))--Total buyout value: %s
+		aucPrint("-----------------------------------")
 	end
-
-	function frame.ClickAnythingHook(link)
-		if not AucAdvanced.Settings.GetSetting("util.appraiser.clickhookany") then return end
-		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
-		if (arg1=="LeftButton" or arg3=="LeftButton") and IsAltKeyDown() then
-			frame.SelectItem(nil, nil, link)
-		end
-	end
-
 
 	function frame.SetScroll(...)
 		local pos = floor(frame.scroller:GetValue())
@@ -2463,7 +2453,7 @@ function private.CreateFrames()
 	end
 
 	function private.BuyAuction()
-		print(private.buyselection.link)
+		aucPrint(private.buyselection.link)
 		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
 		frame.imageview.sheet.selected = nil
 		private.onSelect()
@@ -2497,7 +2487,7 @@ function private.CreateFrames()
 				private.buyselection.curbid = selected[8]
 				private.buyselection.buyout = selected[9]
 				--make sure that it's not one of our auctions, then enable based on buy/bid availability
-				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
+				if (not AucAdvancedConfig["users."..Const.PlayerRealm.."."..private.buyselection.seller]) then
 					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
 						frame.imageview.purchase.buy:Enable()
 						frame.imageview.purchase.buy.price:SetText(AucAdvanced.Coins(private.buyselection.buyout, true))
@@ -2737,7 +2727,23 @@ function private.CreateFrames()
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
-	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+	hooksecurefunc("HandleModifiedItemClick", function (link)
+		if GetMouseButtonClicked() == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.appraiser.clickhookany") then
+			if link then
+				frame.SelectItem(nil, nil, link)
+			end
+		end
+	end)
+
+	-- GetMouseButtonClicked doesn't work for chatlinks, so we hook SetItemRef as well
+	hooksecurefunc("SetItemRef", function (shortlink, hyperlink, mousebutton, chatframe)
+		if mousebutton == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.appraiser.clickhookany") then
+			local link = hyperlink or shortlink
+			if link then
+				frame.SelectItem(nil, nil, link)
+			end
+		end
+	end)
 
 	--[[These scrollframe functions need to be here to avoid errors, since many elements of appraisers frames are not finished when we create the scrollframe]]
 	--If we have a saved column arrangement reapply
