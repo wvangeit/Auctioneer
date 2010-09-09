@@ -1070,7 +1070,7 @@ function private.CreateFrames()
 	frame.options:AddOption("remember", "Remember fixed price")
 
 	function frame.ClickBagHook(_,_,self,button)
-		if (not get("util.simpleauc.clickhook")) then return end
+		if not (frame:IsVisible() and get("util.simpleauc.clickhook")) then return end
 		local bag = self:GetParent():GetID()
 		local slot = self:GetID()
 		local link = GetContainerItemLink(bag, slot)
@@ -1121,21 +1121,12 @@ function private.CreateFrames()
 			AuctionFrameMoneyFrame:Show()
 			frame:Show()
 			AucAdvanced.Scan.LoadScanData()
-			--frame.GenerateList(true)
+			private.UpdateDisplay() -- update for any bag changes while frame was hidden
 		else
 			AuctionFrameMoneyFrame:Show()
 			frame:Hide()
 		end
 	end
-
-	function frame.ClickAnythingHook(link)
-		if not get("util.simpleauc.clickhookany") then return end
-		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
-		if (arg1=="LeftButton" or arg3=="LeftButton") and IsAltKeyDown() then
-			frame.SelectItem(nil, nil, link)
-		end
-	end
-
 
 	frame.imageview = CreateFrame("Frame", nil, frame)
 	frame.imageview:SetBackdrop({
@@ -1279,11 +1270,20 @@ function private.CreateFrames()
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -300, frame.ClickBagHook)
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.tab.OnClick)
 
-	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+	hooksecurefunc("SetItemRef", function (shortlink, hyperlink, mousebutton, chatframe)
+		if mousebutton == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.simpleauc.clickhook") then
+			local link = hyperlink or shortlink
+			if link then
+				private.LoadItemLink(link)
+			end
+		end
+	end)
 
 	function frame:OnEvent(event, ...)
 		if event == "BAG_UPDATE" then
-			private.UpdateDisplay()
+			if frame:IsVisible() then
+				private.UpdateDisplay()
+			end
 		end
 	end
 
