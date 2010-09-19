@@ -5,7 +5,7 @@
 	</Script>
 	<Button name="BF_IgnoreListLineTemplate" virtual="true">
 		<Size>
-			<AbsDimension x="260" y="16"/>
+			<AbsDimension x="235" y="16"/>
 		</Size>
 		<ButtonText inherits="GameFontNormal" justifyH="LEFT" setAllPoints="true"/>
 		<Scripts>
@@ -304,11 +304,11 @@
 				</Layers>
 				<Scripts>
 					<OnLoad>
-						self:SetFrameLevel( self:GetFrameLevel() + 3 );
+						self:SetFrameLevel(self:GetFrameLevel() + 3 );
 						ScrollFrame_OnLoad(self);
 					</OnLoad>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(16, BF_IgnoreList_Update);
+						FauxScrollFrame_OnVerticalScroll(self, offset, 16, BF_IgnoreList_Update);
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>
