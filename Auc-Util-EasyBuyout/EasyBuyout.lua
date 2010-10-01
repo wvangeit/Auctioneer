@@ -62,7 +62,7 @@ function lib.Processor(callbackType, ...)
 end
 
 lib.Processors = {}
-function lib.Processors.lastupdate(callbackType, ...)
+function lib.Processors.listupdate(callbackType, ...)
 	private.EasyCancelMain()
 	private.EasyBuyout()
 end
