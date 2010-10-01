@@ -55,6 +55,7 @@ local wipe = wipe
 local ceil,floor,max,abs = ceil,floor,max,abs
 local tostring,tonumber,strjoin,strsplit,format = tostring,tonumber,strjoin,strsplit,format
 local GetItemInfo = GetItemInfo
+local time = time
 -- GLOBALS: nLog, N_NOTICE, N_WARNING, N_ERROR
 
 
@@ -379,10 +380,11 @@ function lib.IsValidAlgorithm(algorithm, itemLink)
 	return false
 end
 
-private.algorithmstack = {}
+--store the last data request and just return a cache value for the next 5 secs (5 secs is just arbitrary)
+local LastAlgorithmSig, LastAlgorithmTime, LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
 function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 	if (not algorithm) then
-        if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
+		if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
 		return
 	end
 	if type(itemLink) == "number" then
@@ -394,16 +396,22 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 		return
 	end
 
-    if reserved then
-        lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
-            "The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
-        );
+	if reserved then
+		lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
+		"The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
+		);
 
-        serverKey = reserved.."-"..serverKey;
-    end
-    serverKey = serverKey or GetFaction()
+		serverKey = reserved.."-"..serverKey;
+	end
+	serverKey = serverKey or GetFaction()
 
 	local saneLink = SanitizeLink(itemLink)
+	--check if this was just retrieved and return that value
+	local algosig = strjoin(":", algorithm, saneLink, serverKey)
+	if algosig == LastAlgorithmSig and LastAlgorithmTime + 5 > time() then
+		return LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
+	end
+
 	local modules = AucAdvanced.GetAllModules()
 	for pos, engineLib in ipairs(modules) do
 		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
@@ -411,21 +419,8 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 			and not engineLib.IsValidAlgorithm(saneLink) then
 				return
 			end
-			local algosig = strjoin(":", algorithm, saneLink, serverKey)
-			for pos, history in ipairs(private.algorithmstack) do
-				if (history == algosig) then
-					-- We are looping
-					local origAlgo = private.algorithmstack[1]
-					local endSize = #(private.algorithmstack)+1
-					while (#(private.algorithmstack)) do
-						tremove(private.algorithmstack)
-					end
-					error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
-				end
-			end
-
+			
 			local price, seen, array
-			tinsert(private.algorithmstack, algosig)
 			if (engineLib.GetPriceArray) then
 				array = engineLib.GetPriceArray(saneLink, serverKey)
 				if (array) then
@@ -435,7 +430,9 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
 			else
 				price = engineLib.GetPrice(saneLink, serverKey)
 			end
-			tremove(private.algorithmstack, -1)
+			LastAlgorithmSig = algosig
+			LastAlgorithmTime = time()
+			LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray = price, seen, array
 			return price, seen, array
 		end
 	end

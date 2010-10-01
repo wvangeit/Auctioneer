@@ -40,37 +40,21 @@ if not coremodule then return end -- Someone has explicitely broken us
 local tooltip = LibStub("nTipHelper:1")
 local Const = lib.Const
 
--- "Module" functions for CoreUtil
--- installed in private table, called via CoreModule
 
---[[ OnLoad is not currently needed
 function coremodule.OnLoad(addon)
 	if addon == "auc-advanced" then
 		private.FactionOnLoad()
 	end
 end
---]]
 
-function coremodule.Processor(event, subevent)
-	if event == "auctionopen" then
-		private.isAHOpen = true
-	elseif event == "auctionclose" then
-		private.isAHOpen = false
-	elseif event == "newmodule" then
-		-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
-		-- as long as they correctly send a "newmodule" message when created
-		private.modulecache = nil
-		private.resetPriceModels()
-	end
-end
 coremodule.Processors = {}
-function coremodule.Processors.auctionopen(event, subevent)
+function coremodule.Processors.auctionopen()
 	private.isAHOpen = true
 end
-function coremodule.Processors.auctionclose(event, subevent)
+function coremodule.Processors.auctionclose()
 	private.isAHOpen = false
 end
-function coremodule.Processors.newmodule(event, subevent)
+function coremodule.Processors.newmodule(event, libType, libName)
 	-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
 	-- as long as they correctly send a "newmodule" message when created
 	private.modulecache = nil
@@ -250,9 +234,10 @@ lib.breakHyperlink = lib.BreakHyperlink
 do -- Faction and ServerKey related functions
 	local splitcache = {}
 	local localizedfactions = {
-		["Alliance"] = FACTION_ALLIANCE,
-		["Horde"] = FACTION_HORDE,
-		["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
+		-- the following entries are placeholders
+		["Alliance"] = "Alliance",
+		["Horde"] = "Horde",
+		["Neutral"] = "Neutral",
 	}
 	function lib.SplitServerKey(serverKey)
 		local split = splitcache[serverKey]
@@ -273,11 +258,9 @@ do -- Faction and ServerKey related functions
 		["horde"] = "Horde",
 		[FACTION_HORDE:lower()] = "Horde",
 		["neutral"] = "Neutral",
-		[COMBATLOG_FILTER_STRING_NEUTRAL_UNITS:lower()] = "Neutral", -- again, this may not be the correct context? see above
 	}
 	-- Used to check user text input for some form of a faction name; returns standardized form if found
 	-- Possible results are "Alliance", "Horde", "Neutral" or nil if not found
-	-- *** need to confirm this does really work correctly on non-English clients, particularly Russian and Chinese ***
 	function lib.IsFaction(faction)
 		if type(faction) == "string" then
 			return lookupfaction[faction:lower()]
@@ -325,11 +308,21 @@ do -- Faction and ServerKey related functions
 		return Const.PlayerFaction
 	end
 
-	--[[
 	function private.FactionOnLoad()
-		-- localizations will now be available
+		local alliance = lib.localizations("ADV_Interface_FactionAlliance")
+		local horde = lib.localizations("ADV_Interface_FactionHorde")
+		local neutral = lib.localizations("ADV_Interface_FactionNeutral")
+
+		localizedfactions.Alliance = alliance
+		localizedfactions.Horde = horde
+		localizedfactions.Neutral = neutral
+
+		lookupfaction[alliance:lower()] = "Alliance"
+		lookupfaction[horde:lower()] = "Horde"
+		lookupfaction[neutral:lower()] = "Neutral"
+
+		wipe(splitcache)
 	end
-	--]]
 end
 
 function private.relevelFrame(frame)
@@ -348,9 +341,9 @@ function lib.AddTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs (including the tab we are going
 	-- to insert).
 	local tabCount = 1;
-	while (getglobal("AuctionFrameTab"..(tabCount))) do
+	while (_G["AuctionFrameTab"..(tabCount)]) do
 		--check that tab has not already been created, since we can optionally remove tabs now
-		if getglobal("AuctionFrameTab"..(tabCount)):GetName() == tabButton:GetName() then
+		if _G["AuctionFrameTab"..(tabCount)]:GetName() == tabButton:GetName() then
 			lib.Print("Tab with that name already exists")
 			return
 		end
@@ -361,15 +354,15 @@ function lib.AddTab(tabButton, tabFrame)
 	-- tabs. We want to insert them at the end or before BeanCounter's
 	-- Transactions tab.
 	local tabIndex = 1;
-	while (getglobal("AuctionFrameTab"..(tabIndex)) and
-		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabUtilBeanCounter") do
+	while (_G["AuctionFrameTab"..(tabIndex)] and
+		   _G["AuctionFrameTab"..(tabIndex)]:GetName() ~= "AuctionFrameTabUtilBeanCounter") do
 		tabIndex = tabIndex + 1;
 	end
 
 	-- Make room for the tab, if needed.
 	for index = tabCount, tabIndex + 1, -1  do
-		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
-		getglobal("AuctionFrameTab"..(index)):SetID(index);
+		_G["AuctionFrameTab"..(index)] = _G["AuctionFrameTab"..(index - 1)];
+		_G["AuctionFrameTab"..(index)]:SetID(index);
 	end
 
 	-- Configure the frame.
@@ -378,15 +371,15 @@ function lib.AddTab(tabButton, tabFrame)
 	private.relevelFrame(tabFrame);
 
 	-- Configure the tab button.
-	setglobal("AuctionFrameTab"..tabIndex, tabButton);
+	_G["AuctionFrameTab"..tabIndex] = tabButton;
 	tabButton:SetParent("AuctionFrame");
-	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
+	tabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabIndex - 1)]:GetName(), "TOPRIGHT", -8, 0);
 	tabButton:SetID(tabIndex);
 	tabButton:Show();
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
 	if (tabIndex < tabCount) then
-		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
+		nextTabButton = _G["AuctionFrameTab"..(tabIndex + 1)];
 		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
 	end
 
@@ -397,14 +390,14 @@ end
 function lib.RemoveTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs.
 	local tabCount = 0
-	while (getglobal("AuctionFrameTab"..(tabCount+1))) do
+	while (_G["AuctionFrameTab"..(tabCount+1)]) do
 		tabCount = tabCount + 1;
 	end
 
 	-- Find the correct location to remove the tab
 	local tabIndex, tabFound = 1
-	while getglobal("AuctionFrameTab"..(tabIndex)) do
-		if getglobal("AuctionFrameTab"..(tabIndex)):GetName() == tabButton:GetName() then
+	while _G["AuctionFrameTab"..(tabIndex)] do
+		if _G["AuctionFrameTab"..(tabIndex)]:GetName() == tabButton:GetName() then
 			tabFound = tabIndex
 			break
 		end
@@ -416,19 +409,19 @@ function lib.RemoveTab(tabButton, tabFrame)
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button after removal.
 	if tabFound and (tabFound < tabCount) then
-		nextTabButton = getglobal("AuctionFrameTab"..(tabFound + 1))
-		nextTabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabFound - 1)):GetName(), "TOPRIGHT", -8, 0)
+		nextTabButton = _G["AuctionFrameTab"..(tabFound + 1)]
+		nextTabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabFound - 1)]:GetName(), "TOPRIGHT", -8, 0)
 	end
 
 	-- Reduce count on tabs remaining
-	setglobal("AuctionFrameTab"..(tabFound), nil) --remove old tab from namespace
+	_G["AuctionFrameTab"..(tabFound)] = nil --remove old tab from namespace
 	for index = tabFound, tabCount do
-		local tab = getglobal("AuctionFrameTab"..(index + 1))
+		local tab = _G["AuctionFrameTab"..(index + 1)]
 		if tab then
-			setglobal("AuctionFrameTab"..(index),  tab)
-			getglobal("AuctionFrameTab"..(index)):SetID(index)
+			_G["AuctionFrameTab"..(index)] =  tab
+			_G["AuctionFrameTab"..(index)]:SetID(index)
 		else --last tab index needs to be removed
-			setglobal("AuctionFrameTab"..(index), nil)
+			_G["AuctionFrameTab"..(index)] = nil
 		end
 	end
 

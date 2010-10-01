@@ -43,11 +43,6 @@ if not AucAdvancedFilterBasic_IgnoreList then AucAdvancedFilterBasic_IgnoreList 
 
 local IgnoreList = {}
 
-function lib.Processor(callbackType, ...)
-	if callbackType == "config" then
-		private.SetupConfigGui(...)
-	end
-end
 lib.Processors = {}
 function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
@@ -61,15 +56,14 @@ function lib.AuctionFilter(operation, itemData)
 	-- Get the signature of this item and find it's stats.
 	local quality = AucAdvanced.GetLinkQuality(itemData.link)
 	local level = tonumber(itemData.itemLevel) or 0
-	--This needs to have the case conversions done because the data is stored in the SV the same way, and LUA is case-sensitive
-	local seller = itemData.sellerName:sub(1,1):upper()..itemData.sellerName:sub(2):lower()
+	local seller = itemData.sellerName
 	local ignoreself = get("filter.basic.ignoreself")
 	local minquality = tonumber(get("filter.basic.min.quality")) or 1
 	local minlevel = tonumber(get("filter.basic.min.level")) or 0
 	if (quality < minquality) then retval = true end
 	if (level < minlevel) then retval = true end
 	if (ignoreself and seller == UnitName("player")) then retval = true end
-	if (IgnoreList[seller]) then retval = true end
+	if lib.IsPlayerIgnored(seller) then retval = true end
 
 	if nLog and retval then
 		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
@@ -142,13 +136,12 @@ local numIgnoreButtons = 18
 SelectedIgnore = 1
 LastIgnoredPlayer = nil
 
-function lib.IgnoreList_IsPlayerIgnored( name )
-	if ( IgnoreList[name] ) then
+function lib.IsPlayerIgnored(name)
+	if IgnoreList[name] then
 		return true
-	else
-		return false
 	end
 end
+lib.IgnoreList_IsPlayerIgnored = lib.IsPlayerIgnored -- Deprecated - backward compatibility only
 
 function BF_IgnoreList_Update()
 	local numIgnores = #IgnoreList
@@ -168,7 +161,7 @@ function BF_IgnoreList_Update()
 	local ignoreIndex;
 	for i=1, numIgnoreButtons, 1 do
 		ignoreIndex = i + ignoreOffset;
-		ignoreButton = getglobal("BasicFilter_IgnoreList_IgnoreButton"..i);
+		ignoreButton = _G["BasicFilter_IgnoreList_IgnoreButton"..i];
 		ignoreButton:SetText(IgnoreList[ignoreIndex] or "");
 		ignoreButton:SetID(ignoreIndex);
 		-- Update the highlight
@@ -216,7 +209,7 @@ function BF_IgnoreList_Load()
 
 	--Get the ignore list for the current realm and faction
 	IgnoreList = AucAdvancedFilterBasic_IgnoreList[realm][faction]
-	lib.IgnoreList = IgnoreList --make current ignore list global for other addons
+	lib.IgnoreList = IgnoreList --make current ignore list global for other addons *** Deprecated ***
 
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
@@ -234,13 +227,22 @@ function BF_IgnoreList_OnEvent()
 	end
 end
 
-function BF_IgnoreList_Add( name )
+function BF_IgnoreList_Add(name)
 	-- name validity checks
-	if ( (not name) or name == "" ) then return end
-	if ( #name < 2 ) then return end
-	--This is stored in the SV with the first letter capitalized and the rest lowercased
-	--so that it appears that way in the config
-	name = name:sub(1,1):upper()..name:sub(2):lower()
+	if type(name) ~= "string" or #name < 2 then return end
+	-- This is stored in the SV with the first letter capitalized and the rest lowercased
+	-- This is how it should appear in the ScanData image, and how we want it displayed in our GUI
+	-- We must allow for UTF-8 encoding of first character
+	local firstbyte, split = name:byte(1), 1
+	if firstbyte >= 240 then -- quad
+		split = 4
+	elseif firstbyte >= 224 then -- triple
+		split = 3
+	elseif firstbyte >= 192 then -- double
+		split = 2
+	end
+	name = name:sub(1,split):upper()..name:sub(split+1):lower()
+
 	local currentSelection = IgnoreList[SelectedIgnore]
 
 	if not ( IgnoreList[name] ) then

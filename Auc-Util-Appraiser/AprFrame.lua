@@ -34,7 +34,7 @@ if not AucAdvanced then return end
 local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local Const = AucAdvanced.Const
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local frame
 
@@ -59,7 +59,6 @@ function private.CreateFrames()
 
 	frame = CreateFrame("Frame", "AucAdvAppraiserFrame", AuctionFrame)
 	private.frame = frame
-	private.realmKey, private.realm = AucAdvanced.GetFaction()
 	local DiffFromModel = 0
 	local MatchString = ""
 	frame.list = {}
@@ -1249,14 +1248,14 @@ function private.CreateFrames()
 			link = frame.salebox.link
 			if not link then
 				-- The user attempted a single-item refresh without selecting anything, just re-enable the button and return.
-			    print(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
+			    aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
 				frame.refresh:Enable()
 				return
 			-- else
-				-- print(("Got link from salebox: {{%s}}"):format(link))
+				-- aucPrint(("Got link from salebox: {{%s}}"):format(link))
 			end
 		-- else
-			-- print(("Got link from parameter: {{%s}}"):format(link))
+			-- aucPrint(("Got link from parameter: {{%s}}"):format(link))
 		end
 		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack = GetItemInfo(link)
 		local itemTypeId, itemSubId
@@ -1272,7 +1271,7 @@ function private.CreateFrames()
 				break
 			end
 		end
-		print(_TRANS('APPR_Interface_RefreshingView') :format(name))--Refreshing view of {{%s}}
+		aucPrint(_TRANS('APPR_Interface_RefreshingView') :format(name))--Refreshing view of {{%s}}
 		if background and type(background) == 'boolean' then
 			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
 		else
@@ -1311,12 +1310,12 @@ function private.CreateFrames()
 		elseif postType == "batch" then
 			if not IsModifierKeyDown() and GetMouseButtonClicked() ~= "RightButton" then
 				message(_TRANS('APPR_Interface_BatchButtonCombination') )--This button requires you to press a combination of keys when clicked.\nSee help printed in the chat frame for further details.
-				print(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
-				print(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
-				print("  ".._TRANS('APPR_Help_BatchPostHelp3') )--- Alt = Auto-refresh all batch postable items.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp4') )--- Shift = List all auctions that would be posted without actually posting them.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- RightClick = Auto-post all batch postable items.
-				print("  ".._TRANS('APPR_Help_BatchPostHelp6') )--- Alt+RightClick on an item to toggle batch post on/off
+				aucPrint(_TRANS('APPR_Help_BatchPostHelp1') )--The batch post mechanism will allow you to perform automated actions on all the items in your inventory marked for batch posting.
+				aucPrint(_TRANS('APPR_Help_BatchPostHelp2') )--You must hold down one of the following keys when you click the button:
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp3') )--- Alt = Auto-refresh all batch postable items.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp4') )--- Shift = List all auctions that would be posted without actually posting them.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp5') )--- RightClick = Auto-post all batch postable items.
+				aucPrint("  ".._TRANS('APPR_Help_BatchPostHelp6') )--- Alt+RightClick on an item to toggle batch post on/off
 				return
 			end
 
@@ -1337,7 +1336,7 @@ function private.CreateFrames()
 			end
 
 			if mode == "list" then
-				print(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted:
+				aucPrint(_TRANS('APPR_Help_BatchFollowingWouldPosted'))--The following items would have be auto-posted:
 			end
 
 			local bg = false
@@ -1370,7 +1369,7 @@ function private.CreateFrames()
 		local total, _, unpostable = AucAdvanced.Post.CountAvailableItems(sig)
 		if not (link and total) then
 			UIErrorsFrame:AddMessage(_TRANS('APPR_Interface_UnablePostAuctions') )--Unable to post auctions at this time
-			print(_TRANS('APPR_Help_CannotPostAuctions'), "Invalid item sig")--Cannot post auctions:
+			aucPrint(_TRANS('APPR_Help_CannotPostAuctions'), "Invalid item sig")--Cannot post auctions:
 			return
 		end
 		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, nil, true)
@@ -1380,33 +1379,33 @@ function private.CreateFrames()
 		-- Just a quick bit of sanity checking first
 
 		if not (stack and stack >= 1) then
-			print(_TRANS('APPR_Help_SkippingNoStackSize'):format(link) )--Skipping %s: no stack size set
+			aucPrint(_TRANS('APPR_Help_SkippingNoStackSize'):format(link) )--Skipping %s: no stack size set
 			return
 		elseif (not number) or number < -2 or number == 0 then
-			print(_TRANS('APPR_Help_SkippingInvalidNumberStacks'):format(link) )--Skipping %s: invalid number of stacks/items set
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidNumberStacks'):format(link) )--Skipping %s: invalid number of stacks/items set
 			return
 		elseif (not itemBid) or itemBid <= 0 then
-			print(_TRANS('APPR_Help_SkippingNoBidValue'):format(link) )--Skipping %s: no bid value set
+			aucPrint(_TRANS('APPR_Help_SkippingNoBidValue'):format(link) )--Skipping %s: no bid value set
 			return
 		elseif not (itemBuy and (itemBuy == 0 or itemBuy >= itemBid)) then
-			print(_TRANS('APPR_Help_SkippingInvalidBuyoutValue'):format(link) )--Skipping %s: invalid buyout value
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidBuyoutValue'):format(link) )--Skipping %s: invalid buyout value
 			return
 		elseif not (duration and (duration == 720 or duration == 1440 or duration == 2880)) then
-			print(_TRANS('APPR_Help_SkippingInvalidDuration'):format(link).." "..tostring(duration) )--Skipping %s: invalid duration:
+			aucPrint(_TRANS('APPR_Help_SkippingInvalidDuration'):format(link).." "..tostring(duration) )--Skipping %s: invalid duration:
 			return
 		elseif total == 0 then
 			if unpostable > 0 then
-				print(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(link) )--Skipping %s: no auctionable item in bags.  May need to repair item
+				aucPrint(_TRANS('APPR_Help_SkippingNoAuctionableItem'):format(link) )--Skipping %s: no auctionable item in bags.  May need to repair item
 				return
 			else
-				print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
+				aucPrint(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 				return
 			end
 		elseif (number > 0 and number * stack > total) and not numberOnly then
-			print(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
+			aucPrint(_TRANS('APPR_Help_SkippingNotEnoughItems'):format(link) )--Skipping %s: You do not have enough items to do that
 			return
 		elseif (number ~= -1) and (stack > total) then
-			print(_TRANS('APPR_Help_SkippingStackLargerAvailable'):format(link) )--Skipping %s: Stack size larger than available
+			aucPrint(_TRANS('APPR_Help_SkippingStackLargerAvailable'):format(link) )--Skipping %s: Stack size larger than available
 			return
 		end
         if numberOnly and number>0 then
@@ -1423,18 +1422,18 @@ function private.CreateFrames()
             -- reduce number to post by existing amount
             number = number - currentStackCount
             if number < 1 then
-                print(_TRANS('APPR_Help_StacksAreadyPosted'):format(currentStackCount, link))--%d stacks of %s already posted.
+                aucPrint(_TRANS('APPR_Help_StacksAreadyPosted'):format(currentStackCount, link))--%d stacks of %s already posted.
                 return
             end
             if number*stack > total then
-                print(_TRANS('APPR_Help_NeedOnlyHavePosting'):format(number*stack, link, total, math.floor(total/stack)*stack))--Need %d of %s only have %d, posting %d
+                aucPrint(_TRANS('APPR_Help_NeedOnlyHavePosting'):format(number*stack, link, total, math.floor(total/stack)*stack))--Need %d of %s only have %d, posting %d
                 number = math.floor(total/stack)
             end
         end
 
-		print(_TRANS('APPR_Help_PostingBatch'):format(link))--Posting batch of: %s
+		aucPrint(_TRANS('APPR_Help_PostingBatch'):format(link))--Posting batch of: %s
 
-		print("  ".._TRANS('APPR_Help_Duration'):format(duration/60))--- Duration: {{%d hours}}
+		aucPrint("  ".._TRANS('APPR_Help_Duration'):format(duration/60))--- Duration: {{%d hours}}
 
 		local bidVal, buyVal
 		local totalBid, totalBuy, totalNum = 0,0,0
@@ -1450,9 +1449,9 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * remain)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 					else
-						print(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
+						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
 						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
 					end
 
@@ -1465,9 +1464,9 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(itemBuy * stack)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					if dryRun then
-						print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 					else
-						print(" ".._TRANS('APPR_Help_QueueingLots'):format(fullStacks, stack))--- Queueing {{%d}} lots of {{%d}}
+						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(fullStacks, stack))--- Queueing {{%d}} lots of {{%d}}
 						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
 					end
 
@@ -1480,9 +1479,9 @@ function private.CreateFrames()
 				buyVal = lib.RoundBuy(itemBuy * stack)
 				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 				if dryRun then
-					print(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+					aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 				else
-					print(" ".._TRANS('APPR_Help_QueueingLots'):format(number, stack))--- Queueing {{%d}} lots of {{%d}}
+					aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(number, stack))--- Queueing {{%d}} lots of {{%d}}
 					AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
 				end
 
@@ -1496,9 +1495,9 @@ function private.CreateFrames()
 			buyVal = lib.RoundBuy(itemBuy)
 			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 			if dryRun then
-				print(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+				aucPrint(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
 			else
-				print(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
+				aucPrint(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
 				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
 			end
 
@@ -1507,25 +1506,16 @@ function private.CreateFrames()
 			totalNum = totalNum + number
 		end
 
-		print("-----------------------------------")
+		aucPrint("-----------------------------------")
 		if dryRun then
-			print(_TRANS('APPR_Help_PretendedItems'):format(totalNum))--Pretended {{%d}} items
+			aucPrint(_TRANS('APPR_Help_PretendedItems'):format(totalNum))--Pretended {{%d}} items
 		else
-			print(_TRANS('APPR_Help_QueuedUpItems'):format(totalNum))--Queued up {{%d}} items
+			aucPrint(_TRANS('APPR_Help_QueuedUpItems'):format(totalNum))--Queued up {{%d}} items
 		end
-		print(_TRANS('APPR_Help_TotalMinbidValue'):format(AucAdvanced.Coins(totalBid, true)))--Total minbid value: %s'
-		print(_TRANS('APPR_Help_TotalBuyoutValue'):format(AucAdvanced.Coins(totalBuy, true)))--Total buyout value: %s
-		print("-----------------------------------")
+		aucPrint(_TRANS('APPR_Help_TotalMinbidValue'):format(AucAdvanced.Coins(totalBid, true)))--Total minbid value: %s'
+		aucPrint(_TRANS('APPR_Help_TotalBuyoutValue'):format(AucAdvanced.Coins(totalBuy, true)))--Total buyout value: %s
+		aucPrint("-----------------------------------")
 	end
-
-	function frame.ClickAnythingHook(link)
-		if not AucAdvanced.Settings.GetSetting("util.appraiser.clickhookany") then return end
-		-- Ugly: we assume arg1/arg3 is still set from the original OnClick/OnHyperLinkClick handler
-		if (arg1=="LeftButton" or arg3=="LeftButton") and IsAltKeyDown() then
-			frame.SelectItem(nil, nil, link)
-		end
-	end
-
 
 	function frame.SetScroll(...)
 		local pos = floor(frame.scroller:GetValue())
@@ -1604,9 +1594,9 @@ function private.CreateFrames()
 		end
 	end
 
-	frame.SetButtonTooltip = function(text)
-		if text and get("util.appraiser.buttontips") then
-			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
+	function frame.SetButtonTooltip(self, text)
+		if self and text and get("util.appraiser.buttontips") then
+			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
 			GameTooltip:SetText(text)
 		end
 	end
@@ -1661,7 +1651,7 @@ function private.CreateFrames()
 			frame.manifest:Show()
 		end
 	end)
-	frame.toggleManifest:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SidebarINF_Tooltip_AdditionalInfo') ) end)--Open/Close sidebar with additional price info
+	frame.toggleManifest:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SidebarINF_Tooltip_AdditionalInfo') ) end)--Open/Close sidebar with additional price info
 	frame.toggleManifest:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.toggleManifest:SetWidth(120)
 	frame.toggleManifest:SetText("Close Sidebar")
@@ -1690,30 +1680,30 @@ function private.CreateFrames()
 
 	-- "Show Auctions" checkbox
 	frame.itembox.showAuctions = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowAuctions", frame.itembox, "OptionsCheckButtonTemplate")
-	frame.itembox.showAuctions:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_IncludeAuctionsListing') ) end)--Include own auctions in the item listing
+	frame.itembox.showAuctions:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_IncludeAuctionsListing') ) end)--Include own auctions in the item listing
 	frame.itembox.showAuctions:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.itembox.showAuctions:SetWidth(24)
 	frame.itembox.showAuctions:SetHeight(24)
 	Auc_Util_Appraiser_ShowAuctionsText:SetText(_TRANS('APPR_Interface_Auctions') )--Auctions
 	frame.itembox.showAuctions:SetPoint("BOTTOMRIGHT", frame.itembox, "TOPRIGHT", 0-Auc_Util_Appraiser_ShowAuctionsText:GetWidth(), 0)
 	frame.itembox.showAuctions:SetHitRectInsets(0, 0-Auc_Util_Appraiser_ShowAuctionsText:GetWidth(), 0, 0)
-	frame.itembox.showAuctions:SetScript("OnClick", function()
-		frame.showAuctions = this:GetChecked()
+	frame.itembox.showAuctions:SetScript("OnClick", function(self)
+		frame.showAuctions = self:GetChecked()
 		frame.GenerateList(true)
 		PlaySound(frame.showAuctions and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
 	end)
 
 	-- "Show Hidden" checkbox
 	frame.itembox.showHidden = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowHidden", frame.itembox, "OptionsCheckButtonTemplate")
-	frame.itembox.showHidden:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_IncludeItemsHiddenListing') ) end)--Include items tagged as 'hidden' in the item listing
+	frame.itembox.showHidden:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_IncludeItemsHiddenListing') ) end)--Include items tagged as 'hidden' in the item listing
 	frame.itembox.showHidden:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.itembox.showHidden:SetWidth(24)
 	frame.itembox.showHidden:SetHeight(24)
 	Auc_Util_Appraiser_ShowHiddenText:SetText(_TRANS('APPR_Interface_Hidden') )--Hidden
 	frame.itembox.showHidden:SetPoint("BOTTOMRIGHT", frame.itembox.showAuctions, "BOTTOMLEFT", 0-Auc_Util_Appraiser_ShowHiddenText:GetWidth(), 0)
 	frame.itembox.showHidden:SetHitRectInsets(0, 0-Auc_Util_Appraiser_ShowHiddenText:GetWidth(), 0, 0)
-	frame.itembox.showHidden:SetScript("OnClick", function()
-		frame.showHidden = this:GetChecked()
+	frame.itembox.showHidden:SetScript("OnClick", function(self)
+		frame.showHidden = self:GetChecked()
 		frame.GenerateList(true)
 		PlaySound(frame.showHidden and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
 	end)
@@ -1787,7 +1777,7 @@ function private.CreateFrames()
 		item.iconbutton:SetWidth(26)
 		item.iconbutton:SetPoint("LEFT", item, "LEFT", 3,0)
 		item.iconbutton:SetScript("OnClick", itemIconClick)
-		item.iconbutton:SetScript("OnEnter", frame.DoTooltip)
+		item.iconbutton:SetScript("OnEnter", function() frame.DoTooltip(item) end)
 		item.iconbutton:SetScript("OnLeave", frame.UndoTooltip)
 		item.iconbutton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
@@ -1891,7 +1881,7 @@ function private.CreateFrames()
 	frame.salebox.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
 	frame.salebox.icon:SetScript("OnReceiveDrag", frame.IconClicked)
-	frame.salebox.icon:SetScript("OnEnter", frame.DoTooltip)
+	frame.salebox.icon:SetScript("OnEnter", function(self) frame.DoTooltip(self) end)
 	frame.salebox.icon:SetScript("OnLeave", frame.UndoTooltip)
 
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -1929,14 +1919,14 @@ function private.CreateFrames()
 	frame.salebox.stack:SetValue(20)
 	frame.salebox.stack:SetWidth(180)
 	frame.salebox.stack:SetScript("OnValueChanged", function() frame.updated = true end)
-	frame.salebox.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
+	frame.salebox.stack:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
 	frame.salebox.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
 
 	frame.salebox.stack:EnableMouseWheel(1)
-	frame.salebox.stack:SetScript("OnMouseWheel", function()
-		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -arg1)
+	frame.salebox.stack:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -delta)
 	end)
 
 	AppraiserSaleboxStackLow:SetText("")
@@ -1955,7 +1945,7 @@ function private.CreateFrames()
 	frame.salebox.number:SetValue(1)
 	frame.salebox.number:SetWidth(180)
 	frame.salebox.number:SetScript("OnValueChanged", function() frame.updated = true end)
-	frame.salebox.number:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
+	frame.salebox.number:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
 	frame.salebox.number:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.number.element = "number"
 	frame.salebox.number:Hide()
@@ -1996,8 +1986,8 @@ function private.CreateFrames()
 	end
 
 	frame.salebox.number:EnableMouseWheel(1)
-	frame.salebox.number:SetScript("OnMouseWheel", function()
-		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -arg1)
+	frame.salebox.number:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -delta)
 	end)
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2006,7 +1996,7 @@ function private.CreateFrames()
 	frame.salebox.number.label:SetJustifyV("CENTER")
 
    	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "OptionsCheckButtonTemplate")
- 	frame.salebox.numberonly:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RestrictActiveAuctions') ) end)--Restrict active auctions to the 'number' value
+ 	frame.salebox.numberonly:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_RestrictActiveAuctions') ) end)--Restrict active auctions to the 'number' value
 	frame.salebox.numberonly:SetScript("OnLeave", function() return GameTooltip:Hide() end)
    -- Would rather the distance here matched the length of the "All Stacks" text and was recalculated.
 	frame.salebox.numberonly:SetPoint("BOTTOMLEFT", frame.salebox.number.label, "BOTTOMRIGHT", 0, -4)
@@ -2029,7 +2019,7 @@ function private.CreateFrames()
 	frame.salebox.duration:SetValue(3)
 	frame.salebox.duration:SetWidth(80)
 	frame.salebox.duration:SetScript("OnValueChanged", function() frame.updated = true end)
-	frame.salebox.duration:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetTimePostItem') ) end)--Set the time to post this item for
+	frame.salebox.duration:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetTimePostItem') ) end)--Set the time to post this item for
 	frame.salebox.duration:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.duration.element = "duration"
 	frame.salebox.duration:Hide()
@@ -2037,8 +2027,8 @@ function private.CreateFrames()
 	AppraiserSaleboxDurationHigh:SetText("")
 
 	frame.salebox.duration:EnableMouseWheel(1)
-	frame.salebox.duration:SetScript("OnMouseWheel", function()
-		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - arg1)
+	frame.salebox.duration:SetScript("OnMouseWheel", function(self, delta)
+		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - delta)
 	end)
 
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2051,7 +2041,7 @@ function private.CreateFrames()
 	end
 
 	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, function() frame.updated = true end, frame.GetLinkPriceModels, "default")
-	frame.salebox.model.button:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SelectPricingModel') ) end)--Select the pricing model to use
+	frame.salebox.model.button:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SelectPricingModel') ) end)--Select the pricing model to use
 	frame.salebox.model.button:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.model:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", 0, 0)
 	frame.salebox.model.element = "model"
@@ -2062,7 +2052,7 @@ function private.CreateFrames()
 	frame.salebox.model.label:SetText(_TRANS('APPR_Interface_PricingModelUse') )--Pricing model to use:
 
 	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "OptionsCheckButtonTemplate")
- 	frame.salebox.matcher:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnablesMatchersCalculatingPrices') ) end)--Enables the use of matchers (eg Undercut) when calculating prices
+ 	frame.salebox.matcher:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_EnablesMatchersCalculatingPrices') ) end)--Enables the use of matchers (eg Undercut) when calculating prices
 	frame.salebox.matcher:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.matcher:SetPoint("RIGHT", frame.salebox, "RIGHT", -158, -30)
 	frame.salebox.matcher:SetHeight(20)
@@ -2076,7 +2066,7 @@ function private.CreateFrames()
 	frame.salebox.matcher.label:SetText(_TRANS('APPR_Interface_EnablePriceMatching') )--Enable price matching
 
 	frame.salebox.ignore = CreateFrame("CheckButton", "AppraiserSaleboxIgnore", frame.salebox, "OptionsCheckButtonTemplate")
-	frame.salebox.ignore:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RemovesItemListing') ) end)--Removes this item from the item listing
+	frame.salebox.ignore:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_RemovesItemListing') ) end)--Removes this item from the item listing
 	frame.salebox.ignore:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.ignore:SetPoint("TOPRIGHT", frame.salebox, "TOPRIGHT", -160, -3)
 	frame.salebox.ignore:SetHeight(20)
@@ -2090,7 +2080,7 @@ function private.CreateFrames()
 	frame.salebox.ignore.label:SetText(_TRANS('APPR_Interface_HideThisItem') )--Hide this item
 
 	frame.salebox.bulk = CreateFrame("CheckButton", "AppraiserSaleboxBulk", frame.salebox, "OptionsCheckButtonTemplate")
-	frame.salebox.bulk:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_FlagsBatchPosting') ) end)--Flags this item to be included in Batch Posting
+	frame.salebox.bulk:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_FlagsBatchPosting') ) end)--Flags this item to be included in Batch Posting
 	frame.salebox.bulk:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.bulk:SetPoint("TOPRIGHT", frame.salebox.ignore, "BOTTOMRIGHT", 0, 3)
 	frame.salebox.bulk:SetHeight(20)
@@ -2105,7 +2095,7 @@ function private.CreateFrames()
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
-	frame.salebox.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
+	frame.salebox.bid:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
 	frame.salebox.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid, function() frame.SyncMoneyFrameStackBid() frame.updated = true end)
 	frame.salebox.bid.element = "bid"
@@ -2132,7 +2122,7 @@ function private.CreateFrames()
 
 	frame.salebox.bid.stack = CreateFrame("Frame", "AppraiserSaleboxBidStack", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid.stack:SetPoint("RIGHT", frame.salebox, "RIGHT", 0, 20)
-	frame.salebox.bid.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
+	frame.salebox.bid.stack:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_EnterBidAmount') ) end)--Enter new bid amount to set a Fixed Price
 	frame.salebox.bid.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.bid.stack, function() frame.SyncMoneyFrameSingleBid() frame.updated = true end)
 	frame.salebox.bid.stack.element = "bidStack"
@@ -2159,7 +2149,7 @@ function private.CreateFrames()
 
 	frame.salebox.buy = CreateFrame("Frame", "AppraiserSaleboxBuy", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
-	frame.salebox.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
+	frame.salebox.buy:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
 	frame.salebox.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy, function() frame.SyncMoneyFrameStackBuy() frame.updated = true end)
 	frame.salebox.buy.element = "buy"
@@ -2190,7 +2180,7 @@ function private.CreateFrames()
 
 	frame.salebox.buy.stack = CreateFrame("Frame", "AppraiserSaleboxBuyStack", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.buy.stack:SetPoint("TOPLEFT", frame.salebox.bid.stack, "BOTTOMLEFT", 0,-5)
-	frame.salebox.buy.stack:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
+	frame.salebox.buy.stack:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_EnterBuyoutFixedPrice') ) end)--Enter new buyout amount to set a Fixed Price
 	frame.salebox.buy.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	MoneyInputFrame_SetOnValueChangedFunc(frame.salebox.buy.stack, function() frame.SyncMoneyFrameSingleBuy() frame.updated = true end)
 	frame.salebox.buy.stack.element = "buyStack"
@@ -2235,7 +2225,7 @@ function private.CreateFrames()
 		frame.ChangeUI()
 	end)
 	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')--Switch between 'Per Item' and 'Per Stack' Pricing.
-	frame.switchToStack:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
+	frame.switchToStack:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, self.TooltipText) end)
 	frame.switchToStack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack:Enable()
 
@@ -2251,7 +2241,7 @@ function private.CreateFrames()
 		frame.ChangeUI()
 	end)
 	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')--Switch between 'Per Item' and 'Per Stack' Pricing.
-	frame.switchToStack2:SetScript("OnEnter", function() return frame.SetButtonTooltip(this.TooltipText) end)
+	frame.switchToStack2:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, self.TooltipText) end)
 	frame.switchToStack2:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.switchToStack2:Enable()
 
@@ -2261,7 +2251,7 @@ function private.CreateFrames()
 	frame.go:SetText(_TRANS('APPR_Interface_PostItems') )--Post items
 	frame.go:SetWidth(80)
 	frame.go:SetScript("OnClick", frame.PostAuctions)
-	frame.go:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_PostsCurrentItem') ) end)--Posts current item
+	frame.go:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_PostsCurrentItem') ) end)--Posts current item
 	frame.go:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.go.postType = "single"
 	frame.go:Disable()
@@ -2272,7 +2262,7 @@ function private.CreateFrames()
 	frame.gobatch:SetWidth(80)
 	frame.gobatch:SetScript("OnClick", frame.PostAuctions)
 	frame.gobatch:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	frame.gobatch:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RefreshesCurrentBatch') ) end)--Alt: Refreshes batch post items Shift: Lists current batch post items RightClick: Posts batch post items Alt+RightClick: Toggles an item's batch post option on/off
+	frame.gobatch:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_RefreshesCurrentBatch') ) end)--Alt: Refreshes batch post items Shift: Lists current batch post items RightClick: Posts batch post items Alt+RightClick: Toggles an item's batch post option on/off
 	frame.gobatch:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.gobatch.postType = "batch"
 	frame.gobatch:Enable()
@@ -2282,7 +2272,7 @@ function private.CreateFrames()
 	frame.refresh:SetText("Refresh")
 	frame.refresh:SetWidth(80)
 	frame.refresh:SetScript("OnClick", frame.SmartRefresh)
-	frame.refresh:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_RefreshesCurrentItem') ) end)--Normal: Refreshes current item Alt: Refreshes whole item list
+	frame.refresh:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_RefreshesCurrentItem') ) end)--Normal: Refreshes current item Alt: Refreshes whole item list
 	frame.refresh:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	frame.age = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -2302,7 +2292,7 @@ function private.CreateFrames()
 		frame.cancel:Disable()
 		frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 	end)
-	frame.cancel:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_ClearsPostQueue') ) end)--Clears post queue
+	frame.cancel:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_ClearsPostQueue') ) end)--Clears post queue
 	frame.cancel:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
 	frame.cancel.tex:SetPoint("TOPLEFT", frame.cancel, "TOPLEFT", 4, -2)
@@ -2463,7 +2453,7 @@ function private.CreateFrames()
 	end
 
 	function private.BuyAuction()
-		print(private.buyselection.link)
+		aucPrint(private.buyselection.link)
 		AucAdvanced.Buy.QueueBuy(private.buyselection.link, private.buyselection.seller, private.buyselection.stack, private.buyselection.minbid, private.buyselection.buyout, private.buyselection.buyout)
 		frame.imageview.sheet.selected = nil
 		private.onSelect()
@@ -2497,7 +2487,7 @@ function private.CreateFrames()
 				private.buyselection.curbid = selected[8]
 				private.buyselection.buyout = selected[9]
 				--make sure that it's not one of our auctions, then enable based on buy/bid availability
-				if (not AucAdvancedConfig["users."..private.realm.."."..private.buyselection.seller]) then
+				if (not AucAdvancedConfig["users."..Const.PlayerRealm.."."..private.buyselection.seller]) then
 					if private.buyselection.buyout and (private.buyselection.buyout > 0) then
 						frame.imageview.purchase.buy:Enable()
 						frame.imageview.purchase.buy.price:SetText(AucAdvanced.Coins(private.buyselection.buyout, true))
@@ -2618,7 +2608,7 @@ function private.CreateFrames()
 	frame.imageview.purchase.buy:SetWidth(30)
 	frame.imageview.purchase.buy:SetText(_TRANS('APPR_Interface_Buy') )--Buy
 	frame.imageview.purchase.buy:SetScript("OnClick", private.BuyAuction)
- 	frame.imageview.purchase.buy:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_BuyoutSelectedAuction') ) end)--Buyout the selected competing auction
+ 	frame.imageview.purchase.buy:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_BuyoutSelectedAuction') ) end)--Buyout the selected competing auction
 	frame.imageview.purchase.buy:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.buy:Disable()
 
@@ -2632,7 +2622,7 @@ function private.CreateFrames()
 	frame.imageview.purchase.bid:SetWidth(30)
 	frame.imageview.purchase.bid:SetText(_TRANS('APPR_Interface_Bid') )--Bid
 	frame.imageview.purchase.bid:SetScript("OnClick", private.BidAuction)
- 	frame.imageview.purchase.bid:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_BidSelectedAuction') ) end)--Place a bid on the selected competing auction
+ 	frame.imageview.purchase.bid:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_BidSelectedAuction') ) end)--Place a bid on the selected competing auction
 	frame.imageview.purchase.bid:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.imageview.purchase.bid:Disable()
 
@@ -2685,7 +2675,7 @@ function private.CreateFrames()
 	frame.salebox.numberentry:SetWidth(32)
 	frame.salebox.numberentry:SetNumber(0)
 	frame.salebox.numberentry:SetAutoFocus(false)
-	frame.salebox.numberentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
+	frame.salebox.numberentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
 	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
 		frame.salebox.numberentry:ClearFocus()
@@ -2713,7 +2703,7 @@ function private.CreateFrames()
 	frame.salebox.stackentry:SetHeight(16)
 	frame.salebox.stackentry:SetWidth(32)
 	frame.salebox.stackentry:SetAutoFocus(false)
-	frame.salebox.stackentry:SetScript("OnEnter", function() return frame.SetButtonTooltip(_TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
+	frame.salebox.stackentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
 	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
 		frame.salebox.stackentry:ClearFocus()
@@ -2737,7 +2727,23 @@ function private.CreateFrames()
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
-	hooksecurefunc("HandleModifiedItemClick", frame.ClickAnythingHook)
+	hooksecurefunc("HandleModifiedItemClick", function (link)
+		if GetMouseButtonClicked() == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.appraiser.clickhookany") then
+			if link then
+				frame.SelectItem(nil, nil, link)
+			end
+		end
+	end)
+
+	-- GetMouseButtonClicked doesn't work for chatlinks, so we hook SetItemRef as well
+	hooksecurefunc("SetItemRef", function (shortlink, hyperlink, mousebutton, chatframe)
+		if mousebutton == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.appraiser.clickhookany") then
+			local link = hyperlink or shortlink
+			if link then
+				frame.SelectItem(nil, nil, link)
+			end
+		end
+	end)
 
 	--[[These scrollframe functions need to be here to avoid errors, since many elements of appraisers frames are not finished when we create the scrollframe]]
 	--If we have a saved column arrangement reapply

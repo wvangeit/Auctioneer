@@ -183,14 +183,14 @@ end
 function lib.ResetBars()
 	local tex
 	for i=1, NUM_BROWSE_TO_DISPLAY do
-		tex = getglobal("BrowseButton"..i.."PriceLevel")
+		tex = _G["BrowseButton"..i.."PriceLevel"]
 		if (tex) then tex:Hide() end
 	end
 end
 
 function lib.SetBar(i, r,g,b, pct)
 	local tex
-	local button = getglobal("BrowseButton"..i)
+	local button = _G["BrowseButton"..i]
 	local colorize = AucAdvanced.Settings.GetSetting("util.pricelevel.colorize")
 
 	if (button.AddTexture) then
@@ -216,7 +216,7 @@ function lib.SetBar(i, r,g,b, pct)
 			tex:Hide()
 		end
 	else
-		tex = getglobal("BrowseButton"..i.."PriceLevel")
+		tex = _G["BrowseButton"..i.."PriceLevel"]
 	end
 	if not colorize then return end
 
