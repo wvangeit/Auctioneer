@@ -75,10 +75,12 @@ local ScanTip3 = _G["AppraiserTipTextLeft3"]
 local LAG_ADJUST = (4 / 1000)
 local SIGLOCK_TIMEOUT = 8 -- seconds timeout waiting for bags to update after auction created
 local POST_TIMEOUT = 8 -- seconds general timeout after starting an auction, before deciding the auction has failed
-local POST_ERROR_PAUSE = 2 -- seconds pause after an error before trying next request
-local POST_THROTTLE = 0 -- time before starting to post the next item in the queue
+local POST_ERROR_PAUSE = 5 -- seconds pause after an error before trying next request
+local POST_THROTTLE = 0.1 -- time before starting to post the next item in the queue
 local POST_TIMER_INTERVAL = 0.5 -- default interval of updates from the timer
 local MINIMUM_DEPOSIT = 100 -- 1 silver minimum deposit
+local PROMPT_HEIGHT = 120
+local PROMPT_MIN_WIDTH = 500
 
 local BindTypes = {
 	[ITEM_SOULBOUND] = "Bound",
@@ -140,6 +142,7 @@ local REQ_BUYOUT = 4
 local REQ_DURATION = 5
 local REQ_NUMSTACKS = 6
 -- function to create a new posting request table; keep sync'd with the above constants
+-- todo: when we stop using these deprecated constants, remove private.NewRequestTable and streamline into queueing function
 private.lastPostId = 0
 function private.NewRequestTable(sig, count, bid, buyout, duration, numStacks)
 	local postId = private.lastPostId + 1
@@ -268,9 +271,14 @@ do
 		if #postRequests > 0 then
 			local request = postRequests[1] -- save the first request
 			wipe(postRequests)
-			if request.link then -- if 'request' is currently being posted, put it back in the queue until the posting resolves
-				tinsert(postRequests, request)
-				CancelSell() -- abort current Multisell operation
+			if request.posting then
+				if request.prompt then
+					private.HidePrompt()
+				elseif request.time then
+					-- request is currently being posted, put it back in the queue until the posting resolves
+					tinsert(postRequests, request)
+					CancelSell() -- abort current Multisell operation
+				end
 			end
 			private.QueueReport()
 		end
@@ -292,22 +300,7 @@ function lib.ValidateAuctionDuration(duration)
 	return AuctionDurationCode[duration]
 end
 
---[[
-    PostAuction(sig, size, bid, buyout, duration, [multiple])
-
-	Places the request to post a stack of the "sig" item, "size" high
-	into the auction house for "bid" minimum bid, and "buy" buyout and
-	posted for "duration" minutes. The request will be posted
-	"multiple" number of times.
-
-	This is the main entry point to the Post library for other AddOns, so has the strictest parameter checking
-	"multiple" is optional, defaulting to 1. All other parameters are required.
-
-	If successful it returns a request id; the id will be included in the "postresult" Processor message for each request
-	If a problem is detected it returns nil, reason
-		reason is an internal short text code; it can be converted to a displayable text message using lib.ErrorCodes[reason]
-]]
-function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
+function private.GetRequest(sig, size, bid, buyout, duration, multiple)
 	local id = DecodeSig(sig)
 	if not id then
 		return nil, "InvalidSig"
@@ -323,7 +316,7 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 		return nil, "InvalidDuration"
 	end
 
-	local name,_,_,_,_,_,_, maxSize = GetItemInfo(id)
+	local name, link,_,_,_,_,_, maxSize,_, texture = GetItemInfo(id)
 	if not name then
 		return nil, "UnknownItem"
 	elseif size > maxSize then
@@ -344,6 +337,34 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	end
 
 	local request = private.NewRequestTable(sig, size, bid, buyout, duration, multiple)
+	-- Additional values for the Prompt handler (added for Cataclysm)
+	request.name = name
+	request.link = link
+	request.texture = texture
+	
+	return request
+end
+
+--[[
+    PostAuction(sig, size, bid, buyout, duration, [multiple])
+
+	Places the request to post a stack of the "sig" item, "size" high
+	into the auction house for "bid" minimum bid, and "buy" buyout and
+	posted for "duration" minutes. The request will be posted
+	"multiple" number of times.
+
+	This is the main entry point to the Post library for other AddOns, so has the strictest parameter checking
+	"multiple" is optional, defaulting to 1. All other parameters are required.
+
+	If successful it returns a request id; the id will be included in the "postresult" Processor message for each request
+	If a problem is detected it returns nil, reason
+		reason is an internal short text code; it can be converted to a displayable text message using lib.ErrorCodes[reason]
+]]
+function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
+	local request, reason = private.GetRequest(sig, size, bid, buyout, duration, multiple)
+	if not request then
+		return nil, reason
+	end
 	private.QueueInsert(request)
 	private.Wait(0) -- delay until next OnUpdate
 	return request.id
@@ -661,7 +682,7 @@ end
 
 function private.TrackPostingSuccess()
 	local request = private.GetQueueIndex(1)
-	if not request or not request.link then return end
+	if not (request and request.posting) then return end
 	local posted = request.posted + 1
 	request.posted = posted
 	if posted >= request.stacks then -- all stacks posted
@@ -682,7 +703,7 @@ function private.TrackPostingMultisellFail()
 	ClickAuctionSellItemButton() -- Clear Auction slot
 	ClearCursor()
 	local request = private.GetQueueIndex(1)
-	if not request then return end
+	if not (request and request.posting) then return end
 	local link = request.link
 	if not link then return end
 	private.LockSig(request)
@@ -705,16 +726,41 @@ end
 
 function private.TrackCancelSell()
 	local request = private.GetQueueIndex(1)
-	if not request or not request.link then return end
+	if not request or not request.posting then return end
 	-- flag to suppress error messages when the cancelled Multisell 'fails'
 	request.cancelled = true
 end
 
---[[ SelectStack(request)
-	Helper function for ProcessPosts
+--[[ PRIVATE: ClearAuctionSlot()
+	Clears the cursor and the AuctionSellItem slot, and confirms that the clearing was successful
+	Called before starting posting process
+	In most other places we use a shorter inline code sequence, without the confirmations
+--]]
+function private.ClearAuctionSlot()
+	-- cursor needs to be clear before we can attempt posting
+	ClearCursor()
+	if GetCursorInfo() or SpellIsTargeting() then
+		return
+	end
+
+	-- auction slot needs to be clear
+	if GetAuctionSellItemInfo() then
+		ClickAuctionSellItemButton()
+		ClearCursor()
+		if GetAuctionSellItemInfo() then
+			-- it's locked, wait for it to clear
+			private.waitBagUpdate = true -- watch for bag changes too
+			return
+		end
+	end
+	
+	return true
+end
+
+--[[ PRIVATE: SelectStack(request)
 	Decide which stack to put into the Auction Slot for posting
 --]]
-local function SelectStack(request)
+function private.SelectStack(request)
 	local sig, count = request.sig, request.count
 	local matchId, matchSuffix, matchFactor, matchEnchant = DecodeSig(sig)
 	local foundBag, foundSlot, foundStop, foundSize
@@ -772,6 +818,200 @@ local function SelectStack(request)
 	return nil, "NotFound"
 end
 
+--[[ PRIVATE: LoadAuctionSlot(request, bag, slot)
+	Loads the item in bag/slot into AuctionSellItem slot
+	AuctionSellItem slot and cursor must be clear
+	Performs numerous checks to verify the item is loaded correctly and is postable
+--]]
+function private.LoadAuctionSlot(request, bag, slot)
+	local link = GetContainerItemLink(bag, slot)
+
+	PickupContainerItem(bag, slot)
+	if not CursorHasItem() then
+		-- failed to pick up from bags, probably due to some unfinished operation; wait for another cycle
+		private.waitBagUpdate = true -- watch for bag changes too
+		return
+	end
+
+	private.waitBagUpdate = nil
+	private.lastUIError = nil
+	if not AuctionFrameAuctions.duration then
+		-- Fix in case Blizzard_AuctionUI hasn't set this value yet (causes an error otherwise)
+		-- todo: periodically check if this is still needed
+		AuctionFrameAuctions.duration = 2
+	end
+	ClickAuctionSellItemButton()
+
+	-- verify that the contents of the Auction slot are what we expect
+	local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount = GetAuctionSellItemInfo()
+	if not name or name ~= request.name then
+		-- failed to drop item in auction slot, probably because item is not auctionable (but was missed by our checks)
+		local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["FailSlot"])
+		if private.lastUIError then
+			msg = msg.."\nAdditional info: "..private.lastUIError
+		end
+		debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+		private.QueueRemove()
+		private.Wait(POST_ERROR_PAUSE)
+		AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "FailSlot")
+		if private.lastUIError then
+			geterrorhandler()(msg)
+		else
+			message(msg)
+		end
+		return
+	end
+	if totalCount < request.count * request.stacks then
+		-- not enough items to complete this request; abort whole request
+		ClickAuctionSellItemButton()
+		ClearCursor() -- Put it back in the bags
+		local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["NotEnough"])
+		debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+		private.QueueRemove()
+		private.Wait(POST_ERROR_PAUSE)
+		AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "NotEnough")
+		message(msg)
+		return
+	end
+	if GetMoney() < CalculateAuctionDeposit(request.duration, request.count) * request.stacks then
+		-- not enough money to pay the deposit
+		ClickAuctionSellItemButton()
+		ClearCursor() -- Put it back in the bags
+		local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["PayDeposit"])
+		debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+		private.QueueRemove()
+		private.Wait(POST_ERROR_PAUSE)
+		AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "PayDeposit")
+		message(msg)
+		return
+	end
+	-- todo: should we check private.lastUIError at this point for unknown errors?
+
+	request.link = link -- store specific link (uniqueID)
+	request.totalcount = totalCount -- this will be used by the SigLock mechanism
+	request.selectedcount = count -- used by the Prompt sanity checks
+
+	return true
+end
+
+--[[ PRIVATE: VerifyAuctionSlot(request)
+	Checks that the item in the AuctionSellItem slot still matches the item in 'request' and is still sellable
+	Used while the Prompt is open to see if something has changed
+--]]
+function private.VerifyAuctionSlot(request)
+	local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount = GetAuctionSellItemInfo()
+	if name ~= request.name or count ~= request.selectedcount then
+		-- Either slot has been cleared, or has been replaced with something else
+		return
+	end
+	if totalCount < request.count * request.stacks then
+		return
+	end
+	if GetMoney() < CalculateAuctionDeposit(request.duration, request.count) * request.stacks then
+		return
+	end
+	
+	return true
+end
+
+--[[ PRIVATE: PerformPosting()
+	Called from the Prompt Yes/Continue button
+	Note: silently does nothing when prompt is hidden, to handle macro spam
+--]]
+function private.PerformPosting()
+	local request = private.promptRequest
+	private.HidePrompt()
+	if not request then return end
+	request.posting = nil -- temporarily unflag until we complete the checks
+	
+	-- Sanity checks
+	if request ~= private.GetQueueIndex(1) then return end
+	if not private.VerifyAuctionSlot(request) then return end
+
+	private.StartAuction(request)
+end
+
+--[[ PRIVATE: CancelPosting()
+	Called from the Prompt No/Cancel button
+--]]
+function private.CancelPosting()
+	local request = private.promptRequest
+	private.HidePrompt()
+	if request and request == private.GetQueueIndex(1) then
+		ClearCursor()
+		ClickAuctionSellItemButton() -- Clear Auction slot
+		ClearCursor()
+		private.QueueRemove()
+	end
+end
+
+--[[ PRIVATE: ShowPrompt(request)
+	Display the confirmation prompt
+	Item must already be loaded in AuctionSellItem slot
+--]]
+function private.ShowPrompt(request)
+	if private.promptRequest then
+		error("CorePost:ShowPrompt - private.promptRequest is not nil")
+	end
+	if private.Prompt:IsShown() then
+		error("CorePost:ShowPrompt - Prompt is already shown")
+	end
+	private.promptRequest = request
+	request.prompt = true
+	request.posting = true
+	private.Prompt:Show()
+	private.Prompt.Text1:SetText("Ready to post "..private.RequestDisplayString(request))
+	private.Prompt.Text2:SetText("Min Bid "..AucAdvanced.Coins(request.bid, true)..", Buyout "..AucAdvanced.Coins(request.buy))
+	private.Prompt.Item.tex:SetTexture(request.texture)
+	local width1 = (private.Prompt.Text1:GetStringWidth() or 0) + 70
+	local width2 = (private.Prompt.Text2:GetStringWidth() or 0) + 70
+	private.Prompt.Frame:SetWidth(max(width1, width2, PROMPT_MIN_WIDTH))
+end
+
+--[[ PRIVATE: HidePrompt()
+	Close the prompt and tidy up flags
+	May be safely called at any time
+--]]
+function private.HidePrompt()
+	local request = private.promptRequest
+	private.Prompt:Hide()
+	private.promptRequest = nil
+	if request then
+		request.prompt = nil
+	end	
+end
+
+
+--[[ PRIVATE: StartAuction(request)
+	Starts the auction
+	Item must already be loaded in AuctionSellItem slot
+	In WoW4.0 or later must only be called from within an OnClick handler (hardware event required)
+--]]
+function private.StartAuction(request)
+	debugPrint("Starting auction "..private.RequestDisplayString(request), "CorePost", "Starting Auction", "Info")
+	private.lastUIError = nil
+	StartAuction(request.bid, request.buy, request.duration, request.count, request.stacks)
+	if UIAuctionErrors[private.lastUIError] then
+		-- UI Error is one of the known Auction errors that prevent posting
+		ClearCursor()
+		ClickAuctionSellItemButton()
+		ClearCursor() -- Put it back in the bags
+		local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request), ErrorText["FailStart"])
+		msg = msg.."\nAdditional info: "..private.lastUIError
+		debugPrint(msg, "CorePost", "Posting Failure", "Warning")
+		private.QueueRemove()
+		private.Wait(POST_ERROR_PAUSE)
+		AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "FailStart")
+		--message(msg)
+		geterrorhandler()(msg)
+		return
+	end
+	request.time = GetTime() -- record time of posting for calculating timeout
+	request.posting = true
+	
+	return true
+end
+
 --[[
 	ProcessPosts()
 	This function is responsible for maintaining and processing the post queue.
@@ -788,10 +1028,11 @@ local function ProcessPosts()
 
 	local request = private.GetQueueIndex(1)
 
-	if request.link then
+	if request.posting then
 		-- This request is being posted. Check for timeout
 		-- (Other success/fail situations are handled by the TrackPostingX functions)
 		-- use longer timeout delays if connectivity is bad, but always at least 1 second
+		if request.prompt or not request.time then return end
 		local _,_, lag = GetNetStats()
 		lag = max(lag * LAG_ADJUST, 1)
 		if GetTime() > request.time + lag * POST_TIMEOUT then
@@ -826,102 +1067,16 @@ local function ProcessPosts()
 		return
 	end
 
-	-- cursor needs to be clear before we can attempt posting
-	ClearCursor()
-	if GetCursorInfo() or SpellIsTargeting() then
+	if not private.ClearAuctionSlot() then
 		return
 	end
-
-	-- auction slot needs to be clear
-	if GetAuctionSellItemInfo() then
-		ClickAuctionSellItemButton()
-		ClearCursor()
-		if GetAuctionSellItemInfo() then
-			-- it's locked, wait for it to clear
-			private.waitBagUpdate = true -- watch for bag changes too
-			return
-		end
-	end
-
-	local bag, slot = SelectStack(request)
+	
+	local bag, slot = private.SelectStack(request)
 	if bag then
-		local link = GetContainerItemLink(bag, slot)
-
-		PickupContainerItem(bag, slot)
-		if not CursorHasItem() then
-			-- failed to pick up from bags, probably due to some unfinished operation; wait for another cycle
-			private.waitBagUpdate = true -- watch for bag changes too
+		if not private.LoadAuctionSlot(request, bag, slot) then
 			return
 		end
-
-		private.waitBagUpdate = nil
-		private.lastUIError = nil
-		ClickAuctionSellItemButton()
-
-		-- verify that the contents of the Auction slot are what we expect
-		local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount = GetAuctionSellItemInfo()
-		if not name then
-			-- failed to drop item in auction slot, probably because item is not auctionable (but was missed by our checks)
-			local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["FailSlot"])
-			if private.lastUIError then
-				msg = msg.."\nAdditional info: "..private.lastUIError
-			end
-			debugPrint(msg, "CorePost", "Posting Failure", "Warning")
-			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "FailSlot")
-			if private.lastUIError then
-				geterrorhandler()(msg)
-			else
-				message(msg)
-			end
-			return
-		end
-		if totalCount < request.count * request.stacks then
-			-- not enough items to complete this request; abort whole request
-			ClickAuctionSellItemButton()
-			ClearCursor() -- Put it back in the bags
-			local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["NotEnough"])
-			debugPrint(msg, "CorePost", "Posting Failure", "Warning")
-			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "NotEnough")
-			message(msg)
-			return
-		end
-		if GetMoney() < CalculateAuctionDeposit(request.duration, request.count) * request.stacks then
-			-- not enough money to pay the deposit
-			ClickAuctionSellItemButton()
-			ClearCursor() -- Put it back in the bags
-			local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["PayDeposit"])
-			debugPrint(msg, "CorePost", "Posting Failure", "Warning")
-			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "PayDeposit")
-			message(msg)
-			return
-		end
-		-- todo: should we check private.lastUIError at this point for unknown errors?
-
-		request.totalcount = totalCount -- this will be used by the SigLock mechanism
-		debugPrint("Starting auction "..private.RequestDisplayString(request, link), "CorePost", "Starting Auction", "Info")
-		StartAuction(request.bid, request.buy, request.duration, request.count, request.stacks)
-		if UIAuctionErrors[private.lastUIError] then
-			-- UI Error is one of the known Auction errors that prevent posting
-			ClickAuctionSellItemButton()
-			ClearCursor() -- Put it back in the bags
-			local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["FailStart"])
-			msg = msg.."\nAdditional info: "..private.lastUIError
-			debugPrint(msg, "CorePost", "Posting Failure", "Warning")
-			private.QueueRemove()
-			private.Wait(POST_ERROR_PAUSE)
-			AucAdvanced.SendProcessorMessage("postresult", false, request.id, request, "FailStart")
-			--message(msg)
-			geterrorhandler()(msg)
-			return
-		end
-		request.time = GetTime() -- record time of posting for calculating timeout
-		request.link = link -- flag that this request is being posted
+		private.ShowPrompt(request)
 	elseif slot then -- bag == nil
 		-- 'slot' contains the error code
 		private.Wait(POST_ERROR_PAUSE)
@@ -1067,5 +1222,103 @@ StaticPopupDialogs["POST_CANCEL_QUEUE_AH_CLOSED"] = {
   whileDead = true,
   hideOnEscape = true,
 }
+
+--[[ Prompt Frame ]]--
+-- (Cloned and modified from CoreBuy)
+
+--this is a anchor frame that never changes size
+private.Prompt = CreateFrame("Frame", nil, UIParent)
+private.Prompt:Hide()
+private.Prompt:SetPoint("CENTER", UIParent, "CENTER", 0, -50)
+private.Prompt:SetFrameStrata("DIALOG")
+private.Prompt:SetHeight(PROMPT_HEIGHT)
+private.Prompt:SetWidth(PROMPT_MIN_WIDTH)
+private.Prompt:SetMovable(true)
+private.Prompt:SetClampedToScreen(true)
+
+--The "graphic" frame and backdrop that we resize
+private.Prompt.Frame = CreateFrame("Frame", nil, private.Prompt)
+private.Prompt.Frame:SetPoint("CENTER", private.Prompt, "CENTER" )
+private.Prompt.Frame:SetFrameLevel(private.Prompt:GetFrameLevel() - 1) -- lower level than parent (backdrop)
+private.Prompt.Frame:SetHeight(PROMPT_HEIGHT)
+private.Prompt.Frame:SetWidth(PROMPT_MIN_WIDTH)
+private.Prompt.Frame:SetClampedToScreen(true)
+private.Prompt.Frame:SetBackdrop({
+	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	tile = true, tileSize = 32, edgeSize = 32,
+	insets = { left = 9, right = 9, top = 9, bottom = 9 }
+})
+private.Prompt.Frame:SetBackdropColor(0,0,0,0.8)
+
+-- Helper functions
+local function ShowTooltip()
+	local link = private.promptRequest and private.promptRequest.link
+	if link then
+		GameTooltip:SetOwner(private.Prompt.Item, "ANCHOR_TOPRIGHT")
+		GameTooltip:SetHyperlink(link)
+	end
+end
+local function HideTooltip()
+	GameTooltip:Hide()
+end
+local function DragStart()
+	private.Prompt:StartMoving()
+end
+local function DragStop()
+	private.Prompt:StopMovingOrSizing()
+end
+
+private.Prompt.Item = CreateFrame("Button", nil, private.Prompt) -- todo: does this really need to be a button?
+private.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
+private.Prompt.Item:GetNormalTexture():SetTexCoord(0,0.640625, 0, 0.640625)
+private.Prompt.Item:SetPoint("TOPLEFT", private.Prompt.Frame, "TOPLEFT", 15, -15)
+private.Prompt.Item:SetHeight(37)
+private.Prompt.Item:SetWidth(37)
+private.Prompt.Item:SetScript("OnEnter", ShowTooltip)
+private.Prompt.Item:SetScript("OnLeave", HideTooltip)
+private.Prompt.Item.tex = private.Prompt.Item:CreateTexture(nil, "OVERLAY")
+private.Prompt.Item.tex:SetPoint("TOPLEFT", private.Prompt.Item, "TOPLEFT", 0, 0)
+private.Prompt.Item.tex:SetPoint("BOTTOMRIGHT", private.Prompt.Item, "BOTTOMRIGHT", 0, 0)
+
+private.Prompt.Heading = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+private.Prompt.Heading:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 52, -20)
+private.Prompt.Heading:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -15, -20)
+private.Prompt.Heading:SetJustifyH("CENTER")
+private.Prompt.Heading:SetText("Auctioneer needs a confirmation to continue posting")
+
+private.Prompt.Text1 = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+private.Prompt.Text1:SetPoint("CENTER", private.Prompt.Frame, "CENTER", 20, 10)
+
+private.Prompt.Text2 = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+private.Prompt.Text2:SetPoint("CENTER", private.Prompt.Frame, "CENTER", 20, -10)
+
+-- Yes and No buttons are named to allow macros to /click them
+private.Prompt.Yes = CreateFrame("Button", "AuctioneerPostPromptYes", private.Prompt, "OptionsButtonTemplate")
+private.Prompt.Yes:SetText(CONTINUE)
+private.Prompt.Yes:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -100, 10)
+private.Prompt.Yes:SetScript("OnClick", private.PerformPosting)
+
+private.Prompt.No = CreateFrame("Button", "AuctioneerPostPromptNo", private.Prompt, "OptionsButtonTemplate")
+private.Prompt.No:SetText(CANCEL)
+private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -60, 0)
+private.Prompt.No:SetScript("OnClick", private.CancelPosting)
+
+private.Prompt.DragTop = CreateFrame("Button", nil, private.Prompt)
+private.Prompt.DragTop:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 10, -5)
+private.Prompt.DragTop:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -10, -5)
+private.Prompt.DragTop:SetHeight(6)
+private.Prompt.DragTop:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+private.Prompt.DragTop:SetScript("OnMouseDown", DragStart)
+private.Prompt.DragTop:SetScript("OnMouseUp", DragStop)
+
+private.Prompt.DragBottom = CreateFrame("Button", nil, private.Prompt)
+private.Prompt.DragBottom:SetPoint("BOTTOMLEFT", private.Prompt, "BOTTOMLEFT", 10, 5)
+private.Prompt.DragBottom:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -10, 5)
+private.Prompt.DragBottom:SetHeight(6)
+private.Prompt.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+private.Prompt.DragBottom:SetScript("OnMouseDown", DragStart)
+private.Prompt.DragBottom:SetScript("OnMouseUp", DragStop)
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
