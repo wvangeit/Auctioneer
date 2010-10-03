@@ -44,7 +44,10 @@ end
 local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellframe:Hide()
 local autoselldata = {}
 local autosell = {}
-local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+local GetPrice = function() return 0,0 end --fake getPrice when Appraiser is not available
+if AucAdvanced.Modules.Util.Appraiser then
+	GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+end
 lib.autoSellList = {} -- default empty table in case of no saved data
 
 function lib.Processor(callbackType, ...)

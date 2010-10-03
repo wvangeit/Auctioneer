@@ -32,7 +32,10 @@ if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+local GetPrice = function() return 0,0 end --fake getPrice when Appraiser is not available
+if AucAdvanced.Modules.Util.Appraiser then
+	GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+end
 
 local _, selected, selecteditem, selectedvendor, selectedappraiser, selectedwhy, selectedignored
 local selecteddata = {}
@@ -110,7 +113,6 @@ end
 -- ASCtempstorage[index] = { link, vendorPrice, AppraiserPrice, reason, vendorIgnoreDisplay }
 function lib.ASCRefreshSheet()
 	local ASCtempstorage, style = {}, {}
-	local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 	for k, v in pairs(lib.vendorlist) do
 		local itemLink, itemSig, count, bag, slot, reason = unpack(v)
 		local _, iID = decode(itemLink)
