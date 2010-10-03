@@ -337,11 +337,7 @@ function private.GetRequest(sig, size, bid, buyout, duration, multiple)
 	end
 
 	local request = private.NewRequestTable(sig, size, bid, buyout, duration, multiple)
-	-- Additional values for the Prompt handler (added for Cataclysm)
-	request.name = name
-	request.link = link
-	request.texture = texture
-	
+
 	return request
 end
 
@@ -368,6 +364,44 @@ function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	private.QueueInsert(request)
 	private.Wait(0) -- delay until next OnUpdate
 	return request.id
+end
+
+--[[ PostAuctionClick(sig, size, bid, buyout, duration, multiple)
+	As PostAuction, except that this function will attempt to post the auction immediately if possible
+	May only be called from an OnClick handler
+--]]
+function lib.PostAuctionClick(sig, size, bid, buyout, duration, multiple)
+	local request, reason = private.GetRequest(sig, size, bid, buyout, duration, multiple)
+	if not request then
+		return nil, reason
+	end
+	local isEmpty = lib.GetQueueLen() == 0
+	private.QueueInsert(request)
+	local id = request.id
+
+	if isEmpty then
+		-- Attempt to post the item immediately
+		-- If this is not possible, the request will be handled by the queue mechanism
+		private.Wait(0)
+
+		private.SigLockUpdate() -- check the status of any SigLocks
+		if private.IsSigLocked(request.sig) then
+			return id
+		end
+
+		if not private.ClearAuctionSlot() then
+			return id
+		end
+
+		local bag, slot = private.SelectStack(request)
+		if bag then
+			if not private.LoadAuctionSlot(request, bag, slot) then
+				return id
+			end
+			private.StartAuction(request)
+			return id
+		end
+	end
 end
 
 --[[
@@ -753,7 +787,7 @@ function private.ClearAuctionSlot()
 			return
 		end
 	end
-	
+
 	return true
 end
 
@@ -825,6 +859,8 @@ end
 --]]
 function private.LoadAuctionSlot(request, bag, slot)
 	local link = GetContainerItemLink(bag, slot)
+	local checkname = GetItemInfo(link)
+	assert(link and checkname)
 
 	PickupContainerItem(bag, slot)
 	if not CursorHasItem() then
@@ -844,7 +880,7 @@ function private.LoadAuctionSlot(request, bag, slot)
 
 	-- verify that the contents of the Auction slot are what we expect
 	local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount = GetAuctionSellItemInfo()
-	if not name or name ~= request.name then
+	if name ~= checkname then
 		-- failed to drop item in auction slot, probably because item is not auctionable (but was missed by our checks)
 		local msg = ("Unable to create auction for %s: %s"):format(private.RequestDisplayString(request, link), ErrorText["FailSlot"])
 		if private.lastUIError then
@@ -890,6 +926,8 @@ function private.LoadAuctionSlot(request, bag, slot)
 	request.link = link -- store specific link (uniqueID)
 	request.totalcount = totalCount -- this will be used by the SigLock mechanism
 	request.selectedcount = count -- used by the Prompt sanity checks
+	request.name = name -- used by the Prompt sanity checks
+	request.texture = texture
 
 	return true
 end
@@ -910,7 +948,7 @@ function private.VerifyAuctionSlot(request)
 	if GetMoney() < CalculateAuctionDeposit(request.duration, request.count) * request.stacks then
 		return
 	end
-	
+
 	return true
 end
 
@@ -923,7 +961,7 @@ function private.PerformPosting()
 	private.HidePrompt()
 	if not request then return end
 	request.posting = nil -- temporarily unflag until we complete the checks
-	
+
 	-- Sanity checks
 	if request ~= private.GetQueueIndex(1) then return end
 	if not private.VerifyAuctionSlot(request) then return end
@@ -978,7 +1016,7 @@ function private.HidePrompt()
 	private.promptRequest = nil
 	if request then
 		request.prompt = nil
-	end	
+	end
 end
 
 
@@ -1008,7 +1046,7 @@ function private.StartAuction(request)
 	end
 	request.time = GetTime() -- record time of posting for calculating timeout
 	request.posting = true
-	
+
 	return true
 end
 
@@ -1070,7 +1108,7 @@ local function ProcessPosts()
 	if not private.ClearAuctionSlot() then
 		return
 	end
-	
+
 	local bag, slot = private.SelectStack(request)
 	if bag then
 		if not private.LoadAuctionSlot(request, bag, slot) then
