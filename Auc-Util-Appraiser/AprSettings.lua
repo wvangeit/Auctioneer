@@ -77,10 +77,10 @@ function private.sortItems(a,b)
 end
 
 function private.updateRoundExample()
-	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
-	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
-	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep"))
-	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
+	local method = get("util.appraiser.round.method") or "unit"
+	local pos = tonumber(get("util.appraiser.round.position"))
+	local mag = tonumber(get("util.appraiser.round.magstep"))
+	local sub = tonumber(get("util.appraiser.round.subtract"))
 	if pos == nil then pos = 0.10 end
 	if mag == nil then mag = 5 end
 	if sub == nil then sub = 1 end
@@ -96,7 +96,7 @@ function private.updateRoundExample()
 	elseif method == "div" then
 		roundname = _TRANS('APPR_Interface_Divisions')
 	else
-		AucAdvanced.Settings.SetSetting("util.appraiser.round.method", nil) -- saved setting was invalid, so clear it.
+		set("util.appraiser.round.method", nil) -- saved setting was invalid, so clear it.
 		roundname = _TRANS('APPR_Interface_StopValue')
 	end
 
@@ -157,10 +157,10 @@ end
 
 -- Function to round a value according to the current rounding method
 function private.roundValue(value)
-	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
-	local pos = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.position"))
-	local mag = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep"))
-	local sub = tonumber(AucAdvanced.Settings.GetSetting("util.appraiser.round.subtract"))
+	local method = get("util.appraiser.round.method") or "unit"
+	local pos = tonumber(get("util.appraiser.round.position"))
+	local mag = tonumber(get("util.appraiser.round.magstep"))
+	local sub = tonumber(get("util.appraiser.round.subtract"))
 	if pos == nil then pos = 0.10 end
 	if mag == nil then mag = 5 end
 	if sub == nil then sub = 1 end
@@ -172,7 +172,7 @@ function private.roundValue(value)
 end
 
 function lib.RoundBid(value)
-	if AucAdvanced.Settings.GetSetting("util.appraiser.round.bid") then
+	if get("util.appraiser.round.bid") then
 		return private.roundValue(value)
 	else
 		return math.floor(value + 0.5) --We CANNOT allow Decimal values to be passed to hooked modules such as beancounter, even if AH will not throw an error
@@ -180,7 +180,7 @@ function lib.RoundBid(value)
 end
 
 function lib.RoundBuy(value)
-	if value ~= 0 and AucAdvanced.Settings.GetSetting("util.appraiser.round.buy") then
+	if value ~= 0 and get("util.appraiser.round.buy") then
 		return private.roundValue(value)
 	else
 		return math.floor(value + 0.5) --We CANNOT allow Decimal values to be passed to hooked modules such as beancounter, even if AH will not throw an error
@@ -193,7 +193,7 @@ function lib.UpdateList()
 	for i = 1, n do
 		scrollItems[i] = nil
 	end
-	local filter = AucAdvanced.Settings.GetSetting('util.appraiser.filter') or ""
+	local filter = get('util.appraiser.filter') or ""
 	private.currentfilter = filter
 	filter = filter:lower()
 	if (filter == "") then filter = nil end
@@ -210,7 +210,7 @@ function lib.UpdateList()
 	local data
 	for i = 1, #(d.items) do
 		data = d.items[i]
-		if AucAdvanced.Settings.GetSetting("util.appraiser.item."..data[1]..".model") then
+		if get("util.appraiser.item."..data[1]..".model") then
 			if not filter or data[2]:find(filter, 1, true) then
 				table.insert(scrollItems, data)
 			end
@@ -276,7 +276,7 @@ function private:SetVisibility()
 		private.itemModel:Show()
 		private.itemStack:Show()
 		private.itemStack.textEl:Show()
-		if AucAdvanced.Settings.GetSetting("util.appraiser.item."..private.selected..".model") == "fixed" then
+		if get("util.appraiser.item."..private.selected..".model") == "fixed" then
 			private.itemFixBid:Show()
 			private.itemFixBid.textEl:Show()
 			private.itemFixBuy:Show()
@@ -465,7 +465,7 @@ function private.SetupConfigGui(gui)
 	filter.text = filter:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	filter.text:SetPoint("LEFT", filter, "LEFT", 3,0)
 	filter.text:SetText("Filter:")
-	AucAdvanced.Settings.SetSetting('util.appraiser.filter', "")
+	set('util.appraiser.filter', "")
 
 	private.items = {}
 	for i=1, 8 do

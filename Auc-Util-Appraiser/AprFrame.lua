@@ -103,7 +103,7 @@ function private.CreateFrames()
 							end
 
 							if not found then
-								local ignore = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".ignore")
+								local ignore = get('util.appraiser.item.'..sig..".ignore")
 
 								if frame.showHidden or (not ignore) or isDirect then
 									local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
@@ -153,7 +153,7 @@ function private.CreateFrames()
 							sig,name,texture,rarity,stack,count,link,
 							auction=true
 						}
-						if AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".ignore") then
+						if get('util.appraiser.item.'..sig..".ignore") then
 							item.ignore = true
 						end
 						table.insert(ItemList, item)
@@ -199,7 +199,7 @@ function private.CreateFrames()
 					item[6] = AucAdvanced.Post.CountAvailableItems(sig) -- re-count available items
 					sig = item[1]
 					-- pos remains nil
-				elseif AucAdvanced.Settings.GetSetting("util.appraiser.reselect") then
+				elseif get("util.appraiser.reselect") then
 					for i = 1, listLen do
 						local itm = ItemList[i]
 						if itm.ignore then -- don't auto-select ignored item
@@ -305,7 +305,7 @@ function private.CreateFrames()
 		frame.salebox.sig = nil
 		frame.salebox.name:SetText(_TRANS('APPR_Interface_NoItemSelected') )--No item selected
 		frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
-		if not AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+		if not get("util.appraiser.classic") then
 			frame.salebox.info:SetText(_TRANS('APPR_Interface_SelectItemLeft') )--Select an item to the left to begin auctioning...
 		else
 			frame.salebox.info:SetText(_TRANS('APPR_Interface_SelectItemAuctioning') )--Select an item to begin auctioning...
@@ -459,7 +459,7 @@ function private.CreateFrames()
 	end
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
-		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
+		if get('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
 			local _, link = GetItemInfo(itemID)
 			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 
@@ -482,8 +482,8 @@ function private.CreateFrames()
 	function frame.InitControls()
 		frame.valuecache = {}
 
-		local curDuration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".duration") or
-			AucAdvanced.Settings.GetSetting('util.appraiser.duration') or 2880
+		local curDuration = get('util.appraiser.item.'..frame.salebox.sig..".duration") or
+			get('util.appraiser.duration') or 2880
 
 		for i=1, #private.durations do
 			if (curDuration == private.durations[i][1]) then
@@ -493,36 +493,36 @@ function private.CreateFrames()
 			end
 		end
 
-		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.stack")
+		local defStack = get("util.appraiser.stack")
 		if defStack == "max" then
 			defStack = frame.salebox.stacksize
 		elseif (not (tonumber(defStack))) then
 			defStack = frame.salebox.stacksize
-			AucAdvanced.Settings.SetSetting("util.appraiser.stack", "max")
+			set("util.appraiser.stack", "max")
 		end
 		defStack = tonumber(defStack)
 		if defStack > frame.salebox.stacksize then
 			defStack = frame.salebox.stacksize
 		end
-		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
+		local curStack = get('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
 		frame.salebox.stack:SetValue(curStack)
 		frame.salebox.stackentry:SetNumber(curStack)
 		frame.valuecache.stack = frame.salebox.stack:GetValue()
 		frame.valuecache.stackentry = frame.salebox.stackentry:GetNumber()
 
-		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
+		local defStack = get("util.appraiser.number")
 		if defStack == "maxplus" then
 			defStack = -1
 		elseif defStack == "maxfull" then
 			defStack = -2
 		elseif (not (tonumber(defStack))) then
 			defStack = -1
-			AucAdvanced.Settings.SetSetting("util.appraiser.number", "maxplus")
+			set("util.appraiser.number", "maxplus")
 		else
 			defStack = tonumber(defStack)
 		end
-		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
+		local curNumber = get('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
 		local range = math.max(curNumber, math.floor(frame.salebox.count/frame.salebox.stacksize))
 		if frame.salebox.stacksize > 1 then
 			frame.salebox.number:SetAdjustedRange(range, -2, -1)--make sure the slider can handle the setting before we set it
@@ -541,7 +541,7 @@ function private.CreateFrames()
 		frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 
 		-- Only post above number of items, no more. (ie. keep track of current auctions)
-		local curNumberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".numberonly")
+		local curNumberOnly = get('util.appraiser.item.'..frame.salebox.sig..".numberonly")
 		if curNumberOnly == "on" then
 			frame.salebox.numberonly:SetChecked(true)
 		elseif curNumberOnly == "off" then
@@ -551,8 +551,8 @@ function private.CreateFrames()
 		end
 		frame.valuecache.numberonly = frame.salebox.numberonly:GetChecked()
 
-		local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
-		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match")
+		local defMatch = get("util.appraiser.match")
+		local curMatch = get('util.appraiser.item.'..frame.salebox.sig..".match")
 		if curMatch == nil then
 			curMatch = defMatch
 		end
@@ -565,16 +565,16 @@ function private.CreateFrames()
 		end
 		frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
 
-		local ignore = AucAdvanced.Settings.GetSetting("util.appraiser.item."..frame.salebox.sig..".ignore") or false
+		local ignore = get("util.appraiser.item."..frame.salebox.sig..".ignore") or false
 		frame.salebox.ignore:SetChecked(ignore)
 		frame.valuecache.ignore = frame.salebox.ignore:GetChecked()
 
-		local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bulk") or false
+		local curBulk = get('util.appraiser.item.'..frame.salebox.sig..".bulk") or false
 		frame.salebox.bulk:SetChecked(curBulk)
 		frame.valuecache.bulk = frame.salebox.bulk:GetChecked()
 
 
-		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
+		local curModel = get('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		frame.salebox.model.value = curModel
 		frame.salebox.model:UpdateValue()
 		frame.valuecache.model = curModel
@@ -585,7 +585,7 @@ function private.CreateFrames()
 	end
 
 	function frame.ShowOwnAuctionDetails(itemString)
-        local colored = (AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
+        local colored = (get('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
 
 		local itemName, itemLink = GetItemInfo(itemString)
 
@@ -641,14 +641,14 @@ function private.CreateFrames()
 			frame.valuecache.stack = stack
 			frame.valuecache.stackentry = stack
 			frame.salebox.stackentry:SetNumber(stack)
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stack)
+			set("util.appraiser.item."..frame.salebox.sig..".stack", stack)
 		elseif stackentry ~= frame.valuecache.stackentry then
 			frame.salebox.stack:SetValue(stackentry)
 			stackentry = frame.salebox.stack:GetValue()
 			frame.salebox.stackentry:SetNumber(stackentry)
 			frame.valuecache.stack = stackentry
 			frame.valuecache.stackentry = stackentry
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".stack", stackentry)
+			set("util.appraiser.item."..frame.salebox.sig..".stack", stackentry)
 		elseif number ~= frame.valuecache.number then
 			if number >= -2 and number < 0 then
 				if number == -2 then
@@ -661,16 +661,16 @@ function private.CreateFrames()
 			end
 			frame.valuecache.number = number
 			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", number)
+			set("util.appraiser.item."..frame.salebox.sig..".number", number)
 		elseif numberentry ~= frame.valuecache.numberentry then
 			if numberentry:lower() == _TRANS('APPR_Interface_Full') then --Full
 				frame.salebox.number:SetAdjustedValue(-2)
 				numberentry = _TRANS('APPR_Interface_Full') --Full
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -2)
+				set("util.appraiser.item."..frame.salebox.sig..".number", -2)
 			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then --All
 				frame.salebox.number:SetAdjustedValue(-1)
 				numberentry = _TRANS('APPR_Interface_All') --All
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", -1)
+				set("util.appraiser.item."..frame.salebox.sig..".number", -1)
 			elseif tonumber(numberentry) == nil then --we've typed in a partial word.  let them keep typing
 			else
 				numberentry = frame.salebox.numberentry:GetNumber()
@@ -680,7 +680,7 @@ function private.CreateFrames()
 					frame.salebox.number:SetMinMaxValues(1, numberentry + n)
 				end
 				frame.salebox.number:SetAdjustedValue(numberentry)
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".number", numberentry)
+				set("util.appraiser.item."..frame.salebox.sig..".number", numberentry)
 			end
 			frame.salebox.numberentry:SetText(numberentry)
 			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
@@ -695,7 +695,7 @@ function private.CreateFrames()
 			else
 				numberonly = "off"
 			end
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".numberonly", numberonly)
+			set("util.appraiser.item."..frame.salebox.sig..".numberonly", numberonly)
 		end
 
 		local ignore = frame.salebox.ignore:GetChecked()
@@ -706,7 +706,7 @@ function private.CreateFrames()
 			else
 				ignore = "off"
 			end
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".ignore", ignore)
+			set("util.appraiser.item."..frame.salebox.sig..".ignore", ignore)
 			frame.GenerateList()
 		end
 
@@ -718,7 +718,7 @@ function private.CreateFrames()
 			else
 				bulk = "off"
 			end
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".bulk", bulk)
+			set("util.appraiser.item."..frame.salebox.sig..".bulk", bulk)
 
 			frame.GenerateList()
 
@@ -731,7 +731,7 @@ function private.CreateFrames()
 		local model = frame.salebox.model.value
 		if duration ~= frame.valuecache.duration then
 			frame.valuecache.duration = duration
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".duration", private.durations[duration][1])
+			set("util.appraiser.item."..frame.salebox.sig..".duration", private.durations[duration][1])
 			frame.UpdatePricing()
 		elseif matcher ~= frame.valuecache.matcher then
 			frame.valuecache.matcher = matcher
@@ -740,44 +740,44 @@ function private.CreateFrames()
 			else
 				matcher = "off"
 			end
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".match", matcher)
+			set("util.appraiser.item."..frame.salebox.sig..".match", matcher)
 			frame.UpdatePricing()
 		elseif bid ~= frame.valuecache.bid then
 			frame.valuecache.bid = bid
 			frame.salebox.matcher:SetChecked(false)
 			frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".match", "off")
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".model", "fixed")
+			set("util.appraiser.item."..frame.salebox.sig..".match", "off")
+			set("util.appraiser.item."..frame.salebox.sig..".model", "fixed")
 			frame.valuecache.model = "fixed"
 			frame.salebox.model.value = "fixed"
 			frame.salebox.model:UpdateValue()
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
+			set("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
+			set("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
 			frame.UpdatePricing()
 		elseif buy ~= frame.valuecache.buy then
 			frame.valuecache.buy = buy
 			frame.salebox.matcher:SetChecked(false)
 			frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".match", "off")
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".model", "fixed")
+			set("util.appraiser.item."..frame.salebox.sig..".match", "off")
+			set("util.appraiser.item."..frame.salebox.sig..".model", "fixed")
 			frame.valuecache.model = "fixed"
 			frame.salebox.model.value = "fixed"
 			frame.salebox.model:UpdateValue()
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
+			set("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
+			set("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
 			frame.UpdatePricing()
 		elseif model ~= frame.valuecache.model then
-			AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".model", model)
+			set("util.appraiser.item."..frame.salebox.sig..".model", model)
 			frame.valuecache.model = model
 			if model == "fixed" then
 				frame.salebox.matcher:SetChecked(false)
 				frame.valuecache.matcher = frame.salebox.matcher:GetChecked()
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".match", "off")
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
+				set("util.appraiser.item."..frame.salebox.sig..".match", "off")
+				set("util.appraiser.item."..frame.salebox.sig..".fixed.bid", bid)
+				set("util.appraiser.item."..frame.salebox.sig..".fixed.buy", buy)
 			else
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.bid")
-				AucAdvanced.Settings.SetSetting("util.appraiser.item."..frame.salebox.sig..".fixed.buy")
+				set("util.appraiser.item."..frame.salebox.sig..".fixed.bid")
+				set("util.appraiser.item."..frame.salebox.sig..".fixed.buy")
 			end
 			frame.UpdatePricing()
 		end
@@ -881,7 +881,7 @@ function private.CreateFrames()
 		end
 
 		frame.refresh:Enable()
-		local matchers = AucAdvanced.Settings.GetSetting("matcherlist")
+		local matchers = get("matcherlist")
 		if not matchers or #matchers == 0 then
 			frame.salebox.matcher:Disable()
 			frame.salebox.matcher.label:SetTextColor(.5, .5, .5)
@@ -905,7 +905,7 @@ function private.CreateFrames()
 		local curIgnore = frame.salebox.ignore:GetChecked()
 		frame.salebox.icon:GetNormalTexture():SetDesaturated(curIgnore)
 
-		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
+		local curModel = get('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		local curBid = MoneyInputFrame_GetCopper(frame.salebox.bid) or 0
 		local curBuy = MoneyInputFrame_GetCopper(frame.salebox.buy) or 0
 
@@ -915,8 +915,8 @@ function private.CreateFrames()
 		local bidVal, buyVal, depositVal
 
 		local r,g,b,a = 0,0,0,0
-		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
-		local tinted = AucAdvanced.Settings.GetSetting('util.appraiser.tint.color')
+		local colored = get('util.appraiser.manifest.color')
+		local tinted = get('util.appraiser.tint.color')
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBuy, curBuy, r,g,b)
 			if r then a = 0.4 end
@@ -957,7 +957,7 @@ function private.CreateFrames()
 				local fullPop = maxStax*curSize
 				local remain = count - fullPop
 				--we don't want to lose any saved settings, so don't let the maxStax get below the saved value
-				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
+				local SavedNumber = get('util.appraiser.item.'..frame.salebox.sig..".number") or 0
 				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
 					maxStax = SavedNumber
 				end
@@ -1050,7 +1050,7 @@ function private.CreateFrames()
 			else -- non-stackable
 				frame.salebox.stack.label:SetText(_TRANS('APPR_Interface_NotStackable')) --Item is not stackable
 				local maxStax = frame.salebox.count
-				local SavedNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
+				local SavedNumber = get('util.appraiser.item.'..frame.salebox.sig..".number") or 0
 				if (tonumber(SavedNumber) > 0) and SavedNumber > maxStax then
 					maxStax = SavedNumber
 				end
@@ -1229,7 +1229,7 @@ function private.CreateFrames()
 		if objtype == "item" then
 			frame.GetItemByLink(itemlink)
 		else
-			if not AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+			if not get("util.appraiser.classic") then
 				frame.salebox.ignore:SetChecked(not frame.salebox.ignore:GetChecked())
 				frame.updated = true
 			end
@@ -1238,8 +1238,8 @@ function private.CreateFrames()
 
 	function frame.ToggleDisabled()
 		if not frame.salebox.sig then return end
-		local curDisable = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore", not curDisable)
+		local curDisable = get('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
+		set('util.appraiser.item.'..frame.salebox.sig..".ignore", not curDisable)
 		frame.GenerateList()
 	end
 
@@ -1345,7 +1345,7 @@ function private.CreateFrames()
 				local item = frame.list[i]
 				if item then
 					local sig = item[1]
-					if AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bulk") then
+					if get('util.appraiser.item.'..sig..".bulk") then
 						if mode == "autopost" then
 							-- Auto post these items
 							frame.PostBySig(sig)
@@ -1373,7 +1373,7 @@ function private.CreateFrames()
 			return
 		end
 		local itemBuy, itemBid, _, _, _, _, stack, number, duration = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, nil, true)
-		local numberOnly = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".numberonly")
+		local numberOnly = get('util.appraiser.item.'..sig..".numberonly")
 
 
 		-- Just a quick bit of sanity checking first
@@ -1525,7 +1525,7 @@ function private.CreateFrames()
 			if item then
 				local curIgnore = item.ignore
 				local curAuction = item.auction
-				local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk") or false
+				local curBulk = get('util.appraiser.item.'..item[1]..".bulk") or false
 
 				button.icon:SetTexture(item[3])
 				button.icon:SetDrawLayer("ARTWORK");
@@ -1740,8 +1740,8 @@ function private.CreateFrames()
 		elseif mouseButton == "RightButton" then
 			if IsAltKeyDown() and not IsShiftKeyDown() and not IsControlKeyDown() then -- Alt+RightClick
 				if item then
-					local curBulk = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..item[1]..".bulk")
-					AucAdvanced.Settings.SetSetting("util.appraiser.item."..item[1]..".bulk", not curBulk)
+					local curBulk = get('util.appraiser.item.'..item[1]..".bulk")
+					set("util.appraiser.item."..item[1]..".bulk", not curBulk)
 					frame.GenerateList() -- refresh the list and frame after toggling the bulk option.
 					return
 				else
@@ -2221,7 +2221,7 @@ function private.CreateFrames()
 	frame.switchToStack:SetWidth(100)
 	frame.switchToStack:SetHeight(16)
 	frame.switchToStack:SetScript("OnClick", function()
-		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
+		set("util.appraiser.classic", (not get("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
 	frame.switchToStack.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')--Switch between 'Per Item' and 'Per Stack' Pricing.
@@ -2237,7 +2237,7 @@ function private.CreateFrames()
 	frame.switchToStack2:SetWidth(100)
 	frame.switchToStack2:SetHeight(16)
 	frame.switchToStack2:SetScript("OnClick", function()
-		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
+		set("util.appraiser.classic", (not get("util.appraiser.classic")))
 		frame.ChangeUI()
 	end)
 	frame.switchToStack2.TooltipText = _TRANS('APPR_HelpTooltip_PricingMethod')--Switch between 'Per Item' and 'Per Stack' Pricing.
@@ -2445,10 +2445,10 @@ function private.CreateFrames()
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
 	function private.onResize(self, column, width)
 		if not width then
-			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
-			self.labels[column].button:SetWidth(AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText()))
+			set("util.appraiser.columnwidth."..self.labels[column]:GetText(), "default") --reset column if no width is passed. We use CTRL+rightclick to reset column
+			self.labels[column].button:SetWidth(get("util.appraiser.columnwidth."..self.labels[column]:GetText()))
 		else
-			AucAdvanced.Settings.SetSetting("util.appraiser.columnwidth."..self.labels[column]:GetText(), width)
+			set("util.appraiser.columnwidth."..self.labels[column]:GetText(), width)
 		end
 	end
 
@@ -2580,17 +2580,17 @@ function private.CreateFrames()
 	font:SetTextHeight(10)
 
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		--{ "Item",   "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.Item")}, -- Default width 105
-		{ _TRANS('APPR_Interface_Seller') , "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'))},
-		{ _TRANS('APPR_Interface_Left') ,   "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'))},
-		{ _TRANS('APPR_Interface_Stk') ,    "INT",  AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'))},
-		{ _TRANS('APPR_Interface_Min/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea')), { DESCENDING=true } },
-		{ _TRANS('APPR_Interface_Cur/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea')), { DESCENDING=true } },
-		{ _TRANS('APPR_Interface_Buy/ea') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea')), { DESCENDING=true, DEFAULT=true } },
-		{ _TRANS('APPR_Interface_MinBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid')), { DESCENDING=true } },
-		{ _TRANS('APPR_Interface_CurBid') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid')), { DESCENDING=true } },
-		{ _TRANS('APPR_Interface_Buyout') , "COIN", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth." .._TRANS('APPR_Interface_Buyout')), { DESCENDING=true } },
-		{ "", "TEXT", AucAdvanced.Settings.GetSetting("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
+		--{ "Item",   "TEXT", get("util.appraiser.columnwidth.Item")}, -- Default width 105
+		{ _TRANS('APPR_Interface_Seller') , "TEXT", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'))},
+		{ _TRANS('APPR_Interface_Left') ,   "INT",  get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'))},
+		{ _TRANS('APPR_Interface_Stk') ,    "INT",  get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'))},
+		{ _TRANS('APPR_Interface_Min/ea') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_Cur/ea') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_Buy/ea') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea')), { DESCENDING=true, DEFAULT=true } },
+		{ _TRANS('APPR_Interface_MinBid') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_CurBid') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid')), { DESCENDING=true } },
+		{ _TRANS('APPR_Interface_Buyout') , "COIN", get("util.appraiser.columnwidth." .._TRANS('APPR_Interface_Buyout')), { DESCENDING=true } },
+		{ "", "TEXT", get("util.appraiser.columnwidth.BLANK")}, --Hidden column to carry the link --0
 	})
 
 	frame.imageview.sheet:EnableSelect(true)
