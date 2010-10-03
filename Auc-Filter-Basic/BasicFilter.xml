@@ -49,7 +49,7 @@
 						GameTooltip:Hide();
 					</OnLeave>
 					<OnEvent>
-						BF_IgnoreList_OnEvent();
+						BF_IgnoreList_OnEvent(...);
 					</OnEvent>
 				</Scripts>
 			</Button>
