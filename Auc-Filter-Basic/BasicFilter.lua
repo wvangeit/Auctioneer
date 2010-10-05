@@ -217,7 +217,7 @@ function BF_IgnoreList_Load()
 	BF_IgnoreList_Update()
 end
 
-function BF_IgnoreList_OnEvent()
+function BF_IgnoreList_OnEvent(self, event)
 	if event == "PLAYER_LOGOUT" then
 		for key in pairs(IgnoreList) do
 			if type(key) == "number" then

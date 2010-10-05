@@ -32,7 +32,10 @@ if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
-local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+local GetPrice = function() return 0,0 end --fake getPrice when Appraiser is not available
+if AucAdvanced.Modules.Util.Appraiser then
+	GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
+end
 
 local _, selected, selecteditem, selectedvendor, selectedappraiser, selectedwhy, selectedignored
 local selecteddata = {}
@@ -110,7 +113,6 @@ end
 -- ASCtempstorage[index] = { link, vendorPrice, AppraiserPrice, reason, vendorIgnoreDisplay }
 function lib.ASCRefreshSheet()
 	local ASCtempstorage, style = {}, {}
-	local GetPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 	for k, v in pairs(lib.vendorlist) do
 		local itemLink, itemSig, count, bag, slot, reason = unpack(v)
 		local _, iID = decode(itemLink)
@@ -186,7 +188,7 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui:SetPoint("CENTER", UIParent, "CENTER", 1,1)
 	lib.confirmsellui:SetFrameStrata("DIALOG")
 	lib.confirmsellui:SetHeight(220)
-	lib.confirmsellui:SetWidth(550)
+	lib.confirmsellui:SetWidth(650)
 	lib.confirmsellui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -197,6 +199,17 @@ function lib.makeconfirmsellui()
 	lib.confirmsellui:EnableMouse(true)
 	lib.confirmsellui:SetMovable(true)
 	lib.confirmsellui:SetClampedToScreen(true)
+	--will add a item to sell list if its droped onto the edges on the grey item sell window
+	lib.confirmsellui:SetScript("OnReceiveDrag", function()
+		local objtype, _, link = GetCursorInfo()
+			ClearCursor()
+		if objtype == "item" then
+			lib.setWorkingItem(link)
+			autosellframe.additemtolist()
+			lib.vendorAction()
+		end
+	end)
+
 	-- Make highlightable drag bar
 	lib.confirmsellui.Drag = CreateFrame("Button", "", lib.confirmsellui)
 	lib.confirmsellui.Drag:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 10,-5)
@@ -217,7 +230,13 @@ function lib.makeconfirmsellui()
 	lib.confirmsellheader:SetPoint("TOPLEFT",  lib.confirmsellui, "TOPLEFT", 0, -10)
 	lib.confirmsellheader:SetPoint("TOPRIGHT", lib.confirmsellui, "TOPRIGHT", 0, 0)
 	lib.confirmsellui.confirmsellheader = lib.confirmsellheader
-
+	
+	lib.confirmsellui.help = lib.confirmsellui:CreateFontString(nil, "OVERLAY", "NumberFontNormalYellow")
+	lib.confirmsellui.help:SetText("Drop items here to add to the sell list")
+	lib.confirmsellui.help:SetJustifyH("CENTER")
+	lib.confirmsellui.help:SetWidth(100)
+	lib.confirmsellui.help:SetPoint("LEFT",  lib.confirmsellui, "LEFT", 10, 0)
+	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 
 	--Create the autosell list results frame
@@ -230,7 +249,7 @@ function lib.makeconfirmsellui()
 	})
 
 	lib.confirmsellui.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	lib.confirmsellui.resultlist:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 10, -25)
+	lib.confirmsellui.resultlist:SetPoint("TOPLEFT", lib.confirmsellui, "TOPLEFT", 120, -25)
 	lib.confirmsellui.resultlist:SetPoint("TOPRIGHT", lib.confirmsellui, "TOPRIGHT", -10, -10)
 	lib.confirmsellui.resultlist:SetPoint("BOTTOM", lib.confirmsellui, "BOTTOM", 0, 30)
 

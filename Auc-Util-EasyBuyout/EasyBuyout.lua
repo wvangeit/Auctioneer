@@ -213,6 +213,7 @@ function private.SetupConfigGui(gui)
 end
 
 function private.BrowseButton_OnClick(...)
+	local self, arg1 = ...
     -- check for EB enabled
     if not get("util.EasyBuyout.active") then
         return orig_AB_OC(...)
@@ -238,7 +239,7 @@ function private.BrowseButton_OnClick(...)
     end
 
     if (arg1 == "RightButton") then
-        local button = select(1, ...) or this
+        local button = self
 
 		local id
 		if CompactUImode then
@@ -307,11 +308,11 @@ end
 	 tested for compactUI like EasyBuyout does
 --]]
 
-local function OrigAuctionOnClick(...)
+local function OrigAuctionOnClick(self, ...)
 	if ( IsModifiedClick() ) then
-		HandleModifiedItemClick(GetAuctionItemLink("owner", this:GetParent():GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame)));
+		HandleModifiedItemClick(GetAuctionItemLink("owner", self:GetParent():GetID() + FauxScrollFrame_GetOffset(AuctionsScrollFrame)));
 	else
-		AuctionsButton_OnClick(...);
+		AuctionsButton_OnClick(self, ...);
 	end
 end
 -- handler for modifiers
