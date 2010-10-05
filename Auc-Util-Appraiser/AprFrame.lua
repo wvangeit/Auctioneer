@@ -2315,14 +2315,14 @@ function private.CreateFrames()
 		local value = (100 - postnum * 100 / lastPostProgress) or 0
 		AucAdvanced.API.ProgressBars("AppraiserBar", value, true, "Appraiser has "..postnum.." more items to post", progressBarOptions)
 
-		if (postnum > 0) and (frame.cancel:IsEnabled() == 0) then
+		if (postnum > 0) and not frame.cancel:IsEnabled() then
 			frame.cancel:Enable()
 			frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
-		elseif (postnum == 0) and (frame.cancel:IsEnabled() == 1) then
+		elseif (postnum == 0) and frame.cancel:IsEnabled() then
 			frame.cancel:Disable()
 			frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
 			lastPostProgress = 0
-			AucAdvanced.Scan.ProgressBars("AppraiserBar")
+			AucAdvanced.API.ProgressBars("AppraiserBar")
 		end
 	end
 
