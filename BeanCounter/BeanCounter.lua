@@ -49,12 +49,13 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 2.12,
+	version = 3.00,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
+	playerSettings, --Alias for  BeanCounterDBSettings[private.realmName][private.playerName]
 	DBSumEntry = 0,
 	DBSumItems = 0,
 	--BeanCounter Bids/posts
@@ -135,7 +136,8 @@ function lib.OnLoad(addon)
 	local db = BeanCounterDB
 	private.playerData = db[private.realmName][private.playerName]
 	private.serverData = db[private.realmName]
-	private.wealth = private.playerData["wealth"]
+	private.playerSettings = BeanCounterDBSettings[private.realmName][private.playerName]
+	private.wealth = private.playerSettings["wealth"]
 	--Upgrade DB if needed
 	private.UpgradeDatabaseVersion()
 	--Check if user is trying to use old client with newer database or if the database has failed to update
@@ -177,7 +179,7 @@ function lib.OnLoad(addon)
 	--Bids
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, private.postPlaceAuctionBidHook)
 	--Posting
-	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
+	Stubby.RegisterFunctionHook("StartAuction", -100, private.preStartAuctionHook)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 	
@@ -196,23 +198,17 @@ function private.initializeDB(server, player)
 	local db = BeanCounterDB
 	if not db then
 		db = {}
-		BeanCounterDB  = db
-		db["settings"] = {}
-		db["ItemIDArray"] = {}
+		BeanCounterDB = db
 	end
 	
 	if not db[server] then
 		db[server] = {}
 	end
-	
+	--data
 	if not db[server][player] then
 		local playerData = {}
 		db[server][player] = playerData
 		
-		playerData["version"] = private.version
-		playerData["faction"] = "unknown" --faction is recorded when we get the login event
-		playerData["wealth"] = GetMoney()
-
 		playerData["vendorbuy"] = {}
 		playerData["vendorsell"] = {}
 
@@ -229,8 +225,32 @@ function private.initializeDB(server, player)
 
 		playerData["completedBidsBuyoutsNeutral"]  = {}
 		playerData["failedBidsNeutral"]  = {}
-
+	end
+	--settings
+	local db = BeanCounterDBSettings
+	if not db then
+		db = {}
+		BeanCounterDBSettings = db
+	end
+	
+	if not db[server] then
+		db[server] = {}
+	end
+	
+	if not db[server][player] then
+		local playerData = {}
+		db[server][player] = playerData
+		
+		playerData["version"] = private.version
+		playerData["faction"] = "unknown" --faction is recorded when we get the login event
+		playerData["wealth"] = GetMoney()
 		playerData["mailbox"] = {}
+	end
+	--item Name table
+	local db = BeanCounterDBNames
+	if not db then
+		db = {}
+		BeanCounterDBNames = db
 	end
 end
 
@@ -359,12 +379,12 @@ end
 function private.onEvent(frame, event, arg, ...)
 	if (event == "PLAYER_MONEY") then
 		private.wealth = GetMoney()
-		private.playerData["wealth"] = private.wealth
+		private.playerSettings["wealth"] = private.wealth
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then --used to record one time info when player loads
 		private.scriptframe:UnregisterEvent("PLAYER_ENTERING_WORLD") --no longer care about this event after we get our current wealth
 		private.wealth = GetMoney()
-		private.playerData["wealth"] = private.wealth
+		private.playerSettings["wealth"] = private.wealth
 
 	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event, arg, ...)
@@ -376,7 +396,7 @@ function private.onEvent(frame, event, arg, ...)
 		private.hasUnreadMail()
 		--we also use this event to get faction data since the faction often returns nil if called after "PLAYER_ENTERING_WORLD"
 		private.faction = UnitFactionGroup(UnitName("player"))
-		private.playerData["faction"] =  private.faction or "unknown"
+		private.playerSettings["faction"] =  private.faction or "unknown"
 
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
@@ -434,6 +454,8 @@ function private.packString(...)
 			msg = "boolean false"
 		elseif msg == "0" then
 			msg = ""
+		elseif msg == 0 then
+			msg = ""
 		elseif msg == "<nil>" then
 			msg = ""
 		end
@@ -444,7 +466,7 @@ end
 --Will split any string and return a table value, replace gsub with tbl compare, slightly faster this way.
 function private.unpackString(text)
 	if not text then return end
-	local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, location = strsplit(";", text)
+	local stack,  money, deposit , fee, buyout , bid, buyer, Time, reason, meta = strsplit(";", text)
 	if stack == "" then stack = "0" end
 	if money == "" then money = "0" end
 	if deposit == "" then deposit = "0" end
@@ -454,9 +476,9 @@ function private.unpackString(text)
 	if buyer == "" then buyer = "0" end
 	if Time == "" then Time = "0" end
 	if reason == "" then reason = "0" end
-	if location == "" then location = "0" end
+	if meta == "" then meta = "0" end
 	
-	return stack, money, deposit , fee, buyout , bid, buyer, Time, reason, location
+	return stack, money, deposit , fee, buyout , bid, buyer, Time, reason, meta
 end
 --[[
 Adds data to the database in proper place, adds link to itemName array, optionally compresses the itemstring into compact format
@@ -473,7 +495,11 @@ function private.databaseAdd(key, itemLink, itemString, value, compress)
 		debugPrint("Database:", key, "itemString:", itemString, "Value:", value, "compress:",compress)
 		return false
 	end
-
+	--some keys do not need the uniqueID so Always compress em
+	--if key == "failedBids" or key == "failedAuctions" or key == "failedAuctionsNeutral" or key == "failedBidsNeutral"  then
+		--compress = true
+	--end
+	
 	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel = strsplit(":", itemString)
 	--if this will be a compressed entry replace uniqueID with 0 or its scaling factor
 	if compress then

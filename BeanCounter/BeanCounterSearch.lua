@@ -62,7 +62,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 	if not settings then settings = private.getCheckboxSettings() end
 
 	tbl = {}
-	for itemKey, data in pairs(BeanCounterDB["ItemIDArray"]) do
+	for itemKey, data in pairs(BeanCounterDBNames) do
 		if data:lower():find(itemName:lower(), 1, true)  then
 			if settings.exact and private.frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
 				local _, name = strsplit(";", data)
@@ -83,7 +83,7 @@ function private.startSearch(itemName, settings, queryReturn, count, itemTexture
 		return private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName)
 	else
 		--get the itemTexture for display in the drop box
-		for i, data in pairs(BeanCounterDB.ItemIDArray) do
+		for i, data in pairs(BeanCounterDBNames) do
 			local _, name = strsplit(";", data)
 			if name:lower() == itemName:lower() then
 				local itemID = strsplit(":", i) or ""
@@ -190,15 +190,7 @@ end
 function private.searchServerData(serverName, data, tbl, settings)
 	local server = BeanCounterDB[serverName]
 	if not server then return end
-	--check servers are at least at current DB format.
-	for _, player in pairs(server) do
-		if player.version ~= private.version then
-			print("The data for "..serverName.." is not at the current BeanCounter DB version of "..private.version.." Please log into this realm to upgrade BeanCounters Data.")
-			return
-		end
-		break
-	end
-		
+			
 	--Retrives all matching results
 	for i in pairs(server) do
 		if settings.selectbox[2] == "alliance" and server[i]["faction"] and server[i]["faction"]:lower() ~= settings.selectbox[2] then

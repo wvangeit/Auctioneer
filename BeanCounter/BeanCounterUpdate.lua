@@ -44,76 +44,82 @@ end
 
 local performedUpdate = false
 function private.UpgradeDatabaseVersion()
-	--Recreate the itemID array if for some reason user lacks it.
-	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} private.refreshItemIDArray() end
+	--Recreate the itemID array if for some reason user lacks it. Changed locations in version 3.0 database
+	if not BeanCounterDBNames then BeanCounterDBNames = {} private.refreshItemIDArray() end
 	
 	for server, serverData in pairs(BeanCounterDB) do
-		if  server ~= "settings" and server ~= "ItemIDArray" then
-			for player, playerData in pairs(serverData) do
-				private.startPlayerUpgrade(server, player, playerData)
-			end
-			--validate the DB for this server after all upgrades have completed
-			if performedUpdate then --only id we actually had to update
-				private.integrityCheck(true, server)
-			end
+		for player, playerData in pairs(serverData) do
+			private.startPlayerUpgrade(server, player, playerData)
 		end
+		--validate the DB for this server after all upgrades have completed
+		if performedUpdate then --only id we actually had to update
+			private.integrityCheck(true, server)
+		end	
 	end
 end
 
 function private.startPlayerUpgrade(server, player, playerData)
-	if playerData["version"] < 2.0 then --Delete and start fresh
-		BeanCounterDB[server][player] = nil
-		private.initializeDB(server, player)
-		performedUpdate = true
+	if playerData["version"] then
+		if playerData["version"] < 2.0 then --Delete and start fresh
+			BeanCounterDB[server][player] = nil
+			private.initializeDB(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.01 then --removes old "Wealth entry to make room for reason codes
+			private.update._2_01(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.02 then --bump version # only, the fix it implemented is merged into later updates
+			private.update._2_02(server, player)
+			performedUpdate = true
+		end
+		if  playerData["version"] < 2.03 then--if not upgraded yet then upgrade
+			private.update._2_03(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.04 then --bump version # only, the fix it implemented is merged into later updates
+			private.update._2_04(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.05 then --bump version # only, the fix it implemented is merged into later updates
+			private.update._2_05(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.06 then --bump version # only 2.09 nukes the itemIDArray no need to wast time "updating" it
+			private.update._2_06(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.07 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
+			private.update._2_07(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.08 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
+			private.update._2_08(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.09 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
+			private.update._2_09(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.10 then -- remove slash from completedBids/Buys table so its completedBidsBuys
+			private.update._2_10(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.11 then -- adds neutral AH DB
+			private.update._2_11(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 2.12 then -- corrects nil index bug in 2.11 upgrade
+			private.update._2_12(server, player)
+			performedUpdate = true
+		end
+		if playerData["version"] < 3 then -- Moves extra tables (settings, mail,  wealth, version and name array tables into their own DB's leaving only data in the BeanCounterDB table
+			private.update._3_00(server, player)
+	 		performedUpdate = true
+	 	end
 	end
-	if playerData["version"] < 2.01 then --removes old "Wealth entry to make room for reason codes
-		private.update._2_01(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.02 then --bump version # only, the fix it implemented is merged into later updates
-		private.update._2_02(server, player)
-		performedUpdate = true
-	end
-	if  playerData["version"] < 2.03 then--if not upgraded yet then upgrade
-		private.update._2_03(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.04 then --bump version # only, the fix it implemented is merged into later updates
-		private.update._2_04(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.05 then --bump version # only, the fix it implemented is merged into later updates
-		private.update._2_05(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.06 then --bump version # only 2.09 nukes the itemIDArray no need to wast time "updating" it
-		private.update._2_06(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.07 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
-		private.update._2_07(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.08 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
-		private.update._2_08(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.09 then -- removes all 0 entries from stored strings. Makes all database entries same length for easier parsing
-		private.update._2_09(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.10 then -- remove slash from completedBids/Buys table so its completedBidsBuys
-		private.update._2_10(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.11 then -- adds neutral AH DB
-		private.update._2_11(server, player)
-		performedUpdate = true
-	end
-	if playerData["version"] < 2.12 then -- corrects nil index bug in 2.11 upgrade
-		private.update._2_12(server, player)
-		performedUpdate = true
-	end
+	--[[Make sure to refrence the new version location for all new updates after _3_00]]
+
 end
 
 function private.update._2_01(server, player)
@@ -215,14 +221,16 @@ end
 --Storing the data using a colon caused issues with schematics so store using a ;  instead.
 --Easiest to just regenerate the ItemID array
 function private.update._2_09(server, player)
-	local _, item = next(BeanCounterDB["ItemIDArray"])
-	--if not in new format then upgrade itemID array otherwise leave it alone
-	if item and not item:match("c........;.-") then
-		debugPrint("UPGRADE itemName", item)
-		for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
-			local color, name = itemLink:match("|(.-)|.item.*%[(.+)%].*")
-			local data = string.join(";", color, name)
-			BeanCounterDB["ItemIDArray"][itemKey] = data
+	if BeanCounterDB["ItemIDArray"] then
+		local _, item = next(BeanCounterDB["ItemIDArray"])
+		--if not in new format then upgrade itemID array otherwise leave it alone
+		if item and not item:match("c........;.-") then
+			debugPrint("UPGRADE itemName", item)
+			for itemKey, itemLink in pairs(BeanCounterDB["ItemIDArray"]) do
+				local color, name = itemLink:match("|(.-)|.item.*%[(.+)%].*")
+				local data = string.join(";", color, name)
+				BeanCounterDB["ItemIDArray"][itemKey] = data
+			end
 		end
 	end
 	BeanCounterDB[server][player]["version"] = 2.09
@@ -299,4 +307,39 @@ function private.update._2_12(server, player)
 
 	BeanCounterDB[server][player]["version"] = 2.12
 end
+--Moves settings, name array into dedicated saved variables. leaving only transaction data in BeanCounterDB
+function private.update._3_00(server, player)
+	--move settings table, run once
+	if BeanCounterDB.settings then
+		BeanCounterDBSettings = BeanCounterDB.settings
+		BeanCounterDB.settings = nil
+	end
+	--move the itemName array, run once
+	if BeanCounterDB.ItemIDArray then
+		BeanCounterDBNames = BeanCounterDB.ItemIDArray
+		BeanCounterDB.ItemIDArray = nil
+	end
+	--move mail, wealth, faction, version to settings table, run per toon
+	for DB, data in pairs(BeanCounterDB[server][player]) do
+		--create server, player settings seperate from Global settings
+		if not BeanCounterDBSettings[server] then BeanCounterDBSettings[server] = {} end
+		if not BeanCounterDBSettings[server][player] then BeanCounterDBSettings[server][player] = {} end
+		if DB == "wealth" then
+			BeanCounterDBSettings[server][player].wealth = BeanCounterDB[server][player].wealth
+			BeanCounterDB[server][player].wealth = nil
+		elseif DB == "mailbox" then
+			BeanCounterDBSettings[server][player].mailbox = BeanCounterDB[server][player].mailbox
+			BeanCounterDB[server][player].mailbox = nil
+		elseif DB == "version" then
+			BeanCounterDBSettings[server][player].version = BeanCounterDB[server][player].version
+			BeanCounterDB[server][player].version = nil
+		elseif DB == "faction" then
+			BeanCounterDBSettings[server][player].faction = BeanCounterDB[server][player].faction
+			BeanCounterDB[server][player].faction = nil
+		end
+	end
+	--new location for version info
+	BeanCounterDBSettings[server][player].version = 3
+end
+
 	

@@ -65,21 +65,19 @@ end
 --Recreate/refresh ItemIName to ItemID array
 function private.refreshItemIDArray(announce)
 	for player, v in pairs(private.serverData)do
-		for DB,data in pairs(private.serverData[player]) do
-			if DB ~= "mailbox" and type(data) == "table" then
-				for itemID, value in pairs(data) do
-					for itemString, text in pairs(value) do
-						local key, suffix = lib.API.decodeLink(itemString)
-						if not BeanCounterDB["ItemIDArray"][key..":"..suffix] then
-							local _, itemLink = private.getItemInfo(itemString, "itemid")
-							if itemLink then
-								debugPrint("Added to array, missing value",  itemLink)
-								lib.API.storeItemLinkToArray(itemLink)
-							end
+		for DB,data in pairs(private.serverData[player]) do			
+			for itemID, value in pairs(data) do
+				for itemString, text in pairs(value) do
+					local key, suffix = lib.API.decodeLink(itemString)
+					if not BeanCounterDBNames[key..":"..suffix] then
+						local _, itemLink = private.getItemInfo(itemString, "itemid")
+						if itemLink then
+							debugPrint("Added to array, missing value",  itemLink)
+							lib.API.storeItemLinkToArray(itemLink)
 						end
 					end
 				end
-			end
+			end	
 		end
 	end
 	if announce then print("Finished refresing ItemName Array") end
@@ -89,16 +87,12 @@ end
 ]]
 local function pruneItemNameArrayHelper(itemID)
 	for server, serverData in pairs(BeanCounterDB) do
-		if  server ~= "settings" and server ~= "ItemIDArray"  then
-			for player, playerData in pairs(serverData) do
-				for DB, data in pairs(playerData) do
-					if DB ~= "mailbox" and type(data) == "table" then
-						if data[itemID] then
-							--found a match
-							return true
-						end
-					end
-				end
+		for player, playerData in pairs(serverData) do
+			for DB, data in pairs(playerData) do				
+				if data[itemID] then
+					--found a match
+					return true
+				end	
 			end
 		end
 	end
@@ -106,7 +100,7 @@ end
 
 function private.pruneItemNameArray()
 	local  itemID, key
-	for i, link in pairs(BeanCounterDB["ItemIDArray"]) do
+	for i, link in pairs(BeanCounterDBNames) do
 		itemID, key = strsplit(":", i)
 		if not pruneItemNameArrayHelper(itemID) then
 			print("Never seen", itemID, link) 
@@ -117,8 +111,10 @@ end
 --Moves entries older than 40 days into compressed( non uniqueID) Storage
 --Removes data older than X  months from the DB
 --Array refresh needs to run before this function
+local TIME = time()--no need to call this for every loop
 function private.compactDB(announce)
 	debugPrint("Compressing database entries older than 40 days")
+	TIME = time() --sets TIME for this compact operation
 	for DB,data in pairs(private.playerData) do -- just do current player to make process as fast as possible
 		if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
 			for itemID, value in pairs(data) do
@@ -129,7 +125,7 @@ function private.compactDB(announce)
 					elseif lib.GetSetting("oldDataExpireEnabled") then
 						--for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
 						local months = lib.GetSetting("monthstokeepdata")
-						local expire =  time() - (months * 30 * 24 * 60 * 60)
+						local expire = TIME - (months * 30 * 24 * 60 * 60)
 						private.removeOldData(index, DB, itemString, expire)
 					end
 					--remove itemStrings that are now empty, all the keys have been moved to compressed format
@@ -142,8 +138,8 @@ function private.compactDB(announce)
 end
 function private.removeUniqueID(data, DB, itemString)
 	local _, _, _, _, _, _, _, postTime  = private.unpackString(data[1])
-	if data[1] and (time() - postTime) >= 3456000 then --we have an old data entry lets process this
-		debugPrint("Compressed", "|H"..itemString, data[1] )
+	if data[1] and (TIME - postTime) >= 3456000 then --we have an old data entry lets process this
+		--debugPrint("Compressed", "|H"..itemString, data[1] )
 		private.databaseAdd(DB, nil, itemString, data[1], true) --store using the compress option set to true
 		table.remove(data, 1)
 		private.removeUniqueID(data, DB, itemString)
@@ -154,7 +150,7 @@ function private.removeOldData(data, DB, itemString, expire)
 	local _, _, _, _, _, _, _, postTime = private.unpackString(data[1])
 	postTime = tonumber(postTime)
 	if data[1] and (postTime) <= expire then --we have an old data entry lets process this
-		debugPrint("Removed", "|H"..itemString, data[1] , date("%c", postTime), "Older than",  date("%c", keep) )
+		--debugPrint("Removed", "|H"..itemString, data[1] , date("%c", postTime), "Older than",  date("%c", keep) )
 		table.remove(data, 1)
 		private.removeOldData(data, DB, itemString, expire)
 	end
@@ -172,7 +168,6 @@ function private.sortArrayByDate(announce)
 							local _, _, _, _, _, _, _, postTimeA = private.unpackString(a)
 							local _, _, _, _, _, _, _, postTimeB = private.unpackString(b)
 							return postTimeA < postTimeB end)
-						private.serverData[player][DB][itemID][itemString] = index
 					end
 				end
 			end
@@ -221,16 +216,14 @@ end
 function private.deleteExactItem(itemLink)
 	if not itemLink or not itemLink:match("^(|c%x+|H.+|h%[.+%])") then return end
 	for player, playerData in pairs(private.serverData) do
-		for DB, data in pairs(playerData) do
-			if DB ~= "mailbox" and type(data) == "table" then
-				for itemID, itemIDData in pairs(data) do
-					for itemString, itemStringData in pairs(itemIDData) do
-						local  _,_,_,_,_,_, _, suffix, uniqueID = strsplit(":", itemString)
-						local linkID, linkSuffix = lib.API.decodeLink(itemLink)
-						if linkID == itemID and suffix == linkSuffix then
-							debugPrint("matched", itemLink, itemString, linkSuffix, suffix)
-							itemIDData[itemString] = nil
-						end
+		for DB, data in pairs(playerData) do		
+			for itemID, itemIDData in pairs(data) do
+				for itemString, itemStringData in pairs(itemIDData) do
+					local  _,_,_,_,_,_, _, suffix, uniqueID = strsplit(":", itemString)
+					local linkID, linkSuffix = lib.API.decodeLink(itemLink)
+					if linkID == itemID and suffix == linkSuffix then
+						debugPrint("matched", itemLink, itemString, linkSuffix, suffix)
+						itemIDData[itemString] = nil
 					end
 				end
 			end
@@ -261,51 +254,48 @@ local integrityClean, integrityCount = true, 1
 	debugPrint(integrityCount)
 	for player, v in pairs(BeanCounterDB[server])do
 		for DB, data in pairs(v) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "postedBids" or DB == "postedAuctions" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutralNeutral" then
-				for itemID, value in pairs(data) do
-					for itemString, data in pairs(value) do
-						local _, itemStringLength = itemString:gsub(":", ":")
-						--check that the data is a string and table
-						if type(itemString) ~= "string"  or  type(data) ~= "table" then
-							BeanCounterDB[server][player][DB][itemID][itemString] = nil
-							debugPrint("Failed: Invalid format", DB, data, "", itemString)
-							integrityClean = false
-						elseif itemStringLength > 10 then --Bad itemstring purge
-							debugPrint("Failed: Invalid itemString", DB, data, "", itemString)
-							local _, link = GetItemInfo(itemString) --ask server for a good itemlink
-							local itemStringNew = lib.API.getItemString(link) --get NEW itemString from itemlink
-							if itemStringNew then
-								debugPrint(itemStringNew, "New link recived replacing")
-								BeanCounterDB[server][player][DB][itemID][itemStringNew] = data
-								BeanCounterDB[server][player][DB][itemID][itemString] = nil
-							else
-								debugPrint(itemString, "New link falied purging item")
-								BeanCounterDB[server][player][DB][itemID][itemString] = nil
-							end
-							integrityClean = false
-						elseif itemStringLength < 9 then
-							local itemStringNew = itemString..":80"
+			for itemID, value in pairs(data) do
+				for itemString, data in pairs(value) do
+					local _, itemStringLength = itemString:gsub(":", ":")
+					--check that the data is a string and table
+					if type(itemString) ~= "string"  or  type(data) ~= "table" then
+						BeanCounterDB[server][player][DB][itemID][itemString] = nil
+						debugPrint("Failed: Invalid format", DB, data, "", itemString)
+						integrityClean = false
+					elseif itemStringLength > 10 then --Bad itemstring purge
+						debugPrint("Failed: Invalid itemString", DB, data, "", itemString)
+						local _, link = GetItemInfo(itemString) --ask server for a good itemlink
+						local itemStringNew = lib.API.getItemString(link) --get NEW itemString from itemlink
+						if itemStringNew then
+							debugPrint(itemStringNew, "New link recived replacing")
 							BeanCounterDB[server][player][DB][itemID][itemStringNew] = data
 							BeanCounterDB[server][player][DB][itemID][itemString] = nil
-							integrityClean = false
 						else
-							for index, text in pairs(data) do
-								tbl = {strsplit(";", text)}
-									--check entries for missing data points
-								if #integrity[DB] ~= #tbl then
-									debugPrint("Failed: Number of entries invalid", player, DB, #tbl, text)
-									table.remove(data, index)
-									integrityClean = false
-								elseif complete and private.IC(tbl, DB) then
-									--do a full check type() = check
-									debugPrint("Failed type() check", player, DB)
-									table.remove(data, index)
-									integrityClean = false
-								end
+							debugPrint(itemString, "New link falied purging item")
+							BeanCounterDB[server][player][DB][itemID][itemString] = nil
+						end
+						integrityClean = false
+					elseif itemStringLength < 9 then
+						local itemStringNew = itemString..":80"
+						BeanCounterDB[server][player][DB][itemID][itemStringNew] = data
+						BeanCounterDB[server][player][DB][itemID][itemString] = nil
+						integrityClean = false
+					else
+						for index, text in pairs(data) do
+							tbl = {strsplit(";", text)}
+								--check entries for missing data points
+							if #integrity[DB] ~= #tbl then
+								debugPrint("Failed: Number of entries invalid", player, DB, #tbl, text)
+								table.remove(data, index)
+								integrityClean = false
+							elseif complete and private.IC(tbl, DB) then
+								--do a full check type() = check
+								debugPrint("Failed type() check", player, DB)
+								table.remove(data, index)
+								integrityClean = false
 							end
 						end
 					end
-
 				end
 			end
 		end

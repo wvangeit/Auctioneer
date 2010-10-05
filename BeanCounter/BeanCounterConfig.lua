@@ -47,13 +47,13 @@ local function getUserSig()
 end
 
 local function getUserProfileName()
-	if (not settings) then settings = BeanCounterDB["settings"] end
+	if (not settings) then settings = BeanCounterDBSettings end
 	local userSig = getUserSig()
 	return settings[userSig] or "Default"
 end
 
 local function getUserProfile()
-	if (not settings) then settings = BeanCounterDB["settings"] end
+	if (not settings) then settings = BeanCounterDBSettings end
 	local profileName = getUserProfileName()
 	if (not settings["profile."..profileName]) then
 		if profileName ~= "Default" then
@@ -165,7 +165,7 @@ function lib.GetDefault(setting)
 end
 local tbl = {}
 local function setter(setting, value)
-	if (not settings) then settings = BeanCounterDB["settings"] end
+	if (not settings) then settings = BeanCounterDBSettings end
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
@@ -338,7 +338,7 @@ function lib.SetSetting(...)
 end
 
 local function getter(setting)
-	if (not settings) then settings = BeanCounterDB["settings"] end
+	if (not settings) then settings = BeanCounterDBSettings end
 	if not setting then return end
 
 	local a,b,c = strsplit(".", setting)

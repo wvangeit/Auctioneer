@@ -263,7 +263,7 @@ end
 --retrieves the itemID from the DB
 function private.matchDB(text)
 	local itemID
-	for itemKey, data in pairs(BeanCounterDB.ItemIDArray) do
+	for itemKey, data in pairs(BeanCounterDBNames) do
 		local _, name = strsplit(";", data)
 		if text == name then
 			itemID = string.split(":", itemKey)
@@ -519,8 +519,8 @@ The below code manages the mailboxes Icon color /read/unread status
 
 ]]--
 function private.mailFrameClick(self, index)
-	if BeanCounterDB[private.realmName][private.playerName]["mailbox"][index] then
-		BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
+	if private.playerSettings["mailbox"][index] then
+		private.playerSettings["mailbox"][index]["read"] = 2
 	end
 end
 
@@ -528,7 +528,7 @@ local NORMAL_FONT_COLOR, HIGHLIGHT_FONT_COLOR = NORMAL_FONT_COLOR, HIGHLIGHT_FON
 
 function private.mailFrameUpdate()
 	--Change Icon back color if only addon read
-	local db = BeanCounterDB[private.realmName][private.playerName]
+	local db = private.playerSettings
 	if not db["mailbox"] then return end  --we havn't read mail yet
 	if get("util.beancounter.mailrecolor") == "off" then return end
 
@@ -572,7 +572,7 @@ local mailCurrent
 local group = {["n"] = "", ["start"] = 1, ["end"] = 1} --stores the start and end locations for a group of same name items
 function private.mailBoxColorStart()
 	mailCurrent = {} --clean table every update
-	local db=BeanCounterDB[private.realmName][private.playerName]
+	local db=BeanCounterDBSettings[private.realmName][private.playerName]
 
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);

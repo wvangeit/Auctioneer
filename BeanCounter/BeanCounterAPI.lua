@@ -372,7 +372,7 @@ we store itemKeys with a unique ID but our name array does not
 function lib.API.getArrayItemLink(itemString)
 	local itemID, suffix, uniqueID = lib.API.decodeLink(itemString)
 	local itemKey = itemID..":"..suffix
-	if BeanCounterDB.ItemIDArray[itemKey] then
+	if BeanCounterDBNames[itemKey] then
 		return lib.API.createItemLinkFromArray(itemKey, uniqueID) --uniqueID is used as a scaling factor for "of the" suffix items
 	end
 	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
@@ -381,10 +381,10 @@ end
 
 --[[Converts the compressed link stored in the itemIDArray back to a standard blizzard format]]
 function lib.API.createItemLinkFromArray(itemKey, uniqueID)
-	if BeanCounterDB["ItemIDArray"][itemKey] then
+	if BeanCounterDBNames[itemKey] then
 		if not uniqueID then uniqueID = 0 end
 		local itemID, suffix = strsplit(":", itemKey)
-		local color, name = strsplit(";", BeanCounterDB["ItemIDArray"][itemKey])
+		local color, name = strsplit(";", BeanCounterDBNames[itemKey])
 		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":", uniqueID, ":80|h[", name, "]|h|r")
 	end
 	return
@@ -395,7 +395,7 @@ function lib.API.storeItemLinkToArray(itemLink)
 	local color, itemID, suffix, name = itemLink:match("|(.-)|Hitem:(.-):.-:.-:.-:.-:.-:(.-):.+|h%[(.-)%]|h|r")
 	
 	if color and itemID and suffix and name then
-		BeanCounterDB["ItemIDArray"][itemID..":"..suffix] =  color..";"..name
+		BeanCounterDBNames[itemID..":"..suffix] =  color..";"..name
 	end
 end
 
@@ -471,7 +471,7 @@ function lib.API.getBidReason(itemLink, quantity)
 end
 --[[Any itemlink passed into this function will be prompted to remove from the database]]
 function lib.API.deleteItem(itemLink)
-	if itemLink and itemLink:match("^(|c%x+|H.+|h%[.+%])") then
+	if itemLink and itemLink:match("^(|c%x+|Hitem.+|h%[.+%])") then
 		private.deletePromptFrame.item:SetText(itemLink)
 		private.deletePromptFrame:Show()
 	else
