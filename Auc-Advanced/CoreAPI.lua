@@ -593,7 +593,7 @@ function lib.ProgressBars(name, value, show, text, options)
 	
 	--find a generic bar available for use
 	local ID = availableBars[name]
-	if not ID then --find a bar
+	if show and not ID then --find a bar
 		for i = 1, NumGenericBars do
 			if not availableBars[i] then
 				availableBars[i] = {name, value, text, options}
