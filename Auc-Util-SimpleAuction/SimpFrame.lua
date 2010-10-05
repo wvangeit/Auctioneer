@@ -802,7 +802,7 @@ function private.PostAuction()
 	local bid = frame.CurItem.bid
 	local buy = frame.CurItem.buy
 	local duration = frame.CurItem.duration or 48
-	local success, reason = AucAdvanced.Post.PostAuction(sig, stack, bid, buy, duration*60, number)
+	local success, reason = AucAdvanced.Post.PostAuctionClick(sig, stack, bid, buy, duration, number)
 	if success then
 		aucPrint("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
 	else
