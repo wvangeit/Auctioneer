@@ -375,32 +375,38 @@ function lib.PostAuctionClick(sig, size, bid, buyout, duration, multiple)
 	if not request then
 		return nil, reason
 	end
+	local noqueue = false -- placeholder for a Setting to block queueing when CorePost is busy
+
 	local isEmpty = lib.GetQueueLen() == 0
+	if not isEmpty and noqueue then
+		return nil, "Busy"
+	end
 	private.QueueInsert(request)
 	local id = request.id
 
 	if isEmpty then
-		-- Attempt to post the item immediately
-		-- If this is not possible, the request will be handled by the queue mechanism
+		-- Attempt to post the auction immediately
 		private.Wait(0)
-
-		private.SigLockUpdate() -- check the status of any SigLocks
-		if private.IsSigLocked(request.sig) then
-			return id
-		end
-
-		if not private.ClearAuctionSlot() then
-			return id
-		end
-
-		local bag, slot = private.SelectStack(request)
-		if bag then
-			if not private.LoadAuctionSlot(request, bag, slot) then
-				return id
+		private.SigLockUpdate()
+		if not private.IsSigLocked(request.sig) then
+			if private.ClearAuctionSlot() then
+				local bag, slot = private.SelectStack(request)
+				if bag then
+					if private.LoadAuctionSlot(request, bag, slot) then
+						private.StartAuction(request)
+						return id
+					end
+				end
 			end
-			private.StartAuction(request)
-			return id
 		end
+	end
+	if noqueue then
+		-- posting failed, noqueue is flagged, so remove the request we just queued
+		-- todo: consider using/modifying SetQueueReports for this eventuality
+		lib.QueueRemove(lib.GetQueueLen())
+		return nil, "Busy"
+	else
+		return id
 	end
 end
 
@@ -1001,9 +1007,10 @@ function private.ShowPrompt(request)
 	private.Prompt.Text1:SetText("Ready to post "..private.RequestDisplayString(request))
 	private.Prompt.Text2:SetText("Min Bid "..AucAdvanced.Coins(request.bid, true)..", Buyout "..AucAdvanced.Coins(request.buy))
 	private.Prompt.Item.tex:SetTexture(request.texture)
+	local headwidth = (private.Prompt.Heading:GetStringWidth() or 0) + 70
 	local width1 = (private.Prompt.Text1:GetStringWidth() or 0) + 70
 	local width2 = (private.Prompt.Text2:GetStringWidth() or 0) + 70
-	private.Prompt.Frame:SetWidth(max(width1, width2, PROMPT_MIN_WIDTH))
+	private.Prompt.Frame:SetWidth(max(headwidth, width1, width2, PROMPT_MIN_WIDTH))
 end
 
 --[[ PRIVATE: HidePrompt()
@@ -1320,9 +1327,9 @@ private.Prompt.Item.tex:SetPoint("TOPLEFT", private.Prompt.Item, "TOPLEFT", 0, 0
 private.Prompt.Item.tex:SetPoint("BOTTOMRIGHT", private.Prompt.Item, "BOTTOMRIGHT", 0, 0)
 
 private.Prompt.Heading = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-private.Prompt.Heading:SetPoint("TOPLEFT", private.Prompt, "TOPLEFT", 52, -20)
-private.Prompt.Heading:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -15, -20)
-private.Prompt.Heading:SetJustifyH("CENTER")
+private.Prompt.Heading:SetPoint("CENTER", private.Prompt.Frame, "CENTER", 20, 30)
+--private.Prompt.Heading:SetPoint("TOPRIGHT", private.Prompt, "TOPRIGHT", -15, -20)
+--private.Prompt.Heading:SetJustifyH("CENTER")
 private.Prompt.Heading:SetText("Auctioneer needs a confirmation to continue posting")
 
 private.Prompt.Text1 = private.Prompt:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
