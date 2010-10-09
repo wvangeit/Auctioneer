@@ -448,7 +448,7 @@ function private.CreateFrames()
 				style[i][1].rowColor = {r, g, b, Alpha1, Alpha2, direction}
 			end
 			--color ignored sellers
-			if AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
+			if AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored and AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(result[Const.SELLER]) then
 				if not style[i] then style[i] = {} end
 				style[i][1] = {}
 				style[i][1].textColor = {1,0,0}
@@ -2540,7 +2540,7 @@ function private.CreateFrames()
 	function private.onClick(button, row, index)
 		if (IsAltKeyDown()) and frame.imageview.sheet.labels[index]:GetText() == "Seller" then
 			local seller = frame.imageview.sheet.rows[row][index]:GetText()
-			if not seller or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IgnoreList then frame.sellerIgnore:Hide() return end
+			if not seller or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored then frame.sellerIgnore:Hide() return end
 
 			frame.sellerIgnore:SetParent(frame.imageview.sheet.panel)
 			frame.sellerIgnore:SetFrameStrata("TOOLTIP")
@@ -2548,7 +2548,7 @@ function private.CreateFrames()
 			frame.sellerIgnore:SetPoint("TOPLEFT", button, "BOTTOM")
 			frame.sellerIgnore:Show()
 			--if toon not ignored the ignore
-			if not AucAdvanced.Modules.Filter.Basic.IgnoreList[seller] then
+			if not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(seller) then
 				frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) frame.sellerIgnore:Hide() end)
 				frame.sellerIgnore.help:SetText(_TRANS('APPR_Interface_AddPlayerIgnore'):format("|CFFFFFFFF", seller))--Add player to ignore list %s%s
 			else
