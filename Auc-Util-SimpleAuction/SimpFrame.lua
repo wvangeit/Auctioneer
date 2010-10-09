@@ -358,7 +358,7 @@ function private.UpdateCompetition(image)
 		if seller == player then
 			if not style[i] then style[i] = {} end
 			style[i][1] = { textColor = {0,1,0} }
-		elseif AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IgnoreList and AucAdvanced.Modules.Filter.Basic.IgnoreList[result[Const.SELLER]] then
+		elseif AucAdvanced.Modules.Filter.Basic and AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored and AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(result[Const.SELLER]) then
 			if not style[i] then style[i] = {} end
 			style[i][1] = { textColor = {1,0,0} }
 		end
