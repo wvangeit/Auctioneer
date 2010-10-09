@@ -80,7 +80,7 @@ local POST_THROTTLE = 0.1 -- time before starting to post the next item in the q
 local POST_TIMER_INTERVAL = 0.5 -- default interval of updates from the timer
 local MINIMUM_DEPOSIT = 100 -- 1 silver minimum deposit
 local PROMPT_HEIGHT = 120
-local PROMPT_MIN_WIDTH = 500
+local PROMPT_MIN_WIDTH = 400
 
 local BindTypes = {
 	[ITEM_SOULBOUND] = "Bound",
@@ -1213,6 +1213,7 @@ local function EventHandler(self, event, arg1, arg2)
 		end
 	elseif event == "AUCTION_HOUSE_CLOSED" then
 		if lib.GetQueueLen() > 0 then
+			private.HidePrompt()
 			if AucAdvanced.Settings.GetSetting("post.clearonclose") then
 				if AucAdvanced.Settings.GetSetting("post.confirmonclose") then
 					StaticPopup_Show("POST_CANCEL_QUEUE_AH_CLOSED")
@@ -1220,7 +1221,6 @@ local function EventHandler(self, event, arg1, arg2)
 					lib.CancelPostQueue()
 				end
 			end
-
 			-- if currently multiselling, it will fail - treat as deliberate cancel to suppress error
 			private.TrackCancelSell()
 		end
@@ -1341,12 +1341,14 @@ private.Prompt.Text2:SetPoint("CENTER", private.Prompt.Frame, "CENTER", 20, -10)
 -- Yes and No buttons are named to allow macros to /click them
 private.Prompt.Yes = CreateFrame("Button", "AuctioneerPostPromptYes", private.Prompt, "OptionsButtonTemplate")
 private.Prompt.Yes:SetText(CONTINUE)
-private.Prompt.Yes:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -100, 10)
+--private.Prompt.Yes:SetPoint("BOTTOMRIGHT", private.Prompt, "BOTTOMRIGHT", -100, 10)
+private.Prompt.Yes:SetPoint("BOTTOMLEFT", private.Prompt, "BOTTOMLEFT", 100, 10)
 private.Prompt.Yes:SetScript("OnClick", private.PerformPosting)
 
 private.Prompt.No = CreateFrame("Button", "AuctioneerPostPromptNo", private.Prompt, "OptionsButtonTemplate")
 private.Prompt.No:SetText(CANCEL)
-private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -60, 0)
+--private.Prompt.No:SetPoint("BOTTOMRIGHT", private.Prompt.Yes, "BOTTOMLEFT", -60, 0)
+private.Prompt.No:SetPoint("BOTTOMLEFT", private.Prompt.Yes, "BOTTOMRIGHT", 60, 0)
 private.Prompt.No:SetScript("OnClick", private.CancelPosting)
 
 private.Prompt.DragTop = CreateFrame("Button", nil, private.Prompt)
