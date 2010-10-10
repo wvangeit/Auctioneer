@@ -193,7 +193,7 @@ end
 -- names have been changed to prevent conflicts
 ENX_TooltipHooks = {};
 
-function ENX_GameTooltip_OnHide()
+function ENX_GameTooltip_OnHide(this)
 	local tooltipName = this:GetName();
 	ENX_SetTooltipHooks(tooltipName);
 end
@@ -205,7 +205,7 @@ end
 
 function ENX_SetTooltipHooks(tooltipName)
 	if (not tooltipName or tooltipName == "") then return; end
-	local tooltip = getglobal(tooltipName);
+	local tooltip = _G[tooltipName];
 	if (tooltip and tooltip:HasScript("OnTooltipSetItem") and not ENX_TooltipHooks[tooltipName]) then
 		ENX_TooltipHooks[tooltipName] = {};
 		ENX_TooltipHooks[tooltipName].OnTooltipSetItem = tooltip:GetScript("OnTooltipSetItem");
@@ -213,9 +213,9 @@ function ENX_SetTooltipHooks(tooltipName)
 	end
 end
 
-function ENX_OnTooltipSetItem()
+function ENX_OnTooltipSetItem(this)
 	local tooltipName = this:GetName();
-	local tooltip = getglobal(tooltipName);
+	local tooltip = _G[tooltipName];
 	if (ENX_TooltipHooks[tooltipName] and ENX_TooltipHooks[tooltipName].OnTooltipSetItem) then
 		ENX_TooltipHooks[tooltipName].OnTooltipSetItem(tooltip);
 	end
@@ -226,7 +226,7 @@ function ENX_OnTooltipSetItem()
 			-- Ok, we think the item is disenchantable
 			-- search the tooltip text for the non-disenchantable string
 			for lineNum = 1, this:NumLines() do
-				local leftText = getglobal(this:GetName().."TextLeft"..lineNum):GetText();
+				local leftText = _G[this:GetName().."TextLeft"..lineNum]:GetText();
 				if (leftText == ITEM_DISENCHANT_NOT_DISENCHANTABLE) then
 					-- found the string, this item really isn't disenchantable
 					Enchantrix.Storage.SaveNonDisenchantable(link)

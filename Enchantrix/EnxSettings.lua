@@ -516,7 +516,7 @@ function lib.MakeGuiConfig()
 	gui = Configator:Create(setter, getter)
 	lib.Gui = gui
 
-  	gui:AddCat("Enchantrix")
+	gui:AddCat("Enchantrix")
 
 
 	id = gui:AddTab(_ENCH("GuiTabProfiles"))
@@ -541,14 +541,14 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
 	gui:AddControl(id, "Checkbox",   0, 1, "chatShowFindings", _ENCH("GuiPrintYieldsInChat") )
-	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowReagents", _ENCH("GuiShowCraftReagents") )	
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowReagents", _ENCH("GuiShowCraftReagents") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowMatSources", _ENCH("GuiShowMatSources") )
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
 	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
--- TODO: locale -- what are the allowed values?
--- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
+	-- TODO: locale -- what are the allowed values?
+	-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
@@ -575,7 +575,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "AutoDeEpicItems", _ENCH("GuiAutoDeEpicItems"))
 	gui:AddControl(id, "Checkbox",   0, 2, "AutoDeOnlyIfBoughtForDE", _ENCH("GuiAutoDeBoughtForDE"))
 	gui:AddControl(id, "Checkbox",   0, 2, "autoLootDE", _ENCH("GuiAutoLootDE"))
-	
+
 	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
 	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", "this string isn't shown but needs to be long for layout")
 	gui:AddControl(id, "Button",     0, 1, "autode.deleteItem", "remove item")
@@ -633,7 +633,6 @@ function lib.MakeGuiConfig()
 		local reagLink = Enchantrix.Util.GetLinkFromName(reagName)
 		gui:AddLinkTip(id, reagLink)
 	end
-
 	id = gui:AddTab(_ENCH("GuiTabFixed"))
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,  _ENCH("GuiFixedSettings"))

@@ -474,7 +474,7 @@ local function getReagentsFromTooltip(frame)
 	local reagents
 	-- Find reagents line ("Reagents: ...")
 	for i = 1, nLines do
-		local text = getglobal(frameName.."TextLeft"..i):GetText()
+		local text = _G[frameName.."TextLeft"..i]:GetText()
 
 		-- text:find("Reagents: (.+)")
 		local _, _, r = text:find(_ENCH('PatReagents'))

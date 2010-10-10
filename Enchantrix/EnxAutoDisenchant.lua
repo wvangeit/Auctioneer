@@ -55,7 +55,7 @@ end
 local function debugSpam(...)
 --	local message = debug:Dump(...)
 --	local r, g, b = 0, 0.75, 1
---	getglobal("ChatFrame1"):AddMessage("AutoDe: " .. message, r, g, b)
+--	_G["ChatFrame1"]:AddMessage("AutoDe: " .. message, r, g, b)
 end
 
 local function eventSpam(...)
