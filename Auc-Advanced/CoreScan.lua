@@ -1194,7 +1194,7 @@ local Commitfunction = function()
 	if not private.curQuery then
 		private.ResetAll()
 	end
-	AucAdvanced.SendProcessorMessage("scanfinish", scanSize, TempcurQuery.qryinfo.sig, TempcurQuery.qryinfo, not wasIncomplete)
+	AucAdvanced.SendProcessorMessage("scanfinish", scanSize, TempcurQuery.qryinfo.sig, TempcurQuery.qryinfo, not wasIncomplete, TempcurQuery, TempcurScanStats)
 end
 
 local CoCommit, CoStore
