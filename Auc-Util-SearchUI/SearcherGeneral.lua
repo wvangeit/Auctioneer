@@ -125,9 +125,7 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 	gui:SetControlWidth(0.35)
-	local nameEdit = gui:AddControl(id, "Text",       0,   1, "general.name", "Item name")
-	nameEdit:SetScript("OnTextChanged", function(...) gui:ChangeSetting(...) end) --have the edit box update as user types, default box only updates on escape or enter
-	
+	gui:AddControl(id, "Text",       0,   1, "general.name", "Item name")
 	local cont = gui:GetLast(id)
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",   0.11, 0, "general.name.exact", "Exact")
@@ -203,39 +201,6 @@ function lib.Search(item)
 		return false, private.debug
 	end
 end
-
---Rescan is an optional method a searcher can implement that allows it to queue a rescan of teh ah
---Just pass any item you want rescaned
-function lib.Rescan()
-	local name = get("general.name")
-	local min = get("general.ulevel.min")
-	local max = get("general.ulevel.max")
-	local quality = get("general.quality")
-
-	--convert these to the AH API index #
-	local searchtype = get("general.type")
-	local searchsubtype = get("general.subtype")
-
-	local classIndex, subclassIndex
-	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
-		if catName == searchtype then
-			classIndex = catId
-			for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[catId]) do
-				if subName == searchsubtype then
-					subclassIndex = subId
-					break
-				end
-			end
-			break
-		end
-	end
-
-	if name then
-		print(name, min, max, nil, classIndex, subclassIndex, nil, quality)
-		AucSearchUI.RescanAuctionHouse(name, min, max, nil, classIndex, subclassIndex, nil, quality )
-	end
-end
-
 
 function private.LevelSearch(levelType, itemLevel)
 	local min = get("general."..levelType..".min")

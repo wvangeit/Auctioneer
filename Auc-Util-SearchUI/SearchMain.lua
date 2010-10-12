@@ -63,6 +63,7 @@ private.isSearching = false
 local coSearch
 local SettingCache = {}
 local currentSettings = {}
+local hasUnsaved = nil
 
 local TAB_NAME = "Search"
 
@@ -79,7 +80,6 @@ local resources = {}
 lib.Resources = resources
 local flagResourcesUpdateRequired = false
 local flagScanStats = false
-local flagRescan
 
 -- Faction Resources
 -- Commonly used values which change depending whether you are at home or neutral Auctionhouse
@@ -208,97 +208,8 @@ else
 		end)
 	end
 end
---code taken from appraiser
---The rescan method is a button that is displayed only if the searcher implements a rescan function. The searcher then passes any itemlinks it wants refrreshed data on
---this will accept a text search term as well as a itemlink
-function lib.RescanAuctionHouse(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-	if not name or type(name) ~= "string" then print("Invalid input SearchUI RescanAuctionHouse", name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) return end
-	--if we are passed just a itemlink extract what data we can to filter our scan
-	if name and name:match("^(|c%x+|Hitem.+|h%[.+%])") then
-		--look up the itemlink info or pass it as a plain text if no info is returned
-		name, _, qualityIndex, _, minUseLevel, itemType, itemSubType, _ = GetItemInfo(name)
-		
-		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
-			if catName == itemType then
-				classIndex = catId
-				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[classIndex]) do
-					if subName == itemSubType then
-						subclassIndex = subId
-						break
-					end
-				end
-				break
-			end
-		end
-	end
-
-	if name then		
-		if AucAdvanced.Scan.IsScanning() or AucAdvanced.Scan.IsPaused() then
-			AucAdvanced.Scan.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-		else
-			AucAdvanced.Scan.PushScan()
-			AucAdvanced.Scan.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-		end
-	end
-end
-
-function lib.upgradeDB()
-	--No user data to update
-	if not AucAdvancedData or not AucAdvancedData.UtilSearchUiData or not AucAdvancedData.UtilSearchUiData.Version then
-		return
-	end
-	if AucAdvancedData.UtilSearchUiData.Version == 1 then
-		local function findMatch(text)
-			for name in pairs(lib.Searchers) do
-				if name:lower() == text then
-					return name, "search"
-				end
-			end
-			for name in pairs(lib.Filters) do
-				if "ignore"..name:lower() == text then
-					return name, "filter"
-				end
-			end
-			return
-		end
-		local tempSearch = {}
-		local tempFilterSet = {["Default"] = {}}
-		--create the deafult tables
-		for name in pairs(lib.Searchers) do
-			--print(name)
-			tempSearch[name] = {["Default"] = {}}
-		end
-		--transfer all profiles into the new format
-		for profile, settings in pairs(AucAdvancedData.UtilSearchUiData.SavedSearches) do
-			for setting, value in pairs(settings) do
-				local a = strsplit(".",setting)
-				local name, nameType = findMatch(a)
-				if name and nameType == "search" then
-					if not tempSearch[name] then tempSearch[name] = {} end
-					if not tempSearch[name][profile] then tempSearch[name][profile] = {} end
-					tempSearch[name][profile][setting] = value
-				elseif name and nameType == "filter" then
-					--filtersets by profile
-					if not tempFilterSet[profile] then tempFilterSet[profile] = {} end
-					tempFilterSet[profile][setting] = value
-				else
-					AucAdvancedData.UtilSearchUiData.Global[setting] = value
-				end
-			end
-			AucAdvancedData.UtilSearchUiData.Version = 2
-			AucAdvancedData.UtilSearchUiData.Selected = {}
-			AucAdvancedData.UtilSearchUiData.SelectedFilterSet = {}
-			AucAdvancedData.UtilSearchUiData.FilterSets= tempFilterSet
-			AucAdvancedData.UtilSearchUiData.SavedSearches = tempSearch
-			AucAdvancedData.UtilSearchUiData.Current = nil
-		end
-	end
-end
 
 function lib.OnLoad(addon)
-	--Check and upgrade Database if needed
-	lib.upgradeDB()
-
 	-- Notify that SearchUI is fully loaded
 	resources.isSearchUILoaded = true
 	lib.NotifyCallbacks("onload", addon)
@@ -528,27 +439,22 @@ function lib.SetDefault(setting, default)
 	settingDefaults[setting] = default
 end
 
-local function initData(searcherName)
+local function initData()
 	local data = AucAdvancedData.UtilSearchUiData
 	if not data then
 		data = {}
-		data.Version = 2
+		data.Version = 1
 		AucAdvancedData.UtilSearchUiData = data
 	end
 	if not data.SavedSearches then data.SavedSearches = {} end
-	if searcherName and not data.SavedSearches[searcherName] then data.SavedSearches[searcherName] = {["Default"] = {}} end
-	if not data.FilterSets then data.FilterSets = {["Default"] = {}} end
+	if not data.Current then data.Current = {} end
 	if not data.Global then data.Global = {} end
-	if not data.Selected then data.Selected = {} end
-	if not data.SelectedFilterSet then data.SelectedFilterSet = {} end	
 end
 
 local function isGlobalSetting(setting)
 	local a,b,c = strsplit(".", setting)
 	if a == "configator" then return true end
 	if a == "global" then return true end
-	if a == "columnorder" then return true end
-	if a == "columnsortcurSort" then return true end
 	return
 end
 
@@ -581,10 +487,15 @@ local function setter(setting, value)
 			-- same table as before
 			-- call UpdateSave to check if the *contents* of the table have changed
 			-- but don't send Processor message as *setting* is the same (consistent with Core version of 'setter')
+			hasUnsaved = true
+			lib.UpdateSave()
 		end
 		return
 	end
 	db[setting] = value
+
+	hasUnsaved = true
+	lib.UpdateSave()
 
 	AucAdvanced.SendProcessorMessage("configchanged", setting, value)
 	lib.NotifyCallbacks('config', 'changed', setting, value)
@@ -600,16 +511,7 @@ end
 local function getter(setting)
 	initData()
 	local db = currentSettings
-	
-	local filter
-	if gui then
-		filter = private.gui.saves.filters:GetText()
-		if AucAdvancedData.UtilSearchUiData.FilterSets[filter] then
-			filter = AucAdvancedData.UtilSearchUiData.FilterSets[filter]
-		else
-			filter = AucAdvancedData.UtilSearchUiData.FilterSets["Default"]
-		end
-	end
+
 	if (isGlobalSetting(setting)) then
 		local value = AucAdvancedData.UtilSearchUiData.Global[setting]
 		if value ~= nil then return value end
@@ -618,10 +520,6 @@ local function getter(setting)
 
 	if ( db[setting] ~= nil ) then
 		return db[setting]
-	end
-	--try getting the request from the searchers setting then fall back to the current filters settings
-	if filter and filter[setting] ~= nil then
-		return filter[setting]
 	else
 		return getDefault(setting)
 	end
@@ -746,8 +644,6 @@ function lib.NewSearcher(searcherName)
 		end
 
 		lib.Searchers[searcherName] = searcher
-		--create a saved var default for this searcher
-		initData(searcherName)
 		return searcher, lib, {}
 	end
 end
@@ -1027,270 +923,108 @@ local function isEqual(a, b, l)
 end
 lib.IsEqual = isEqual
 
-local function HideSearcherGui(block)
-	gui.saves.blocker:Hide()
-	gui.saves.filters.blocker:Hide()
-	gui.saves.filters.editblocker:Show()
-	gui.saves.filters:SetTextColor(1, 1, 1, 1)
-	--clear focus on edit boxes
-	EditBox_ClearFocus(gui.saves.searchers)
-	EditBox_ClearFocus(gui.saves.filters)
-	
-	if block == "search" then
-		gui.saves.blocker:Show()
-		gui.saves.filters.editblocker:Hide()
-		gui.saves.filters:SetTextColor(0.3, 1, 0.3, 1)
-	elseif block == "filter" then
-		gui.saves.filters.blocker:Show()
-	elseif block == "both" then
-		gui.saves.blocker:Show()
-		gui.saves.filters.blocker:Show()
+function lib.LoadCurrent()
+	initData()
+	local name = gui.saves.name:GetText()
+	currentSettings = AucAdvancedData.UtilSearchUiData.Current
+	if not currentSettings then
+		lib.LoadSearch()
+		return
 	end
+
+	local existing = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
+	if not existing then
+		hasUnsaved = true
+	elseif not isEqual(currentSettings, existing) then
+		hasUnsaved = true
+	else
+		hasUnsaved = nil
+	end
+	lib.UpdateSave()
+	gui:Refresh()
+	lib.NotifyCallbacks('config', 'loaded', nil)
 end
-function lib.Load()
-	
-	local 	_, searcher = private.FindSearcher()
-	local _, filter = private.FindFilter()
 
-	--for non searchers use the global settings
-	--for filters use the filter sets
-	if searcher then
-		HideSearcherGui()
-	elseif filter then--this only occurs when player is in the filters subsection. So only time we want to have set/get mapped to the profile
-		HideSearcherGui("search")
-		local filterName = private.gui.saves.filters:GetText()
-		if AucAdvancedData.UtilSearchUiData.FilterSets[filterName] then
-			currentSettings = AucAdvancedData.UtilSearchUiData.FilterSets[filterName]
-		else
-			currentSettings = AucAdvancedData.UtilSearchUiData.FilterSets["Default"]
-		end
-		--link this filter set to users current searcher if one
-		local settingName = private.gui.saves.searchers:GetText()
-		if filterName and settingName then
-			AucAdvancedData.UtilSearchUiData.SelectedFilterSet[settingName] = filterName
-		end
-		gui:Refresh()
-		return
-	else
-		HideSearcherGui("both")
-		currentSettings = AucAdvancedData.UtilSearchUiData.Global
-		gui:Refresh()
-		return
-	end
-	--Check if rescan method is implemented
-	if lib.Searchers[searcher].Rescan then
-		gui.Rescan:Show()
-		gui.Rescan:SetScript("OnClick", function()
-							if flagRescan then
-								flagRescan = nil
-								CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 0, 0)
-								private.gui.Search:Enable()
-								lib.PerformSearch()
-							else
-								lib.Searchers[searcher].Rescan()
-								CooldownFrame_SetTimer(gui.Rescan.frame, GetTime(), 2, 1)
-								private.gui.Search:Disable()
-								flagRescan = GetTime()
-							end
-						end)
-	else
-		gui.Rescan:Hide()
-	end
-	--Change load search title text
-	gui.saves.title:SetText("Saved |CFF01FF00"..searcher:upper().."|r searches:")
-
-	if not AucAdvancedData.UtilSearchUiData.SavedSearches[searcher] then
+function lib.LoadSearch()
+	initData()
+	local name = gui.saves.name:GetText()
+	if not AucAdvancedData.UtilSearchUiData.SavedSearches[name] then
 		message("SearchUI warning:\nThat search does not exist, please select an available search from the menu.")
 		return
 	end
-	--check if we have a valid saved search, if not try last used, if all else fails use "Default"
-	local lastSelected = AucAdvancedData.UtilSearchUiData.Selected[searcher]
-	local name = gui.saves.searchers:GetText()
-	--no text supplied, or text is not a saved search
-	if name == "" or not AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] then
-		name = lastSelected
-	end
-	--it does not exist use default
-	if not AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] then
-		name = "Default"
-	end
-	gui.saves.searchers:SetText(name)
-
-	currentSettings = AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name]
-	AucAdvancedData.UtilSearchUiData.Selected[searcher] = name
-	--link to last selected filter set
-	local filterName = AucAdvancedData.UtilSearchUiData.SelectedFilterSet[name]
-	if AucAdvancedData.UtilSearchUiData.FilterSets[filterName] then
-		private.gui.saves.filters:SetText(filterName)
-	else
-		private.gui.saves.filters:SetText("Default")
-	end
-
+	currentSettings = replicate(AucAdvancedData.UtilSearchUiData.SavedSearches[name])
+	AucAdvancedData.UtilSearchUiData.Current = currentSettings
+	AucAdvancedData.UtilSearchUiData.Selected = name
+	hasUnsaved = nil
+	lib.UpdateSave()
 	gui:Refresh()
 	lib.NotifyCallbacks('config', 'loaded', name)
 end
 
-function lib.CreateNewSearch()
-	local _, searcher = private.FindSearcher()
-	local step = 1
-	while (step < 100) and AucAdvancedData.UtilSearchUiData.SavedSearches[searcher]["New "..step] do
-		step = step + 1
-	end
-	local name = "New "..step
-		
-	local _, searcher = private.FindSearcher()
-	initData(searcher)
-	if not AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] then
-		AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] = {}
-	end
-		
-	AucAdvancedData.UtilSearchUiData.Selected[searcher] = name
-	
-	gui.saves.searchers:SetText(name)
-	--load the data
-	lib.Load()
-	--gui:Refresh()
-	--lib.NotifyCallbacks('config', 'saved', name)
-end
-function lib.CreateNewFilter()
-	local step = 1
-	while (step < 100) and AucAdvancedData.UtilSearchUiData.FilterSets["New "..step] do
-		step = step + 1
-	end
-	local name = "New "..step
-	
-	if not AucAdvancedData.UtilSearchUiData.FilterSets[name] then
-		AucAdvancedData.UtilSearchUiData.FilterSets[name] = {}
-	end
-	gui.saves.filters:SetText(name)
+function lib.SaveSearch()
+	initData()
+	local name = gui.saves.name:GetText()
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = replicate(currentSettings)
+	AucAdvancedData.UtilSearchUiData.Selected = name
+	hasUnsaved = nil
+	lib.UpdateSave()
 	gui:Refresh()
 	lib.NotifyCallbacks('config', 'saved', name)
 end
 
-function lib.FilterChanged()
-	local filterName = private.gui.saves.filters:GetText()
-	if filterName == "" then filterName = "Default" end
-	--link this filter set to users current searcher if one
-	local settingName = private.gui.saves.searchers:GetText()
-	if filterName and settingName then
-		AucAdvancedData.UtilSearchUiData.SelectedFilterSet[settingName] = filterName
-	end
-	gui.saves.filters:SetText(filterName)
-	lib.Load()
-	gui:Refresh()
-end
-
-function lib.CopySearch()
-	local _, searcher = private.FindSearcher()
-	local name = gui.saves.searchers:GetText()
-	local old = AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name]
-	
-	if old then
-		local step = 1
-		while (step < 100) and AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name.." copy "..step] do
-			step = step + 1
-		end
-		local new = name.." copy "..step
-		if not AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][new] then
-			AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][new] = {}
-		else
-			assert(nil, "This copy already exists "..new)
-			return
-		end
-		
-		AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][new] = replicate(old)
-
-		gui.saves.searchers:SetText(new)
-	end
-	lib.Load()
-end
-
-function lib.CopyFilter()
-	local name = gui.saves.filters:GetText()
-	local old = AucAdvancedData.UtilSearchUiData.FilterSets[name]
-	if old then
-		local step = 1
-		while (step < 100) and AucAdvancedData.UtilSearchUiData.FilterSets[name.." copy "..step] do
-			step = step + 1
-		end
-		local new = name.." copy "..step
-		if not AucAdvancedData.UtilSearchUiData.FilterSets[new] then
-			AucAdvancedData.UtilSearchUiData.FilterSets[new] = {}
-		else
-			assert(nil, "This copy already exists "..new)
-			return
-		end
-		
-		AucAdvancedData.UtilSearchUiData.FilterSets[new] = replicate(old)
-
-		gui.saves.filters:SetText(new)
-	end
-	gui:Refresh()
-end
-
 function lib.DeleteSearch()
-	local _, searcher = private.FindSearcher()
-	local name = gui.saves.searchers:GetText()
-	--never delete default just reset it
-	if name == "Default" then
-		AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] = {}
-	else
-		AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] = nil
-	end
-	gui.saves.searchers:SetText("")
+	initData()
+	local name = gui.saves.name:GetText()
+	AucAdvancedData.UtilSearchUiData.SavedSearches[name] = nil
+	hasUnsaved = nil
+	AucAdvancedData.UtilSearchUiData.Selected = ""
+	gui.saves.name:SetText("")
+	lib.UpdateSave()
+	gui:Refresh()
+	lib.NotifyCallbacks('config', 'deleted', name)
 end
-
-function lib.DeleteFilter()
-	local name = gui.saves.filters:GetText()
-	--never delete default just reset it
-	if name == "Default" then
-		AucAdvancedData.UtilSearchUiData.FilterSets[name] = {}
-	else
-		AucAdvancedData.UtilSearchUiData.FilterSets[name] = nil
-	end
-	gui.saves.filters:SetText("")
-end
-
-function lib.RenameSearch()
-	local _, searcher = private.FindSearcher()
-	local name = gui.saves.searchers:GetText()
-	if AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] then
-		return
-	end
-	local original = AucAdvancedData.UtilSearchUiData.Selected[searcher]
-	local data = AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][original]
-	--store data
-	AucAdvancedData.UtilSearchUiData.Selected[searcher] = name
-	AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][name] = data
-	
-	AucAdvancedData.UtilSearchUiData.SavedSearches[searcher][original] = nil
-	lib.Load()
-end
-
-function lib.RenameFilter()
-	local name = gui.saves.filters:GetText()
-	if AucAdvancedData.UtilSearchUiData.FilterSets[name] then
-		return
-	end
-	local original = AucAdvancedData.UtilSearchUiData.SelectedFilterSet[name]
-	local data = AucAdvancedData.UtilSearchUiData.FilterSets[original]
-	--store data
-	AucAdvancedData.UtilSearchUiData.SelectedFilterSet[searcher] = name
-	AucAdvancedData.UtilSearchUiData.FilterSets[name] = data
-	
-	AucAdvancedData.UtilSearchUiData.FilterSets[original] = nil
-	lib.Load()
-end
-
 
 function lib.ResetSearch()
 	initData()
 	currentSettings = {}
 	AucAdvancedData.UtilSearchUiData.Current = currentSettings
+	hasUnsaved = nil
 	AucAdvancedData.UtilSearchUiData.Selected = ""
-	gui.saves.searchers:SetText("")
+	gui.saves.name:SetText("")
+	lib.UpdateSave()
 	gui:Refresh()
 	lib.NotifyCallbacks('config', 'reset')
+end
+
+local curColor = "white"
+function lib.UpdateSave()
+	if not (gui and AucAdvancedData.UtilSearchUiData) then return end
+
+	local name = gui.saves.name:GetText()
+
+	if hasUnsaved then
+		local saved = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
+		if saved and isEqual(currentSettings, saved) then
+			hasUnsaved = false
+		end
+	end
+
+	if AucAdvancedData.UtilSearchUiData.Selected ~= name then
+		if curColor ~= "white" then
+			gui.saves.name:SetTextColor(1, 1, 1, 1)
+			curColor = "white"
+		end
+	elseif hasUnsaved then
+		if curColor ~= "red" then
+			gui.saves.name:SetTextColor(1, 0.5, 0.1, 1)
+			curColor = "red"
+		end
+	else
+		if curColor ~= "green" then
+			gui.saves.name:SetTextColor(0.3, 1, 0.3, 1)
+			curColor = "green"
+		end
+	end
 end
 
 function lib.AddSearcher(gui, searchType, searchDetail, searchPos)
@@ -1302,10 +1036,7 @@ function lib.AttachToAH()
 	if private.isAttached then return end
 	local height, width = 410, 830
 	gui.buttonTop = -30
-	--Dont use configators SetPosition with a parent it resets our frame stratas
-	gui:SetPosition(nil, width, height, 5, 7+height)
-	gui:SetPoint("TOPLEFT", gui.AuctionFrame ,"TOPLEFT", 0, -30)
-	gui:SetPoint("BOTTOMRIGHT", gui.AuctionFrame ,"BOTTOMRIGHT", 0, 5)
+	gui:SetPosition(gui.AuctionFrame, width, height, 5, 7+height)
 	gui:HideBackdrop()
 	gui:EnableMouse(false)
 	gui:RealSetScale(0.9999)
@@ -1438,10 +1169,6 @@ function lib.MakeGuiConfig()
 		if newtab ~= gui.LastActiveTab then
 			gui.LastActiveTab = newtab
 			lib.NotifyCallbacks("selecttab", newtab)
-			--clear old saved text
-			gui.saves.searchers:SetText("")
-			--load new searchers saved settings
-			lib.Load()
 		end
 		gui.Search.updateDisplay()
 	end
@@ -1451,7 +1178,7 @@ function lib.MakeGuiConfig()
 	-- common functions and scripthandlers, used by various buttons and frames
 	local function showTooltipText(button)
 		if lib.GetSetting("tooltiphelp.show") then
-			GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+			GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
 			GameTooltip:SetText(button.TooltipText)
 		end
 	end
@@ -1485,28 +1212,30 @@ function lib.MakeGuiConfig()
 
 	gui.saves.title = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	gui.saves.title:SetPoint("LEFT", gui.saves, "LEFT", 10,0)
-	gui.saves.title:SetText("Saved search:")
+	gui.saves.title:SetText("Saved searches:")
 
-	gui.saves.searchers = CreateFrame("EditBox", "SearchUiSaveName", gui.saves, "InputBoxTemplate")
-	gui.saves.searchers:SetPoint("LEFT", gui.saves.title, "RIGHT", 10,0)
-	gui.saves.searchers:SetAutoFocus(false)
-	gui.saves.searchers:SetWidth(120)
-	gui.saves.searchers:SetHeight(18)
-	gui.saves.searchers:SetScript("OnTextSet", function() lib.Load() end)
-	gui.saves.searchers:SetScript("OnEnterPressed", function(self) lib.RenameSearch() EditBox_ClearFocus(self) end)
-	gui.saves.searchers:SetScript("OnEscapePressed", function(self) lib.RenameSearch() EditBox_ClearFocus(self) end)
-	gui.saves.searchers.TooltipText =  "Click to rename current saved searcher.\nRight Click to create/copy/delete a saved searcher"
-	gui.saves.searchers:SetScript("OnEnter", showTooltipText )
-	gui.saves.searchers:SetScript("OnLeave", hideTooltip)
+	gui.saves.name = CreateFrame("EditBox", "SearchUiSaveName", gui.saves, "InputBoxTemplate")
+	gui.saves.name:SetPoint("LEFT", gui.saves.title, "RIGHT", 10,0)
+	gui.saves.name:SetAutoFocus(false)
+	gui.saves.name:SetWidth(200)
+	gui.saves.name:SetHeight(18)
+	gui.saves.name:SetScript("OnTextChanged", function() lib.UpdateSave() end)
+	if AucAdvancedData.UtilSearchUiData then
+		local curSearch = AucAdvancedData.UtilSearchUiData.Selected or ""
+		if AucAdvancedData.UtilSearchUiData.SavedSearches[curSearch] then
+			gui.saves.name:SetText(curSearch)
+		else
+			gui.saves.name:SetText("")
+		end
+		lib.LoadCurrent()
+	end
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 
-	gui.saves.select = SelectBox:Create("SearchUiSaveSelect", gui.saves, 120, function(pos, key, value)
-		gui.saves.searchers:SetText(value)
+	gui.saves.select = SelectBox:Create("SearchUiSaveSelect", gui.saves, 220, function(pos, key, value)
+		gui.saves.name:SetText(value)
 	end, function ()
-		local _, searcher = private.FindSearcher()
-		if not searcher then return end
-		local saves = AucAdvancedData.UtilSearchUiData.SavedSearches[searcher]
+		local saves = AucAdvancedData.UtilSearchUiData.SavedSearches
 		local items = {}
 		if (saves) then
 			for name, sdata in keyPairs(saves) do
@@ -1516,177 +1245,45 @@ function lib.MakeGuiConfig()
 		return items
 	end, "")
 	gui.saves.select:SetParent(gui.saves)
-	gui.saves.select:SetScale(0.999) --The frame is not anchored properly otherwise!??
-	gui.saves.select:SetScale(1)
-	gui.saves.select:SetPoint("RIGHT", gui.saves.searchers, "RIGHT", 38,-4)
+	gui.saves.select:SetScale(0.999)
+	gui.saves.select:SetScale(1.0)
+	gui.saves.select:SetPoint("RIGHT", gui.saves.name, "RIGHT", 38,-4)
 	gui.saves.select:SetInputHidden(true)
 
-	--Filter select
-	gui.saves.filters = CreateFrame("EditBox", "SearchUiFilterName", gui.saves, "InputBoxTemplate")
-	gui.saves.filters:SetAutoFocus(false)
-	gui.saves.filters:SetWidth(120)
-	gui.saves.filters:SetHeight(18)
-	gui.saves.filters:SetScript("OnTextSet", function() lib.FilterChanged()  end)
-	gui.saves.filters:SetScript("OnEnterPressed", function(self)  lib.RenameFilter() EditBox_ClearFocus(self) end)
-	gui.saves.filters:SetScript("OnEscapePressed", function(self)  lib.RenameFilter() EditBox_ClearFocus(self) end)
-	gui.saves.filters.TooltipText = "Click to rename current saved filter.\nRight Click to create/copy/delete a saved filter.\nAll filters are saved as a set"
-	gui.saves.filters:SetScript("OnEnter", showTooltipText )
-	gui.saves.filters:SetScript("OnLeave", hideTooltip)
-	
-	gui.saves.filters.title = gui.saves:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	gui.saves.filters.title:SetPoint("LEFT", gui.saves.searchers, "RIGHT", 50,0)
-	gui.saves.filters.title:SetText("Filter set:")
-	
-	gui.saves.filters:SetPoint("LEFT", gui.saves.filters.title, "RIGHT", 10,0)
-	
-	gui.saves.filters.select = SelectBox:Create("SearchUiFilterSelect", gui.saves, 120, function(pos, key, value)
-		gui.saves.filters:SetText(value)
-	end, function ()
-		local saves = AucAdvancedData.UtilSearchUiData.FilterSets
-		local items = {}
-		if (saves) then
-			for name, sdata in keyPairs(saves) do
-				tinsert(items, name)
-			end
-		end
-		return items
-	end, "")
-	gui.saves.filters.select:SetParent(gui.saves)
-	gui.saves.filters.select:SetScale(0.999)
-	gui.saves.filters.select:SetScale(1)
-	gui.saves.filters.select:SetPoint("RIGHT", gui.saves.filters, "RIGHT", 38,-4)
-	gui.saves.filters.select:SetInputHidden(true)
+	gui.saves.load = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.load:SetPoint("LEFT", gui.saves.name, "RIGHT", 25, 0)
+	gui.saves.load:SetWidth(70)
+	gui.saves.load:SetHeight(20)
+	gui.saves.load:SetText("Load")
+	gui.saves.load:SetScript("OnClick", function() lib.LoadSearch() end)
 
-	--[[gui.saves.delete = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
-	gui.saves.delete:SetPoint("LEFT", gui.saves.filters, "RIGHT", 40, 0)
+	gui.saves.save = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.save:SetPoint("LEFT", gui.saves.load, "RIGHT", 5, 0)
+	gui.saves.save:SetWidth(70)
+	gui.saves.save:SetHeight(20)
+	gui.saves.save:SetText("Save")
+	gui.saves.save:SetScript("OnClick", function() lib.SaveSearch() end)
+
+	gui.saves.delete = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.delete:SetPoint("LEFT", gui.saves.save, "RIGHT", 5, 0)
 	gui.saves.delete:SetWidth(70)
 	gui.saves.delete:SetHeight(20)
 	gui.saves.delete:SetText("Delete")
-	gui.saves.delete:SetScript("OnEnter", function(self) 
-									GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-									GameTooltip:SetText("To delete a saved Search you must Hold SHIFT while clicking this button") 
-									end)
-	gui.saves.delete:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
-	gui.saves.delete:SetScript("OnClick", function() if IsShiftKeyDown() then lib.DeleteSearch() else print("To delete a saved Search you must Hold SHIFT while clicking this button") end end)
-]]
-	--Rightclick context buttons for new/copy/delete
-	gui.saves.searchers:SetScript("OnMouseUp", function(self, button)
-								if button ~= "RightButton" then gui.saves.options:Hide() return end
-								gui.saves.options:SetPoint("LEFT", self, "RIGHT", 0,0)
-								if gui.saves.options:IsShown() then
-									gui.saves.options:Hide()
-									gui.saves.options.name = nil
-								else
-									gui.saves.options:Show()
-									gui.saves.options.name = "searchers"
-								end
-							end)
-	gui.saves.filters:SetScript("OnMouseUp", function(self, button)
-								if button ~= "RightButton" then gui.saves.options:Hide() return end
-								gui.saves.options:SetPoint("LEFT", self, "RIGHT", 0,0)
-								if gui.saves.options:IsShown() then
-									gui.saves.options:Hide()
-									gui.saves.options.name = nil
-								else
-									gui.saves.options:Show()
-									gui.saves.options.name = "filters"
-								end
-							end)						
-							
-	gui.saves.options = CreateFrame("Frame", nil, gui)
-	gui.saves.options:ClearAllPoints()
-	gui.saves.options:SetFrameStrata("DIALOG")
-	gui.saves.options:SetPoint("LEFT", gui.saves.searchers, "RIGHT", 0,0)
-	gui.saves.options:Hide()
-	gui.saves.options:SetWidth(100)
-	gui.saves.options:SetHeight(100)
-	gui.saves.options:SetBackdrop({
-		bgFile = "Interface/Tooltips/ChatBubble-Background",
-		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
-		tile = true, tileSize = 32, edgeSize = 32,
-		insets = { left = 32, right = 32, top = 32, bottom = 32 }
-	})
-	
-	gui.saves.options.new = CreateFrame("Button", nil, gui.saves.options, "OptionsButtonTemplate")
-	gui.saves.options.new:SetText("New")
-	gui.saves.options.new:ClearAllPoints()
-	gui.saves.options.new:SetScript("OnClick", function() gui.saves.options:Hide() if gui.saves.options.name == "searchers" then lib.CreateNewSearch() elseif gui.saves.options.name == "filters" then lib.CreateNewFilter() end end)
-	gui.saves.options.new:SetPoint("TOP", gui.saves.options, "TOP", 0,-10)
-	
-	gui.saves.options.copy = CreateFrame("Button", nil, gui.saves.options, "OptionsButtonTemplate")
-	gui.saves.options.copy:SetText("COPY")
-	gui.saves.options.copy:ClearAllPoints()
-	gui.saves.options.copy:SetScript("OnClick", function() gui.saves.options:Hide() if gui.saves.options.name == "searchers" then lib.CopySearch() elseif gui.saves.options.name == "filters" then lib.CopyFilter() end end)
-	gui.saves.options.copy:SetPoint("TOP", gui.saves.options.new, "BOTTOM", 0,-5)
-	
-	gui.saves.options.delete = CreateFrame("Button", nil, gui.saves.options, "OptionsButtonTemplate")
-	gui.saves.options.delete:SetText("DELETE")
-	gui.saves.options.delete:ClearAllPoints()
-	gui.saves.options.delete:SetScript("OnClick", function() gui.saves.options:Hide() if gui.saves.options.name == "searchers" then lib.DeleteSearch() elseif gui.saves.options.name == "filters" then lib.DeleteFilter() end end)
-	gui.saves.options.delete:SetPoint("TOP", gui.saves.options.copy, "BOTTOM", 0,-5)
+	gui.saves.delete:SetScript("OnClick", function() lib.DeleteSearch() end)
 
-	--blocker frames to "disable" gui elements when we dont want users to click on em
-	gui.saves.blocker = CreateFrame("Frame", nil, gui)
-	gui.saves.blocker:EnableMouse(true)
-	gui.saves.blocker:SetFrameStrata("DIALOG")
-	gui.saves.blocker:SetPoint("CENTER", gui.saves.searchers, "CENTER", 0,0)
-	gui.saves.blocker:SetHeight(28)
-	gui.saves.blocker:SetPoint("LEFT", gui.saves.title, "LEFT", 0,0)
-	gui.saves.blocker:SetPoint("RIGHT", gui.saves.select, "RIGHT", 0,0)
-	gui.saves.blocker.TooltipText = "You must select a Searcher from the list on the left"
-	gui.saves.blocker:SetScript("OnEnter", showTooltipText )
-	gui.saves.blocker:SetScript("OnLeave", hideTooltip)
-	gui.saves.blocker:Hide()
-	
-	gui.saves.blocker.texture = gui.saves.blocker:CreateTexture()
-	gui.saves.blocker.texture:SetAllPoints(gui.saves.blocker)
-	gui.saves.blocker.texture:SetTexture(0,0,0,0.5)
-
-	gui.saves.filters.blocker = CreateFrame("Frame", nil, gui)
-	gui.saves.filters.blocker:EnableMouse(true)
-	gui.saves.filters.blocker:SetFrameStrata("DIALOG")
-	gui.saves.filters.blocker:SetPoint("CENTER", gui.saves.filters, "CENTER", 0,0)
-	gui.saves.filters.blocker:SetHeight(28)
-	gui.saves.filters.blocker:SetPoint("LEFT", gui.saves.filters.title, "LEFT", 0,0)
-	gui.saves.filters.blocker:SetPoint("RIGHT", gui.saves.filters.select, "RIGHT", 0,0)
-	gui.saves.filters.blocker.TooltipText = "You must select a Filter from the list on the left"
-	gui.saves.filters.blocker:SetScript("OnEnter", showTooltipText )
-	gui.saves.filters.blocker:SetScript("OnLeave", hideTooltip)
-	gui.saves.filters.blocker:Hide()
-	
-	gui.saves.filters.blocker.texture = gui.saves.filters.blocker:CreateTexture()
-	gui.saves.filters.blocker.texture:SetAllPoints(gui.saves.filters.blocker)
-	gui.saves.filters.blocker.texture:SetTexture(0,0,0,0.5)
-
-	gui.saves.filters.editblocker = CreateFrame("Frame", nil, gui)
-	gui.saves.filters.editblocker:EnableMouse(true)
-	gui.saves.filters.editblocker:SetFrameStrata("DIALOG")
-	gui.saves.filters.editblocker:SetPoint("CENTER", gui.saves.filters, "CENTER", 0,0)
-	gui.saves.filters.editblocker:SetHeight(20)
-	gui.saves.filters.editblocker:SetAllPoints(gui.saves.filters)
-	gui.saves.filters.editblocker.TooltipText = "You can only edit filters when you have selected a filter from the list on the left"
-	gui.saves.filters.editblocker:SetScript("OnEnter", showTooltipText )
-	gui.saves.filters.editblocker:SetScript("OnLeave", hideTooltip)
-	gui.saves.filters.editblocker:Show()
-	
-	gui.saves.filters.editblocker.texture = gui.saves.filters.editblocker:CreateTexture()
-	gui.saves.filters.editblocker.texture:SetAllPoints(gui.saves.filters.editblocker)
-	gui.saves.filters.editblocker.texture:SetTexture(0,0,0,0)
-	
-	-- gui.saves.reset = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
-	-- gui.saves.reset:SetPoint("LEFT", gui.saves.delete, "RIGHT", 10, 0)
-	-- gui.saves.reset:SetWidth(70)
-	-- gui.saves.reset:SetHeight(20)
-	-- gui.saves.reset:SetText("Reset")
-	-- gui.saves.reset:SetScript("OnClick", function()
-		-- if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
-			-- lib.ResetSearch()
-			-- print("All searchUI settings have been reset.")
-		-- else
-			-- print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
-		-- end
-	-- end)
+	gui.saves.reset = CreateFrame("Button", nil, gui.saves, "OptionsButtonTemplate")
+	gui.saves.reset:SetPoint("LEFT", gui.saves.delete, "RIGHT", 10, 0)
+	gui.saves.reset:SetWidth(70)
+	gui.saves.reset:SetHeight(20)
+	gui.saves.reset:SetText("Reset")
+	gui.saves.reset:SetScript("OnClick", function()
+		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
+			lib.ResetSearch()
+			print("All searchUI settings have been reset.")
+		else
+			print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
+		end
+	end)
 
 	function lib.UpdateControls()
 		if gui.sheet.selected then
@@ -1726,11 +1323,9 @@ function lib.MakeGuiConfig()
 			if private.data.bid then
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.bid)
 				gui.frame.bid:Enable()
-				gui.frame.bidbox:Show()
 			else
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, 0)
 				gui.frame.bid:Disable()
-				gui.frame.bidbox:Hide()
 			end
 		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable
 			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < ceil(private.data.curbid*1.05) then
@@ -1742,7 +1337,6 @@ function lib.MakeGuiConfig()
 		if private.data.buyout and (private.data.buyout > 0) and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
 			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
 			gui.frame.bid:Disable()
-			gui.frame.bidbox:Hide()
 		end
 		gui.frame.purchase.updateEnable()
 	end
@@ -1851,7 +1445,7 @@ function lib.MakeGuiConfig()
 	end
 
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
-	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 80)
+	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 50)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 	gui.Search:SetFrameLevel(11)
@@ -1867,22 +1461,7 @@ function lib.MakeGuiConfig()
 		end
 	end
 
-	--rescan AH button.
-	gui.Rescan = CreateFrame("Button", "AucSearchUISearchButton", gui, "UIPanelCloseButton")
-	gui.Rescan:Show()
-	gui.Rescan:SetWidth(20)
-	gui.Rescan:SetHeight(20)
-	gui.Rescan:SetNormalTexture("Interface\\ICONS\\Ability_Creature_Cursed_04")
-	gui.Rescan:SetPoint("LEFT", gui.Search, "RIGHT", 5, 0)
-	gui.Rescan:Hide()
-	gui.Rescan.TooltipText = "Refresh the Auction House snapshot, then search"
-	gui.Rescan:SetScript("OnEnter", showTooltipText)
-	gui.Rescan:SetScript("OnLeave", hideTooltip)	
-	--animation
-	gui.Rescan.frame = CreateFrame("Cooldown", nil, gui.Rescan, "CooldownFrameTemplate")
-	gui.Rescan.frame:SetAllPoints(gui.Rescan)
-			
-	
+
 	gui:AddCat("Welcome")
 
 	id = gui:AddTab("About")
@@ -1923,29 +1502,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",          0,    "Integration")
 	gui:AddControl(id, "Checkbox",          0, 1, "global.createtab", "Create tab in auction house (requires restart)")
 
---	gui:SetScript("OnKeyDown", lib.UpdateControls) --Why are we intercepting all keystrokes, this affects other addons that are not in dialog level
+	gui:SetScript("OnKeyDown", lib.UpdateControls)
 
-	id = gui:AddTab("Profiles")
-
-	--gui:AddControl(id, "Header",     0,    _TRANS('TODO')) --"Setup, Configure and Edit Profiles"
-	-- gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_ActivateProfile')) --"Activate a current profile"
-	-- gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile")
-	-- gui:AddTip(id, _TRANS('ADV_Help_ActivateProfile')) --"Select the profile that you wish to use for this character"
-
-	-- gui:AddControl(id, "Button",     0, 1, "profile.delete", _TRANS('ADV_Interface_Delete')) --"Delete"
-	-- gui:AddTip(id, _TRANS('ADV_Help_DeleteProfile')) --"Deletes the currently selected profile"
-	-- gui:AddControl(id, "Button",     0, 1, "profile.default", _TRANS("ADV_Interface_ResetProfile")) --"Reset"
-	-- gui:AddTip(id, _TRANS('ADV_HelpTooltip_ResetProfile')) --"Reset all settings in the current profile to the default values"
-
-	-- gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_CreateProfile')) --"Create or replace a profile"
-	-- gui:AddControl(id, "Text",       0, 1, "profile.name", _TRANS('ADV_Interface_ProfileName')) --"New profile name:"
-	-- gui:AddTip(id, _TRANS('ADV_Help_ProfileName')) --"Enter the name of the profile that you wish to create"
-
-	-- gui:AddControl(id, "Button",     0, 1, "profile.save", _TRANS('ADV_Interface_NewProfile')) --"New"
-	-- gui:AddTip(id, _TRANS('ADV_HelpTooltip_NewProfile')) --"Create or overwrite a profile with the specified profile name. All settings will be reset to the default values."
-	-- gui:AddControl(id, "Button",     0, 1, "profile.duplicate", _TRANS("ADV_Interface_CopyProfile")) --"Copy"
-	-- gui:AddTip(id, _TRANS('ADV_HelpTooltip_CopyProfile')) --"Create or overwrite a profile with the specified profile name. All settings will be copied from the current profile.")
-	
 	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
 	gui.frame.purchase:SetText("Purchase")
@@ -1988,7 +1546,7 @@ function lib.MakeGuiConfig()
 
 
 	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.notnow:SetPoint("TOP", gui.frame.purchase, "BOTTOM", 0, -2)
+	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 260, 35)
 	gui.frame.notnow:SetText("Not Now")
 	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
 	gui.frame.notnow:Disable()
@@ -1997,7 +1555,7 @@ function lib.MakeGuiConfig()
 	gui.frame.notnow:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignore:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 280, 0)
+	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 400, 35)
 	gui.frame.ignore:SetText("Ignore Price")
 	gui.frame.ignore:SetScript("OnClick", private.ignore)
 	gui.frame.ignore:Disable()
@@ -2006,7 +1564,7 @@ function lib.MakeGuiConfig()
 	gui.frame.ignore:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.ignoreperm = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignoreperm:SetPoint("TOP", gui.frame.ignore, "BOTTOM",0 , -2)
+	gui.frame.ignoreperm:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 490, 35)
 	gui.frame.ignoreperm:SetText("Ignore")
 	gui.frame.ignoreperm:SetScript("OnClick", private.ignoreperm)
 	gui.frame.ignoreperm:Disable()
@@ -2016,32 +1574,15 @@ function lib.MakeGuiConfig()
 
 	gui.frame.snatch = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.snatch:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 630, 35)
-	gui.frame.snatch:SetText("Snatch to..")
+	gui.frame.snatch:SetText("Snatch")
 	gui.frame.snatch:SetScript("OnClick", private.snatch)
 	gui.frame.snatch:Disable()
 	gui.frame.snatch.TooltipText = "Add selected auction to snatch list"
 	gui.frame.snatch:SetScript("OnEnter", showTooltipText)
 	gui.frame.snatch:SetScript("OnLeave", hideTooltip)
-	--select box for where the snatch will be added
-	gui.frame.snatch.selectbox = SelectBox:Create("SearchUiSnatchSelect", gui.frame.snatch, 80, 
-									function(pos, key, value) gui.frame.snatch.selectbox:SetText(value) end,
-									function ()
-											local saves = AucAdvancedData.UtilSearchUiData.SavedSearches["Snatch"]
-											local items = {}
-											if (saves) then
-												for name, sdata in keyPairs(saves) do
-													tinsert(items, name)
-												end
-											end
-											return items
-										end, 
-									"")
-
-	gui.frame.snatch.selectbox:SetPoint("LEFT", gui.frame.snatch, "RIGHT", -15, -2)
-	
 
 	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.clear:SetPoint("TOP", gui.Search, "BOTTOM", 0, -5)
+	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 10)
 	gui.frame.clear:SetText("Clear")
 	gui.frame.clear:SetScript("OnClick", private.removeall)
 	gui.frame.clear:Enable()
@@ -2090,7 +1631,7 @@ function lib.MakeGuiConfig()
 	gui.frame.cancel.label:SetJustifyH("LEFT")
 
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.buyout:SetPoint("LEFT", gui.frame.notnow, "RIGHT", 5, 0)
+	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
 	gui.frame.buyout:SetText("Buyout")
 	gui.frame.buyout:SetScript("OnClick", private.buyauction)
 	gui.frame.buyout:Disable()
@@ -2099,11 +1640,11 @@ function lib.MakeGuiConfig()
 	gui.frame.buyout:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.buyoutbox = gui.frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	gui.frame.buyoutbox:SetPoint("LEFT", gui.frame.buyout, "RIGHT", 0, 0)
+	gui.frame.buyoutbox:SetPoint("BOTTOMRIGHT", gui.frame.buyout, "BOTTOMLEFT", -4, 4)
 	gui.frame.buyoutbox:SetWidth(100)
 
 	gui.frame.bid = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.bid:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 5, 0)
+	gui.frame.bid:SetPoint("BOTTOMRIGHT", gui.frame.buyoutbox, "BOTTOMLEFT", -10, -4)
 	gui.frame.bid:SetText("Bid")
 	gui.frame.bid:SetScript("OnClick", private.bidauction)
 	gui.frame.bid:Disable()
@@ -2112,7 +1653,7 @@ function lib.MakeGuiConfig()
 	gui.frame.bid:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
-	gui.frame.bidbox:SetPoint("LEFT", gui.frame.bid, "RIGHT", 10, 2)
+	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
 	MoneyInputFrame_SetOnValueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
 
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
@@ -2228,23 +1769,12 @@ if LibStub then
 end
 
 function private.FindSearcher(item)
-	if not gui or not gui.config.selectedTab then
+	if not gui.config.selectedTab then
 		return
 	end
 	for name, searcher in pairs(lib.Searchers) do
 		if searcher and searcher.tabname and searcher.tabname == gui.config.selectedTab and searcher.Search then
 			return searcher, name
-		end
-	end
-end
-
-function private.FindFilter(item)
-	if not gui or not gui.config.selectedTab then
-		return
-	end
-	for name, filter in pairs(lib.Filters) do
-		if filter and filter.tabname and filter.tabname == gui.config.selectedTab and filter.Filter then
-			return filter, name
 		end
 	end
 end
@@ -2523,21 +2053,6 @@ function private.OnUpdate(self, elapsed)
 	if flagScanStats then
 		flagScanStats = false
 		lib.NotifyCallbacks("postscanupdate")
-	end
-	
-	if flagRescan and private.gui and private.gui.Rescan.frame:IsShown() then
-		--if scan still in progress, keep the button churnin'
-		if flagRescan + 2.5 < GetTime() then
-			CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 2, 1)
-			flagRescan = GetTime()
-		end
-		--are we finished scanning
-		if private.gui.AuctionFrame and private.gui.AuctionFrame.scanscount.last == 0 then
-			flagRescan = nil
-			CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 0, 0)
-			private.gui.Search:Enable()
-			lib.PerformSearch()
-		end	
 	end
 end
 

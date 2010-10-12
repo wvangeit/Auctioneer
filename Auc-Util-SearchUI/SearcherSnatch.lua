@@ -109,8 +109,6 @@ function lib:MakeGuiConfig(gui)
 	--Add Drag slot / Item icon
 	frame = gui.tabs[id].content
 	private.frame = frame
-	
-	private.FR = gui.tabs[id]
 
 	--Create the snatch list results frame
 	frame.snatchlist = CreateFrame("Frame", nil, frame)
@@ -166,8 +164,6 @@ function lib:MakeGuiConfig(gui)
 		{ "%", "NUMBER", 25 },
 		{ "Buy each", "COIN", 70},
 		{ "Valuation", "COIN", 70 },
-		{ "Amount", "NUMBER", 70 },
-		{ "Reason", "TEXT", 70 },
 		})
 
 	--Processor function for all scrollframe events for this frame
@@ -240,15 +236,7 @@ function lib:MakeGuiConfig(gui)
 			frame.money:SetAlpha(1)
 		end
 	end)
-	frame.pctBox:SetScript("OnEnterPressed", function(self) 
-								local text = self:GetText()
-								if text ~= "" and tonumber(text) > 0 then 
-									lib.AddSnatch(private.workingItemLink, nil, text) 
-								end	
-								EditBox_ClearFocus(self) 								
-							end)
-	
-	
+
 	frame.pctBox.help = frame.pctBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.pctBox.help:SetPoint("LEFT", frame.pctBox, "RIGHT", 0, 0)
 	frame.pctBox.help:SetWidth(130)
@@ -291,7 +279,7 @@ function lib:MakeGuiConfig(gui)
 							end)
 	frame.resetList:SetScript("OnEnter", function() lib.buttonTooltips( frame.resetList, "Shift+Ctrl+Alt Click to remove all items from the snatch list") end)
 	frame.resetList:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	
+
 	-- Normal GUI controls
 	-- Anchored to the hidden "Note" control we added earlier
 	gui:AddControl(id, "Subhead",0, "Snatch search settings:")
@@ -423,10 +411,6 @@ end
 
 function private.OnClickSnatch(button, row, index)
 	local link = frame.snatchlist.sheet.rows[row][index]:GetText()
-	if IsShiftKeyDown() then
-		ChatEdit_InsertLink(link)
-		return
-	end
 	--lib.SetWorkingItem(link) handles the job of checking that link is valid
 	lib.SetWorkingItem(link)
 end
@@ -503,16 +487,6 @@ function lib.Search(item)
 		end
 	end
 	return false, "Not in snatch list"
-end
---Rescan is an optional method a searcher can implement that allows it to queue a rescan of teh ah
---Just pass any itemlinks you want rescaned
-function lib.Rescan()
-	for itemsig, iteminfo in pairs(private.snatchList) do
-		local link = iteminfo.link
-		if link then
-			AucSearchUI.RescanAuctionHouse(link)
-		end
-	end
 end
 
 --[[Snatch GUI functinality code]]
@@ -633,14 +607,12 @@ function private.refreshDisplay()
 		else
 			price = iteminfo.price
 		end
-		tinsert(Data, {iteminfo.link, iteminfo.percent or 0, price, market, 1, "shits and giggles"})
+		tinsert(Data, {iteminfo.link, iteminfo.percent or 0, price, market})
 	end
 	frame.snatchlist.sheet:SetData(Data, Style)
 
 	--update "help" text to display current
 	frame.pctBox.help:SetText(format("Buy as percent of %s value", get("snatch.price.model") or "market") )
 end
-
-
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
