@@ -1502,7 +1502,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",          0,    "Integration")
 	gui:AddControl(id, "Checkbox",          0, 1, "global.createtab", "Create tab in auction house (requires restart)")
 
-	gui:SetScript("OnKeyDown", lib.UpdateControls)
+	--gui:SetScript("OnKeyDown", lib.UpdateControls)
 
 	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
