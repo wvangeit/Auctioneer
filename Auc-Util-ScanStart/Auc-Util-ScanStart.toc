@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Scan Start
-## Interface: 30300
+## Interface: 40000
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
@@ -7,5 +7,6 @@
 ## URL: http://auctioneeraddon.com/
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer
+## X-Max-Interface: 40000
 ##
 Embed.xml
