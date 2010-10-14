@@ -316,7 +316,7 @@ function private.SetupConfigGui(gui)
 	private.id = id
 	private.frame = frame
 
-	function frame.SetButtonTooltip(text)
+	function frame.SetButtonTooltip(this, text)
 		if text and get("util.appraiser.buttontips") then
 			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
 			GameTooltip:SetText(text)
@@ -495,7 +495,7 @@ function private.SetupConfigGui(gui)
 	frame.refreshButton:SetWidth(110)
 	frame.refreshButton:SetText("Scan Glyphs")
 	frame.refreshButton:SetScript("OnClick", function() private.refreshAll() end)
-	frame.refreshButton:SetScript("OnEnter", function() return frame.SetButtonTooltip("Click to do a category scan on glyphs, refreshing Auctioneers image of all glyphs.") end)
+	frame.refreshButton:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, "Click to do a category scan on glyphs, refreshing Auctioneers image of all glyphs.") end)
 	frame.refreshButton:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -503,7 +503,7 @@ function private.SetupConfigGui(gui)
 	frame.searchButton:SetWidth(110)
 	frame.searchButton:SetText("Get Profitable")
 	frame.searchButton:SetScript("OnClick", function() private.findGlyphs() end)
-	frame.searchButton:SetScript("OnEnter", function() return frame.SetButtonTooltip("Click to get profitable glyphs.") end)
+	frame.searchButton:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, "Click to get profitable glyphs.") end)
 	frame.searchButton:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	frame.skilletButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
@@ -511,7 +511,7 @@ function private.SetupConfigGui(gui)
 	frame.skilletButton:SetWidth(110)
 	frame.skilletButton:SetText("Add to Skill")
 	frame.skilletButton:SetScript("OnClick", function() private.addtoCraft() end)
-	frame.skilletButton:SetScript("OnEnter", function() return frame.SetButtonTooltip("Click to add profitable glyphs from the list to Skillet.") end)
+	frame.skilletButton:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, "Click to add profitable glyphs from the list to Skillet.") end)
 	frame.skilletButton:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 
 	--Create the glyph list results frame
@@ -910,7 +910,7 @@ function private.cofindGlyphs()
 							qtyInk = qtyInk + (addInk * make)
 						else
 							local mess = "Skipping " .. link .. ": failedratio = " .. failedratio .. " (failed: " .. failed .. " / sold: " .. bcSold .. ")"
-							DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
+							print(mess)
 						end
 					end
 				end
