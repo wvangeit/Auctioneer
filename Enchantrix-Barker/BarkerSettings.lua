@@ -137,6 +137,7 @@ local settingDefaults = {
 	['barker.factor_stat.agility'] = 70,
 	['barker.factor_stat.strength'] = 70,
 	['barker.factor_stat.spirit'] = 45,
+	['barker.factor_stat.resilience'] = 45,
 	['barker.factor_stat.all'] = 75,
 	['barker.factor_stat.armor'] = 65,
 	['barker.factor_stat.fireRes'] = 85,
@@ -197,6 +198,8 @@ local function getDefault(setting)
 	-- no idea what this setting is, so log it for debugging purposes
 	if (result == nil) then
 		Barker.Util.DebugPrint("GetDefault", ENX_INFO, "Unknown key", "default requested for unknown key:" .. setting)
+--		self:GetID() -- crash and get me a stack trace
+--		this:GetID() -- crash and get me a stack trace
 	end
 
 	return result
@@ -402,6 +405,7 @@ local function gsc(value)
 	return tooltip:Coins(value)
 end
 
+-- ccox - this doesn't appear to be getting used!
 function lib.MakeGuiConfig()
 	if gui then return end
 
@@ -463,6 +467,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.spirit", 0, 100, 1, "Spirit priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.armor", 0, 100, 1, "Armor priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.all", 0, 100, 1, "All Stats priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.resilience", 0, 100, 1, "Resilience priority: %d%%")
 
 	id = gui.AddTab("Resist, Enhance")
 	gui.AddControl(id, "Header",         0,    "Barker options (continued)")

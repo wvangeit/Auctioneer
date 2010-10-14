@@ -146,76 +146,6 @@ function round(m, n, base, offset)
 end
 
 
----------------------
--- Debug functions --
----------------------
-
--- profiler:Start()
--- Record start time and memory, set state to running
-local function _profilerStart(this)
-	this.t = GetTime()
-	this.m = gcinfo()
-	this.r = true
-end
-
--- profiler:Stop()
--- Record time and memory change, set state to stopped
-local function _profilerStop(this)
-	this.m = (gcinfo()) - this.m
-	this.t = GetTime() - this.t
-	this.r = false
-end
-
--- profiler:DebugPrint()
-local function _profilerDebugPrint(this)
-	if this.n then
-		Barker.Util.DebugPrintQuick("Profiler ["..this.n.."]")
-	else
-		Barker.Util.DebugPrintQuick("Profiler")
-	end
-	if this.r == nil then
-		Barker.Util.DebugPrintQuick("  Not started")
-	else
-		Barker.Util.DebugPrintQuick(("  Time: %0.3f s"):format(this:Time()))
-		Barker.Util.DebugPrintQuick(("  Mem: %0.0f KiB"):format(this:Mem()))
-		if this.r then
-			Barker.Util.DebugPrintQuick("  Running...")
-		end
-	end
-end
-
--- time = profiler:Time()
--- Return time (in seconds) from Start() [until Stop(), if stopped]
-local function _profilerTime(this)
-	if this.r == false then
-		return this.t
-	elseif this.r == true then
-		return GetTime() - this.t
-	end
-end
-
--- mem = profiler:Mem()
--- Return memory change (in kilobytes) from Start() [until Stop(), if stopped]
-local function _profilerMem(this)
-	if this.r == false then
-		return this.m
-	elseif this.r == true then
-		return (gcinfo()) - this.m
-	end
-end
-
--- profiler = Barker.Util.CreateProfiler("foobar")
-function createProfiler(name)
-	return {
-		Start = _profilerStart,
-		Stop = _profilerStop,
-		DebugPrint = _profilerDebugPrint,
-		Time = _profilerTime,
-		Mem = _profilerMem,
-		n = name,
-	}
-end
-
 Barker.Util = {
 	Revision			= "$Revision$",
 
@@ -225,8 +155,6 @@ Barker.Util = {
 
 	Round				= round,
 	RoundUp				= roundUp,
-
-	CreateProfiler		= createProfiler,
 }
 
 

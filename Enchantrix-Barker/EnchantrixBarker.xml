@@ -39,7 +39,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Size>
 		<Scripts>
 			<OnClick>
-				Enchantrix_BarkerOptions_OnClick();
+				Enchantrix_BarkerOptions_OnClick(self);
 			</OnClick>
 		</Scripts>
 	</Button>
@@ -47,7 +47,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Button name="Enchantrix_BarkerOptions_TradeTab" inherits="CharacterFrameTabButtonTemplate" id="1" text="Trade Barker">
 		<Scripts>
 			<OnClick>
-				Enchantrix_BarkerOptions_OnClick();
+				Enchantrix_BarkerOptions_OnClick(self);
 			</OnClick>
 		</Scripts>
 	</Button>
@@ -58,7 +58,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Size>
 		<Scripts>
 			<OnValueChanged> <!-- we need to update the text on value change -->
-				EnchantrixBarker_OptionsSlider_OnValueChanged();
+				EnchantrixBarker_OptionsSlider_OnValueChanged(self);
 			</OnValueChanged>
 		</Scripts>
 	</Slider>
@@ -68,14 +68,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnClick>
 				PlaySound("igCharacterInfoTab");
 				
-				if select(4, GetBuildInfo() ) >= 30000 then
-					local frame = self:GetParent()
-					PanelTemplates_SetTab(frame, this:GetID());
-				else
-					PanelTemplates_Tab_OnClick(Enchantrix_BarkerOptions_Frame);
-				end
+				local frame = self:GetParent()
+				PanelTemplates_SetTab(frame, self:GetID());
 				
-				Enchantrix_BarkerOptions_Tab_OnClick();
+				Enchantrix_BarkerOptions_Tab_OnClick(self);
 			</OnClick>
 		</Scripts>
 	</Button>
@@ -196,7 +192,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Enchantrix_BarkerOnClick();
+						Enchantrix_BarkerOnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -214,7 +210,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Enchantrix_BarkerOptions_TestButton_OnClick();
+						Enchantrix_BarkerOptions_TestButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -232,7 +228,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Enchantrix_BarkerOptions_ResetButton_OnClick();
+						Enchantrix_BarkerOptions_ResetButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -255,7 +251,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						dropDownMenuInitialize(self,Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize);
 					</OnLoad>
 					<OnClick>
-						Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick();
+						Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Frame>
@@ -413,10 +409,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<Scripts>
 			<OnLoad>
 				EnchantrixBarker_OnLoad();
-				this:RegisterEvent("CRAFT_SHOW")
-				this:RegisterEvent("CRAFT_CLOSE")
-				this:RegisterEvent("TRADE_SKILL_SHOW")
-				this:RegisterEvent("TRADE_SKILL_CLOSE")
+				self:RegisterEvent("CRAFT_SHOW")
+				self:RegisterEvent("CRAFT_CLOSE")
+				self:RegisterEvent("TRADE_SKILL_SHOW")
+				self:RegisterEvent("TRADE_SKILL_CLOSE")
 			</OnLoad>
 			<OnEvent>
 				EnchantrixBarker_OnEvent();

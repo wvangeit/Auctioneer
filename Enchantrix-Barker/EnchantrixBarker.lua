@@ -114,7 +114,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchArmor"), key = "factor_stat.armor", print = _BARKLOC("ShortArmor") },						-- too general, has to come near last
-
+	{ search = _BARKLOC("EnchSearchResilience"), key = "factor_stat.resilience", print = _BARKLOC("RESIL") },
 };
 
 --[[
@@ -186,57 +186,15 @@ function EnchantrixBarker_OnEvent()
 	if craftName and craftName == _BARKLOC('Enchanting') then
 		if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
 			if( Barker.Settings.GetSetting('barker') ) then
-				Enchantrix_BarkerDisplayButton:Show();
-				Enchantrix_BarkerDisplayButton.tooltipText = _BARKLOC('OpenBarkerWindow');
+				Enchantrix_BarkerOptions_TradeTab:Show();
+				Enchantrix_BarkerOptions_TradeTab.tooltipText = _BARKLOC('OpenBarkerWindow');
 			else
-				Enchantrix_BarkerDisplayButton:Hide();
-				Enchantrix_BarkerOptions_Frame:Hide();
+				Enchantrix_BarkerOptions_TradeTab:Hide();
 			end
 		end
 	elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
 		-- we are closing, or it's a different craft/trade, hide the button and frame
-		Enchantrix_BarkerDisplayButton:Hide();
-		Enchantrix_BarkerOptions_Frame:Hide();
-	end
-
-
-	-- ccox - WoW 3.0 - Tradeskill Window no longer has space for the button
-	if select(4, GetBuildInfo() ) >= 30000 then
-		if craftName and craftName == _BARKLOC('Enchanting') then
-			if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
-				if( Barker.Settings.GetSetting('barker') ) then
-					Enchantrix_BarkerOptions_TradeTab:Show();
-					Enchantrix_BarkerOptions_TradeTab.tooltipText = _BARKLOC('OpenBarkerWindow');
-				else
-					Enchantrix_BarkerOptions_TradeTab:Hide();
-					Enchantrix_BarkerOptions_TradeTab:Hide();
-				end
-			end
-		elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
-			-- we are closing, or it's a different craft/trade, hide the button and frame
-			Enchantrix_BarkerOptions_TradeTab:Hide();
-			Enchantrix_BarkerOptions_TradeTab:Hide();
-		end
-	end
-
-
-	-- ccox - WoW 3.0 - Tradeskill Window no longer has space for the button
-	if select(4, GetBuildInfo() ) >= 30000 then
-		if craftName and craftName == _BARKLOC('Enchanting') then
-			if( event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW") then
-				if( Barker.Settings.GetSetting('barker') ) then
-					Enchantrix_BarkerOptions_TradeTab:Show();
-					Enchantrix_BarkerOptions_TradeTab.tooltipText = _BARKLOC('OpenBarkerWindow');
-				else
-					Enchantrix_BarkerOptions_TradeTab:Hide();
-					Enchantrix_BarkerOptions_TradeTab:Hide();
-				end
-			end
-		elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
-			-- we are closing, or it's a different craft/trade, hide the button and frame
-			Enchantrix_BarkerOptions_TradeTab:Hide();
-			Enchantrix_BarkerOptions_TradeTab:Hide();
-		end
+		Enchantrix_BarkerOptions_TradeTab:Hide();
 	end
 	
 end
@@ -245,7 +203,7 @@ function Enchantrix_BarkerOptions_OnShow()
 	Enchantrix_BarkerOptions_ShowFrame(1);
 end
 
-function Enchantrix_BarkerOnClick()
+function Enchantrix_BarkerOnClick(self)
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName( _BARKLOC("TradeChannel") ) ;
 	--Barker.Util.DebugPrintQuick("Attempting to send barker ", barker, " Trade Channel ID ", id)
@@ -254,8 +212,6 @@ function Enchantrix_BarkerOnClick()
 		if (barker) then
 			SendChatMessage(barker,"CHANNEL", GetDefaultLanguage("player"), id);
 		end
-	else
-		Barker.Util.ChatPrint( _BARKLOC("BarkerNotTradeZone") );
 	end
 end
 
@@ -287,27 +243,14 @@ local function craftUILoaded()
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
 		useFrame = ATSWFrame;
 	end
-	
-	-- ccox - WoW 3.0 - the tradskill window no longer has room for the barker button
-	if select(4, GetBuildInfo() ) >= 30000 then
-		Enchantrix_BarkerOptions_TradeTab:SetParent(useFrame);
-		if (ATSWFrame ~= nil) then
-			-- this works for ATSW
-			Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 15 );
-		else
-			-- and this works for the WoW 3.0 trade Window
-			Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 75 );
-		end
+
+	Enchantrix_BarkerOptions_TradeTab:SetParent(useFrame);
+	if (ATSWFrame ~= nil) then
+		-- this works for ATSW
+		Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 15 );
 	else
-		Enchantrix_BarkerDisplayButton:SetParent(useFrame);
-	
-		if (ATSWFrame ~= nil) then
-			-- this works for ATSW
-			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
-		else
-			-- and this works for the WoW 2.1 trade Window
-			Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -68 );
-		end
+		-- and this works for the WoW 4.0 trade Window
+		Enchantrix_BarkerOptions_TradeTab:SetPoint("TOPLEFT", useFrame, "BOTTOMLEFT", 10, 2 );		-- was 10, 75
 	end
 
 	-- skillet has an API to add buttons
@@ -349,12 +292,12 @@ function Enchantrix_BarkerOptions_SetDefaults()
 	end
 end
 
-function Enchantrix_BarkerOptions_ResetButton_OnClick()
+function Enchantrix_BarkerOptions_ResetButton_OnClick(self)
 	-- reset all slider values
 	Enchantrix_BarkerOptions_SetDefaults();
 end
 
-function Enchantrix_BarkerOptions_TestButton_OnClick()
+function Enchantrix_BarkerOptions_TestButton_OnClick(self)
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName( _BARKLOC("TradeChannel") )
 	--Barker.Util.DebugPrintQuick("Attempting to send test barker ", barker, "Trade Channel ID ", id)
@@ -363,23 +306,15 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 		if (barker) then
 			Barker.Util.ChatPrint(barker);
 		end
-	else
-		Barker.Util.ChatPrint( _BARKLOC("BarkerNotTradeZone") );
 	end
 end
 
 function Enchantrix_BarkerOptions_Factors_Slider_GetValue(id)
-	if (not id) then
-		id = this:GetID();
-	end
 	return Enchantrix_BarkerGetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key);
 end
 
-function Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged(id)
-	if (not id) then
-		id = this:GetID();
-	end
-	Enchantrix_BarkerSetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key, this:GetValue());
+function Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged(self)
+	Enchantrix_BarkerSetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].key, self:GetValue());
 end
 
 Enchantrix_BarkerOptions_ActiveTab = -1;
@@ -653,6 +588,17 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
+				name = _BARKLOC('BarkerOptionsResiliencePriority'),
+				tooltip = _BARKLOC('BarkerOptionsResiliencePriorityTooltip'),
+				units = 'percentage',
+				min = 0,
+				max = 100,
+				step = 1,
+				key = 'factor_stat.resilience',
+				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+			},
+			{
 				name = _BARKLOC('BarkerOptionsAllStatsPriority'),
 				tooltip = _BARKLOC('BarkerOptionsAllStatsPriorityTooltip'),
 				units = 'percentage',
@@ -782,16 +728,16 @@ Enchantrix_BarkerOptions_TabFrames = {
 	}
 };
 
-function EnchantrixBarker_OptionsSlider_OnValueChanged()
+function EnchantrixBarker_OptionsSlider_OnValueChanged(self)
 	if Enchantrix_BarkerOptions_ActiveTab ~= -1 then
-		--Barker.Util.ChatPrint( "Tab - Slider changed: "..Enchantrix_BarkerOptions_ActiveTab..' - '..this:GetID() );
-		Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].valuechanged();
-		value = this:GetValue();
-		--Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].getvalue();
+		--Barker.Util.ChatPrint( "Tab - Slider changed: "..Enchantrix_BarkerOptions_ActiveTab..' - '..self:GetID() );
+		Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].valuechanged(self);
+		value = self:GetValue();
+		--Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].getvalue();
 
-		valuestr = EnchantrixBarker_OptionsSlider_GetTextFromValue( value, Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].units );
+		valuestr = EnchantrixBarker_OptionsSlider_GetTextFromValue( value, Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].units );
 
-		getglobal(this:GetName().."Text"):SetText(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].name.." - "..valuestr );
+		getglobal(self:GetName().."Text"):SetText(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].name.." - "..valuestr );
 	end
 end
 
@@ -814,10 +760,9 @@ function EnchantrixBarker_OptionsSlider_GetTextFromValue( value, units )
 	return valuestr;
 end
 
-function Enchantrix_BarkerOptions_Tab_OnClick()
-	--Barker.Util.ChatPrint( "Clicked Tab: "..this:GetID() );
-	Enchantrix_BarkerOptions_ShowFrame( this:GetID() )
-
+function Enchantrix_BarkerOptions_Tab_OnClick(self)
+	--Barker.Util.ChatPrint( "Clicked Tab: "..self:GetID() );
+	Enchantrix_BarkerOptions_ShowFrame( self:GetID() )
 end
 
 function Enchantrix_BarkerOptions_Refresh()
@@ -858,7 +803,7 @@ function Enchantrix_BarkerOptions_ShowFrame( frame_index )
 	end
 end
 
-function Enchantrix_BarkerOptions_OnClick()
+function Enchantrix_BarkerOptions_OnClick(self)
 	--Barker.Util.ChatPrint("You pressed the options button." );
 	--showUIPanel(Enchantrix_BarkerOptions_Frame);
 	if not Enchantrix_BarkerOptions_Frame:IsShown() then
@@ -877,154 +822,19 @@ end
 function Enchantrix_CheckButton_OnLeave()
 end
 
---[[
-function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
-
-		local dropdown = this:GetParent();
-		local frame = dropdown:GetParent();
-
-		ChnPtyBtn		= {};
-		ChnPtyBtn.text	= _BARKLOC('ChannelParty');
-		ChnPtyBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnPtyBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnPtyBtn)
-
-		ChnRdBtn		= {};
-	    ChnRdBtn.text	= _BARKLOC('ChannelRaid');
-		ChnRdBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnRdBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnRdBtn)
-
-		ChnGldBtn		= {};
-		ChnGldBtn.text	= _BARKLOC('ChannelGuild');
-		ChnGldBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnGldBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnGldBtn)
-
-		ChnTlRBtn		= {};
-		ChnTlRBtn.text	= _BARKLOC('ChannelTellRec');
-		ChnTlRBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnTlRBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnTlRBtn)
-
-		ChnTlSBtn		= {};
-		ChnTlSBtn.text	= _BARKLOC('ChannelTellSent');
-		ChnTlSBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnTlSBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnTlSBtn)
-
-		ChnSayBtn		= {};
-		ChnSayBtn.text	= _BARKLOC('ChannelSay');
-		ChnSayBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		ChnSayBtn.owner	= dropdown
-		UIDropDownMenu_AddButton(ChnSayBtn)
-
-		local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
-		local ZoneName = GetRealZoneText();
-
-		for i = 1, table.getn(chanlist) do
-			id, channame = GetChannelName(i);
-
-			if ((channame) and  (channame ~= (_BARKLOC('ChannelGeneral')..ZoneName)) and
-			 (channame ~= (_BARKLOC('ChannelLocalDefense')..ZoneName)) and (channame ~= _BARKLOC('ChannelWorldDefense')) and
-			 (channame ~= _BARKLOC('ChannelGuildRecruitment')) and (channame ~= _BARKLOC('ChannelBlock1')) ) then
-					info	= {};
-				info.text	= channame;
-				info.value	= i;
-				info.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-				info.owner	= dropdown;
-				UIDropDownMenu_AddButton(info)
-			end
-       end
-end
-
-function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick()
-       ToggleDropDownMenu(1, nil, Enchantrix_BarkerOptions_ChanFilterDropDown, "cursor");
-end
-
--- The following is shamelessly lifted from auctioneer/UserInterace/AuctioneerUI.lua
--------------------------------------------------------------------------------
--- Wrapper for UIDropDownMenu_Initialize() that sets 'this' before calling
--- UIDropDownMenu_Initialize().
--------------------------------------------------------------------------------
-function dropDownMenuInitialize(dropdown, func)
-	-- Hide all the buttons to prevent any calls to Hide() inside
-	-- UIDropDownMenu_Initialize() which will screw up the value of this.
-	local button, dropDownList;
-	for i = 1, UIDROPDOWNMENU_MAXLEVELS, 1 do
-		dropDownList = getglobal("DropDownList"..i);
-		if ( i >= UIDROPDOWNMENU_MENU_LEVEL or dropdown:GetName() ~= UIDROPDOWNMENU_OPEN_MENU ) then
-			dropDownList.numButtons = 0;
-			dropDownList.maxWidth = 0;
-			for j=1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
-				button = getglobal("DropDownList"..i.."Button"..j);
-				button:Hide();
-			end
-		end
-	end
-
-	-- Call the UIDropDownMenu_Initialize() after swapping in a value for 'this'.
-	local oldThis = this;
-	this = getglobal(dropdown:GetName().."Button");
-	local newThis = this;
-	UIDropDownMenu_Initialize(dropdown, func);
-	-- Double check that the value of 'this' didn't change... this can screw us
-	-- up and prevent the reason for this method!
-	if (newThis ~= this) then
-		Barker.Util.DebugPrintQuick("WARNING: The value of this changed during dropDownMenuInitialize()")
-	end
-	this = oldThis;
-end
-
--------------------------------------------------------------------------------
--- Wrapper for UIDropDownMenu_SetSeletedID() that sets 'this' before calling
--- UIDropDownMenu_SetSelectedID().
--------------------------------------------------------------------------------
-function dropDownMenuSetSelectedID(dropdown, index)
-	local oldThis = this;
-	this = dropdown;
-	local newThis = this;
-	UIDropDownMenu_SetSelectedID(dropdown, index);
-	-- Double check that the value of 'this' didn't change... this can screw us
-	-- up and prevent the reason for this method!
-	if (newThis ~= this) then
-		Barker.Util.DebugPrintQuick("WARNING: The value of this changed during dropDownMenuSetSelectedID()")
-	end
-	this = oldThis;
-end
-
-function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
-	local index = this:GetID();
-	local dropdown = this.owner;
-
-	dropDownMenuSetSelectedID(dropdown, index);
-	Enchantrix_BarkerSetConfig("barker_chan", this:GetText())
-end
-]]
-
--- end UI code
 
 function Enchantrix_CreateBarker()
 
-	if (not EnchantrixBarker_BarkerGetZoneText()) then
+	--Barker.Util.DebugPrintQuick("CreateBarker started");
+
+	local zoneString = EnchantrixBarker_BarkerGetZoneText();
+	if (not zoneString) then
 		-- not in a recognized trade zone
+		Barker.Util.ChatPrint( _BARKLOC("BarkerNotTradeZone") );
 		return nil;
 	end
 	
-	local temp
-	if select(4, GetBuildInfo() ) >= 30000 then
-		temp = GetTradeSkillLine();
-	else
-		temp = GetCraftSkillLine(1);
-	end
-
-	local temp
-	if select(4, GetBuildInfo() ) >= 30000 then
-		temp = GetTradeSkillLine();
-	else
-		temp = GetCraftSkillLine(1);
-	end
-
+	local temp = GetTradeSkillLine();
 	if (not temp) then
 		-- trade skill window isn't open (how did this happen?)
 		Barker.Util.ChatPrint(_BARKLOC('BarkerEnxWindowNotOpen'));
@@ -1053,12 +863,7 @@ function Enchantrix_CreateBarker()
 
 		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded;
 
-		-- ccox - WoW 3.0 - API change, and return value change
-		if select(4, GetBuildInfo() ) >= 30000 then
-			craftName, craftType, numEnchantsAvailable, isExpanded = GetTradeSkillInfo(index);
-		else
-			craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-		end
+		craftName, craftType, numEnchantsAvailable, isExpanded = GetTradeSkillInfo(index);
 
 		if ( numEnchantsAvailable > 0 ) then -- user has reagents
 
@@ -1112,6 +917,7 @@ function Enchantrix_CreateBarker()
 		EnchantrixBarker_AddEnchantToBarker( element.enchant );
 	end
 
+	--Barker.Util.DebugPrintQuick("Barker string created");
 	return EnchantrixBarker_GetBarkerString();
 
 end
@@ -1222,9 +1028,10 @@ function EnchantrixBarker_ResetBarkerString()
 end
 
 function EnchantrixBarker_BarkerGetZoneText()
-	local result = short_location[GetZoneText()];
+	local zoneText = GetZoneText();
+	local result = short_location[zoneText];
 	if (not result) then
-		Barker.Util.DebugPrintQuick("Attempting to use barker in zone", GetZoneText() )
+		Barker.Util.DebugPrintQuick("Attempting to use barker in non-trade zone ", zoneText )
 	end
 	return result;
 end
@@ -1345,13 +1152,7 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 end
 
 function EnchantrixBarker_GetCraftDescription( index )
-
-	-- ccox - WoW 3.0 - API change
-	if select(4, GetBuildInfo() ) >= 30000 then
-		return GetTradeSkillDescription(index) or "";
-	else
-		return GetCraftDescription(index) or "";
-	end
+	return GetTradeSkillDescription(index) or "";
 end
 
 function Enchantrix_GetShortDescriptor( index )
@@ -1397,7 +1198,7 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 
 	for index,attribute in ipairs(attributes) do
 
-		--if (not attribute.search) then
+		--if (not attribute.search or not attribute.key) then
 		--	Barker.Util.DebugPrintQuick("bad attribute: ", index, attribute  );
 		--end
 
