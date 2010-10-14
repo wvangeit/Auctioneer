@@ -81,16 +81,16 @@ function chatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
 	local frameIndex = Barker.Settings.GetSetting('printframe');
 
 	if (cRed and cGreen and cBlue) then
-		if getglobal("ChatFrame"..frameIndex) then
-			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+		if _G["ChatFrame"..frameIndex] then
+			_G["ChatFrame"..frameIndex]:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 
 		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 		end
 
 	else
-		if getglobal("ChatFrame"..frameIndex) then
-			getglobal("ChatFrame"..frameIndex):AddMessage(text, 1.0, 0.5, 0.25);
+		if _G["ChatFrame"..frameIndex] then
+			_G["ChatFrame"..frameIndex]:AddMessage(text, 1.0, 0.5, 0.25);
 		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, 1.0, 0.5, 0.25);
 		end

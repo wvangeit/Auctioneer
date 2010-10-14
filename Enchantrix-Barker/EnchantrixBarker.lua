@@ -177,7 +177,7 @@ local function getGSC(money)
 	return g,s,c
 end
 
-function EnchantrixBarker_OnEvent()
+function EnchantrixBarker_OnEvent(event)
 
 	--Returns "Enchanting" for enchantwindow
 	local GetTradeLineFunc = GetCraftDisplaySkillLine or GetTradeSkillLine	-- ccox - WoW 3.0 - GetCraft routines are gone
@@ -737,7 +737,7 @@ function EnchantrixBarker_OptionsSlider_OnValueChanged(self)
 
 		valuestr = EnchantrixBarker_OptionsSlider_GetTextFromValue( value, Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].units );
 
-		getglobal(self:GetName().."Text"):SetText(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].name.." - "..valuestr );
+		_G[self:GetName().."Text"]:SetText(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[self:GetID()].name.." - "..valuestr );
 	end
 end
 
@@ -778,26 +778,26 @@ function Enchantrix_BarkerOptions_ShowFrame( frame_index )
 		if ( index == frame_index ) then
 			--Barker.Util.ChatPrint( "Showing Frame: "..index );
 			for i = 1,10 do
-				local slider = getglobal('EnchantrixBarker_OptionsSlider_'..i);
+				local slider = _G['EnchantrixBarker_OptionsSlider_'..i];
 				slider:Hide();
 			end
 			for i, opt in pairs(frame.options) do
 				local slidername = 'EnchantrixBarker_OptionsSlider_'..i
-				local slider = getglobal(slidername);
+				local slider = _G[slidername];
 				slider:SetMinMaxValues(opt.min, opt.max);
 				slider:SetValueStep(opt.step);
 				slider.tooltipText = opt.tooltip;
-				getglobal(slidername.."High"):SetText();
-				getglobal(slidername.."Low"):SetText();
+				_G[slidername.."High"]:SetText();
+				_G[slidername.."Low"]:SetText();
 				slider:Show();
 			end
 			Enchantrix_BarkerOptions_ActiveTab = index
 			for i, opt in pairs(frame.options) do
 				local slidername = 'EnchantrixBarker_OptionsSlider_'..i
-				local slider = getglobal(slidername);
+				local slider = _G[slidername];
 				local newValue = opt.getvalue(i);
 				slider:SetValue(newValue);
-				getglobal(slidername.."Text"):SetText(opt.name..' - '..EnchantrixBarker_OptionsSlider_GetTextFromValue(slider:GetValue(),opt.units));
+				_G[slidername.."Text"]:SetText(opt.name..' - '..EnchantrixBarker_OptionsSlider_GetTextFromValue(slider:GetValue(),opt.units));
 			end
 		end
 	end

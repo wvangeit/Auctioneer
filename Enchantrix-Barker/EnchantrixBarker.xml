@@ -415,7 +415,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				self:RegisterEvent("TRADE_SKILL_CLOSE")
 			</OnLoad>
 			<OnEvent>
-				EnchantrixBarker_OnEvent();
+				EnchantrixBarker_OnEvent(...);
 			</OnEvent>
 		</Scripts>
 	</Frame>
