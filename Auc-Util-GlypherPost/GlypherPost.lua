@@ -149,7 +149,7 @@ function private.SetupConfigGui(gui)
 
     frame.SetButtonTooltip = function(text)
         if text and get("util.appraiser.buttontips") then
-            GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
             GameTooltip:SetText(text)
         end
     end
