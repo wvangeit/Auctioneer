@@ -535,7 +535,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
-	gui:AddControl(id, "Selectbox", 0, 1, {always=_TRANS('ADV_Interface_mts_always'),alt=_TRANS('ADV_Interface_mts_alt'),noalt=_TRANS('ADV_Interface_mts_noalt'),never=_TRANS('ADV_Interface_mts_never')}, "ModTTShow")
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, { "alt" , _TRANS('ADV_Interface_mts_alt') },{ "noalt", _TRANS('ADV_Interface_mts_noalt') },{ "never", _TRANS('ADV_Interface_mts_never') }, }, "ModTTShow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"This option will hide Auctioneer's extra tooltip unless the Alt key is pressed"
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	
