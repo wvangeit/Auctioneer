@@ -1505,16 +1505,13 @@ local StorePageFunction = function()
 		end
 	end
 	if isGetAll then
-		local oldThis = this
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-			this = frame
 			local eventscript = frame:GetScript("OnEvent")
 			if eventscript then
-				pcall(eventscript, this, "AUCTION_ITEM_LIST_UPDATE")
+				pcall(eventscript, frame, "AUCTION_ITEM_LIST_UPDATE")
 			end
 		end
-		this = oldThis
 		EventFramesRegistered=nil
 	end
 
