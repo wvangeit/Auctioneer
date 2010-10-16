@@ -44,10 +44,6 @@ if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 
 local private = {}
 
-local _, internalStore = AucAdvanced.GetCoreModule() -- Don't need a module but do need the addon internal storage area.
-if not internalStore then return end -- Someone has explicitely broken us
-
-
 -- For our modular stats system, each stats engine should add their
 -- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
 -- data table in AucAdvancedData.Stats.<type><name>
@@ -64,8 +60,21 @@ local flagBlockTooltip = true
 function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, rlvl, itype, isubtype, stack, equiploc, texture)
 	if flagBlockTooltip then return end
 	if not tip then return end
-	if AucAdvanced.Settings.GetSetting("ModTTShow") and not IsAltKeyDown() then
-		return
+	if AucAdvanced.Settings.GetSetting("ModTTShow") then
+		if AucAdvanced.Settings.GetSetting("ModTTShow") == "never" then
+			return
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noalt" and IsAltDown() then
+			return
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "alt" and not IsAltDown() then
+			return
+		elseif not AucAdvanced.Settings.GetSetting("ModTTShow") == "alt" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "noalt" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "never" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "always" then
+			AucAdvanced.Settings.SetSetting("ModTTShow", "alt")
+			if not IsAltDown() then
+				return
+			end
+		end
+	else 
+		AucAdvanced.Settings.SetSetting("ModTTShow", "always")
 	end
 
 	tooltip:SetFrame(tip)
@@ -133,16 +142,25 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		end
 	end
 
-	AucAdvanced.SendProcessorMessage("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
+	for pos, engineLib in ipairs(modules) do
+		if (engineLib.Processor) then
+			-- TODO: Make these defaults configurable
+			tooltip:SetColor(0.3, 0.9, 0.8)
+			tooltip:SetMoneyAsText(false)
+			tooltip:SetEmbed(false)
+
+			engineLib.Processor("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
+		end
+	end
 	tooltip:ClearFrame(tip)
 end
 
 function private.ClickBagHook(hookParams, returnValue, self, button, ignoreShift)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-	
-	local bag = self:GetParent():GetID()
-	local slot = self:GetID()
+
+	local bag = this:GetParent():GetID()
+	local slot = this:GetID()
 
 	local link = GetContainerItemLink(bag, slot)
 
@@ -201,9 +219,7 @@ function private.OnLoad(addon)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 
 		private.HookTT()
-		--updated saved variables format 
-		if not AucAdvancedConfig["version"] then AucAdvanced.Settings.upgradeSavedVariables() end
-		
+
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
@@ -249,7 +265,6 @@ private.Schedule = {}
 function private.OnEvent(self, event, arg1, arg2, ...)
 	if (event == "ADDON_LOADED") then
 		private.OnLoad(arg1)
-		AucAdvanced.ResetSPMArray()
 	elseif (event == "PLAYER_LOGIN") then
 		-- (used as an alternative to "ADDON_LOADED", to delay loading scandata.
 		-- as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event)
@@ -272,10 +287,6 @@ function private.OnEvent(self, event, arg1, arg2, ...)
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD") -- we only want the first instance of this event
 		flagBlockTooltip = nil -- Unblock tooltips: this flag prevented us from trying to draw a tooltip while the game was still loading
-	elseif event == "AUCTION_ITEM_LIST_UPDATE" then
-		if internalStore.Scan then internalStore.Scan.NotifyItemListUpdated() end
-	elseif event == "AUCTION_OWNED_LIST_UPDATE" then
-		if internalStore.Scan then internalStore.Scan.NotifyOwnedListUpdated() end
 	end
 end
 
@@ -301,12 +312,6 @@ private.Frame:RegisterEvent("PLAYER_LOGIN")
 private.Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
-
--- Following items are for experimental scan processor modifications
-private.Frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE");
-private.Frame:RegisterEvent("AUCTION_OWNED_LIST_UPDATE");
-
-
 
 -- Auctioneer's debug functions
 AucAdvanced.Debug = {}

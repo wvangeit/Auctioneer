@@ -33,25 +33,14 @@ data layout:
 		AucAdvancedConfig = {
 
 			["profile.test4"] = {
-				["miniicon.distance"] = 56, 
+				["miniicon.distance"] = 56,
 				["miniicon.angle"] = 189,
 				["show"] = true,
 				["enable"] = true,
-				["util"] = {
-					["scanprogress"] = {
-						["activated"] = false,
-						["leaveshown"] = false,
-					},
-					["protectwindow"] = {
-						["protectwindow"] = 2,
-					},
-					["pricelevel"] = {
-						["colorize"] = true,
-					},
-				},
+			},
 
-					["profiles"] = {
-						"Default", -- [1]
+			["profiles"] = {
+				"Default", -- [1]
 				"test4", -- [2]
 			},
 
@@ -64,14 +53,13 @@ data layout:
 
 		}
 
-if user does not have a set profile name, they get the default profile. 
-All modules should use this format for stored KEYS         ModuleType.ModuleName.setting   = value    for example     util.automagic.showmailgui = true
+if user does not have a set profile name, they get the default profile
 
 
 Usage:
-	def = AucAdvanced.Settings.GetDefault('util.example.showgui')
-	val = AucAdvanced.Settings.GetSetting(util.example.showgui')
-	AucAdvanced.Settings.SetSetting('util.example.showgui', true );
+	def = AucAdvanced.Settings.GetDefault('ToolTipShowCounts')
+	val = AucAdvanced.Settings.GetSetting('ToolTipShowCounts')
+	AucAdvanced.Settings.SetSetting('ToolTipShowCounts', true );
 
 ]]
 if not AucAdvanced then return end
@@ -130,7 +118,7 @@ local settingDefaults = {
 	['marketvalue.accuracy'] = .08,
 	["ShowPurchaseDebug"] = true,
 	["SelectedLocale"] = GetLocale(),
-	["ModTTShow"] = false,
+	["ModTTShow"] = "always",
 	["post.clearonclose"] = true,
 	["post.confirmonclose"] = true,
 }
@@ -306,20 +294,8 @@ local function setter(setting, value)
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
-		--lets change the settings to be inside module branches not all in the same tree
-		local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-		if a and b and c then
-			if db[a] and db[a][b] and db[a][b][c] == value then return end
-			--create array
-			if not db[a] then db[a] = {} end
-			if not db[a][b] then db[a][b] = {} end
-			--store value
-			db[a][b][c] = value
-		else
-			--non valid format saved variables are stored here.  All modules should use  type.modulename.setting
-			if db[setting] == value then return end
-			db[setting] = value
-		end
+		if db[setting] == value then return end
+		db[setting] = value
 	end
 	if setting == "uselocale" then--Stores the last user choosen locale so it can be used next time
 		lib.SetSetting("SelectedLocale", value)
@@ -364,17 +340,11 @@ local function getter(setting)
 	end
 
 	local db = getUserProfile()
-	--string.split does not always work depending on format of setting
-	local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-	if a and b and c and db[a] and db[a][b] and db[a][b][c] ~= nil then --the nil check just allows it to fall through to the getDefault check
-		return db[a][b][c] --return setting
-	end
-	--NON valid format saved variables are stored here.  All modules should use  type.modulename.setting
 	if ( db[setting] ~= nil ) then
 		return db[setting]
+	else
+		return getDefault(setting)
 	end
-	--return default values if all else fails
-	return getDefault(setting)
 end
 
 function lib.GetSetting(setting, default)
@@ -564,7 +534,8 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataModifier')) --"Makes the scan data only display exact matches unless the shift key is held down"
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
-	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _TRANS('ADV_Interface_ModTTShow'))--"Only show Auctioneer's extra tooltip if Alt is pressed."
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"This option will hide Auctioneer's extra tooltip unless the Alt key is pressed"
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	
@@ -587,57 +558,20 @@ function lib.MakeGuiConfig()
 	AucAdvanced.SendProcessorMessage("config", gui)
 end
 
+local sideIcon
 if LibStub then
-	local LibDataBroker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-	if LibDataBroker then
-		private.LDBButton = LibDataBroker:NewDataObject("AucAdvanced", {
-					type = "launcher",
-					icon = "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon",
-					OnClick = function(self, button) lib.Toggle(self, button) end,
-				})
-		
-		function private.LDBButton:OnTooltipShow()
-			self:AddLine("Auctioneer",  1,1,0.5, 1)
-			self:AddLine("Auctioneer allows you to scan the auction house and collect statistics about prices.",  1,1,0.5, 1)
-			self:AddLine("It also provides a framework for creating auction related addons.",  1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Click|r to edit the configuration.",  1,1,0.5, 1)
-		end
-		function private.LDBButton:OnEnter()
-			GameTooltip:SetOwner(self, "ANCHOR_NONE")
-			GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-			GameTooltip:ClearLines()
-			private.LDBButton.OnTooltipShow(GameTooltip)
-			GameTooltip:Show()
-		end
-		function private.LDBButton:OnLeave()
-			GameTooltip:Hide()
-		end
+	local SlideBar = LibStub:GetLibrary("SlideBar", true)
+	if SlideBar then
+		sideIcon = SlideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
+		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+		sideIcon:SetScript("OnClick", lib.Toggle)
+		sideIcon.tip = {
+			"Auctioneer",
+			"Auctioneer allows you to scan the auction house and collect statistics about prices.",
+			"It also provides a framework for creating auction related addons.",
+			"{{Click}} to edit the configuration.",
+		}
 	end
-end
-
---Changes the layout of saved var from a flat table to a nested set
---called from coremain lua's onload. This also adds a version # to our saved variables for future use
-function lib.upgradeSavedVariables()
-	for p, data in pairs(AucAdvancedConfig) do
-		if type(p) == "string" then
-			local profile = strsplit(".",p)
-			if profile =="profile" then
-				local temp = {}
-				for setting, value in pairs(data) do
-					local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-					if  a and b and c then
-						if not temp[a] then temp[a] = {} end
-						if not temp[a][b] then temp[a][b] = {} end
-						temp[a][b][c] = value
-					else --still keep the improper keys
-						temp[setting] = value
-					end
-				end
-				AucAdvancedConfig[p] = temp
-			end
-		end
-	end
-	AucAdvancedConfig["version"] = 1
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
