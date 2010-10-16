@@ -283,16 +283,18 @@ local integrityClean, integrityCount = true, 1
 					else
 						for index, text in pairs(data) do
 							tbl = {strsplit(";", text)}
-								--check entries for missing data points
-							if #integrity[DB] ~= #tbl then
-								debugPrint("Failed: Number of entries invalid", player, DB, #tbl, text)
-								table.remove(data, index)
-								integrityClean = false
-							elseif complete and private.IC(tbl, DB) then
-								--do a full check type() = check
-								debugPrint("Failed type() check", player, DB)
-								table.remove(data, index)
-								integrityClean = false
+							--check entries for missing data points, skip any DB we havnt made a key for
+							if integrity[DB] then
+								if #integrity[DB] ~= #tbl then
+									debugPrint("Failed: Number of entries invalid", player, DB, #tbl, text)
+									table.remove(data, index)
+									integrityClean = false
+								elseif complete and private.IC(tbl, DB) then
+									--do a full check type() = check
+									debugPrint("Failed type() check", player, DB)
+									table.remove(data, index)
+									integrityClean = false
+								end
 							end
 						end
 					end
