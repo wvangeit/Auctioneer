@@ -64,10 +64,22 @@ local flagBlockTooltip = true
 function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, rlvl, itype, isubtype, stack, equiploc, texture)
 	if flagBlockTooltip then return end
 	if not tip then return end
-	if AucAdvanced.Settings.GetSetting("ModTTShow") and not IsAltKeyDown() then
-		return
+	if AucAdvanced.Settings.GetSetting("ModTTShow") then
+		if AucAdvanced.Settings.GetSetting("ModTTShow") == "never" then
+			return
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noalt" and IsAltKeyDown() then
+			return
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "alt" and not IsAltKeyDown() then
+			return
+		elseif not AucAdvanced.Settings.GetSetting("ModTTShow") == "alt" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "noalt" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "never" and not AucAdvanced.Settings.GetSetting("ModTTShow") == "always" then
+			AucAdvanced.Settings.SetSetting("ModTTShow", "alt")
+			if not IsAltKeyDown() then
+				return
+			end
+		end
+	else 
+		AucAdvanced.Settings.SetSetting("ModTTShow", "always")
 	end
-
 	tooltip:SetFrame(tip)
 
 	local extra = tooltip:GetExtra()

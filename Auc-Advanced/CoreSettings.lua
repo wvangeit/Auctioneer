@@ -130,7 +130,7 @@ local settingDefaults = {
 	['marketvalue.accuracy'] = .08,
 	["ShowPurchaseDebug"] = true,
 	["SelectedLocale"] = GetLocale(),
-	["ModTTShow"] = false,
+	["ModTTShow"] = "always",
 	["post.clearonclose"] = true,
 	["post.confirmonclose"] = true,
 }
@@ -564,8 +564,9 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataModifier')) --"Makes the scan data only display exact matches unless the shift key is held down"
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
-	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _TRANS('ADV_Interface_ModTTShow'))--"Only show Auctioneer's extra tooltip if Alt is pressed."
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"This option will hide Auctioneer's extra tooltip unless the Alt key is pressed"
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When alt is pressed: Only show Auctioneer's tooltip if alt is pressed. When alt is not pressed: Only show Auctioneer's tooltip if alt is not pressed. Never: Never show Auctioneer's tooltip."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
