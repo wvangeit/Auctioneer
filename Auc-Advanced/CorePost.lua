@@ -1005,7 +1005,7 @@ function private.ShowPrompt(request)
 	request.posting = true
 	private.Prompt:Show()
 	private.Prompt.Text1:SetText("Ready to post "..private.RequestDisplayString(request))
-	private.Prompt.Text2:SetText("Min Bid "..AucAdvanced.Coins(request.bid, true)..", Buyout "..AucAdvanced.Coins(request.buy))
+	private.Prompt.Text2:SetText("Min Bid "..AucAdvanced.Coins(request.bid, true)..", Buyout "..AucAdvanced.Coins(request.buy, true))
 	private.Prompt.Item.tex:SetTexture(request.texture)
 	local headwidth = (private.Prompt.Heading:GetStringWidth() or 0) + 70
 	local width1 = (private.Prompt.Text1:GetStringWidth() or 0) + 70
@@ -1272,7 +1272,7 @@ StaticPopupDialogs["POST_CANCEL_QUEUE_AH_CLOSED"] = {
 -- (Cloned and modified from CoreBuy)
 
 --this is a anchor frame that never changes size
-private.Prompt = CreateFrame("Frame", nil, UIParent)
+private.Prompt = CreateFrame("Frame", "AuctioneerPostPrompt", UIParent)
 private.Prompt:Hide()
 private.Prompt:SetPoint("CENTER", UIParent, "CENTER", 0, -50)
 private.Prompt:SetFrameStrata("DIALOG")
