@@ -80,19 +80,24 @@ end
 
 
 local OldSortAuctionApplySort
+function private.OnLoadRunOnce()
+	private.OnLoadRunOnce = nil
 
-function lib.OnLoad()
-	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	if SortAuctionApplySort then
 		OldSortAuctionApplySort = SortAuctionApplySort
-		SortAuctionApplySort=private.QueryCurrent
+		SortAuctionApplySort = private.QueryCurrent
 	end
 	hooksecurefunc("QueryAuctionItems", private.CopyQuery)
+
 	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.tooltiphelp", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
 	AucAdvanced.Settings.SetDefault("util.browseoverride.activated", false)
+end
+function lib.OnLoad()
+	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	if private.OnLoadRunOnce then private.OnLoadRunOnce() end
 end
 
 --[[ Local functions ]]--
