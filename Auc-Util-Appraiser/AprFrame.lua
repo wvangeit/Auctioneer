@@ -2748,7 +2748,7 @@ function private.CreateFrames()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
 	hooksecurefunc("HandleModifiedItemClick", function (link)
-		if GetMouseButtonClicked() == "LeftButton" and IsAltKeyDown() and frame:IsVisible() and get("util.appraiser.clickhookany") then
+		if GetMouseButtonClicked() == "LeftButton" and IsAltKeyDown() and get("util.appraiser.clickhookany") then
 			if link then
 				frame.SelectItem(nil, nil, link)
 			end
