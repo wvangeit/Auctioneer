@@ -129,7 +129,7 @@ local settingDefaults = {
 	['show-ilevel'] = true,
 	['show-link'] = false,
 	['auto-update'] = false,
-	['ModTTShow'] = false,
+	['ModTTShow'] = "always",
 
 -- leave this option off until we have real data to test with
 -- enable only for dev testing
@@ -383,9 +383,9 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowLink'))
 	gui:AddControl(id, "Checkbox",   0, 1, "show-crafted", _TRANS('INF_Interface_ShowCrafted'))
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowCrafted'))
-	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _TRANS('INF_Interface_ModTTShow'))--Only show tooltip if Alt is pressed.
-	gui:AddTip(id, _TRANS('INF_HelpTooltip_ModTTShow'))--This will prevent the display of Informant's extra tooltip unless Alt is pressed.
-
+	gui:AddControl(id, "Subhead",     0,	_TRANS('INF_Interface_ModTTShow')) --"Show Tooltip:"
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('INF_Interface_mts_always') }, {"alt", _TRANS('INF_Interface_mts_alt') }, { "noalt", _TRANS('INF_Interface_mts_noalt') }, { "never", _TRANS('INF_Interface_mts_never')} }, "ModTTShow")
+	gui:AddTip(id, _TRANS('INF_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Informant's Tooltip every time. When alt is pressed: Only show Informant's tooltip if alt is pressed. When alt is not pressed: Only show Informant's tooltip if alt is not pressed. Never: Never show Informant's tooltip."
 	-- TODO - localize me!
 	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", _TRANS('INF_Interface_AutoUpdate')) --"Automatically update item information at merchants"
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_AutoUpdate')) --"Allow Informant to scan your bags and merchant inventory for updates"

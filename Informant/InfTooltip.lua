@@ -28,6 +28,7 @@ Informant_RegisterRevision("$URL$", "$Rev$")
 local nilSafeString			-- nilSafeString(String)
 local whitespace			-- whitespace(length)
 local getFilter = Informant.Settings.GetSetting
+local setFilter = Informant.Settings.SetSetting
 local debugPrint
 
 local tooltip = LibStub("nTipHelper:1")
@@ -90,8 +91,21 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	itemInfo.itemSell = sell
 	itemInfo.itemQuant = quant
 
-	if getFilter('ModTTShow') and not IsAltKeyDown() then
-		return
+	if getFilter("ModTTShow") then
+		if getFilter("ModTTShow") == "never" then
+			return
+		elseif getFilter("ModTTShow") == "noalt" and IsAltKeyDown() then
+			return
+		elseif getFilter("ModTTShow") == "alt" and not IsAltKeyDown() then
+			return
+		elseif not getFilter("ModTTShow") == "alt" and not getFilter("ModTTShow") == "noalt" and not getFilter("ModTTShow") == "never" and not getFilter("ModTTShow") == "always" then
+			setFilter("ModTTShow", "alt")
+			if not IsAltKeyDown() then
+				return
+			end
+		end
+	else 
+		setFilter("ModTTShow", "always")
 	end
 
 	local embedded = getFilter('embed')

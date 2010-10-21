@@ -158,7 +158,7 @@ local settingDefaults = {
 	['autoLootDE'] = false,				-- off by default for backwards compatibility
 
 	['export.aucadv'] = true, -- Send our price values to Auctioneer as stats
-	['ModTTShow'] = false,
+	['ModTTShow'] = "always",
 }
 
 local function getDefault(setting)
@@ -534,8 +534,9 @@ function lib.MakeGuiConfig()
 
 	id = gui:AddTab(_ENCH("GuiTabGeneral"))
 	gui:AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
-	gui:AddControl(id, "Checkbox", 0, 1, "ModTTShow", _ENCH("ModTTShow"))--Only display our extra tooltip data if Alt is pressed.
-	gui:AddTip(id, _ENCH("ModTTShow_Help"))--Show Enchantrix's extra tooltip only if Alt is pressed.
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ModTTShow')) --"Show Tooltip:"
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ModTTShow_always') }, {"alt", _TRANS('ModTTShow_alt') }, { "noalt", _TRANS('ModTTShow_noalt') }, { "never", _TRANS('ModTTShow_never')} }, "ModTTShow")
+	gui:AddTip(id, _TRANS('ModTTShow_Help')) --"Determines Tooltip behavior. Always: Show Enchantrix's Tooltip every time. When alt is pressed: Only show Enchantrix's tooltip if alt is pressed. When alt is not pressed: Only show Enchantrix's tooltip if alt is not pressed. Never: Never show Enchantrix's tooltip."	
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
 	gui:AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )

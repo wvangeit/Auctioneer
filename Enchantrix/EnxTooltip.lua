@@ -277,8 +277,21 @@ end
 
 
 function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
-	if Enchantrix.Settings.GetSetting('ModTTShow') and not IsAltKeyDown() then
-		return
+	if Enchantrix.Settings.GetSetting("ModTTShow") then
+		if Enchantrix.Settings.GetSetting("ModTTShow") == "never" then
+			return
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "noalt" and IsAltKeyDown() then
+			return
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "alt" and not IsAltKeyDown() then
+			return
+		elseif not Enchantrix.Settings.GetSetting("ModTTShow") == "alt" and not Enchantrix.Settings.GetSetting("ModTTShow") == "noalt" and not Enchantrix.Settings.GetSetting("ModTTShow") == "never" and not Enchantrix.Settings.GetSetting("ModTTShow") == "always" then
+			Enchantrix.Settings.SetSetting("ModTTShow", "alt")
+			if not IsAltKeyDown() then
+				return
+			end
+		end
+	else 
+		Enchantrix.Settings.SetSetting("ModTTShow", "always")
 	end
 	
 	-- see if this is a simple reagent produced from disenchanting, prospecting or milling
