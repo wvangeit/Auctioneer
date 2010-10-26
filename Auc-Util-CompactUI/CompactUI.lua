@@ -37,36 +37,20 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
-local data
 private.cache = {}
 
 local searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "config") then
-		private.SetupConfigGui(...)
-	elseif (callbackType == "auctionui") then
-		private.HookAH(...)
-	elseif callbackType == "configchanged"
-	or callbackType == "blockupdate" then
-		if (private.Active) then
-			private.MyAuctionFrameUpdate()
-		end
-	elseif (callbackType == "scanstats") then
-		private.cache = {}
-	end
-end
-
 lib.Processors = {}
 function lib.Processors.config(callbackType, ...)
-	private.SetupConfigGui(...)
+	if private.SetupConfigGui then private.SetupConfigGui(...) end
 end
 
 function lib.Processors.auctionui(callbackType, ...)
-	private.HookAH(...)
+	if private.HookAH then private.HookAH(...) end
 end
 
-function lib.Processors.configchanged(callbackType, ...)
+function lib.Processors.configchanged()
 	if (private.Active) then
 		private.MyAuctionFrameUpdate()
 	end
@@ -74,8 +58,8 @@ end
 
 lib.Processors.blockupdate = lib.Processors.configchanged
 
-function lib.Processors.scanstats(callbackType, ...)
-	private.cache = {}
+function lib.Processors.scanstats()
+	wipe(private.cache)
 end
 
 
@@ -89,11 +73,11 @@ function private.OnLoadRunOnce()
 	end
 	hooksecurefunc("QueryAuctionItems", private.CopyQuery)
 
-	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
-	AucAdvanced.Settings.SetDefault("util.compactui.tooltiphelp", true)
-	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
-	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
-	AucAdvanced.Settings.SetDefault("util.browseoverride.activated", false)
+	default("util.compactui.activated", true)
+	default("util.compactui.tooltiphelp", true)
+	default("util.compactui.collapse", false)
+	default("util.compactui.bidrequired", true)
+	default("util.browseoverride.activated", false)
 end
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -124,12 +108,13 @@ function private.buttonTooltips(self, text)
 end
 
 function private.HookAH()
+	private.HookAH = nil
 	lib.inUse = true
 	private.switchUI:SetParent(AuctionFrameBrowse)
 	private.switchUI:SetPoint("TOPRIGHT", AuctionFrameBrowse, "TOPRIGHT", -157, -17)
 
 
-	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
+	if (not get("util.compactui.activated")) then
 		private.MyAuctionFrameUpdate = function() end
 		return
 	end
@@ -218,18 +203,19 @@ function private.HookAH()
 		button.Owner:SetHeight(19)
 		button.Owner:SetJustifyH("LEFT")
 		button.Owner:SetFont(STANDARD_TEXT_FONT, 10)
+		button.OwnerHitBox = CreateFrame("Frame", nil, button) -- we need a Frame to call MouseIsOver
+		button.OwnerHitBox:SetPoint("TOPLEFT", button.Owner, "TOPLEFT")
+		button.OwnerHitBox:SetPoint("BOTTOMRIGHT", button.Owner, "BOTTOMRIGHT")
 		button.Bid = AucAdvanced.CreateMoney(10,110)
 		button.Bid:SetParent(button)
 		button.Bid.SetMoney = private.SetMoney
 		button.Bid:SetPoint("TOPRIGHT", button.Owner, "TOPRIGHT", 112, 0)
-	--	button.Bid:SetFrameStrata("PARENT")
 		button.Bid:SetDrawLayer("OVERLAY")
 		button.Buy = AucAdvanced.CreateMoney(10,110)
 		button.Buy:SetParent(button)
 		button.Buy.SetMoney = private.SetMoney
 		button.Buy:SetColor(1,0.82,0)
 		button.Buy:SetPoint("TOPRIGHT", button.Bid, "BOTTOMRIGHT", 0, 1)
-	--	button.Buy:SetFrameStrata("PARENT")
 		button.Buy:SetDrawLayer("OVERLAY")
 		button.Value = button:CreateFontString(nil,nil,"GameFontHighlight")
 		button.Value:SetPoint("TOPLEFT", button.Bid, "TOPRIGHT", 2, 0)
@@ -440,25 +426,31 @@ function private.SetMoney(me, value, hasBid, highBidder)
 end
 
 function private.ButtonClick(me, mouseButton)
-	if ( IsControlKeyDown() ) then
-		DressUpItemLink(GetAuctionItemLink("list", me.id))
-	elseif ( IsShiftKeyDown() ) then
-		ChatEdit_InsertLink(GetAuctionItemLink("list", me.id))
-	--Display the ignore player UI
-	elseif (IsAltKeyDown() ) and me.Owner:GetText() then
-		if not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored then private.sellerIgnore:Hide() return end
+	if IsModifiedClick() then
+		if mouseButton == "LeftButton" and IsAltKeyDown() and MouseIsOver(me.OwnerHitBox) then
+			--Display the ignore player UI
+			local seller = me.Owner:GetText()
+			if not seller or seller == "" or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored then
+				private.sellerIgnore:Hide()
+				return
+			end
 
-		private.sellerIgnore:ClearAllPoints()	private.sellerIgnore:SetPoint("TOPLEFT", me.Owner,"TOPRIGHT") private.sellerIgnore:Show()
-		--if toon not ignored the ignore
-		local seller = me.Owner:GetText()
-		if not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(seller) then
-			private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) private.sellerIgnore:Hide() end)
-			private.sellerIgnore.help:SetText("Add player to ignore list\n\n|CFFFFFFFF"..(seller))
+			private.sellerIgnore:ClearAllPoints()
+			private.sellerIgnore:SetPoint("TOPLEFT", me.Owner, "TOPRIGHT")
+			private.sellerIgnore:Show()
+			--if toon not ignored then ignore
+			if not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(seller) then
+				private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) private.sellerIgnore:Hide() end)
+				private.sellerIgnore.help:SetText("Add player to ignore list\n\n|CFFFFFFFF"..(seller))
+			else
+				private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) private.sellerIgnore:Hide() end)
+				private.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
+			end
 		else
-			private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) private.sellerIgnore:Hide() end)
-			private.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
+			HandleModifiedItemClick(GetAuctionItemLink("list", me.id))
 		end
 	else
+		-- Modified from Blizzard_AuctionUI.lua BrowseButton_OnClick function, as the IDs of our buttons are different
 		if GetCVarBool("auctionDisplayOnCharacter") then
 			DressUpItemLink(GetAuctionItemLink("list", me.id))
 		end
@@ -650,7 +642,7 @@ function private.SetAuction(button, pos)
 	button.id = id
 
 	local showBid
-	if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
+	if (get("util.compactui.bidrequired")) then
 		showBid = requiredBid
 	else
 		showBid = max (bidAmount, minBid)
@@ -859,6 +851,7 @@ font:SetFontObject("GameFontNormalSmall" )
 font:SetTextHeight(10)
 
 function private.SetupConfigGui(gui)
+	private.SetupConfigGui = nil
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
 	private.gui = gui --stores our ID id we use this to open the config button to correct frame
