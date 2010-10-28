@@ -618,7 +618,7 @@ function lib.ProgressBars(name, value, show, text, options)
 		--ReRender bars
 		for ID = 1, NumGenericBars do
 			if availableBars[ID] then
-				barData = availableBars[ID]
+				local barData = availableBars[ID]
 				renderBars(ID, barData[1], barData[2], barData[3], barData[4])			
 			else--blank bars
 				renderBars(ID)	

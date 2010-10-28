@@ -1046,7 +1046,7 @@ local Commitfunction = function()
 	end
 	if (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
-		scanSize = "NoSum-"..scansize
+		scanSize = "NoSum-"..scanSize
 	end
 
 	if (nLog or printSummary) then
@@ -1388,7 +1388,7 @@ function lib.GetAuctionSellItem(minBid, buyoutPrice, runTime)
 		local curTime = time()
 
 		return {
-			itemLink, itemLevel, itemType, itemSubType, invType, minBid,
+			itemLink, itemLevel, itemType, itemSubType, nil, minBid,
 			timeLeft, curTime, name, texture, count, quality, canUse, level,
 			minBid, 0, buyoutPrice, 0, nil, UnitName("player"),
 			0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
@@ -1405,7 +1405,7 @@ local StorePageFunction = function()
 	end
 	local startTime = GetTime()
 	local lastPause = startTime
-	localRunTime = 0
+	local RunTime = 0
 	private.sentQuery = false
 	local page = AuctionFrameBrowse.page
 	if not private.curScan then
@@ -1441,7 +1441,7 @@ local StorePageFunction = function()
 		local now = GetTime()
 		private.nextCheck = now
 		private.scanDelay = now + 30
-		localRunTime = GetTime()-lastPause
+		RunTime = GetTime()-lastPause
 		coroutine.yield()
 		lastPause = GetTime()
 	end
@@ -1465,7 +1465,7 @@ local StorePageFunction = function()
 				local gt = GetTime()
 				if (gt-lastPause >= processingTime) then
 					lib.ProgressBars("GetAllProgressBar", 100*i/numBatchAuctions, true)
-					localRunTime = localRunTime + GetTime()-lastPause
+					RunTime = RunTime + GetTime()-lastPause
 					coroutine.yield()
 					lastPause = GetTime()
 					if private.breakStorePage then
@@ -1560,10 +1560,10 @@ local StorePageFunction = function()
 		private.Commit(incomplete, false)
 	end
 	local endTime = GetTime()
-	localRunTime = localRunTime + endTime-lastPause
-	private.storeTime = (private.storeTime or 0) + localRunTime
+	RunTime = RunTime + endTime-lastPause
+	private.storeTime = (private.storeTime or 0) + RunTime
 	if (nLog) then
-		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage %fs"):format(localRunTime), ("StorePage Took %f seconds from request to complete, %f seconds of that was to store, and %f seconds of the time to store was processing time"):format(endTime-queryStarted, endTime-startTime, localRunTime))
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage %fs"):format(RunTime), ("StorePage Took %f seconds from request to complete, %f seconds of that was to store, and %f seconds of the time to store was processing time"):format(endTime-queryStarted, endTime-startTime, RunTime))
 	end
 end
 
@@ -1846,7 +1846,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	if (page==0) then
 		local scanSize = query.qryinfo.scanSize
 		if (query.qryinfo.NoSummary) then
-			scanSize = "NoSum-"..scansize
+			scanSize = "NoSum-"..scanSize
 		end
 		if (nLog) then
 			local queryType = "standard"

@@ -130,7 +130,7 @@ function lib.setFrame(frame)
 		frame = 0
 	--Compatibility, for those who had set this previously.
 	elseif (type(frame) == "number" and frame > 0 and frame < 10) then
-		frame,_,_,_,_,_,_,_,_=GetChatWindowInfo(frame)
+		frame = GetChatWindowInfo(frame)
 	--If the frame argument is a string, set that as the frameNumber
 	elseif (type(frame) == "string") then
 		set("printwindow", frame)
@@ -379,7 +379,7 @@ function lib.AddTab(tabButton, tabFrame)
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
 	if (tabIndex < tabCount) then
-		nextTabButton = _G["AuctionFrameTab"..(tabIndex + 1)];
+		local nextTabButton = _G["AuctionFrameTab"..(tabIndex + 1)];
 		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
 	end
 
@@ -409,7 +409,7 @@ function lib.RemoveTab(tabButton, tabFrame)
 
 	-- If we inserted a tab in the middle, adjust the layout of the next tab button after removal.
 	if tabFound and (tabFound < tabCount) then
-		nextTabButton = _G["AuctionFrameTab"..(tabFound + 1)]
+		local nextTabButton = _G["AuctionFrameTab"..(tabFound + 1)]
 		nextTabButton:SetPoint("TOPLEFT", _G["AuctionFrameTab"..(tabFound - 1)]:GetName(), "TOPRIGHT", -8, 0)
 	end
 
@@ -615,7 +615,7 @@ function lib.SendProcessorMessage(spmMsg, ...)
 			local f = x.Func
 --if (nLog) then nLog.AddMessage("Auctioneer", "Coreutil", N_INFO, ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg), ("SendProcessorMessage Called %s For %s"):format(x.Name, spmMsg)) end
 
-			good,msg=pcall(f, spmMsg, ...)
+			local good,msg=pcall(f, spmMsg, ...)
 			if not good then
 				lib.Debug.DebugPrint(msg, "SendProcessorMessage", "Processor Error in "..(x.Name or "??"), 0, "Debug")
 			end
