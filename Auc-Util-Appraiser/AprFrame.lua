@@ -2662,7 +2662,7 @@ function private.CreateFrames()
 
 	function frame.ScanTab.OnClick(self)
 		local index = self:GetID()
-		local tab = getglobal("AuctionFrameTab"..index)
+		local tab = _G["AuctionFrameTab"..index]
 		if (tab and tab:GetName() == "AuctionFrameTabUtilAppraiser") then
 			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-TopLeft")
 			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Top")
