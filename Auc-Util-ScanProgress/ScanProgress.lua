@@ -69,10 +69,9 @@ end
 
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
---private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
-private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d (%3.1f%%)\n\nElapsed scan time: %s\nEstimated time left: %s"
+private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d (%3.1f%%)\n\nElapsed scan time: %s\nEstimated time left: %s\n%s"
 
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query, scanCount)
 	--Check that we're enabled before passing on the callback
 	if not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")
 
@@ -102,7 +101,7 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elaps
 		private.ShowScanProgressUI(totalAuctions)
 	end
 	if scannedAuctions and scannedAuctions > 0 then
-		private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
+		private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query, scanCount)
 	end
 end
 
@@ -150,30 +149,30 @@ function private.HideScanProgressUI()
 	initShown = nil
 end
 
-function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
+function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query, scanCount)
 	if (nLog) then nLog.AddMessage("Auctioneer", "ScanProgress", N_INFO, "UpdateScanProgressUI Called") end
 	local numAuctionsPerPage = NUM_AUCTION_ITEMS_PER_PAGE
+	local warningMessage = ""
 	initShown = false
 	-- Prefer the elapsed time which is provided by core and excludes paused time.
 	local secondsElapsed = elapsedTime or (time() - private.scanStartTime)
 
-	local auctionsToScan = totalAuctions - scannedAuctions
+	local auctionsToScan = totalAuctions - (page-1)*numAuctionsPerPage
+	local missedAuctions = (page-1)*numAuctionsPerPage - scannedAuctions
+	local currentPage = page
 
-	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)
-
-	local totalPages = math.ceil(totalAuctions / numAuctionsPerPage)
-	if (totalPages < 1) then
-		totalPages = 1
+	if (missedAuctions > 10) then
+		warningMessage = "Too many auctions have been missed.  This will be an incomplete scan."
+	else
+		if ((missedAuctions / page) * maxPages > 10) then
+			warningMessage = "Missing auctions.  This is likely this will be an incomplete scan."
+		end
 	end
---	if (totalPages - math.floor(totalPages) > 0) then
---		totalPages = math.ceil(totalPages)
---	else
---		totalPages = math.floor(totalPages)
---	end
+	local totalPages = maxPages
 
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
-	if (currentPage+1 == totalPages) then 
+	if (currentPage >= totalPages) then 
 		secondsToScanCompletion = "Done" 
 	else 
 		secondsToScanCompletion = SecondsToTime(secondsToScanCompletion) 
@@ -181,13 +180,14 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 
 	BrowseNoResultsText:SetText(
 		private.scanProgressFormat:format(
-			"Scanning auctions.",
-			currentPage + 1, totalPages,
+			"Scanning auctions",
+			currentPage, totalPages,
 			auctionsScannedPerSecond,
 			totalAuctions,
-			scannedAuctions, ((currentPage+1)/totalPages)*100,
+			scannedAuctions, (currentPage/totalPages)*100,
 			SecondsToTime(secondsElapsed),
-			secondsToScanCompletion			
+			secondsToScanCompletion,
+			warningMessage
 		)
 	)
 end

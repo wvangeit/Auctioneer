@@ -57,7 +57,7 @@ local EquipCodeToInvIndex = AucAdvanced.Const.EquipCodeToInvIndex
 local tinsert, tremove = tinsert, tremove
 local bitand, bitor, bitnot = bit.band, bit.bor, bit.bnot
 local type, wipe = type, wipe
-local pairs, ipairs = pairs, ipairs
+local pairs, ipairs, next = pairs, ipairs, next
 local tonumber = tonumber
 
 local GetTime = GetTime
@@ -821,32 +821,30 @@ local Commitfunction = function()
 
 	local itemLinkTable = { }
 
+	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 1")
 	for pos, data in ipairs(TempcurScan) do
 		local gt = GetTime()
 		progresscounter = progresscounter + 1
 		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 1")
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 			totalProcessingTime = totalProcessingTime + (gt - lastPause)
 			coroutine.yield()
 			lastPause = GetTime()
 		end
-		if data[Const.LINK] then
-			if (not itemLinkTable[data[Const.LINK]]) then itemLinkTable[data[Const.LINK]] = { } end
-			tinsert(itemLinkTable[data[Const.LINK]], data)
-		else
-			progresscount = progresscounter + 1
-		end
+		if (not itemLinkTable[data[Const.LINK]]) then itemLinkTable[data[Const.LINK]] = { } end
+		tinsert(itemLinkTable[data[Const.LINK]], data)
 	end
 
 	local next = next
-	local triesLeft = 100
+	local maxTries = 61 -- one more than retries
+	local triesLeft = maxTries
 	while ((not (next(itemLinkTable)==nil)) and (triesLeft > 0)) do
 		local itemLinkNewTable = { }
 		local index, data
 		for index, data in pairs(itemLinkTable) do
 			local gt = GetTime()
 			if gt - lastPause >= processingTime then
-				lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 2")
+				lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 				totalProcessingTime = totalProcessingTime + (gt - lastPause)
 				coroutine.yield()
 				lastPause = GetTime()
@@ -855,6 +853,8 @@ local Commitfunction = function()
 			if (itemEquipLoc) then
 				local pos2, data2
 				for pos2, data2 in ipairs(data) do
+					-- Found one.  Reset try count
+					triesLeft = maxTries
 					progresscounter = progresscounter + 1
 					data2[Const.ILEVEL] = itemLevel
 					data2[Const.ITYPE] = itemType
@@ -871,27 +871,8 @@ local Commitfunction = function()
 		triesLeft = triesLeft - 1
 	end
 
-	if (nLog) then
-	for pos, data in ipairs(TempcurScan) do
-		local gt = GetTime()
-		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 1")
-			totalProcessingTime = totalProcessingTime + (gt - lastPause)
-			coroutine.yield()
-			lastPause = GetTime()
-		end
-		if data[Const.LINK] then
-			if (data[Const.ILEVEL] == -1 or data[Const.ITYPE] == -1 or data[Const.ISUB] == -1
-					or data[Const.IEQUIP] == -1) then
-				nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "GetInfoFailure : "..data[Const.LINK])
-			end
-		end
-	end
-	end
 
-	
-	
-	--[[ *** Stage 1: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
+	--[[ *** Stage 3: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
 	local dirtyCount = 0
 	local lut = {}
 
@@ -900,7 +881,7 @@ local Commitfunction = function()
 		progresscounter = progresscounter + 1
 		local gt = GetTime()
 		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
 			totalProcessingTime = totalProcessingTime + (gt - lastPause)
 			coroutine.yield()
 			lastPause = GetTime()
@@ -929,6 +910,9 @@ local Commitfunction = function()
 		end
 	end
 
+
+	--[[ *** Stage 4: Merge new scan into ScanData *** ]]
+	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 4") -- change displayed text for reporting purposes
 	local processors = {}
 	local modules = AucAdvanced.GetAllModules("AuctionFilter", "Filter")
 	for pos, engineLib in ipairs(modules) do
@@ -948,16 +932,13 @@ local Commitfunction = function()
 			table.insert(processors[op], x)
 		end
 	end
-
-	--[[ *** Stage 2: Merge new scan into ScanData *** ]]
-	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 2") -- change displayed text for reporting purposes
 	processStats(processors, "begin")
 	for index, data in ipairs(TempcurScan) do
 		local itemPos
 		progresscounter = progresscounter + 4
 		local gt = GetTime()
 		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 2")
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
 			totalProcessingTime = totalProcessingTime + (gt - lastPause)
 			coroutine.yield()
 			lastPause = GetTime()
@@ -1005,8 +986,7 @@ local Commitfunction = function()
 	end
 
 
-	--[[ *** Stage 3: Cleanup deleted auctions *** ]]
-	local numempty = 0
+	--[[ *** Stage 5: Cleanup deleted auctions *** ]]
 	local progressstep = 1
 	if #scandata.image > 0 then -- (avoid potential div0)
 		-- #scandata.image is probably now larger than when we originally calculated progresstotal -- adjust the step size to compensate
@@ -1017,7 +997,7 @@ local Commitfunction = function()
 		progresscounter = progresscounter + progressstep
 		local gt = GetTime()
 		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 5")
 			totalProcessingTime = totalProcessingTime + (gt - lastPause)
 			coroutine.yield()
 			lastPause = GetTime()
@@ -1063,9 +1043,6 @@ local Commitfunction = function()
 				end
 				tremove(scandata.image, pos)
 			end
-		elseif not data[Const.LINK] then --if there isn't a link in the data, remove the entry
-			tremove(scandata.image, pos)
-			numempty = numempty + 1
 		end
 	end
 
@@ -1083,12 +1060,6 @@ local Commitfunction = function()
 		end
 	end
 
-	if numempty > 0 then
-		if nLog then
-			nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "ScanData Missing Links",
-				("We saw %d entries in scandata without links"):format(numempty))
-		end
-	end
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
 	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
 		if nLog then
@@ -1386,15 +1357,15 @@ function private.HasAllData()
 	return false
 end
 
-function lib.GetAuctionItem(list, i, getInfo)
+function lib.GetAuctionItem(list, i, skipGetInfo)
 	local itemLink = GetAuctionItemLink(list, i)
 	if itemLink then
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
 		local itemLevel,itemType,itemSubType,itemEquipLoc
-		if (getInfo) then
-			_,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
-		else
+		if (skipGetInfo) then
 			itemLevel, itemType, itemSubType, itemEquipLoc = -1, -1, -1, -1
+		else
+			_,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
 		end
 		local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)
 		--[[
@@ -1521,12 +1492,12 @@ local StorePageFunction = function()
 
 	local storecount = 0
 	if not private.breakStorePage and (page > curQuery.qryinfo.page) then
-
+		local retries = { }
 		for i = 1, numBatchAuctions do
 			if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 				local gt = GetTime()
 				if (gt-lastPause >= processingTime) then
-					lib.ProgressBars("GetAllProgressBar", 100*i/numBatchAuctions, true)
+					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					RunTime = RunTime + GetTime()-lastPause
 					coroutine.yield()
 					lastPause = GetTime()
@@ -1536,13 +1507,95 @@ local StorePageFunction = function()
 				end
 			end
 
-			local itemData = lib.GetAuctionItem("list", i, false)
-			if itemData then
+			local itemData = lib.GetAuctionItem("list", i, true)
+--[[
+			local maxTries = 60
+			local tryCount = maxTries
+			while itemData==nil and tryCount>0 do
+				if nLog then
+					local lvl = N_WARNING
+					if (tryCount<maxTries) then 
+						nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Auction Store Retry",
+							("Store Being Reattempted with %d attempts left"):format(tryCount))
+					end
+				end
+
+				itemData = lib.GetAuctionItem("list", i, true)
+				tryCount = tryCount - 1
+				RunTime = GetTime()-lastPause
+				pauseTime = GetTime()
+				while (GetTime() - pauseTime) < 1 do
+					coroutine.yield()
+				end
+				lastPause = GetTime()
+			end
+--]]
+			if (itemData) then
 				tinsert(curScan, itemData)
 				storecount = storecount + 1
+--				if nLog then
+--					local lvl = N_WARNING
+--					if (tryCount<maxTries) then 
+--						lvl=N_INFO
+--						nLog.AddMessage("Auctioneer", "Scan", lvl, "Auction Stored",
+--							("Stored Auction with %d attempts left"):format(tryCount))
+--					end
+--				end
+			else
+				tinsert(retries, i)
+--				if nLog then
+--					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Auction Not Stored", "Failed to Store Auction After all attempts")
+--				end
 			end
 		end
+		local maxTries = 60
+		local tryCount = maxTries
 
+		local newRetries = { }
+		while (#retries > 0 and tryCount > 0 and not private.breakStorePage) do
+			RunTime = RunTime + GetTime()-lastPause
+			pauseTime = GetTime()
+			while (GetTime() - pauseTime) < 1 do
+				coroutine.yield()
+				if private.breakStorePage then break end
+			end
+			pauseTime = GetTime()
+			if private.breakStorePage then break end
+			tryCount = tryCount - 1
+			for _, i in ipairs(retries) do
+				if nLog then
+					local lvl = N_WARNING
+					if (tryCount<maxTries) then 
+						nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Auction Store Retry",
+							("Storage of %d Being Reattempted with %d attempts left"):format(i, tryCount))
+					end
+				end
+				if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+					local gt = GetTime()
+					if (gt-lastPause >= processingTime) then
+						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
+						RunTime = RunTime + GetTime()-lastPause
+						coroutine.yield()
+						lastPause = GetTime()
+						if private.breakStorePage then
+							break
+						end
+					end
+				end
+
+				itemData = lib.GetAuctionItem("list", i, true)
+				if (itemData) then
+					-- Found one.  Reset retry delay.
+					tryCount = maxTries
+					tinsert(curScan, itemData)
+					storecount = storecount + 1
+				else
+					tinsert(newRetries, i)
+				end
+			end
+			retries = newRetries
+			newRetries = { }
+		end
 		if (storecount > 0) then
 			curQuery.qryinfo.page = page
 			curPages[page] = true -- we have pulled this page
