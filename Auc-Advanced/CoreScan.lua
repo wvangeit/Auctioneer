@@ -815,11 +815,82 @@ local Commitfunction = function()
 	local scanCount = #TempcurScan
 
 	local progresscounter = 0
-	local progresstotal = 3*oldCount + 4*scanCount
+	local progresstotal = 3*oldCount + 6*scanCount
 
 	local filterDeleteCount,filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0,0,0,0
 
+	local itemLinkTable = { }
 
+	for pos, data in ipairs(TempcurScan) do
+		local gt = GetTime()
+		progresscounter = progresscounter + 1
+		if gt - lastPause >= processingTime then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 1")
+			totalProcessingTime = totalProcessingTime + (gt - lastPause)
+			coroutine.yield()
+			lastPause = GetTime()
+		end
+		if data[Const.LINK] then
+			if (not itemLinkTable[data[Const.LINK]]) then itemLinkTable[data[Const.LINK]] = { } end
+			tinsert(itemLinkTable[data[Const.LINK]], data)
+		else
+			progresscount = progresscounter + 1
+		end
+	end
+
+	local next = next
+	local triesLeft = 100
+	while ((not (next(itemLinkTable)==nil)) and (triesLeft > 0)) do
+		local itemLinkNewTable = { }
+		local index, data
+		for index, data in pairs(itemLinkTable) do
+			local gt = GetTime()
+			if gt - lastPause >= processingTime then
+				lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 2")
+				totalProcessingTime = totalProcessingTime + (gt - lastPause)
+				coroutine.yield()
+				lastPause = GetTime()
+			end
+			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(index)
+			if (itemEquipLoc) then
+				local pos2, data2
+				for pos2, data2 in ipairs(data) do
+					progresscounter = progresscounter + 1
+					data2[Const.ILEVEL] = itemLevel
+					data2[Const.ITYPE] = itemType
+					data2[Const.ISUB] = itemSubType
+					data2[Const.IEQUIP] = itemEquipLoc
+				end
+			else
+				itemLinkNewTable[index] = data
+			end
+		end
+		itemLinkTable = itemLinkNewTable
+		coroutine.yield()
+		lastPause = GetTime()
+		triesLeft = triesLeft - 1
+	end
+
+	if (nLog) then
+	for pos, data in ipairs(TempcurScan) do
+		local gt = GetTime()
+		if gt - lastPause >= processingTime then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Prep Stage 1")
+			totalProcessingTime = totalProcessingTime + (gt - lastPause)
+			coroutine.yield()
+			lastPause = GetTime()
+		end
+		if data[Const.LINK] then
+			if (data[Const.ILEVEL] == -1 or data[Const.ITYPE] == -1 or data[Const.ISUB] == -1
+					or data[Const.IEQUIP] == -1) then
+				nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "GetInfoFailure : "..data[Const.LINK])
+			end
+		end
+	end
+	end
+
+	
+	
 	--[[ *** Stage 1: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
 	local dirtyCount = 0
 	local lut = {}
@@ -1315,25 +1386,16 @@ function private.HasAllData()
 	return false
 end
 
---[[ Not currently used
-function private.NoDupes(pageData, compare)
-	if not pageData then return true end
-	for pos, pageItem in ipairs(pageData) do
-		if (compare[Const.LINK] == pageItem[Const.LINK]) then
-			if (private.IsSameItem(pageItem, compare)) then
-				return false
-			end
-		end
-	end
-	return true
-end
---]]
-
-function lib.GetAuctionItem(list, i)
+function lib.GetAuctionItem(list, i, getInfo)
 	local itemLink = GetAuctionItemLink(list, i)
 	if itemLink then
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
-		local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+		local itemLevel,itemType,itemSubType,itemEquipLoc
+		if (getInfo) then
+			_,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+		else
+			itemLevel, itemType, itemSubType, itemEquipLoc = -1, -1, -1, -1
+		end
 		local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = AucAdvanced.DecodeLink(itemLink)
 		--[[
 			Returns Integer giving range of time left for query
@@ -1474,26 +1536,8 @@ local StorePageFunction = function()
 				end
 			end
 
-			local itemData = lib.GetAuctionItem("list", i)
+			local itemData = lib.GetAuctionItem("list", i, false)
 			if itemData then
---				local legacyScanning = private.legacyScanning
---				if legacyScanning == nil then
---					if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
---						legacyScanning = Auctioneer.ScanManager.IsScanning
---					else
---						legacyScanning = function () return false end
---					end
---					private.legacyScanning = legacyScanning
---				end
-
-				-- We only store one of the same item/owner/price/quantity in the scan
-				-- unless we are doing a forward scan (in which case we can be sure they
-				-- are not duplicate entries.
---			if private.isScanning
---			or totalAuctions <= 50
---			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
---			or legacyScanning() -- Is AucClassic scanning?
---			or private.NoDupes(curScan, itemData) then
 				tinsert(curScan, itemData)
 				storecount = storecount + 1
 			end
