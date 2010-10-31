@@ -125,7 +125,7 @@ local settingDefaults = {
 	['clickhook.enable'] = true,
 	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
-	['scancommit.ttl'] = 60,
+	['scancommit.ttl'] = 70,
 	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
 	['marketvalue.accuracy'] = .08,
@@ -513,7 +513,10 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostClearOnClose')) --"When the Auctionhouse closes, cancels any auction requests queued up to be posted"
 	gui:AddControl(id, "Checkbox",    0, 2,  "post.confirmonclose", _TRANS('ADV_Interface_PostConfirmOnClose')) --"Ask before clearing the posting queue"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostConfirmOnClose')) --"When the Auctionhouse closes, presents a popup dialog asking if you really want to clear the posting queue"
-
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
+	gui:AddControl(id, "WideSlider", 0, 1, "scanprogress.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
+	
 	gui:AddHelp(id, "what is scandata",
 		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
 		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
@@ -545,6 +548,10 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is accuracy",
         _TRANS('ADV_Help_WhatAccuracy'), --"What is Market Pricing error?",
         _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
+
+	gui:AddHelp(id, "what is ttl",
+	_TRANS('ADV_Interface_ScanRetrievalTTL'), --Scan Retrieval Time-to-Live,
+	_TRANS('ADV_Help_ScanRetrieveTTL'))--After a fast (GetAll) scan, there are usually many items for which we did not receive data. We can try to get a complete scan by rechecking the items for new information.  This slider sets the time, in seconds, we will wait before giving up if we're unable to get new data.
 
 	--Tooltip category for all modules to add tooltip related settings too
 	id = gui:AddTab("Tooltip")
