@@ -836,8 +836,9 @@ local Commitfunction = function()
 	end
 
 	local next = next
-	local maxTries = 61 -- one more than retries
+	local maxTries = get('scancommit.ttl')
 	local triesLeft = maxTries
+	if (triesLeft == 0) then triesLeft = 1 end
 	while ((not (next(itemLinkTable)==nil)) and (triesLeft > 0)) do
 		local itemLinkNewTable = { }
 		local index, data
@@ -859,7 +860,7 @@ local Commitfunction = function()
 					data2[Const.ILEVEL] = itemLevel
 					data2[Const.ITYPE] = itemType
 					data2[Const.ISUB] = itemSubType
-					data2[Const.IEQUIP] = itemEquipLoc
+					data2[Const.IEQUIP] = AucAdvanced.Const.EquipEncode[itemEquipLoc]
 				end
 			else
 				itemLinkNewTable[index] = data
@@ -872,6 +873,8 @@ local Commitfunction = function()
 	end
 
 
+	
+	
 	--[[ *** Stage 3: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
 	local dirtyCount = 0
 	local lut = {}
@@ -1363,7 +1366,7 @@ function lib.GetAuctionItem(list, i, skipGetInfo)
 		itemLink = AucAdvanced.SanitizeLink(itemLink)
 		local itemLevel,itemType,itemSubType,itemEquipLoc
 		if (skipGetInfo) then
-			itemLevel, itemType, itemSubType, itemEquipLoc = -1, -1, -1, -1
+			itemLevel, itemType, itemSubType, itemEquipLoc = -1, -1, -1, ""
 		else
 			_,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
 		end
@@ -1508,47 +1511,14 @@ local StorePageFunction = function()
 			end
 
 			local itemData = lib.GetAuctionItem("list", i, true)
---[[
-			local maxTries = 60
-			local tryCount = maxTries
-			while itemData==nil and tryCount>0 do
-				if nLog then
-					local lvl = N_WARNING
-					if (tryCount<maxTries) then 
-						nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Auction Store Retry",
-							("Store Being Reattempted with %d attempts left"):format(tryCount))
-					end
-				end
-
-				itemData = lib.GetAuctionItem("list", i, true)
-				tryCount = tryCount - 1
-				RunTime = GetTime()-lastPause
-				pauseTime = GetTime()
-				while (GetTime() - pauseTime) < 1 do
-					coroutine.yield()
-				end
-				lastPause = GetTime()
-			end
---]]
 			if (itemData) then
 				tinsert(curScan, itemData)
 				storecount = storecount + 1
---				if nLog then
---					local lvl = N_WARNING
---					if (tryCount<maxTries) then 
---						lvl=N_INFO
---						nLog.AddMessage("Auctioneer", "Scan", lvl, "Auction Stored",
---							("Stored Auction with %d attempts left"):format(tryCount))
---					end
---				end
 			else
 				tinsert(retries, i)
---				if nLog then
---					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Auction Not Stored", "Failed to Store Auction After all attempts")
---				end
 			end
 		end
-		local maxTries = 60
+		local maxTries = get('scancommit.ttl')
 		local tryCount = maxTries
 
 		local newRetries = { }
@@ -1563,13 +1533,6 @@ local StorePageFunction = function()
 			if private.breakStorePage then break end
 			tryCount = tryCount - 1
 			for _, i in ipairs(retries) do
-				if nLog then
-					local lvl = N_WARNING
-					if (tryCount<maxTries) then 
-						nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Auction Store Retry",
-							("Storage of %d Being Reattempted with %d attempts left"):format(i, tryCount))
-					end
-				end
 				if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 					local gt = GetTime()
 					if (gt-lastPause >= processingTime) then
@@ -1596,11 +1559,19 @@ local StorePageFunction = function()
 			retries = newRetries
 			newRetries = { }
 		end
+		if nLog and (#retries > 0) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, "Auction Store Failure",
+				("Store Page Failed to Store %d records on page %d"):format(#retries, page))
+		end
+
 		if (storecount > 0) then
 			curQuery.qryinfo.page = page
 			curPages[page] = true -- we have pulled this page
 		end
 	end
+	
+	
+	
 	if isGetAll then
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
@@ -1612,6 +1583,7 @@ local StorePageFunction = function()
 		EventFramesRegistered=nil
 	end
 
+	
 	-- Just updated the page if it was a new page, so record it as latest page.
 	if (page > curQuery.qryinfo.page) then
 		curQuery.qryinfo.page = page

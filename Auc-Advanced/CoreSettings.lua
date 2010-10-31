@@ -125,6 +125,7 @@ local settingDefaults = {
 	['clickhook.enable'] = true,
 	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
+	['scancommit.ttl'] = 60,
 	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
 	['marketvalue.accuracy'] = .08,
