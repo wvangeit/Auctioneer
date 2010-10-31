@@ -402,7 +402,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "sendSearchBrowseFrame", _BC('C_SendToSearch')) --Add BeanCounter's searched item to the Main Auction House Window?
-	gui:AddTip(id, _BC('TT_SendToSearch')) --"When entering a search in BeanCounter it will also add the string to the AH browse frame.
+	gui:AddTip(id, _BC('TT_sendtosearch')) --"When entering a search in BeanCounter it will also add the string to the AH browse frame.
 
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 20, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
