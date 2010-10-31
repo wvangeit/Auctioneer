@@ -50,7 +50,7 @@ local private = {}
 lib.Private = private
 
 local Const = AucAdvanced.Const
-local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local GetFaction = AucAdvanced.GetFaction
 local EquipCodeToInvIndex = AucAdvanced.Const.EquipCodeToInvIndex
 
@@ -1102,74 +1102,74 @@ local Commitfunction = function()
 		local summary
 
 		if scanTimeHours ~= 0 then
-			scanTime = scanTime..scanTimeHours.." Hours "
+			scanTime = scanTime..scanTimeHours.._TRANS("PSS_Hours")
 		end
 		if scanTimeMins ~= 0 then
-			scanTime = scanTime..scanTimeMins.." Mins "
+			scanTime = scanTime..scanTimeMins.._TRANS("PSS_Minutes")
 		end
 		if scanTimeSecs ~= 0 or (scanTimeHours == 0 and scanTimeMins == 0) then
-			scanTime = scanTime..scanTimeSecs.." Secs "
+			scanTime = scanTime..scanTimeSecs.._TRANS("PSS_Seconds")
 		end
 
 		if (wasIncomplete) then
-			summaryLine = "Auctioneer scanned {{"..scanCount.."}} auctions over{{"..scanTime.."}}before stopping:"
+			summaryLine = _TRANS("PSS_Incomplete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Incomplete_2").."{{"..scanTime.."}}".._TRANS("PSS_Incomplete_3")
 		else
-			summaryLine = "Auctioneer finished scanning {{"..scanCount.."}} auctions over{{"..scanTime.."}}:"
+			summaryLine = _TRANS("PSS_Complete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Complete_2").."{{"..scanTime.."}}:"
 		end
 		if (printSummary) then _print(summaryLine) end
 		summary = summaryLine
 
-		summaryLine = "  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query); {{"..currentCount.."}} at end"
+		summaryLine = "  {{"..oldCount.."}} ".._TRANS("PSS_StartItems").."{{"..dirtyCount.."}} ".._TRANS("PSS_MatchedItems").." {{"..currentCount.."}} ".._TRANS("PSS_AtEnd")
 		if (printSummary) then _print(summaryLine) end
 		summary = summary.."\n"..summaryLine
 
 		if (sameCount > 0) then
 			if (sameRecoveredCount > 0) then
-				summaryLine = "  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)"
+				summaryLine = "  {{"..sameCount.."}} ".._TRANS("PSS_Unchanged_Missed")..sameRecoveredCount.._TRANS("PSS_Missed")
 			else
-				summaryLine = "  {{"..sameCount.."}} unchanged items"
+				summaryLine = "  {{"..sameCount.."}} ".._TRANS("PSS_Unchanged_NoMissed")
 			end
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (updateCount > 0) then
 			if (updateRecoveredCount > 0) then
-				summaryLine = "  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)"
+				summaryLine = "  {{"..updateCount.."}} ".._TRANS("PSS_Updated_Missed")..updateRecoveredCount.._TRANS("PSS_Missed")
 			else
-				summaryLine = "  {{"..updateCount.."}} updated items"
+				summaryLine = "  {{"..updateCount.."}} ".._TRANS("PSS_Updated_NoMissed")
 			end
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (newCount > 0) then
-			summaryLine = "  {{"..newCount.."}} new items"
+			summaryLine = "  {{"..newCount.."}} ".._TRANS("PSS_NewItems")
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (earlyDeleteCount+expiredDeleteCount > 0) then
 			if expiredDeleteCount > 0 then
-				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed (of which, {{"..expiredDeleteCount.."}} were past expiry time)"
+				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} ".._TRANS("PSS_Removed_Expired").." {{"..expiredDeleteCount.."}} ".._TRANS("PSS_Expired")
 			else
-				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed"
+				summaryLine = "  {{"..earlyDeleteCount+expiredDeleteCount.."}} ".._TRANS("PSS_Removed_NoExpired")
 			end
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (filterNewCount+filterOldCount > 0) then
-			summaryLine = "  {{"..filterNewCount+filterOldCount.."}} filtered items"
+			summaryLine = "  {{"..filterNewCount+filterOldCount.."}} ".._TRANS("PSS_Filtered")
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (filterDeleteCount > 0) then
-			summaryLine = "  {{"..filterDeleteCount.."}} filtered items removed"
+			summaryLine = "  {{"..filterDeleteCount.."}} ".._TRANS("PSS_Filtered_Removed")
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
 		if (missedCount > 0) then
 			if (wasIncomplete) then
-				summaryLine = "  (Incomplete scan missed {{"..missedCount.."}} items)"
+				summaryLine = "  ".._TRANS("PSS_Incomplete_Missed_1")..missedCount.."}} ".._TRANS("PSS_Incomplete_Missed_2")
 			else
-				summaryLine = "  {{"..missedCount.."}} missed items"
+				summaryLine = "  {{"..missedCount.."}} ".._TRANS("PSS_MissedItems")
 			end
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
