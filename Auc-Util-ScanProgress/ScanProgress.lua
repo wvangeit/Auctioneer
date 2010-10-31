@@ -70,6 +70,7 @@ end
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
 private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned thus far: %d (%3.1f%%)\n\nElapsed scan time: %s\nEstimated time left: %s\n%s"
+private.scanCompleteFormat = "Auctioneer Advanced: %s\nScan Complete\n\nAuctions per second: %.2f\nAuctions expected: %d\nAuctions scanned: %d (%3.1f%%)\n\nElapsed scan time: %s\n%s"
 
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query, scanCount)
 	--Check that we're enabled before passing on the callback
@@ -160,24 +161,31 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 	local auctionsToScan = totalAuctions - (page-1)*numAuctionsPerPage
 	local missedAuctions = (page-1)*numAuctionsPerPage - scannedAuctions
 	local currentPage = page
+	local totalPages = maxPages
 
-	if (missedAuctions > 10) then
-		warningMessage = "Too many auctions have been missed.  This will be an incomplete scan."
+	if (currentPage <= totalPages) then
+		if (missedAuctions > 10) then
+			warningMessage = "Too many auctions have been missed.  This will be an incomplete scan."
+		else
+			if ((missedAuctions / page) * maxPages > 10) then
+				warningMessage = "Missing auctions.  This is likely this will be an incomplete scan."
+			end
+		end
 	else
-		if ((missedAuctions / page) * maxPages > 10) then
-			warningMessage = "Missing auctions.  This is likely this will be an incomplete scan."
+		if (totalAuctions - scannedAuctions > 10) then
+			warningMessage = "Too many auctions have been missed.  This will be an incomplete scan."
 		end
 	end
-	local totalPages = maxPages
 
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
-	if (currentPage >= totalPages) then 
+	if (currentPage > totalPages) then 
 		secondsToScanCompletion = "Done" 
 	else 
 		secondsToScanCompletion = SecondsToTime(secondsToScanCompletion) 
 	end
 
+	if (currentPage <= totalPages) then
 	BrowseNoResultsText:SetText(
 		private.scanProgressFormat:format(
 			"Scanning auctions",
@@ -190,6 +198,18 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 			warningMessage
 		)
 	)
+	else
+	BrowseNoResultsText:SetText(
+		private.scanCompleteFormat:format(
+			"Scanning auctions",
+			auctionsScannedPerSecond,
+			totalAuctions,
+			scannedAuctions, (scannedAuctions/totalAuctions)*100,
+			SecondsToTime(secondsElapsed),
+			warningMessage
+		)
+	)
+	end	
 end
 
 --Config UI functions

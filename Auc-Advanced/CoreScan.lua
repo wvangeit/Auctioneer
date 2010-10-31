@@ -1603,6 +1603,7 @@ local StorePageFunction = function()
 	-- Send the next page query or finish scanning
 	if isGetAll then
 		if not private.breakStorePage then
+			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
 			private.Commit((#curScan < totalAuctions - 100), true)
 			-- Clear the getall output. We don't want to create a new query so use the hook
 			private.queryStarted = GetTime()
@@ -1616,6 +1617,7 @@ local StorePageFunction = function()
 			if (#curScan < totalAuctions - 10) then -- we just got scan size above, so they should be close.
 				incomplete = true
 			end
+			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
 			private.Commit(incomplete, false)
 		end
 	elseif (maxPages == page+1) then
@@ -1626,6 +1628,7 @@ local StorePageFunction = function()
 				break
 			end
 		end
+		private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
 		private.Commit(incomplete, false)
 	end
 	local endTime = GetTime()
