@@ -550,7 +550,7 @@ function lib.MakeGuiConfig()
         _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
 
 	gui:AddHelp(id, "what is ttl",
-	_TRANS('ADV_Interface_ScanRetrievalTTL'), --Scan Retrieval Time-to-Live,
+	_TRANS('ADV_Interface_ScanRetrieveTTL'), --Scan Retrieval Time-to-Live,
 	_TRANS('ADV_Help_ScanRetrieveTTL'))--After a fast (GetAll) scan, there are usually many items for which we did not receive data. We can try to get a complete scan by rechecking the items for new information.  This slider sets the time, in seconds, we will wait before giving up if we're unable to get new data.
 
 	--Tooltip category for all modules to add tooltip related settings too
