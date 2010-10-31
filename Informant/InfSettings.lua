@@ -384,7 +384,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "show-crafted", _TRANS('INF_Interface_ShowCrafted'))
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_ShowCrafted'))
 	gui:AddControl(id, "Subhead",     0,	_TRANS('INF_Interface_ModTTShow')) --"Show Tooltip:"
-	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('mts_always') }, {"alt", _TRANS('mts_alt') }, { "noalt", _TRANS('mts_noalt') }, { "never", _TRANS('mts_never')} }, "ModTTShow")
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('INF_Interface_MTS_Always') }, {"alt", _TRANS('INF_Interface_MTS_Alt') }, { "noalt", _TRANS('INF_Interface_MTS_NoAlt') }, { "never", _TRANS('INF_Interface_MTS_Never')} }, "ModTTShow")
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Informant's Tooltip every time. When alt is pressed: Only show Informant's tooltip if alt is pressed. When alt is not pressed: Only show Informant's tooltip if alt is not pressed. Never: Never show Informant's tooltip."
 	-- TODO - localize me!
 	gui:AddControl(id, "Checkbox",   0, 1, "auto-update", _TRANS('INF_Interface_AutoUpdate')) --"Automatically update item information at merchants"
