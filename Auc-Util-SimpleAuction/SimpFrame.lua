@@ -624,7 +624,7 @@ function private.LoadItemLink(itemLink, size)
 			if reason == "Damaged" then
 				aucPrint(itemLink.." is damaged: you may be able to post it after repairing it")
 			else
-				aucPrint(itemLink.." cannot be posted: "..(AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"))
+				aucPrint(itemLink.." cannot be posted: "..AucAdvanced.Post.GetErrorText(reason))
 			end
 			return private.LoadItemLink()
 		end
@@ -806,8 +806,7 @@ function private.PostAuction()
 	if success then
 		aucPrint("Posting "..number.." stacks of "..stack.."x "..link.." at Bid:"..coins(bid)..", BO:"..coins(buy).." for "..duration.."h")
 	else
-		reason = AucAdvanced.Post.ErrorText[reason] or "Unknown Reason"
-		aucPrint("Posting Failed for "..link..": "..reason)
+		aucPrint("Posting Failed for "..link..": "..AucAdvanced.Post.GetErrorText(reason))
 	end
 end
 
