@@ -514,7 +514,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",    0, 2,  "post.confirmonclose", _TRANS('ADV_Interface_PostConfirmOnClose')) --"Ask before clearing the posting queue"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostConfirmOnClose')) --"When the Auctionhouse closes, presents a popup dialog asking if you really want to clear the posting queue"
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
-	gui:AddControl(id, "WideSlider", 0, 1, "scanprogress.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
+	gui:AddControl(id, "WideSlider", 0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 	
 	gui:AddHelp(id, "what is scandata",
