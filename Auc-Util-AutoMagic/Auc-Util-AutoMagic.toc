@@ -4,8 +4,12 @@
 ## OptionalDependencies: Auc-Util-Appraiser, Enchantrix, Auc-Util-ItemSuggest, LibDataBroker
 ##
 ## Version: <%version%> (<%codename%>)
-## URL: http://auctioneeraddon.com/
+## Revision: $Id$
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer
+## X-Category: Auction House
 ## X-Max-Interface: 40000
+## X-URL: http://auctioneeraddon.com/
+## X-Feedback: http://forums.norganna.org
+##
 Embed.xml

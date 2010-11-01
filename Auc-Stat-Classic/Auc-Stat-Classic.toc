@@ -5,8 +5,12 @@
 ##
 ## SavedVariables: AucAdvancedStatClassicData
 ## Version: <%version%> (<%codename%>)
-## URL: http://auctioneeraddon.com/
+## Revision: $Id$
 ## Author: Norganna's AddOns
 ## X-Part-Of: Auctioneer
+## X-Category: Auction House
+## X-Max-Interface: 30300
+## X-URL: http://auctioneeraddon.com/
+## X-Feedback: http://forums.norganna.org
 ##
 StatClassic.lua
