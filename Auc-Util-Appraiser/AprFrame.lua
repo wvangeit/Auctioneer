@@ -1364,6 +1364,40 @@ function private.CreateFrames()
 		end
 	end
 
+	local function helperPostRequest(sig, stack, bidVal, buyVal, duration, numstacks, dryRun, singleclick)
+		-- called from multiple places in PostBySig
+		-- lifted out as a separate function, as it was getting increasingly unwieldy
+		if dryRun then
+			aucPrint(" - ".._TRANS('APPR_Help_PretendingPostStacks'):format(numstacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
+		elseif singleclick then
+			local success, reason = AucAdvanced.Post.PostAuctionClick(sig, stack, bidVal, buyVal, duration, numstacks)
+			if success then
+				if stack > 1 then
+					aucPrint(" - ".._TRANS('APPR_Help_PostingLots'):format(numstacks, stack))--Posting {{%d}} lots of {{%d}}
+				else
+					aucPrint(" - ".._TRANS('APPR_Help_PostingItems'):format(numstacks))--Posting {{%d}} items
+				end
+			else
+				reason = AucAdvanced.Post.GetErrorText(reason)
+				aucPrint(" * ".._TRANS('APPR_Help_CouldNotPost')..": "..reason)--Could not post item
+			end
+			return success, reason
+		else
+			local success, reason = AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, numstacks)
+			if success then
+				if stack > 1 then
+					aucPrint(" - ".._TRANS('APPR_Help_QueueingLots'):format(numstacks, stack))--Queueing {{%d}} lots of {{%d}}
+				else
+					aucPrint(" - ".._TRANS('APPR_Help_QueueingItems'):format(numstacks))--Queueing {{%d}} items
+				end
+			else
+				reason = AucAdvanced.Post.GetErrorText(reason)
+				aucPrint(" * ".._TRANS('APPR_Help_CouldNotQueue')..": "..reason)--Could not queue item
+			end
+			return success, reason
+		end
+	end
+
 	function frame.PostBySig(sig, dryRun, singleclick)
 		local link, itemName = AucAdvanced.Modules.Util.Appraiser.GetLinkFromSig(sig)
 		local total, _, unpostable = AucAdvanced.Post.CountAvailableItems(sig)
@@ -1433,7 +1467,7 @@ function private.CreateFrames()
 
 		aucPrint(_TRANS('APPR_Help_PostingBatch'):format(link))--Posting batch of: %s
 
-		aucPrint("  ".._TRANS('APPR_Help_Duration'):format(duration/60))--- Duration: {{%d hours}}
+		aucPrint(" - ".._TRANS('APPR_Help_Duration'):format(AucAdvanced.Post.AuctionDurationHours(duration)))--Duration: {{%d hours}}
 
 		local bidVal, buyVal
 		local totalBid, totalBuy, totalNum = 0,0,0
@@ -1448,87 +1482,53 @@ function private.CreateFrames()
 					bidVal = lib.RoundBid(itemBid * stack)
 					buyVal = lib.RoundBuy(itemBuy * stack)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
-					if dryRun then
-						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(fullStacks, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
-					else
-						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(fullStacks, stack))--- Queueing {{%d}} lots of {{%d}}
-						if singleclick then
-							singleclick = nil
-							AucAdvanced.Post.PostAuctionClick(sig, stack, bidVal, buyVal, duration, fullStacks)
-						else
-							AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
-						end
-					end
 
-					totalBid = totalBid + (bidVal * fullStacks)
-					totalBuy = totalBuy + (buyVal * fullStacks)
-					totalNum = totalNum + (stack * fullStacks)
+					if helperPostRequest(sig, stack, bidVal, buyVal, duration, fullStacks, dryRun, singleclick) then
+						totalBid = totalBid + (bidVal * fullStacks)
+						totalBuy = totalBuy + (buyVal * fullStacks)
+						totalNum = totalNum + (stack * fullStacks)
+					end
 				end
 				if (number == -1 and remain > 0) then
 					bidVal = lib.RoundBid(itemBid * remain)
 					buyVal = lib.RoundBuy(itemBuy * remain)
 					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
-					if dryRun then
-						aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(1, remain, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
-					else
-						aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(1, remain))--- Queueing {{%d}} lots of {{%d}}
-						if singleclick then
-							singleclick = nil
-							AucAdvanced.Post.PostAuctionClick(sig, remain, bidVal, buyVal, duration)
-						else
-							AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
-						end
-					end
 
-					totalBid = totalBid + bidVal
-					totalBuy = totalBuy + buyVal
-					totalNum = totalNum + remain
+					if helperPostRequest(sig, remain, bidVal, buyVal, duration, 1, dryRun, singleclick) then
+						totalBid = totalBid + bidVal
+						totalBuy = totalBuy + buyVal
+						totalNum = totalNum + remain
+					end
 				end
 			else
 				bidVal = lib.RoundBid(itemBid * stack)
 				buyVal = lib.RoundBuy(itemBuy * stack)
 				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
-				if dryRun then
-					aucPrint(" ".._TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
-				else
-					aucPrint(" ".._TRANS('APPR_Help_QueueingLots'):format(number, stack))--- Queueing {{%d}} lots of {{%d}}
-					if singleclick then
-						singleclick = nil
-						AucAdvanced.Post.PostAuctionClick(sig, stack, bidVal, buyVal, duration, number)
-					else
-						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
-					end
-				end
 
-				totalBid = totalBid + (bidVal * number)
-				totalBuy = totalBuy + (buyVal * number)
-				totalNum = totalNum + (stack * number)
+				if helperPostRequest(sig, stack, bidVal, buyVal, duration, number, dryRun, singleclick) then
+					totalBid = totalBid + (bidVal * number)
+					totalBuy = totalBuy + (buyVal * number)
+					totalNum = totalNum + (stack * number)
+				end
 			end
 		else
 			if number < 0 then number = total end
 			bidVal = lib.RoundBid(itemBid)
 			buyVal = lib.RoundBuy(itemBuy)
 			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
-			if dryRun then
-				aucPrint(_TRANS('APPR_Help_PretendingPostStacks'):format(number, stack, AucAdvanced.Coins(bidVal, true), AucAdvanced.Coins(buyVal, true)))--- Pretending to post {{%d}} stacks of {{%d}} at {{%s}} min and {{%s}} buyout per stack
-			else
-				aucPrint(_TRANS('APPR_Help_QueueingItems'):format(number))--- Queueing {{%d}} items
-				if singleclick then
-					singleclick = nil
-					AucAdvanced.Post.PostAuctionClick(sig, 1, bidVal, buyVal, duration, number)
-				else
-					AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
-				end
-			end
 
-			totalBid = totalBid + (bidVal * number)
-			totalBuy = totalBuy + (buyVal * number)
-			totalNum = totalNum + number
+			if helperPostRequest(sig, 1, bidVal, buyVal, duration, number, dryRun, singleclick) then
+				totalBid = totalBid + (bidVal * number)
+				totalBuy = totalBuy + (buyVal * number)
+				totalNum = totalNum + number
+			end
 		end
 
 		aucPrint("-----------------------------------")
 		if dryRun then
 			aucPrint(_TRANS('APPR_Help_PretendedItems'):format(totalNum))--Pretended {{%d}} items
+		elseif singleclick then
+			aucPrint(_TRANS('APPR_Help_PostedItems'):format(totalNum))--Posted {{%d}} items
 		else
 			aucPrint(_TRANS('APPR_Help_QueuedUpItems'):format(totalNum))--Queued up {{%d}} items
 		end
