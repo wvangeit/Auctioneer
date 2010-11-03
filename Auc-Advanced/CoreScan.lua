@@ -1342,7 +1342,7 @@ local Commitfunction = function()
 	end
 
 	scanstats.LastScan = now
-	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0  or numempty > 0 then
+	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0 then
 		scanstats.ImageUpdated = now
 	end
 	if wasUnrestricted and not wasIncomplete then scanstats.LastFullScan = now end
