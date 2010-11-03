@@ -1292,7 +1292,7 @@ local Commitfunction = function()
 		end
 		if (missedCount > 0) then
 			if (wasIncomplete) then
-				summaryLine = "  ".._TRANS("PSS_Incomplete_Missed_1")..missedCount.."}} ".._TRANS("PSS_Incomplete_Missed_2")
+				summaryLine = "  ".._TRANS("PSS_Incomplete_Missed_1").." "..missedCount.."}} ".._TRANS("PSS_Incomplete_Missed_2")
 			else
 				summaryLine = "  {{"..missedCount.."}} ".._TRANS("PSS_MissedItems")
 			end
