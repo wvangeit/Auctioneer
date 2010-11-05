@@ -284,7 +284,7 @@ function lib:MakeGuiConfig(gui)
 	-- Anchored to the hidden "Note" control we added earlier
 	gui:AddControl(id, "Subhead",0, "Snatch search settings:")
 	gui:AddControl(id, "Note", 0, 1, nil, nil, " ")
-	last = gui:GetLast(id)
+	local last = gui:GetLast(id)
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.allow.bid", "Allow Bids")
 	gui:AddTip(id, "Allow Snatch searcher to suggest bids")
 	gui:SetLast(id, last)
