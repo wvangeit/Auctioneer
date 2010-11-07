@@ -115,6 +115,24 @@ local function update()
 	end
 end
 
+-- NOTE - this is a duplicate of the slidebar icon code
+local function mmButton_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_NONE")
+	GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine("Enchantrix",  1,1,0.5, 1)
+	GameTooltip:AddLine(_ENCH("EnxMMTip"),  1,1,0.5, 1)
+	GameTooltip:AddLine("|cff1fb3ff".._ENCH("Click").."|r ".._ENCH("TipOpenEnchant"), 1,1,0.5, 1)
+	GameTooltip:AddLine("|cff1fb3ff".._ENCH("ShiftClick").."|r ".._ENCH("TipOpenJewel"), 1,1,0.5, 1)
+	GameTooltip:AddLine("|cff1fb3ff".._ENCH("RightClick").."|r ".._ENCH("TipOpenConfig"), 1,1,0.5, 1)
+	GameTooltip:Show()
+end
+
+local function mmButton_OnLeave(self)
+	GameTooltip:Hide()
+end
+
+
 miniIcon:SetToplevel(true)
 miniIcon:SetMovable(true)
 miniIcon:SetFrameStrata("LOW")
@@ -143,6 +161,8 @@ miniIcon:SetScript("OnDragStart", dragStart)
 miniIcon:SetScript("OnDragStop", dragStop)
 miniIcon:SetScript("OnClick", click)
 miniIcon:SetScript("OnUpdate", update)
+miniIcon:SetScript("OnEnter", mmButton_OnEnter)
+miniIcon:SetScript("OnLeave", mmButton_OnLeave)
 
 
 
@@ -163,13 +183,12 @@ if LibStub then
 					icon = "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb",
 					OnClick = function(self, button) click(self, button) end,
 					})
-		-- TODO - localize these strings!
 		function sideIcon:OnTooltipShow()
 			self:AddLine("Enchantrix",  1,1,0.5, 1)
-			self:AddLine("Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer to allow pricing and purchasing decisions to be made.",  1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Click".."|r ".."to open the Enchanting window.", 1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Shift-Click".."|r ".."to open Jewel Crafting.", 1,1,0.5, 1)
-			self:AddLine("|cff1fb3ff".."Right-Click".."|r ".."to edit the configuration.", 1,1,0.5, 1)
+			self:AddLine(_ENCH("EnxMMTip"),  1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".._ENCH("Click").."|r ".._ENCH("TipOpenEnchant"), 1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".._ENCH("ShiftClick").."|r ".._ENCH("TipOpenJewel"), 1,1,0.5, 1)
+			self:AddLine("|cff1fb3ff".._ENCH("RightClick").."|r ".._ENCH("TipOpenConfig"), 1,1,0.5, 1)
 		end
 		function sideIcon:OnEnter()
 			GameTooltip:SetOwner(self, "ANCHOR_NONE")
@@ -183,19 +202,3 @@ if LibStub then
 		end
 	end
 end
-
-if sideIcon and SlideBar then
-	function sideIcon.Update()
-		if (settings.GetSetting("sideIcon.enable")) then
-			SlideBar.AddButton("Enchantrix")
-		else
-			SlideBar.RemoveButton("Enchantrix")
-		end
-	end
-else
-	sideIcon = {}
-	function sideIcon.Update() end
-end
-
-Enchantrix.SideIcon = sideIcon
-

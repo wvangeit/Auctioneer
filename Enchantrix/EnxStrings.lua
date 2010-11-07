@@ -678,6 +678,10 @@ EnchantrixLocalizations = {
 		["GuiWeightSettings"]	= "Reagenzwunsch bei Entzauberung";
 		["GuiYes"]	= "Ja";
 		["ModTTShow"]	= "Zeige extra tooltip nur wenn Alt gedrückt wird";
+		["ModTTShow_alt"]	= "Wenn Alt gedrückt wird";
+		["ModTTShow_always"]	= "Immer";
+		["ModTTShow_never"]	= "Nie";
+		["ModTTShow_noalt"]	= "Wenn Alt nicht gedrückt wird";
 
 	};
 
@@ -838,6 +842,8 @@ EnchantrixLocalizations = {
 		["FrmtPctlessSkipped"]	= "Skipped %d auctions due to profitability cutoff (%s)";
 
 		-- Section: Tooltip Messages
+		["Click"]	= "Click";
+		["EnxMMTip"]	= "Enchantrix shows you what reagents an item will disenchant, prospect, or mill into. It also provides integration into Auctioneer to allow pricing and purchasing decisions to be made.";
 		["FrmtBarkerPrice"]	= "Barker Price (%d%% margin)";
 		["FrmtDEItemLevels"]	= "Disenchantable from item levels %d to %d.";
 		["FrmtDisinto"]	= "Disenchants into:";
@@ -868,6 +874,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer not loaded, using cached prices]";
 		["FrmtWarnNoPrices"]	= "[No prices available]";
 		["FrmtWarnPriceUnavail"]	= "[Some prices unavailable]";
+		["RightClick"]	= "Right-Click";
+		["ShiftClick"]	= "Shift-Click";
+		["TipOpenConfig"]	= "to edit the configuration.";
+		["TipOpenEnchant"]	= "to open the Enchanting window.";
+		["TipOpenJewel"]	= "to open the Jewel Crafting window.";
 		["TooltipMillingLevel"]	= "Milling requires skill %d";
 		["TooltipProspectLevel"]	= "Prospecting requires skill %d";
 		["TooltipShowDisenchantLevel"]	= "Disenchanting requires skill %d";
@@ -2069,16 +2080,27 @@ EnchantrixLocalizations = {
 		-- Section: Command Messages
 		["FrmtActClearall"]	= "Czyszczenie wszystkich informacji o zaklęciach(enchant)";
 		["FrmtActClearFail"]	= "Nie można znaleźć przedmiotu: %s";
-		["FrmtActClearOk"]	= "Limpando os dados para o item: %s";
-		["FrmtActDefault"]	= "A opção %s Enchantrix foi resetada para as configuraçaõ padrão";
-		["FrmtActDefaultAll"]	= "Todas as opções do Enchantrix foram resetadas para as opções padrões";
-		["FrmtActDisable"]	= "Não indicando os dados do item %s";
-		["FrmtActEnable"]	= "Indicando os dados do item %s";
-		["FrmtActSet"]	= "Por %s para '%s'";
-		["FrmtActUnknown"]	= "Comando desconhecido :'%s' ";
-		["FrmtActUnknownLocale"]	= "O local que voce especificou ('%s') ´s desconhecida. Os locais validos são:";
-		["FrmtPrintin"]	= "As mensagens do Enchantrix serão mostradas no \"%s\" do quadro do chat";
-		["FrmtUsage"]	= "Uso:";
+		["FrmtActClearOk"]	= "Wyczyszczone informacje o przedmiocie: %s";
+		["FrmtActDefault"]	= "Opcje Enchantrix'a zostały zresetowane do wartości domyślnych";
+		["FrmtActDefaultAll"]	= "Wszystkie opcje Enchantrix'a zostały zresetowane do wartości domyślnych.";
+		["FrmtActDisable"]	= "Nie wyświetlaj informacji o przedmiocie %s";
+		["FrmtActEnable"]	= "Wyświetlaj informacje o przedmiocie %s";
+		["FrmtActSet"]	= "Ustaw %s na '%s'";
+		["FrmtActUnknown"]	= "Nieznana komenda: '%s' ";
+		["FrmtActUnknownLocale"]	= "Lokale jakie podałeś ('%s') są nieznane.";
+		["FrmtPrintin"]	= "Wiadomości Enchantrix'a będą wyświetlane w oknie czatu";
+		["FrmtUsage"]	= "Wykorzystanie:";
+		["MesgDisable"]	= "Wyłączanie automatycznego ładowania Enchantrix'a";
+		["MesgNotloaded"]	= "Enchantrix  nie jest wczytany. Wpisz /enchantrix  by wyświetlić więcej informacji.";
+
+		-- Section: User Interface
+		["GuiSaveProfileButton"]	= "Zapisz";
+		["GuiYes"]	= "Tak";
+		["ModTTShow"]	= "Pokaż podpowiedź";
+		["ModTTShow_alt"]	= "Gdy klawisz Alt jest wciśnięty";
+		["ModTTShow_always"]	= "Zawsze";
+		["ModTTShow_never"]	= "Nigdy";
+		["ModTTShow_noalt"]	= "Gdy klawisz Alt nie jest wciśnięty";
 
 	};
 
@@ -2507,6 +2529,10 @@ EnchantrixLocalizations = {
 		["GuiWeightSettings"]	= "Желательный реагент при распылении";
 		["GuiYes"]	= "Да";
 		["ModTTShow"]	= "Показывать дополнительную подсказку только при нажатии Alt";
+		["ModTTShow_alt"]	= "Когда нажат Alt";
+		["ModTTShow_always"]	= "Всегда";
+		["ModTTShow_never"]	= "Никогда";
+		["ModTTShow_noalt"]	= "Когда не нажат Alt";
 
 	};
 
@@ -2840,24 +2866,24 @@ EnchantrixLocalizations = {
 		["CmdOn"]	= "on";
 		["CmdPrintin"]	= "print-in";
 		["CmdToggle"]	= "toggle";
-		["ConfigUI"]	= "config";
-		["ShowDELevels"]	= "levels";
-		["ShowDEMaterials"]	= "materials";
+		["ConfigUI"]	= "設置";
+		["ShowDELevels"]	= "等級";
+		["ShowDEMaterials"]	= "材料";
 		["ShowEmbed"]	= "embed";
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
 		["ShowGuessAuctioneerVal"]	= "valuate-val ";
 		["ShowGuessBaseline"]	= "valuate-baseline";
-		["ShowTerse"]	= "terse";
-		["ShowUI"]	= "show";
+		["ShowTerse"]	= "簡潔的\n";
+		["ShowUI"]	= "顯示";
 		["ShowValue"]	= "valuate";
 		["StatOff"]	= "不顯示任何附魔數據";
 		["StatOn"]	= "顯示已設置好的附魔資料中";
 
 		-- Section: Config Text
-		["GuiLoad"]	= "載入Enchantrix";
-		["GuiLoad_Always"]	= "always";
-		["GuiLoad_Never"]	= "never";
+		["GuiLoad"]	= "載入附魔助手";
+		["GuiLoad_Always"]	= "總是";
+		["GuiLoad_Never"]	= "從不";
 
 		-- Section: Game Constants
 		["ArgSpellMillingName"]	= "研磨";
@@ -2872,23 +2898,23 @@ EnchantrixLocalizations = {
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= " (請至 http://enchantrix.org/ 以分享您的數據) ";
-		["FrmtWelcome"]	= "Enchantrix v%s 已載入";
-		["MesgAuctVersion"]	= "Enchantrix 需要 Auctioneer v4.0 或更新的版本。部份功能在您未更新您的Auctioneer前無法使用。";
+		["FrmtWelcome"]	= "附魔助手 v%s 已載入";
+		["MesgAuctVersion"]	= "附魔助手 需要 拍賣助手 v4.0 或更新的版本。部份功能在您未更新您的Auctioneer前無法使用。";
 
 		-- Section: Help Text
 		["GuiClearall"]	= "清除所有附魔數據";
 		["GuiClearallButton"]	= "清除全部";
 		["GuiClearallHelp"]	= "點擊此處，清除目前伺服器之所有附魔數據";
 		["GuiClearallNote"]	= "目前的伺服器";
-		["GuiDefaultAll"]	= "重置所有Enchantrix選項";
+		["GuiDefaultAll"]	= "重置所有附魔助手選項";
 		["GuiDefaultAllButton"]	= "重設所有設定";
-		["GuiDefaultAllHelp"]	= "點擊這裡以重設所有Enchantrix的選項回預設值。警告：這個操作是無法還原的。";
+		["GuiDefaultAllHelp"]	= "點擊這裡以重設所有附魔助手的選項回預設值。警告：這個操作是無法還原的。";
 		["GuiDefaultOption"]	= "重設這個設定";
 		["GuiDELevels"]	= "在提示資訊中顯示分解需要的等級";
 		["GuiDEMaterials"]	= "在提示資訊中顯示分解材料數據";
 		["GuiEmbed"]	= "將信息嵌入遊戲提示資訊中";
 		["GuiLocale"]	= "設定語言為";
-		["GuiMainEnable"]	= "啟動 Enchantrix";
+		["GuiMainEnable"]	= "啟動 附魔助手";
 		["GuiMainHelp"]	= "包含插件 - 附魔助手的設置。它用於顯示物品分解產物信息";
 		["GuiOtherHeader"]	= "其他選項";
 		["GuiOtherHelp"]	= "附魔助手 雜項設定";
@@ -2994,7 +3020,7 @@ EnchantrixLocalizations = {
 		["BeanCounterRequired"]	= "必須安裝 BeanCounter 才能決定收益因子。 關閉 AutoDE 限制直到安裝了 BeanCounter。";
 		["ExportPriceAucAdv"]	= "匯出 Enchantrix 價格資訊到 Auctioneer Advanced";
 		["GuiActivateProfile"]	= "啟用目前記錄檔";
-		["GuiAutoDeBoughtForDE"]	= "只為了分解而購買的物品";
+		["GuiAutoDeBoughtForDE"]	= "只分解購買的物品";
 		["GuiAutoDeEnable"]	= "監看背包中可分解的物品 - 小心使用\n";
 		["GuiAutoDeEpicItems"]	= "自動分解史詩(紫)物品";
 		["GuiAutoDeOptions"]	= "自動化";
@@ -3068,6 +3094,10 @@ EnchantrixLocalizations = {
 		["GuiWeightSettings"]	= "分解材料需求度";
 		["GuiYes"]	= "確定";
 		["ModTTShow"]	= "只在按下ALT時顯示額外的提示窗。";
+		["ModTTShow_alt"]	= "當Alt鍵被按下";
+		["ModTTShow_always"]	= "總是";
+		["ModTTShow_never"]	= "從不";
+		["ModTTShow_noalt"]	= "當Alt鍵沒有被按下";
 
 	};
 
