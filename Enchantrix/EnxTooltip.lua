@@ -149,7 +149,7 @@ local function prospectTooltip(prospect, tooltip, name, link, quality, count)
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
 			tooltip:AddLine(line.str, nil, embed)
-			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
+--			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
 
@@ -242,7 +242,7 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
 			tooltip:AddLine(line.str, nil, embed)
-			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
+--			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
 
@@ -427,7 +427,7 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
 		for n, line in ipairs(lines) do
 			tooltip:AddLine(line.str, nil, embed)
-			if n >= 5 then break end -- Don't add more than 5 lines
+--			if n >= 5 then break end -- Don't add more than 5 lines
 		end
 	end
 
