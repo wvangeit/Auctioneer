@@ -881,8 +881,8 @@ function private.CreateFrames()
 		end
 
 		frame.refresh:Enable()
-		local matchers = get("matcherlist")
-		if not matchers or #matchers == 0 then
+		local matchers = AucAdvanced.API.GetNumMatchers()
+		if matchers == 0 then
 			frame.salebox.matcher:Disable()
 			frame.salebox.matcher.label:SetTextColor(.5, .5, .5)
 		else

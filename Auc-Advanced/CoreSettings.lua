@@ -33,7 +33,7 @@ data layout:
 		AucAdvancedConfig = {
 
 			["profile.test4"] = {
-				["miniicon.distance"] = 56, 
+				["miniicon.distance"] = 56,
 				["miniicon.angle"] = 189,
 				["show"] = true,
 				["enable"] = true,
@@ -64,7 +64,7 @@ data layout:
 
 		}
 
-if user does not have a set profile name, they get the default profile. 
+if user does not have a set profile name, they get the default profile.
 All modules should use this format for stored KEYS         ModuleType.ModuleName.setting   = value    for example     util.automagic.showmailgui = true
 
 
@@ -75,6 +75,8 @@ Usage:
 
 ]]
 if not AucAdvanced then return end
+local coremodule, internal = AucAdvanced.GetCoreModule("CoreSettings")
+if not coremodule or not internal then return end -- Someone has explicitely broken us
 
 AucAdvanced.Settings = {}
 local lib = AucAdvanced.Settings
@@ -83,6 +85,12 @@ local gui
 local Matcherdropdown
 
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+
+function coremodule.OnLoad(addon)
+	if addon == "auc-advanced" then
+		private.CheckObsolete()
+	end
+end
 
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
@@ -128,7 +136,7 @@ local settingDefaults = {
 	['scancommit.ttl'] = 70,
 	['alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
-	['marketvalue.accuracy'] = .08,
+	["core.marketvalue.tolerance"] = .08,
 	["ShowPurchaseDebug"] = true,
 	["SelectedLocale"] = GetLocale(),
 	["ModTTShow"] = "always",
@@ -261,6 +269,7 @@ local function setter(setting, value)
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
 					AucAdvancedConfig[getUserSig()] = 'Default'
+					private.CheckObsolete()
 				end
 			else
 				message(_TRANS("ADV_Help_CannotDeleteProfile")) --"The selected profile cannot be deleted"
@@ -282,26 +291,14 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			AucAdvancedConfig[getUserSig()] = value
 
+			-- Check newly loaded profile
+			private.CheckObsolete()
 		end
 
 		-- Refresh all values to reflect current data
 		gui:Refresh()
 	elseif (a == "matcher") then
-		local matchers = AucAdvanced.Settings.GetSetting("matcherlist")
-		local i = AucAdvanced.Settings.GetSetting("matcherdynamiclist")
-		if i then
-			i = strsplit(":", i)
-			i = tonumber(i)
-			if b == "up" and i > 1 then
-				matchers[i], matchers[i-1] = matchers[i-1], matchers[i]
-			elseif b == "down" and i < #matchers then
-				matchers[i], matchers[i+1] = matchers[i+1], matchers[i]
-			end
-			AucAdvanced.Settings.SetSetting("matcherlist", matchers)
-			for j = 1, #matchers do
-				gui.elements["matcherdynamiclist"].list()[j] = AucAdvanced.API.GetMatcherDropdownList()[j]
-			end
-			AucAdvanced.Settings.SetSetting("matcherdynamiclist", 1)
+		if AucAdvanced.API.MatcherSetter(setting, value) then
 			gui:Refresh()
 		end
 	else
@@ -358,6 +355,8 @@ local function getter(setting)
 			end
 			return pList
 		end
+	elseif a == "matcher" then
+		return AucAdvanced.API.MatcherGetter(setting)
 	end
 
 	if (setting == 'profile') then
@@ -485,17 +484,18 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
-	
+
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
 
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
 	last = gui:GetLast(id)
-	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList(), "matcherdynamiclist")
+	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList, "matcher.select")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.3,1, "matcher.up", _TRANS('ADV_Interface_Up')) --"Up"
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", _TRANS('ADV_Interface_Down')) --"Down"
+
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredOutputFrame')) --"Preferred Output Frame"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ChatOutputFrame')) --"This allows you to select which chat window Auctioneer prints its output to."
@@ -507,7 +507,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PurchasingOptions')) --"Purchasing Options"
 	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", _TRANS('ADV_Interface_ShowPurchaseDebug')) --"Show purchase queue info"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ShowPurchaseDebug')) --"Shows what is added to the purchase queue, and what is being purchased"
-	
+
 	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PostingOptions')) --"Posting Options"
 	gui:AddControl(id, "Checkbox",    0, 1,  "post.clearonclose", _TRANS('ADV_Interface_PostClearOnClose')) --"Clear the posting queue when the Auctionhouse is closed"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostClearOnClose')) --"When the Auctionhouse closes, cancels any auction requests queued up to be posted"
@@ -516,7 +516,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
 	gui:AddControl(id, "WideSlider", 0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
-	
+
 	gui:AddHelp(id, "what is scandata",
 		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
 		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
@@ -560,11 +560,11 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is the tooltip tab",
 		_TRANS('ADV_Help_WhatTooltipTab'), --What is the tooltip tab?
 		_TRANS('ADV_Help_WhatTooltipTabAnswer')) --This tab allows you to adjust what data gets displayed in the tooltips added by auctioneer. It provides a single point for any module to add settings that are related to tooltip functionality.
-	
+
 	gui:AddControl(id, "Header",   0,    _TRANS('ADV_Interface_TooltipDisplayOptionsOptions') ) --Tooltip Display Options
 	gui:AddControl(id, "Subhead",    0,    _TRANS('ADV_Interface_ControlsShowHideTooltip') ) --Controls to show or hide tooltip information.
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", _TRANS('ADV_Interface_ScanDataDisplay')) --"Display scan data tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataDisplay')) --"Enable the display of how many items in the current scan image match this item"
@@ -576,13 +576,13 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When alt is pressed: Only show Auctioneer's tooltip if alt is pressed. When alt is not pressed: Only show Auctioneer's tooltip if alt is not pressed. Never: Never show Auctioneer's tooltip."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	
+
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
 	gui:AddControl(id, "Checkbox",   0, 1, "tooltip.marketprice.show", _TRANS('ADV_Interface_MktPriceShow')) --"Display Market Price in the tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
 	gui:AddControl(id, "Checkbox",   0, 2, "tooltip.marketprice.stacksize", _TRANS('ADV_Interface_MultiplyStack')) --"Multiply by Stack Size"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MultiplyStack')) --"Multiplies by current stack size if enabled"
-	gui:AddControl(id, "Slider", 0, 1, "marketvalue.accuracy", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
+	gui:AddControl(id, "Slider", 0, 1, "core.marketvalue.tolerance", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
@@ -604,7 +604,7 @@ if LibStub then
 					icon = "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon",
 					OnClick = function(self, button) lib.Toggle(self, button) end,
 				})
-		
+
 		function private.LDBButton:OnTooltipShow()
 			self:AddLine("Auctioneer",  1,1,0.5, 1)
 			self:AddLine("Auctioneer allows you to scan the auction house and collect statistics about prices.",  1,1,0.5, 1)
@@ -647,6 +647,32 @@ function lib.upgradeSavedVariables()
 		end
 	end
 	AucAdvancedConfig["version"] = 1
+end
+
+-- Check for obsolete settings and either convert to new "triplet" version, or delete if no longer required
+-- Only checks the current profile, so must be called at OnLoad, and when user selects a new profile
+-- todo: this list is probably going to get quite long, also it is related to upgradeSavedVariables -
+---- can we do something to reduce duplicate code, and/or merge with upgradeSavedVariables?
+function private.CheckObsolete()
+	-- clean up obsolete setting(s)
+	if getter("matcherdynamiclist") then
+		setter("matcherdynamiclist", nil)
+	end
+	local old
+	local old = getter("matcherlist")
+	if old then
+		if not getter("core.matcher.matcherlist") then
+			setter("core.matcher.matcherlist", old)
+		end
+		setter("matcherlist", nil)
+	end
+	old = getter("marketvalue.accuracy")
+	if old then
+		if getter("core.marketvalue.tolerance") == getDefault("core.marketvalue.tolerance") then
+			setter("core.marketvalue.tolerance", old)
+		end
+		setter("marketvalue.accuracy", nil)
+	end
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
