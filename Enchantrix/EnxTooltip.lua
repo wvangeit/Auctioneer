@@ -284,11 +284,14 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 			return
 		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "alt" and not IsAltKeyDown() then
 			return
-		elseif not Enchantrix.Settings.GetSetting("ModTTShow") == "alt" and not Enchantrix.Settings.GetSetting("ModTTShow") == "noalt" and not Enchantrix.Settings.GetSetting("ModTTShow") == "never" and not Enchantrix.Settings.GetSetting("ModTTShow") == "always" then
-			Enchantrix.Settings.SetSetting("ModTTShow", "alt")
-			if not IsAltKeyDown() then
-				return
-			end
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "noshift" and IsShiftKeyDown() then
+			return
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "shift" and not IsShiftKeyDown() then
+			return
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "noctrl" and IsControlKeyDown() then
+			return
+		elseif Enchantrix.Settings.GetSetting("ModTTShow") == "ctrl" and not IsControlKeyDown() then
+			return
 		end
 	else 
 		Enchantrix.Settings.SetSetting("ModTTShow", "always")

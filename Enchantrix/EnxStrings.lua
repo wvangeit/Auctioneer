@@ -807,7 +807,7 @@ EnchantrixLocalizations = {
 		["HelpShowUI"]	= "Show or hide the settings panel.";
 		["HelpTerse"]	= "Enable/disable terse mode, showing only disenchant value. Can be overridden by holding down the control key.";
 		["HelpValue"]	= "Select whether to show item's estimated values based on the proportions of possible disenchants";
-		["ModTTShow_Help"]	= "Determines Tooltip behavior. \nAlways: Show Enchantrix's Tooltip every time. \nWhen alt is pressed: Only show Enchantrix's tooltip if alt is pressed. \nWhen alt is not pressed: Only show Enchantrix's tooltip if alt is not pressed.\nNever: Never show Enchantrix's tooltip.";
+		["ModTTShow_Help"]	= "Determines Tooltip behavior. \nAlways: Show Enchantrix's Tooltip every time. \nWhen <mod> is pressed: Only show Enchantrix's tooltip if the specified modifier is pressed. \nWhen <mod> is not pressed: Only show Enchantrix's tooltip if the specified modifier is not pressed.\nNever: Never show Enchantrix's tooltip.";
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "You do not have Auctioneer installed. Auctioneer must be installed to perform an auction scan.";
@@ -963,8 +963,12 @@ EnchantrixLocalizations = {
 		["ModTTShow"]	= "Show Tooltip:";
 		["ModTTShow_alt"]	= "When Alt is pressed";
 		["ModTTShow_always"]	= "Always";
+		["ModTTShow_ctrl"]	= "When Ctrl is pressed";
 		["ModTTShow_never"]	= "Never";
 		["ModTTShow_noalt"]	= "When Alt is not pressed";
+		["ModTTShow_noctrl"]	= "When Ctrl is not pressed";
+		["ModTTShow_noshift"]	= "When Shift is not pressed";
+		["ModTTShow_shift"]	= "When Shift is pressed";
 
 	};
 
