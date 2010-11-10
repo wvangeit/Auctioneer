@@ -98,11 +98,14 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 			return
 		elseif getFilter("ModTTShow") == "alt" and not IsAltKeyDown() then
 			return
-		elseif not getFilter("ModTTShow") == "alt" and not getFilter("ModTTShow") == "noalt" and not getFilter("ModTTShow") == "never" and not getFilter("ModTTShow") == "always" then
-			setFilter("ModTTShow", "alt")
-			if not IsAltKeyDown() then
-				return
-			end
+		elseif getFilter("ModTTShow") == "noshift" and IsShiftKeyDown() then
+			return
+		elseif getFilter("ModTTShow") == "shift" and not IsShiftKeyDown() then
+			return
+		elseif getFilter("ModTTShow") == "noctrl" and IsControlKeyDown() then
+			return
+		elseif getFilter("ModTTShow") == "ctrl" and not IsControlKeyDown() then
+			return
 		end
 	else 
 		setFilter("ModTTShow", "always")
@@ -115,6 +118,13 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 		if (itemInfo.itemLevel) then
 			tooltip:AddLine(_TRANS('INF_Tooltip_ItemLevel'):format(itemInfo.itemLevel), embedded)
 		end
+	end
+
+	if (getFilter('show-binding')) and itemInfo.soulBindText then
+		tooltip:AddLine(itemInfo.soulBindText,embedded)
+	end
+	if (getFilter('show-binding')) and itemInfo.specialBindText then
+		tooltip:AddLine(itemInfo.specialBindText,embedded)
 	end
 
 	if (getFilter('show-link')) then
