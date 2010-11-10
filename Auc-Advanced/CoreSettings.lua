@@ -573,8 +573,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
-	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When alt is pressed: Only show Auctioneer's tooltip if alt is pressed. When alt is not pressed: Only show Auctioneer's tooltip if alt is not pressed. Never: Never show Auctioneer's tooltip."
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, {"shift", _TRANS('ADV_Interface_mts_shift') }, {"noshift", _TRANS('ADV_Interface_mts_noshift')}, {"ctrl", _TRANS('ADV_Interface_mts_ctrl')},{"noctrl", _TRANS('ADV_Interface_mts_noctrl')}, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When <mod> is pressed: Only show Auctioneer's tooltip if the specified modifier is pressed. When <mod> is not pressed: Only show Auctioneer's tooltip if the specified modifier is not pressed. Never: Never show Auctioneer's tooltip."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
