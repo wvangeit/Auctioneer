@@ -121,6 +121,8 @@ CLASS_TO_CATEGORY_MAP = {
 	[12] = 12, --Quest
 } 
 
+local soulbindtypes = {_TRANS("INF_Tooltip_SoulBindUse"),_TRANS("INF_Tooltip_SoulBindEquip"),_TRANS("INF_Tooltip_SoulBindPickup")}
+local specialbindtypes = {_TRANS("INF_Tooltip_SpecialBindAccount"),_TRANS("INF_Tooltip_SpecialBindGuild")}
 
 -- FUNCTION DEFINITIONS
 
@@ -165,11 +167,11 @@ function getItem(itemID, static)
 	if cache[itemID] then return cache[itemID] end
 	
 	local baseData = self.database[itemID]
-	local buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist
+	local buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist,soulbind,specialbind
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
 
 	if (baseData) then
-		buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
+		buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist, soulbind, specialbind = strsplit(":", baseData)
 		buy = tonumber(buy)
 	end
 	
@@ -205,6 +207,8 @@ function getItem(itemID, static)
 	quality = tonumber(quality) or itemQuality
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
+	soulbind = tonumber(soulbind)
+	specialbind = tonumber(specialbind)
 
 	sell = select(11,GetItemInfo(itemID))
 	local dataItem = (static and staticDataItem or {})
@@ -222,6 +226,10 @@ function getItem(itemID, static)
 	dataItem.texture = itemTexture
 	dataItem.itemLevel = itemLevel
 	dataItem.reqLevel = itemUseLevel
+	dataItem.soulBind = soulbind
+	dataItem.specialBind = specialbind
+	if soulbind > 0 then dataItem.soulBindText = soulbindtypes[soulbind] else dataItem.soulBindText = nil end
+	if specialbind > 0 then dataItem.specialBindText = specialbindtypes[specialbind] else dataItem.specialBindText = nil end
 
 	local addition = ""
 	if (additional and additional ~= "") then

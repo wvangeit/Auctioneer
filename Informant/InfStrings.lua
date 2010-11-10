@@ -159,6 +159,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Slår visning af et items vendor købs pris til eller fra";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Slår visning af et items vendor salgs pris til eller fra";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Slår visning af en tooltip besked om at ingen merchant sælger et item";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Blacksmithing";
+		["INF_HelpTooltip_SkillCooking"]	= "Cooking";
 		["INF_HelpTooltip_VendorToggle"]	= "Slår visning af et items vendor købs/salgs pris til eller fra";
 
 		-- Section: Interface
@@ -204,8 +206,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Vis Vendor Køb/Salgs priser";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Blacksmithing";
-		["INF_HelpTooltip_SkillCooking"]	= "Cooking";
 		["INF_Tooltip_AdditAlchemy"]	= "Alchemy";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Ammo Pouch";
 		["INF_Tooltip_AdditAmulet"]	= "Amulet";
@@ -416,6 +416,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Ändert die Anzeige des Kaufpreises (Händler) für einen Gegenstand.";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Ändert die Anzeige des Verkaufpreises (Händler) für einen Gegenstand.";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Ändert die Anzeige des Tooltips für Gegenstände, die von keinem Händler angeboten werden.";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Schmieden";
+		["INF_HelpTooltip_SkillCooking"]	= "Kochen";
 		["INF_HelpTooltip_VendorToggle"]	= "Ändert die Anzeige des Kauf-/Verkaufpreises (Händler) für einen Gegenstand.";
 
 		-- Section: Interface
@@ -465,8 +467,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Zeigt Händler Kauf/Verkaufspreise an";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Schmieden";
-		["INF_HelpTooltip_SkillCooking"]	= "Kochen";
 		["INF_Tooltip_AdditAlchemy"]	= "Alchemie";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Munitionstasche";
 		["INF_Tooltip_AdditAmulet"]	= "Amulett";
@@ -652,6 +652,8 @@ InformantLocalizations = {
 		["INF_Help_Off"]	= "Off";
 		["INF_Help_On"]	= "On";
 		["INF_Help_OptLocale"]	= "<locale>";
+		["INF_Help_ShowBindingTTHeading"]	= "Show item binding behavior in tooltip";
+		["INF_Help_ShowBindingTTText"]	= "An item's soul binding behavior (Bind on Use, Bind on Equip, Bind on Pickup) and special binding behavior (Bind on Account, Bind on Guild) can be displayed in Informant's tooltip if desired.  This defaults to off, as the information is available through Blizzard's tooltip prior to an item binding as well.";
 		["INF_Help_Toggle"]	= "Toggle";
 		["INF_Help_Welcome"]	= "Informant v%s loaded";
 		["INF_Help_WhatIs"]	= "What is Informant?";
@@ -664,9 +666,10 @@ InformantLocalizations = {
 		["INF_HelpTooltip_DeleteProfile"]	= "Deletes the currently selected profile";
 		["INF_HelpTooltip_Embed"]	= "Embed most of the info in the original game-tooltip (note: the item's link cannot be embedded)";
 		["INF_HelpTooltip_EnableInformant"]	= "Toggles Informant's data display on and off";
-		["INF_HelpTooltip_ModTTShow"]	= "Determines Tooltip behavior. \nAlways: Show Informant's Tooltip every time. \nWhen alt is pressed: Only show Informant's tooltip if alt is pressed. \nWhen alt is not pressed: Only show Informant's tooltip if alt is not pressed.\nNever: Never show Informant's tooltip.";
+		["INF_HelpTooltip_ModTTShow"]	= "Determines Tooltip behavior. \nAlways: Show Informant's Tooltip every time. \nWhen <mod> is pressed: Only show Informant's tooltip if the specified modifier is pressed. \nWhen <mod> is not pressed: Only show Informant's tooltip if the specified modifier is not pressed.\nNever: Never show Informant's tooltip.";
 		["INF_HelpTooltip_ProfileName"]	= "Enter the name of the profile that you wish to create";
 		["INF_HelpTooltip_ProfileSave"]	= "Click this button to create or overwrite the specified profile name";
+		["INF_HelpTooltip_ShowBindinginTT"]	= "Show how an item binds (on Use, on Equip, on Pickupt, etc) in the Informant tooltip";
 		["INF_HelpTooltip_ShowCrafted"]	= "Turning this on will cause Informant to show the crafted item and it's Appraiser, Disenchant and Vendor values (as applicable) in the tooltip of Recipe, Plan, Schematic, Pattern, and Design item tooltips.";
 		["INF_HelpTooltip_ShowIlevel"]	= "Toggle the display of an item's level (this is different from its use level)";
 		["INF_HelpTooltip_ShowLink"]	= "Toggle the display of an item's link (link cannot be embedded)";
@@ -677,6 +680,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Toggle the display of an item's vendor buy price";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Toggle the display of an item's vendor sell price";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Toggles the display of a tooltip message of zero merchants selling an item";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Blacksmithing";
+		["INF_HelpTooltip_SkillCooking"]	= "Cooking";
 		["INF_HelpTooltip_VendorToggle"]	= "Toggle to show an item's vendor buy/sell pricing";
 
 		-- Section: Interface
@@ -708,11 +713,16 @@ InformantLocalizations = {
 		["INF_Interface_ModTTShow"]	= "Show Tooltip:";
 		["INF_Interface_MTS_Alt"]	= "When Alt is pressed";
 		["INF_Interface_MTS_Always"]	= "Always";
+		["INF_Interface_MTS_Ctrl"]	= "When Ctrl is pressed";
 		["INF_Interface_MTS_Never"]	= "Never";
 		["INF_Interface_MTS_NoAlt"]	= "When Alt is not pressed";
+		["INF_Interface_MTS_NoCtrl"]	= "When Ctrl is not pressed";
+		["INF_Interface_MTS_NoShift"]	= "When Shift is not pressed";
+		["INF_Interface_MTS_Shift"]	= "When Shift is pressed";
 		["INF_Interface_ProfileName"]	= "New profile name";
 		["INF_Interface_SaveProfile"]	= "Save";
 		["INF_Interface_SetupProfiles"]	= "Setup, Configure and Edit Profiles";
+		["INF_Interface_ShowBindinginTT"]	= "Show item binding behavior in tooltip?";
 		["INF_Interface_ShowCrafted"]	= "Show crafted item and value.";
 		["INF_Interface_ShowIlevel"]	= "Show an item's level";
 		["INF_Interface_ShowLink"]	= "Show an item's link";
@@ -726,8 +736,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Show Vendor Buy/Sell Prices";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Blacksmithing";
-		["INF_HelpTooltip_SkillCooking"]	= "Cooking";
 		["INF_Tooltip_AdditAlchemy"]	= "Alchemy";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Ammo Pouch";
 		["INF_Tooltip_AdditAmulet"]	= "Amulet";
@@ -867,6 +875,11 @@ InformantLocalizations = {
 		["INF_Tooltip_SkillTailoring"]	= "Tailoring";
 		["INF_Tooltip_SkillWarlock"]	= "Warlock Spells";
 		["INF_Tooltip_SkillWarrior"]	= "Warrior Skills";
+		["INF_Tooltip_SoulBindEquip"]	= "Bind on Equip";
+		["INF_Tooltip_SoulBindPickup"]	= "Bind on Pickup";
+		["INF_Tooltip_SoulBindUse"]	= "Bind on Use";
+		["INF_Tooltip_SpecialBindAccount"]	= "Bind on Account";
+		["INF_Tooltip_SpecialBindGuild"]	= "Bind on Guild";
 		["INF_Tooltip_StackSize"]	= "Stacks in lots of %d";
 		["INF_Tooltip_Use"]	= "Used for: %s";
 
@@ -938,6 +951,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Muestra el valor de compra del objeto por los mercaderes";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Muestra el valor de venta del objeto por los mercaderes";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Muestra un mensaje cuando no hay mercaderes que vendan el objeto";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Herrería";
+		["INF_HelpTooltip_SkillCooking"]	= "Cocina";
 		["INF_HelpTooltip_VendorToggle"]	= "Muestra u oculta el precio de compra/venta en los mercaderes de un objeto";
 
 		-- Section: Interface
@@ -983,8 +998,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Mostrar precios de compra/venta en mercader";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Herrería";
-		["INF_HelpTooltip_SkillCooking"]	= "Cocina";
 		["INF_Tooltip_AdditAlchemy"]	= "Alquimia";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Bolsa de munición";
 		["INF_Tooltip_AdditAmulet"]	= "Amuleto";
@@ -1239,6 +1252,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Affiche le prix d'achat auprès d'un marchand pour un objet";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Affiche le prix de vente au marchand d'un objet";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Permet l'affichage d'un message indiquant qu'aucun marchand ne vend l'objet";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Forge";
+		["INF_HelpTooltip_SkillCooking"]	= "Cuisine";
 		["INF_HelpTooltip_VendorToggle"]	= "Permet l'affichage du prix d'achat/vente dumarchand pour un objet";
 
 		-- Section: Interface
@@ -1284,8 +1299,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Afficher les prix de vente et d'achat du marchand";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Forge";
-		["INF_HelpTooltip_SkillCooking"]	= "Cuisine";
 		["INF_Tooltip_AdditAlchemy"]	= "Alchimie";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Giberne";
 		["INF_Tooltip_AdditAmulet"]	= "Amulette";
@@ -1601,6 +1614,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "아이템의 상점 판매 가격 표시를 토글합니다.";
 		["INF_HelpTooltip_ShowVendorSell"]	= "아이템의 상점 판매 가격 표시를 토글합니다.";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "0개의 상인 판매 아이템의 툴팁 메시지 표시를 토글합니다.";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "대장기술";
+		["INF_HelpTooltip_SkillCooking"]	= "요리";
 		["INF_HelpTooltip_VendorToggle"]	= "아이템의 상점 구입/판매 가격 표시를 토글합니다.";
 
 		-- Section: Interface
@@ -1645,8 +1660,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "상점 구입/판매 가격 표시";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "대장기술";
-		["INF_HelpTooltip_SkillCooking"]	= "요리";
 		["INF_Tooltip_AdditAlchemy"]	= "연금술";
 		["INF_Tooltip_AdditAmmoPouch"]	= "탄약 주머니";
 		["INF_Tooltip_AdditAmulet"]	= "부적";
@@ -1832,6 +1845,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Schakelt de weergave van een item's koop prijs van een vendor";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Schakelt de weergave van een item's verkoop prijs van een vendor";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Schakelt de weergave van een tooltip bericht van nul verkopers die een item verkopen";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "smeedkunst";
+		["INF_HelpTooltip_SkillCooking"]	= "koken";
 		["INF_HelpTooltip_VendorToggle"]	= "Schakelt de weergave van een item's verkoper koop/verkoop prijs";
 
 		-- Section: Interface
@@ -1875,8 +1890,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "laat Vendor koop en verkoop prijs zien";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "smeedkunst";
-		["INF_HelpTooltip_SkillCooking"]	= "koken";
 		["INF_Tooltip_AdditAlchemy"]	= "alchemie";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Ammunitie Zak";
 		["INF_Tooltip_AdditAmulet"]	= "Amulet";
@@ -1946,6 +1959,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Włącza pokazywanie ceny przedmiotu w przypadku kupna u sprzedawcy";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Włącza pokazywanie ceny przedmiotu w przypadku sprzedaży u kupca";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Włącza wyświetlanie okna gdy żaden kupiec nie sprzedaje przedmiotu";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "Kowalstwo";
+		["INF_HelpTooltip_SkillCooking"]	= "Gotowanie";
 		["INF_HelpTooltip_VendorToggle"]	= "Włącza pokazywanie ceny za którą kupiec kupi/sprzeda przedmiot";
 
 		-- Section: Interface
@@ -1995,8 +2010,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Pokaż cenę Kupna/sprzedaży u kupca";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "Kowalstwo";
-		["INF_HelpTooltip_SkillCooking"]	= "Gotowanie";
 		["INF_Tooltip_AdditAlchemy"]	= "Alchemia";
 		["INF_Tooltip_AdditAmmoPouch"]	= "Torba na amunicję";
 		["INF_Tooltip_AdditAmulet"]	= "Amulet";
@@ -2283,6 +2296,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "Показывает, за сколько вы продадите предмет торговцу";
 		["INF_HelpTooltip_ShowVendorSell"]	= "Показывает, за сколько вы купите предмет у торговца";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "Выводит в подсказке сообщение, если не найдено (или неизвестно) ни одного торговца, которые продают предмет";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "кузнечное дело";
+		["INF_HelpTooltip_SkillCooking"]	= "кулинария";
 		["INF_HelpTooltip_VendorToggle"]	= "Отображение во всплывающей подсказке стоимости купли/продажи предмета торговцем (общая кнопка).";
 
 		-- Section: Interface
@@ -2332,8 +2347,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "Показать стоимость предмета у торговца (общая кнопка)";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "кузнечное дело";
-		["INF_HelpTooltip_SkillCooking"]	= "кулинария";
 		["INF_Tooltip_AdditAlchemy"]	= "алхимия";
 		["INF_Tooltip_AdditAmmoPouch"]	= "подсумок";
 		["INF_Tooltip_AdditAmulet"]	= "амулет";
@@ -2543,6 +2556,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "开启显示一件物品的商店买入价。";
 		["INF_HelpTooltip_ShowVendorSell"]	= "开启显示物品卖给商人的卖出价。";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "设置是否要在信息提示框中显示\"无商人贩卖该物品\"。";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "锻造";
+		["INF_HelpTooltip_SkillCooking"]	= "烹饪";
 		["INF_HelpTooltip_VendorToggle"]	= "设置是否显示物品在商人处的买/卖价格。";
 
 		-- Section: Interface
@@ -2587,8 +2602,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "显示在商人处购买/卖出价格";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "锻造";
-		["INF_HelpTooltip_SkillCooking"]	= "烹饪";
 		["INF_Tooltip_AdditAlchemy"]	= "炼金";
 		["INF_Tooltip_AdditAmmoPouch"]	= "弹药袋";
 		["INF_Tooltip_AdditAmulet"]	= "项链";
@@ -2798,6 +2811,8 @@ InformantLocalizations = {
 		["INF_HelpTooltip_ShowVendorBuy"]	= "顯示物品購買價格";
 		["INF_HelpTooltip_ShowVendorSell"]	= "顯示物品賣出價格";
 		["INF_HelpTooltip_ShowZeroMerchants"]	= "設置是否要在提示窗訊息中顯示\"無商人販賣該物品\"。";
+		["INF_HelpTooltip_SkillBlacksmithing"]	= "鍛造";
+		["INF_HelpTooltip_SkillCooking"]	= "烹飪";
 		["INF_HelpTooltip_VendorToggle"]	= "設置是否顯示該物品的買賣價格";
 
 		-- Section: Interface
@@ -2847,8 +2862,6 @@ InformantLocalizations = {
 		["INF_Interface_VendorToggle"]	= "顯示從商人購入、賣出給商人的價格";
 
 		-- Section: Tooltip
-		["INF_HelpTooltip_SkillBlacksmithing"]	= "鍛造";
-		["INF_HelpTooltip_SkillCooking"]	= "烹飪";
 		["INF_Tooltip_AdditAlchemy"]	= "煉金術";
 		["INF_Tooltip_AdditAmmoPouch"]	= "彈藥包";
 		["INF_Tooltip_AdditAmulet"]	= "護身符";
