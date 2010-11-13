@@ -308,9 +308,9 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	hideOnEscape = 1
 }
 
-function lib.PromptSellerIgnore(name, point, relativeFrame, relativePoint, ofsx, ofsy)
+function lib.PromptSellerIgnore(name, parent, point, relativeFrame, relativePoint, ofsx, ofsy)
 	if not name or name == "" then return end
-	if not (point and relativeFrame and relativePoint) then return end -- todo: implement a default anchor of some sort
+	if not (parent and point and relativeFrame and relativePoint) then return end -- todo: implement a default anchor of some sort
 	if IgnoreList[name] then
 		private.IgnorePrompt.text:SetText(_TRANS("BASC_Interface_RemovePlayerIgnore"))--Remove player from Ignore List
 	else
@@ -319,7 +319,7 @@ function lib.PromptSellerIgnore(name, point, relativeFrame, relativePoint, ofsx,
 	private.IgnorePrompt.name:SetText(name)
 	private.curPromptName = name
 	private.IgnorePrompt:ClearAllPoints()
-	private.IgnorePrompt:SetParent(relativeFrame)
+	private.IgnorePrompt:SetParent(parent)
 	private.IgnorePrompt:SetPoint(point, relativeFrame, relativePoint, ofsx, ofsy)
 	private.IgnorePrompt:SetFrameStrata("TOOLTIP")
 	private.IgnorePrompt:Show()
