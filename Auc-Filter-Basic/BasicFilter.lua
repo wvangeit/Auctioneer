@@ -38,7 +38,7 @@ local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
-if not AucAdvancedFilterBasic then AucAdvancedFilterBasic = {} end
+--if not AucAdvancedFilterBasic then AucAdvancedFilterBasic = {} end
 if not AucAdvancedFilterBasic_IgnoreList then AucAdvancedFilterBasic_IgnoreList = {} end
 
 local IgnoreList = {}
@@ -47,7 +47,6 @@ lib.Processors = {}
 function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
 end
-
 
 function lib.AuctionFilter(operation, itemData)
 	local active = get("filter.basic.activated")
@@ -66,8 +65,9 @@ function lib.AuctionFilter(operation, itemData)
 	if lib.IsPlayerIgnored(seller) then retval = true end
 
 	if nLog and retval then
+		if not seller or seller == "" then seller = "UNKNOWN" end
 		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
-			itemData.itemName, " from ", (itemData.sellerName or "UNKNOWN"), ", quality ", tostring(quality or 0), ", item level ", tostring(itemData.itemLevel or 0))
+			itemData.itemName, " from ", seller, ", quality ", tostring(quality or 0), ", item level ", tostring(itemData.itemLevel or 0))
 	end
 	return retval
 end
@@ -79,7 +79,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.basic.ignoreself", false)
 	BF_IgnoreList_Load()
 	private.DataLoaded()
-	BasicFilter_IgnoreListFrame:RegisterEvent("PLAYER_LOGOUT")
+	--BasicFilter_IgnoreListFrame:RegisterEvent("PLAYER_LOGOUT")
 end
 
 function private.SetupConfigGui(gui)
@@ -109,7 +109,7 @@ function private.SetupConfigGui(gui)
 		"0 = (|cff9d9d9d ".._TRANS('BASC_HelpTooltip_MinimumQualityJunk').."|r),\n"..--Junk
 		"1 = (|cffffffff ".._TRANS('BASC_HelpTooltip_MinimumQualityCommon').."|r),\n"..--Common
 		"2 = (|cff1eff00 ".._TRANS('BASC_HelpTooltip_MinimumQualityUncommon').."|r),\n"..--Uncommon
-		"3 = (|cff0070dd".._TRANS('BASC_HelpTooltip_MinimumQualityRare').."|r),\n"..--Rare
+		"3 = (|cff0070dd ".._TRANS('BASC_HelpTooltip_MinimumQualityRare').."|r),\n"..--Rare
 		"4 = (|cffa335ee ".._TRANS('BASC_HelpTooltip_MinimumQualityEpic').."|r)")--Epic
 
 	gui:AddControl(id, "Subhead",	0, _TRANS('BASC_Interface_FilterItemLevel') )--Filter by Item Level
@@ -217,6 +217,7 @@ function BF_IgnoreList_Load()
 	BF_IgnoreList_Update()
 end
 
+--[[ broken & never gets called ###
 function BF_IgnoreList_OnEvent(self, event)
 	if event == "PLAYER_LOGOUT" then
 		for key in pairs(IgnoreList) do
@@ -226,6 +227,7 @@ function BF_IgnoreList_OnEvent(self, event)
 		end
 	end
 end
+--]]
 
 function BF_IgnoreList_Add(name)
 	-- name validity checks
@@ -305,5 +307,81 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	whileDead = 1,
 	hideOnEscape = 1
 }
+
+function lib.PromptSellerIgnore(name, point, relativeFrame, relativePoint, ofsx, ofsy)
+	if not name or name == "" then return end
+	if not (point and relativeFrame and relativePoint) then return end -- todo: implement a default anchor of some sort
+	if IgnoreList[name] then
+		private.IgnorePrompt.text:SetText(_TRANS("BASC_Interface_RemovePlayerIgnore"))--Remove player from Ignore List
+	else
+		private.IgnorePrompt.text:SetText(_TRANS("BASC_Interface_AddPlayerIgnore"))--Add player to Ignore List
+	end
+	private.IgnorePrompt.name:SetText(name)
+	private.curPromptName = name
+	private.IgnorePrompt:ClearAllPoints()
+	private.IgnorePrompt:SetParent(relativeFrame)
+	private.IgnorePrompt:SetPoint(point, relativeFrame, relativePoint, ofsx, ofsy)
+	private.IgnorePrompt:SetFrameStrata("TOOLTIP")
+	private.IgnorePrompt:Show()
+end
+
+function private.OnPromptYes()
+	local name = private.curPromptName
+	private.curPromptName = nil
+	private.IgnorePrompt:Hide()
+	if IgnoreList[name] then
+		BF_IgnoreList_Remove(name)
+	else
+		BF_IgnoreList_Add(name)
+	end
+end
+
+function private.OnPromptNo()
+	private.curPromptName = nil
+	private.IgnorePrompt:Hide()
+end
+
+function private.OnPromptHide()
+	private.curPromptName = nil
+	if private.IgnorePrompt:IsShown() then
+		-- prompt has been implicitly hidden by hiding parent
+		-- explicitly hide prompt, so it won't reappear when parent is shown again
+		private.IgnorePrompt:Hide()
+	end
+end
+
+private.IgnorePrompt = CreateFrame("Frame", nil, UIParent)
+private.IgnorePrompt:Hide()
+private.IgnorePrompt:SetBackdrop({
+	  bgFile = "Interface/Tooltips/ChatBubble-Background",
+	  edgeFile = "Interface/Minimap/TooltipBackdrop",
+	  tile = true, tileSize = 32, edgeSize = 10,
+	  insets = { left = 2, right = 2, top = 2, bottom = 2 }
+})
+private.IgnorePrompt:SetBackdropColor(0,0,0, 1)
+private.IgnorePrompt:SetWidth(100)
+private.IgnorePrompt:SetHeight(76)
+private.IgnorePrompt:SetPoint("CENTER", UIParent, "CENTER")
+private.IgnorePrompt:SetScript("OnHide", private.OnPromptHide)
+-- todo: can we hide on ESC too?
+
+private.IgnorePrompt.text = private.IgnorePrompt:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
+private.IgnorePrompt.text:SetPoint("TOP", private.IgnorePrompt, "TOP", 0, -8)
+private.IgnorePrompt.text:SetWidth(94)
+private.IgnorePrompt.text:SetNonSpaceWrap(true)
+
+private.IgnorePrompt.name = private.IgnorePrompt:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
+private.IgnorePrompt.name:SetPoint("TOP", private.IgnorePrompt.text, "BOTTOM", 0, -4)
+private.IgnorePrompt.name:SetTextColor(1, 1, 1)
+
+private.IgnorePrompt.yes = CreateFrame("Button", nil, private.IgnorePrompt, "AucPromptSmallButtonTemplate")
+private.IgnorePrompt.yes:SetPoint("BOTTOMLEFT", private.IgnorePrompt, "BOTTOMLEFT", 10, 8)
+private.IgnorePrompt.yes:SetScript("OnClick", private.OnPromptYes)
+private.IgnorePrompt.yes:SetText(YES)
+
+private.IgnorePrompt.no = CreateFrame("Button", nil, private.IgnorePrompt, "AucPromptSmallButtonTemplate")
+private.IgnorePrompt.no:SetPoint("BOTTOMRIGHT", private.IgnorePrompt, "BOTTOMRIGHT", -10, 8)
+private.IgnorePrompt.no:SetScript("OnClick", private.OnPromptNo)
+private.IgnorePrompt.no:SetText(NO)
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
