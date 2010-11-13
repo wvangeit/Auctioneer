@@ -2540,64 +2540,11 @@ function private.CreateFrames()
 	function private.onClick(button, row, index)
 		if (IsAltKeyDown()) and frame.imageview.sheet.labels[index]:GetText() == "Seller" then
 			local seller = frame.imageview.sheet.rows[row][index]:GetText()
-			if not seller or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored then frame.sellerIgnore:Hide() return end
-
-			frame.sellerIgnore:SetParent(frame.imageview.sheet.panel)
-			frame.sellerIgnore:SetFrameStrata("TOOLTIP")
-			frame.sellerIgnore:ClearAllPoints()
-			frame.sellerIgnore:SetPoint("TOPLEFT", button, "BOTTOM")
-			frame.sellerIgnore:Show()
-			--if toon not ignored the ignore
-			if not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(seller) then
-				frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) frame.sellerIgnore:Hide() end)
-				frame.sellerIgnore.help:SetText(_TRANS('APPR_Interface_AddPlayerIgnore'):format("|CFFFFFFFF", seller))--Add player to ignore list %s%s
-			else
-				frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) frame.sellerIgnore:Hide() end)
-				frame.sellerIgnore.help:SetText(_TRANS('APPR_Interface_RemovePlayerIgnore'):format("|CFFFFFFFF", seller))--Remove player from ignore list %s%s
+			if AucAdvanced.Modules.Filter.Basic then
+				AucAdvanced.Modules.Filter.Basic.PromptSellerIgnore(seller, frame.imageview.sheet.panel, "TOPLEFT", button, "BOTTOM")
 			end
 		end
 	end
-	--ignore/unignore seller GUI
-	frame.sellerIgnore = CreateFrame("Frame", nil, UiParent)
-	frame.sellerIgnore:Hide()
-	frame.sellerIgnore:SetBackdrop({
-	      bgFile = "Interface/Tooltips/ChatBubble-Background",
-	      edgeFile = "Interface/Minimap/TooltipBackdrop",
-	      tile = true, tileSize = 32, edgeSize = 10,
-	      insets = { left = 2, right = 2, top = 2, bottom = 2 }
-	})
-	frame.sellerIgnore:SetBackdropColor(0,0,0, 1)
-	frame.sellerIgnore:SetWidth(100)
-	frame.sellerIgnore:SetHeight(70)
-	frame.sellerIgnore:SetPoint("CENTER", UIParent, "CENTER")
-	frame.sellerIgnore:SetFrameStrata("TOOLTIP")
-
-	frame.sellerIgnore.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
-	frame.sellerIgnore.help:SetParent(frame.sellerIgnore)
-	frame.sellerIgnore.help:SetPoint("CENTER", frame.sellerIgnore, "TOP", 0, -25)
-	frame.sellerIgnore.help:SetWidth(100)
-
-	frame.sellerIgnore.yes = CreateFrame("Button", nil, frame.sellerIgnore, "UIPanelButtonTemplate")
-	frame.sellerIgnore.yes:SetNormalFontObject(GameFontNormalSmall)
-	frame.sellerIgnore.yes:SetPoint("BOTTOMLEFT", frame.sellerIgnore, "BOTTOMLEFT", 5, 10)
-	frame.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( name ) end)
-	frame.sellerIgnore.yes:SetText(_TRANS('APPR_Interface_Yes') )--Yes
-	frame.sellerIgnore.yes:SetWidth(30)
-	frame.sellerIgnore.yes:SetHeight(10)
-	local font = frame.sellerIgnore.yes:GetFontString()
-	font:SetFontObject("GameFontNormalSmall" )
-	font:SetTextHeight(10)
-
-	frame.sellerIgnore.no = CreateFrame("Button", nil, frame.sellerIgnore, "UIPanelButtonTemplate")
-	frame.sellerIgnore.no:SetNormalFontObject(GameFontNormalSmall)
-	frame.sellerIgnore.no:SetPoint("BOTTOMRIGHT", frame.sellerIgnore, "BOTTOMRIGHT", -5, 10)
-	frame.sellerIgnore.no:SetScript("OnClick", function()  frame.sellerIgnore:Hide() end)
-	frame.sellerIgnore.no:SetText(_TRANS("APPR_Interface_No"))--No
-	frame.sellerIgnore.no:SetWidth(30)
-	frame.sellerIgnore.no:SetHeight(10)
-	local font = frame.sellerIgnore.no:GetFontString()
-	font:SetFontObject("GameFontNormalSmall" )
-	font:SetTextHeight(10)
 
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		--{ "Item",   "TEXT", get("util.appraiser.columnwidth.Item")}, -- Default width 105
