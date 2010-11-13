@@ -228,8 +228,8 @@ function getItem(itemID, static)
 	dataItem.reqLevel = itemUseLevel
 	dataItem.soulBind = soulbind
 	dataItem.specialBind = specialbind
-	if soulbind > 0 then dataItem.soulBindText = soulbindtypes[soulbind] else dataItem.soulBindText = nil end
-	if specialbind > 0 then dataItem.specialBindText = specialbindtypes[specialbind] else dataItem.specialBindText = nil end
+	if soulbind and soulbind > 0 then dataItem.soulBindText = soulbindtypes[soulbind] else dataItem.soulBindText = nil end
+	if specialbind and specialbind > 0 then dataItem.specialBindText = specialbindtypes[specialbind] else dataItem.specialBindText = nil end
 
 	local addition = ""
 	if (additional and additional ~= "") then
