@@ -428,23 +428,8 @@ end
 function private.ButtonClick(me, mouseButton)
 	if IsModifiedClick() then
 		if mouseButton == "LeftButton" and IsAltKeyDown() and MouseIsOver(me.OwnerHitBox) then
-			--Display the ignore player UI
-			local seller = me.Owner:GetText()
-			if not seller or seller == "" or not AucAdvanced.Modules.Filter.Basic or not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored then
-				private.sellerIgnore:Hide()
-				return
-			end
-
-			private.sellerIgnore:ClearAllPoints()
-			private.sellerIgnore:SetPoint("TOPLEFT", me.Owner, "TOPRIGHT")
-			private.sellerIgnore:Show()
-			--if toon not ignored then ignore
-			if not AucAdvanced.Modules.Filter.Basic.IsPlayerIgnored(seller) then
-				private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( seller ) private.sellerIgnore:Hide() end)
-				private.sellerIgnore.help:SetText("Add player to ignore list\n\n|CFFFFFFFF"..(seller))
-			else
-				private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Remove( seller ) private.sellerIgnore:Hide() end)
-				private.sellerIgnore.help:SetText("Remove player from ignore list\n\n|CFFFFFFFF"..(seller))
+			if AucAdvanced.Modules.Filter.Basic then
+				AucAdvanced.Modules.Filter.Basic.PromptSellerIgnore(me.Owner:GetText(), me, "TOPLEFT", me.Owner, "TOPRIGHT")
 			end
 		else
 			HandleModifiedItemClick(GetAuctionItemLink("list", me.id))
@@ -806,49 +791,6 @@ private.switchUI:SetScript("OnClick", function()
 end)
 private.switchUI:SetScript("OnEnter", function()  private.buttonTooltips(private.switchUI, "Open the configuration options for the CompactUI window.") end)
 private.switchUI:SetScript("OnLeave", function() GameTooltip:Hide() end)
-
---ignore/unignore seller GUI
-private.sellerIgnore = CreateFrame("Frame", nil, UiParent)
-private.sellerIgnore:Hide()
-private.sellerIgnore:SetBackdrop({
-      bgFile = "Interface/Tooltips/ChatBubble-Background",
-      edgeFile = "Interface/Minimap/TooltipBackdrop",
-      tile = true, tileSize = 32, edgeSize = 10,
-      insets = { left = 2, right = 2, top = 2, bottom = 2 }
-})
-private.sellerIgnore:SetBackdropColor(0,0,0, 1)
-private.sellerIgnore:SetWidth(100)
-private.sellerIgnore:SetHeight(70)
-private.sellerIgnore:SetPoint("CENTER", UIParent, "CENTER")
-private.sellerIgnore:SetFrameStrata("TOOLTIP")
-private.sellerIgnore:SetScale(0.7)
-
-private.sellerIgnore.help = private.sellerIgnore:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall" )
-private.sellerIgnore.help:SetParent(private.sellerIgnore)
-private.sellerIgnore.help:SetPoint("CENTER", private.sellerIgnore, "TOP", 0, -25)
-private.sellerIgnore.help:SetWidth(100)
-
-private.sellerIgnore.yes = CreateFrame("Button", nil, private.sellerIgnore, "UIPanelButtonTemplate")
-private.sellerIgnore.yes:SetNormalFontObject(GameFontNormalSmall)
-private.sellerIgnore.yes:SetPoint("BOTTOMLEFT", private.sellerIgnore, "BOTTOMLEFT", 5, 10)
-private.sellerIgnore.yes:SetScript("OnClick", function() BF_IgnoreList_Add( name ) end)
-private.sellerIgnore.yes:SetText("Yes")
-private.sellerIgnore.yes:SetWidth(30)
-private.sellerIgnore.yes:SetHeight(10)
-local font = private.sellerIgnore.yes:GetFontString()
-font:SetFontObject("GameFontNormalSmall" )
-font:SetTextHeight(10)
-
-private.sellerIgnore.no = CreateFrame("Button", nil, private.sellerIgnore, "UIPanelButtonTemplate")
-private.sellerIgnore.no:SetNormalFontObject(GameFontNormalSmall)
-private.sellerIgnore.no:SetPoint("BOTTOMRIGHT", private.sellerIgnore, "BOTTOMRIGHT", -5, 10)
-private.sellerIgnore.no:SetScript("OnClick", function()  private.sellerIgnore:Hide() end)
-private.sellerIgnore.no:SetText("No")
-private.sellerIgnore.no:SetWidth(30)
-private.sellerIgnore.no:SetHeight(10)
-local font = private.sellerIgnore.no:GetFontString()
-font:SetFontObject("GameFontNormalSmall" )
-font:SetTextHeight(10)
 
 function private.SetupConfigGui(gui)
 	private.SetupConfigGui = nil
