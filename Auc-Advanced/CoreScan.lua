@@ -555,8 +555,26 @@ function lib.FindItem(item, image, lut)
 	end
 end
 
-local statItem = {}
-local statItemOld = {}
+
+local function processBeginEndStats(processors, operation, querySizeInfo, TempcurScanStats)
+	if (not processors) then return end
+	local po = processors[operation]
+	if (po) then
+		for i=1,#po do
+			local x = po[i]
+			local f = x.Func
+			local pOK, errormsg = pcall(f, operation, querySizeInfo, TempcurScanStats)
+			if (not pOK) then
+				if (nLog) then nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "ScanProcessor Error", ("ScanProcessor %s Returned Error %s"):format(x and x.Name or "??", errormsg)) end
+			end
+		end
+	end
+	return true
+end
+
+local statItem = { }
+local statItemOld = { }
+
 local function processStats(processors, operation, curItem, oldItem)
 	local filtered = false
 	if (not processors) then return end
@@ -904,6 +922,7 @@ local Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
+		
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
 	local scandata = private.GetScanData(serverKey)
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
@@ -1060,7 +1079,32 @@ local Commitfunction = function()
 			table.insert(processors[op], x)
 		end
 	end
-	processStats(processors, "begin")
+
+	local printSummary, scanSize = false, ""
+	scanSize = TempcurQuery.qryinfo.scanSize
+	if scanSize=="Full" then
+		printSummary = get("scandata.summaryonfull");
+	elseif scanSize=="Partial" then
+		printSummary = get("scandata.summaryonpartial")
+	else -- scanSize=="Micro"
+		printSummary = get("scandata.summaryonmicro")
+	end
+	if (TempcurQuery.qryinfo.nosummary) then
+		printSummary = false
+		scanSize = "NoSum-"..scanSize
+	end
+	
+	local querySizeInfo = { }
+	querySizeInfo.wasIncomplete = wasIncomplete
+	querySizeInfo.wasGetAll = wasGetAll
+	querySizeInfo.scanStarted = scanStarted
+	querySizeInfo.wasUnrestricted = wasUnrestricted
+	querySizeInfo.Query = TempcurCommit.Query
+	querySizeInfo.matchCount = dirtyCount
+	querySizeInfo.scanCount = scanCount
+	querySizeInfo.printSummary = printSummary
+
+	processBeginEndStats(processors, "begin", querySizeInfo, nil)
 	for index, data in ipairs(TempcurScan) do
 		local itemPos
 		progresscounter = progresscounter + 4
@@ -1177,7 +1221,6 @@ local Commitfunction = function()
 
 	--[[ *** Stage 4: Reports *** ]]
 	lib.ProgressBars("CommitProgressBar", 100, true, "Auctioneer: Processing Finished")
-	processStats(processors, "complete")
 
 	local currentCount = #scandata.image
 	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount ~= scanCount) then
@@ -1205,20 +1248,6 @@ local Commitfunction = function()
 	scanTimeMins = mod(scanTimeMins, 60)
 
 	--Hides the end of scan summary if user is not interested
-	local printSummary, scanSize = false, ""
-	scanSize = TempcurQuery.qryinfo.scanSize
-	if scanSize=="Full" then
-		printSummary = get("scandata.summaryonfull");
-	elseif scanSize=="Partial" then
-		printSummary = get("scandata.summaryonpartial")
-	else -- scanSize=="Micro"
-		printSummary = get("scandata.summaryonmicro")
-	end
-	if (TempcurQuery.qryinfo.nosummary) then
-		printSummary = false
-		scanSize = "NoSum-"..scanSize
-	end
-
 	if (nLog or printSummary) then
 		totalProcessingTime = totalProcessingTime + (GetTime() - lastPause)
 
@@ -1303,7 +1332,7 @@ local Commitfunction = function()
 			local eTime = GetTime()
 			nLog.AddMessage("Auctioneer", "Scan", N_INFO,
 			"Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed",
-			summary..("\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f\nTotal Commit Coroutine Execution Time (excluding yields): %f"):format(eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-startTime, totalProcessingTime))
+			("%s\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f\nTotal Commit Coroutine Execution Time (excluding yields): %f"):format(summary, eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-startTime, totalProcessingTime))
 		end
 	end
 
@@ -1354,6 +1383,9 @@ local Commitfunction = function()
 
 	-- Tell everyone that our stats are updated
 	TempcurQuery.qryinfo.finished = true
+
+	processBeginEndStats(processors, "complete", querySizeInfo, TempcurScanStats)
+
 	AucAdvanced.SendProcessorMessage("scanstats", TempcurScanStats)
 
 	--Hide the progress indicator
