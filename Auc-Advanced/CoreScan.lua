@@ -349,7 +349,7 @@ function lib.PopScan()
 			if (nLog) then
 				nLog.AddMessage("Auctioneer", "Scan", N_WARNING, ("Scan %d Too Old, committing what we have and aborting"):format(private.curQuery.qryinfo.id))
 			end
-			private.Commit(true, false) --  Incomplete, non-GetAll Scan
+			private.Commit(true, private.curQuery.pageError or false, false, false) -- Scan terminated early.
 			return
 		end
 
@@ -414,7 +414,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			private.Commit(true, false) -- sets private.curQuery to nil
+			private.Commit(true, private.curQuery.pageError or false, false, false) -- sets private.curQuery to nil and commits prior cancelled query
 		end
 
 		private.isScanning = true
@@ -910,7 +910,12 @@ local Commitfunction = function()
 	-- setup various locals for later use
 	local TempcurScan = TempcurCommit.Scan
 	local TempcurQuery = TempcurCommit.Query
+
 	local wasIncomplete = TempcurCommit.wasIncomplete
+	local wasEarlyTerm = TempcurCommit.wasEarlyTerm
+	local hadGetError = TempcurCommit.hadGetError
+	local wasEndPagesOnly = TempcurCommit.wasEndPagesOnly
+
 	local wasGetAll = TempcurCommit.wasGetAll
 	local scanStarted = TempcurCommit.scanStarted
 	local scanStartTime = TempcurCommit.scanStartTime
@@ -1002,6 +1007,9 @@ local Commitfunction = function()
 	if (#itemLinkTable >0) then
 		wasIncomplete = true
 		TempcurCommit.wasIncomplete = true
+		hadGetError = true
+		TempcurCommit.hadGetError = true
+		TempcurQuery.scanError = true
 		local i=#TempcurScan
 		while (i>0) do
 			local gt = GetTime()
@@ -1017,7 +1025,6 @@ local Commitfunction = function()
 			i = i -1
 		end
 	end
-	
 	
 	--[[ *** Stage 3: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
 	local dirtyCount = 0
@@ -1089,7 +1096,10 @@ local Commitfunction = function()
 	else -- scanSize=="Micro"
 		printSummary = get("scandata.summaryonmicro")
 	end
-	if (TempcurQuery.qryinfo.nosummary) then
+	if (wasEndPagesOnly) then
+		scanSize = "TailScan-"..scanSize
+		printSummary = false
+	elseif (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
 		scanSize = "NoSum-"..scanSize
 	end
@@ -1099,6 +1109,9 @@ local Commitfunction = function()
 	querySizeInfo.wasGetAll = wasGetAll
 	querySizeInfo.scanStarted = scanStarted
 	querySizeInfo.wasUnrestricted = wasUnrestricted
+	querySizeInfo.wasEarlyTerm = wasEarlyTerm
+	querySizeInfo.hadGetError = hadGetError
+	querySizeInfo.wasEndPagesOnly = wasEndPagesOnly
 	querySizeInfo.Query = TempcurCommit.Query
 	querySizeInfo.matchCount = dirtyCount
 	querySizeInfo.scanCount = scanCount
@@ -1265,9 +1278,17 @@ local Commitfunction = function()
 			scanTime = scanTime..scanTimeSecs.._TRANS("PSS_Seconds")
 		end
 
-		if (wasIncomplete) then
+		if (wasEndPagesOnly) then
+			summaryLine = (_TRANS("PSS_TailScan")):format(scanCount, scanTime))
+			summaryLine = _TRANS("PSS_TailScan_1").." {{"..scanCount.."}} ".._TRANS("PSS_TailScan_2").."{{"..scanTime.."}}:"
+		elseif (wasEarlyTerm) then
+			summaryLine = (_TRANS("PSS_Incomplete")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_Incomplete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Incomplete_2").."{{"..scanTime.."}}".._TRANS("PSS_Incomplete_3")
+		elseif (hadGetError) then
+			summaryLine = (_TRANS("PSS_ScanError")):format(scanCount, scanTime))
+			summaryLine = _TRANS("PSS_ScanError_1").." {{"..scanCount.."}} ".._TRANS("PSS_ScanError_2").."{{"..scanTime.."}}".._TRANS("PSS_ScanError_3")
 		else
+			summaryLine = (_TRANS("PSS_Complete")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_Complete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Complete_2").."{{"..scanTime.."}}:"
 		end
 		if (printSummary) then _print(summaryLine) end
@@ -1409,13 +1430,16 @@ local function CoroutineResume(...)
 	return status, result
 end
 
-function private.Commit(wasIncomplete, wasGetAll)
+function private.Commit(wasEarlyTerm, hadGetError, wasEndPagesOnly, wasGetAll)
 	private.StopStorePage()
 	if not private.curScan then return end
 	tinsert(private.CommitQueue, {
 		Query = private.curQuery,
 		Scan = private.curScan,
-		wasIncomplete = wasIncomplete,
+		wasIncomplete = wasEarlyTerm or hadGetError or wasEndPagesOnly or false,
+		wasEarlyTerm = wasEarlyTerm,
+		hadGetError = hadGetError,
+		wasEndPagesOnly = wasEndPagesOnly,
 		wasGetAll = wasGetAll,
 		scanStarted = private.scanStarted,
 		scanStartTime = private.scanStartTime,
@@ -1735,7 +1759,7 @@ local StorePageFunction = function()
 			curPages[page] = true -- we have pulled this page
 		end
 		if (#retries > 0) then
-			curQuery.pageIncomplete = true
+			curQuery.pageError = true
 		end
 	end
 	
@@ -1773,7 +1797,7 @@ local StorePageFunction = function()
 		if not private.breakStorePage then
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit((#curScan < totalAuctions - 100) or curQuery.pageIncomplete, true)
+			private.Commit((#curScan < totalAuctions - 100), curQuery.pageError or false, false, true)
 			-- Clear the getall output. We don't want to create a new query so use the hook
 			private.queryStarted = GetTime()
 			private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
@@ -1782,25 +1806,32 @@ local StorePageFunction = function()
 		if (page+1 < maxPages) then
 			private.ScanPage(page + 1)
 		else
-			local incomplete = curQuery.pageIncomplete
-			if ((#curScan < totalAuctions - 10)) then -- we just got scan size above, so they should be close.
-				incomplete = true
-			end
+			local incomplete = (#curScan < totalAuctions - 10)
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(incomplete, false)
+			private.Commit(incomplete, curQuery.pageError or false, false, false)
 		end
 	elseif (maxPages == page+1) then
-		local incomplete = curQuery.pageIncomplete
+		local incomplete = false
 		for i = 0, maxPages-1 do
 			if not curPages[i] then
 				incomplete = true
 				break
 			end
 		end
+		local wasEndOnly = false
+		if (incomplete) then
+			wasEndOnly = (curPages[maxPages-1] and true) or false
+			for i = 0, maxPages-3 do
+				if not curPages[i] then
+					wasEndOnly = false
+					break
+				end
+			end		
+		end
 		elapsed = GetTime() - private.scanStarted - private.totalPaused
 		private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-		private.Commit(incomplete, false)
+		private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
 	end
 	local endTime = GetTime()
 	RunTime = RunTime + endTime-lastPause
@@ -2074,7 +2105,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 				nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending exisiting query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 			end
 		else
-			private.Commit(true, false)
+			private.Commit(true, private.curQuery.pageError or false, false, false)
 		end
 	end
 	if not query then
@@ -2206,7 +2237,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 function lib.Cancel()
 	if (private.curQuery) then
 		_print("Cancelling current scan")
-		private.Commit(true, false)
+		private.Commit(true, private.curQuery.pageError or false, false, false)
 	end
 	private.ResetAll()
 end
@@ -2215,7 +2246,7 @@ function lib.Interrupt()
 	if private.curQuery and not AuctionFrame:IsVisible() then
 		if private.isGetAll then
 			-- GetAll cannot be pushed/popped so we have to commit here instead
-			private.Commit(true, true)
+			private.Commit(true, private.curQuery.pageError or false, false, true)
 			private.sentQuery = false
 			if private.isGetAll then
 				-- If the StorePage function didn't run, we need to cleanup here instead
@@ -2228,7 +2259,7 @@ function lib.Interrupt()
 			private.unexpectedClose = true
 			lib.PushScan()
 		else
-			private.Commit(true, false)
+			private.Commit(true, private.curQuery.pageError, false, false)
 			private.sentQuery = false
 		end
 	end
@@ -2440,7 +2471,9 @@ end
 
 function lib.Logout()
 	AucAdvancedData.Scandata = nil -- delete obsolete data. it's here because CoreScan doesn't have an OnLoad processor
-	private.Commit(true, false)
+	if (private.curQuery) then
+		private.Commit(true, private.curQuery.pageError or false, false, false)
+	end
 	if CoCommit then
 		while coroutine.status(CoCommit) == "suspended" do
 			CoroutineResume(CoCommit)
