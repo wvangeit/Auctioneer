@@ -185,7 +185,7 @@ function lib.GetPrice(link, faction)
 
 	if not faction then faction = GetFaction() end
 	if (not data[faction]) or (not data[faction][itemId]) or (not data[faction][itemId][property]) then
-		debugPrint("GetPrice: No data", libType.."-"..libName, "Info")
+		--debugPrint("GetPrice: No data", libType.."-"..libName, "Info")
 		return
 	end
 	if pricecache and pricecache[faction] and pricecache[faction][itemId] and pricecache[faction][itemId][property] then
