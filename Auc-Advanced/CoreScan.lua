@@ -1279,16 +1279,16 @@ local Commitfunction = function()
 		end
 
 		if (wasEndPagesOnly) then
-			summaryLine = (_TRANS("PSS_TailScan")):format(scanCount, scanTime))
+--			summaryLine = (_TRANS("PSS_TailScan")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_TailScan_1").." {{"..scanCount.."}} ".._TRANS("PSS_TailScan_2").."{{"..scanTime.."}}:"
 		elseif (wasEarlyTerm) then
-			summaryLine = (_TRANS("PSS_Incomplete")):format(scanCount, scanTime))
+--			summaryLine = (_TRANS("PSS_Incomplete")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_Incomplete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Incomplete_2").."{{"..scanTime.."}}".._TRANS("PSS_Incomplete_3")
 		elseif (hadGetError) then
-			summaryLine = (_TRANS("PSS_ScanError")):format(scanCount, scanTime))
+--			summaryLine = (_TRANS("PSS_ScanError")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_ScanError_1").." {{"..scanCount.."}} ".._TRANS("PSS_ScanError_2").."{{"..scanTime.."}}".._TRANS("PSS_ScanError_3")
 		else
-			summaryLine = (_TRANS("PSS_Complete")):format(scanCount, scanTime))
+--			summaryLine = (_TRANS("PSS_Complete")):format(scanCount, scanTime))
 			summaryLine = _TRANS("PSS_Complete_1").." {{"..scanCount.."}} ".._TRANS("PSS_Complete_2").."{{"..scanTime.."}}:"
 		end
 		if (printSummary) then _print(summaryLine) end
