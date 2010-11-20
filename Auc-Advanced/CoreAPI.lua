@@ -33,13 +33,15 @@
 ]]
 if not AucAdvanced then return end
 local AucAdvanced = AucAdvanced
-local coremodule = AucAdvanced.GetCoreModule("CoreAPI")
-if not coremodule then return end -- Someone has explicitely broken us
+local coremodule, internal = AucAdvanced.GetCoreModule("CoreAPI")
+if not (coremodule and internal) then return end -- Someone has explicitely broken us
 
 
 AucAdvanced.API = {}
 local lib = AucAdvanced.API
 local private = {}
+internal.API = {}
+local libinternal = internal.API
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
@@ -708,7 +710,7 @@ end
 
 -- Matcher functions used by CoreSettings for Matcher dropdown list
 
-function lib.GetMatcherDropdownList()
+function libinternal.GetMatcherDropdownList()
 	if not matcherDropdown then
 		local matcherlist = GetMatcherList()
 		matcherDropdown = {}
@@ -719,8 +721,8 @@ function lib.GetMatcherDropdownList()
 	return matcherDropdown
 end
 
-function lib.MatcherSetter(setting, value)
-	local matcherlist = GetSetting("core.matcher.matcherlist") -- work from the actual saved setting, not our saved value (which has probably been reset)
+function libinternal.MatcherSetter(setting, value)
+	local matcherlist = GetSetting("core.matcher.matcherlist") -- work from the actual saved setting, not matcherCurList (which has probably been reset)
 	if not matcherlist then return end
 	if setting == "matcher.select" then
 		if type(value) == "number" and value >= 1 and value <= #matcherlist then
@@ -757,7 +759,7 @@ function lib.MatcherSetter(setting, value)
 	end
 end
 
-function lib.MatcherGetter(setting)
+function libinternal.MatcherGetter(setting)
 	if setting == "matcher.select" then
 		return matcherSelected
 	end
@@ -790,7 +792,7 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey)
 
 	local matchers = GetMatcherEngines()
 	local originalPrice = price
-	local count, diff, infoString = 0, 0, ""
+	local count, infoString = 0, ""
 
 	for index = 1, #matchers do
 		local matcher = matchers[index]
@@ -798,28 +800,29 @@ function lib.GetBestMatch(itemLink, algorithm, serverKey)
 		if matchArray then
 			price = matchArray.value
 			count = count + 1
-			diff = diff + matchArray.diff
 			if matchArray.returnstring then
 				infoString = infoString.."\n"..matchArray.returnstring -- using two .. is faster than calling strjoin
 			end
 		end
 	end
-	if count > 1 then
-		diff = diff / count
-	end
 
 	if price > 0 then
-		return price, nil, count, diff, infoString
+		return price, nil, count, price - originalPrice, infoString
 	end
 end
 
--- Modules would mainly use this to check if number of matchers > 0
+-- Returns the number of installed matchers
+-- Normally only used to check if number of matchers is > 0
+-- Note: count will include matchers that are installed but disabled
 function lib.GetNumMatchers()
 	return #(GetMatcherEngines())
 end
 
 -- Additional Matcher functions for compatibility
 
+-- Returns an ordered list of matcher names
+-- Matchers are installed, and if itemLink was provided, are valid for that item
+-- Note: matchers may not be enabled, or may not actually have data for that item
 function lib.GetMatchers(itemLink)
 	local saneLink = SanitizeLink(itemLink)
 	local matchers = GetMatcherEngines()
@@ -832,6 +835,9 @@ function lib.GetMatchers(itemLink)
 	return retlist
 end
 
+-- Checks that the itemLink is valid for the specified matcher
+-- Obsolete, as all matchers should return nil from GetMatchArray if they cannot handle the item
+-- However may still be useful for external modules to obtain a matcher lib from the name
 function lib.IsValidMatcher(matcher, itemLink)
 	if type(matcher) == "table" then -- if provided with a table, get the name
 		matcher = matcher.GetName and matcher.GetName()
@@ -844,6 +850,7 @@ function lib.IsValidMatcher(matcher, itemLink)
 	end
 end
 
+-- Allows external modules to request individual matcher values using matcher's name
 function lib.GetMatcherValue(matcher, itemLink, price, serverKey, originalPrice)
 	if type(matcher) == "table" then
 		matcher = matcher.GetName and matcher.GetName()

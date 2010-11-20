@@ -82,40 +82,33 @@ AucAdvanced.Settings = {}
 local lib = AucAdvanced.Settings
 local private = {}
 local gui
-local Matcherdropdown
+local Const = AucAdvanced.Const
+local UserSig = format("users.%s.%s", Const.PlayerRealm, Const.PlayerName)
 
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 function coremodule.OnLoad(addon)
+	if not AucAdvancedConfig then AucAdvancedConfig = {} end
 	if addon == "auc-advanced" then
 		private.CheckObsolete()
 	end
 end
 
-local function getUserSig()
-	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
-	return userSig
-end
-
 local function getUserProfileName()
-	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-	local userSig = getUserSig()
-	return AucAdvancedConfig[userSig] or "Default"
+	return AucAdvancedConfig[UserSig] or "Default"
 end
 
 local function getUserProfile()
-	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-	local profileName = getUserProfileName()
-	if (not AucAdvancedConfig["profile."..profileName]) then
-		if profileName ~= "Default" then
-			profileName = "Default"
-			AucAdvancedConfig[getUserSig()] = "Default"
-		end
-		if not AucAdvancedConfig["profile.Default"] then
-			AucAdvancedConfig["profile.Default"] = {}
+	local data = AucAdvancedConfig["profile."..getUserProfileName()]
+	if not data then
+		AucAdvancedConfig[UserSig] = "Default"
+		data = AucAdvancedConfig["profile.Default"]
+		if not data then
+			data = {}
+			AucAdvancedConfig["profile.Default"] = data
 		end
 	end
-	return AucAdvancedConfig["profile."..profileName]
+	return data
 end
 
 -- Default setting values
@@ -219,7 +212,7 @@ local function setter(setting, value)
 				AucAdvancedConfig["profile."..value] = newProfile or {}
 
 				-- Set the user profile to the new profile
-				AucAdvancedConfig[getUserSig()] = value
+				AucAdvancedConfig[UserSig] = value
 
 				-- Add the new profile to the profiles list:-
 
@@ -268,7 +261,7 @@ local function setter(setting, value)
 
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
-					AucAdvancedConfig[getUserSig()] = 'Default'
+					AucAdvancedConfig[UserSig] = 'Default'
 					private.CheckObsolete()
 				end
 			else
@@ -289,7 +282,7 @@ local function setter(setting, value)
 			value = gui.elements["profile"].value
 
 			-- Change the user's current profile to this new one
-			AucAdvancedConfig[getUserSig()] = value
+			AucAdvancedConfig[UserSig] = value
 
 			-- Check newly loaded profile
 			private.CheckObsolete()
@@ -298,7 +291,7 @@ local function setter(setting, value)
 		-- Refresh all values to reflect current data
 		gui:Refresh()
 	elseif (a == "matcher") then
-		if AucAdvanced.API.MatcherSetter(setting, value) then
+		if internal.API.MatcherSetter(setting, value) then
 			gui:Refresh()
 		end
 	else
@@ -356,7 +349,7 @@ local function getter(setting)
 			return pList
 		end
 	elseif a == "matcher" then
-		return AucAdvanced.API.MatcherGetter(setting)
+		return internal.API.MatcherGetter(setting)
 	end
 
 	if (setting == 'profile') then
@@ -490,7 +483,7 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
 	last = gui:GetLast(id)
-	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList, "matcher.select")
+	gui:AddControl(id, "Selectbox",  0, 1, internal.API.GetMatcherDropdownList, "matcher.select")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.3,1, "matcher.up", _TRANS('ADV_Interface_Up')) --"Up"
 	gui:SetLast(id, last)
