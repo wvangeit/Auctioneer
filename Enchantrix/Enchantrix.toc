@@ -16,6 +16,7 @@
 ## X-Max-Interface: 40000
 ## X-URL: http://auctioneeraddon.com/
 ## X-Feedback: http://forums.norganna.org
+
 ##
 Support\Load.xml
 EnxManifest.lua
@@ -34,6 +35,8 @@ EnxMiniIcon.lua
 EnxCommand.lua
 EnxConfig.lua
 EnxConstants.lua
+EnxConstantsInscription.lua
+EnxConstantsJewelcrafting.lua
 EnxStorage.lua
 EnxTooltip.lua
 EnxUtil.lua

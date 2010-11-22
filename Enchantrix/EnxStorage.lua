@@ -502,14 +502,22 @@ end
 -- get entry from disenchant table (or nil if nothing found)
 local function getBaseTableDisenchants(level, quality, type, item)
 	local rLevel = roundupLevel(level);
+	
+	if rLevel and Enchantrix.Constants.baseDisenchantTable[quality] then
+		local baseTable = Enchantrix.Constants.baseDisenchantTable[quality][type];
 
-	if Enchantrix.Constants.baseDisenchantTable[quality]
-		and Enchantrix.Constants.baseDisenchantTable[quality][type]
-		and Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel] then
-			return Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel]
+		-- so we don't have to keep armor and weapon tables when both are the same
+		-- if the weapon table is missing, use the armor table
+		if (not baseTable) then
+			baseTable = Enchantrix.Constants.baseDisenchantTable[quality][Enchantrix.Constants.ARMOR];
+		end
+		
+		if baseTable and baseTable[rLevel] then
+			return baseTable[rLevel]
+		end
 	end
-
-	-- no matching entry found, this is bad because this is the backup!
+	
+	-- no matching entry found, this is bad!!
 	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level, item )
 	return nil
 end

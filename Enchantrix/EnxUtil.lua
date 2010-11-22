@@ -281,11 +281,6 @@ end
 
 
 
--- TODO: what is the correct limit post TBC?
--- ccox - 32090 is the highest I can find so far
--- but we REALLY should get rid of this search!
-Enchantrix.State.MAX_ITEM_ID = 33000
-
 function getLinkFromName(name)
 	assert(type(name) == "string")
 
@@ -317,21 +312,8 @@ function getLinkFromName(name)
 		end
 	end
 
-	if not EnchantConfig.cache.names[name] then
-		--print("DISABLED NAME CACHE LOOKUP FOR BETA SERVER", name)
-		-- still no result?  Darn.
-		-- last resort,  check ALL item ids until we find a name match, and cache it!
--- 		for i = 1, Enchantrix.State.MAX_ITEM_ID + 4000 do
--- 			local n, link = GetItemInfo(i)
--- 			if n then
--- 				if n == name then
--- 					EnchantConfig.cache.names[name] = link
--- 					break
--- 				end
--- 				Enchantrix.State.MAX_ITEM_ID = math.max(Enchantrix.State.MAX_ITEM_ID, i)
--- 			end
--- 		end
-	end
+	-- max item is now about 69000
+	-- we should NOT be doing a search item by item
 
 	return EnchantConfig.cache.names[name]
 end
@@ -766,30 +748,6 @@ function Enchantrix.Util.GetIType(link)
 end
 
 
--- NOTE - ccox - this ignores the skill requirements due to item quality!
-function Enchantrix.Util.MaxDisenchantItemLevel(skill)
-	local maxLevel;
-
-	if (skill >= 375) then
-		maxLevel = 220;
-	elseif (skill >= 350) then
-		maxLevel = 200;
-	elseif (skill >= 325) then
-		maxLevel = 151;
-	elseif (skill >= 300) then
-		maxLevel = 129;		-- max level for WoW 2.2/BC ??
-	elseif (skill >= 125) then
-		-- skill 125 to 299
-		maxLevel = 19 + (5 * math.floor(skill / 25));
-	else
-		-- skill 1 to 124
-		maxLevel = 15 + (5 * math.floor(skill / 25));
-	end
-
-	return maxLevel;
-end
-
-
 
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
@@ -799,8 +757,28 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		return 0
 	end
 	
-	if (level >= 200) then
-		-- rares still bugged Nov 2009
+
+	-- ccox - Cataclysm items, this is partly guesswork
+	if (level >= 270) then
+		if (quality == 3) then
+			if (level >= 325) then
+				return 500;				-- 325 - 352
+			else
+				return 450;				-- 279 - 316
+			end
+		elseif (quality == 2) then
+			if (level >= 301) then
+				return 475;				-- 301 - 333
+			else
+				return 425;				-- 270 - 300
+			end
+		else
+			-- epic, so far all require 500
+			return 500;
+		end
+		
+	elseif (level >= 200) then
+		-- rares still bugged Nov 2009, and Nov 2010, guess they're going to stay that way
 		if (quality ~= 3) then
 			return 375;
 		else
@@ -997,6 +975,7 @@ local function balanceEssencePrices(scanReagentTable, style)
 		[16202] = 16203,  	-- eternal
 		[22447] = 22446,	-- planar
 		[34056] = 34055,	-- cosmic
+		[52719] = 52718,	-- celestial
 	};
 
 	for lesser, greater in pairs(essenceTable) do

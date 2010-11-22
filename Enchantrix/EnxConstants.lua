@@ -36,10 +36,12 @@ local const = Enchantrix.Constants
 -- Median prices from several sites updated August 23, 2009 - Updated by ccox
 -- Prices are in copper aka GGSSCC
 const.StaticPrices = {
-	[34057] = 1000000, -- Abyss Crystal
-	[22450] =  60000, -- Void Crystal
+	[52722] =1000000, -- Maelstrom Crystal
+	[34057] =  50000, -- Abyss Crystal
+	[22450] =  20000, -- Void Crystal
 	[20725] =  15000, -- Nexus Crystal
 
+	[52721] = 200000, -- Heavenly Shard
 	[34052] = 140000, -- Dream Shard
 	[22449] =  60000, -- Large Prismatic Shard
 	[14344] =  25000, -- Large Brilliant Shard
@@ -47,6 +49,7 @@ const.StaticPrices = {
 	[11139] =  10000, -- Large Glowing Shard
 	[11084] =   6000, -- Large Glimmering Shard
 
+	[52720] =  80000, -- Small Heavenly Shard
 	[34053] =  60000, -- Small Dream Shard
 	[22448] =  16000, -- Small Prismatic Shard
 	[14343] =  23000, -- Small Brilliant Shard
@@ -54,6 +57,7 @@ const.StaticPrices = {
 	[11138] =   1000, -- Small Glowing Shard
 	[10978] =    700, -- Small Glimmering Shard
 
+	[52718] = 200000, -- Greater Celestial Essence
 	[34055] = 200000, -- Greater Cosmic Essence
 	[22446] = 120000, -- Greater Planar Essence
 	[16203] = 110000, -- Greater Eternal Essence
@@ -62,6 +66,7 @@ const.StaticPrices = {
 	[11082] =   6000, -- Greater Astral Essence
 	[10939] =   6000, -- Greater Magic Essence
 
+	[52719] =  75000, -- Lesser Celestial Essence
 	[34056] =  75000, -- Lesser Cosmic Essence
 	[22447] =  38000, -- Lesser Planar Essence
 	[16202] =  52500, -- Lesser Eternal Essence
@@ -70,6 +75,7 @@ const.StaticPrices = {
 	[10998] =   5000, -- Lesser Astral Essence
 	[10938] =   4000, -- Lesser Magic Essence
 
+	[52555] =  50000, -- Hypnotic Dust
 	[34054] =  47500, -- Infinite Dust
 	[22445] =  12500, -- Arcane Dust
 	[16204] =  15000, -- Illusion Dust
@@ -310,15 +316,24 @@ local GCOSMIC = 34055
 local LCOSMIC = 34056
 local ABYSS = 34057
 
+local HEAVENLY_SHARD = 52721
+local SHEAVENLY_SHARD = 52720
+local HYPNOTIC = 52555
+local GCELESTIAL = 52718
+local LCELESTIAL = 52719
+local MAELSTROM = 52722
+
 
 -- and in a form we can iterate over, with a fixed order for the UI
 
 const.DisenchantReagentList = {
 
+--	52722, -- Maelstrom Crystal		-- wait for Cataclysm
 	34057, -- Abyss Crystal
 	22450, -- Void Crystal
 	20725, -- Nexus Crystal
 
+--	52721, -- Heavenly Shard		-- wait for Cataclysm
 	34052, -- Dream Shard
 	22449, -- Large Prismatic Shard
 	14344, -- Large Brilliant Shard
@@ -326,6 +341,7 @@ const.DisenchantReagentList = {
 	11139, -- Large Glowing Shard
 	11084, -- Large Glimmering Shard
 
+--	52720, -- Small Heavenly Shard		-- wait for Cataclysm
 	34053, -- Small Dream Shard
 	22448, -- Small Prismatic Shard
 	14343, -- Small Brilliant Shard
@@ -333,6 +349,7 @@ const.DisenchantReagentList = {
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
 
+--	52718, -- Greater Celestial Essence		-- wait for Cataclysm
 	34055, -- Greater Cosmic Essence
 	22446, -- Greater Planar Essence
 	16203, -- Greater Eternal Essence
@@ -341,6 +358,7 @@ const.DisenchantReagentList = {
 	11082, -- Greater Astral Essence
 	10939, -- Greater Magic Essence
 
+--	52719, -- Lesser Celestial Essence		-- wait for Cataclysm
 	34056, -- Lesser Cosmic Essence
 	22447, -- Lesser Planar Essence
 	16202, -- Lesser Eternal Essence
@@ -349,6 +367,7 @@ const.DisenchantReagentList = {
 	10998, -- Lesser Astral Essence
 	10938, -- Lesser Magic Essence
 
+--	52555, -- Hypnotic Dust		-- wait for Cataclysm
 	34054, -- Infinite Dust
 	22445, -- Arcane Dust
 	16204, -- Illusion Dust
@@ -367,7 +386,7 @@ local EPIC = 4
 
 -- disenchanting level bracket upper bounds
 -- e.g. an ilevel 52 item goes into bracket 55
-const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 275 }
+const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 115, 120, 151, 164, 200, 270, 300, 320, 375 }
 
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
@@ -398,7 +417,13 @@ const.baseDisenchantTable = {
    [120] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },	-- highest level BC green
    [151] = { { INFINITE, 0.20, 2.5 }, { LCOSMIC , 0.75, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
    [164] = { { INFINITE, 0.20, 5.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },
-   [200] = { { INFINITE, 0.20, 5.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
+   [200] = { { INFINITE, 0.20, 5.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
+   
+ -- ccox - this is guesswork!
+   [270] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [300] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [320] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [375] = { { HYPNOTIC, 0.20, 5.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
   [const.ARMOR] = {
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
@@ -421,34 +446,18 @@ const.baseDisenchantTable = {
    [120] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },	-- highest level BC green
    [151] = { { INFINITE, 0.75, 2.5 }, { LCOSMIC , 0.20, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
    [164] = { { INFINITE, 0.75, 5.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },
-   [200] = { { INFINITE, 0.75, 5.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182, so far
+   [200] = { { INFINITE, 0.75, 5.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
+   
+ -- ccox - this is guesswork!
+-- BUG - Cataclysm is currenly giving more essences for armor and weapons
+   [270] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [300] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [320] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [375] = { { HYPNOTIC, 0.20, 5.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
  },
  [RARE] = {
-  [const.WEAPON] = {
-   [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
-   [20]  = { { SGLIMMERING, 1.00, 1.0 }, },
-   [25]  = { { SGLIMMERING, 1.00, 1.0 }, },
-   [30]  = { { LGLIMMERING, 1.00, 1.0 }, },
-   [35]  = { { SGLOWING   , 1.00, 1.0 }, },
-   [40]  = { { LGLOWING   , 1.00, 1.0 }, },
-   [45]  = { { SRADIANT   , 1.00, 1.0 }, },
-   [50]  = { { LRADIANT   , 1.00, 1.0 }, },
-   [55]  = { { SBRILLIANT , 1.00, 1.0 }, },
-   [60]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [65]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [79]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [85]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [115] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },	-- highest level BC blue is 115
-   [120] = { { LPRISMATIC , 0.05, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [275] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
-  },
+ 	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
    [15]  = { { SGLIMMERING, 1.00, 1.0 }, },
    [20]  = { { SGLIMMERING, 1.00, 1.0 }, },
@@ -470,30 +479,17 @@ const.baseDisenchantTable = {
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [151] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
    [164] = { { SDREAM_SHARD, 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },
-   [275] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200, so far
+   [200] = { { DREAM_SHARD , 0.99, 1.0 }, { ABYSS, 0.01, 1.0 }, },	-- highest level LK blue is 200
+ 
+ -- ccox - this is guesswork!
+   [270] = { { SHEAVENLY_SHARD , 0.99, 1.0 }, { MAELSTROM, 0.01, 1.0 }, },
+   [300] = { { SHEAVENLY_SHARD , 0.99, 1.0 }, { MAELSTROM, 0.01, 1.0 }, },
+   [320] = { { SHEAVENLY_SHARD , 0.99, 1.0 }, { MAELSTROM, 0.01, 1.0 }, },
+   [375] = { { HEAVENLY_SHARD  , 0.99, 1.0 }, { MAELSTROM, 0.01, 1.0 }, },	-- highest level Cata blue is 352, so far
   },
  },
  [EPIC] = {
-  [const.WEAPON] = {
-   [40]  = { { SRADIANT  , 1.00, 3.0 }, },
-   [45]  = { { SRADIANT  , 1.00, 3.5 }, },
-   [50]  = { { LRADIANT  , 1.00, 3.5 }, },
-   [55]  = { { SBRILLIANT, 1.00, 3.5 }, },
-   [60]  = { { NEXUS     , 1.00, 1.0 }, },
-   [65]  = { { NEXUS     , 1.00, 1.5 }, },
-   [70]  = { { NEXUS     , 1.00, 1.5 }, },
-   [79]  = { { NEXUS     , 1.00, 1.5 }, },
-   [85]  = { { NEXUS     , 1.00, 1.5 }, },
-   [94]  = { { NEXUS     , 1.00, 1.5 }, },	-- BC gear appears to start at 95
-   [99]  = { { VOID      , 1.00, 1.0 }, },
-   [115] = { { VOID      , 1.00, 1.5 }, },
-   [120] = { { VOID      , 1.00, 1.5 }, },
-   [151] = { { VOID      , 1.00, 1.5 }, },
-   [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
-   [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [275] = { { ABYSS     , 1.00, 1.0 }, },	-- highest level LK epic is 258, so far - where is the break to 1.5 shards?
-  },
+ 	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
    [45]  = { { SRADIANT  , 1.00, 3.5 }, },
@@ -511,7 +507,10 @@ const.baseDisenchantTable = {
    [151] = { { VOID      , 1.00, 1.5 }, },
    [164] = { { VOID      , 1.00, 1.5 }, },	-- highest level BC epic
    [200] = { { ABYSS     , 1.00, 1.0 }, },
-   [275] = { { ABYSS     , 1.00, 1.0 }, },	-- highest level LK epic is 258, so far
+   [270] = { { ABYSS     , 1.00, 1.0 }, },
+   [300] = { { MAELSTROM , 1.00, 1.0 }, },	-- highest level LK epic is 284
+   [320] = { { MAELSTROM , 1.00, 1.0 }, },
+   [375] = { { MAELSTROM , 1.00, 1.0 }, },	-- highest level CATA epic so far is 372
   },
  },
 }
@@ -523,17 +522,20 @@ const.baseDisenchantTable = {
 
 const.ReverseDisenchantLevelList = {
 	
+	[52722] = { 350, 400 }, -- Maelstrom Crystal		 -- ccox - this is guesswork!
 	[34057] = { 165, 275 }, -- Abyss Crystal
 	[22450] = {  95, 164 }, -- Void Crystal
 	[20725] = {  56,  94 }, -- Nexus Crystal
 	
-	[34052] = { 165, 275 }, -- Dream Shard
+	[52721] = { 321, 375 }, -- Heavenly Shard		 -- ccox - this is guesswork!
+	[34052] = { 165, 200 }, -- Dream Shard
 	[22449] = { 100, 120 }, -- Large Prismatic Shard
 	[14344] = {  56,  65 }, -- Large Brilliant Shard
 	[11178] = {  46,  50 }, -- Large Radiant Shard
 	[11139] = {  36,  40 }, -- Large Glowing Shard
 	[11084] = {  26,  30 }, -- Large Glimmering Shard
 	
+	[52720] = { 230, 320 }, -- Small Heavenly Shard		 -- ccox - this is guesswork!
 	[34053] = { 121, 164 }, -- Small Dream Shard
 	[22448] = {  66,  99 }, -- Small Prismatic Shard
 	[14343] = {  51,  55 }, -- Small Brilliant Shard
@@ -541,6 +543,7 @@ const.ReverseDisenchantLevelList = {
 	[11138] = {  31,  35 }, -- Small Glowing Shard
 	[10978] = {  1,   25 }, -- Small Glimmering Shard
 	
+	[52718] = { 271, 350 }, -- Greater Celestial Essence		 -- ccox - this is guesswork!
 	[34055] = { 152, 200 }, -- Greater Cosmic Essence
 	[22446] = { 100, 120 }, -- Greater Planar Essence
 	[16203] = {  56,  65 }, -- Greater Eternal Essence
@@ -549,6 +552,7 @@ const.ReverseDisenchantLevelList = {
 	[11082] = {  26,  30 }, -- Greater Astral Essence
 	[10939] = {  16,  20 }, -- Greater Magic Essence
 	
+	[52719] = { 230, 270 }, -- Lesser Celestial Essence		 -- ccox - this is guesswork!
 	[34056] = { 121, 151 }, -- Lesser Cosmic Essence
 	[22447] = {  66,  99 }, -- Lesser Planar Essence
 	[16202] = {  51,  55 }, -- Lesser Eternal Essence
@@ -557,6 +561,7 @@ const.ReverseDisenchantLevelList = {
 	[10998] = {  21,  25 }, -- Lesser Astral Essence
 	[10938] = {   1,  15 }, -- Lesser Magic Essence
 	
+	[52555] = { 230, 350 }, -- Hypnotic Dust		 -- ccox - this is guesswork!
 	[34054] = { 121, 200 }, -- Infinite Dust
 	[22445] = {  66, 120 }, -- Arcane Dust
 	[16204] = {  56,  65 }, -- Illusion Dust
@@ -568,631 +573,6 @@ const.ReverseDisenchantLevelList = {
 }
 
 
-local COPPER_ORE = 2770
-local TIN_ORE = 2771
-local IRON_ORE = 2772
-local MITHRIL_ORE = 3858
-local THORIUM_ORE = 10620
-local FEL_IRON_ORE = 23424
-local ADAMANTITE_ORE = 23425
-local COBALT_ORE = 36909
-local SARONITE_ORE = 36912
-local TITANIUM_ORE = 36910
-
-local COPPERPOWDER = 24186
-local TINPOWDER = 24188
-local IRONPOWDER = 24190
-local MITHRILPOWDER = 24234
-local THORIUMPOWDER = 24235
-local FELIRONPOWDER = 24242
-local ADAMANTITEPOWDER = 24243
-local TITANIUMPOWDER = 46849
-
-local TIGERSEYE = 818
-local MALACHITE = 774
-local SHADOWGEM = 1210
-local LESSERMOONSTONE = 1705
-local MOSSAGATE = 1206
-local CITRINE = 3864
-local JADE = 1529
-local AQUAMARINE = 7909
-local STARRUBY = 7910
-local AZEROTHIANDIAMOND = 12800
-local BLUESAPPHIRE = 12361
-local LARGEOPAL = 12799
-local HUGEEMERALD = 12364
-local BLOODGARNET = 23077
-local FLAMESPESSARITE = 21929
-local GOLDENDRAENITE = 23112
-local DEEPPERIDOT = 23079
-local AZUREMOONSTONE = 23117
-local SHADOWDRAENITE = 23107
-local LIVINGRUBY = 23436
-local NOBLETOPAZ = 23439
-local DAWNSTONE = 23440
-local TALASITE = 23437
-local STAROFELUNE = 23438
-local NIGHTSEYE = 23441
-
--- ccox - new for WOTLK
-local CHALCEDONY = 36923
-local SHADOWCRYSTAL = 36926
-local TWILIGHTOPAL = 36927
-local HUGECITRINE = 36929
-local BLOODSTONE = 36917
-local SUNCRYSTAL = 36920
-local DARKJADE = 36932
-local FORESTEMERALD = 36933
-local SCARLETRUBY = 36918
-local MONARCHTOPAZ = 36930
-local SKYSAPPHIRE = 36924
-local AUTMNSGLOW = 36921
-
-local MAJESTICZIRCON = 36925
-local AMETRINE = 36931
-local KINGSAMBER = 36922
-local DREADSTONE = 36928
-local CARDINALRUBY = 36919
-local EYEOFZUL = 36934
-
-
---[[
-	Prospectable ores
-]]
-
-const.ProspectMinLevels = {
-	[COPPER_ORE] = 20,
-	[TIN_ORE] = 50,
-	[IRON_ORE] = 125,
-	[MITHRIL_ORE] = 175,
-	[THORIUM_ORE] = 250,
-	[FEL_IRON_ORE] = 275,
-	[ADAMANTITE_ORE] = 325,
-	[COBALT_ORE] = 350,
-	[SARONITE_ORE] = 400,
-	[TITANIUM_ORE] = 450,
-}
-
-
--- data is a combination of wowhead, wowwiki, and personal results
-const.ProspectableItems = {
-
-	[COPPER_ORE] = {
-			[TIGERSEYE] = 0.5,
-			[MALACHITE] = 0.5,
-			[SHADOWGEM] = 0.1,
-			},
-
-	[TIN_ORE] = {
-			[SHADOWGEM] = 0.375,
-			[LESSERMOONSTONE] = 0.375,
-			[MOSSAGATE] = 0.375,
-
-			[CITRINE] = 0.04,
-			[JADE] = 0.04,
-			[AQUAMARINE] = 0.04,
-			},
-
-	[IRON_ORE] = {
-			[CITRINE] = 0.375,
-			[LESSERMOONSTONE] = 0.375,
-			[JADE] = 0.375,
-
-			[AQUAMARINE] = 0.05,
-			[STARRUBY] = 0.05,
-			},
-
-	[MITHRIL_ORE] = {
-			[CITRINE] = 0.375,
-			[STARRUBY] = 0.375,
-			[AQUAMARINE] = 0.375,
-
-			[AZEROTHIANDIAMOND] = 0.03,
-			[BLUESAPPHIRE] = 0.03,
-			[LARGEOPAL] = 0.03,
-			[HUGEEMERALD] = 0.03,
-			},
-
-	[THORIUM_ORE] = {
-			[STARRUBY] = 0.25,
-			[LARGEOPAL] = 0.20,
-			[BLUESAPPHIRE] = 0.20,
-			[AZEROTHIANDIAMOND] = 0.20,
-			[HUGEEMERALD] = 0.20,
-
-			[BLOODGARNET] = 0.01,
-			[FLAMESPESSARITE] = 0.01,
-			[GOLDENDRAENITE] = 0.01,
-			[DEEPPERIDOT] = 0.01,
-			[AZUREMOONSTONE] = 0.01,
-			[SHADOWDRAENITE] = 0.01,
-			},
-
-	[FEL_IRON_ORE] = {
-			[BLOODGARNET] = 0.17,
-			[FLAMESPESSARITE] = 0.17,
-			[GOLDENDRAENITE] = 0.17,
-			[DEEPPERIDOT] = 0.17,
-			[AZUREMOONSTONE] = 0.17,
-			[SHADOWDRAENITE] = 0.17,
-
-			[LIVINGRUBY] = 0.011,
-			[NOBLETOPAZ] = 0.011,
-			[DAWNSTONE] = 0.011,
-			[TALASITE] = 0.011,
-			[STAROFELUNE] = 0.011,
-			[NIGHTSEYE] = 0.011,
-			},
-
-	[ADAMANTITE_ORE] = {
-			[ADAMANTITEPOWDER] = 1.0,		-- other powders were taken out in 3.0
-			[BLOODGARNET] = 0.19,
-			[FLAMESPESSARITE] = 0.19,
-			[GOLDENDRAENITE] = 0.19,
-			[DEEPPERIDOT] = 0.19,
-			[AZUREMOONSTONE] = 0.19,
-			[SHADOWDRAENITE] = 0.19,
-
-			[LIVINGRUBY] = 0.03,
-			[NOBLETOPAZ] = 0.03,
-			[DAWNSTONE] = 0.03,
-			[TALASITE] = 0.03,
-			[STAROFELUNE] = 0.03,
-			[NIGHTSEYE] = 0.03,
-			},
-
-	[COBALT_ORE] = {
-			[CHALCEDONY] = 0.25,
-			[HUGECITRINE] = 0.25,
-			[BLOODSTONE] = 0.25,
-			[SHADOWCRYSTAL] = 0.25,
-			[SUNCRYSTAL] = 0.25,
-			[DARKJADE] = 0.25,
-
-			[TWILIGHTOPAL] = 0.013,
-			[FORESTEMERALD] = 0.013,
-			[SCARLETRUBY] = 0.013,
-			[MONARCHTOPAZ] = 0.013,
-			[SKYSAPPHIRE] = 0.013,
-			[AUTMNSGLOW] = 0.013,
-			},
-
-	[SARONITE_ORE] = {
-			[CHALCEDONY] = 0.2,
-			[SHADOWCRYSTAL] = 0.2,
-			[DARKJADE] = 0.2,
-			[HUGECITRINE] = 0.2,
-			[BLOODSTONE] = 0.2,
-			[SUNCRYSTAL] = 0.2,
-
-			[FORESTEMERALD] = 0.04,
-			[SCARLETRUBY] = 0.04,
-			[MONARCHTOPAZ] = 0.04,
-			[SKYSAPPHIRE] = 0.04,
-			[TWILIGHTOPAL] = 0.04,
-			[AUTMNSGLOW] = 0.04,
-			},
-
-	[TITANIUM_ORE] = {
-			[TITANIUMPOWDER] = 0.65,
-			
-			[CHALCEDONY] = 0.25,
-			[SHADOWCRYSTAL] = 0.25,
-			[DARKJADE] = 0.25,
-			[HUGECITRINE] = 0.25,
-			[BLOODSTONE] = 0.25,
-			[SUNCRYSTAL] = 0.25,
-			
-			[FORESTEMERALD] = 0.04,
-			[SCARLETRUBY] = 0.04,
-			[MONARCHTOPAZ] = 0.04,
-			[SKYSAPPHIRE] = 0.04,
-			[TWILIGHTOPAL] = 0.04,
-			[AUTMNSGLOW] = 0.04,
-			
-			[MAJESTICZIRCON] = 0.04,
-			[AMETRINE] = 0.04,
-			[KINGSAMBER] = 0.04,
-			[DREADSTONE] = 0.04,
-			[CARDINALRUBY] = 0.04,
-			[EYEOFZUL] = 0.04,
-			
-			},
-
-}
-
-
--- list of ores from which each item could be prospected
--- copied from ProspectableItems
-
-const.ReverseProspectingSources = {
-	
-	[TIGERSEYE] = { COPPER_ORE },
-	[MALACHITE] = { COPPER_ORE },
-	[SHADOWGEM] = { TIN_ORE, COPPER_ORE },
-	
-	[LESSERMOONSTONE] = { IRON_ORE, TIN_ORE },
-	[MOSSAGATE] = { TIN_ORE },
-	[CITRINE] = { MITHRIL_ORE, IRON_ORE, TIN_ORE },
-	[JADE] = { IRON_ORE, TIN_ORE },
-	[AQUAMARINE] = { MITHRIL_ORE, IRON_ORE, TIN_ORE },
-	[STARRUBY] = { THORIUM_ORE, MITHRIL_ORE, IRON_ORE },
-	
-	[AZEROTHIANDIAMOND] = { THORIUM_ORE, MITHRIL_ORE },
-	[BLUESAPPHIRE] = { THORIUM_ORE, MITHRIL_ORE },
-	[LARGEOPAL] = { THORIUM_ORE, MITHRIL_ORE },
-	[HUGEEMERALD] = { THORIUM_ORE, MITHRIL_ORE },
-	
-	[BLOODGARNET] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	[FLAMESPESSARITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	[GOLDENDRAENITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	[DEEPPERIDOT] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	[AZUREMOONSTONE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	[SHADOWDRAENITE] = { ADAMANTITE_ORE, FEL_IRON_ORE, THORIUM_ORE },
-	
-	[LIVINGRUBY] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[NOBLETOPAZ] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[DAWNSTONE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[TALASITE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[STAROFELUNE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[NIGHTSEYE] = { ADAMANTITE_ORE, FEL_IRON_ORE },
-	[ADAMANTITEPOWDER] = { ADAMANTITE_ORE },
-	
-	[CHALCEDONY] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[HUGECITRINE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[BLOODSTONE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[SHADOWCRYSTAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[SUNCRYSTAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[DARKJADE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	
-	[TWILIGHTOPAL] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[FORESTEMERALD] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[SCARLETRUBY] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[MONARCHTOPAZ] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[SKYSAPPHIRE] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	[AUTMNSGLOW] = { TITANIUM_ORE, SARONITE_ORE, COBALT_ORE },
-	
-	[MAJESTICZIRCON] = { TITANIUM_ORE },
-	[AMETRINE] = { TITANIUM_ORE },
-	[KINGSAMBER] = { TITANIUM_ORE },
-	[DREADSTONE] = { TITANIUM_ORE },
-	[CARDINALRUBY] = { TITANIUM_ORE },
-	[EYEOFZUL] = { TITANIUM_ORE },
-	[TITANIUMPOWDER] = { TITANIUM_ORE },
-
-}
-
-
-local ALABASTER_PIGMENT = 39151
-local DUSKY_PIGMENT = 39334
-local GOLDEN_PIGMENT = 39338
-local EMERALD_PIGMENT = 39339
-local VIOLET_PIGMENT = 39340
-local SILVERY_PIGMENT = 39341
-local NETHER_PIGMENT = 39342
-local AZURE_PIGMENT = 39343
-
-local VERDANT_PIGMENT = 43103
-local BURNT_PIGMENT = 43104
-local INDIGO_PIGMENT = 43105
-local RUBY_PIGMENT = 43106
-local SAPPHIRE_PIGMENT = 43107
-local EBON_PIGMENT = 43108
-local ICY_PIGMENT = 43109
-
-local HERB_PEACEBLOOM = 2447
-local HERB_SILVERLEAF = 765
-local HERB_EARTHROOT = 2449
-local HERB_MAGEROYAL = 785
---local HERB_BLOODTHISTLE = 22710		-- removed during beta
-
-local HERB_BRIARTHORN = 2450
-local HERB_SWIFTTHISTLE = 2452
-local HERB_BRUISEWEED = 2453
-local HERB_STRANGLEKELP = 3820
-
-local HERB_WILDSTEELBLOOM = 3355
-local HERB_GRAVEMOSS = 3369
-local HERB_KINGSBLOOD = 3356
-local HERB_LIFEROOT = 3357
-
-local HERB_FADELEAF = 3818
-local HERB_GOLDTHORN = 3821
-local HERB_WINTERSBITE = 3819
-local HERB_KHADGARSWHISKER = 3358
-
-local HERB_FIREBLOOM = 4625
-local HERB_GHOSTMUSHROOM = 8845
-local HERB_ARTHASTEARS = 8836
-local HERB_GROMSBLOOD = 8846
-local HERB_BLINDWEED = 8839
-local HERB_SUNGRASS = 8838
-local HERB_PURPLELOTUS = 8831
-
-local HERB_ICECAP = 13467
-local HERB_GOLDENSANSAM = 13464
-local HERB_PLAGUEBLOOM = 13466
-local HERB_DREAMFOIL = 13463
-local HERB_MOUNTAINSILVERSAGE = 13465
-
--- all BC herbs
-local HERB_TEROCONE = 22789
-local HERB_DREAMINGGLORY = 22786
-local HERB_FELWEED = 22785
-local HERB_RAGVEIL = 22787
-local HERB_NIGHTMAREVINE = 22792
-local HERB_MANATHISTLE = 22793
-local HERB_NETHERBLOOM = 22791
-local HERB_ANCIENTLICHEN = 22790
-
--- all northrend herbs?
-local HERB_GOLDCLOVER = 36901
---local HERB_CONSTRICTORGRASS = 36902		-- removed 3.0.8
-local HERB_ADDERSTONGUE = 36903
-local HERB_TIGERLILY = 36904
-local HERB_LICHBLOOM = 36905
-local HERB_ICETHORN = 36906
-local HERB_TALANDRASROSE = 36907
-local HERB_DEADNETTLE = 37921
-local HERB_FIRESEED = 39969					-- milling added 3.0.8
-local HERB_FIRELEAF = 39970					-- milling added 3.0.8
-
-
--- only currently used for autoloot in EnxAutoDisenchant.lua
--- Blizz normally provides the reverse data in the pigment tooltip
-const.ReversePigmentList = {
-
-	-- common
-	[ALABASTER_PIGMENT] = 1,
-	[DUSKY_PIGMENT] = 1,
-	[GOLDEN_PIGMENT] = 1,
-	[EMERALD_PIGMENT] = 1,
-	[VIOLET_PIGMENT] = 1,
-	[SILVERY_PIGMENT] = 1,
-	[NETHER_PIGMENT] = 1,
-	[AZURE_PIGMENT] = 1,
-
-	-- rare
-	[VERDANT_PIGMENT] = 1,
-	[BURNT_PIGMENT] = 1,
-	[INDIGO_PIGMENT] = 1,
-	[RUBY_PIGMENT] = 1,
-	[SAPPHIRE_PIGMENT] = 1,
-	[EBON_PIGMENT] = 1,
-	[ICY_PIGMENT] = 1,
-
-}
-
--- map groups to a string for now
-local	ALABASTER_PIGMENT_LOW = "ALABASTER_PIGMENT_LOW"
-local	DUSKY_PIGMENT_LOW =  "DUSKY_PIGMENT_LOW"
-local	GOLDEN_PIGMENT_LOW = "GOLDEN_PIGMENT_LOW"
-local	EMERALD_PIGMENT_LOW = "EMERALD_PIGMENT_LOW"
-local	VIOLET_PIGMENT_LOW = "VIOLET_PIGMENT_LOW"
-local	SILVERY_PIGMENT_LOW = "SILVERY_PIGMENT_LOW"
-local	NETHER_PIGMENT_LOW = "NETHER_PIGMENT_LOW"
-local	AZURE_PIGMENT_LOW = "AZURE_PIGMENT_LOW"
-local	ALABASTER_PIGMENT_HIGH = "ALABASTER_PIGMENT_HIGH"
-local	DUSKY_PIGMENT_HIGH = "DUSKY_PIGMENT_HIGH"
-local	GOLDEN_PIGMENT_HIGH = "GOLDEN_PIGMENT_HIGH"
-local	EMERALD_PIGMENT_HIGH = "EMERALD_PIGMENT_HIGH"
-local	VIOLET_PIGMENT_HIGH = "VIOLET_PIGMENT_HIGH"
-local	SILVERY_PIGMENT_HIGH = "SILVERY_PIGMENT_HIGH"
-local	NETHER_PIGMENT_HIGH = "NETHER_PIGMENT_HIGH"
-local	AZURE_PIGMENT_HIGH = "AZURE_PIGMENT_HIGH"
-
-
--- skill required, by bracket/result
-const.MillingSkillRequired = {
-
-	[ALABASTER_PIGMENT_LOW] = 1,
-	[ALABASTER_PIGMENT_HIGH] = 1,
-	[DUSKY_PIGMENT_LOW] =  25,
-	[DUSKY_PIGMENT_HIGH] =  25,
-	[GOLDEN_PIGMENT_LOW] = 75,
-	[GOLDEN_PIGMENT_HIGH] = 75,
-	[EMERALD_PIGMENT_LOW] = 125,
-	[EMERALD_PIGMENT_HIGH] = 125,
-	[VIOLET_PIGMENT_LOW] = 175,
-	[VIOLET_PIGMENT_HIGH] = 175,
-	[SILVERY_PIGMENT_LOW] = 225,
-	[SILVERY_PIGMENT_HIGH] = 225,
-	[NETHER_PIGMENT_LOW] = 275,
-	[NETHER_PIGMENT_HIGH] = 275,
-	[AZURE_PIGMENT_LOW] = 325,
-	[AZURE_PIGMENT_HIGH] = 325,
-
-}
-
-const.MillableItems = {
-
-	[HERB_SILVERLEAF] = ALABASTER_PIGMENT_LOW,
-	[HERB_PEACEBLOOM] = ALABASTER_PIGMENT_HIGH,
-	[HERB_EARTHROOT] = ALABASTER_PIGMENT_HIGH,
-
-	[HERB_MAGEROYAL] = DUSKY_PIGMENT_LOW,
-	[HERB_BRIARTHORN] = DUSKY_PIGMENT_LOW,
-	[HERB_SWIFTTHISTLE] = DUSKY_PIGMENT_LOW,
-	[HERB_BRUISEWEED] = DUSKY_PIGMENT_HIGH,
-	[HERB_STRANGLEKELP] = DUSKY_PIGMENT_HIGH,
-
-	[HERB_WILDSTEELBLOOM] = GOLDEN_PIGMENT_LOW,
-	[HERB_GRAVEMOSS] = GOLDEN_PIGMENT_LOW,
-	[HERB_KINGSBLOOD] = GOLDEN_PIGMENT_HIGH,
-	[HERB_LIFEROOT] = GOLDEN_PIGMENT_HIGH,
-
-	[HERB_FADELEAF] = EMERALD_PIGMENT_LOW,
-	[HERB_GOLDTHORN] = EMERALD_PIGMENT_LOW,
-	[HERB_WINTERSBITE] = EMERALD_PIGMENT_HIGH,
-	[HERB_KHADGARSWHISKER] = EMERALD_PIGMENT_HIGH,
-
-	[HERB_FIREBLOOM] = VIOLET_PIGMENT_LOW,
-	[HERB_PURPLELOTUS] = VIOLET_PIGMENT_LOW,
-	[HERB_ARTHASTEARS] = VIOLET_PIGMENT_LOW,
-	[HERB_SUNGRASS] = VIOLET_PIGMENT_LOW,
-	[HERB_GHOSTMUSHROOM] = VIOLET_PIGMENT_HIGH,
-	[HERB_BLINDWEED] = VIOLET_PIGMENT_HIGH,
-	[HERB_GROMSBLOOD] = VIOLET_PIGMENT_HIGH,
-
-	[HERB_GOLDENSANSAM] = SILVERY_PIGMENT_LOW,
-	[HERB_DREAMFOIL] = SILVERY_PIGMENT_LOW,
-	[HERB_MOUNTAINSILVERSAGE] = SILVERY_PIGMENT_HIGH,
-	[HERB_PLAGUEBLOOM] = SILVERY_PIGMENT_HIGH,
-	[HERB_ICECAP] = SILVERY_PIGMENT_HIGH,
-
-	[HERB_TEROCONE] = NETHER_PIGMENT_LOW,
-	[HERB_DREAMINGGLORY] = NETHER_PIGMENT_LOW,
-	[HERB_FELWEED] = NETHER_PIGMENT_LOW,
-	[HERB_RAGVEIL] = NETHER_PIGMENT_LOW,
-	[HERB_ANCIENTLICHEN] = NETHER_PIGMENT_HIGH,
-	[HERB_NIGHTMAREVINE] = NETHER_PIGMENT_HIGH,
-	[HERB_MANATHISTLE] = NETHER_PIGMENT_HIGH,
-	[HERB_NETHERBLOOM] = NETHER_PIGMENT_HIGH,
-
-	[HERB_TIGERLILY] = AZURE_PIGMENT_LOW,
-	[HERB_TALANDRASROSE] = AZURE_PIGMENT_LOW,
-	[HERB_GOLDCLOVER] = AZURE_PIGMENT_LOW,
-	[HERB_DEADNETTLE] = AZURE_PIGMENT_LOW,
-	[HERB_FIRESEED] = AZURE_PIGMENT_LOW,			-- milling added 3.0.8
-	[HERB_FIRELEAF] = AZURE_PIGMENT_LOW,			-- milling added 3.0.8
---	[HERB_CONSTRICTORGRASS] = AZURE_PIGMENT,		-- removed 3.0.8
-	[HERB_ADDERSTONGUE] = AZURE_PIGMENT_HIGH,
-	[HERB_LICHBLOOM] = AZURE_PIGMENT_HIGH,
-	[HERB_ICETHORN] = AZURE_PIGMENT_HIGH,
-}
-
-
-const.MillGroupYields = {
-
-	[ALABASTER_PIGMENT_LOW] = {
-		[ALABASTER_PIGMENT] = 2.5,
-		},
-
-	[ALABASTER_PIGMENT_HIGH] = {
-		[ALABASTER_PIGMENT] = 3.0,
-		},
-
-	[DUSKY_PIGMENT_LOW] = {
-		[DUSKY_PIGMENT] = 2.5,
-		[VERDANT_PIGMENT] = 0.25,
- 		},
-
-	[DUSKY_PIGMENT_HIGH] = {
-		[DUSKY_PIGMENT] = 3.0,
-		[VERDANT_PIGMENT] = 0.5,
- 		},
-
-	[GOLDEN_PIGMENT_LOW] = {
-		[GOLDEN_PIGMENT] = 2.5,
-		[BURNT_PIGMENT] = 0.25,
-		},
-
-	[GOLDEN_PIGMENT_HIGH] = {
-		[GOLDEN_PIGMENT] = 3.0,
-		[BURNT_PIGMENT] = 0.5,
-		},
-
-	[EMERALD_PIGMENT_LOW] = {
-		[EMERALD_PIGMENT] = 2.5,
-		[INDIGO_PIGMENT] = 0.25,
-		},
-
-	[EMERALD_PIGMENT_HIGH] = {
-		[EMERALD_PIGMENT] = 3.0,
-		[INDIGO_PIGMENT] = 0.5,
-		},
-
-	[VIOLET_PIGMENT_LOW] = {
-		[VIOLET_PIGMENT] = 2.5,
-		[RUBY_PIGMENT] = 0.25,
-		},
-
-	[VIOLET_PIGMENT_HIGH] = {
-		[VIOLET_PIGMENT] = 3.0,
-		[RUBY_PIGMENT] = 0.5,
-		},
-
-	[SILVERY_PIGMENT_LOW] = {
-		[SILVERY_PIGMENT] = 2.5,
-		[SAPPHIRE_PIGMENT] = 0.25,
-		},
-
-	[SILVERY_PIGMENT_HIGH] = {
-		[SILVERY_PIGMENT] = 3.0,
-		[SAPPHIRE_PIGMENT] = 0.5,
-		},
-
-	[NETHER_PIGMENT_LOW] = {
-		[NETHER_PIGMENT] = 2.5,
-		[EBON_PIGMENT] = 0.25,
-		},
-
-	[NETHER_PIGMENT_HIGH] = {
-		[NETHER_PIGMENT] = 3.0,
-		[EBON_PIGMENT] = 0.5,
-		},
-
-	[AZURE_PIGMENT_LOW] = {
-		[AZURE_PIGMENT] = 2.5,
-		[ICY_PIGMENT] = 0.25,
-		},
-
-	[AZURE_PIGMENT_HIGH] = {
-		[AZURE_PIGMENT] = 3.0,
-		[ICY_PIGMENT] = 0.5,
-		},
-
-}
-
-
-local SHIMMERING_INK = 43122
-local MOONGLOW_INK = 39469
-local MIDNIGHT_INK = 39774
-local LIONS_INK = 43116
-local JADEFIRE_INK = 43118
-local IVORY_INK = 37101
-local INKOFTHESEA_INK = 43126
-local ETHEREAL_INK = 43124
-local CELESTIAL_INK = 43120
-local SNOWFALL_INK = 43127
-local ROYAL_INK = 43119
-local INKOFTHESKY_INK = 43123
-local HUNTERS_INK = 43115
-local FIERY_INK = 43212
-local DAWNSTAR_INK = 43117
-local DARKFLAME_INK = 43125
-
-const.ReverseInkList = {
-
-	[ MOONGLOW_INK ] = { ALABASTER_PIGMENT },
-	[ IVORY_INK ] = { ALABASTER_PIGMENT },
-	[ MIDNIGHT_INK ] = { DUSKY_PIGMENT },
-	[ LIONS_INK ] = { GOLDEN_PIGMENT },
-	[ JADEFIRE_INK ] = { EMERALD_PIGMENT },
-	[ CELESTIAL_INK ] = { VIOLET_PIGMENT },
-	[ SHIMMERING_INK ] = { SILVERY_PIGMENT },
-	[ ETHEREAL_INK ] = { NETHER_PIGMENT },
-	[ INKOFTHESEA_INK ] = { AZURE_PIGMENT },
-	
-	[ HUNTERS_INK ] = { VERDANT_PIGMENT },
-	[ DAWNSTAR_INK ] = { BURNT_PIGMENT },
-	[ ROYAL_INK ] = { INDIGO_PIGMENT },
-	[ FIERY_INK ] = { RUBY_PIGMENT },
-	[ INKOFTHESKY_INK ] = { SAPPHIRE_PIGMENT },
-	[ DARKFLAME_INK ] = { EBON_PIGMENT },
-	[ SNOWFALL_INK ] = { ICY_PIGMENT },
-
-}
-
--- items that have no use, sell to vendor, and thus get vendor prices
-const.VendorTrash =  {
-	[COPPERPOWDER] = true,
-	[TINPOWDER] = true,
-	[IRONPOWDER] = true,
-	[MITHRILPOWDER] = true,
-	[THORIUMPOWDER] = true,
-	[FELIRONPOWDER] = true,
-}
 
 
 -- needed because GetItemInfo fails when items are not in the user's cache
