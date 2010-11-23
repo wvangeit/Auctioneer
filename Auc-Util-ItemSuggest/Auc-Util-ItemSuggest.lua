@@ -35,83 +35,75 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "ItemSuggest"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
+
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
-local AppraiserValue, DisenchantValue, ProspectValue, MillingValue, ConvertValue, VendorValue, bestmethod, bestvalue, _
-local resultcache
 local cutRate = 0.05 -- "home" AH cut / broker fee. todo: Is it worth introducing a "neutral" AH option?
+local LastLink, LastQuantity, LastSuggest, LastValue
+
+local Suggestors = {}
 
 function lib.GetName()
 	return libName
 end
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
-	elseif (callbackType == "config") then lib.SetupConfigGui(...) --Called when you should build your Configator tab.
-	elseif (callbackType == "listupdate") then --Called when the AH Browse screen receives an update.
-	elseif (callbackType == "configchanged") then --Called when your config options (if Configator) have been changed.
-		resultcache = nil
-	elseif (callbackType == "scanstats") then
-		resultcache = nil
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost, additional)
+	if (get("util.itemsuggest.enablett")) then
+		local text = lib.GetSuggestText(lib.Suggest(hyperlink, quantity), get("util.itemsuggest.usecolour"))
+		tooltip:AddLine(format("Suggestion: %s this item", text))
 	end
 end
 
-lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
-	lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
+function lib.Processors.config(callbackType, gui)
+	if private.SetupConfigGui then private.SetupConfigGui(gui) end
 end
 
-function lib.Processors.config(callbackType, ...)
-	lib.SetupConfigGui(...) --Called when you should build your Configator tab.
+function lib.Processors.configchanged()--(callbackType, ...)
+	LastLink = nil -- only necessary to nil one of these 4 values
 end
-
-function lib.Processors.configchanged(callbackType, ...)
-	resultcache = nil
-end
-
 lib.Processors.scanstats = lib.Processors.configchanged
 
-
-
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
-	if (get("util.itemsuggest.enablett")) then
-		local aimethod = lib.itemsuggest(hyperlink, quantity)
-		tooltip:AddLine("Suggestion: ".. aimethod.. " this item")
-	end
-end
-
 function lib.OnLoad()
-	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	-- Check for invalid setting from older versions of ItemSuggest (<=r3872)
-	local validate, deplength = {[12]=true,[24]=true,[48]=true}, get("util.itemsuggest.deplength")
-	if not validate[deplength] then
-		deplength = tonumber(deplength)
-		deplength = validate[deplength] and deplength or 48
-		set ("util.itemsuggest.deplength", deplength)
-	end
+	--aucPrint("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	if private.OnLoadRunOnce then private.OnLoadRunOnce() end
 end
 
-local ahdeplength = {
-	{12, "12 hour"},
-	{24, "24 hour"},
-	{48, "48 hour"},
-}
-default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-default("util.itemsuggest.enchantskill", 450) -- Used for item AI
-default("util.itemsuggest.jewelcraftskill", 450)-- Used for item AI
-default("util.itemsuggest.inscriptionskill", 450)-- Used for item AI
-default("util.itemsuggest.vendorweight", 100)-- Used for item AI
-default("util.itemsuggest.auctionweight", 100)-- Used for item AI
-default("util.itemsuggest.prospectweight", 100)-- Used for item AI
-default("util.itemsuggest.millingweight", 100)-- Used for item AI
-default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
-default("util.itemsuggest.convertweight", 100)-- Used for item AI
-default("util.itemsuggest.relisttimes", 1)-- Used for item AI
-default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
-default("util.itemsuggest.includedeposit", 1)-- Used for item AI
-default("util.itemsuggest.deplength", 48)
+function private.OnLoadRunOnce()
+	private.OnLoadRunOnce = nil
 
-function lib.SetupConfigGui(gui)
+	default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
+	default("util.itemsuggest.enchantskill", 450) -- Used for item AI
+	default("util.itemsuggest.jewelcraftskill", 450)-- Used for item AI
+	default("util.itemsuggest.inscriptionskill", 450)-- Used for item AI
+	default("util.itemsuggest.vendorweight", 100)-- Used for item AI
+	default("util.itemsuggest.auctionweight", 100)-- Used for item AI
+	default("util.itemsuggest.prospectweight", 100)-- Used for item AI
+	default("util.itemsuggest.millingweight", 100)-- Used for item AI
+	default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
+	default("util.itemsuggest.convertweight", 100)-- Used for item AI
+	default("util.itemsuggest.relisttimes", 1)-- Used for item AI
+	default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
+	default("util.itemsuggest.includedeposit", 1)-- Used for item AI
+	default("util.itemsuggest.deplength", 48)
+	default("util.itemsuggest.usecolour", true)
+
+	lib.NewSuggest("Auction", lib.GetAppraiserValue, "util.itemsuggest.auctionweight")
+	lib.SetSuggestText("Auction", "Auction", "1fff00") -- green
+	lib.NewSuggest("Disenchant", lib.GetDisenchantValue, "util.itemsuggest.disenchantweight")
+	lib.SetSuggestText("Disenchant", "Disenchant", "ffff00") -- yellow
+	lib.NewSuggest("Prospect", lib.GetProspectValue, "util.itemsuggest.prospectweight")
+	lib.SetSuggestText("Prospect", "Prospect", "ffff00") -- yellow
+	lib.NewSuggest("Mill", lib.GetMillingValue, "util.itemsuggest.millingweight")
+	lib.SetSuggestText("Mill", "Mill", "ffff00") -- yellow
+	lib.NewSuggest("Convert", lib.GetConvertValue, "util.itemsuggest.convertweight")
+	lib.SetSuggestText("Convert", "Convert", "007fee") -- blue
+	lib.NewSuggest("Vendor", lib.GetVendorValue, "util.itemsuggest.vendorweight")
+	lib.SetSuggestText("Vendor", "Vendor", "9d9d9d") -- grey
+end
+
+function private.SetupConfigGui(gui)
+	private.SetupConfigGui = nil
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 
@@ -119,158 +111,157 @@ function lib.SetupConfigGui(gui)
         "What is the ItemSuggest module?",
         "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill or convert that item.")
 
-	gui:AddControl(id, "Header",     0,    "ItemSuggest Options")
-	gui:AddControl(id, "Checkbox",      0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
+	gui:AddControl(id, "Header", 0, "ItemSuggest Options")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
 	gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
+	gui:AddControl(id, "Checkbox", 0, 2, "util.itemsuggest.usecolour", "Use colours in tooltip")
+	gui:AddTip(id, "Set whether the tooltip will display different colour text for the different suggestions.")
 
-    gui:AddControl(id, "Header",     0,    "Skill usage Limits")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.enchantskill", 0, 450, 5, "Max Enchanting Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.jewelcraftskill", 0, 450, 5, "Max JewelCrafting Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.inscriptionskill", 0, 450, 5, "Max Inscription Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
-
-	gui:AddControl(id, "Header",     0,    "ItemSuggest Recommendation Bias")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
+	gui:AddControl(id, "Header", 0, "ItemSuggest Recommendation Bias")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
 	gui:AddTip(id, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
 	gui:AddTip(id, "Weight ItemSuggest recommendations for auction resale higher or lower.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
 	gui:AddTip(id, "Weight ItemSuggest recommendations for Disenchanting higher or lower.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.millingweight", 0, 200, 1, "Milling Bias %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.millingweight", 0, 200, 1, "Milling Bias %s")
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Milling higher or lower.")
-	gui:AddControl(id, "WideSlider",           0, 2, "util.itemsuggest.convertweight", 0, 200, 1, "Conversion Bias %s")
+	gui:AddControl(id, "WideSlider",  0, 2, "util.itemsuggest.convertweight", 0, 200, 1, "Conversion Bias %s")
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Conversion higher or lower.")
 
-	gui:AddControl(id, "Header",     0,    "Deposit cost influence")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
+    gui:AddControl(id, "Header", 0, "Skill usage Limits")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 0, 525, 25, "Max Enchanting Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 0, 525, 25, "Max JewelCrafting Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 0, 525, 25, "Max Inscription Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
+
+	gui:AddControl(id, "Header", 0, "Deposit cost influence")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
 	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
-	gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
 	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
-	gui:AddControl(id, "WideSlider",       0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
 	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
-	gui:AddControl(id, "Checkbox",     0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
 	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
-
 end
 
-function lib.itemsuggest(hyperlink, quantity)
-	if resultcache and resultcache[hyperlink] then
-		local bestmethod, bestvalue = strsplit(";", resultcache[hyperlink])
-		return bestmethod, tonumber(bestvalue)
+
+function lib.Suggest(hyperlink, quantity)
+	if not hyperlink then return end
+	if not quantity then quantity = 1 end
+	if hyperlink == LastLink and quantity == LastQuantity then
+		return LastSuggest, LastValue
 	end
-	-- Determine Base Values
-	if (quantity == nil) then quantity = 1 end
-	VendorValue = lib.GetVendorValue(hyperlink, quantity) or 0
-	AppraiserValue = lib.GetAppraiserValue(hyperlink, quantity) or 0
-	ConvertValue = lib.GetConvertValue (hyperlink, quantity) or 0
+	local bestsuggest, bestvalue = "Unknown", 0
 
-	if (get("util.itemsuggest.jewelcraftskill") == 0) then
-		ProspectValue = 0
-	else
-		ProspectValue = lib.GetProspectValue(hyperlink, quantity) or 0
+	for key, data in pairs(Suggestors) do
+		local value = data.suggestor(hyperlink, quantity)
+		if value and value > 0 then
+			if data.bias then
+				local bias = get(data.bias)
+				if bias then
+					value = value * bias / 100
+				end
+			end
+			if value > bestvalue then
+				bestvalue = value
+				bestsuggest = key
+			end
+		end
 	end
+	LastLink, LastQuantity, LastSuggest, LastValue = hyperlink, quantity, bestsuggest, bestvalue
+	return bestsuggest, bestvalue
+end
+lib.itemsuggest = lib.Suggest -- compatibility
 
-	if (get("util.itemsuggest.inscriptionskill") == 0) then
-		MillingValue = 0
-	else
-		MillingValue = lib.GetMillingValue(hyperlink, quantity) or 0
+function lib.NewSuggest(key, valueFunc, biasSetting, options)
+	if type(key) ~= "string" or type(valueFunc) ~= "function" or (options and type(options) ~= "table") then
+		return nil, "Invalid parameter(s)"
 	end
-
-	if (get("util.itemsuggest.enchantskill") == 0) then
-		DisenchantValue = 0
-	else
-		DisenchantValue = lib.GetDisenchantValue(hyperlink, quantity) or 0
+	if Suggestors[key] then
+		return nil, "Key already exists"
 	end
-
-	-- Adjust final values based on custom weights by enduser
-	local adjustment = get("util.itemsuggest.vendorweight") or 0
-	VendorValue = VendorValue * adjustment / 100
-	adjustment = get("util.itemsuggest.auctionweight") or 0
-	AppraiserValue = AppraiserValue * adjustment / 100
-	adjustment = get("util.itemsuggest.prospectweight") or 0
-	ProspectValue = ProspectValue * adjustment / 100
-	adjustment = get("util.itemsuggest.millingweight") or 0
-	MillingValue = MillingValue * adjustment / 100
-	adjustment = get("util.itemsuggest.disenchantweight") or 0
-	DisenchantValue = DisenchantValue * adjustment / 100
-	adjustment = get("util.itemsuggest.convertweight") or 0
-	ConvertValue = ConvertValue * adjustment / 100
-
-	-- Determine which method 'wins' the battle
-	bestvalue = math.max(0, VendorValue, AppraiserValue, ProspectValue, MillingValue, ConvertValue, DisenchantValue)
-	bestmethod = "Unknown"
-	if bestvalue == 0 then
-		bestmethod = "Unknown"
-		bestvalue = "Unknown"
-	elseif bestvalue == VendorValue then
-		bestmethod = "Vendor"
-	elseif bestvalue == AppraiserValue then
-		bestmethod = "Auction"
-	elseif bestvalue == ProspectValue then
-		bestmethod = "Prospect"
-	elseif bestvalue == MillingValue then
-		bestmethod = "Mill"
-	elseif bestvalue == DisenchantValue then
-		bestmethod = "Disenchant"
-	elseif bestvalue == ConvertValue then
-		bestmethod = "Convert"
+	local data = {
+		key = key,
+		suggestor = valueFunc,
+	}
+	Suggestors[key] = data
+	if biasSetting then
+		data.bias = biasSetting
 	end
-
-	if not resultcache then resultcache = {} end
-	resultcache[hyperlink] = strjoin(";", bestmethod, tostring(bestvalue))
-	-- Hand the winner back to caller...
-	return bestmethod, bestvalue
+	if options then
+		lib.SetSuggestText(key, options.text, options.textHex or options.textRed, options.textGreen, options.textBlue)
+		-- more options to be added later
+	end
+	return true
 end
 
-function lib.GetAppraiserValue(hyperlink, quantity)
-	AppraiserValue = GetAprPrice(hyperlink, nil, true) or 0
+function lib.SetSuggestText(key, text, colR, colG, colB)
+	local data = Suggestors[key]
+	if not data then return end
+	if type(text) ~= "string" then return end
+	data.plaintext = text
+	local hex
+	if type(colR) == "string" and colR:match("^%x%x%x%x%x%x$") then -- exactly 6 hexadecimal digits
+		hex = colR
+	elseif type(colR) == "number" and type(colG) == "number" and type(colB) == "number" then
+		if colR>=0 and colR<=1 and colG>=0 and colG<=1 and colB>=0 and colB<=1 then
+			hex = format("%02x%02x%02x", colR*255, colG*255, colB*255)
+		end
+	end
+	if hex then
+		data.displaytext = format("|cff%s%s|r", hex, text)
+	end
+	return true
+end
+
+function lib.GetSuggestText(key, useCol)
+	local data = Suggestors[key]
+	if data then
+		return useCol and data.displaytext or data.plaintext or key
+	end
+	return "Unknown" -- always return a string value
+end
+
+
+function lib.GetAppraiserValue(hyperlink, quantity) -- deprecated function: will be converted to an internal-only function in future
+	local AppraiserValue = GetAprPrice(hyperlink) or 0
 	AppraiserValue = AppraiserValue * quantity
-	local brokerRate, depositRate = 0.05, 0.05
 	if (get("util.itemsuggest.includebrokerage")) then
-		AppraiserValue = AppraiserValue - AppraiserValue * brokerRate
+		AppraiserValue = AppraiserValue * (1 - cutRate)
 	end
 	if (get("util.itemsuggest.includedeposit")) then
 		local aadvdepcost = GetDepositCost(hyperlink, get("util.itemsuggest.deplength"), nil, quantity) or 0
-		local depcost = aadvdepcost * get("util.itemsuggest.relisttimes")
-		AppraiserValue = AppraiserValue - depcost
+		AppraiserValue = AppraiserValue - aadvdepcost * get("util.itemsuggest.relisttimes")
 	end
 
-return AppraiserValue end
+	return AppraiserValue
+end
 
-function lib.GetDisenchantValue(hyperlink, quantity)
+function lib.GetDisenchantValue(hyperlink, quantity) -- deprecated function
 	if not (Enchantrix and Enchantrix.Storage) then return end
-	local DisenchantValue = 0
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
-	if (iQual == nil or iQual <= 1 or iLevel == nil) then return end
+	if not iQual or iQual <= 1 or not iLevel then return end
+	
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
-	local market
-
-	if (skillneeded > get("util.itemsuggest.enchantskill"))  then
-		return DisenchantValue
-	else
-		_, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(hyperlink)
-
-		if (market == 0)  then
-			return DisenchantValue
-		end
-	end
-
-	local adjusted = market or 0
+	if skillneeded > get("util.itemsuggest.enchantskill") then return end
+	
+	local _, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(hyperlink)
+	if not market or market == 0 then return end
 
 	if (get("util.itemsuggest.includebrokerage")) then
-		local brokerRate, depositRate = 0.05, 0.05
-		local amount = (adjusted * brokerRate)
-		adjusted = adjusted - amount
+		market = market * (1 - cutRate)
 	end
 
-	DisenchantValue = adjusted * quantity -- quantity may be more than 1 when mousing over Appraiser
-return DisenchantValue end
+	return market * quantity -- quantity may be more than 1 when mousing over Appraiser
+end
 
-function lib.GetProspectValue(hyperlink, quantity)
+function lib.GetProspectValue(hyperlink, quantity) -- deprecated function
 	if not Enchantrix then return end
 	local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(hyperlink)
 	if not jcSkillRequired or jcSkillRequired > get("util.itemsuggest.jewelcraftskill")  then
@@ -278,7 +269,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 	end
 	local prospects = Enchantrix.Storage.GetItemProspects(hyperlink)
 	if not prospects then return end
-	
+
 	local marketTotal, depositTotal = 0, 0
 	local depositAucLength, depositRelistTimes
 	local includeDeposit = get("util.itemsuggest.includedeposit")
@@ -302,7 +293,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 			depositTotal = depositTotal + aadvdepcost * yield * depositRelistTimes
 		end
 	end
-	
+
 	-- Adjustments
 	if get("util.itemsuggest.includebrokerage") then -- Auction House cut
 		marketTotal = marketTotal * (1 - cutRate)
@@ -312,7 +303,7 @@ function lib.GetProspectValue(hyperlink, quantity)
 	return marketTotal
 end
 
-function lib.GetMillingValue(hyperlink, quantity)
+function lib.GetMillingValue(hyperlink, quantity) -- deprecated function
 	if not Enchantrix then return end
 	local insSkillRequired = Enchantrix.Util.InscriptionSkillRequiredForItem(hyperlink)
 	if not insSkillRequired or insSkillRequired > get("util.itemsuggest.inscriptionskill")  then
@@ -320,7 +311,7 @@ function lib.GetMillingValue(hyperlink, quantity)
 	end
 	local pigments = Enchantrix.Storage.GetItemMilling(hyperlink)
 	if not pigments then return end
-	
+
 	local marketTotal, depositTotal = 0, 0
 	local depositAucLength, depositRelistTimes
 	local includeDeposit = get("util.itemsuggest.includedeposit")
@@ -344,7 +335,7 @@ function lib.GetMillingValue(hyperlink, quantity)
 			depositTotal = depositTotal + aadvdepcost * yield * depositRelistTimes
 		end
 	end
-	
+
 	-- Adjustments
 	if get("util.itemsuggest.includebrokerage") then -- Auction House cut
 		marketTotal = marketTotal * (1 - cutRate)
@@ -426,9 +417,9 @@ do -- build table for Converter-suggest
 
 	-- Temporary tables to help build the working table
 	-- To add new conversions, edit these tables
-	
+
 	-- TWO WAY Tables
-	
+
 	local lesser_greater = {
 		[LCOSMIC] = GCOSMIC,
 		[LPLANAR] = GPLANAR,
@@ -446,9 +437,9 @@ do -- build table for Converter-suggest
 		[CFIRE] = EFIRE,
 		[CWATER] = EWATER,
 	}
-	
+
 	-- ONE WAY Tables
-	
+
 	local mote2primal = {
 		[MAIR] = PAIR,
 		[MEARTH] = PEARTH,
@@ -470,7 +461,7 @@ do -- build table for Converter-suggest
 		[DSWORD] = DSWORDTO,
 		[DTHAXE] = DTHAXETO,
 	}
-	
+
 	-- Build the table
 	-- ItemSuggest version
 	-- Two-way
@@ -491,15 +482,15 @@ do -- build table for Converter-suggest
 	end
 end
 
-function lib.GetConvertValue (hyperlink, quantity)
+function lib.GetConvertValue (hyperlink, quantity) -- deprecated function
 	-- assume type(hyperlink) == "string" in all cases... if not, insert test here
 	local id = tonumber(strmatch(hyperlink, "item:(%d+):"))
 	local convert = findConvertable[id]
 	if not convert then return end
-	
+
 	id = convert[1] -- id of item we can convert to
-	
-	local market = GetAprPrice(id, nil, true) or 0
+
+	local market = GetAprPrice(id) or 0
 	market = market * quantity
 	if (get("util.itemsuggest.includebrokerage")) then
 		market = market * (1 - cutRate)
@@ -508,15 +499,15 @@ function lib.GetConvertValue (hyperlink, quantity)
 		local aadvdepcost = GetDepositCost(id, get("util.itemsuggest.deplength"), nil, quantity) or 0
 		market = market - aadvdepcost * get("util.itemsuggest.relisttimes")
 	end
-	
+
 	-- Adjust for yield
 	market = market * convert[2]
 
 	return market
 end
 
-function lib.GetVendorValue(hyperlink, quantity)
-	VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
+function lib.GetVendorValue(hyperlink, quantity) -- deprecated function
+	local VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
 	VendorValue = VendorValue * quantity
 return VendorValue end
 
