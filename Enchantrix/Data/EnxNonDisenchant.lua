@@ -9,6 +9,10 @@
 		We'll be gathering new information as Cataclysm develops and new items are found.
 ]]
 NonDisenchantables = {
-
+	["11287:0:0"] = true,
+	["11288:0:0"] = true,
+	["20406:0:0"] = true,
+	["20407:0:0"] = true,
+	["20408:0:0"] = true,
 }
 
