@@ -824,7 +824,7 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		return temp;
 	end
 
-	if (quality > 1) then
+	if (quality > 2) then
 		return 25;
 	end
 	
