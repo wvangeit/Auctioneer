@@ -225,8 +225,14 @@ function ENX_OnTooltipSetItem(this)
 			-- Ok, we think the item is disenchantable
 			-- search the tooltip text for the non-disenchantable string
 			for lineNum = 1, this:NumLines() do
-				local leftText = _G[this:GetName().."TextLeft"..lineNum]:GetText();
-				if (leftText == ITEM_DISENCHANT_NOT_DISENCHANTABLE) then
+				-- be careful, some addons don't format their tooltips very well
+				local lookup = tooltipName.."TextLeft"..lineNum;
+				local string = _G[lookup];
+				if (not string) then
+					return false
+				end
+				local leftText = string:GetText();
+				if (leftText and leftText == ITEM_DISENCHANT_NOT_DISENCHANTABLE) then
 					-- found the string, this item really isn't disenchantable
 					Enchantrix.Storage.SaveNonDisenchantable(link)
 					-- no need to continue
