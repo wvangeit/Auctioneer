@@ -71,13 +71,13 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 			return
 		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "alt" and not IsAltKeyDown() then
 			return
-		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "shift" and IsShiftKeyDown() then
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noshift" and IsShiftKeyDown() then
 			return
-		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noshift" and not IsShiftKeyDown() then
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "shift" and not IsShiftKeyDown() then
 			return
-		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "ctrl" and IsControlKeyDown() then
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noctrl" and IsControlKeyDown() then
 			return
-		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "noctrl" and not IsControlKeyDown() then
+		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "ctrl" and not IsControlKeyDown() then
 			return
 		end
 	else 
