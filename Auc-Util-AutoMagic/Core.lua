@@ -107,6 +107,7 @@ local isDEMats =
 	[52722] = true, --Maelstrom Crystal
 	[52721] = true, --Heavenly Shard
 	[52720] = true, --Small Heavenly Shard
+	[52719] = true, --Greater Celestial Essence
 	[52718] = true, --Lesser Celestial Essence
 	[52555] = true, --Hypnotic Dust
 
