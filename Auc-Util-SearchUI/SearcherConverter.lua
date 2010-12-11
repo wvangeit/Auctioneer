@@ -42,6 +42,8 @@ local findConvertable = {}
 do
 	-- Set our constants
 	--Essences
+	local GCELESTIAL = 52719
+	local LCELESTIAL = 52718
 	local GCOSMIC = 34055
 	local GPLANAR = 22446
 	local GETERNAL = 16203
@@ -112,6 +114,7 @@ do
 	-- TWO WAY Tables
 
 	local lesser_greater = {
+		[LCELESTIAL] = GCELESTIAL,
 		[LCOSMIC] = GCOSMIC,
 		[LPLANAR] = GPLANAR,
 		[LETERNAL] = GETERNAL,
@@ -211,7 +214,6 @@ function private.doValidation()
 end
 
 -- This function is automatically called from AucSearchUI.NotifyCallbacks
-private.validationRequired = true
 function lib.Processor(event, subevent)
 	if event == "selecttab" then
 		if subevent == lib.tabname and private.doValidation then
@@ -313,7 +315,7 @@ function lib.Search (item)
 		market = market * resources.CutAdjust
 	end
 	if get("converter.adjust.deposit") then
-		-- note: GetDepositCost calls GetSellValue API, which handles numerical itemIDs (prefers them actually)
+		-- note: GetDepositCost can handle numerical itemIDs instead of links
 		local amount = GetDepositCost(newID, get("converter.adjust.deplength"), resources.faction, count)
 		if amount then
 			market = market - amount * get("converter.adjust.listings")
