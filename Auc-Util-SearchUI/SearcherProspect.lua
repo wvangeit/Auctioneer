@@ -110,7 +110,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "prospect.maxprice", 1, 99999999, "Maximum Price for Prospect")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
-	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "milling.model")
+	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "prospect.model")
 	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
