@@ -56,7 +56,6 @@ local HERB_PEACEBLOOM = 2447
 local HERB_SILVERLEAF = 765
 local HERB_EARTHROOT = 2449
 local HERB_MAGEROYAL = 785
---local HERB_BLOODTHISTLE = 22710		-- removed during beta
 
 local HERB_BRIARTHORN = 2450
 local HERB_SWIFTTHISTLE = 2452
@@ -99,15 +98,14 @@ local HERB_ANCIENTLICHEN = 22790
 
 -- all northrend herbs?
 local HERB_GOLDCLOVER = 36901
---local HERB_CONSTRICTORGRASS = 36902		-- removed 3.0.8
 local HERB_ADDERSTONGUE = 36903
 local HERB_TIGERLILY = 36904
 local HERB_LICHBLOOM = 36905
 local HERB_ICETHORN = 36906
 local HERB_TALANDRASROSE = 36907
 local HERB_DEADNETTLE = 37921
-local HERB_FIRESEED = 39969					-- milling added 3.0.8
-local HERB_FIRELEAF = 39970					-- milling added 3.0.8
+local HERB_FIRESEED = 39969
+local HERB_FIRELEAF = 39970
 
 -- Cataclysm herbs
 local HERB_CINDERBLOOM = 52983
@@ -164,6 +162,7 @@ local	SILVERY_PIGMENT_HIGH = "SILVERY_PIGMENT_HIGH"
 local	NETHER_PIGMENT_HIGH = "NETHER_PIGMENT_HIGH"
 local	AZURE_PIGMENT_HIGH = "AZURE_PIGMENT_HIGH"
 local	ASHEN_PIGMENT_HIGH = "ASHEN_PIGMENT_HIGH"
+local	ASHEN_PIGMENT_MID = "ASHEN_PIGMENT_MID"
 
 
 -- skill required, by bracket/result
@@ -186,6 +185,7 @@ const.MillingSkillRequired = {
 	[AZURE_PIGMENT_LOW] = 325,
 	[AZURE_PIGMENT_HIGH] = 325,
 	[ASHEN_PIGMENT_LOW] = 425,						 -- ccox - this is guesswork!
+	[ASHEN_PIGMENT_MID] = 450,						 -- ccox - this is guesswork!
 	[ASHEN_PIGMENT_HIGH] = 475,						 -- ccox - this is guesswork!
 
 }
@@ -239,17 +239,16 @@ const.MillableItems = {
 	[HERB_TALANDRASROSE] = AZURE_PIGMENT_LOW,
 	[HERB_GOLDCLOVER] = AZURE_PIGMENT_LOW,
 	[HERB_DEADNETTLE] = AZURE_PIGMENT_LOW,
-	[HERB_FIRESEED] = AZURE_PIGMENT_LOW,			-- milling added 3.0.8
-	[HERB_FIRELEAF] = AZURE_PIGMENT_LOW,			-- milling added 3.0.8
---	[HERB_CONSTRICTORGRASS] = AZURE_PIGMENT,		-- removed 3.0.8
+	[HERB_FIRESEED] = AZURE_PIGMENT_LOW,
+	[HERB_FIRELEAF] = AZURE_PIGMENT_LOW,
 	[HERB_ADDERSTONGUE] = AZURE_PIGMENT_HIGH,
 	[HERB_LICHBLOOM] = AZURE_PIGMENT_HIGH,
 	[HERB_ICETHORN] = AZURE_PIGMENT_HIGH,
 	
 	[HERB_CINDERBLOOM] = ASHEN_PIGMENT_LOW,			-- ccox - this is guesswork!
 	[HERB_STORMVINE] = ASHEN_PIGMENT_LOW,			-- ccox - this is guesswork!
-	[HERB_AZSHARASVEIL] = ASHEN_PIGMENT_LOW,		-- ccox - this is guesswork!
-	[HERB_HEARTBLOSSOM] = ASHEN_PIGMENT_HIGH,		-- ccox - this is guesswork!
+	[HERB_AZSHARASVEIL] = ASHEN_PIGMENT_MID,		-- ccox - this is guesswork!
+	[HERB_HEARTBLOSSOM] = ASHEN_PIGMENT_MID,		-- ccox - this is guesswork!
 	[HERB_TWILIGHTJASMINE] = ASHEN_PIGMENT_HIGH,	-- ccox - this is guesswork!
 	[HERB_WHIPTAIL] = ASHEN_PIGMENT_HIGH,			-- ccox - this is guesswork!
 }
@@ -336,6 +335,11 @@ const.MillGroupYields = {
 		},
 	
 	[ASHEN_PIGMENT_LOW] = {		-- ccox - this is guesswork!
+		[ASHEN_PIGMENT] = 2.5,
+		[BURNING_EMBERS] = 0.25,
+		},
+	
+	[ASHEN_PIGMENT_MID] = {		-- ccox - this is guesswork!
 		[ASHEN_PIGMENT] = 2.5,
 		[BURNING_EMBERS] = 0.25,
 		},

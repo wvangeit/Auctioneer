@@ -57,7 +57,7 @@ const.StaticPrices = {
 	[11138] =   1000, -- Small Glowing Shard
 	[10978] =    700, -- Small Glimmering Shard
 
-	[52718] = 200000, -- Greater Celestial Essence
+	[52719] = 200000, -- Greater Celestial Essence
 	[34055] = 200000, -- Greater Cosmic Essence
 	[22446] = 120000, -- Greater Planar Essence
 	[16203] = 110000, -- Greater Eternal Essence
@@ -66,7 +66,7 @@ const.StaticPrices = {
 	[11082] =   6000, -- Greater Astral Essence
 	[10939] =   6000, -- Greater Magic Essence
 
-	[52719] =  75000, -- Lesser Celestial Essence
+	[52717] =  75000, -- Lesser Celestial Essence
 	[34056] =  75000, -- Lesser Cosmic Essence
 	[22447] =  38000, -- Lesser Planar Essence
 	[16202] =  52500, -- Lesser Eternal Essence
@@ -178,6 +178,8 @@ const.StaticPrices = {
 	[43108] =  20000, 	-- EBON_PIGMENT
 	[39343] =  20000, 	-- AZURE_PIGMENT
 	[43109] = 230000, 	-- ICY_PIGMENT
+	[61979] = 200000,  -- ASHEN_PIGMENT				-- Cata items, no prices established yet
+	[61981] = 200000,  -- BURNING_EMBERS			-- Cata items, no prices established yet
 
 	[818] =      7500, 	-- TIGERSEYE
 	[774] =      5000, 	-- MALACHITE
@@ -225,6 +227,20 @@ const.StaticPrices = {
 	[36928] = 1750000, 	-- DREADSTONE
 	[36919] = 1850000, 	-- CARDINALRUBY
 	[36934] = 1250000, 	-- EYEOFZUL
+	
+	[52177] = 200000,  -- CARNELIAN				-- Cata items, no prices established yet
+	[52178] = 200000,  -- ZEPHYRITE
+	[52179] = 200000,  -- ALICITE
+	[52180] = 200000,  -- NIGHTSTONE
+	[52181] = 200000,  -- HESSONITE
+	[52182] = 200000,  -- JASPER
+
+	[52190] = 1250000,  -- INFERNORUBY			-- Cata items, no prices established yet
+	[52191] = 1250000,  -- OCEANSAPPHIRE
+	[52192] = 1250000,  -- DREAMEMERALD
+	[52193] = 1250000,  -- EMBERTOPAZ
+	[52194] = 1250000,  -- DEMONSEYE
+	[52195] = 1250000,  -- AMBERJEWEL
 
 }
 
@@ -319,8 +335,8 @@ local ABYSS = 34057
 local HEAVENLY_SHARD = 52721
 local SHEAVENLY_SHARD = 52720
 local HYPNOTIC = 52555
-local GCELESTIAL = 52718
-local LCELESTIAL = 52719
+local GCELESTIAL = 52719
+local LCELESTIAL = 52718
 local MAELSTROM = 52722
 
 
@@ -328,12 +344,12 @@ local MAELSTROM = 52722
 
 const.DisenchantReagentList = {
 
---	52722, -- Maelstrom Crystal		-- wait for Cataclysm
+	52722, -- Maelstrom Crystal
 	34057, -- Abyss Crystal
 	22450, -- Void Crystal
 	20725, -- Nexus Crystal
 
---	52721, -- Heavenly Shard		-- wait for Cataclysm
+	52721, -- Heavenly Shard
 	34052, -- Dream Shard
 	22449, -- Large Prismatic Shard
 	14344, -- Large Brilliant Shard
@@ -341,7 +357,7 @@ const.DisenchantReagentList = {
 	11139, -- Large Glowing Shard
 	11084, -- Large Glimmering Shard
 
---	52720, -- Small Heavenly Shard		-- wait for Cataclysm
+	52720, -- Small Heavenly Shard
 	34053, -- Small Dream Shard
 	22448, -- Small Prismatic Shard
 	14343, -- Small Brilliant Shard
@@ -349,7 +365,7 @@ const.DisenchantReagentList = {
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
 
---	52718, -- Greater Celestial Essence		-- wait for Cataclysm
+	52719, -- Greater Celestial Essence
 	34055, -- Greater Cosmic Essence
 	22446, -- Greater Planar Essence
 	16203, -- Greater Eternal Essence
@@ -358,7 +374,7 @@ const.DisenchantReagentList = {
 	11082, -- Greater Astral Essence
 	10939, -- Greater Magic Essence
 
---	52719, -- Lesser Celestial Essence		-- wait for Cataclysm
+	52718, -- Lesser Celestial Essence
 	34056, -- Lesser Cosmic Essence
 	22447, -- Lesser Planar Essence
 	16202, -- Lesser Eternal Essence
@@ -367,7 +383,7 @@ const.DisenchantReagentList = {
 	10998, -- Lesser Astral Essence
 	10938, -- Lesser Magic Essence
 
---	52555, -- Hypnotic Dust		-- wait for Cataclysm
+	52555, -- Hypnotic Dust
 	34054, -- Infinite Dust
 	22445, -- Arcane Dust
 	16204, -- Illusion Dust
@@ -420,8 +436,8 @@ const.baseDisenchantTable = {
    [200] = { { INFINITE, 0.20, 5.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
    
  -- ccox - this is guesswork!
-   [270] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [300] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [270] = { { HYPNOTIC, 0.20, 2.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [300] = { { HYPNOTIC, 0.20, 2.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
    [320] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
    [375] = { { HYPNOTIC, 0.20, 5.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
@@ -449,11 +465,10 @@ const.baseDisenchantTable = {
    [200] = { { INFINITE, 0.75, 5.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
    
  -- ccox - this is guesswork!
--- BUG - Cataclysm is currenly giving more essences for armor and weapons
-   [270] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [300] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [320] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [375] = { { HYPNOTIC, 0.20, 5.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
+   [270] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [300] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [320] = { { HYPNOTIC, 0.75, 5.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [375] = { { HYPNOTIC, 0.75, 5.5 }, { GCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
  },
  [RARE] = {
@@ -522,53 +537,53 @@ const.baseDisenchantTable = {
 
 const.ReverseDisenchantLevelList = {
 	
-	[52722] = { 350, 400 }, -- Maelstrom Crystal		 -- ccox - this is guesswork!
-	[34057] = { 165, 275 }, -- Abyss Crystal
-	[22450] = {  95, 164 }, -- Void Crystal
-	[20725] = {  56,  94 }, -- Nexus Crystal
+	[MAELSTROM] = { 350, 400 }, -- Maelstrom Crystal		 -- ccox - this is guesswork!
+	[ABYSS]     = { 165, 275 }, -- Abyss Crystal
+	[VOID]      = {  95, 164 }, -- Void Crystal
+	[NEXUS]     = {  56,  94 }, -- Nexus Crystal
 	
-	[52721] = { 321, 375 }, -- Heavenly Shard		 -- ccox - this is guesswork!
-	[34052] = { 165, 200 }, -- Dream Shard
-	[22449] = { 100, 120 }, -- Large Prismatic Shard
-	[14344] = {  56,  65 }, -- Large Brilliant Shard
-	[11178] = {  46,  50 }, -- Large Radiant Shard
-	[11139] = {  36,  40 }, -- Large Glowing Shard
-	[11084] = {  26,  30 }, -- Large Glimmering Shard
+	[HEAVENLY_SHARD] = { 321, 375 }, -- Heavenly Shard		 -- ccox - this is guesswork!
+	[DREAM_SHARD]    = { 165, 200 }, -- Dream Shard
+	[LPRISMATIC]     = { 100, 120 }, -- Large Prismatic Shard
+	[LBRILLIANT]     = {  56,  65 }, -- Large Brilliant Shard
+	[LRADIANT]       = {  46,  50 }, -- Large Radiant Shard
+	[LGLOWING]       = {  36,  40 }, -- Large Glowing Shard
+	[LGLIMMERING]    = {  26,  30 }, -- Large Glimmering Shard
 	
-	[52720] = { 230, 320 }, -- Small Heavenly Shard		 -- ccox - this is guesswork!
-	[34053] = { 121, 164 }, -- Small Dream Shard
-	[22448] = {  66,  99 }, -- Small Prismatic Shard
-	[14343] = {  51,  55 }, -- Small Brilliant Shard
-	[11177] = {  41,  45 }, -- Small Radiant Shard
-	[11138] = {  31,  35 }, -- Small Glowing Shard
-	[10978] = {  1,   25 }, -- Small Glimmering Shard
+	[SHEAVENLY_SHARD] = { 230, 320 }, -- Small Heavenly Shard		 -- ccox - this is guesswork!
+	[SDREAM_SHARD]    = { 121, 164 }, -- Small Dream Shard
+	[SPRISMATIC]      = {  66,  99 }, -- Small Prismatic Shard
+	[SBRILLIANT]      = {  51,  55 }, -- Small Brilliant Shard
+	[SRADIANT]        = {  41,  45 }, -- Small Radiant Shard
+	[SGLOWING]        = {  31,  35 }, -- Small Glowing Shard
+	[SGLIMMERING]     = {  1,   25 }, -- Small Glimmering Shard
 	
-	[52718] = { 271, 350 }, -- Greater Celestial Essence		 -- ccox - this is guesswork!
-	[34055] = { 152, 200 }, -- Greater Cosmic Essence
-	[22446] = { 100, 120 }, -- Greater Planar Essence
-	[16203] = {  56,  65 }, -- Greater Eternal Essence
-	[11175] = {  46,  50 }, -- Greater Nether Essence
-	[11135] = {  36,  40 }, -- Greater Mystic Essence
-	[11082] = {  26,  30 }, -- Greater Astral Essence
-	[10939] = {  16,  20 }, -- Greater Magic Essence
+	[GCELESTIAL] = { 271, 350 }, -- Greater Celestial Essence		 -- ccox - this is guesswork!
+	[GCOSMIC]    = { 152, 200 }, -- Greater Cosmic Essence
+	[GPLANAR]    = { 100, 120 }, -- Greater Planar Essence
+	[GETERNAL]   = {  56,  65 }, -- Greater Eternal Essence
+	[GNETHER]    = {  46,  50 }, -- Greater Nether Essence
+	[GMYSTIC]    = {  36,  40 }, -- Greater Mystic Essence
+	[GASTRAL]    = {  26,  30 }, -- Greater Astral Essence
+	[GMAGIC]     = {  16,  20 }, -- Greater Magic Essence
 	
-	[52719] = { 230, 270 }, -- Lesser Celestial Essence		 -- ccox - this is guesswork!
-	[34056] = { 121, 151 }, -- Lesser Cosmic Essence
-	[22447] = {  66,  99 }, -- Lesser Planar Essence
-	[16202] = {  51,  55 }, -- Lesser Eternal Essence
-	[11174] = {  41,  45 }, -- Lesser Nether Essence
-	[11134] = {  31,  35 }, -- Lesser Mystic Essence
-	[10998] = {  21,  25 }, -- Lesser Astral Essence
-	[10938] = {   1,  15 }, -- Lesser Magic Essence
+	[LCELESTIAL] = { 230, 270 }, -- Lesser Celestial Essence		 -- ccox - this is guesswork!
+	[LCOSMIC]    = { 121, 151 }, -- Lesser Cosmic Essence
+	[LPLANAR]    = {  66,  99 }, -- Lesser Planar Essence
+	[LETERNAL]   = {  51,  55 }, -- Lesser Eternal Essence
+	[LNETHER]    = {  41,  45 }, -- Lesser Nether Essence
+	[LMYSTIC]    = {  31,  35 }, -- Lesser Mystic Essence
+	[LASTRAL]    = {  21,  25 }, -- Lesser Astral Essence
+	[LMAGIC]     = {   1,  15 }, -- Lesser Magic Essence
 	
-	[52555] = { 230, 350 }, -- Hypnotic Dust		 -- ccox - this is guesswork!
-	[34054] = { 121, 200 }, -- Infinite Dust
-	[22445] = {  66, 120 }, -- Arcane Dust
-	[16204] = {  56,  65 }, -- Illusion Dust
-	[11176] = {  46,  55 }, -- Dream Dust
-	[11137] = {  36,  45 }, -- Vision Dust
-	[11083] = {  26,  35 }, -- Soul Dust
-	[10940] = {   1,  25 }, -- Strange Dust
+	[HYPNOTIC] = { 230, 350 }, -- Hypnotic Dust		 -- ccox - this is guesswork!
+	[INFINITE] = { 121, 200 }, -- Infinite Dust
+	[ARCANE]   = {  66, 120 }, -- Arcane Dust
+	[ILLUSION] = {  56,  65 }, -- Illusion Dust
+	[DREAM]    = {  46,  55 }, -- Dream Dust
+	[VISION]   = {  36,  45 }, -- Vision Dust
+	[SOUL]     = {  26,  35 }, -- Soul Dust
+	[STRANGE]  = {   1,  25 }, -- Strange Dust
 
 }
 
