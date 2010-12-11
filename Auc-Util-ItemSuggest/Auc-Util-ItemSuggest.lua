@@ -73,9 +73,9 @@ function private.OnLoadRunOnce()
 	private.OnLoadRunOnce = nil
 
 	default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-	default("util.itemsuggest.enchantskill", 450) -- Used for item AI
-	default("util.itemsuggest.jewelcraftskill", 450)-- Used for item AI
-	default("util.itemsuggest.inscriptionskill", 450)-- Used for item AI
+	default("util.itemsuggest.enchantskill", 525) -- Used for item AI
+	default("util.itemsuggest.jewelcraftskill", 525)-- Used for item AI
+	default("util.itemsuggest.inscriptionskill", 525)-- Used for item AI
 	default("util.itemsuggest.vendorweight", 100)-- Used for item AI
 	default("util.itemsuggest.auctionweight", 100)-- Used for item AI
 	default("util.itemsuggest.prospectweight", 100)-- Used for item AI
@@ -132,11 +132,11 @@ function private.SetupConfigGui(gui)
    	gui:AddTip(id, "Weight ItemSuggest recommendations for Conversion higher or lower.")
 
     gui:AddControl(id, "Header", 0, "Skill usage Limits")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 0, 525, 25, "Max Enchanting Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 25, 525, 25, "Max Enchanting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 0, 525, 25, "Max JewelCrafting Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 25, 525, 25, "Max JewelCrafting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 0, 525, 25, "Max Inscription Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 25, 525, 25, "Max Inscription Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
 
 	gui:AddControl(id, "Header", 0, "Deposit cost influence")
@@ -247,10 +247,10 @@ function lib.GetDisenchantValue(hyperlink, quantity) -- deprecated function
 	if not (Enchantrix and Enchantrix.Storage) then return end
 	local _, _, iQual, iLevel = GetItemInfo(hyperlink)
 	if not iQual or iQual <= 1 or not iLevel then return end
-	
+
 	local skillneeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(iLevel, iQual)
 	if skillneeded > get("util.itemsuggest.enchantskill") then return end
-	
+
 	local _, _, _, market = Enchantrix.Storage.GetItemDisenchantTotals(hyperlink)
 	if not market or market == 0 then return end
 
@@ -351,6 +351,8 @@ do -- build table for Converter-suggest
 	-- todo: possibly modify SearchUI to export its table, and reuse the same table here?
 	-- Set our constants
 	--Essences
+	local GCELESTIAL = 52719
+	local LCELESTIAL = 52718
 	local GCOSMIC = 34055
 	local GPLANAR = 22446
 	local GETERNAL = 16203
@@ -421,6 +423,7 @@ do -- build table for Converter-suggest
 	-- TWO WAY Tables
 
 	local lesser_greater = {
+		[LCELESTIAL] = GCELESTIAL,
 		[LCOSMIC] = GCOSMIC,
 		[LPLANAR] = GPLANAR,
 		[LETERNAL] = GETERNAL,
