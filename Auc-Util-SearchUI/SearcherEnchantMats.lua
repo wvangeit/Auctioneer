@@ -130,7 +130,7 @@ local validReagents =
 
 -- Set our defaults
 default("enchantmats.level.custom", false)
-default("enchantmats.level.min", 1)
+default("enchantmats.level.min", 0)
 default("enchantmats.level.max", 525)
 default("enchantmats.allow.bid", true)
 default("enchantmats.allow.buy", true)
