@@ -438,8 +438,8 @@ const.baseDisenchantTable = {
  -- ccox - this is guesswork!
    [270] = { { HYPNOTIC, 0.20, 2.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
    [300] = { { HYPNOTIC, 0.20, 2.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [320] = { { HYPNOTIC, 0.20, 5.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [375] = { { HYPNOTIC, 0.20, 5.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
+   [320] = { { HYPNOTIC, 0.20, 2.5 }, { LCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [375] = { { HYPNOTIC, 0.20, 2.5 }, { GCELESTIAL , 0.75, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
   [const.ARMOR] = {
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
@@ -467,8 +467,8 @@ const.baseDisenchantTable = {
  -- ccox - this is guesswork!
    [270] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
    [300] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [320] = { { HYPNOTIC, 0.75, 5.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
-   [375] = { { HYPNOTIC, 0.75, 5.5 }, { GCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
+   [320] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },
+   [375] = { { HYPNOTIC, 0.75, 2.5 }, { GCELESTIAL , 0.20, 1.5 }, { HEAVENLY_SHARD , 0.05, 1.0 }, },	-- highest level Cata green is 333, so far
   },
  },
  [RARE] = {
