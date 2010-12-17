@@ -136,7 +136,7 @@ const.ProspectMinLevels = {
 	[TITANIUM_ORE] = 450,
 	[OBSIDIUM_ORE] = 425,
 	[ELEMENTIUM_ORE] = 475,
-	[PYRITE_ORE] = 525,
+	[PYRITE_ORE] = 500,
 }
 
 
