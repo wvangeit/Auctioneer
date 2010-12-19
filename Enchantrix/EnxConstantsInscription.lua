@@ -184,9 +184,9 @@ const.MillingSkillRequired = {
 	[NETHER_PIGMENT_HIGH] = 275,
 	[AZURE_PIGMENT_LOW] = 325,
 	[AZURE_PIGMENT_HIGH] = 325,
-	[ASHEN_PIGMENT_LOW] = 425,						 -- ccox - this is guesswork!
-	[ASHEN_PIGMENT_MID] = 450,						 -- ccox - this is guesswork!
-	[ASHEN_PIGMENT_HIGH] = 475,						 -- ccox - this is guesswork!
+	[ASHEN_PIGMENT_LOW] = 425,
+	[ASHEN_PIGMENT_MID] = 450,
+	[ASHEN_PIGMENT_HIGH] = 475,
 
 }
 
@@ -245,12 +245,14 @@ const.MillableItems = {
 	[HERB_LICHBLOOM] = AZURE_PIGMENT_HIGH,
 	[HERB_ICETHORN] = AZURE_PIGMENT_HIGH,
 	
-	[HERB_CINDERBLOOM] = ASHEN_PIGMENT_LOW,			-- ccox - this is guesswork!
-	[HERB_STORMVINE] = ASHEN_PIGMENT_LOW,			-- ccox - this is guesswork!
-	[HERB_AZSHARASVEIL] = ASHEN_PIGMENT_MID,		-- ccox - this is guesswork!
-	[HERB_HEARTBLOSSOM] = ASHEN_PIGMENT_MID,		-- ccox - this is guesswork!
-	[HERB_TWILIGHTJASMINE] = ASHEN_PIGMENT_HIGH,	-- ccox - this is guesswork!
-	[HERB_WHIPTAIL] = ASHEN_PIGMENT_HIGH,			-- ccox - this is guesswork!
+	[HERB_CINDERBLOOM] = ASHEN_PIGMENT_LOW,
+	[HERB_STORMVINE] = ASHEN_PIGMENT_LOW,
+	
+	[HERB_AZSHARASVEIL] = ASHEN_PIGMENT_MID,
+	[HERB_HEARTBLOSSOM] = ASHEN_PIGMENT_MID,
+	
+	[HERB_TWILIGHTJASMINE] = ASHEN_PIGMENT_HIGH,
+	[HERB_WHIPTAIL] = ASHEN_PIGMENT_HIGH,
 }
 
 
@@ -334,17 +336,17 @@ const.MillGroupYields = {
 		[ICY_PIGMENT] = 0.5,
 		},
 	
-	[ASHEN_PIGMENT_LOW] = {		-- ccox - this is guesswork!
+	[ASHEN_PIGMENT_LOW] = {
 		[ASHEN_PIGMENT] = 2.5,
 		[BURNING_EMBERS] = 0.25,
 		},
 	
-	[ASHEN_PIGMENT_MID] = {		-- ccox - this is guesswork!
+	[ASHEN_PIGMENT_MID] = {
 		[ASHEN_PIGMENT] = 2.5,
 		[BURNING_EMBERS] = 0.25,
 		},
 	
-	[ASHEN_PIGMENT_HIGH] = {	-- ccox - this is guesswork!
+	[ASHEN_PIGMENT_HIGH] = {
 		[ASHEN_PIGMENT] = 3.0,
 		[BURNING_EMBERS] = 0.5,
 		},

@@ -140,7 +140,7 @@ const.ProspectMinLevels = {
 }
 
 
--- data is a combination of wowhead, wowwiki, and personal results
+-- data is a combination of wowhead, wowwiki, forums, and personal results
 const.ProspectableItems = {
 
 	[COPPER_ORE] = {
@@ -285,7 +285,7 @@ const.ProspectableItems = {
 			
 			},
 
-	[OBSIDIUM_ORE] = {						 -- ccox - this is guesswork!
+	[OBSIDIUM_ORE] = {
 			[CARNELIAN] = 0.25,
 			[ZEPHYRITE] = 0.25,
 			[ALICITE] = 0.25,
@@ -301,13 +301,13 @@ const.ProspectableItems = {
 			[AMBERJEWEL] = 0.013,
 			},
 
-	[ELEMENTIUM_ORE] = {						 -- ccox - this is guesswork!
-			[CARNELIAN] = 0.25,
-			[ZEPHYRITE] = 0.25,
-			[ALICITE] = 0.25,
-			[NIGHTSTONE] = 0.25,
-			[HESSONITE] = 0.25,
-			[JASPER] = 0.25,
+	[ELEMENTIUM_ORE] = {
+			[CARNELIAN] = 0.18,
+			[ZEPHYRITE] = 0.18,
+			[ALICITE] = 0.18,
+			[NIGHTSTONE] = 0.18,
+			[HESSONITE] = 0.18,
+			[JASPER] = 0.18,
 
 			[INFERNORUBY] = 0.04,
 			[OCEANSAPPHIRE] = 0.04,
@@ -317,15 +317,15 @@ const.ProspectableItems = {
 			[AMBERJEWEL] = 0.04,
 			},
 
-	[PYRITE_ORE] = {						 -- ccox - this is guesswork!
-			[VOLATILE_EARTH] = 1.5,
+	[PYRITE_ORE] = {						 -- ccox - this is guesswork, not enough samples!
+			[VOLATILE_EARTH] = 2.0,
 	
-			[CARNELIAN] = 0.25,
-			[ZEPHYRITE] = 0.25,
-			[ALICITE] = 0.25,
-			[NIGHTSTONE] = 0.25,
-			[HESSONITE] = 0.25,
-			[JASPER] = 0.25,
+			[CARNELIAN] = 0.18,
+			[ZEPHYRITE] = 0.18,
+			[ALICITE] = 0.18,
+			[NIGHTSTONE] = 0.18,
+			[HESSONITE] = 0.18,
+			[JASPER] = 0.18,
 
 			[INFERNORUBY] = 0.04,
 			[OCEANSAPPHIRE] = 0.04,
