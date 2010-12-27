@@ -399,7 +399,7 @@ function private.SetupConfigGui(gui)
 	--gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.overstock", 0, 60, 1, "Overstock")
 	--gui:AddTip(id, "Maximimum stock to allow when Glypher wants to make at least min overstock more than max stock")
 
-	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.herbprice", "Price of single Northrend herb")
+	gui:AddControl(id, "MoneyFrame", 0, 1, "util.glypher.herbprice", "Price of single Cataclysm herb")
 	gui:AddTip(id, "Used to calculate the price of Blackfallow Ink which can be traded for most other inks.")
 
 	gui:AddControl(id, "Subhead", 0, "New glyph configuration")
