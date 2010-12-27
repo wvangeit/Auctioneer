@@ -599,7 +599,7 @@ function private.ProcessTooltip(frame, name, link, quality, quantity, cost, addi
 	frame:AddLine("bcSold: " .. bcSold)
 	local currentAuctions = stock
 	local stockdays = get("util.glypher.stockdays")
-	local make = floor(bcSold/history * stockdays + .5) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
+	local make = ceil(bcSold/history * stockdays) - currentAuctions -- *must* use ceiling so that small numbers don't round to zero & bypass our minimum stock setting
 
 	frame:AddLine("Wanting to make " .. make .. " (" .. bcSold .. "/" .. history .. "*" .. stockdays .. " + .5)")
 end
@@ -856,7 +856,7 @@ function private.cofindGlyphs()
 				if worthPrice and (worthPrice - reagentCost) >= MinimumProfit and inkMatch then
 					local currentAuctions = private.GetStock(itemId)
 
-					local make = floor(bcSold/history * stockdays + .5) - currentAuctions -- using .9 for rounding because it's best not to miss a sale
+					local make = ceil(bcSold/history * stockdays) - currentAuctions -- *must* use ceiling so that small numbers don't round to zero & bypass our minimum stock setting
 					local failed = 0
 					if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
 						for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
