@@ -129,6 +129,7 @@ function lib.OnLoad()
 	default("util.glypher.makefornew", 2)
 	default("util.glypher.herbprice", 8000)
 	default("util.glypher.profitAppraiser", 100)
+        default("util.glypher.profitAppraiser.forceGlypher", false)
 	default("util.glypher.profitBeancounter", 100)
 	default("util.glypher.profitMarket", 50)
 	default("util.glypher.pricemodel.min1", get("util.glypher.pricemodel.min") or 35000)
@@ -414,6 +415,8 @@ function private.SetupConfigGui(gui)
 	if AucAdvanced.Modules.Util.Appraiser then
 		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "Current model")
 		gui:AddTip(id, "Relative weight for the current pricing model set " .. weightWords)
+                gui:AddControl(id, "Checkbox",   0, 1, "util.glypher.profitAppraiser.forceGlypher", "Force Glypher Pricing Model")
+		gui:AddTip(id, "Force the Glypher pricing model instead of using the default Appraiser pricing model")
 	else
 		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "|caaaaaaaaCurrent model")
 		gui:AddTip(id, "Auc-Util-Appraiser is not enabled, so the current model weighting is disabled")
@@ -788,13 +791,18 @@ function private.cofindGlyphs()
 
 				--We want these local to the loop (at least) because we're zeroing them if there is no price
 				local profitAppraiser = get("util.glypher.profitAppraiser")
+				local forceGlypher = get("util.glypher.profitAppraiser.forceGlypher")
 				local profitMarket = get("util.glypher.profitMarket")
 				local profitBeancounter = get("util.glypher.profitBeancounter")
 
 				--local price = AucAdvanced.API.GetMarketValue(link)
 				local priceAppraiser = 0
 				if AucAdvanced.Modules.Util.Appraiser then
-					priceAppraiser = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, AucAdvanced.GetFaction()) or 0
+					if forceGlypher then
+						priceAppraiser = AucAdvanced.Modules.Util.Glypher.GetPrice(link, AucAdvanced.GetFaction()) or 0 
+					else
+						priceAppraiser = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, AucAdvanced.GetFaction()) or 0
+					end
 				end
 
 				if priceAppraiser == 0 then profitAppraiser = 0 end
