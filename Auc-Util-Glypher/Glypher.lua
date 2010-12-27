@@ -416,7 +416,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "Current model")
 		gui:AddTip(id, "Relative weight for the current pricing model set " .. weightWords)
                 gui:AddControl(id, "Checkbox",   0, 1, "util.glypher.profitAppraiser.forceGlypher", "Force Glypher Pricing Model")
-		gui:AddTip(id, "Force the Glypher pricing model instead of using the default Appraiser pricing model")
+		gui:AddTip(id, "Force the Glypher pricing model instead of using the default Appraiser pricing model (Recommended)")
 	else
 		gui:AddControl(id, "NumeriSlider", 0, 1, "util.glypher.profitAppraiser", 1, 100, 1, "|caaaaaaaaCurrent model")
 		gui:AddTip(id, "Auc-Util-Appraiser is not enabled, so the current model weighting is disabled")
