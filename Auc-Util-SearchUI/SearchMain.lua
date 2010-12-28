@@ -36,7 +36,7 @@ local libType, libName = "Util", "SearchUI"
 local AucAdvanced = AucAdvanced
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local empty = wipe
@@ -80,6 +80,7 @@ local resources = {}
 lib.Resources = resources
 local flagResourcesUpdateRequired = false
 local flagScanStats = false
+local flagRescan
 
 -- Faction Resources
 -- Commonly used values which change depending whether you are at home or neutral Auctionhouse
@@ -208,7 +209,39 @@ else
 		end)
 	end
 end
+--code taken from appraiser
+--The rescan method is a button that is displayed only if the searcher implements a rescan function. The searcher then passes any itemlinks it wants refrreshed data on
+--this will accept a text search term as well as a itemlink
+function lib.RescanAuctionHouse(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+	if not name or type(name) ~= "string" then print("Invalid input SearchUI RescanAuctionHouse", name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) return end
+	--if we are passed just a itemlink extract what data we can to filter our scan
+	if name and name:match("^(|c%x+|Hitem.+|h%[.+%])") then
+		--look up the itemlink info or pass it as a plain text if no info is returned
+		name, _, qualityIndex, _, minUseLevel, itemType, itemSubType, _ = GetItemInfo(name)
+		
+		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
+			if catName == itemType then
+				classIndex = catId
+				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[classIndex]) do
+					if subName == itemSubType then
+						subclassIndex = subId
+						break
+					end
+				end
+				break
+			end
+		end
+	end
 
+	if name then		
+		if AucAdvanced.Scan.IsScanning() or AucAdvanced.Scan.IsPaused() then
+			AucAdvanced.Scan.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+		else
+			AucAdvanced.Scan.PushScan()
+			AucAdvanced.Scan.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+		end
+	end
+end
 function lib.OnLoad(addon)
 	-- Notify that SearchUI is fully loaded
 	resources.isSearchUILoaded = true
@@ -931,7 +964,7 @@ function lib.LoadCurrent()
 		lib.LoadSearch()
 		return
 	end
-
+		
 	local existing = AucAdvancedData.UtilSearchUiData.SavedSearches[name]
 	if not existing then
 		hasUnsaved = true
@@ -1178,7 +1211,7 @@ function lib.MakeGuiConfig()
 	-- common functions and scripthandlers, used by various buttons and frames
 	local function showTooltipText(button)
 		if lib.GetSetting("tooltiphelp.show") then
-			GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
+			GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
 			GameTooltip:SetText(button.TooltipText)
 		end
 	end
@@ -1323,9 +1356,11 @@ function lib.MakeGuiConfig()
 			if private.data.bid then
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.bid)
 				gui.frame.bid:Enable()
+				gui.frame.bidbox:Show()
 			else
 				MoneyInputFrame_SetCopper(gui.frame.bidbox, 0)
 				gui.frame.bid:Disable()
+				gui.frame.bidbox:Hide()
 			end
 		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable
 			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < ceil(private.data.curbid*1.05) then
@@ -1337,6 +1372,7 @@ function lib.MakeGuiConfig()
 		if private.data.buyout and (private.data.buyout > 0) and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
 			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
 			gui.frame.bid:Disable()
+			gui.frame.bidbox:Hide()
 		end
 		gui.frame.purchase.updateEnable()
 	end
@@ -1445,7 +1481,7 @@ function lib.MakeGuiConfig()
 	end
 
 	gui.Search = CreateFrame("Button", "AucSearchUISearchButton", gui, "OptionsButtonTemplate")
-	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 50)
+	gui.Search:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 30, 80)
 	gui.Search:SetText("Search")
 	gui.Search:SetScript("OnClick", lib.PerformSearch)
 	gui.Search:SetFrameLevel(11)
@@ -1456,12 +1492,47 @@ function lib.MakeGuiConfig()
 	gui.Search.updateDisplay = function()
 		if gui.config.selectedCat == "Searchers" then
 			gui.Search:Enable()
+			--Check if rescan method is implemented
+			local searcher = gui.config.selectedTab
+			if lib.Searchers[searcher].Rescan then
+				gui.Rescan:Show()
+				gui.Rescan:SetScript("OnClick", function() 
+									if flagRescan then
+										flagRescan = nil
+										CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 0, 0)
+										private.gui.Search:Enable()
+										lib.PerformSearch()
+									else
+										lib.Searchers[searcher].Rescan()
+										CooldownFrame_SetTimer(gui.Rescan.frame, GetTime(), 2, 1)
+										private.gui.Search:Disable()
+										flagRescan = GetTime()
+									end
+								end)
+			else
+				gui.Rescan:Hide()
+			end
 		else
 			gui.Search:Disable()
 		end
 	end
 
-
+	--rescan AH button.
+	gui.Rescan = CreateFrame("Button", "AucSearchUISearchButton", gui, "UIPanelCloseButton")
+	gui.Rescan:Show()
+	gui.Rescan:SetWidth(20)
+	gui.Rescan:SetHeight(20)
+	gui.Rescan:SetNormalTexture("Interface\\ICONS\\Ability_Creature_Cursed_04")
+	gui.Rescan:SetPoint("LEFT", gui.Search, "RIGHT", 5, 0)
+	gui.Rescan:Hide()
+	gui.Rescan.TooltipText = "Refresh the Auction House snapshot, then search\nClick again to cancel"
+	gui.Rescan:SetScript("OnEnter", showTooltipText)
+	gui.Rescan:SetScript("OnLeave", hideTooltip)	
+	--animation
+	gui.Rescan.frame = CreateFrame("Cooldown", nil, gui.Rescan, "CooldownFrameTemplate")
+	gui.Rescan.frame:SetAllPoints(gui.Rescan)
+			
+	
 	gui:AddCat("Welcome")
 
 	id = gui:AddTab("About")
@@ -1502,7 +1573,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",          0,    "Integration")
 	gui:AddControl(id, "Checkbox",          0, 1, "global.createtab", "Create tab in auction house (requires restart)")
 
-	--gui:SetScript("OnKeyDown", lib.UpdateControls)
+--	gui:SetScript("OnKeyDown", lib.UpdateControls) --Why are we intercepting all keystrokes, this affects other addons that are not in dialog level
 
 	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
@@ -1546,7 +1617,7 @@ function lib.MakeGuiConfig()
 
 
 	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.notnow:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 260, 35)
+	gui.frame.notnow:SetPoint("TOP", gui.frame.purchase, "BOTTOM", 0, -2)
 	gui.frame.notnow:SetText("Not Now")
 	gui.frame.notnow:SetScript("OnClick", private.ignoretemp)
 	gui.frame.notnow:Disable()
@@ -1555,7 +1626,7 @@ function lib.MakeGuiConfig()
 	gui.frame.notnow:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.ignore = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignore:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 400, 35)
+	gui.frame.ignore:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 280, 0)
 	gui.frame.ignore:SetText("Ignore Price")
 	gui.frame.ignore:SetScript("OnClick", private.ignore)
 	gui.frame.ignore:Disable()
@@ -1564,7 +1635,7 @@ function lib.MakeGuiConfig()
 	gui.frame.ignore:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.ignoreperm = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.ignoreperm:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 490, 35)
+	gui.frame.ignoreperm:SetPoint("TOP", gui.frame.ignore, "BOTTOM",0 , -2)
 	gui.frame.ignoreperm:SetText("Ignore")
 	gui.frame.ignoreperm:SetScript("OnClick", private.ignoreperm)
 	gui.frame.ignoreperm:Disable()
@@ -1582,7 +1653,7 @@ function lib.MakeGuiConfig()
 	gui.frame.snatch:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.clear = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.clear:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 10)
+	gui.frame.clear:SetPoint("TOP", gui.Search, "BOTTOM", 0, -5)
 	gui.frame.clear:SetText("Clear")
 	gui.frame.clear:SetScript("OnClick", private.removeall)
 	gui.frame.clear:Enable()
@@ -1631,7 +1702,7 @@ function lib.MakeGuiConfig()
 	gui.frame.cancel.label:SetJustifyH("LEFT")
 
 	gui.frame.buyout = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.buyout:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 650, 10)
+	gui.frame.buyout:SetPoint("LEFT", gui.frame.notnow, "RIGHT", 5, 0)
 	gui.frame.buyout:SetText("Buyout")
 	gui.frame.buyout:SetScript("OnClick", private.buyauction)
 	gui.frame.buyout:Disable()
@@ -1640,11 +1711,11 @@ function lib.MakeGuiConfig()
 	gui.frame.buyout:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.buyoutbox = gui.frame.buyout:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	gui.frame.buyoutbox:SetPoint("BOTTOMRIGHT", gui.frame.buyout, "BOTTOMLEFT", -4, 4)
+	gui.frame.buyoutbox:SetPoint("LEFT", gui.frame.buyout, "RIGHT", 0, 0)
 	gui.frame.buyoutbox:SetWidth(100)
 
 	gui.frame.bid = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.bid:SetPoint("BOTTOMRIGHT", gui.frame.buyoutbox, "BOTTOMLEFT", -10, -4)
+	gui.frame.bid:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 5, 0)
 	gui.frame.bid:SetText("Bid")
 	gui.frame.bid:SetScript("OnClick", private.bidauction)
 	gui.frame.bid:Disable()
@@ -1653,7 +1724,7 @@ function lib.MakeGuiConfig()
 	gui.frame.bid:SetScript("OnLeave", hideTooltip)
 
 	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
-	gui.frame.bidbox:SetPoint("BOTTOMRIGHT", gui.frame.bid, "BOTTOMLEFT", -4, 4)
+	gui.frame.bidbox:SetPoint("LEFT", gui.frame.bid, "RIGHT", 10, 2)
 	MoneyInputFrame_SetOnValueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
 
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
@@ -2053,6 +2124,21 @@ function private.OnUpdate(self, elapsed)
 	if flagScanStats then
 		flagScanStats = false
 		lib.NotifyCallbacks("postscanupdate")
+	end
+	
+	if flagRescan and private.gui and private.gui.Rescan.frame:IsShown() then
+		--if scan still in progress, keep the button churnin'
+		if flagRescan + 2.5 < GetTime() then
+			CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 2, 1)
+			flagRescan = GetTime()
+		end
+		--are we finished scanning
+		if private.gui.AuctionFrame and private.gui.AuctionFrame.scanscount.last == 0 then
+			flagRescan = nil
+			CooldownFrame_SetTimer(private.gui.Rescan.frame, GetTime(), 0, 0)
+			private.gui.Search:Enable()
+			lib.PerformSearch()
+		end	
 	end
 end
 
