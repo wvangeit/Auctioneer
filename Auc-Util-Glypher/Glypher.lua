@@ -765,10 +765,11 @@ function private.cofindGlyphs()
 						addInk = addInk + count
 						set("util.glypher.inks."..itemId..".ink", 61978)
 						set("util.glypher.inks."..itemId..".count", count)
-					elseif Id == 43127 then
+					--In case blizzard decides to use snowfall or inferno ink to make glyphs
+					elseif string.find(":61981:43127:", ":" .. Id .. ":") then
 						reagentCost = (reagentCost + (inkCost * count * 10) )
 						addInk = addInk + (count * 10)
-						set("util.glypher.inks."..itemId..".ink", 43127)
+						set("util.glypher.inks."..itemId..".ink", 61981)
 						set("util.glypher.inks."..itemId..".count", count)
 					elseif isVendored then
 						reagentCost = (reagentCost + (itemCost * count) )
@@ -1077,7 +1078,7 @@ function lib.GetPrice(link, faction, realm)
 		auction.buyoutPrice = (auction.buyoutPrice/auction.stackSize)
 		itemId = auction.itemId
 		local ink = get("util.glypher.inks."..itemId..".ink") or 61978
-		local count = get("util.glypher.inks."..itemId..".count") or 2
+		local count = get("util.glypher.inks."..itemId..".count") or 3
 		if ink == 61978 then
 			glypherMin = glypherMin1
 				--print("Warning: Item " .. itemId .. " has not been scanned by Glypher:Get Profitable Glyphs, assuming for now that 2 inks are required to make.")
