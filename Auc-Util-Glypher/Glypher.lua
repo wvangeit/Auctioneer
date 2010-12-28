@@ -455,7 +455,7 @@ function private.SetupConfigGui(gui)
 	--gui:AddControl(id, "Subhead", 0, "Whitelist")
 	gui:AddControl(id, "Note", 0, 1, nil, nil, "Whitelist")
 	gui:AddControl(id, "Text", 0, 1, "util.glypher.pricemodel.whitelist")
-	gui:AddTip(id, "The players to whitelist on undercuts (blank for no whitelist, separarate whitelisted users with a ':')") --eventually have a list to edit
+	gui:AddTip(id, "The players to whitelist on undercuts (blank for no whitelist, separarate whitelisted users with a ':') \r \rNOTE: This item is case sensitive.  Please capitalize the first letter. \rEx: Playername") --eventually have a list to edit
 
 	gui:AddControl(id, "Note", 0, 1, nil, nil, "Ignore Time Left")
 	gui:AddControl(id, "Selectbox", 0, 1, {
@@ -481,11 +481,11 @@ function private.SetupConfigGui(gui)
 
 		gui:AddControl(id, "Note", 0, 1, nil, nil, "Alt list")
 		gui:AddControl(id, "Text", 0, 1, "util.glypher.altlist")
-		gui:AddTip(id, "List of alts which you use for your glyph business, separate alts with a ':'. Leave blank to disable.")
+		gui:AddTip(id, "List of alts which you use for your glyph business, separate alts with a ':'. Leave blank to disable. \r \rNOTE: This item is case sensitive.  Please capitalize the first letter. \rEx: Playername")
 
 		gui:AddControl(id, "Note", 0, 1, nil, nil, "Guild")
 		gui:AddControl(id, "Text", 0, 1, "util.glypher.gvault")
-		gui:AddTip(id, "Guild name for the vault which you use for your glyph business. Leave blank to disable.")
+		gui:AddTip(id, "Guild name for the vault which you use for your glyph business. Leave blank to disable. \r \rNOTE: This item is case sensitive.  Please capitalize all applicable letters. \rEx: Silent Force")
 	end
 
 	frame.refreshButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
