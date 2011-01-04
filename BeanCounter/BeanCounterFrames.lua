@@ -92,7 +92,7 @@ function private.AuctionUI()
 				AuctionDressUpFrame:Show()
 				AuctionDressUpFrame.reshow = nil
 			end
-			AuctionFrameMoneyFrame:Show()
+			--AuctionFrameMoneyFrame:Show() --we interfere with other addosn which hide this.
 			private.displayGUI("HideAHGUI")
 		end
 	end
