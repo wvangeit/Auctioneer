@@ -932,16 +932,16 @@ function private.cofindGlyphs()
 		local stock, a = private.GetStock(61978)
 		--Rounds the percentage to definded decimal places (num,ipv)
 		local availstockratio = private.round((stock / qtyInk) * 100,2)
-		local messneed = link .. "x" .. qtyInk .. " needed to process this queue."
-		local messavail = link .. "x" .. stock .. " available"
-		local messstock = availstockratio .. "% Stocked"
-		local messnostock = "No profitable glyphs found."
+		local messneed = "|cFF83BAFE Glypher: |r" .. link .. "x" .. qtyInk .. " needed to process this queue."
+		local messavail = "|cFF83BAFE Glypher: |r" .. link .. "x" .. stock .. " available"
+		local messstock = "|cFF83BAFE Glypher: |r" .. availstockratio .. "% Stocked"
+		local messnostock = "|cFF83BAFE Glypher:|r" .. " No profitable glyphs found."
 			if qtyInk == 0 then
-				DEFAULT_CHAT_FRAME:AddMessage(messnostock,1.0,0.0,0.0)
+				DEFAULT_CHAT_FRAME:AddMessage(messnostock,0.8,0.33,0.33)
 			else
-				DEFAULT_CHAT_FRAME:AddMessage(messneed,1.0,0.0,0.0)
-				DEFAULT_CHAT_FRAME:AddMessage(messavail,1.0,0.0,0.0)
-				DEFAULT_CHAT_FRAME:AddMessage(messstock,1.0,0.0,0.0)
+				DEFAULT_CHAT_FRAME:AddMessage(messneed,0.8,0.33,0.33)
+				DEFAULT_CHAT_FRAME:AddMessage(messavail,0.8,0.33,0.33)
+				DEFAULT_CHAT_FRAME:AddMessage(messstock,0.8,0.33,0.33)
 		end 
 	end
 	private.frame.glypher.sheet:SetData(private.Display, Style)
