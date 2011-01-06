@@ -1,10 +1,11 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Glypher.lua 5060 2011-01-05 03:32:00Z Mascondante $
-
-	Glypher - Inscriptionist's 'Swiss Army Knife'
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
+	
+	Glypher - Inscriptionist's 'Swiss Army Knife'
+	Tools for managing mass sales and production of glyphs
 
 	License:
 		This program is free software; you can redistribute it and/or
