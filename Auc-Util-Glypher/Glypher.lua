@@ -301,6 +301,11 @@ function private.makefornewFormat()
 	if makefornew > maxstock then fmt = WARN end -- We'd never make the total amount because maxstock is less than makefornew
 	return fmt
 end
+function private.round(num,idp)
+	local mult = 10^(idp or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
+	
 
 local frame
 function private.SetupConfigGui(gui)
@@ -924,8 +929,20 @@ function private.cofindGlyphs()
 
 	if get("util.glypher.misc.inktrader") then
 		local _, link = GetItemInfo(61978)
-		local mess = "You need " .. link .. "x" .. qtyInk .. " to process this queue."
-		DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
+		local stock, a = private.GetStock(61978)
+		--Rounds the percentage to definded decimal places (num,ipv)
+		local availstockratio = private.round((stock / qtyInk) * 100,2)
+		local messneed = link .. "x" .. qtyInk .. " needed to process this queue."
+		local messavail = link .. "x" .. stock .. " available"
+		local messstock = availstockratio .. "% Stocked"
+		local messnostock = "No profitable glyphs found."
+			if qtyInk == 0 then
+				DEFAULT_CHAT_FRAME:AddMessage(messnostock,1.0,0.0,0.0)
+			else
+				DEFAULT_CHAT_FRAME:AddMessage(messneed,1.0,0.0,0.0)
+				DEFAULT_CHAT_FRAME:AddMessage(messavail,1.0,0.0,0.0)
+				DEFAULT_CHAT_FRAME:AddMessage(messstock,1.0,0.0,0.0)
+		end 
 	end
 	private.frame.glypher.sheet:SetData(private.Display, Style)
 	private.frame.searchButton:Enable()
