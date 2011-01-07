@@ -944,7 +944,7 @@ function private.cofindGlyphs()
 						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = failed end
 						--if (bcSold > 0 and failedratio < failratio) or failed == 0 or failratio == 0 then
 						if failedratio < failratio or failed == 0 or failratio == 0 then
-							table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName} )
+							table.insert(private.data, { ["link"] = link, ["ID"] = ID, ["count"] = make, ["name"] = itemName, ["profit"] = worthPrice - reagentCost } )
 							table.insert(private.Display, {link, make, worthPrice - reagentCost} )
 							qtyInk = qtyInk + (addInk * make)
 						else
@@ -1060,7 +1060,12 @@ end
 function private.addToGnomeworks()
 	local player = UnitName("player")
 	local inscription = 45357 --static spell ID
-	for i, glyph in ipairs(private.data) do
+	local sorted = {}
+	for k, v in pairs(private.data) do
+		sorted[k] = v
+	end
+	table.sort(sorted, function (a,b) return a.profit > b.profit end)
+	for i, glyph in ipairs(sorted) do
 		local recipieLink = GetTradeSkillRecipeLink(glyph.ID)
 		local recipeID = recipieLink:match("^|c.-|H.-:(%d-)|h")
 		recipeID  = tonumber(recipeID)
