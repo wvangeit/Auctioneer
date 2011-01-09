@@ -296,7 +296,7 @@ do -- Faction and ServerKey related functions
 			if not factionGroup then
 				SetMapToCurrentZone()
 				local map = GetMapInfo()
-				if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+				if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn") or (map == "TheCapeOfStranglethorn")) then
 					factionGroup = "Neutral"
 				else
 					factionGroup = Const.PlayerFaction
