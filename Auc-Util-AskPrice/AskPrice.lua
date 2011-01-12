@@ -69,6 +69,7 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("CHAT_MSG_PARTY")
 	private.frame:RegisterEvent("CHAT_MSG_GUILD")
 	private.frame:RegisterEvent("CHAT_MSG_RAID")
+	private.frame:RegisterEvent("CHAT_MSG_BN_WHISPER");
 
 	private.frame:RegisterEvent("CHAT_MSG_ADDON")
 
@@ -78,12 +79,17 @@ function lib.OnLoad(addon)
 	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
 	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(self,event,message,...)
-		if (AskPriceSentMessages[message] and not private.getOption('util.askprice.whispers')) then
-			AskPriceSentMessages[message] = nil
-			return true
+
+	do
+		local function filter(self, event, message, ...)
+			if (AskPriceSentMessages[message] and not private.getOption('util.askprice.whispers')) then
+				AskPriceSentMessages[message] = nil
+				return true
+			end
 		end
-	end)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter); 
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM", filter);
+	end
 
 	--Setup Configator defaults
 	for config, value in pairs(private.defaults) do
@@ -129,7 +135,8 @@ function private.onEvent(frame, event, ...)
 	end
 end
 
-function private.chatEvent(event, text, player)
+-- PresenceID is only for battlenet whispers
+function private.chatEvent(event, text, player, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, presenceID)
 	local channel
 	if (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID_LEADER") then
 		channel = "RAID"
@@ -141,6 +148,10 @@ function private.chatEvent(event, text, player)
 
 	if (event == "CHAT_MSG_WHISPER") then
 		channel = "WHISPER"
+	end
+
+	if (event == "CHAT_MSG_BN_WHISPER") then
+		channel = "BN";
 	end
 
 	if (not (
@@ -164,12 +175,12 @@ function private.chatEvent(event, text, player)
 			private.sendAddOnMessage(channel, "QUERY", link, count, player, channel)
 		end
 
-	elseif (channel == "WHISPER") then
+	elseif (channel == "WHISPER" or channel == "BN") then
 		for i = 1, #items, 2 do
 			local count = items[i]
 			local link = items[i+1]
 
-			private.sendResponse(link, count, player, 1, private.getData(link))
+			private.sendResponse(link, count, channel == "WHISPER" and player or presenceID, 1, private.getData(link))
 		end
 	end
 end
@@ -279,7 +290,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 end
 
 function private.onEventHook(_, _, self, event, arg1, ...)
-	if (event == "CHAT_MSG_WHISPER_INFORM") then
+	if (event == "CHAT_MSG_WHISPER_INFORM" or event == "CHAT_MSG_BN_WHISPER_INFORM") then
 		if (private.whisperList[arg1]) then
 			private.whisperList[arg1] = nil
 		end
@@ -312,7 +323,12 @@ function private.sendWhisper(message, player)
 	if not private.getOption('util.askprice.whispers') then
 		AskPriceSentMessages[message] = true
 	end
-	ChatThrottleLib:SendChatMessage("ALERT", "AucAdvAskPrice", message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
+
+	if player:match("^%d+$") then		-- Must be a presence ID. Use a BattleNet whisper instead.
+		BNSendWhisper(tonumber(player), message)
+	else
+		ChatThrottleLib:SendChatMessage("ALERT", "AucAdvAskPrice", message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
+	end
 end
 
 function private.sendAddOnMessage(channel, ...)
