@@ -124,15 +124,19 @@ function private.onEvent(frame, event, ...)
 		return
 	end
 
+	local msg = ...;
+
 	if (event == "CHAT_MSG_ADDON") then
 		return private.addOnEvent(...)
 
 	elseif (event == "CHAT_MSG_IGNORED") then
 		return private.beingIgnored(...)
 
-	else
-		return private.chatEvent(event, ...)
+	elseif (event == "CHAT_MSG_BN_WHISPER") then
+		-- TODO later
 	end
+
+	return private.chatEvent(event, msg, select(2, ...))
 end
 
 -- PresenceID is only for battlenet whispers
@@ -311,9 +315,12 @@ function private.getItems(str)
 		itemList[i] = nil
 	end
 
-	for number, color, item, name in str:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
+	-- Color is optional because Battle net doesn't use colors
+	for number, link, color, item, name in str:gmatch("(%d*)%s*(|?c?(%x*)|Hitem:([^|]+)|h%[(.-)%]|h|?r?)") do
 		table.insert(itemList, tonumber(number) or 1)
-		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
+
+		-- Use GetItemInfo to rebuild the link with color
+		table.insert(itemList, link)
 	end
 	return itemList
 end
@@ -324,8 +331,8 @@ function private.sendWhisper(message, player)
 		AskPriceSentMessages[message] = true
 	end
 
-	if player:match("^%d+$") then		-- Must be a presence ID. Use a BattleNet whisper instead.
-		BNSendWhisper(tonumber(player), message)
+	if type(player) == "number" then		-- Must be a presence ID. Use a BattleNet whisper instead.
+		BNSendWhisper(player, message)
 	else
 		ChatThrottleLib:SendChatMessage("ALERT", "AucAdvAskPrice", message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
 	end
@@ -483,7 +490,6 @@ function private.SlashHandler.send(queryString)
 	local parseError = false
 	if queryString then
 		local player, itemLinks = strsplit(" ", queryString, 2)
-		print(player, itemLinks)
 
 		--Error out if we have a target, but no potential itemLinks
 		if itemLinks then
