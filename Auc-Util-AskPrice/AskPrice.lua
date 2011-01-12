@@ -158,6 +158,9 @@ function private.chatEvent(event, text, player, arg3, arg4, arg5, arg6, arg7, ar
 		channel = "BN";
 	end
 
+	-- Trim out spaces at the beginning
+	text = text:match("^%s*(.+)$") or "";
+
 	if (not (
 		text:find("|Hitem:", 1, true)
 		and
