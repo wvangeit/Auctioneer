@@ -1,7 +1,7 @@
 ## Title: Auc:Util:Glypher
 ## Notes: Auctioneer utility to assist in the creation of glyphs according to the player's stock and market conditions.
 ##
-## Interface: 30300
+## Interface: 40000
 ## Dependancies: Auc-Advanced, BeanCounter, Informant
 ## OptionalDeps: AdvancedTradeSkillWindow, Auc-Util-Appraiser, DataStore, Skillet
 ##

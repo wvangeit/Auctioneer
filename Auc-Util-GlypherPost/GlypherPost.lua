@@ -1,11 +1,12 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: 5.6.4409 (KangaII)
-	Revision: $Id: GlypherPost.lua 3882 2008-12-02 16:36:58Z kandoko $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer Advanced module that does something nifty.
-
+	GlypherPost - Inscriptionist's 'Swiss Army Knife'
+	Tools for managing mass sales and production of glyphs
+	
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -585,4 +586,4 @@ end
 function private.Baz()
 end
 
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/branches/5.6/Auc-Advanced/Modules/Auc-Util-GlypherPost/GlypherPost.lua $", "$Rev: 3882 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
