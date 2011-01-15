@@ -490,8 +490,8 @@ end
 
 
 -- take an ilevel and round it up to the corresponding bracket
-local function roundupLevel(level)
-	for _, bracket in pairs(Enchantrix.Constants.levelUpperBounds) do
+local function roundupLevel(level, level_list)
+	for _, bracket in pairs(level_list) do
 		if bracket >= level then
 			return bracket
 		end
@@ -501,9 +501,8 @@ end
 
 -- get entry from disenchant table (or nil if nothing found)
 local function getBaseTableDisenchants(level, quality, type, item)
-	local rLevel = roundupLevel(level);
-	
-	if rLevel and Enchantrix.Constants.baseDisenchantTable[quality] then
+
+	if Enchantrix.Constants.baseDisenchantTable[quality] then
 		local baseTable = Enchantrix.Constants.baseDisenchantTable[quality][type];
 
 		-- so we don't have to keep armor and weapon tables when both are the same
@@ -512,13 +511,17 @@ local function getBaseTableDisenchants(level, quality, type, item)
 			baseTable = Enchantrix.Constants.baseDisenchantTable[quality][Enchantrix.Constants.ARMOR];
 		end
 		
-		if baseTable and baseTable[rLevel] then
-			return baseTable[rLevel]
+		if baseTable then
+			-- find level bracket
+			local rLevel = roundupLevel(level, baseTable.bounds);
+			if rLevel then
+				return baseTable[rLevel]
+			end
 		end
 	end
 	
 	-- no matching entry found, this is bad!!
-	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level, item )
+	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", quality, type, level, item )
 	return nil
 end
 
