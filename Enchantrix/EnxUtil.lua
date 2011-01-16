@@ -442,18 +442,26 @@ function getIType(link)
 end
 
 
--- ccox - I'm pretty sure this is wrong, that's the second jewel slot, not a uniqe id
+
+-- itemId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel:reforgeId
+-- we want to keep just the itemID and suffixID (random enchantment)
 function getSigFromLink(link)
 	assert(type(link) == "string")
 
-	local _, _, id, rand = link:find("item:(%d+):%d+:(%d+):%d+")
+	local _, _, id, rand = link:find("item:(%d+):%d+:%d+:%d+:%d+:%d+:([-%d]+)")
 	if id and rand then
 		return id..":0:"..rand
+	elseif id then
+		return id..":0:0"
+	else
+		local _, _, trimmed = link:find("(item:.+:%d+)|?")
+		Enchantrix.Util.DebugPrint("getSigFromLink", ENX_INFO, "failed to get sig from link", "could not get sig for: " .. trimmed)
 	end
 end
 
--- ccox - this is also wrong
--- emId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel:reforgeId
+
+-- ccox - this is also wrong, but where is it used?
+-- itemId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel:reforgeId
 function getItems(str)
 	if (not str) then return end
 	local itemList = {};
