@@ -160,7 +160,7 @@ lib.Processors.scanfinish = function(callbackType, scanSizre, querySig, qryInfo,
 -- A query was sent.  via QueryAuctionItems.  Not the ... are the standard return items form QueryAuctionItems.
 lib.Processors.querysent = function(callbackType, query, isSearch, ...) end
 -- Page Store for page has completed.
-lib.Processors.pagefinished = function(callbackType, pageNum)
+lib.Processors.pagefinished = function(callbackType, pageNum) end
 lib.Processors.scanstart = function(callbackType, scanSize, querySig, qryInfo) end
 lib.Processors.configchanged = function(callbackType, setting, value) end
 -- Request for config screen gui elements.  gui references the config screen GUI.
