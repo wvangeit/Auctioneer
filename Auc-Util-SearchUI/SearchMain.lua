@@ -815,10 +815,10 @@ function private.purchase()
 end
 --Will buy/bid ALL auctions based on "reason" column
 function private.purchaseall()
-	local balance = GetMoney()
 	local enableres = lib.GetSetting("reserve.enable")
 	local reserve = lib.GetSetting("reserve") or 1
 	for i = 1 ,#gui.sheet.sort do
+		local balance = GetMoney()
 		local bidqueue = gui.frame.cancel.value or 0
 		balance = balance - bidqueue --account for money we've already "spent"
 
@@ -852,7 +852,6 @@ function private.purchaseall()
 		end
 	end
 	private.removeall()
-
 end
 function private.ignore()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
