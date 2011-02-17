@@ -815,37 +815,44 @@ function private.purchase()
 end
 --Will buy/bid ALL auctions based on "reason" column
 function private.purchaseall()
-	gui.sheet.selected = gui.sheet.sort[1]
-	if not gui.sheet.selected then
-		return
-	end
-	lib.UpdateControls()
-	local count = 0
-	while #gui.sheet.sort > 0 and (gui.sheet.sort[1] or count < 5000 ) do
-		count = count+1--emergency break routine
-		local enableres = lib.GetSetting("reserve.enable")
-		local reserve = lib.GetSetting("reserve") or 1
+	local balance = GetMoney()
+	local enableres = lib.GetSetting("reserve.enable")
+	local reserve = lib.GetSetting("reserve") or 1
+	for i = 1 ,#gui.sheet.sort do
 		local bidqueue = gui.frame.cancel.value or 0
-		local balance = GetMoney()
 		balance = balance - bidqueue --account for money we've already "spent"
 
+		--get the default layout (not the users rearranged view)
+		local data = gui.sheet:GetRowData(i)
+		local link = data[1]
+		local seller = data[8]
+		local stack = data[4]
+		local bid = data[6]
+		local minbid = data[12]
+		local curbid = data[13]
+		local buyout = data[5]
+		local reason = data[7]
 		local price = 0
-		if strmatch(private.data.reason, ":buy") then
-			price = private.data.buyout
-		elseif strmatch(private.data.reason, ":bid") then
-			price = private.data.bid
-		elseif private.data.buyout > 0 then
-			price = private.data.buyout
+	
+		if strmatch(reason, ":buy") then
+			price = buyout
+		elseif strmatch(reason, ":bid") then
+			price = bid
+		elseif buyout > 0 then
+			price = buyout
 		else
-			price = private.data.bid
+			price = bid
 		end
+
 		if ((balance-price) > reserve or not enableres) then
-			AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
+			AucAdvanced.Buy.QueueBuy(link, seller, stack, minbid, buyout, price, private.cropreason(private.data.reason))
+
 		else
 			print("Purchase cancelled: Reserve reached")
 		end
-		private.removeline()
 	end
+	private.removeall()
+
 end
 function private.ignore()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
