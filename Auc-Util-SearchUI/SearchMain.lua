@@ -817,13 +817,12 @@ end
 function private.purchaseall()
 	local enableres = lib.GetSetting("reserve.enable")
 	local reserve = lib.GetSetting("reserve") or 1
-	for i = 1 ,#gui.sheet.sort do
-		local balance = GetMoney()
+	local money = GetMoney()
+	for _, sortedRow in ipairs(gui.sheet.sort) do
 		local bidqueue = gui.frame.cancel.value or 0
-		balance = balance - bidqueue --account for money we've already "spent"
+		local balance = money - bidqueue --account for money we've already "spent"
 
-		--get the default layout (not the users rearranged view)
-		local data = gui.sheet:GetRowData(i)
+		local data = gui.sheet:GetRowData(sortedRow)
 		local link = data[1]
 		local seller = data[8]
 		local stack = data[4]
