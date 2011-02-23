@@ -844,7 +844,7 @@ function private.purchaseall()
 		end
 
 		if ((balance-price) > reserve or not enableres) then
-			AucAdvanced.Buy.QueueBuy(link, seller, stack, minbid, buyout, price, private.cropreason(private.data.reason))
+			AucAdvanced.Buy.QueueBuy(link, seller, stack, minbid, buyout, price, private.cropreason(reason))
 
 		else
 			print("Purchase cancelled: Reserve reached")
