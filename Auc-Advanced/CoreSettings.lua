@@ -135,6 +135,8 @@ local settingDefaults = {
 	["ModTTShow"] = "always",
 	["post.clearonclose"] = true,
 	["post.confirmonclose"] = true,
+	["core.scan.sellernamedelay"] = true,
+	["core.scan.unresolvedtolerance"] = 0,
 }
 
 local function getDefault(setting)
@@ -462,33 +464,6 @@ function lib.MakeGuiConfig()
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
 
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
-
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonfull", _TRANS('ADV_Interface_ScanDataSummaryFull')) --"Enables the display of the post scan summary"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryFull')) --"Display the summation of an Auction House scan"
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonpartial", _TRANS('ADV_Interface_ScanDataSummaryPartial')) --"Enables the display of the post scan summary"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryPartial')) --"Display the summation of an Auction House scan"
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonmicro", _TRANS('ADV_Interface_ScanDataSummaryMicro')) --"Enables the display of the post scan summary"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryMicro')) --"Display the summation of an Auction House scan"
-
-	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", _TRANS('ADV_Interface_SearchingClickHooks')) --"Enable searching click-hooks"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
-
-	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
-
-	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
-
-	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
-	last = gui:GetLast(id)
-	gui:AddControl(id, "Selectbox",  0, 1, internal.API.GetMatcherDropdownList, "matcher.select")
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.3,1, "matcher.up", _TRANS('ADV_Interface_Up')) --"Up"
-	gui:SetLast(id, last)
-	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", _TRANS('ADV_Interface_Down')) --"Down"
-
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredOutputFrame')) --"Preferred Output Frame"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.configFramesList, "printwindow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ChatOutputFrame')) --"This allows you to select which chat window Auctioneer prints its output to."
@@ -496,6 +471,22 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_PreferredLanguage')) --"Preferred Language"
 	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.changeLocale(), "uselocale")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PreferredLanguage')) --"Chooses the language used by Auctioneer. This will require a /console reloadui or restart to take full effect"
+
+	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", _TRANS('ADV_Interface_SearchingClickHooks')) --"Enable searching click-hooks"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
+
+	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
+	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
+	gui:AddControl(id, "Slider", 0, 1, "core.marketvalue.tolerance", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
+	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
+	last = gui:GetLast(id)
+	gui:AddControl(id, "Selectbox",  0, 1, internal.API.GetMatcherDropdownList, "matcher.select")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Button",     0.3,1, "matcher.up", _TRANS('ADV_Interface_Up')) --"Up"
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", _TRANS('ADV_Interface_Down')) --"Down"
 
 	gui:AddControl(id, "Subhead",     0,     _TRANS('ADV_Interface_PurchasingOptions')) --"Purchasing Options"
 	gui:AddControl(id, "Checkbox",    0, 1,  "ShowPurchaseDebug", _TRANS('ADV_Interface_ShowPurchaseDebug')) --"Show purchase queue info"
@@ -506,19 +497,32 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostClearOnClose')) --"When the Auctionhouse closes, cancels any auction requests queued up to be posted"
 	gui:AddControl(id, "Checkbox",    0, 2,  "post.confirmonclose", _TRANS('ADV_Interface_PostConfirmOnClose')) --"Ask before clearing the posting queue"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostConfirmOnClose')) --"When the Auctionhouse closes, presents a popup dialog asking if you really want to clear the posting queue"
+
+	-- todo: may change text of "Data Retrieval" to something more generic. Or may create new "Scanner" tab
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
-	gui:AddControl(id, "WideSlider", 0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
+	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
+
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonfull", _TRANS('ADV_Interface_ScanDataSummaryFull')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryFull')) --"Display the summation of an Auction House scan"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonpartial", _TRANS('ADV_Interface_ScanDataSummaryPartial')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryPartial')) --"Display the summation of an Auction House scan"
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonmicro", _TRANS('ADV_Interface_ScanDataSummaryMicro')) --"Enables the display of the post scan summary"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryMicro')) --"Display the summation of an Auction House scan"
+
+	gui:AddControl(id, "Slider",	0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
+	gui:AddControl(id, "Slider",	0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 
-	gui:AddHelp(id, "what is scandata",
-		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
-		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
-	gui:AddHelp(id, "what is image",
-		_TRANS('ADV_Help_WhatIsImage'), --"What is an auction house image?"
-		_TRANS('ADV_Help_WhatIsImageAnswer')) --"As you scan the auction house, Auctioneer builds up an image of what is at the auction. This is the image. It represents Auctioneer's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not a recent scan, then the info will not."
-	gui:AddHelp(id, "what is exact",
-		_TRANS('ADV_Help_WhatExactMatch'), --"What is an exact match?"
-		_TRANS('ADV_Help_WhatExactMatchAnswer')) --"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same."
+	-- experimental settings, subject to change. do not localize yet
+	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.sellernamedelay", "Additional scanning to retrieve more Seller names")
+	gui:AddTip(id, "Perform additional scanning to retrieve more data about the names of Sellers. If this option is disabled scans will finish sooner but some filters and searchers will not work")
+	gui:AddControl(id, "Slider",	0, 1, "core.scan.unresolvedtolerance", 0, 100, 1, "Unresolved auctions tolerance: %d")
+	gui:AddTip(id, "Maximum number of unresolvable auctions allowed for a full scan to still be treated as Complete. A lower tolerance is used for smaller scans.")
+
 	gui:AddHelp(id, "why force load",
 		_TRANS('ADV_Help_WhyForceLoad'), --"Why would you want to force load the scan data?"
 		_TRANS('ADV_Help_WhyForceLoadAnswer')) --"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded."
@@ -559,15 +563,13 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
+	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, {"shift", _TRANS('ADV_Interface_mts_shift') }, {"noshift", _TRANS('ADV_Interface_mts_noshift')}, {"ctrl", _TRANS('ADV_Interface_mts_ctrl')},{"noctrl", _TRANS('ADV_Interface_mts_noctrl')}, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When <mod> is pressed: Only show Auctioneer's tooltip if the specified modifier is pressed. When <mod> is not pressed: Only show Auctioneer's tooltip if the specified modifier is not pressed. Never: Never show Auctioneer's tooltip."
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", _TRANS('ADV_Interface_ScanDataDisplay')) --"Display scan data tooltip"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataDisplay')) --"Enable the display of how many items in the current scan image match this item"
 	gui:AddControl(id, "Checkbox",   0, 3, "scandata.tooltip.modifier", _TRANS('ADV_Interface_ScanDataModifier')) --"Only show exact match unless SHIFT is held"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataModifier')) --"Makes the scan data only display exact matches unless the shift key is held down"
-	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
-	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
-	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, {"shift", _TRANS('ADV_Interface_mts_shift') }, {"noshift", _TRANS('ADV_Interface_mts_noshift')}, {"ctrl", _TRANS('ADV_Interface_mts_ctrl')},{"noctrl", _TRANS('ADV_Interface_mts_noctrl')}, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When <mod> is pressed: Only show Auctioneer's tooltip if the specified modifier is pressed. When <mod> is not pressed: Only show Auctioneer's tooltip if the specified modifier is not pressed. Never: Never show Auctioneer's tooltip."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
@@ -575,9 +577,17 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MktPrice')) --"Enables the display of Marketprice in the tooltip.  Holding down Shift will also show the prices that went into marketprice"
 	gui:AddControl(id, "Checkbox",   0, 2, "tooltip.marketprice.stacksize", _TRANS('ADV_Interface_MultiplyStack')) --"Multiply by Stack Size"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MultiplyStack')) --"Multiplies by current stack size if enabled"
-	gui:AddControl(id, "Slider", 0, 1, "core.marketvalue.tolerance", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+
+	gui:AddHelp(id, "what is scandata",
+		_TRANS('ADV_Help_WhatIsScanData'), --"What is the scan data tooltip?"
+		_TRANS('ADV_Help_WhatIsScanDataAnswer')) --"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auction house image."
+	gui:AddHelp(id, "what is image",
+		_TRANS('ADV_Help_WhatIsImage'), --"What is an auction house image?"
+		_TRANS('ADV_Help_WhatIsImageAnswer')) --"As you scan the auction house, Auctioneer builds up an image of what is at the auction. This is the image. It represents Auctioneer's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not a recent scan, then the info will not."
+	gui:AddHelp(id, "what is exact",
+		_TRANS('ADV_Help_WhatExactMatch'), --"What is an exact match?"
+		_TRANS('ADV_Help_WhatExactMatchAnswer')) --"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same."
 
 	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")

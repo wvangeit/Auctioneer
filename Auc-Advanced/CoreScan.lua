@@ -36,9 +36,9 @@
 	Auctioneer Scanning Engine.
 
 	Provides a service to walk through an AH Query, reporting changes in the AH to registered utilities and stats modules
-	
+
 	System Overview
-	
+
 		Overloads function QueryAuctionItems.
 			when called checks to see if a scan is in progress.
 			If we are currently in a scan, store the last recieved page if not saved just in case (shouldn't be necessary).
@@ -47,7 +47,7 @@
 			Else if not in a scan, record the start of a new scan including whether a manual or automated scan.
 			if first page of scan, indicate to all clients that a scan has started.
 			calls original Blizzard QueryAuctionItems.
-			
+
 		We add a listener on the AH window, and fire every frame it is opened.
 			If commit coroutine is asleep, resume it.
 			If commit routine is dead and there are scans needing committed, wake it up.
@@ -71,11 +71,11 @@
 			while retry list has items and retries left is greater than 0, do following
 				pauses for 1 second
 				decrement retries left
-				walks through all auctions in retries list.  
-					If data is ready, stores it in page store and resets retry count to max.  
+				walks through all auctions in retries list.
+					If data is ready, stores it in page store and resets retry count to max.
 					If not, records location # in newRetry list.
 				replaces retry list with newRetry list.
-			
+
 			add the items to the scan store and record what the next page we need is.
 			if isGetAll, put AH Window back in normal state.
 			otherwise if an automated scan and there are more pages, start the scan of the next page.
@@ -85,7 +85,7 @@
 			this routine means that a page store can take up to NumActionsOnPage*RetryCount seconds to complete
 			for a default page, that is 5 minutes.  For a getall, it could take forever.
 			In practice, it adds up to 15 seconds to what already happens for a regular page, and 5 minutes for getAll.
-			
+
 		Committing a scan.
 			the commit routine is responsible for storing the scan store into a list and then starting a coroutine (if not already running) that can commit it.
 			The coroutine runs in a loop until there are no more items in the commit queue.
@@ -101,7 +101,7 @@
 				Walk through items in itemlink lookup
 					call GetItemInfo for item
 					If GetItemInfo returns data
-						walk through auction list and fix up data returned for each. 
+						walk through auction list and fix up data returned for each.
 						reset retry count to max.
 					else add item to next itemLink lookup
 				replace itemlink lookup with next itemLink lookup
@@ -109,18 +109,18 @@
 				walk scan table from back to front, and remove any item with an ILEVEL of -1
 				mark scan an an incomplete scan.
 
-			
+
 			Stage 3.  Prep AH Image
 				mark all auctions in auction house image that match current scan as still needing resolved against scan
 				mark all auctions in auction house image that don't match current scan as NOT needing resolved against scan
-				
+
 			Stage 4.  Merge new scan with AH Image
 				walk through all items in new scan.
 				if a match is found in AH Image that still needs resolved
 					if auction in AH Image was not filtered then
 						check if AH exactly matches current info.
 						if not, then send 'update' processor message.
-						otherwise send 'leave' processor message. 
+						otherwise send 'leave' processor message.
 					update item in AH Image from scan info and mark entry as resolved.
 				otherwise
 					send 'filter' processor message.
@@ -129,7 +129,7 @@
 					otherwise
 						add flag to auction to indicate it is filtered.
 					add auction to AH Image.
-					
+
 			Stage 5.  Remove unseen from AH Image
 				walk through all items in AH Image
 				if needs resolved then
@@ -162,6 +162,9 @@ local pairs, ipairs, next = pairs, ipairs, next
 local tonumber = tonumber
 
 local GetTime = GetTime
+
+local UNRESOLVED_UPPER_LIMIT = 10000
+local UNRESOLVED_LOWER_LIMIT = 100
 
 private.isScanning = false
 
@@ -927,7 +930,7 @@ local Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
-		
+
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
 	local scandata = private.GetScanData(serverKey)
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
@@ -999,7 +1002,7 @@ local Commitfunction = function()
 			while gt - GetTime() < 1 do
 				coroutine.yield()
 				lastPause = GetTime()
-			end		
+			end
 			lastPause = GetTime()
 		end
 	end
@@ -1018,14 +1021,14 @@ local Commitfunction = function()
 				totalProcessingTime = totalProcessingTime + (gt - lastPause)
 				coroutine.yield()
 				lastPause = GetTime()
-			end		
+			end
 			if (TempcurScan[i][Const.ILEVEL] == -1) then
 				tremove(TempcurScan, i)
 			end
 			i = i -1
 		end
 	end
-	
+
 	--[[ *** Stage 3: Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]
 	local dirtyCount = 0
 	local lut = {}
@@ -1103,7 +1106,7 @@ local Commitfunction = function()
 		printSummary = false
 		scanSize = "NoSum-"..scanSize
 	end
-	
+
 	local querySizeInfo = { }
 	querySizeInfo.wasIncomplete = wasIncomplete
 	querySizeInfo.wasGetAll = wasGetAll
@@ -1430,12 +1433,29 @@ local function CoroutineResume(...)
 	return status, result
 end
 
-function private.Commit(wasEarlyTerm, hadGetError, wasEndPagesOnly, wasGetAll)
+function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
 	private.StopStorePage()
-	if not private.curScan then return end
+	local curScan, curQuery = private.curScan, private.curQuery
+	private.curQuery = nil
+	private.curScan = nil
+	private.isScanning = false
+	if not (curQuery and curScan) then return end
+	local unresolved = curQuery.qryinfo.unresolved
+	local hadGetError = false
+	if unresolved then
+		local total = #curScan + unresolved
+		local tolerance = get("core.scan.unresolvedtolerance")
+		if total >= UNRESOLVED_UPPER_LIMIT then
+			hadGetError = unresolved > tolerance
+		elseif total > UNRESOLVED_LOWER_LIMIT then
+			hadGetError = unresolved > (tolerance * total / UNRESOLVED_UPPER_LIMIT)
+		else
+			hadGetError = unresolved > 0
+		end
+	end
 	tinsert(private.CommitQueue, {
-		Query = private.curQuery,
-		Scan = private.curScan,
+		Query = curQuery,
+		Scan = curScan,
 		wasIncomplete = wasEarlyTerm or hadGetError or wasEndPagesOnly or false,
 		wasEarlyTerm = wasEarlyTerm,
 		hadGetError = hadGetError,
@@ -1447,10 +1467,6 @@ function private.Commit(wasEarlyTerm, hadGetError, wasEndPagesOnly, wasGetAll)
 		scanCommitTime = GetTime(),
 		storeTime = private.storeTime
 	})
-
-	private.curQuery = nil
-	private.curScan = nil
-	private.isScanning = false
 
 	if not CoCommit or coroutine.status(CoCommit) == "dead" then
 		CoCommit = coroutine.create(Commitfunction)
@@ -1499,10 +1515,12 @@ function private.ScanPage(nextPage, really)
 			private.curQuery.isUsable, private.curQuery.quality)
 		AuctionFrameBrowse.page = nextPage
 
-		-- The maximum time we'll wait for the pagedata to be returned to us:
-		local now = GetTime()
-		private.scanDelay = now + 8 -- Only wait for up to ?? seconds
-		private.nextCheck = now + 0.5 -- Check complete in ?? seconds
+		if get("core.scan.sellernamedelay") then
+			-- The maximum time we'll wait for the seller name data to be returned to us:
+			local now = GetTime()
+			private.scanDelay = now + 8 -- Only wait for up to ?? seconds
+			private.nextCheck = now + 0.5 -- First check in ?? seconds
+		end
 		private.verifyStart = nil
 	end
 end
@@ -1634,7 +1652,7 @@ local StorePageFunction = function()
 	if not private.curPages then
 		private.curPages = {}
 	end
-	
+
 
 	if (nLog) then
 		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage For Page %d Started %fs after Query Start"):format(page, startTime - queryStarted), ("StorePage (Page %d) Called\n%f seconds have elapsed since scan start"):format(page, startTime - queryStarted))
@@ -1651,17 +1669,27 @@ local StorePageFunction = function()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local maxPages = ceil(totalAuctions / 50)
 	local isGetAll = false
+	local isGetAllFail = false -- used to handle Blizzard bug {ADV-595}
 	if (numBatchAuctions > 50) then
 		isGetAll = true
 		maxPages = 1
+		if totalAuctions ~= numBatchAuctions then
+			-- Blizzard bug - these should be the same for a GetAll scan {ADV-595}
+			isGetAllFail = true
+			totalAuctions = numBatchAuctions
+			_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete|r")
+			_print("It may not be possible to complete a GetAll scan on this server at this time.")
+		end
 		EventFramesRegistered = {GetFramesRegisteredForEvent("AUCTION_ITEM_LIST_UPDATE")}
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 		end
 		private.verifyStart = 1
-		local now = GetTime()
-		private.nextCheck = now
-		private.scanDelay = now + 30
+		if get("core.scan.sellernamedelay") then
+			local now = GetTime()
+			private.nextCheck = now
+			private.scanDelay = now + 30
+		end
 		RunTime = RunTime + GetTime()-lastPause
 		coroutine.yield()
 		lastPause = GetTime()
@@ -1705,9 +1733,17 @@ local StorePageFunction = function()
 		end
 		local maxTries = get('scancommit.ttl')
 		local tryCount = 0
+		if nLog and (#retries > 0) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Requires Retries Page %d"):format(page),
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries:%d"):format(page, maxTries, #retries))
+		end
 
 		local newRetries = { }
+		local retriesStartTime = GetTime()
 		while (#retries > 0 and tryCount < maxTries and not private.breakStorePage) do
+			if isGetAll then
+				lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
+			end
 			tryCount = tryCount + 1
 			RunTime = RunTime + GetTime()-lastPause
 			lastPause = GetTime()
@@ -1718,10 +1754,9 @@ local StorePageFunction = function()
 			lastPause = GetTime()
 			if private.breakStorePage then break end
 			for _, i in ipairs(retries) do
-				if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+				if isGetAll and ((i % getallspeed) == 0) then
 					local gt = GetTime()
 					if (gt-lastPause >= processingTime) then
-						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						RunTime = RunTime + GetTime()-lastPause
 						coroutine.yield()
 						lastPause = GetTime()
@@ -1738,9 +1773,9 @@ local StorePageFunction = function()
 				end
 			end
 			if nLog and (#retries ~= #newRetries) then
-				nLog.AddMessage("Auctioneer", "Scan", N_INFO, 
-					("StorePage %d Retry Successful"):format(page),
-					("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d"):format(page, tryCount, #retries - #newRetries, #newRetries))
+				nLog.AddMessage("Auctioneer", "Scan", N_INFO,
+					("StorePage Retry Successful Page %d"):format(page),
+					("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nRetry Time %.2f"):format(page, tryCount, #retries - #newRetries, #newRetries, GetTime()-retriesStartTime))
 			end
 			if (#retries ~= #newRetries) then
 				-- Found at least one.  Reset retry delay.
@@ -1750,8 +1785,8 @@ local StorePageFunction = function()
 			newRetries = { }
 		end
 		if nLog and (#retries > 0) then
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Auction Store Failure Page %d"):format(page),
-				("Page; %d\nRetries: %d\nMissed Entries:%d"):format(page, maxTries, #retries))
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Resolution Failure Page %d"):format(page),
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries:%d"):format(page, maxTries, #retries))
 		end
 
 		if (storecount > 0) then
@@ -1759,11 +1794,12 @@ local StorePageFunction = function()
 			curPages[page] = true -- we have pulled this page
 		end
 		if (#retries > 0) then
+			curQuery.qryinfo.unresolved = (curQuery.qryinfo.unresolved or 0) + #retries
 			curQuery.pageError = true
 		end
 	end
-	
-	
+
+
 	if isGetAll then
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
@@ -1775,7 +1811,7 @@ local StorePageFunction = function()
 		EventFramesRegistered=nil
 	end
 
-	
+
 	-- Just updated the page if it was a new page, so record it as latest page.
 	if (page > curQuery.qryinfo.page) then
 		curQuery.qryinfo.page = page
@@ -1797,7 +1833,7 @@ local StorePageFunction = function()
 		if not private.breakStorePage then
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit((#curScan < totalAuctions - 100), curQuery.pageError or false, false, true)
+			private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
 			-- Clear the getall output. We don't want to create a new query so use the hook
 			private.queryStarted = GetTime()
 			private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
@@ -1806,10 +1842,9 @@ local StorePageFunction = function()
 		if (page+1 < maxPages) then
 			private.ScanPage(page + 1)
 		else
-			local incomplete = (#curScan < totalAuctions - 10)
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(incomplete, curQuery.pageError or false, false, false)
+			private.Commit(false, curQuery.pageError or false, false, false)
 		end
 	elseif (maxPages == page+1) then
 		local incomplete = false
@@ -1827,17 +1862,25 @@ local StorePageFunction = function()
 					wasEndOnly = false
 					break
 				end
-			end		
+			end
 		end
 		elapsed = GetTime() - private.scanStarted - private.totalPaused
 		private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
 		private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
 	end
+	-- Report warning for Blizzard bug {ADV-595}
+	if private.warningCanSendBug then
+		private.warningCanSendBug = nil
+		if not CanSendAuctionQuery() then
+			message("The Server is not responding correctly.\nClosing and reopening the Auctionhouse may fix this problem.")
+		end
+	end
+
 	local endTime = GetTime()
 	RunTime = RunTime + endTime-lastPause
 	private.storeTime = (private.storeTime or 0) + RunTime
 	if (nLog) then
-		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Page %d Complete (%fs)"):format(page, RunTime), 
+		nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Page %d Complete (%fs)"):format(page, RunTime),
 		("Query Elapsed: %fs\nThis Page Store Elapsed: %fs\nThis Page Code Execution Time: %fs"):format(endTime-queryStarted, endTime-startTime, RunTime))
 	end
 end
@@ -2145,7 +2188,10 @@ end
 function lib.SetPaused(pause)
 	if private.isGetAll then
 		-- A GetAll scan cannot be Popped or Pushed
-		_print("Scan cannot be paused/unpaused because it is a GetAll scan")
+		assert(not private.isPaused)
+		if pause then
+			_print("Scan cannot be paused/unpaused because it is a GetAll scan")
+		end
 		return
 	end
 	if pause then
@@ -2160,6 +2206,7 @@ end
 
 private.unexpectedClose = false
 local flipb, flopb = false, false
+local timeoutCanSend = 0 -- part of fix for Blizzard bug {ADV-595}
 function private.OnUpdate(me, dur)
 	if CoCommit then
 		local costat = coroutine.status(CoCommit)
@@ -2224,8 +2271,20 @@ function private.OnUpdate(me, dur)
 			return
 		end
 
-		if private.sentQuery and CanSendAuctionQuery() then
-			lib.StorePage()
+		if private.sentQuery then
+			if CanSendAuctionQuery() then
+				timeoutCanSend = 0
+				lib.StorePage()
+			elseif timeoutCanSend > 60 then
+				-- Fix for Blizzard Auctionhouse bug {ADV-595}
+				-- CanSendAuctionQuery continues to return nil indefinitely. We use a timeout
+				timeoutCanSend = 0
+				private.warningCanSendBug = true -- further handling required by StorePageFunction
+				lib.StorePage()
+			else
+				-- part of fix for Blizzard bug {ADV-595}
+				timeoutCanSend = timeoutCanSend + dur
+			end
 		end
 	elseif private.curQuery then
 		lib.Interrupt()
