@@ -959,7 +959,7 @@ local Commitfunction = function()
 		end
 		if (not data[Const.SELLER]) then data[Const.SELLER] = "" end
 		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP])) then
-			local itemLink = data[Const.LINK]
+		local itemLink = data[Const.LINK]
 			if (not private.itemLinkDB[itemLink] and not itemLinksTried[itemLink]) then
 				itemLinksTried[itemLink] = true
 				local tmp = { GetItemInfo(itemLink) }
@@ -1878,7 +1878,7 @@ local StorePageFunction = function()
 						tinsert(curScan, itemData)
 						storecount = storecount + 1
 					else
-						tinsert(retries, { i[1], itemData })
+						tinsert(newRetries, { i[1], itemData })
 					end
 				else
 					tinsert(newRetries, i)
