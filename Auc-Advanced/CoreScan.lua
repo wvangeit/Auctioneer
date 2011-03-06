@@ -1439,13 +1439,13 @@ end
 
 function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
 	private.StopStorePage()
-	if not private.curScan then return end
+	local curScan, curQuery, storeTime = private.curScan, private.curQuery, private.storeTime
+	local scanStarted, scanStartTime, totalPaused = private.scanStarted, private.scanStartTime, private.totalPaused
+	private.curQuery = nil
+	private.curScan = nil
+	private.isScanning = false
+	if not (curQuery and curScan) then return end
 
---	local curScan, curQuery = private.curScan, private.curQuery
---	private.curQuery = nil
---	private.curScan = nil
---	private.isScanning = false
---	if not (curQuery and curScan) then return end
 --	local unresolved = curQuery.qryinfo.unresolved
 --	local hadGetError = false
 --	if unresolved then
@@ -1462,23 +1462,19 @@ function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
 
 
 	tinsert(private.CommitQueue, {
-		Query = private.curQuery,
-		Scan = private.curScan,
+		Query = curQuery,
+		Scan = curScan,
 		wasIncomplete = wasEarlyTerm or wasEndPagesOnly or false,
 		wasEarlyTerm = wasEarlyTerm,
 		hadGetError = false,
 		wasEndPagesOnly = wasEndPagesOnly,
 		wasGetAll = wasGetAll,
-		scanStarted = private.scanStarted,
-		scanStartTime = private.scanStartTime,
-		totalPaused = private.totalPaused,
+		scanStarted = scanStarted,
+		scanStartTime = scanStartTime,
+		totalPaused = totalPaused,
 		scanCommitTime = GetTime(),
-		storeTime = private.storeTime
+		storeTime = storeTime
 	})
-
-	private.curQuery = nil
-	private.curScan = nil
-	private.isScanning = false
 
 	if not CoCommit or coroutine.status(CoCommit) == "dead" then
 		CoCommit = coroutine.create(Commitfunction)
@@ -2325,7 +2321,10 @@ end
 function lib.SetPaused(pause)
 	if private.isGetAll then
 		-- A GetAll scan cannot be Popped or Pushed
-		_print("Scan cannot be paused/unpaused because it is a GetAll scan")
+		assert(not private.isPaused)
+		if pause then
+			_print("Scan cannot be paused/unpaused because it is a GetAll scan")
+		end
 		return
 	end
 	if pause then
@@ -2408,9 +2407,6 @@ function private.OnUpdate(me, dur)
 			return
 		end
 
-		if private.sentQuery and CanSendAuctionQuery() then
-			lib.StorePage()
-		end
 		if private.sentQuery then
 			if CanSendAuctionQuery() then
 				timeoutCanSend = 0
