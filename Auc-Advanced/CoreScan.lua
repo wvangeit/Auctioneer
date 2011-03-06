@@ -1974,7 +1974,7 @@ local StorePageFunction = function()
 		if not private.breakStorePage then
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit((#curScan < totalAuctions - 100), curQuery.pageError or false, false, true)
+			private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
 			-- Clear the getall output. We don't want to create a new query so use the hook
 			private.queryStarted = GetTime()
 			private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
