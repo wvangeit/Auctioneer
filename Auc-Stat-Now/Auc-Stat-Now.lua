@@ -126,70 +126,11 @@ function lib.GetPrice(hyperlink, serverKey)
 			--No data for item in current image
 		end
 	end
--- Work stopped here -- Work stopped here -- Work stopped here -- Work stopped here -- 
-	if data.daily[itemId] then
-		local stats = private.UnpackStats(data.daily[itemId])
-		if stats[property] then
-			dayTotal, dayCount, minBuyout = unpack(stats[property])
-			dayAverage = dayTotal/dayCount
-			if not minBuyout then minBuyout = 0 end
-			-- Stddev calculations for market price
-			count=count+1
-			snowCache[count] = dayAverage
-			daysUsed = 1
-		end
-	end
-	if data.means[itemId] then
-		local stats = private.UnpackStats(data.means[itemId])
-		if stats[property] then
-			seenDays, seenCount, avg3, avg7, avg14, avgmins = unpack(stats[property])
-			if not avgmins then avgmins = 0 end
-			-- Stddev calculations for market price
-			if seenDays >= 3 then
-				for n = 1, 3-daysUsed do
-					count=count+1
-					snowCache[count] = avg3
-				end
-				daysUsed = 3
-			end
-			if seenDays >= 7 then
-				for n = 1, 7-daysUsed do
-					count=count+1
-					snowCache[count] = avg7
-				end
-				daysUsed = 7
-			end
-			if seenDays >= 14 then
-				for n = 1, 14-daysUsed do
-					count=count+1
-					snowCache[count] = avg14
-				end
-				daysUsed = 14
-			end
-		end
-	end
-	local mean = 0
-	if count > 0 then
-		for n=1,count do
-			mean=mean+snowCache[n]
-		end
-		mean = mean/count
-	end
-	local variance = 0
-	if count == 1 then
-		variance = 0
-	else
-		for n=1,count do
-			variance = variance + (mean - snowCache[n])^2;
-		end
-		variance = sqrt(variance/(count-1))
-	end
-
-	return dayAverage, avg3, avg7, avg14, minBuyout, avgmins, false, dayTotal, dayCount, seenDays, seenCount, mean, variance
+return itemvalue,false,valuetype,count,confidence
 end
 
 function lib.GetPriceColumns()
-	return "Daily Avg", "3 Day Avg", "7 Day Avg", "14 Day Avg", "Min BO", "Avg MBO", false, "Daily Total", "Daily Count", "Seen Days", "Seen Count", "Mean", "StdDev"
+	return "ItemValue",false,"ValueType","Seen","Confidence"
 end
 
 local array = {}
@@ -199,32 +140,13 @@ function lib.GetPriceArray(hyperlink, serverKey)
 	wipe(array)
 
 	-- Get our statistics
-	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
+	local itemvalue,_,valuetype,seen,confidence = lib.GetPrice(hyperlink, serverKey)
 
 	--if nothing is returned, return nil
-	if not dayCount then return end
-
-	-- If reportsafe is on use the mean of all 14 day samples. Else use the "traditional" Simple values.
-	if not get("stat.now.reportsafe") then
-		if (avg3 and seenDays > 3) or dayCount == 0 then
-			array.price = avg3
-		elseif dayCount > 0 then
-			array.price = dayAverage
-		end
-	else
-		array.price = mean
-	end
-	array.stddev = stddev
-	array.seen = seenCount
-	array.avgday = dayAverage
-	array.avg3 = avg3
-	array.avg7 = avg7
-	array.avg14 = avg14
-	array.mbo = minBuyout
-	array.avgmins = avgmins
-	array.daytotal = dayTotal
-	array.daycount = dayCount
-	array.seendays = seenDays
+	if not itemvalue then return end
+	array.price = itemvalue
+	array.seen = seen
+	array.confidence = confidence
 
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
@@ -245,10 +167,10 @@ local bellCurve = AucAdvanced.API.GenerateBellCurve();
 -- @return The upper limit of meaningful data for the PDF (determined
 -- as the mean plus 5 standard deviations)
 function lib.GetItemPDF(hyperlink, serverKey)
-	-- TODO: This is an estimate. Can we touch this up later? Especially the stddev==0 case
 
 	if not get("stat.now.enable") then return end
 	if not get("stat.now.market") then return end
+-- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE --
 	-- Calculate the SE estimated standard deviation & mean
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
 
