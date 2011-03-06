@@ -1847,6 +1847,7 @@ local StorePageFunction = function()
 		local tryCount = 0
 
 		local newRetries = { }
+		local readCount = 1
 		while (#retries > 0 and tryCount < maxTries and not private.breakStorePage) do
 			itemLinksTried = {}
 			tryCount = tryCount + 1
@@ -1858,7 +1859,6 @@ local StorePageFunction = function()
 			end
 			lastPause = GetTime()
 			if private.breakStorePage then break end
-			local readCount = 1
 			for _, i in ipairs(retries) do
 				if isGetAll and ((readCount % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 					local gt = GetTime()
