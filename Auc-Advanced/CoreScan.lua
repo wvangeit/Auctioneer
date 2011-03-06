@@ -1785,6 +1785,7 @@ local StorePageFunction = function()
 		if totalAuctions ~= numBatchAuctions then
 			-- Blizzard bug - these should be the same for a GetAll scan {ADV-595}
 			isGetAllFail = true
+ 			curQuery.pageError = true
 			totalAuctions = numBatchAuctions
 			_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete|r")
 			_print("It may not be possible to complete a GetAll scan on this server at this time.")
@@ -1985,7 +1986,7 @@ local StorePageFunction = function()
 			local incomplete = (#curScan < totalAuctions - 10)
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(incomplete, curQuery.pageError or false, false, false)
+			private.Commit(incomplete, curQuery.pageError or getAllFail or false, false, false)
 		end
 	elseif (maxPages == page+1) then
 		local incomplete = false
