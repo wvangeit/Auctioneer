@@ -1573,7 +1573,7 @@ function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 		itemData = {nil, nil, nil, nil, nil, nil,
 			nil, nil, nil, nil, nil, nil, nil,
 			nil, nil, nil, nil, nil, nil,
-			0, -1, nil, nil, nil, nil, nil}
+			nil, 0, -1, nil, nil, nil, nil, nil}
 		itemData.PAGE = page
 		itemData.PAGEINDEX = i
 	end
@@ -1920,7 +1920,6 @@ local StorePageFunction = function()
 				i[2][Const.SELLER] = "" 
 				names_missed = names_missed + 1
 			elseif (not i[2][Const.LINK]) then 
-				i[2][Const.SELLER] = "" 
 				links_missed = links_missed + 1
 			end
 			tinsert(curScan, i[2])
