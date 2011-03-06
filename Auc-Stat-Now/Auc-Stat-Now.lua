@@ -171,17 +171,6 @@ function lib.GetItemPDF(hyperlink, serverKey)
 	if not get("stat.now.enable") then return end
 	if not get("stat.now.market") then return end
 -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE -- STOPPED HERE --
-	-- Calculate the SE estimated standard deviation & mean
-	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount, mean, stddev = lib.GetPrice(hyperlink, serverKey)
-
-	if seenCount == 0 or stddev ~= stddev or mean ~= mean or not mean or mean == 0 then
-		return ;                         -- No available data or cannot estimate
-	end
-
-	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
-	-- the std dev is 100% of the mean divided by square root of number of views
-	if stddev == 0 then stddev = mean / sqrt(seenCount); end
-
 	-- Calculate the lower and upper bounds as +/- 3 standard deviations
 	local lower, upper = mean - 3*stddev, mean + 3*stddev;
 
@@ -202,9 +191,6 @@ function lib.OnLoad(addon)
 	default("stat.now.quantmul", true)
 	default("stat.now.enable", true)
 	default("stat.now.reportsafe", false)
-
-	-- Load and check data
-	private.InitData()
 end
 
 function lib.ClearItem(hyperlink, serverKey)
