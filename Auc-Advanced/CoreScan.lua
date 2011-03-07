@@ -599,7 +599,7 @@ local function processStats(processors, operation, curItem, oldItem)
 				end
 			else
 				if (nLog) then
-					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "AuctionFilter Error", ("AuctionFilter %s Returned Error %s"):format(x and x.Name or "??", errormsg))
+					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "AuctionFilter Error", ("AuctionFilter %s Returned Error %s"):format(x and x.Name or "??", result or "??"))
 				end
 			end
 		end
@@ -959,7 +959,7 @@ local Commitfunction = function()
 		end
 		if (not data[Const.SELLER]) then data[Const.SELLER] = "" end
 		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP])) then
-		local itemLink = data[Const.LINK]
+			local itemLink = data[Const.LINK]
 			if (not private.itemLinkDB[itemLink] and not itemLinksTried[itemLink]) then
 				itemLinksTried[itemLink] = true
 				local tmp = { GetItemInfo(itemLink) }
@@ -1845,6 +1845,10 @@ local StorePageFunction = function()
 		end
 		local maxTries = get('scancommit.ttl')
 		local tryCount = 0
+		if nLog and (#retries > 0) then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Requires Retries Page %d"):format(page),
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries:%d\nPage Elapsed Time: %.2fs"):format(page, maxTries, #retries, GetTime() - startTime))
+		end
 
 		local newRetries = { }
 		local readCount = 1
@@ -1889,8 +1893,8 @@ local StorePageFunction = function()
 			if (#retries ~= #newRetries) then
 				if nLog then
 					nLog.AddMessage("Auctioneer", "Scan", N_INFO, 
-						("StorePage %d Retry Successful"):format(page),
-						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d"):format(page, tryCount, #retries - #newRetries, #newRetries))
+						("StorePage Retry Successful Page %d"):format(page),
+						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nPage Elapsed Time: %.2fs"):format(page, tryCount, #retries - #newRetries, #newRetries, GetTime() - startTime))
 				end
 				-- Found at least one.  Reset retry delay.
 				tryCount = 0
@@ -1925,9 +1929,9 @@ local StorePageFunction = function()
 			tinsert(curScan, i[2])
 		end		
 		
-		if nLog and (names_missed > 1) then
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Auction Store Failure Page %d"):format(page),
-				("Page; %d\nRetries: %d\nMissed Entries:%d, Missing Names: %d, Missing Links: %d, Missing Both: %d"):format(page, maxTries, #retries, names_missed, links_missed,both_missed))
+		if nLog and #retries > 0 then
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Resolution Failure Page %d"):format(page),
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries: %d\nMissing Names: %d, Missing Links: %d, Missing Both: %d"):format(page, maxTries, #retries, names_missed, links_missed,both_missed))
 		end
 
 		if (storecount > 0) then
@@ -1982,10 +1986,9 @@ local StorePageFunction = function()
 		if (page+1 < maxPages) then
 			private.ScanPage(page + 1)
 		else
-			local incomplete = (#curScan < totalAuctions - 10)
 			elapsed = GetTime() - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(incomplete, curQuery.pageError or getAllFail or false, false, false)
+			private.Commit(false, curQuery.pageError or false, false, false)
 		end
 	elseif (maxPages == page+1) then
 		local incomplete = false
