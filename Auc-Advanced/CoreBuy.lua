@@ -272,15 +272,11 @@ function private.PushSearch()
 	AucAdvanced.Scan.StartScan(request.itemname, request.uselevel, request.uselevel, nil, request.classindex, request.subclassindex, nil, request.quality)
 end
 
-function private.FinishedSearch(scanstats)
-	-- We only want to process scans that were started by PushSearch
-	-- After some basic checks, we will compare the query sig to the sig(s) calculated during PushSearch
-	if not scanstats or scanstats.wasIncomplete then return end
-	local query = scanstats.query
-	if not query or query.isUsable or query.invType or not query.name then return end
-	local querysig = query.qryinfo.sig
+function private.FinishedSearch(complete, querysig, query)
+	if not complete or query.isUsable or query.invType or not query.name then return end
 	for index = #private.BuyRequests, 1, -1 do
 		local request = private.BuyRequests[index]
+		-- Compare the query sig to the sig(s) calculated during PushSearch
 		if request.querysig == querysig then
 			-- The auction for this buy request no longer exists on the Auctionhouse
 			if request.foundHigh then
@@ -483,12 +479,12 @@ function private.onBidAccepted()
 	private.removePendingBid()
 end
 
---private.onBidFailed(arg1)
+--private.onBidFailed(message)
 --This function is called when a bid fails
 --purpose is to output to chat the reason for the failure, and then pass the Bid on to private.removePendingBid()
 --The output may duplicate some client output.  If so, those lines need to be removed.
-function private.onBidFailed(arg1)
-	aucPrint(highlight.."Bid Failed: "..arg1)
+function private.onBidFailed(message)
+	aucPrint(highlight.."Bid Failed: "..message)
 	private.removePendingBid()
 end
 
@@ -523,7 +519,7 @@ local function OnUpdate()
 	end
 end
 
-local function OnEvent(frame, event, arg1, ...)
+local function OnEvent(frame, event, message, ...)
 	if event == "AUCTION_ITEM_LIST_UPDATE" then
 		local request = private.CurRequest
 		if request then
@@ -564,25 +560,20 @@ local function OnEvent(frame, event, arg1, ...)
 		end
 		private.DeactivateEvents()
 	elseif event == "CHAT_MSG_SYSTEM" then
-		if arg1 == ERR_AUCTION_BID_PLACED then
+		if message == ERR_AUCTION_BID_PLACED then
 		 	private.onBidAccepted()
 		end
 	elseif event == "UI_ERROR_MESSAGE" then
-		if (arg1 == ERR_ITEM_NOT_FOUND or
-			arg1 == ERR_NOT_ENOUGH_MONEY or
-			arg1 == ERR_AUCTION_BID_OWN or
-			arg1 == ERR_AUCTION_HIGHER_BID or
-			arg1 == ERR_AUCTION_BID_INCREMENT or
-			arg1 == ERR_AUCTION_MIN_BID or
-			arg1 == ERR_ITEM_MAX_COUNT) then
-			private.onBidFailed(arg1)
+		if (message == ERR_ITEM_NOT_FOUND or
+			message == ERR_NOT_ENOUGH_MONEY or
+			message == ERR_AUCTION_BID_OWN or
+			message == ERR_AUCTION_HIGHER_BID or
+			message == ERR_AUCTION_BID_INCREMENT or
+			message == ERR_AUCTION_MIN_BID or
+			message == ERR_ITEM_MAX_COUNT) then
+			private.onBidFailed(message)
 		end
 	end
-end
-
-coremodule.Processors = {}
-function coremodule.Processors.scanstats(event, ...)
-	private.FinishedSearch(...)
 end
 
 private.updateFrame = CreateFrame("Frame")
@@ -591,6 +582,12 @@ private.updateFrame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 private.updateFrame:SetScript("OnUpdate", OnUpdate)
 private.updateFrame:SetScript("OnEvent", OnEvent)
 private.updateFrame:Hide()
+
+coremodule.Processors = {
+	scanfinish = function(event, scansize, querysig, queryinfo, complete, query, scanstats)
+		private.FinishedSearch(complete, querysig, query)
+	end,
+}	
 
 --[[ Prompt Frame ]]--
 
