@@ -135,8 +135,8 @@ local settingDefaults = {
 	["ModTTShow"] = "always",
 	["post.clearonclose"] = true,
 	["post.confirmonclose"] = true,
-	["core.scan.sellernamedelay"] = true,
-	["core.scan.unresolvedtolerance"] = 0,
+--	["core.scan.sellernamedelay"] = true,
+--	["core.scan.unresolvedtolerance"] = 0,
 }
 
 local function getDefault(setting)
@@ -518,10 +518,14 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 
 	-- experimental settings, subject to change. do not localize yet
+	--[[ temporarily disabled
 	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.sellernamedelay", "Additional scanning to retrieve more Seller names")
 	gui:AddTip(id, "Perform additional scanning to retrieve more data about the names of Sellers. If this option is disabled scans will finish sooner but some filters and searchers will not work")
+	--]]
+	--[[ temporarily disabled
 	gui:AddControl(id, "Slider",	0, 1, "core.scan.unresolvedtolerance", 0, 100, 1, "Unresolved auctions tolerance: %d")
 	gui:AddTip(id, "Maximum number of unresolvable auctions allowed for a full scan to still be treated as Complete. A lower tolerance is used for smaller scans.")
+	--]]
 
 	gui:AddHelp(id, "why force load",
 		_TRANS('ADV_Help_WhyForceLoad'), --"Why would you want to force load the scan data?"
