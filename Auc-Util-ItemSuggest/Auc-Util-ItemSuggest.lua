@@ -33,124 +33,33 @@
 if not AucAdvanced then return end
 
 local libType, libName = "Util", "ItemSuggest"
-local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+local lib = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 local GetAprPrice = AucAdvanced.Modules.Util.Appraiser.GetPrice
 local cutRate = 0.05 -- "home" AH cut / broker fee. todo: Is it worth introducing a "neutral" AH option?
 local LastLink, LastQuantity, LastSuggest, LastValue
+local ConfigGUI, ConfigID
+local SliderLast, SliderSpacer
 
 local Suggestors = {}
+local setupSliderSettings = {}
+
+--[[ Library functions ]]--
 
 function lib.GetName()
 	return libName
 end
 
-lib.Processors = {}
-function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost, additional)
-	if (get("util.itemsuggest.enablett")) then
-		local text = lib.GetSuggestText(lib.Suggest(hyperlink, quantity), get("util.itemsuggest.usecolour"))
-		tooltip:AddLine(format("Suggestion: %s this item", text))
-	end
-end
-
-function lib.Processors.config(callbackType, gui)
-	if private.SetupConfigGui then private.SetupConfigGui(gui) end
-end
-
-function lib.Processors.configchanged()--(callbackType, ...)
-	LastLink = nil -- only necessary to nil one of these 4 values
-end
-lib.Processors.scanstats = lib.Processors.configchanged
-
-function lib.OnLoad()
-	--aucPrint("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	if private.OnLoadRunOnce then private.OnLoadRunOnce() end
-end
-
-function private.OnLoadRunOnce()
-	private.OnLoadRunOnce = nil
-
-	default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-	default("util.itemsuggest.enchantskill", 525) -- Used for item AI
-	default("util.itemsuggest.jewelcraftskill", 525)-- Used for item AI
-	default("util.itemsuggest.inscriptionskill", 525)-- Used for item AI
-	default("util.itemsuggest.vendorweight", 100)-- Used for item AI
-	default("util.itemsuggest.auctionweight", 100)-- Used for item AI
-	default("util.itemsuggest.prospectweight", 100)-- Used for item AI
-	default("util.itemsuggest.millingweight", 100)-- Used for item AI
-	default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
-	default("util.itemsuggest.convertweight", 100)-- Used for item AI
-	default("util.itemsuggest.relisttimes", 1)-- Used for item AI
-	default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
-	default("util.itemsuggest.includedeposit", 1)-- Used for item AI
-	default("util.itemsuggest.deplength", 48)
-	default("util.itemsuggest.usecolour", true)
-
-	lib.NewSuggest("Auction", lib.GetAppraiserValue, "util.itemsuggest.auctionweight")
-	lib.SetSuggestText("Auction", "Auction", "1fff00") -- green
-	lib.NewSuggest("Disenchant", lib.GetDisenchantValue, "util.itemsuggest.disenchantweight")
-	lib.SetSuggestText("Disenchant", "Disenchant", "ffff00") -- yellow
-	lib.NewSuggest("Prospect", lib.GetProspectValue, "util.itemsuggest.prospectweight")
-	lib.SetSuggestText("Prospect", "Prospect", "ffff00") -- yellow
-	lib.NewSuggest("Mill", lib.GetMillingValue, "util.itemsuggest.millingweight")
-	lib.SetSuggestText("Mill", "Mill", "ffff00") -- yellow
-	lib.NewSuggest("Convert", lib.GetConvertValue, "util.itemsuggest.convertweight")
-	lib.SetSuggestText("Convert", "Convert", "007fee") -- blue
-	lib.NewSuggest("Vendor", lib.GetVendorValue, "util.itemsuggest.vendorweight")
-	lib.SetSuggestText("Vendor", "Vendor", "9d9d9d") -- grey
-end
-
-function private.SetupConfigGui(gui)
-	private.SetupConfigGui = nil
-	local id = gui:AddTab(libName)
-	gui:MakeScrollable(id)
-
-	gui:AddHelp(id, "what itemsuggest",
-        "What is the ItemSuggest module?",
-        "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill or convert that item.")
-
-	gui:AddControl(id, "Header", 0, "ItemSuggest Options")
-	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
-	gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
-	gui:AddControl(id, "Checkbox", 0, 2, "util.itemsuggest.usecolour", "Use colours in tooltip")
-	gui:AddTip(id, "Set whether the tooltip will display different colour text for the different suggestions.")
-
-	gui:AddControl(id, "Header", 0, "ItemSuggest Recommendation Bias")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.vendorweight", 0, 200, 1, "Vendor Bias %s")
-	gui:AddTip(id, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.auctionweight", 0, 200, 1, "Auction Bias %s")
-	gui:AddTip(id, "Weight ItemSuggest recommendations for auction resale higher or lower.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.disenchantweight", 0, 200, 1, "Disenchant Bias %s")
-	gui:AddTip(id, "Weight ItemSuggest recommendations for Disenchanting higher or lower.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.prospectweight", 0, 200, 1, "Prospect Bias %s")
-   	gui:AddTip(id, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.millingweight", 0, 200, 1, "Milling Bias %s")
-   	gui:AddTip(id, "Weight ItemSuggest recommendations for Milling higher or lower.")
-	gui:AddControl(id, "WideSlider",  0, 2, "util.itemsuggest.convertweight", 0, 200, 1, "Conversion Bias %s")
-   	gui:AddTip(id, "Weight ItemSuggest recommendations for Conversion higher or lower.")
-
-    gui:AddControl(id, "Header", 0, "Skill usage Limits")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 25, 525, 25, "Max Enchanting Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 25, 525, 25, "Max JewelCrafting Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 25, 525, 25, "Max Inscription Skill On Realm: %s")
-	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
-
-	gui:AddControl(id, "Header", 0, "Deposit cost influence")
-	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
-	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
-	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
-	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
-	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
-	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
-	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
-end
-
-
+--[[ Suggest:
+	suggestion, value = lib.Suggest(hyperlink, quantity)
+	hyperlink (string) itemlink
+	quantity (number, default = 1) stack size
+	--
+	suggestion (string) key representing best suggestion
+	value (floating point number) estimated value of best suggestion (includes quantity and bias)
+]]--
 function lib.Suggest(hyperlink, quantity)
 	if not hyperlink then return end
 	if not quantity then quantity = 1 end
@@ -195,7 +104,11 @@ function lib.NewSuggest(key, valueFunc, biasSetting, options)
 		data.bias = biasSetting
 	end
 	if options then
+		if not biasSetting then data.bias = options.bias end
 		lib.SetSuggestText(key, options.text, options.textHex or options.textRed, options.textGreen, options.textBlue)
+		if options.slider or options.sliderText or options.sliderTip then
+			lib.SetBiasSlider(key, options.sliderText, options.sliderTip)
+		end
 		-- more options to be added later
 	end
 	return true
@@ -220,14 +133,55 @@ function lib.SetSuggestText(key, text, colR, colG, colB)
 	return true
 end
 
+--[[ GetSuggestText
+	text = lib.GetSuggestText(key, useCol)
+	key (string, required) suggestor key value (e.g. value returned by lib.Suggest)
+	useCol (boolean, optional) 'true' to include colour codes in the text
+	--
+	text (string) display text (Note: safe to concatenate; will *always* return a string)
+]]--
 function lib.GetSuggestText(key, useCol)
 	local data = Suggestors[key]
 	if data then
 		return useCol and data.displaytext or data.plaintext or key
 	end
-	return "Unknown" -- always return a string value
+	return "Unknown"
 end
 
+function lib.SetBiasSlider(key, sliderText, tipText)
+	local data = Suggestors[key]
+	if not data or not data.bias or data.slider then return end
+	if not ConfigGUI then
+		if data.setupslider then return end
+		-- gui has not been created yet, pack up our settings for when it gets created
+		data.setupslider = true
+		tinsert(setupSliderSettings, {key, sliderText, tipText})
+		return true
+	end
+	data.setupslider = nil
+
+	-- sliderText is optional: we use a default template if not provided
+	if not sliderText then
+		-- this will be localized sometime; the localized string may contain the token '@d' in place of '%d'
+		-- note that SetSuggestTest should have been called first (to set data.plaintext)
+		sliderText = format("%s Bias @d", data.plaintext or key)
+	end
+	sliderText = sliderText:gsub("@d", "%%d")
+
+	local oldLast = ConfigGUI:GetLast(ConfigID)
+	ConfigGUI:SetLast(ConfigID, SliderLast)
+	data.slider = ConfigGUI:AddControl(ConfigID, "WideSlider", 0, 2, data.bias, 0, 200, 1, sliderText)
+	if tipText then
+		ConfigGUI:AddTip(ConfigID, tipText)
+	end
+	SliderLast = ConfigGUI:GetLast(ConfigID)
+	SliderSpacer:SetPoint("BOTTOM", SliderLast, "BOTTOM")
+	ConfigGUI:SetLast(ConfigID, oldLast)
+
+	return true
+end
+
+--[[ Built-in Suggestors ]]--
 
 function lib.GetAppraiserValue(hyperlink, quantity) -- deprecated function: will be converted to an internal-only function in future
 	local AppraiserValue = GetAprPrice(hyperlink) or 0
@@ -513,5 +467,113 @@ function lib.GetVendorValue(hyperlink, quantity) -- deprecated function
 	local VendorValue = GetSellValue and GetSellValue(hyperlink) or 0
 	VendorValue = VendorValue * quantity
 return VendorValue end
+
+--[[ Setup functions and Event Handlers ]]--
+
+lib.NewSuggest("Auction", lib.GetAppraiserValue, "util.itemsuggest.auctionweight")
+lib.NewSuggest("Disenchant", lib.GetDisenchantValue, "util.itemsuggest.disenchantweight")
+lib.NewSuggest("Prospect", lib.GetProspectValue, "util.itemsuggest.prospectweight")
+lib.NewSuggest("Mill", lib.GetMillingValue, "util.itemsuggest.millingweight")
+lib.NewSuggest("Convert", lib.GetConvertValue, "util.itemsuggest.convertweight")
+lib.NewSuggest("Vendor", lib.GetVendorValue, "util.itemsuggest.vendorweight")
+
+local function OnLoadRunOnce()
+	OnLoadRunOnce = nil
+
+	default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
+	default("util.itemsuggest.enchantskill", 525) -- Used for item AI
+	default("util.itemsuggest.jewelcraftskill", 525)-- Used for item AI
+	default("util.itemsuggest.inscriptionskill", 525)-- Used for item AI
+	default("util.itemsuggest.vendorweight", 100)-- Used for item AI
+	default("util.itemsuggest.auctionweight", 100)-- Used for item AI
+	default("util.itemsuggest.prospectweight", 100)-- Used for item AI
+	default("util.itemsuggest.millingweight", 100)-- Used for item AI
+	default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
+	default("util.itemsuggest.convertweight", 100)-- Used for item AI
+	default("util.itemsuggest.relisttimes", 1)-- Used for item AI
+	default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
+	default("util.itemsuggest.includedeposit", 1)-- Used for item AI
+	default("util.itemsuggest.deplength", 48)
+	default("util.itemsuggest.usecolour", true)
+
+	lib.SetSuggestText("Auction", "Auction", "1fff00") -- green
+	lib.SetBiasSlider("Auction", nil, "Weight ItemSuggest recommendations for auction resale higher or lower.")
+	lib.SetSuggestText("Disenchant", "Disenchant", "ffff00") -- yellow
+	lib.SetBiasSlider("Disenchant", nil, "Weight ItemSuggest recommendations for Disenchanting higher or lower.")
+	lib.SetSuggestText("Prospect", "Prospect", "ffff00") -- yellow
+	lib.SetBiasSlider("Prospect", nil, "Weight ItemSuggest recommendations for Prospecting higher or lower.")
+	lib.SetSuggestText("Mill", "Mill", "ffff00") -- yellow
+	lib.SetBiasSlider("Mill", nil, "Weight ItemSuggest recommendations for Milling higher or lower.")
+	lib.SetSuggestText("Convert", "Convert", "007fee") -- blue
+	lib.SetBiasSlider("Convert", nil, "Weight ItemSuggest recommendations for Conversion higher or lower.")
+	lib.SetSuggestText("Vendor", "Vendor", "9d9d9d") -- grey
+	lib.SetBiasSlider("Vendor", nil, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
+end
+
+local function SetupConfigGui(gui)
+	SetupConfigGui = nil
+	local id = gui:AddTab(libName)
+	ConfigGUI, ConfigID = gui, id
+	gui:MakeScrollable(id)
+
+	gui:AddHelp(id, "what itemsuggest",
+        "What is the ItemSuggest module?",
+        "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill or convert that item.")
+
+	gui:AddControl(id, "Header", 0, "ItemSuggest Options")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
+	gui:AddTip(id,  "If enabled, will show ItemSuggest tooltip information.")
+	gui:AddControl(id, "Checkbox", 0, 2, "util.itemsuggest.usecolour", "Use colours in tooltip")
+	gui:AddTip(id, "Set whether the tooltip will display different colour text for the different suggestions.")
+
+	gui:AddControl(id, "Header", 0, "ItemSuggest Recommendation Bias")
+	SliderLast = gui:GetLast(id) -- bias sliders will be inserted at this point
+	SliderSpacer = gui:AddControl(id, "Note", 0 ,0 ,0, "") -- invisible control used to correctly space controls following the sliders
+
+    gui:AddControl(id, "Header", 0, "Skill usage Limits")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 25, 525, 25, "Max Enchanting Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 25, 525, 25, "Max JewelCrafting Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 25, 525, 25, "Max Inscription Skill On Realm: %s")
+	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
+
+	gui:AddControl(id, "Header", 0, "Deposit cost influence")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
+	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
+	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
+	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
+	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
+
+	for _, packed in ipairs(setupSliderSettings) do
+		lib.SetBiasSlider(unpack(packed, 1, 3))
+	end
+	setupSliderSettings = nil
+end
+
+lib.Processors = {}
+function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost, additional)
+	if (get("util.itemsuggest.enablett")) then
+		local text = lib.GetSuggestText(lib.Suggest(hyperlink, quantity), get("util.itemsuggest.usecolour"))
+		tooltip:AddLine(format("Suggestion: %s this item", text))
+	end
+end
+
+function lib.Processors.config(callbackType, gui)
+	if SetupConfigGui then SetupConfigGui(gui) end
+end
+
+function lib.Processors.configchanged()--(callbackType, ...)
+	LastLink = nil -- only necessary to nil one of the 4 cache values
+end
+lib.Processors.scanstats = lib.Processors.configchanged
+
+function lib.OnLoad()
+	--aucPrint("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	if OnLoadRunOnce then OnLoadRunOnce() end
+end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
