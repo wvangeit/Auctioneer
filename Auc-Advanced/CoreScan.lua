@@ -303,6 +303,7 @@ function lib.PushScan()
 		end
 		-- _print(("Pausing current scan at page {{%d}}."):format(private.curQuery.qryinfo.page+1))
 		if not private.scanStack then private.scanStack = {} end
+		private.StopStorePage()
 		tinsert(private.scanStack, {
 			private.scanStartTime,
 			private.sentQuery,
@@ -1972,45 +1973,45 @@ local StorePageFunction = function()
 		private.isGetAll = nil
 	end
 
-	-- Send the next page query or finish scanning
-	if isGetAll then
-		if not private.breakStorePage then
-			elapsed = GetTime() - private.scanStarted - private.totalPaused
-			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
-			-- Clear the getall output. We don't want to create a new query so use the hook
-			private.queryStarted = GetTime()
-			private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
-		end
-	elseif private.isScanning then
-		if (page+1 < maxPages) then
-			private.ScanPage(page + 1)
-		else
-			elapsed = GetTime() - private.scanStarted - private.totalPaused
-			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-			private.Commit(false, curQuery.pageError or false, false, false)
-		end
-	elseif (maxPages == page+1) then
-		local incomplete = false
-		for i = 0, maxPages-1 do
-			if not curPages[i] then
-				incomplete = true
-				break
+	if not private.breakStorePage then
+		-- Send the next page query or finish scanning
+		if isGetAll then
+				elapsed = GetTime() - private.scanStarted - private.totalPaused
+				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) -- page+2 signals that scan is done
+				private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
+				-- Clear the getall output. We don't want to create a new query so use the hook
+				private.queryStarted = GetTime()
+				private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
+		elseif private.isScanning then
+			if (page+1 < maxPages) then
+				private.ScanPage(page + 1)
+			else
+				elapsed = GetTime() - private.scanStarted - private.totalPaused
+				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
+				private.Commit(false, curQuery.pageError or false, false, false)
 			end
-		end
-		local wasEndOnly = false
-		if (incomplete) then
-			wasEndOnly = (curPages[maxPages-1] and true) or false
-			for i = 0, maxPages-3 do
+		elseif (maxPages == page+1) then
+			local incomplete = false
+			for i = 0, maxPages-1 do
 				if not curPages[i] then
-					wasEndOnly = false
+					incomplete = true
 					break
 				end
-			end		
+			end
+			local wasEndOnly = false
+			if (incomplete) then
+				wasEndOnly = (curPages[maxPages-1] and true) or false
+				for i = 0, maxPages-3 do
+					if not curPages[i] then
+						wasEndOnly = false
+						break
+					end
+				end		
+			end
+			elapsed = GetTime() - private.scanStarted - private.totalPaused
+			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
+			private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
 		end
-		elapsed = GetTime() - private.scanStarted - private.totalPaused
-		private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) --page starts at 0 so we need to add +1
-		private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
 	end
 	local endTime = GetTime()
 	RunTime = RunTime + endTime-lastPause
@@ -2023,13 +2024,14 @@ end
 
 function private.StopStorePage(silent)
 	if not CoStore or coroutine.status(CoStore) ~= "suspended" then return end
+	local isGetAll = private.isGetAll
 	-- flag to break out of the loop, or prevent the loop being entered, within the coroutine
 	private.breakStorePage = true
 	while coroutine.status(CoStore) == "suspended" do
 		CoroutineResume(CoStore)
 	end
 	private.breakStorePage = nil
-	if not silent then
+	if isGetAll and not silent then
 		message("Warning: GetAll scan is incomplete because it was interrupted")
 	end
 end
@@ -2278,7 +2280,9 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 
 	local query
 	if private.curQuery then
-		if private.QueryCompareParameters(private.curQuery, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
+		if not GetAll and not private.isGetAll
+		and private.QueryCompareParameters(private.curQuery, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) then
+			private.StopStorePage()
 			query = private.curQuery
 			if (nLog) then
 				nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending exisiting query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
