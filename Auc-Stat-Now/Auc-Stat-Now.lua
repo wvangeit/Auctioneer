@@ -50,11 +50,107 @@ local ceil,floor,max,min,sqrt,tonumber = ceil,floor,max,min,sqrt,tonumber
 ---- Iterator functions and select
 local select,ipairs,pairs = select,ipairs,pairs
 ---- Table functions
-local concat,tinsert=table.concat,table.insert
+local tconcat,tinsert,tsort=table.concat,table.insert,table.sort
 ---- String functions
 local strsplit,strfind=strsplit,strfind
 ---- Sundry functions
 local unpack,assert,type,time,wipe,QueryImage = unpack,assert,type,time,wipe,AucAdvanced.API.QueryImage
+--[[	QueryImage: A function used to get information from the current
+AH snapshot.  It can be called as follows:
+someTable = QueryImage(queryTable, serverKey, reserved, ...)
+where someTable becomes a table of results.  It's actually a table of
+	tables with the following numbered fields:
+		1 - item link
+		2 - iLvl
+		3 - item type
+		4 - item subtype
+		5 - item equip location
+		6 - item price (probably sell-to-vendor price)
+		7 - time left
+		8 - seen time
+		9 - name
+		10 - texture
+		11 - stack size
+		12 - quality
+		13 - Useable by the player
+		14 - min level to use
+		15 - minimum bid
+		16 - minimum increment
+		17 - buyout
+		18 - current bid
+		19 - If the player is the high bidder
+		20 - Seller of the item
+		21 - "flag"
+		22 - ID
+		23 - Item ID
+		24 - Suffix "of the _______"
+		25 - Factor
+		26 - Enchant
+		27 - Seed
+	entries of particular interest to us are itemID (Const.ITEMID),
+	suffix (Const.SUFFIX) and factor (Const.FACTOR), 
+	bid (Const.CURBID), buyout (Const.BUYOUT), and
+	stacksize (Const.STACKSIZE).  These should technically
+	be handled by importing Auctioneer's Constant table, ie
+local Const = AucAdvanced.API.Const
+
+queryTable is a table that may contain the following fields:
+	queryTable.itemId (self-explanatory, if missing, you loop the 
+		whole image for results, else you get just auctions for
+		the specified itemId.)
+	queryTable.name (searches the image for items that contain the
+		specified string in their names)
+	queryTable.link (searches the image for items that match the
+		supplied item link)
+	queryTable.suffix (searches the image for items matching the 
+		specified "of the _______", though this must be a
+		numerical code, not a string.)
+	queryTable.factor (not actually interesting for me, but I don't
+		want to forget what it is.  This is the suffixFactor
+		associated with random-enchant items)
+	queryTable.perItem (if this exists, the prices returned will be
+		returned as prices for one item, regardless of the stack
+		size for the auction in the image)
+There are many more possible fields, but these are the most pertinent to 
+this module.
+
+serverKey: the serverKey you're interested in.  This will always be
+	the current server in StatNow
+reserved: must always be nil
+Anything after 'reserved' only gets used if queryTable.filter exists.
+	queryTable.filter must be a function that can be passed two
+	arguments: a line of information from the snapshot and the
+	filter string.  If this function returns true, the item is
+	not included in the results that get from QueryImage.
+	--]]
+local constants = AucAdvanced.API.Const
+
+local function findmean(meantype,data)
+	if meantype == "trimmed" then
+		-- Sort the table by numerical value
+		tsort(data, function(a,b) return a[constants.BUYOUT]<b[constants.BUYOUT] end)
+		-- Determine the number of entries to remove from each end
+		local trim = floor(#data*(get("stat.now.trim")/100))
+		-- Now slice off the appropriate number of entries.
+		for i=1,trim do
+			tremove(data)
+			tremove(data,1)
+			i=i+1
+		end
+	end
+	-- Calculate the mean, variance, and Std. Dev.
+	local mean,variance,stddev = 0,0,0
+	for i=1,#data do
+		mean = mean + data[i][constants.BUYOUT]
+	end
+	mean = mean/#data
+	for i=1,#data do
+		variance = variance + (data[i][constants.BUYOUT]-mean)^2
+	end
+	variance = variance/#data
+	stddev = sqrt(variance)
+	return mean,variance,stddev
+end
 
 function lib.CommandHandler(command, ...)
 	local serverKey = GetFaction()
