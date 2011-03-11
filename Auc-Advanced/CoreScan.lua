@@ -892,6 +892,14 @@ end
 
 private.CommitQueue = {}
 
+function private.isFullyUnresolved(data)
+	local pos
+	for pos = 1, Const.LASTENTRY, 1 do
+		if (data[pos] and data[pos]~="") then return false end
+	end
+	return true
+end
+
 local CommitRunning = false
 local Commitfunction = function()
 	local startTime = GetTime()
@@ -938,6 +946,7 @@ local Commitfunction = function()
 	if get("scancommit.progressbar") then
 		lib.ProgressBars("CommitProgressBar", 0, true)
 	end
+	local unresolvedCount = 0
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
 
@@ -951,6 +960,8 @@ local Commitfunction = function()
 	local itemLinksTried, missingData = {}, false
 	for pos, data in ipairs(TempcurScan) do
 		local gt = GetTime()
+		local entryUnresolved = false
+		local entryUnusable = false
 		progresscounter = progresscounter + 1
 		if gt - lastPause >= processingTime then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
@@ -958,19 +969,22 @@ local Commitfunction = function()
 			coroutine.yield()
 			lastPause = GetTime()
 		end
-		if (not data[Const.SELLER]) then data[Const.SELLER] = "" end
-		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP])) then
+		if (not data[Const.SELLER] or data[Const.SELLER]=="") then data[Const.SELLER], entryUnresolved = "", true end
+		
+		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP]
+				and data[Const.ID] and data[Const.SUFFIX] and data[Const.FACTOR] and data[Const.ENCHANT] and data[Const.SEED])) then
 			local itemLink = data[Const.LINK]
 			if (not private.itemLinkDB[itemLink] and not itemLinksTried[itemLink]) then
 				itemLinksTried[itemLink] = true
 				local tmp = { GetItemInfo(itemLink) }
-				if (tmp[1] and tmp[2] and tmp[3] and tmp[4] and tmp[5] and tmp[6] and tmp[7] and tmp[8] and tmp[9] and tmp[10]) then
-					tmp[9] = Const.EquipEncode[tmp[9]]
+				if (tmp[1] and tmp[2] and tmp[3] and tmp[4] and tmp[5] and tmp[6] and tmp[7] and tmp[8] --[[ and tmp[9] (can be null) ]] and tmp[10]) then
+					if tmp[9] then
+						tmp[9] = Const.EquipEncode[tmp[9]]
+					end
 					_, tmp[11], tmp[12], tmp[13], tmp[14], tmp[15] = AucAdvanced.DecodeLink(itemLink)
 					private.itemLinkDB[itemLink] = tmp
 				end
 			end
-			
 			if (private.itemLinkDB[itemLink]) then
 				local idat = private.itemLinkDB[itemLink]
 				data[Const.ILEVEL] = idat[4]
@@ -982,20 +996,46 @@ local Commitfunction = function()
 				data[Const.FACTOR] = idat[13]			
 				data[Const.ENCHANT] = idat[14]
 				data[Const.SEED] = idat[15]
-			else
-				missingData = true
 			end
-		elseif (not data[Const.LINK]) then
-			missingData = true
+		end
+
+		local pos
+		for pos = 1, Const.LASTENTRY, 1 do
+			if (pos ~= Const.MININC and pos ~= Const.BUYOUT and pos ~= Const.CURBID and pos ~= Const.IEQUIP and pos ~= Const.AMHIGH and pos ~= Const.CANUSE and pos ~= Const.FLAG) then 
+				if ((not data[pos]) or data[pos]=="") then 
+					missingData = true
+					entryUnresolved = true
+					if (pos ~= Const.SELLER) then
+						entryUnusable = true
+						break
+					end
+				end
+			end
+		end
+
+
+		if (nLog and entryUnresolved) then
+			local tmp = TempcurScan[i]
+			-- Yes this is a mess.  However, it gives enough information to let us resolve problems in the future when blizzard breaks in a new way.
+			nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Incomplete Auction Seen",
+				(("%s%s%s%s%s%s"):format(
+				"Page %d, Index %d -- %s\n %s -- %d of %s sold by %s\n",
+				"Level %d, Quality %s, Item Level %s\n",
+				"Item Type %s, Sub Type %s, Equipment Position %s\n",
+				"Price %d, Bid %d, NextBid %d, MinInc %d, Buyout %d\n Time Left %s, Time %s\n",
+				"High Bidder %s  Can Use: %s  ID %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
+				"Texture: %s")):format(
+				data.PAGE, data.PAGEINDEX, (entryUnusable and "too broken, can not use at all") or "using with missed items blanked",
+				data[Const.LINK] or "(nil)", data[Const.COUNT] or -1, data[Const.NAME] or "(nil)", data[Const.SELLER] or "(UNKNOWN)", 
+				data[Const.ULEVEL] or -1, data[Const.QUALITY] or -1, data[Const.ILEVEL] or -1,data[Const.ITYPE] or -1, data[Const.ISUB] or -1, data[Const.IEQUIP] or '(n/a)',
+				data[Const.PRICE] or -1, data[Const.CURBID] or -1, data[Const.MINBID] or -1, data[Const.MININC] or -1, data[Const.BUYOUT] or -1,
+				data[Const.TLEFT] or -1, data[Const.TIME] or "(nil)", data[Const.AMHIGH] and "Yes" or "No", 
+				(data[Const.CANUSE]==false and "Yes") or (data[Const.CANUSE] and "No" or "(nil)"), data[Const.ID] or '(nil)', data[Const.ITEMID] or '(nil)',
+				data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.TEXTURE] or '(nil)'))
 		end
 	end
 
 	if (missingData) then
-		wasIncomplete = true
-		TempcurCommit.wasIncomplete = true
-		hadGetError = true
-		TempcurCommit.hadGetError = true
-		TempcurQuery.scanError = true
 		local i=#TempcurScan
 		while (i>0) do
 			local gt = GetTime()
@@ -1006,21 +1046,23 @@ local Commitfunction = function()
 				lastPause = GetTime()
 			end
 			local tmp = TempcurScan[i]
-			local removeInd = not tmp[Const.ILEVEL] or tmp[Const.ILEVEL] == -1 or not tmp[Const.LINK]
+			local pos
+			local removeInd = false
+			for pos = 1, Const.LASTENTRY, 1 do
+				if tmp[pos] or tmp[pos]=="" then removeInd=true break end
+			end
+			removeInd = removInd or tmp[pos]==-1
 			if (removeInd) then
-				if (nLog) then
-
-				local tmp = TempcurScan[i]
-				nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Bad Auction Seen",
-						("Page %d, Index %d\n %s -- %d of %s sold by %s\n %d,%s,%s,%s,%s,%s\n Price %d, Bid %d, NextBid %d, MinInc %d, Buyout %d\n Time Left %s, Time %s\n"):format(
-						tmp.PAGE, tmp.PAGEINDEX,
-						tmp[Const.LINK] or "(nil)", tmp[Const.COUNT] or -1, tmp[Const.NAME] or "(nil)", tmp[Const.SELLER] or "(nil)", tmp[Const.ULEVEL] or -1, tmp[Const.QUALITY] or -1, tmp[Const.ILEVEL] or -1,tmp[Const.ITYPE] or -1, tmp[Const.ISUB] or -1, tmp[Const.IEQUIP] or -1,
-						tmp[Const.PRICE] or -1, tmp[Const.CURBID] or -1, tmp[Const.MINBID] or -1, tmp[Const.MININC] or -1, tmp[Const.BUYOUT] or -1,
-						tmp[Const.TLEFT] or -1, tmp[Const.TIME] or "(nil)"))
+				unresolvedCount = unresolvedCount + 1
+				if not private.fullyUnresolved(tmp) then
+					-- We got absolutely nothing about the auction.
+					wasIncomplete = true
+					TempcurCommit.wasIncomplete = true
+					hadGetError = true
+					TempcurCommit.hadGetError = true
+					TempcurQuery.scanError = true
 				end
 				tremove(TempcurScan, i)
-				hadGetError = true
-				TempcurCommit.hadGetError = true
 			end
 			i = i -1
 		end
@@ -1245,10 +1287,10 @@ local Commitfunction = function()
 	end
 
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
-	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
+	if (oldCount - unresolvedCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
 		if nLog then
 			nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Current Count Discrepency Seen",
-				("%d - %d - %d + %d + %d - %d != %d"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
+				("%d - %d - %d - %d + %d + %d - %d != %d"):format(oldCount, unresolvedCount, earlyDeleteCount, expiredDeleteCount,
 					newCount, filterNewCount, filterDeleteCount, currentCount))
 		end
 	end
@@ -1531,42 +1573,6 @@ function private.ScanPage(nextPage, really)
 		private.verifyStart = nil
 	end
 end
---[[
-function private.HasAllData()
-	local check = private.nextCheck
-	if not check then return true end
-	local now = GetTime()
-	if now > check then -- Wait at least 1 second before checking
-		-- Check to see if we have all the page data
-		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
-		if not private.NoOwnerList then
-			private.NoOwnerList = {}
-			for i = 1, numBatchAuctions do
-				private.NoOwnerList[i] = i
-			end
-		end
-		local _, owner = 0, {}
-		for i, j in ipairs(private.NoOwnerList) do
-			_,_,_,_,_,_,_,_,_,_,_,owner[j] = GetAuctionItemInfo("list", j)
-		end
-		for i = #private.NoOwnerList, 1, -1 do
-			local j = private.NoOwnerList[i]
-			if owner[j] then
-				-- Remove from the lookuptable
-				tremove(private.NoOwnerList, i)
-			end
-		end
-		if #private.NoOwnerList ~= 0 then
-			private.nextCheck = now + 0.1
-			return false
-		end
-		private.NoOwnerList = nil
-		return true
-	end
-	return false
-end
-]]
-
 
 function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 	if (not private.itemLinkDB) then private.itemLinkDB = {} end
@@ -1639,7 +1645,7 @@ function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 		itemData[Const.ULEVEL] = level or itemData[Const.ULEVEL]
 		itemData[Const.CURBID] = bidAmount or 0
 		itemData[Const.AMHIGH] = highBidder and true or false
-
+		itemData[Const.MININC] = minIncrement or itemData[Const.MININC]
 		buyoutPrice = buyoutPrice or itemData[Const.BUYOUT] or 0
 		itemData[Const.BUYOUT] = buyoutPrice
 		
@@ -1738,7 +1744,8 @@ function lib.GetAuctionSellItem(minBid, buyoutPrice, runTime)
 end
 
 function private.isComplete(itemData)
-	return itemData and itemData[1] and itemData[20] and true
+	return itemData and itemData[Const.LINK] and itemData[Const.TLEFT] and itemData[Const.SELLER] and true,
+		itemData and itemData[Const.LINK] and itemData[Const.TLEFT] and true
 end
 
 local StorePageFunction = function()
@@ -1815,6 +1822,17 @@ local StorePageFunction = function()
 	local getallspeed = (get("GetAllSpeed") or 500)*4
 
 	local storecount = 0
+	local sellerOnly = true
+	
+	local missedCounts, remissedCounts, switchCounts, mc = {}, {}, nil, nil
+	for i = 1, Const.LASTENTRY do
+		missedCounts[i] = 0
+	end
+	local resolvedCounts = {}
+	for i = 1, Const.LASTENTRY do
+		remissedCounts[i] = 0
+	end
+	
 	if not private.breakStorePage and (page > curQuery.qryinfo.page) then
 		local itemLinksTried = {}
 		local retries = { }
@@ -1830,17 +1848,27 @@ local StorePageFunction = function()
 						break
 					end
 				end
-			end
+			end 
 
 			local itemData = private.GetAuctionItem("list", page, i, itemLinksTried)
+
 			if (itemData) then
-				if (private.isComplete(itemData)) then
+				local isComplete, completeMinusSeller = private.isComplete(itemData)
+				if (isComplete) then
 					tinsert(curScan, itemData)
 					storecount = storecount + 1
 				else
+					for mc = 1, Const.LASTENTRY do
+						missedCounts[mc] = missedCounts[mc] + ((itemData[mc] and 0) or 1)
+					end
+						sellerOnly = sellerOnly and completeMinusSeller
 					tinsert(retries, { i, itemData })
 				end
 			else
+				for mc = 1, Const.LASTENTRY do
+					missedCounts[mc] = missedCounts[mc] + ((itemData[mc] and 0) or 1)
+				end
+				sellerOnly = false
 				tinsert(retries, { i, nil })
 			end
 		end
@@ -1853,7 +1881,8 @@ local StorePageFunction = function()
 
 		local newRetries = { }
 		local readCount = 1
-		while (#retries > 0 and tryCount < maxTries and not private.breakStorePage) do
+		while (#retries > 0 and tryCount < maxTries and ((not sellerOnly) or get("core.scan.sellernamedelay")) and not private.breakStorePage) do
+			sellerOnly = true
 			itemLinksTried = {}
 			tryCount = tryCount + 1
 			RunTime = RunTime + GetTime()-lastPause
@@ -1880,31 +1909,61 @@ local StorePageFunction = function()
 				itemData = private.GetAuctionItem("list", page, i[1], itemLinksTried, i[2])
 
 				if (itemData) then
-					if (private.isComplete(itemData)) then
+					local isComplete, completeMinusSeller = private.isComplete(itemData)
+					if (isComplete) then
 						tinsert(curScan, itemData)
 						storecount = storecount + 1
 					else
+						for mc = 1, Const.LASTENTRY do
+							remissedCounts[mc] = remissedCounts[mc] + ((itemData[mc] and 0) or 1)
+						end
+						sellerOnly = sellerOnly and completeMinusSeller
 						tinsert(newRetries, { i[1], itemData })
 					end
 				else
+					for mc = 1, Const.LASTENTRY do
+						remissedCounts[mc] = remissedCounts[mc] + ((itemData[mc] and 0) or 1)
+					end
+					sellerOnly = false
 					tinsert(newRetries, i)
 				end
 			end
 
 			if (#retries ~= #newRetries) then
 				if nLog then
+					local resolvedMap = ""
+					local missingMap = ""
+					resolvedMap = ("%d"):format(missedCounts[1]-remissedCounts[1])
+					missingMap = ("%d"):format(remissedCounts[1])
+					for mc = 2, Const.LASTENTRY do
+						resolvedMap = ("%s,%d"):format(resolvedMap,missedCounts[mc]-remissedCounts[mc])
+						missingMap = ("%s,%d"):format(missingMap,remissedCounts[mc])
+						if mc==Const.SELLER then
+							resolvedMap = resolvedMap.."*"
+							missingMap = missingMap.."*"
+						elseif mc==Const.IEQUIP then
+							resolvedMap = resolvedMap.."-"
+							missingMap = missingMap.."-"
+						end
+					end
+					
 					nLog.AddMessage("Auctioneer", "Scan", N_INFO, 
 						("StorePage Retry Successful Page %d"):format(page),
-						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nPage Elapsed Time: %.2fs"):format(page, tryCount, #retries - #newRetries, #newRetries, GetTime() - startTime))
+						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nPage Elapsed Time: %.2fs\nResolved:\n %s\nRemaining Unresolved:\n %s\nSeller Only Remaining: %s,   Wait on Only Seller: %s"):format(page, tryCount, 
+							#retries - #newRetries, #newRetries, GetTime() - startTime, resolvedMap, missingMap, sellerOnly and "True" or "False"), get("core.scan.sellernamedelay") and "True" or "False")
 				end
 				-- Found at least one.  Reset retry delay.
 				tryCount = 0
+			end
+			for mc = 1, Const.LASTENTRY do
+				missedCounts[mc]=remissedCounts[mc]
+				remissedCounts[mc]=0
 			end
 			retries = newRetries
 			newRetries = { }
 		end
 
-		local names_missed, both_missed, links_missed = 0,0,0;
+		local names_missed, all_missed, ld_and_names_missed, links_missed, link_data_missed = 0,0,0,0,0
 		for _, i in ipairs(retries) do
 			if isGetAll and ((readCount % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 				local gt = GetTime()
@@ -1920,19 +1979,25 @@ local StorePageFunction = function()
 			-- Put it to scan and let the commit routine deal with it.
 			if (not i[2][Const.SELLER] and not i[2][Const.LINK]) then 
 				i[2][Const.SELLER] = "" 
-				both_missed = both_missed + 1
-			elseif (not i[2][Const.SELLER]) then 
+				all_missed = all_missed + 1
+			elseif (not i[2][Const.SELLER] and not i[2][Const.ITEMID]) then 
 				i[2][Const.SELLER] = "" 
-				names_missed = names_missed + 1
+				ld_and_names_missed = ld_and_names_missed + 1
+			elseif (not i[2][Const.SELLER]) then
+				i[2][Const.SELLER] = "" 
+				all_missed = all_missed + 1
 			elseif (not i[2][Const.LINK]) then 
 				links_missed = links_missed + 1
+			elseif (not i[2][Const.ITEMID]) then
+				link_data_missed = link_data_missed + 1
 			end
 			tinsert(curScan, i[2])
 		end		
 		
 		if nLog and #retries > 0 then
-			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Resolution Failure Page %d"):format(page),
-				("Page: %d\nRetries Setting: %d\nUnresolved Entries: %d\nMissing Names: %d, Missing Links: %d, Missing Both: %d"):format(page, maxTries, #retries, names_missed, links_missed,both_missed))
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("StorePage Incomplete Resolution of Page %d"):format(page),
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries: %d\nMissing Everything: %d, Just Names: %d, Just Links (and link data): %d, Names and Link Data: %d, Link Data: %d"):format(page, 
+				maxTries, #retries, all_missed, names_missed, links_missed, ld_and_names_missed, link_data_missed ))
 		end
 
 		if (storecount > 0) then
