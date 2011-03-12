@@ -164,6 +164,7 @@ local tonumber = tonumber
 local GetTime = GetTime
 
 private.isScanning = false
+private.auctionItemListUpdated = false
 
 function private.LoadScanData()
 	if not private.loadingScanData then
@@ -1565,10 +1566,12 @@ function private.ScanPage(nextPage, really)
 		end
 		private.sentQuery = true
 		private.queryStarted = GetTime()
+		private.auctionItemListUpdated = false
 		private.Hook.QueryAuctionItems(private.curQuery.name or "",
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
 			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
 			private.curQuery.isUsable, private.curQuery.quality)
+			
 		AuctionFrameBrowse.page = nextPage
 
 		-- The maximum time we'll wait for the pagedata to be returned to us:
@@ -1990,7 +1993,7 @@ local StorePageFunction = function()
 				ld_and_names_missed = ld_and_names_missed + 1
 			elseif (not i[2][Const.SELLER]) then
 				i[2][Const.SELLER] = "" 
-				all_missed = all_missed + 1
+				names_missed = names_missed + 1
 			elseif (not i[2][Const.LINK]) then 
 				links_missed = links_missed + 1
 			elseif (not i[2][Const.ITEMID]) then
@@ -2355,7 +2358,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			private.StopStorePage()
 			query = private.curQuery
 			if (nLog) then
-				nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending exisiting query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
+				nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("Sending existing query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 			end
 		else
 			private.Commit(true, private.curQuery.pageError or false, false, false)
@@ -2389,6 +2392,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	lib.lastReq = GetTime()
 
 	private.queryStarted = GetTime()
+	private.auctionItemListUpdated = false
 	return private.QuerySent(query, isSearch,
 		private.Hook.QueryAuctionItems(
 			name or "", minLevel or "", maxLevel or "", invTypeIndex, classIndex, subclassIndex,
@@ -2484,7 +2488,7 @@ function private.OnUpdate(me, dur)
 			return
 		end
 
-		if private.sentQuery then
+		if private.sentQuery and private.auctionItemListUpdated then
 			if CanSendAuctionQuery() then
 				timeoutCanSend = 0
 				lib.StorePage()
@@ -2770,12 +2774,13 @@ end
 
 internal.Scan = {}
 function internal.Scan.NotifyItemListUpdated()
---	if private.scanStarted then
---		if (nLog) then
---			local startTime = GetTime()
---			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyItemListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyItemListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted))
---		end
---	end
+	if private.scanStarted then
+		private.auctionItemListUpdated = true
+		if (nLog) then
+			local startTime = GetTime()
+			nLog.AddMessage("Auctioneer", "Scan", N_INFO, ("NotifyItemListUpdated Called %fs after Query Start"):format(startTime - private.scanStarted), ("NotifyItemListUpdated Called %f seconds from query to be called"):format(startTime - private.scanStarted))
+		end
+	end
 end
 
 function internal.Scan.NotifyOwnedListUpdated()
