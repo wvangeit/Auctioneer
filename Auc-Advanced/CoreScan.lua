@@ -1475,7 +1475,12 @@ local CoCommit, CoStore
 local function CoroutineResume(...)
 	local status, result = coroutine.resume(...)
 	if not status and result then
-		geterrorhandler()("Error occurred in coroutine: "..result, nil, debugstack((...)));
+		local msg = "Error occurred in coroutine: "..result
+		if Swatter then
+			Swatter.OnError(msg, nil, debugstack((...)))
+		else
+			geterrorhandler()(msg)
+		end
 	end
 	return status, result
 end
@@ -1950,7 +1955,7 @@ local StorePageFunction = function()
 					nLog.AddMessage("Auctioneer", "Scan", N_INFO, 
 						("StorePage Retry Successful Page %d"):format(page),
 						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nPage Elapsed Time: %.2fs\nResolved:\n %s\nRemaining Unresolved:\n %s\nSeller Only Remaining: %s,   Wait on Only Seller: %s"):format(page, tryCount, 
-							#retries - #newRetries, #newRetries, GetTime() - startTime, resolvedMap, missingMap, sellerOnly and "True" or "False"), get("core.scan.sellernamedelay") and "True" or "False")
+							#retries - #newRetries, #newRetries, GetTime() - startTime, resolvedMap, missingMap, sellerOnly and "True" or "False", get("core.scan.sellernamedelay") and "True" or "False"))
 				end
 				-- Found at least one.  Reset retry delay.
 				tryCount = 0
