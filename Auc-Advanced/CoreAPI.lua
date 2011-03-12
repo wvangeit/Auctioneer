@@ -491,6 +491,8 @@ end
 function lib.IsBlocked()
 	return private.isBlocked == true
 end
+
+
 --[[Progress bars that are usable by any addon.
 name = string - unique bar name
 value =  0-100   the % the bar should be filled
@@ -502,9 +504,9 @@ options = table containing formatting commands.
 
 value, text, color, and options are all optional variables
 ]]
-local availableBars = {}
-local NumGenericBars = 0
---generate new bars as needed
+local ProgressBarFrames = {}
+local ActiveProgressBars = {}
+-- generate new bars as needed
 local function newBar()
 	local bar = CreateFrame("STATUSBAR", nil, UIParent, "TextStatusBar")
 	bar:SetWidth(300)
@@ -528,23 +530,23 @@ local function newBar()
 	bar.text:SetJustifyV("CENTER")
 	bar.text:SetTextColor(1,1,1)
 
-	if NumGenericBars < 1 then
-		bar:SetPoint("CENTER", UIParent, "CENTER", -5,5)
-	else--attach to previous bar
-		bar:SetPoint("BOTTOM", lib["GenericProgressBar"..NumGenericBars], "TOP", 0, 0)
+	tinsert(ProgressBarFrames, bar)
+	local newID = #ProgressBarFrames
+
+	if newID > 1 then
+		-- attach to previous bar
+		bar:SetPoint("BOTTOM", ProgressBarFrames[newID-1], "TOP", 0, 0)
 	end
-	NumGenericBars = NumGenericBars + 1
-	lib["GenericProgressBar"..(NumGenericBars)] = bar
-	return NumGenericBars
+	return newID
 end
---create 1 bar to start for anchoring
+-- create 1 bar to start for anchoring
 newBar()
 -- handles the rendering
 local function renderBars(ID, name, value, text, options)
-	local self = lib["GenericProgressBar"..ID]
+	local self = ProgressBarFrames[ID]
 	if not self then assert("No bar found available for ID", ID, name, text) end
 
-	--reset all generated bars that are not inuse to defaults
+	-- reset bars that are not in use to defaults
 	if self and not name then
 		self:Hide()
 		self.text:SetText("")
@@ -564,7 +566,7 @@ local function renderBars(ID, name, value, text, options)
 	end
 	--[[options is a table that contains, "tweaks" ie text or bar color changes
 	Nothing below this line will be processed unless an options table is passed]]
-	if not options or type(options) ~= "table" then return end
+	if not options then return end
 
 	--change bars color
 	local barColor = options.barColor
@@ -587,46 +589,49 @@ local function renderBars(ID, name, value, text, options)
 end
 --main entry point. Handles which bar will be assigned and recycling bars
 function lib.ProgressBars(name, value, show, text, options)
-	--setup parent so we can display even if AH is closed
+	-- reanchor first bar so we can display even if AH is closed
 	if AuctionFrame and AuctionFrame:IsShown() then
-		lib.GenericProgressBar1:SetParent(AuctionFrame)
-		lib.GenericProgressBar1:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5)
+		ProgressBarFrames[1]:SetPoint("TOPRIGHT", AuctionFrame, "TOPRIGHT", -5, 5)
 	else
-		lib.GenericProgressBar1:SetParent(UIParent)
+		ProgressBarFrames[1]:SetPoint("CENTER", UIParent, "CENTER", -5,5)
 	end
-	if not name then return end
 
-	--find a generic bar available for use
-	local ID = availableBars[name]
-	if show and not ID then --find a bar
-		for i = 1, NumGenericBars do
-			if not availableBars[i] then
-				availableBars[i] = {name, value, text, options}
-				availableBars[name] = i
-				ID = i
-				break
-			end
-		end
-		--no bar available make a new one
-		if not ID then
-			ID = newBar()
-			availableBars[ID] = {name, value, text, options}
-			availableBars[name] = ID
-		end
-	end
-	--Render Bars
+	if type(name) ~= "string" then return end
+	if value and type(value) ~= "number" then return end
+	if options and type(options) ~= "table" then options = nil end
+
+	local ID = ActiveProgressBars[name]
 	if show then
+		if ID then -- this is a live bar; update the data table
+			local barData = ActiveProgressBars[ID]
+			assert(barData[1] == name) -- ### debug
+			if value then barData[2] = value end
+			if text then barData[3] = text end
+			if options then barData[4] = options end
+		else -- initialize data table for new bar
+			-- get an available bar
+			local test = #ActiveProgressBars + 1
+			if ProgressBarFrames[test] then
+				ID = test
+			else
+				ID = newBar()
+			end
+			ActiveProgressBars[ID] = {name, value, text, options}
+			ActiveProgressBars[name] = ID
+		end
 		renderBars(ID, name, value, text, options)
-	else
-		table.remove(availableBars, ID)
-		availableBars[name] = nil
-		--ReRender bars
-		for ID = 1, NumGenericBars do
-			if availableBars[ID] then
-				local barData = availableBars[ID]
-				renderBars(ID, barData[1], barData[2], barData[3], barData[4])
-			else--blank bars
-				renderBars(ID)
+	elseif ID then
+		tremove(ActiveProgressBars, ID)
+		ActiveProgressBars[name] = nil
+		-- move down and re-render higher bars
+		for renderID = 1, #ActiveProgressBars + 1 do
+			-- first reset/hide every bar
+			renderBars(renderID)
+			-- then if it is in use re-render from the data table
+			local barData = ActiveProgressBars[renderID]
+			if barData then
+				ActiveProgressBars[barData[1]] = renderID -- update 'name' lookup entry
+				renderBars(renderID, barData[1], barData[2], barData[3], barData[4])
 			end
 		end
 	end
