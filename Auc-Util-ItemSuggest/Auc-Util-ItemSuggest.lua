@@ -44,7 +44,7 @@ local ConfigGUI, ConfigID
 local SliderLast, SliderSpacer
 
 local Suggestors = {}
-local setupSliderSettings = {}
+local setupSliderSettings, setupGUICallbacks = {}, {}
 
 --[[ Library functions ]]--
 
@@ -88,6 +88,11 @@ function lib.Suggest(hyperlink, quantity)
 end
 lib.itemsuggest = lib.Suggest -- compatibility
 
+--[[ NewSuggest
+	Add a new suggestor to ItemSuggest
+	key must be a string, and each suggestor must use a different key
+	valueFunc must be a function of the form: value = valueFunc(hyperlink, quantity)
+--]]
 function lib.NewSuggest(key, valueFunc, biasSetting, options)
 	if type(key) ~= "string" or type(valueFunc) ~= "function" or (options and type(options) ~= "table") then
 		return nil, "Invalid parameter(s)"
@@ -114,6 +119,9 @@ function lib.NewSuggest(key, valueFunc, biasSetting, options)
 	return true
 end
 
+--[[ SetSuggestText
+	Change the display text and colour for a suggestor
+--]]
 function lib.SetSuggestText(key, text, colR, colG, colB)
 	local data = Suggestors[key]
 	if not data then return end
@@ -148,6 +156,9 @@ function lib.GetSuggestText(key, useCol)
 	return "Unknown"
 end
 
+--[[ SetBiasSlider
+	Allows a module to insert a bias slider into ItemSuggest's configuration page
+--]]
 function lib.SetBiasSlider(key, sliderText, tipText)
 	local data = Suggestors[key]
 	if not data or not data.bias or data.slider then return end
@@ -179,6 +190,32 @@ function lib.SetBiasSlider(key, sliderText, tipText)
 	ConfigGUI:SetLast(ConfigID, oldLast)
 
 	return true
+end
+
+--[[ GetGUI
+	Allows another module to add settings to ItemSuggest's configuration tab
+	This is done via a callback function, which will be triggered after ItemSuggest has created its GUI
+	The calling module is expected to leave the GUI in a useable state for the next module
+--]]
+do
+	local keyused = { -- treat our own keys as "used"
+		Auction = true,
+		Disenchant=true,
+		Prospect = true,
+		Mill = true,
+		Convert = true,
+		Vendor = true,
+	}
+	function lib.GetGUI(key, callback)
+		if keyused[key] or not Suggestors[key] then return end
+		keyused[key] = true
+		if ConfigGUI then
+			callback(ConfigGUI, ConfigID)
+		else
+			tinsert(setupGUICallbacks, callback)
+		end
+		return true
+	end
 end
 
 --[[ Built-in Suggestors ]]--
@@ -552,6 +589,10 @@ local function SetupConfigGui(gui)
 		lib.SetBiasSlider(unpack(packed, 1, 3))
 	end
 	setupSliderSettings = nil
+	for _, callback in ipairs(setupGUICallbacks) do
+		callback(ConfigGUI, ConfigID)
+	end
+	setupGUICallbacks = nil
 end
 
 lib.Processors = {}
