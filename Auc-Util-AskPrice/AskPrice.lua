@@ -73,11 +73,11 @@ function lib.OnLoad(addon)
 
 	--Do our addon message event registration
 	private.frame:RegisterEvent("CHAT_MSG_ADDON")
-	if (RegisterAddonMessagePrefix and (type(RegisterAddonMessagePrefix) == 'function')) {
-		if (not RegisterAddonMessagePrefix("AucAdvAskPrice")) {
+	if (RegisterAddonMessagePrefix and (type(RegisterAddonMessagePrefix) == 'function')) then
+		if (not RegisterAddonMessagePrefix("AucAdvAskPrice")) then
 			print("Too many addons have registered for an addon communication prefix via RegisterAddonMessagePrefix(), disable some of the others so that {{AskPrice}} can work.")
-		}
-	}
+		end
+	end
 
 
 	private.frame:SetScript("OnEvent", private.onEvent)
