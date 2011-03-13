@@ -69,9 +69,16 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("CHAT_MSG_PARTY")
 	private.frame:RegisterEvent("CHAT_MSG_GUILD")
 	private.frame:RegisterEvent("CHAT_MSG_RAID")
-	private.frame:RegisterEvent("CHAT_MSG_BN_WHISPER");
+	private.frame:RegisterEvent("CHAT_MSG_BN_WHISPER")
 
+	--Do our addon message event registration
 	private.frame:RegisterEvent("CHAT_MSG_ADDON")
+	if (RegisterAddonMessagePrefix and (type(RegisterAddonMessagePrefix) == 'function')) {
+		if (not RegisterAddonMessagePrefix("AucAdvAskPrice")) {
+			print("Too many addons have registered for an addon communication prefix via RegisterAddonMessagePrefix(), disable some of the others so that {{AskPrice}} can work.")
+		}
+	}
+
 
 	private.frame:SetScript("OnEvent", private.onEvent)
 	private.frame:SetScript("OnUpdate", private.onUpdate)
