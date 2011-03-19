@@ -973,7 +973,7 @@ local Commitfunction = function()
 		if (not data[Const.SELLER] or data[Const.SELLER]=="") then data[Const.SELLER], entryUnresolved = "", true end
 		
 		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP]
-				and data[Const.ID] and data[Const.SUFFIX] and data[Const.FACTOR] and data[Const.ENCHANT] and data[Const.SEED])) then
+				and data[Const.ITEMID] and data[Const.SUFFIX] and data[Const.FACTOR] and data[Const.ENCHANT] and data[Const.SEED])) then
 			local itemLink = data[Const.LINK]
 			if (not private.itemLinkDB[itemLink] and not itemLinksTried[itemLink]) then
 				itemLinksTried[itemLink] = true
@@ -992,7 +992,7 @@ local Commitfunction = function()
 				data[Const.ITYPE] = idat[6]
 				data[Const.ISUB] = idat[7]
 				data[Const.IEQUIP] = idat[9]
-				data[Const.ID] = idat[11]
+				data[Const.ITEMID] = idat[11]
 				data[Const.SUFFIX] = idat[12]
 				data[Const.FACTOR] = idat[13]			
 				data[Const.ENCHANT] = idat[14]
