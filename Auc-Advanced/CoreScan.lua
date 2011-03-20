@@ -893,7 +893,7 @@ end
 
 private.CommitQueue = {}
 
-function private.isFullyUnresolved(data)
+function private.isFullyUnresolved(data) -- function not used?
 	local pos
 	for pos = 1, Const.LASTENTRY, 1 do
 		if (data[pos] and data[pos]~="") then return false end
@@ -1008,6 +1008,7 @@ local Commitfunction = function()
 					entryUnresolved = true
 					if (pos ~= Const.SELLER) then
 						entryUnusable = true
+						data.UNUSABLE = true -- temp patch, see below
 						break
 					end
 				end
@@ -1047,22 +1048,25 @@ local Commitfunction = function()
 				lastPause = GetTime()
 			end
 			local tmp = TempcurScan[i]
+			--[[
 			local pos
 			local removeInd = false
 			for pos = 1, Const.LASTENTRY, 1 do
-				if tmp[pos] or tmp[pos]=="" then removeInd=true break end
+				if tmp[pos] or tmp[pos]=="" then removeInd=true break end -- this will *always* set removeInd to true!
 			end
-			removeInd = removInd or tmp[pos]==-1
+			removeInd = removInd or tmp[pos]==-1 -- removInd (misspelled) is usually nil. pos is always nil here
 			if (removeInd) then
+			--]]
+			if tmp.UNUSABLE then
 				unresolvedCount = unresolvedCount + 1
-				if not private.fullyUnresolved(tmp) then
+				--if not private.fullyUnresolved(tmp) then -- function does not exist
 					-- We got absolutely nothing about the auction.
 					wasIncomplete = true
 					TempcurCommit.wasIncomplete = true
 					hadGetError = true
 					TempcurCommit.hadGetError = true
 					TempcurQuery.scanError = true
-				end
+				--end
 				tremove(TempcurScan, i)
 			end
 			i = i -1
@@ -1279,19 +1283,19 @@ local Commitfunction = function()
 	lib.ProgressBars("CommitProgressBar", 100, true, "Auctioneer: Processing Finished")
 
 	local currentCount = #scandata.image
-	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount ~= scanCount) then
+	if (updateCount + sameCount + newCount + filterNewCount + filterOldCount + unresolvedCount ~= scanCount) then
 		if nLog then
 			nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Scan Count Discrepency Seen",
-				("%d updated + %d same + %d new + %d filtered != %d scanned"):format(updateCount, sameCount,
-					newCount, filterOldCount+filterNewCount, scanCount))
+				("%d updated + %d same + %d new + %d filtered + %d unresolved != %d scanned"):format(updateCount, sameCount,
+					newCount, filterOldCount+filterNewCount, unresolvedCount, scanCount))
 		end
 	end
 
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
-	if (oldCount - unresolvedCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
+	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
 		if nLog then
 			nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "Current Count Discrepency Seen",
-				("%d - %d - %d - %d + %d + %d - %d != %d"):format(oldCount, unresolvedCount, earlyDeleteCount, expiredDeleteCount,
+				("%d - %d - %d + %d + %d - %d != %d"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
 					newCount, filterNewCount, filterDeleteCount, currentCount))
 		end
 	end
