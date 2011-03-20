@@ -121,6 +121,9 @@ AucAdvanced.Const = {
 	SEED = 27,
 	LASTENTRY = 27, -- Used to determine how many entries the table has when copying (some entries can be nil so # won't work)
 
+	ScanPosLabels = {"LINK", "ILEVEL", "ITYPE", "ISUB", "IEQUIP", "PRICE", "TLEFT", "TIME", "NAME", "TEXTURE", "COUNT", "QUALITY", "CANUSE", "ULEVEL", "MINBID", "MININC",
+		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "ID", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
+	
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,
 	FLAG_FILTER = 4,
