@@ -65,7 +65,6 @@ local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "(.+)")
 ]]
 local reportTotalMail, reportReadMail = 0, 0 --Used as a debug check on mail scanning engine
 
-local registeredAltaholicHook = false
 local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
@@ -128,7 +127,8 @@ function private.updateInboxStart()
 	reportTotalMail = GetInboxNumItems()
 	for n = reportTotalMail, 1, -1 do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and subject and (not wasRead or private.mailReadOveride[n]) then
+		if subject == "" then debugPrint("Skipping mail #", n, "The server is not sending the subject data. Mail will be left unread and we will retry") end
+		if sender and subject and subject ~= "" and (not wasRead or private.mailReadOveride[n]) then -- subject ~= "" when the server fails, this will prevent us from reading the mail giving the server more time to get its shit togather
 			local auctionHouse --A, H, N flag for which AH the trxn came from
 			if sender ==_BC('MailAllianceAuctionHouse') then
 				auctionHouse = "A"
@@ -137,9 +137,8 @@ function private.updateInboxStart()
 			elseif sender == _BC('MailNeutralAuctionHouse') then
 				auctionHouse = "N"
 			end
-			if subject == "" then debugPrint("Skipping mail #", n, "The server is not sending the subject data. Mail will be left unread and we will retry") end
-			
-			if auctionHouse and subject ~= "" then -- subject ~= "" when the server fails, this will prevent us from reading the mail giving the server more time to get its shit togather
+
+			if auctionHouse then
 				private.HideMailGUI(true)
 				wasRead = wasRead or 0 --its nil unless its has been read
 				local itemLink = GetInboxItemLink(n, 1)
@@ -422,7 +421,7 @@ function private.sortCompletedBidsBuyouts( i )
 	local reason = private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
 	if itemID then
 		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
-		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], deposite, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
+		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], nil, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
 		if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
 			private.databaseAdd("completedBidsBuyouts", private.reconcilePending[i]["itemLink"], nil, value)
 		else
@@ -430,7 +429,7 @@ function private.sortCompletedBidsBuyouts( i )
 		end
 		--debugPrint("databaseAdd completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"])
 	else
-		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], value, "index", private.reconcilePending[i].n)
+		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
 	end
 
 	tremove(private.reconcilePending,i)

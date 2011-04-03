@@ -373,7 +373,7 @@ function private.CreateFrames()
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
 	frame.exactCheck:SetChecked(get("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
-	frame.exactCheck:SetScript("OnClick", function() local on if frame.exactCheck:GetChecked() then on = true end set("util.beancounter.ButtonExactCheck", on) private.wipeSearchCache() end)
+	frame.exactCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonExactCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterexactCheckText"]:SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.exactCheck, _BC('TT_ExactCheck')) end) --"Only match the Exact text in the search box"
 	frame.exactCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -381,9 +381,9 @@ function private.CreateFrames()
 	--search classic data
 	frame.neutralCheck = CreateFrame("CheckButton", "BeancounterneutralCheck", frame, "OptionsCheckButtonTemplate")
 	frame.neutralCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
-	frame.neutralCheck:SetScript("OnClick", function() local on if frame.neutralCheck:GetChecked() then on = true end set("util.beancounter.ButtonneutralCheck", on) private.wipeSearchCache() end)
+	frame.neutralCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonneutralCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterneutralCheckText"]:SetText(_BC('UiNeutralCheckBox'))
-	frame.neutralCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)
+	frame.neutralCheck:SetPoint("TOP", frame.exactCheck, "BOTTOM", 0, 0)
 	frame.neutralCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.neutralCheck, _BC('TT_neutralCheck')) end) --"Display results from BeanCounter Classic Database"
 	frame.neutralCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
@@ -392,7 +392,7 @@ function private.CreateFrames()
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(get("util.beancounter.ButtonBidCheck"))
-	frame.bidCheck:SetScript("OnClick", function() local on if frame.bidCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidCheck", on) private.wipeSearchCache() end)
+	frame.bidCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonBidCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterbidCheckText"]:SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
@@ -403,20 +403,20 @@ function private.CreateFrames()
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(get("util.beancounter.ButtonBidFailedCheck"))
-	frame.bidFailedCheck:SetScript("OnClick", function() local on if frame.bidFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonBidFailedCheck", on) private.wipeSearchCache() end)
+	frame.bidFailedCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonBidFailedCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	frame.bidFailedCheck:SetScale(0.85)
 	_G["BeancounterbidFailedCheckText"]:SetText(_BC('UiOutbids'))
-	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
+	frame.bidFailedCheck:SetPoint("TOP", frame.bidCheck, "BOTTOM", 0, 0)
 	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidFailedCheck, _BC('TT_BidFailedCheck')) end) --"Display items you were outbided on."
 	frame.bidFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(get("util.beancounter.ButtonAuctionCheck"))
-	frame.auctionCheck:SetScript("OnClick", function() local on if frame.auctionCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionCheck", on) private.wipeSearchCache() end)
+	frame.auctionCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonAuctionCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterauctionCheckText"]:SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
-	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
+	frame.auctionCheck:SetPoint("TOP", frame.bidFailedCheck, "BOTTOM", 0, 0)
 	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, _BC('TT_AuctionCheck')) end) --"Display items sold at the Auction House"
 	frame.auctionCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
@@ -424,10 +424,10 @@ function private.CreateFrames()
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(get("util.beancounter.ButtonAuctionFailedCheck"))
-	frame.auctionFailedCheck:SetScript("OnClick", function() local on if frame.auctionFailedCheck:GetChecked() then on = true end set("util.beancounter.ButtonAuctionFailedCheck", on) private.wipeSearchCache() end)
+	frame.auctionFailedCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonAuctionFailedCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	frame.auctionFailedCheck:SetScale(0.85)
 	_G["BeancounterauctionFailedCheckText"]:SetText(_BC('UiFailedAuctions'))
-	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
+	frame.auctionFailedCheck:SetPoint("TOP", frame.auctionCheck, "BOTTOM", 0, 0)
 	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, _BC('TT_AuctionFailedCheck')) end) --Display items you failed to sell.
 	frame.auctionFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 

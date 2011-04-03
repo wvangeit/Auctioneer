@@ -202,62 +202,6 @@ function lib.API.getAHProfit(player, item, lowDate, highDate, includeMeta)
 	return sum, lowDate or low, highDate or high
 end
 
---[[This will return profits in date segments  allow easy to create graphs
-Similar to API.getProfit()  This utility return a table containing the profit earned in day based segments. useful for graphing a change over time
-example: entering (player, "arcane dust", 7) would return the the profit for arcane dust in 7 day segments starting from most recent to oldest
-]]
-function lib.API.getAHProfitGraph(player, item ,days)
-	if not player or player == "" then player = "server" end
-	if not item then item = "" end
-	if not days then days = 7 end
-	--Get data from BeanCounter
-	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true}
-	local tbl = private.startSearch(item, settings, "none")
-	--Merge and edit provided table to needed format
-	for i,v in pairs(tbl) do
-		for a,b in pairs(v) do
-			tinsert(tbl, b)
-		end
-	end
-	--remove now redundant table entries
-	tbl.completedAuctions, tbl["completedBidsBuyouts"], tbl.failedAuctions, tbl.failedBids = nil, nil, nil, nil
-	--check if we actually have any results from the search
-	if #tbl == 0 then return {0}, 0, 0 end
-	--sort by date
-	sort(tbl, function(a,b) return a[5] > b[5] end)
-	--get min and max dates.
-	local high, low, count, sum, number = tbl[1][5], tbl[#tbl][5], 1, 0, 0
-	local range = high - (days* 86400)
-
-	tbl.sums = {}
-	tbl.sums[count] = {}
-	for i,v in ipairs(tbl) do
-		if tonumber(v[5]) >= range then
-			if v[4] == "Auction successful" then
-				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
-				sum = sum + number
-			elseif v[4] == "Auction won" then
-				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
-				sum = sum - number
-			end
-			tbl.sums[count] = sum
-		else
-			count = count + 1
-			range = range - (days * 86400)
-			tbl.sums[count] = {}
-			sum = 0
-			if v[4] == "Auction successful" then
-				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
-				sum = sum + number
-			elseif v[4] == "Auction won" then
-				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
-				sum = sum - number
-			end
-			tbl.sums[count] = sum
-		end
-	end
-	return tbl.sums, low, high
-end
 
 --[[
 Get  Sold / Failed Ratio
@@ -327,13 +271,13 @@ function lib.API.getAHSoldFailed(player, link, days, serverKey)
 			end
 		end
 	end
-	
+
 	return success, failed, sucessStack, failedStack
 end
 --[[Change or add a reason code to a transaction]]
 function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, stack, sellerName, deposit, fee, currentReason, Time)
 	--to string all number values for comparison to stored data
-	bid, buy, net, stack, deposit, fee, Time = tostring(bid), tostring(buy), tostring(net), tostring(stack), tostring(deposit), tostring(fee), tostring(Time)
+	bid, buy, net, stack, deposit, fee, Time = tostringall(bid, buy, net, stack, deposit, fee, Time)
 	--convert ... back to 0
 	if currentReason == "..." then currentReason = "0" end
 	if sellerName == "..." then sellerName = "0" end
@@ -344,18 +288,16 @@ function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, s
 	
 	for  player, playerData in pairs(BeanCounterDB[server]) do
 		for DB, data in pairs(playerData) do
-			if  DB == "failedBids" or DB == "failedAuctions" or DB == "completedAuctions" or DB == "completedBidsBuyouts" or DB == "failedBidsNeutral" or DB == "failedAuctionsNeutral" or DB == "completedAuctionsNeutral" or DB == "completedBidsBuyoutsNeutral" then
-				if data[itemID] and data[itemID][itemString] then
-					for i, text in pairs(data[itemID][itemString]) do
-						local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, CURRENTREASON, LOCATION = private.unpackString(text)
-						if currentReason == CURRENTREASON and stack == STACK and sellerName == SELLERNAME and bid == BID and buy == BUY and net == NET and deposit == DEPOSIT and Time == TIME then
-							local newText = private.packString(STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, newReason, LOCATION)
-					
-							table.remove(data[itemID][itemString], i)
-							private.databaseAdd(DB, nil, itemString, newText)
-							private.wipeSearchCache() --clear cached searches
-							return
-						end
+			if data[itemID] and data[itemID][itemString] then
+				for i, text in pairs(data[itemID][itemString]) do
+					local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, CURRENTREASON, LOCATION = private.unpackString(text)
+					if currentReason == CURRENTREASON and stack == STACK and sellerName == SELLERNAME and bid == BID and buy == BUY and net == NET and deposit == DEPOSIT and Time == TIME then
+						local newText = private.packString(STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, newReason, LOCATION)
+				
+						table.remove(data[itemID][itemString], i)
+						private.databaseAdd(DB, nil, itemString, newText)
+						private.wipeSearchCache() --clear cached searches
+						return
 					end
 				end
 			end
