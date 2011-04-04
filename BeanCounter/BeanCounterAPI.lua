@@ -312,26 +312,27 @@ end
 we store itemKeys with a unique ID but our name array does not
 ]]
 function lib.API.getArrayItemLink(itemString)
-	local itemID, suffix, uniqueID = lib.API.decodeLink(itemString)
+	local itemID, suffix, uniqueID, reforged = lib.API.decodeLink(itemString)
 	local itemKey = itemID..":"..suffix
 	if BeanCounterDBNames[itemKey] then
-		return lib.API.createItemLinkFromArray(itemKey, uniqueID) --uniqueID is used as a scaling factor for "of the" suffix items
+		return lib.API.createItemLinkFromArray(itemKey, uniqueID, reforged) --uniqueID is used as a scaling factor for "of the" suffix items
 	end
 	debugPrint("Searching DB for ItemID..", suffix, itemID, "Failed Item does not exist")
 	return
 end
 
 --[[Converts the compressed link stored in the itemIDArray back to a standard blizzard format]]
-function lib.API.createItemLinkFromArray(itemKey, uniqueID)
+function lib.API.createItemLinkFromArray(itemKey, uniqueID, reforged)
 	if BeanCounterDBNames[itemKey] then
 		if not uniqueID then uniqueID = 0 end
+		if not reforged then reforged = 0 end
 		local itemID, suffix = strsplit(":", itemKey)
 		local color, name = strsplit(";", BeanCounterDBNames[itemKey])
-		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":", uniqueID, ":80|h[", name, "]|h|r")
+		return strjoin("", "|", color, "|Hitem:", itemID,":0:0:0:0:0:", suffix, ":", uniqueID, ":80:",reforged,"|h[", name, "]|h|r")
 	end
 	return
 end
---[[Convert and store an itemLink into teh compressed format used in teh itemIDArray]]
+--[[Convert and store an itemLink into the compressed format used in the itemIDArray]]
 function lib.API.storeItemLinkToArray(itemLink)
 	if not itemLink then return end
 	local color, itemID, suffix, name = itemLink:match("|(.-)|Hitem:(.-):.-:.-:.-:.-:.-:(.-):.+|h%[(.-)%]|h|r")
@@ -352,7 +353,7 @@ function lib.API.getItemString(itemLink)
 	return itemString, itemName
 end
 
---[[Returns id, suffix, uniqueID when passed an itemLink or itemString, this a mildly tweaked version of the one found in AucAdv.
+--[[Returns id, suffix, uniqueID, reforged when passed an itemLink or itemString, this a mildly tweaked version of the one found in AucAdv.
 Handles Hitem:string,  item:string, or full itemlinks
 ]]
 local function breakHyperlink(match, matchlen, ...)
@@ -370,9 +371,9 @@ end
 function lib.API.decodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
-		local lType, id, enchant, gem1, gem2, gem3, gemBonus, suffix, uniqueID, lichKing = breakHyperlink("item:", 5, strsplit("|", link))
+		local lType, id, enchant, gem1, gem2, gem3, gemBonus, suffix, uniqueID, lichKing, reforged = breakHyperlink("item:", 5, strsplit("|", link))
 		if (lType ~= "item") then return end
-			return id, suffix, uniqueID
+			return id, suffix, uniqueID, reforged
 		end
 	return
 end

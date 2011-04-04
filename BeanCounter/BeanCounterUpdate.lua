@@ -52,7 +52,7 @@ function private.UpgradeDatabaseVersion()
 			private.startPlayerUpgrade(server, player, playerData)
 		end
 		--validate the DB for this server after all upgrades have completed
-		if performedUpdate then --only id we actually had to update
+		if performedUpdate then --only if we actually had to update
 			private.integrityCheck(true, server)
 		end	
 	end
@@ -119,7 +119,16 @@ function private.startPlayerUpgrade(server, player, playerData)
 	 	end
 	end
 	--[[Make sure to refrence the new version location for all new updates after _3_00]]
-
+	local version = 999999
+	if BeanCounterDBSettings and BeanCounterDBSettings[server] and BeanCounterDBSettings[server][player] then
+		version = BeanCounterDBSettings[server][player]["version"] or version
+	end
+	
+	if version < 3.01 then
+ 		private.update._3_01(server, player) --adds reforged itemstring value if missing
+ 		performedUpdate = true
+	end
+	
 end
 
 function private.update._2_01(server, player)
@@ -342,4 +351,24 @@ function private.update._3_00(server, player)
 	BeanCounterDBSettings[server][player].version = 3
 end
 
+--Add new reforged item position on all keys
+function private.update._3_01(server, player)
+	for DB, data in pairs(BeanCounterDB[server][player]) do
+		for itemID, itemIDData in pairs(data) do
+			local del = {}
+			for itemString, itemStringData in pairs(itemIDData) do
+				local _, _, _, reforged = lib.API.decodeLink(itemString)
+				if not reforged then
+					del[itemString] = itemStringData
+				end
+			end
+			for i,v in pairs(del)do
+				itemIDData[i..":0"] = v
+				itemIDData[i] = nil
+			end
+		end
+	end
+
+	BeanCounterDBSettings[server][player].version = 3.01
+end
 	
