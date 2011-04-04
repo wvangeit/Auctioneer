@@ -483,6 +483,7 @@ end
 --[[
 Adds data to the database in proper place, adds link to itemName array, optionally compresses the itemstring into compact format
 return false if data fails to write
+Add at start of DB so its in newest to oldest order
 ]]
 function private.databaseAdd(key, itemLink, itemString, value, compress)
 	--if we are passed a link and not both then extract the string
@@ -500,7 +501,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress)
 		--compress = true
 	--end
 	
-	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel = strsplit(":", itemString)
+	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel, reforged = strsplit(":", itemString)
 	--if this will be a compressed entry replace uniqueID with 0 or its scaling factor
 	if compress then
 		suffixID = tonumber(suffixID)
@@ -511,13 +512,13 @@ function private.databaseAdd(key, itemLink, itemString, value, compress)
 		else
 			uniqueID = 0
 		end
-		itemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel)
+		itemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel, reforged)
 		--print(itemString)
 	end
 	
 	if private.playerData[key][itemID] then --if ltemID exists
 		if private.playerData[key][itemID][itemString] then
-			tinsert(private.playerData[key][itemID][itemString], value)
+			tinsert(private.playerData[key][itemID][itemString],1 , value) --insert into front of array
 		else
 			private.playerData[key][itemID][itemString] = {value}
 		end
