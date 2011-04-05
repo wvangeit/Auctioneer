@@ -470,7 +470,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    _BC('C_DatabaseLength')) --"Determines how long BeanCounter will save Auction House Transactions."
 	gui:AddControl(id, "Checkbox",   0, 1, "oldDataExpireEnabled", format("Enable purging transactions older than %s months from the database. \nYou must hold the SHIFT key to check this box since this will DELETE data.", get("monthstokeepdata") or 48) )--Enable purging transactions older than %s months from the database. This will DELETE data.
 	gui:AddTip(id, _BC('TTDataExpireEnabled'))--Data older than the selected time range will be DELETED
-	gui:AddControl(id, "NumeriSlider", 0, 3, "monthstokeepdata",    6, 48 , 2, "How many months of data to keep?")
+	gui:AddControl(id, "NumeriSlider", 0, 3, "monthstokeepdata",    1, 48 , 1, "How many months of data to keep?")
 
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")

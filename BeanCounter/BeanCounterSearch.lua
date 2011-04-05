@@ -55,8 +55,6 @@ local tbl = {}
 --This is all handled by ITEMIDS need to remove/rename this to be a utility to convert text searches to itemID searches
 function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 	--Run the compression function once per session, use first search as trigger
-	--Check the postedDB tables and remove any entries that are older than 31 Days
-	if not private.compressed then private.refreshItemIDArray() private.sortArrayByDate() private.compactDB() private.prunePostedDB() private.sumDatabase() private.compressed = true end
 
 	if not itemName then return end
 	if not settings then settings = private.getCheckboxSettings() end

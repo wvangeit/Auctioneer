@@ -50,11 +50,18 @@ function private.UpgradeDatabaseVersion()
 	for server, serverData in pairs(BeanCounterDB) do
 		for player, playerData in pairs(serverData) do
 			private.startPlayerUpgrade(server, player, playerData)
+			private.startPlayerMaintenance(server, player)
 		end
 		--validate the DB for this server after all upgrades have completed
 		if performedUpdate then --only if we actually had to update
 			private.integrityCheck(true, server)
-		end	
+		end
+	end
+	--check for tasks that need to run.
+	for server, serverData in pairs(BeanCounterDB) do
+		for player, playerData in pairs(serverData) do
+			private.startPlayerMaintenance(server, player)
+		end
 	end
 end
 
