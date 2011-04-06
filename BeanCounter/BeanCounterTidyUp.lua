@@ -178,7 +178,7 @@ function private.compactDB(server, player)
 						local expire = TIME - (months * 30 * 24 * 60 * 60)
 						--check last key in DB to see if its old enough
 						local _, _, _, _, _, _, _, postTime = private.unpackString(itemStringData[#itemStringData])
-						if tonumber(postTime) <= expire then
+						if postTime and tonumber(postTime) <= expire then --postTime may not exist if the table is empty
 							datatoPurge[itemString] = itemStringData
 						end
 					end
@@ -197,7 +197,7 @@ function private.compactDB(server, player)
 				end
 				--after removing the itemStrings look to see if there are itemID's that need removing
 				if next (itemIDData) == nil then
-					print("Removed empty itemID:", itemID, server, player)
+					debugPrint("Removed empty itemID:", itemID, server, player)
 					BeanCounterDB[server][player][DB][itemID] = nil
 				end
 			end
@@ -364,7 +364,7 @@ local integrityClean, integrityCount = true, 1
 									integrityClean = false
 								elseif complete and private.IC(tbl, DB) then
 									--do a full check type() = check
-									debugPrint("Failed type() check", player, DB)
+									debugPrint("Failed type() check", player, DB, index, text)
 									table.remove(data, index)
 									integrityClean = false
 								end

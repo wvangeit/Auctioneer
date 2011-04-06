@@ -135,7 +135,10 @@ function private.startPlayerUpgrade(server, player, playerData)
  		private.update._3_01(server, player) --adds reforged itemstring value if missing
  		performedUpdate = true
 	end
-	
+	if version < 3.02 then
+ 		private.update._3_02(server, player) --clear any data from the vendor tables
+ 		performedUpdate = true
+	end
 end
 
 function private.update._2_01(server, player)
@@ -292,7 +295,7 @@ function private.update._2_11(server, player)
 					for i = #itemStringData, 1, -1 do
 						local stack, money, deposit , fee, buyout , bid, buyer, Time, reason, location = private.unpackString(itemStringData[i])
 						if location and location == "N" then
-							print(player, server, itemString)
+--~ 							print(player, server, itemString)
 							migrateNeutralData(server, player, DB, itemID, itemString, itemStringData[i]) --local help[er function
 							--itemStringData[i] = nil --This was a bad idea, left nil holes in my indexed data tables. We correct Nils in upgrade 2.12
 							table.remove(itemStringData, i)
@@ -375,7 +378,12 @@ function private.update._3_01(server, player)
 			end
 		end
 	end
-
 	BeanCounterDBSettings[server][player].version = 3.01
 end
-	
+
+--remove any entries in the vendor tables, old cruft can cause errors
+function private.update._3_02(server, player)
+	BeanCounterDB[server][player]["vendorsell"] = {}
+	BeanCounterDB[server][player]["vendorbuy"] = {}	
+	BeanCounterDBSettings[server][player].version = 3.02
+end
