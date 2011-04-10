@@ -59,6 +59,7 @@ local ceil,floor,max,abs = ceil,floor,max,abs
 local tostring,tonumber,strjoin,strsplit,format = tostring,tonumber,strjoin,strsplit,format
 local GetItemInfo = GetItemInfo
 local time = time
+local bitand = bit.band
 -- GLOBALS: nLog, N_NOTICE, N_WARNING, N_ERROR
 
 
@@ -878,20 +879,40 @@ end
 
 -- Creates an AucAdvanced signature from an item link
 function lib.GetSigFromLink(link)
-	local sig
-	local itype, id, suffix, factor, enchant = DecodeLink(link)
-	if itype == "item" then
-		if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
+	local ptype = type(link)
+	if ptype == "number" then
+		return ("%d"):format(link)
+	elseif ptype ~= "string" then
+		return
+	end
+	local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed = strsplit(":", link)
+	if not id or lType:sub(-4) ~= "item" then
+		return
+	end
+
+	if suffix and suffix ~= "0" then
+		local factor = "0"
+		if suffix and suffix:byte(1) == 45 then -- look for '-' to see if it is a negative number
+			local nseed = tonumber(seed)
+			if nseed then
+				factor = ("%d"):format(bitand(nseed, 65535)) -- here format is faster than tostring
+			end
+		end
+		if enchant and enchant ~= "0" then
+			-- concat is slightly faster than using strjoin with this many parameters, and far faster than format
+			return id..":"..suffix..":"..factor..":"..enchant
+		elseif factor ~= "0" then
+			return id..":"..suffix..":"..factor
 		else
-			sig = tostring(id)
+			return id..":"..suffix
+		end
+	else
+		if enchant and enchant ~= "0" then
+			return id..":0:0:"..enchant
+		else
+			return id
 		end
 	end
-	return sig
 end
 
 -- Creates an item link from an AucAdvanced signature
