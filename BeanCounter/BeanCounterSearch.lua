@@ -154,6 +154,10 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	local player = private.frame.SelectBoxSetting[2]
 	profit, low, high = lib.API.getAHProfit(player, data)
 	
+	--filter by dates
+	if settings.dateFilterLow or settings.dateFilterHigh then
+		data = private.filterbyDate(data, settings.dateFilterLow, settings.dateFilterHigh)
+	end
 	--reduce results to the latest XXXX ammount based on how many user wants displayed
 	if #data > count then
 		data = private.reduceSize(data, count)
@@ -175,6 +179,11 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 		profit = private.tooltip:Coins(profit)
 		private.frame.slot.help:SetTextColor(.8, .5, 1)
 		private.frame.slot.help:SetText(change..(" %s from %s to %s"):format(profit or "", date("%x", low) or "", date("%x", high) or ""))
+		--set date filter box only if user is not using date filtering
+		if not get("util.beancounter.ButtonuseDateCheck") then
+			private.lowerDateBox:SetDate(low)
+			private.upperDateBox:SetDate(high)
+		end
 	else
 		private.frame.slot.help:SetTextColor(1, 0.8, 0)
 		private.frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
@@ -310,7 +319,19 @@ function private.reduceSize(tbl, count)
 	end
 	return data
 end
+--Filter out dates older than we are interested in
+function private.filterbyDate(tbl, lowDate, highDate)
+	if not lowDate then lowDate = 1 end
+	if not highDate then highData = 2051283600 end -- wow's date system errors when you go to far into the future 2035
 
+	local data = {} -- this will be a new table, this prevents chages from being propagated back to the cached "data" refrence
+	for i,v in ipairs(tbl) do
+		if v[12] > lowDate and v[12] < highDate then
+			tinsert(data, v)
+		end
+	end
+	return data
+end
 --To simplify having two seperate search routines, the Data creation of each table has been made a local function
 	function private.COMPLETEDAUCTIONS(id, itemKey, text)
 			local uStack, uMoney, uDeposit , uFee, uBuyout , uBid, uSeller, uTime, uReason, uMeta = private.unpackString(text)

@@ -395,10 +395,10 @@ function private.CreateFrames()
 	frame.bidCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonBidCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterbidCheckText"]:SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
-	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
+	frame.bidCheck:SetHitRectInsets(0, -60, 0, 0) --stops frame from overlaping with nearby checkbox
+	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -315)
 	frame.bidCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidCheck, _BC('TT_BidCheck')) end) --"Display items bought from the Auction House"
 	frame.bidCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
-
 
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
@@ -406,7 +406,7 @@ function private.CreateFrames()
 	frame.bidFailedCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonBidFailedCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	frame.bidFailedCheck:SetScale(0.85)
 	_G["BeancounterbidFailedCheckText"]:SetText(_BC('UiOutbids'))
-	frame.bidFailedCheck:SetPoint("TOP", frame.bidCheck, "BOTTOM", 0, 0)
+	frame.bidFailedCheck:SetPoint("LEFT", frame.bidCheck, "RIGHT", 65, 0)
 	frame.bidFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.bidFailedCheck, _BC('TT_BidFailedCheck')) end) --"Display items you were outbided on."
 	frame.bidFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
@@ -416,7 +416,8 @@ function private.CreateFrames()
 	frame.auctionCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonAuctionCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	_G["BeancounterauctionCheckText"]:SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
-	frame.auctionCheck:SetPoint("TOP", frame.bidFailedCheck, "BOTTOM", 0, 0)
+	frame.auctionCheck:SetHitRectInsets(0, -60, 0, 0) --stops frame from overlaping with nearby checkbox
+	frame.auctionCheck:SetPoint("TOP", frame.bidCheck, "BOTTOM", 0, 0)
 	frame.auctionCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionCheck, _BC('TT_AuctionCheck')) end) --"Display items sold at the Auction House"
 	frame.auctionCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
@@ -427,20 +428,51 @@ function private.CreateFrames()
 	frame.auctionFailedCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonAuctionFailedCheck", self:GetChecked() ) private.wipeSearchCache() end)
 	frame.auctionFailedCheck:SetScale(0.85)
 	_G["BeancounterauctionFailedCheckText"]:SetText(_BC('UiFailedAuctions'))
-	frame.auctionFailedCheck:SetPoint("TOP", frame.auctionCheck, "BOTTOM", 0, 0)
+	BeancounterauctionFailedCheckText:SetWidth(80) --keeps text from overlaping
+	frame.auctionFailedCheck:SetPoint("LEFT", frame.auctionCheck, "RIGHT", 65, 0)
 	frame.auctionFailedCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.auctionFailedCheck, _BC('TT_AuctionFailedCheck')) end) --Display items you failed to sell.
 	frame.auctionFailedCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-	--[[search Purchases (vendor/trade)
-	frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
-	frame.buyCheck:SetChecked(true)
-	_G[BeancounterbuyCheck:GetName().."Text"]:SetText("Buys")
-	frame.buyCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -255)
-	--search Sold (vendor/trade)
-	frame.sellCheck = CreateFrame("CheckButton", "BeancountersellCheck", frame, "OptionsCheckButtonTemplate")
-	frame.sellCheck:SetChecked(true)
-	_G[BeancountersellCheck:GetName().."Text"]:SetText("Sold")
-	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
+	--[[Date filter edit boxes]]--
+	frame.useDateCheck = CreateFrame("CheckButton", "BeancounteruseDateCheck", frame, "OptionsCheckButtonTemplate")
+	frame.useDateCheck:SetScript("OnClick", function(self) set("util.beancounter.ButtonuseDateCheck", self:GetChecked() ) private.wipeSearchCache() end)
+	set("util.beancounter.ButtonuseDateCheck", false)--always start off
+	frame.useDateCheck:SetChecked(get("util.beancounter.ButtonuseDateCheck"))
+	frame.useDateCheck:SetScale(0.85)
+	BeancounteruseDateCheckText:SetText(_BC('UiUseDateFilter'))
+	frame.useDateCheck:SetPoint("TOP", frame.auctionCheck, "BOTTOM", 0, -10)
+	frame.useDateCheck:SetScript("OnEnter", function() private.buttonTooltips( frame.useDateCheck, _BC('TT_useDateCheck')) end) --"Display items you were outbided on."
+	frame.useDateCheck:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	
+	private.lowerDateBox = private.dateBoxTemplate(frame, "BeanCounterLower")
+	private.lowerDateBox.hour = 0 --sets time so we cover teh full day
+	private.lowerDateBox:SetPoint("TOPLEFT", frame.useDateCheck, "BOTTOM", 10, -20)
+	
+	private.upperDateBox = private.dateBoxTemplate(frame, "BeanCounterUpper")
+	private.upperDateBox.hour = 24 --sets time so we cover teh full day
+	private.upperDateBox:SetPoint("TOP", private.lowerDateBox, "BOTTOM", 0, -10)
+	--tab between two sets
+	private.lowerDateBox.year:SetScript("OnTabPressed", function(self)
+		if IsShiftKeyDown() then
+			self.day:SetFocus()
+		else
+			private.upperDateBox.month:SetFocus()
+		end
+	end)
+	private.upperDateBox.year:SetScript("OnTabPressed", function(self)
+		if IsShiftKeyDown() then
+			self.day:SetFocus()
+		else
+			private.lowerDateBox.month:SetFocus()
+		end
+	end)
+		
+	
+	frame.dateHelp = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.dateHelp:ClearAllPoints()
+	frame.dateHelp:SetPoint("BOTTOMLEFT", private.lowerDateBox, "TOPLEFT", 0, 10)
+	frame.dateHelp:SetText("month day year")
+	
 	--creates teh report text that tells info on # of entries
 	frame.DBCount = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.DBCount:SetPoint("TOPLEFT", frame, "TOPLEFT", 70, -40)
@@ -452,7 +484,7 @@ function private.CreateFrames()
 	private.sumDatabase() --Sums database Done on first Start and Search of the session
 	
 	--Edit box for changing UI reason codes
-	frame.reasonEditBox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+	frame.reasonEditBox = CreateFrame("EditBox", "BeanCounterReasonEditBox", frame, "InputBoxTemplate")
 	frame.reasonEditBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
 	frame.reasonEditBox:SetAutoFocus(true)
 	frame.reasonEditBox:Hide()
@@ -619,9 +651,20 @@ function private.CreateFrames()
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function private.getCheckboxSettings()
+		local low, high
+		if get("util.beancounter.ButtonuseDateCheck") then
+			--always set lowest to the low side regardless of which entry box user set it in
+			local a = private.lowerDateBox:GetDate()
+			local b = private.upperDateBox:GetDate()
+			if a > b then
+				low, high = b, a
+			else
+				low, high = a, b
+			end
+		end
 		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["neutral"] = frame.neutralCheck:GetChecked(),
 			["bid"] = frame.bidCheck:GetChecked(), ["failedbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked(),
-			["failedauction"] = frame.auctionFailedCheck:GetChecked()
+			["failedauction"] = frame.auctionFailedCheck:GetChecked(), ["dateFilterLow"] = low, ["dateFilterHigh"] = high
 			}
 	end
 	--set parent of the Reason edit box to the created scrollframe. This prevents overlaping.
@@ -786,6 +829,94 @@ function private.relevelFrames(myLevel, ...)
 		private.relevelFrame(child)
 	end
 end
+--creates a basic editbox
+function private.editboxTemplate(frame, name, height, width, numChar, numeric)
+	if not height then height = 15 end
+	if not width then width = 30 end
+
+	local editBox = CreateFrame("EditBox", name, frame, "InputBoxTemplate")
+	editBox:SetHeight(height)
+	editBox:SetWidth(width)
+	editBox:SetAutoFocus(false)
+	editBox:SetNumeric(numeric)
+	if numChar then
+		editBox:SetMaxLetters(numChar)
+	end
+	return editBox
+end
+--creates a day month year edit box combo
+function private.dateBoxTemplate(frame, name)
+	if frame.name then print("This name already exists") return end
+
+	local self = CreateFrame("Frame", name, frame)
+	self:SetWidth(100) --total frame width of all elements
+	self:SetHeight(15)
+	
+	local month = private.editboxTemplate(self, name.."MonthEditBox", 15, 20, 2, true)
+	month:SetPoint("LEFT", self, "LEFT", 0, 0)
+
+	local day = private.editboxTemplate(self, name.."DayEditBox", 15, 20, 2, true)
+	day:SetPoint("LEFT", month, "RIGHT", 10, 0)
+
+	local year = private.editboxTemplate(self, name.."YearEditBox", 15, 40, 4, true)
+	year:SetPoint("LEFT", day, "RIGHT", 10, 0)
+
+	month:SetScript("OnTabPressed", function(self)
+		if IsShiftKeyDown() then
+			year:SetFocus()
+		else
+			day:SetFocus()
+		end
+	end)
+	day:SetScript("OnTabPressed", function(self)
+		if IsShiftKeyDown() then
+			month:SetFocus()
+		else
+			year:SetFocus()
+		end
+	end)
+	year:SetScript("OnTabPressed", function(self)
+		if IsShiftKeyDown() then
+			day:SetFocus()
+		else
+			month:SetFocus()
+		end
+	end)
+
+	self.month = month
+	self.day = day
+	self.year = year
+	function self:SetDate(t)
+		t = tonumber(t)
+		if not t then t = 1 end
+		if t < 1 or t > 2051283600 then t = 1 end
+		
+		local m, d, y = string.split(" ", date("%m %d %Y",t))
+		self.month:SetText(m)
+		self.day:SetText(d)
+		self.year:SetText(y)
+	end
+	function self:GetDate()
+		local m = self.month:GetNumber()
+		local d = self.day:GetNumber()
+		local y = self.year:GetNumber()
+		local h = self.hour --this is an optional setting defaults to noon otherwise
+	
+		--sanity check
+		if m < 1 or m > 12 then    debugPrint("Month's value can only be 1 to 12") m = 1 end
+		if d< 1 or d > 31 then     debugPrint("Day's value can only be 1 to 31") d = 1 end
+		if y < 0 then  debugPrint("Year's value cannot be negative") y = 1 end
+		if #tostring(y) < 3 then y = 2000+y end
+
+		local t = time({["day"] = d,["month"] = m, ["year"] = y, ["hour"] = h})
+		if get("util.beancounter.ButtonuseDateCheck") then
+			private.wipeSearchCache()
+		end		
+		return t
+	end
+	return self
+end
+
 --Created SearchUI reason code data into tooltips
 function private.processTooltip(tip, itemLink, quantity)
 	if not itemLink then return end

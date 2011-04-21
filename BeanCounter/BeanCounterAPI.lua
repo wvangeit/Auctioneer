@@ -155,7 +155,7 @@ function lib.API.getAHProfit(player, item, lowDate, highDate, includeMeta)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 	
-	local sum, low, high, date = 0, 9999999999, 0
+	local sum, low, high, date = 0, 2051283600, 1  -- wow's date system errors when you go to far into the future 2035 seems like a good year
 	local settings = {["selectbox"] = {"1", player} , ["bid"] = true, ["auction"] = true, ["failedauction"] = true}
 	local tbl
 	--allow a already API searched data table to be passed instead of just a text string
