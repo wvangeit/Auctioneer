@@ -156,10 +156,9 @@ end
 --Moves entries older than 40 days into compressed( non uniqueID) Storage
 --Removes data older than X  months from the DB
 --Array refresh needs to run before this function
-local TIME = time()--no need to call this for every loop
 function private.compactDB(server, player)
 	local playerData = BeanCounterDB[server][player]
-	TIME = time() --sets TIME for this compact operation
+	local TIME = time() --sets TIME for this compact operation
 
 	for DB, data in pairs(playerData) do
 		if DB ~= "postedBids" and DB ~= "postedAuctions" then
@@ -172,9 +171,9 @@ function private.compactDB(server, player)
 						--Since we will be possibly creating new itemID keys we need to delay till after we have parsed all itemID's
 						--adding new keys while parsing the table can make it skip checking
 						datatoCompress[itemString] = itemStringData
-					elseif lib.GetSetting("oldDataExpireEnabled") then
+					elseif get("oldDataExpireEnabled") then
 				         --for non unique strings we know they are already older than the compress date, So check to see if they are old enough to be pruned by the Remove Old transactions option
-						local months = lib.GetSetting("monthstokeepdata")
+						local months = get("monthstokeepdata")
 						local expire = TIME - (months * 30 * 24 * 60 * 60)
 						--check last key in DB to see if its old enough
 						local _, _, _, _, _, _, _, postTime = private.unpackString(itemStringData[#itemStringData])
@@ -206,6 +205,7 @@ function private.compactDB(server, player)
 --~ 	debugPrint("Finished compressing Databases", server, player)
 end
 function private.removeUniqueID(datatoCompress, DB, server, player)
+	local TIME = time()--no need to call this for every loop
 	for itemString, itemStringData in pairs(datatoCompress) do
 		for i = #itemStringData, 1, -1 do
 			local _, _, _, _, _, _, _, postTime  = private.unpackString(itemStringData[i])
@@ -220,8 +220,8 @@ function private.removeUniqueID(datatoCompress, DB, server, player)
 	end
 end
 function private.removeOldData(datatoPurge, DB, server, player)
-	local months = 48
-	local expire = TIME - (months * 30 * 24 * 60 * 60)
+	local months = get("monthstokeepdata") --doh, hard coded the value during testing
+	local expire = time() - (months * 30 * 24 * 60 * 60)
 	for itemString, itemStringData in pairs(datatoPurge) do
 		for i = #itemStringData, 1, -1 do
 			local _, _, _, _, _, _, _, postTime = private.unpackString(itemStringData[i])
