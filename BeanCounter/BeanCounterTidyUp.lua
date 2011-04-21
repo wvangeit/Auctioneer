@@ -51,21 +51,21 @@ function private.createplayerplan()
 	}
 end
 local runServerTaskOnce = true
---[[ALL FUNCTION ARE RUN ON ALL LOGINS FOR TESTING PURPOSES]]
+--[[Checks each players last run time and runs maintaince functions if apprp.  Adds a random amount of days and reschedules]]
 function private.startPlayerMaintenance(server, player)
 	local main = BeanCounterDBSettings[server][player]["maintenance"] or private.createplayerplan()
 	local currentTime = time()
 	--we use random to add 1-5 days to the fixed intervals. This should keep all the tasks from occuring in the same login in general
 	for task, lastRun in pairs(main) do
-		if task == "sortArray" and lastRun then-- + 2592000 < currentTime then --run monthly
+		if task == "sortArray" and lastRun + 2592000 < currentTime then --run monthly
 			private.sortArrayByDate(server, player)
 			main[task] = currentTime + random(86400, 432000)
 		
-		elseif task == "prunePostedDB" and lastRun then--+ 1296000 < currentTime then --run every 15 days
+		elseif task == "prunePostedDB" and lastRun + 1296000 < currentTime then --run every 14 days
 			private.prunePostedDB(server, player)
 			main[task] = currentTime + random(86400, 432000)
 		
-		elseif task == "compactDB" and lastRun then--+ 2592000 < currentTime then --run monthly
+		elseif task == "compactDB" and lastRun + 2592000 < currentTime then --run monthly
 			private.compactDB(server, player)
 			main[task] = currentTime + random(86400, 432000)			
 		end
