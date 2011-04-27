@@ -89,6 +89,8 @@ local BindTypes = {
 	[ITEM_CONJURED] = "Conjured",
 	[ITEM_ACCOUNTBOUND] = "Accountbound",
 	[ITEM_BIND_TO_ACCOUNT] = "Accountbound",
+	[ITEM_BIND_TO_BNETACCOUNT] = "Accountbound",
+	[ITEM_BNETACCOUNTBOUND] = "Accountbound",
 }
 
 local UIKnownErrors = {
@@ -105,6 +107,7 @@ local UIKnownErrors = {
 	[ERR_AUCTION_REPAIR_ITEM] = "ERR_AUCTION_REPAIR_ITEM",
 	[ERR_AUCTION_USED_CHARGES] = "ERR_AUCTION_USED_CHARGES",
 	[ERR_AUCTION_WRAPPED_ITEM] = "ERR_AUCTION_WRAPPED_ITEM",
+	[ERR_AUCTION_REPAIR_ITEM] = "ERR_AUCTION_REPAIR_ITEM",
 }
 function private.IsBlockingError(errorcode)
 	if UIKnownErrors[errorcode] then
