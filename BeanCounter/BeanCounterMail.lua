@@ -47,22 +47,14 @@ local function debugPrint(...)
         private.debugPrint("BeanCounterMail",...)
     end
 end
-
-local expiredLocale = AUCTION_EXPIRED_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
-local salePendingLocale = AUCTION_INVOICE_MAIL_SUBJECT:gsub("(.+)%%s", "%1") --sale pending
-local outbidLocale = AUCTION_OUTBID_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
-local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
-local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
-local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("(.+)%%s", "%1")
---[[
-Essamyns improved parser. Need to test before comiting	
-local expiredLocale = AUCTION_EXPIRED_MAIL_SUBJECT:gsub("%%s", "(.+)")
-local salePendingLocale = AUCTION_INVOICE_MAIL_SUBJECT:gsub("%%s", "(.+)") --sale pending
+	
+local expiredLocale = AUCTION_EXPIRED_MAIL_SUBJECT:gsub("%%s", "") --remove the %s
+local salePendingLocale = AUCTION_INVOICE_MAIL_SUBJECT:gsub("%%s", "") --sale pending
 local outbidLocale = AUCTION_OUTBID_MAIL_SUBJECT:gsub("%%s", "(.+)")
-local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("%%s", "(.+)")
-local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("%%s", "(.+)")
-local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "(.+)")
-]]
+local cancelledLocale = AUCTION_REMOVED_MAIL_SUBJECT:gsub("%%s", "")
+local successLocale = AUCTION_SOLD_MAIL_SUBJECT:gsub("%%s", "")
+local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "")
+
 local reportTotalMail, reportReadMail = 0, 0 --Used as a debug check on mail scanning engine
 
 local registeredInboxFrameHook = false
@@ -144,6 +136,8 @@ function private.updateInboxStart()
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
 				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
+				--subject now can contain a stack size. Remove them so only itemName remains
+				subject = subject:gsub("%s-%(%d-%)", "") --strips off the count (x) from the itemName
 				tinsert(private.inboxStart, {["n"] = n, ["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft,
 						["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout,
 						["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["itemLink"] = itemLink, ["stack"] = stack, ["auctionHouse"] = auctionHouse,
