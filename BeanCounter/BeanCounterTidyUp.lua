@@ -53,7 +53,10 @@ end
 local runServerTaskOnce = true
 --[[Checks each players last run time and runs maintaince functions if apprp.  Adds a random amount of days and reschedules]]
 function private.startPlayerMaintenance(server, player)
-	local main = BeanCounterDBSettings[server][player]["maintenance"] or private.createplayerplan()
+	if not BeanCounterDBSettings[server][player]["maintenance"] then
+		BeanCounterDBSettings[server][player]["maintenance"] = private.createplayerplan()
+	end
+	local main = BeanCounterDBSettings[server][player]["maintenance"]
 	local currentTime = time()
 	--we use random to add 1-5 days to the fixed intervals. This should keep all the tasks from occuring in the same login in general
 	for task, lastRun in pairs(main) do
