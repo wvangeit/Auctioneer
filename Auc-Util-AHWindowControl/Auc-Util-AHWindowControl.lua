@@ -221,29 +221,29 @@ function private.AdjustProtection ()
 	if not UIPanelWindows["AuctionFrame"] then
 		debugPrint("AuctionFrame doesn't exist yet.")
 		return
-	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
+	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-area") then
 		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
-		AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+		AuctionFrame:SetAttribute("UIPanelLayout-area", "doublewide")
 		if AuctionFrame:IsVisible() then
 			AuctionFrame.IsShown = function() end
 			ShowUIPanel(AuctionFrame, 1)
 			AuctionFrame.IsShown = nil
 		end
-	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-enabled") == true then
+	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-area") then
 		debugPrint("Disabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
 		if AuctionFrame:IsVisible() then
 			AuctionFrame.Hide = function() end
 			HideUIPanel(AuctionFrame)
 			AuctionFrame.Hide = nil
 		end
-		AuctionFrame:SetAttribute("UIPanelLayout-enabled", nil)
+		AuctionFrame:SetAttribute("UIPanelLayout-area", nil)
 	elseif get("util.protectwindow.protectwindow") ~= 1 and get("util.protectwindow.protectwindow") ~=2 then
 		local protectvalue = get("util.protectwidow.protectwindow")
 		protectvalue = tostring(protectvalue)
 		debugPrint("util.protectwindow.protectwindow="..protectvalue.." an invalid value")
 		set("util.protectwindow.protectwindow", 1)
-		if not AuctionFrame:GetAttribute("UIPanelLayout-enabled") then
-			AuctionFrame:SetAttribute("UIPanelLayout-enabled", true)
+		if not AuctionFrame:GetAttribute("UIPanelLayout-area") then
+			AuctionFrame:SetAttribute("UIPanelLayout-area", "doublewide")
 			if AuctionFrame:IsVisible() then
 				AuctionFrame.IsShown = function() end
 				ShowUIPanel(AuctionFrame, 1)
@@ -253,7 +253,7 @@ function private.AdjustProtection ()
 	else
 		debugPrint("No case matched.")
 		debugPrint("util.protectwindow.protectwindow="..get("util.protectwindow.protectwindow"))
-		debugPrint("UIPanelLayout-enabled="..tostring(AuctionFrame:GetAttribute("UIPanelLayout-enabled")))
+		debugPrint("UIPanelLayout-area="..tostring(AuctionFrame:GetAttribute("UIPanelLayout-area")))
 	end
 end
 
