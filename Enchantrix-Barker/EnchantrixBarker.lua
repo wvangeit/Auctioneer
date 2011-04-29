@@ -198,6 +198,10 @@ function EnchantrixBarker_OnEvent(event,...)
 	
 end
 
+function Enchantrix_BarkerOptions_TradeTab_OnShow()
+--fake function to prevent template from erroring when frame is not parented
+end
+
 function Enchantrix_BarkerOptions_OnShow()
 	Enchantrix_BarkerOptions_ShowFrame(1);
 end

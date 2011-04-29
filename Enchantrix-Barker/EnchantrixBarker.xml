@@ -49,6 +49,11 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnClick>
 				Enchantrix_BarkerOptions_OnClick(self);
 			</OnClick>
+			<OnShow>
+				<!-- the template defines a show function even before we parent the frame. So add a sacraficial show function here-->
+				Enchantrix_BarkerOptions_TradeTab_OnShow();
+				PanelTemplates_TabResize(Enchantrix_BarkerOptions_TradeTab, 0); <!-- size to fit text, no padding-->
+			</OnShow>
 		</Scripts>
 	</Button>
 
