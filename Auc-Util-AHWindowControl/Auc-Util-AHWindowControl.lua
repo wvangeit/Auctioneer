@@ -34,6 +34,33 @@ if not AucAdvanced then return end
 
 local libType, libName = "Util", "AHWindowControl"
 local lib, parent, private = AucAdvanced.NewModule(libType, libName)
+local SetUIPanelAttribute = SetUIPanelAttribute or function (frame,name,value)
+	local info = UIPanelWindows[frame:GetName()]
+	if ( not info ) then
+		return;
+	end
+	
+	if ( not frame:GetAttribute("UIPanelLayout-defined") ) then
+		frame:SetAttribute("UIPanelLayout-defined", true);
+		for name,value in pairs(info) do
+			frame:SetAttribute("UIPanelLayout-"..name, value);
+		end
+	end
+	
+	frame:SetAttribute("UIPanelLayout-"..name, value);
+end	
+
+local GetUIPanelAttribute = GetUIPanelAttribute or function (frame,name)
+	local info = UIPanelWindows[frame:GetName()]
+	if ( not info ) then
+		return;
+	end
+	if (not frame:GetAttribute("UIPanelLayout-defined") ) then
+		return
+	end
+	local value = frame:GetAttribute("UIPanelLayout-"..name)
+	return value
+end
 
 if not lib then return end
 
@@ -215,45 +242,80 @@ function private.recallLastPos()
 	end
 end
 
---This script will turn the protection of the AuctionFrame on or off,
+--This will turn the protection of the AuctionFrame on or off,
 --as appropriate.
 function private.AdjustProtection ()
+ 	--If the auction frame hasn't been opened yet, we can't do anything.	 
 	if not UIPanelWindows["AuctionFrame"] then
 		debugPrint("AuctionFrame doesn't exist yet.")
 		return
-	elseif (get("util.protectwindow.protectwindow") == 1) and not AuctionFrame:GetAttribute("UIPanelLayout-area") then
+	--Else, if we're set never to protect the AuctionFrame, 
+	--but UIPanelLayout-enabled is nil (it's protected) adjust
+	elseif (get("util.protectwindow.protectwindow") == 1) and not GetUIPanelAttribute(AuctionFrame,"area") then	
 		debugPrint("Enabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
-		AuctionFrame:SetAttribute("UIPanelLayout-area", "doublewide")
+		--Enable the standard FrameHandler
+		SetUIPanelAttribute(AuctionFrame,"area","doublewide")
+		--We can't adjust this with the AuctionFrame visible
 		if AuctionFrame:IsVisible() then
+			--Set AuctionFrame.IsShown to an empty 
+			--function so it appears to be hidden.
 			AuctionFrame.IsShown = function() end
+			--Tell the game to "show" the frame, 
+			--making the client aware of our 
+			--adjusted setting.
 			ShowUIPanel(AuctionFrame, 1)
+			--AuctionFrame.IsShown is stored in the 
+			--meta-table, restore it by nil-ing it.
 			AuctionFrame.IsShown = nil
 		end
-	elseif (get("util.protectwindow.protectwindow") == 2) and AuctionFrame:GetAttribute("UIPanelLayout-area") then
+	--Else, if we're set to always protect the AuctionFrame, 
+	--but UIPanelLayout-enabled is true (not protected) adjust
+	elseif (get("util.protectwindow.protectwindow") == 2) and GetUIPanelAttribute(AuctionFrame,"area") then
 		debugPrint("Disabling Standard Frame Handler for Auction Frame because protectwindow ="..get("util.protectwindow.protectwindow"))
+		--We can't adjust with the AuctionFrame visible
 		if AuctionFrame:IsVisible() then
+			--We need the game to think it's hidden 
+			--the Auction Frame, so Hide to an empty 
+			--function.
 			AuctionFrame.Hide = function() end
+			--Tell the game to hide the frame
 			HideUIPanel(AuctionFrame)
+			--Restore the original function from the 
+			--meta-table by nil-ing it.
 			AuctionFrame.Hide = nil
 		end
-		AuctionFrame:SetAttribute("UIPanelLayout-area", nil)
+		--Disable the standard frame handler. We don't 
+		--need to re-show the Auction frame, because the 
+		--game doesn't think it's shown right now, anyway.
+		SetUIPanelAttribute(AuctionFrame,"area",nil)
+	--If we have an invalid setting, set it to never protect,
+	--and record the appropriate configuration.
 	elseif get("util.protectwindow.protectwindow") ~= 1 and get("util.protectwindow.protectwindow") ~=2 then
 		local protectvalue = get("util.protectwidow.protectwindow")
 		protectvalue = tostring(protectvalue)
 		debugPrint("util.protectwindow.protectwindow="..protectvalue.." an invalid value")
 		set("util.protectwindow.protectwindow", 1)
-		if not AuctionFrame:GetAttribute("UIPanelLayout-area") then
-			AuctionFrame:SetAttribute("UIPanelLayout-area", "doublewide")
+		--If the standard frame handler is disabled, re-enable it.
+		if not GetUIPanelAttribute(AuctionFrame,"area") then
+			SetUIPanelAttribute(AuctionFrame,"area","doublewide")
+			--We need to get the client to re-read the configuration
 			if AuctionFrame:IsVisible() then
+				--Set IsShown to an empty function, fooling the
+				--client.
 				AuctionFrame.IsShown = function() end
+				--Tell the client to Show the frame.
 				ShowUIPanel(AuctionFrame, 1)
+				--Restore the original IsShown from the meta-table
+				--by nil-ing it.
 				AuctionFrame.IsShown = nil
 			end
 		end
+	--If none of the above are true (I'm not sure how that would happen at this
+	--point), print some errors so we can figure out something's wrong here.
 	else
 		debugPrint("No case matched.")
 		debugPrint("util.protectwindow.protectwindow="..get("util.protectwindow.protectwindow"))
-		debugPrint("UIPanelLayout-area="..tostring(AuctionFrame:GetAttribute("UIPanelLayout-area")))
+		debugPrint("UIPanelLayout-area="..tostring(GetUIPanelAttribute(AuctionFrame,"area")))
 	end
 end
 
