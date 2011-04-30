@@ -297,7 +297,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 	local DBitemID, DBSuffix = lib.API.decodeLink(itemLink)
 	for itemString,v in pairs (private.playerData[key][itemID]) do
 		local SearchID, SearchSuffix = lib.API.decodeLink(itemString)
-		print(SearchID, DBitemID,SearchSuffix ,DBSuffix, itemLink, itemString)
+		--print(SearchID, DBitemID,SearchSuffix ,DBSuffix, itemLink, itemString)
 		if SearchID == DBitemID and  SearchSuffix == DBSuffix then
 			for index, text in pairs(v) do
 				if not text:match(".*USED.*") then
