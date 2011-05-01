@@ -272,7 +272,7 @@ local function beginScan(bag)
 	setState("scan")
 	
 	-- do not scan while in combat
-	if UnitAffectingCombat("player") then
+	if InCombatLockdown() or UnitAffectingCombat("player") then
 		debugSpam("aborting scan during combat")
 		return
 	end
@@ -490,7 +490,7 @@ function showPrompt(link, bag, slot, value, spell)
 	clearPrompt()		-- safety
 	
 	-- avoid taint, don't hide or show while in combat
-	if UnitAffectingCombat("player") then
+	if InCombatLockdown() or UnitAffectingCombat("player") then
 		return
 	end
 	
@@ -543,7 +543,7 @@ end
 -- declared local at top
 function hidePrompt()
 	-- avoid taint, don't hide or show while in combat
-	if not UnitAffectingCombat("player") then
+	if not (InCombatLockdown() or UnitAffectingCombat("player")) then
 		auto_de_prompt:Hide()
 	end
 end
