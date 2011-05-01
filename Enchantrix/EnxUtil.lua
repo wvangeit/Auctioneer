@@ -761,20 +761,14 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- ccox - Cataclysm items, this is partly guesswork
 	if (level >= 270) then
 		if (quality == 3) then
-			if (level >= 325) then
-				return 500;				-- 325 - 352
-			else
-				return 450;				-- 279 - 316
-			end
+			-- all blues
+			return 450;				-- 279 - 346
 		elseif (quality == 2) then
-			if (level >= 301) then
-				return 475;				-- 301 - 333
-			else
-				return 425;				-- 270 - 300
-			end
+			-- all greens
+			return 425;				-- 270 - 318
 		else
-			-- epic, so far all require 500
-			return 500;
+			-- all epics
+			return 475;				-- 353 - 372
 		end
 		
 	elseif (level >= 200) then
