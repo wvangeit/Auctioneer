@@ -392,10 +392,11 @@ function onEvent(funcVars, event, player, spell, rank, target)
 					-- Save result
 					local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
 					if reagentID then
-						-- for prospecting, we need to save the whole list
+						-- for prospecting and milling, we need to save the whole list
 						reagentList[ reagentID ] = (reagentList[ reagentID ] or 0) + quantity
-						if (isDisenchant) then
+						if (isDisenchant and i == 1) then
 							-- disenchant only yields one item, so we can pass it in one at a time
+							-- also, we want to ignore guild bonus materials, so only take the first one
 							Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)
 						end
 					end

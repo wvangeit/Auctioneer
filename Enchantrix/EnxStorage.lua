@@ -45,6 +45,7 @@ local getItemDisenchantFromTableForOneMaterial	-- Enchantrix.Storage.GetItemDise
 local saveDisenchant				-- Enchantrix.Storage.SaveDisenchant()
 local addonLoaded					-- Enchantrix.Storage.AddonLoaded()
 local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
+local removeFromNonDisenchantable	-- Enchantrix.Storage.RemoveNonDisenchantable()
 
 local saveProspect					-- Enchantrix.Storage.SaveProspect()
 local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
@@ -61,6 +62,7 @@ local serialize
 local normalizeDisenchant
 local mergeDisenchant
 local mergeDisenchantLists
+local writeToNonDisenchantable
 
 local tooltip = LibStub("nTipHelper:1")
 
@@ -183,6 +185,9 @@ function saveDisenchant(sig, reagentID, count)
 	if itype then
 		EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 	end
+	
+	-- if we disenchanted successfully, then make sure it isn't on the non-disenchantable list
+	removeFromNonDisenchantable(sig)
 end
 
 
@@ -635,6 +640,7 @@ local function newindex(self, key, value)
 end
 
 
+
 function saveNonDisenchantable(itemLink)
 	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
 	local sig = Enchantrix.Util.GetSigFromLink(itemLink);
@@ -644,8 +650,18 @@ function saveNonDisenchantable(itemLink)
 		if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtFoundNotDisenchant"):format(itemLink))
 		end
-		NonDisenchantablesLocal[sig] = true;
-		NonDisenchantables[sig] = true;
+		NonDisenchantablesLocal[sig] = value;
+		NonDisenchantables[sig] = value;
+	end
+end
+
+function removeFromNonDisenchantable(sig)
+	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
+	-- put this in the local and combined list
+	-- only the local list will be saved in SavedVariables
+	if (NonDisenchantables[sig]) then
+		NonDisenchantablesLocal[sig] = NIL;
+		NonDisenchantables[sig] = NIL;
 	end
 end
 
@@ -675,6 +691,7 @@ Enchantrix.Storage = {
 	GetItemDisenchantFromTableForOneMaterial = getItemDisenchantFromTableForOneMaterial,
 	SaveDisenchant = saveDisenchant,
 	SaveNonDisenchantable = saveNonDisenchantable,
+	RemoveNonDisenchantable = removeFromNonDisenchantable,
 
 	SaveProspect = saveProspect,
 	GetItemProspects = getItemProspects,
