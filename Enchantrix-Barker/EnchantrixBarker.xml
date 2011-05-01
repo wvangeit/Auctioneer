@@ -44,19 +44,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Scripts>
 	</Button>
 
-	<Button name="Enchantrix_BarkerOptions_TradeTab" inherits="CharacterFrameTabButtonTemplate" id="1" text="Trade Barker">
-		<Scripts>
-			<OnClick>
-				Enchantrix_BarkerOptions_OnClick(self);
-			</OnClick>
-			<OnShow>
-				<!-- the template defines a show function even before we parent the frame. So add a sacraficial show function here-->
-				Enchantrix_BarkerOptions_TradeTab_OnShow();
-				PanelTemplates_TabResize(Enchantrix_BarkerOptions_TradeTab, 0); <!-- size to fit text, no padding-->
-			</OnShow>
-		</Scripts>
-	</Button>
-
 	<Slider name="EnchantrixBarker_OptionsSliderTemplate" inherits="OptionsSliderTemplate" virtual="true" minValue="0" maxValue="100" defaultValue="50" valueStep="2">
 		<Size>
 			<AbsDimension x="290" y="17"/>
@@ -424,5 +411,13 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnEvent>
 		</Scripts>
 	</Frame>
+	<!--Changes to the "CharacterFrameTabButtonTemplate" in 4.1 require a parent frame be specified  self:GetParent().maxTabWidth errors otherwise-->
+	<Button name="Enchantrix_BarkerOptions_TradeTab" inherits="CharacterFrameTabButtonTemplate" id="1" text="Trade Barker" parent="Enchantrix_BarkerOptions_Frame">
+		<Scripts>
+			<OnClick>
+				Enchantrix_BarkerOptions_OnClick(self);
+			</OnClick>
+		</Scripts>
+	</Button>
 </Ui>
 
