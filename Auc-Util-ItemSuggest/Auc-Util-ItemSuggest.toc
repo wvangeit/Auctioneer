@@ -1,7 +1,7 @@
 ## Title: Auc:Util:ItemSuggest
 ## Interface: 40100
-## OptionalDependencies: Auc-Util-Appraiser Enchantrix
-## Dependancies: Auc-Advanced
+## OptionalDependencies:
+## Dependencies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
