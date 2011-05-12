@@ -67,7 +67,19 @@ local ErrorText = {
 	InvalidBuyout = "Buyout is invalid",
 	NoItem = "Unable to retrieve info for this item",
 }
-lib.ErrorText = ErrorText
+-- lib.GetErrorText shall be expected to always return a string
+function lib.GetErrorText(code)
+	if not code then
+		return "No error"
+	end
+	local text = ErrorText[code]
+	if text then
+		return text
+	end
+	code = tostring(code)
+	debugPrint("Error code without matching ErrorText: "..code, "CorePost", "Unknown Errorcode", "Warning")
+	return "Unknown Errorcode ("..code..")"
+end
 
 private.BuyRequests = {}
 private.PendingBids = {}
