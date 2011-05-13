@@ -360,7 +360,7 @@ function private.play()
 		AucAdvanced.Scan.SetPaused(false)
 	elseif not AucAdvanced.Scan.IsScanning() then
 		if #queue == 0 then queue = private.checkedFrames() end --check for user selected frames
-		debugPrint(("play: queue count=%i"):format(#queue), "ScanButton", "play", 0, "Debug")
+		--debugPrint(("play: queue count=%i"):format(#queue), "ScanButton", "play", 0, "Debug")
 		if #queue > 0  then
 			if AucAdvanced.Settings.GetSetting("util.scanbutton.message") then print("Starting search on filter: |CFFFFFF00", CLASS_FILTERS[queue[1]]) end
 			AucAdvanced.Scan.StartScan("", "", "", nil, queue[1], nil, nil, nil)

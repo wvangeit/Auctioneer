@@ -47,7 +47,7 @@ function lib.Processor(callbackType, ...)
 		local msg = ("CallbackType=%s, Sound=%s, IsBlocked=%s, IsScanning=%s"):format(callbackType, 
 			tostring(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")), 
 			tostring(AucAdvanced.API.IsBlocked()), tostring(AucAdvanced.Scan.IsScanning()))
-		debugPrint(msg, "ScanFinish Processor", callbackType, 0, "Debug")
+		--debugPrint(msg, "ScanFinish Processor", callbackType, 0, "Debug")
 	end
 	
 	if (callbackType == "scanfinish") then
@@ -86,7 +86,7 @@ function lib.OnLoad()
 end
 
 function private.ScanStart(scanSize, querysig, query)
-	debugPrint(scanSize, "ScanFinish", "ScanStart", 0, "Debug")
+	--debugPrint(scanSize, "ScanFinish", "ScanStart", 0, "Debug")
 
 	if (scanSize ~= "Full") then return end
 	AlertShutdownOrLogOff()
@@ -94,7 +94,7 @@ end
 
 
 function private.ScanFinish(scanSize, querysig, query, wasComplete)
-	debugPrint(scanSize..","..tostring(wasComplete), "ScanFinish", "ScanFinish", 0, "Debug")
+	--debugPrint(scanSize..","..tostring(wasComplete), "ScanFinish", "ScanFinish", 0, "Debug")
 
 	if (scanSize ~= "Full") then return end
 	if (not wasComplete) then return end
@@ -109,7 +109,7 @@ function private.PerformFinishEvents()
 		AucAdvanced.Settings.GetSetting("util.scanfinish.emote"),
 		tostring(AucAdvanced.Settings.GetSetting("util.scanfinish.logout")),
 		tostring(AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")))
-	debugPrint(msg, "ScanFinish", "PerformFinishEvents", 0, "Debug")
+	--debugPrint(msg, "ScanFinish", "PerformFinishEvents", 0, "Debug")
 
 	--Sound
 	PlayCompleteSound()
