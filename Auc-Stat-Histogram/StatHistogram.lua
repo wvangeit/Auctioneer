@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - Histogram Statistics module
-	Version: 5.7.4568 (KillerKoala)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 

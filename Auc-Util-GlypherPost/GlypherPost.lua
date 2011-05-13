@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
-	Version: 5.6.4409 (KangaII)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
