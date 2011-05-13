@@ -1114,7 +1114,7 @@ local Commitfunction = function()
 	end
 	if (wasEndPagesOnly) then
 		scanSize = "TailScan-"..scanSize
-		printSummary = false
+		printSummary = get("scandata.summaryonpartial") -- todo: do we want a separate "summary on end pages only" option?
 	elseif (TempcurQuery.qryinfo.nosummary) then
 		printSummary = false
 		scanSize = "NoSum-"..scanSize
@@ -2139,10 +2139,10 @@ local StorePageFunction = function()
 				end
 			end
 			local wasEndOnly = false
-			if (incomplete) then
-				wasEndOnly = (curPages[maxPages-1] and true) or false
-				for i = 0, maxPages-3 do
-					if not curPages[i] then
+			if incomplete and curPages[maxPages-1] then
+				wasEndOnly = true
+				for i = 1, maxPages-3 do
+					if curPages[i] then
 						wasEndOnly = false
 						break
 					end
