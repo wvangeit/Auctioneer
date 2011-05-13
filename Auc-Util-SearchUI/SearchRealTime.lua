@@ -167,6 +167,7 @@ function lib.RefreshPage()
 	AuctionFrameBrowse.page = page
 	SortAuctionClearSort("list")
 	private.IsRefresh = true
+	AucAdvanced.Scan.SetAuctioneerQuery()
 	QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 end
 

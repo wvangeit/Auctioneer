@@ -137,6 +137,7 @@ local settingDefaults = {
 	["post.confirmonclose"] = true,
 	["core.scan.sellernamedelay"] = true,
 --	["core.scan.unresolvedtolerance"] = 0,
+	["core.scan.scanallqueries"] = true,
 }
 
 local function getDefault(setting)
@@ -520,6 +521,8 @@ function lib.MakeGuiConfig()
 	-- experimental settings, subject to change. do not localize yet
 	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.sellernamedelay", "Additional scanning to retrieve more Seller names")
 	gui:AddTip(id, "Perform additional scanning to retrieve more data about the names of Sellers. If this option is disabled scans will finish sooner but some filters and searchers will not work")
+	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.scanallqueries", "Scan manual searches and searches by other Addons")
+	gui:AddTip(id, "Enable to perform scanning of every Auctionhouse search. Disable to only scan Auctioneer's own searches.\nYou may need to disable this option if you have compatibility problems with other AddOns")
 
 	--[[ temporarily disabled
 	gui:AddControl(id, "Slider",	0, 1, "core.scan.unresolvedtolerance", 0, 100, 1, "Unresolved auctions tolerance: %d")
