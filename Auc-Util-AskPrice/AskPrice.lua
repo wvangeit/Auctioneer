@@ -497,27 +497,20 @@ private.SlashHandler = {}
 --This is the function that will be called by the slash handler when
 --/askprice send is issued.
 function private.SlashHandler.send(queryString)
-	local parseError = false
+	local parseError = true 	--Report errors unless we succeed. Reduces error checks
 	if queryString then
 		local player, itemLinks = strsplit(" ", queryString, 2)
 
 		--Error out if we have a target, but no potential itemLinks
-		if itemLinks then
+		if itemLinks and player:find("%a.*") then --if we dont have a target we also need to flag a parse error
 			local items = private.getItems(itemLinks)
-			--Error out if we dont get any items back
-			if #items == 0 then parseError = true end
-
 			for i = 1, #items, 2 do
 				local count = items[i]
 				local link = items[i+1]
-
+				parseError = false
 				private.sendResponse(link, count, player, 1, private.getData(link))
 			end
-		else
-			parseError = true
 		end
-	else
-			parseError = true
 	end
 
 	if parseError then
