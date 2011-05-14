@@ -80,7 +80,7 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 		elseif AucAdvanced.Settings.GetSetting("ModTTShow") == "ctrl" and not IsControlKeyDown() then
 			return
 		end
-	else 
+	else
 		AucAdvanced.Settings.SetSetting("ModTTShow", "always")
 	end
 
@@ -154,26 +154,18 @@ function private.OnTooltip(tip, item, quantity, name, hyperlink, quality, ilvl, 
 end
 
 function private.ClickBagHook(hookParams, returnValue, self, button, ignoreShift)
-	--if click-hooks are disabled, do nothing
-	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
-	
-	local bag = self:GetParent():GetID()
-	local slot = self:GetID()
-
-	local link = GetContainerItemLink(bag, slot)
-
-	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
-		if link then
-			if (button == "RightButton") and (IsAltKeyDown()) then
-				local itemType, itemID = AucAdvanced.DecodeLink(link)
-				if (itemType and itemType == "item" and itemID) then
-					local itemName = GetItemInfo(tostring(itemID))
-					if (itemName) then
-						AuctionFrameBrowse_Reset(BrowseResetButton)
-						AuctionFrameBrowse.page = 0
-						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
-						BrowseName:SetText(itemName)
-					end
+	if button == "RightButton" and IsAltKeyDown() and AucAdvanced.Settings.GetSetting("clickhook.enable") then
+		if AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible() then
+			local bag = self:GetParent():GetID()
+			local slot = self:GetID()
+			local link = GetContainerItemLink(bag, slot)
+			if link and link:match("item:%d") then
+				local itemName = GetItemInfo(link)
+				if itemName then
+					AuctionFrameBrowse_Reset(BrowseResetButton)
+					AuctionFrameBrowse.page = 0
+					BrowseName:SetText(itemName)
+					AuctionFrameBrowse_Search()
 				end
 			end
 		end
@@ -188,8 +180,8 @@ function private.ClickLinkHook(self, item, link, button)
 				if itemName then
 					AuctionFrameBrowse_Reset(BrowseResetButton)
 					AuctionFrameBrowse.page = 0
-					QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
 					BrowseName:SetText(itemName)
+					AuctionFrameBrowse_Search()
 				end
 			end
 		end
@@ -217,9 +209,9 @@ function private.OnLoad(addon)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
 
 		private.HookTT()
-		--updated saved variables format 
+		--updated saved variables format
 		if not AucAdvancedConfig["version"] then AucAdvanced.Settings.upgradeSavedVariables() end
-		
+
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
