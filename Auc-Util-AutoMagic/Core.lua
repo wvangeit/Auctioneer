@@ -242,7 +242,6 @@ local isHerb =
 local _, CLOTH, LEATHER, MAIL, PLATE = GetAuctionItemSubClasses(2) --only way I found to get a localized subtype
 local isClass = {
 	["DEATHKNIGHT"] = PLATE,
-	["SHAMAN"] = MAIL,
 	["MAGE"] = CLOTH,
 	["PRIEST"] = CLOTH,
 	["WARLOCK"] = CLOTH,
@@ -251,10 +250,12 @@ local isClass = {
 	--lvl 40
 	["WARRIOR"] = PLATE,
 	["WARRIORLOW"] = MAIL, --warriors and paladins plate does not appear before 40,
-	["HUNTER"] = MAIL,
-	["HUNTERLOW"] = LEATHER,
 	["PALADIN"] = PLATE,
 	["PALADINLOW"] = MAIL,
+	["HUNTER"] = MAIL,
+	["HUNTERLOW"] = LEATHER,
+	["SHAMAN"] = MAIL,
+	["SHAMANLOW"] = LEATHER,
 }
 
 local playerArmorType
@@ -263,7 +264,7 @@ function lib.playerArmor()
 	local level = UnitLevel("player")
 	if not isClass[class] then print("Unknown player class..", class) return end
 
-	if level < 40 and (class == "WARRIOR" or class == "PALADIN" or class == "HUNTER") then
+	if level < 40 and (class == "WARRIOR" or class == "PALADIN" or class == "HUNTER" or class == "SHAMAN") then
 		class = class.."LOW"
 	end
 	return isClass[class]
@@ -307,10 +308,10 @@ local ScanTip3 = AppraiserTipTextLeft3
 local ScanTipRight2  = AppraiserTipTextRight2
 local ScanTipRight3 = AppraiserTipTextRight3
 function lib.cannotUse(itemSubType)
-	--check usable armor types
-	--check usable armor types
+	--check desirable armor types
 	if itemSubType == CLOTH or itemSubType == LEATHER or itemSubType == MAIL or itemSubType == PLATE then
 		if playerArmorType ~= itemSubType then
+--~ 			print(1, AppraiserTipTextLeft1:GetText(), ScanTip2:GetText(), playerArmorType ,itemSubType)
 			return true
 		end
 	end
@@ -335,7 +336,6 @@ function lib.cannotUse(itemSubType)
 		r,g,b = ScanTipRight2:GetTextColor()
 		hex = string.format("%02x%02x%02x", r*255, g*255, b*255)
 		if ScanTipRight2:GetText() and hex == "fe1f1f" then
-			print(r,g,b)
 --~ 			print(4, AppraiserTipTextLeft1:GetText(), ScanTipRight2:GetText())
 			return true
 		end
@@ -386,7 +386,7 @@ function lib.vendorAction(autovendor)
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
 						elseif itemRarity == 0 and get("util.automagic.autosellgrey") and get("util.automagic.autosellgreynoprompt") then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
-						elseif soulbound and get("util.automagic.vendorunusablebop") and get("util.automagic.autosellbopnoprompt") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
+						elseif soulbound and get("util.automagic.vendorunusablebop") and get("util.automagic.autosellbopnoprompt") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and lib.cannotUse(itemSubType) then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
 						elseif get("util.automagic.autosellreason") and get("util.automagic.autosellreasonnoprompt") then
 							local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
@@ -399,7 +399,7 @@ function lib.vendorAction(autovendor)
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Sell List"}
 						elseif itemRarity == 0 and get("util.automagic.autosellgrey") then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Grey"}
-						elseif soulbound and get("util.automagic.vendorunusablebop") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and playerClassEquipment[itemSubType] then
+						elseif soulbound and get("util.automagic.vendorunusablebop") and IsEquippableItem(itemLink) and itemRarity < 3 and not lootable and lib.cannotUse(itemSubType) then
 							lib.vendorlist[key] = {itemLink, itemSig, itemCount, bag, slot, "Unusable"}
 						elseif get("util.automagic.autosellreason") then
 							local reason, text = lib.getReason(itemLink, itemName, itemCount, "vendor")
