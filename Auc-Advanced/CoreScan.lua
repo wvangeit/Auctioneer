@@ -1728,7 +1728,7 @@ function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 			while pos <= #Const.ScanPosLabels do
 				if (pos ~= Const.SELLER and pos ~= Const.NAME and pos ~= Const.COUNT and pos ~= Const.LINK) then
 					if itemData[pos] ~= GetAuctionItemData[pos] then
-						message = ("%s%s %s (%s), "):format(message, itemData[pos] or "(nil)", GetAuctionItemData[pos] or "(nil)")
+						message = ("%s%s (%s), "):format(message, itemData[pos] or "(nil)", GetAuctionItemData[pos] or "(nil)")
 					else
 						message = ("%s%s %s, "):format(message, itemData[pos] or "(nil)")
 					end
