@@ -70,12 +70,6 @@ function lib:MakeGuiConfig(gui)
 end
 
 function lib.Search(item)
-	local market, seen, _, pctstring
-
-	if not GetSellValue then
-		return false, "Vendor pricing not available"
-	end
-
 	local bidprice, buyprice = item[Const.PRICE], item[Const.BUYOUT]
 	local maxprice = get("vendor.maxprice.enable") and get("vendor.maxprice")
 	if buyprice <= 0 or not get("vendor.allow.buy") or (maxprice and buyprice > maxprice) then
@@ -88,19 +82,17 @@ function lib.Search(item)
 		return false, "Does not meet bid/buy requirements"
 	end
 
-	local market = GetSellValue(item[Const.ITEMID])
+	local _,_,_,_,_,_,_,_,_,_,market = GetItemInfo(item[Const.ITEMID])
 	-- If there's no price, then we obviously can't sell it, ignore!
 	if not market or market == 0 then
 		return false, "No vendor price"
 	end
 	market = market * item[Const.COUNT]
 
-
-	local pct = get("vendor.profit.pct")
-	local minprofit = get("vendor.profit.min")
-	local value = market * (100-pct) / 100
-	if value > (market - minprofit) then
-		value = market - minprofit
+	local value = market * (100-get("vendor.profit.pct")) / 100
+	local value2 = market - get("vendor.profit.min")
+	if value > value2 then
+		value = value2
 	end
 	if buyprice and buyprice <= value then
 		return "buy", market
