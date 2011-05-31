@@ -44,12 +44,10 @@ private.sheetdata = {}
 
 function private.OnEnterSheet(button, row, index)
 	if private.ignorelistGUI.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-		local link, name
-		link = private.ignorelistGUI.sheet.rows[row][index]:GetText()
-		name = GetItemInfo(link)
-		if link and name then
+		local link = private.ignorelistGUI.sheet.rows[row][index]:GetText()
+		if link and link:match("|Hitem:%d") then
 			GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-			AucAdvanced.ShowItemLink(GameTooltip, link, count)
+			GameTooltip:SetHyperlink(link)
 		end
 	end
 end
