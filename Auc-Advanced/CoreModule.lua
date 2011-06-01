@@ -1,7 +1,7 @@
 --[[
 	Auctioneer
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: CoreConst.lua 4598 2010-01-07 20:40:09Z brykrys $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
@@ -158,4 +158,4 @@ function lib.CoreModuleOnLoad(addon)
 end
 
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/CoreConst.lua $", "$Rev: 4598 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
