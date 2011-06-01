@@ -1730,7 +1730,7 @@ function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 					if itemData[pos] ~= GetAuctionItemData[pos] then
 						message = ("%s%s (%s), "):format(message, itemData[pos] or "(nil)", GetAuctionItemData[pos] or "(nil)")
 					else
-						message = ("%s%s %s, "):format(message, itemData[pos] or "(nil)")
+						message = ("%s%s, "):format(message, itemData[pos] or "(nil)")
 					end
 
 					printed = printed + 1
