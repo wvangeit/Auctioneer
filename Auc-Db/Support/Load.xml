@@ -1,5 +1,4 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 	<Script file="StringRope.lua"/>
-	<Script file="LibRevision.lua"/>
 </Ui>
 
