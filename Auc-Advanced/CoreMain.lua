@@ -188,6 +188,15 @@ function private.ClickLinkHook(self, item, link, button)
 	end
 end
 
+local ALTCHATLINKTOOLTIP_OPEN
+function private.AltChatLinkTooltipHook(link, text, button, chatFrame)
+	if button == "LeftButton"
+	and AucAdvanced.Settings.GetSetting("core.tooltip.altchatlink_leftclick")
+	and link:sub(1, 4) == "item" then
+		return ALTCHATLINKTOOLTIP_OPEN
+	end
+end
+
 function private.HookAH()
 	hooksecurefunc("AuctionFrameBrowse_Update", AucAdvanced.API.ListUpdate)
 	AucAdvanced.SendProcessorMessage("auctionui")
@@ -197,6 +206,8 @@ function private.HookTT()
 	tooltip = AucAdvanced.GetTooltip()
 	tooltip:Activate()
 	tooltip:AddCallback(private.OnTooltip, 600)
+	tooltip:AltChatLinkRegister(private.AltChatLinkTooltipHook)
+	ALTCHATLINKTOOLTIP_OPEN = tooltip:AltChatLinkConstants()
 end
 
 function private.OnLoad(addon)
