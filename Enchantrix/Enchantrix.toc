@@ -18,7 +18,6 @@
 ## X-Feedback: http://forums.norganna.org
 
 ##
-Support\Load.xml
 EnxManifest.lua
 
 Libs\Load.xml
