@@ -959,11 +959,22 @@ function onLoad()
 	slidebar()
 end
 
+local ALTCHATLINKTOOLTIP_OPEN
+local function callbackAltChatLinkTooltip(link, text, button, chatFrame)
+	if button == "LeftButton"
+	and Informant.Settings.GetSetting("altchatlink-tooltip")
+	and link:sub(1, 4) == "item" then
+		return ALTCHATLINKTOOLTIP_OPEN
+	end
+end
+
 local function frameLoaded()
 	Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
 
 	tooltip:Activate()
 	tooltip:AddCallback(Informant.TooltipHandler, 300)
+	tooltip:AltChatLinkRegister(callbackAltChatLinkTooltip)
+	ALTCHATLINKTOOLTIP_OPEN = tooltip:AltChatLinkConstants()
 
 	onLoad()
 
