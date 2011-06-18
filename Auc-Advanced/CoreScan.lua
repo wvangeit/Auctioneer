@@ -233,11 +233,6 @@ function private.LoadScanData()
 	end
 end
 
-function lib.GetImage()
-	-- Deprecated
-	if private.LoadScanData then private.LoadScanData() end
-end
-
 function lib.LoadScanData()
 	if private.LoadScanData then private.LoadScanData() end
 end
@@ -675,30 +670,6 @@ function private.GetNextID(idList)
 	end
 	idList[1] = nextId
 	return nextId
-end
-
--- Library wrapper for private.GetScanData. Deprecated function
-function lib.GetScanData(serverKey, reserved)
-	_G.AucAdvanced.API.ShowDeprecationAlert(nil, "Direct access to the ScanData image is deprecated. Instead QueryImage, GetImageCopy or GetImageItem should be used")
-	if serverKey then
-		local realmName, faction = _G.AucAdvanced.SplitServerKey(serverKey)
-		if not realmName then
-			if serverKey == "Alliance" or serverKey == "Horde" or serverKey == "Neutral" then
-				faction = serverKey
-			else
-				error("Invalid serverKey passed to GetScanData")
-			end
-			if reserved then
-				realmName = reserved
-			else
-				realmName = GetRealmName()
-			end
-			serverKey = realmName.."-"..faction
-		end
-	else
-		serverKey = GetFaction()
-	end
-	return private.GetScanData(serverKey)
 end
 
 function lib.GetScanStats(serverKey)
