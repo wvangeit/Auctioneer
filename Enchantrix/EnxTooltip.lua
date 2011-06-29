@@ -120,6 +120,7 @@ local function prospectTooltip(prospect, tooltip, name, link, quality, count)
 		-- Name and quality
 		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
 		local _, _, _, color = GetItemQualityColor(rQuality or 0)
+		color = "|c"..color
 		tooltipFormat:SetPattern("|q", color or "|cffcccc33")
 		if (not rName) then rName = "item:"..result; end
 		tooltipFormat:SetPattern("$name", rName)
@@ -213,6 +214,7 @@ local function millingTooltip(prospect, tooltip, name, link, quality, count)
 		-- Name and quality
 		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
 		local _, _, _, color = GetItemQualityColor(rQuality or 0)
+		color = "|c"..color
 		tooltipFormat:SetPattern("|q", color or "|cffcccc33")
 		if (not rName) then rName = "item:"..result; end
 		tooltipFormat:SetPattern("$name", rName)
@@ -396,6 +398,7 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 				-- Name and quality
 				local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
 				local _, _, _, color = GetItemQualityColor(rQuality or 0)
+				color = "|c"..color
 				tooltipFormat:SetPattern("|q", color or "|cffcccc33")
 				if (not rName) then rName = "item:"..result; end
 				tooltipFormat:SetPattern("$name", rName)
@@ -599,6 +602,7 @@ function enchantTooltip(tooltip, name, link, isItem)
 		local style, extra = Enchantrix.Util.GetPricingModel();
 		local hsp, median, market, five, fix = Enchantrix.Util.GetReagentPrice(reagent[1],extra)
 		local _, _, _, color = GetItemQualityColor(rQuality)
+		color = "|c"..color
 
 		reagent[1] = rName
 		table.insert(reagent, rQuality)
