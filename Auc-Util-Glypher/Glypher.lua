@@ -898,9 +898,10 @@ function private.cofindGlyphs()
 
 				--if we match the ink and our profits high enough, check how many we currently have on AH
 				if worthPrice and (worthPrice - reagentCost) >= MinimumProfit and inkMatch then
-					local currentAuctions = private.GetStock(itemId)
+					local inventory = private.GetStock(itemId) -- this is really the current inventory, not just auctions
 
-					local make = ceil(bcSold/history * stockdays) - currentAuctions -- *must* use ceiling so that small numbers don't round to zero & bypass our minimum stock setting
+					local want = ceil(bcSold/history * stockdays) -- *must* use ceiling so that small numbers don't round to zero & bypass our minimum stock setting
+
 					local failed = 0
 					if DataStore and DataStore:IsModuleEnabled("DataStore_Auctions") then -- Auctions & Bids
 						for characterName, character in pairs(DataStore:GetCharacters(realm, account)) do
@@ -914,31 +915,41 @@ function private.cofindGlyphs()
 						if characterFailed then failed = characterFailed end
 					end
 
-					if bcSold == 0 and failed == 0 and currentAuctions == 0 then
+
+					local makemaxstock = get("util.glypher.makemaxstock")
+
+					-- Order of precedence for rules maxstock > mincraft > makefornew > minstock > projected
+					local make
+					if bcSold == 0 and failed == 0 and inventory == 0 then
 						make = makefornew
 						local mess = "New glyph: " .. link
 						DEFAULT_CHAT_FRAME:AddMessage(mess,1.0,0.0,0.0)
+					elseif makemaxstock then
+						make = maxstock - inventory
+					elseif (want > 0 or hardminstock) and want < minstock then
+						-- *must* gate minimum against the ceiling of our calculated want, not 
+						-- (want - inventory). If we calculate that we want 0.7 and we have 2 in 
+						-- inventory, ceil(want - inventory) will be < 0, and we won't respect our
+						-- minimum-stock rule.
+						make = minstock - inventory
+					else
+						make = want - inventory
 					end
-					local makemaxstock = get("util.glypher.makemaxstock")
-					if makemaxstock and (currentAuctions == 0) and (make < maxstock) then make = maxstock end
-					if (make > 0 or hardminstock) and ((make + currentAuctions) < minstock) then make = (minstock - currentAuctions) end
-					if (make > 0) and (make < mincraft) then
-						--if (make >= (mincraft * (mincraftthreshold/100))) or (currentAuctions <  minstock) or (currentAuctions == 0) then
-						--if (currentAuctions < minstock) or (currentAuctions == 0) then
+
+					-- Respect mincraft and maxstock
+					if inventory + mincraft > maxstock then
+						-- if mincraft would put us over the limit don't make anything (this 
+						-- avoids repeatedly topping off stacks)
+						make = 0
+					elseif make > 0 and make < mincraft then
 						make = mincraft
-						--else
-						--    make = 0
-						--end
+					elseif make + inventory > maxstock then 
+						make = maxstock - inventory
 					end
-					--if (minoverstock > 0) and (make + currentAuctions) > maxstock and (make + currentAuctions) > (((100+minoverstock)/100)*maxstock) then
-					--    if (make + currentAuctions) > overstock then
-					--        make = (overstock - currentAuctions)
-					--    end
-					--elseif (make + currentAuctions) > maxstock then
-					if (make + currentAuctions) > maxstock then
-						make = (maxstock - currentAuctions)
-					end
-					if (make > 0) and (make < mincraft) then make = 0 end -- in this case we can't make mincraft because it would put us over the limit, so let's make none at all (this avoids repeatedly "topping off" stacks)
+					
+					assert(make <= 0 or make + inventory <= maxstock, "planned to make more than maxstock, logic error")
+					assert(make <= 0 or make >= mincraft, "planned to make less than mincraft, logic error")
+
 					if make > 0 then
 						local failedratio
 						if (bcSold > 0) then failedratio = failed/bcSold else failedratio = failed end
