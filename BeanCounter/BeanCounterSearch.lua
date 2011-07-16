@@ -201,7 +201,7 @@ function private.searchServerData(serverName, data, tbl, settings)
 	--Retrives all matching results
 	for i in pairs(server) do
 		--get faction for player i out of the BeanCounterDBSettings table
-		local faction = BeanCounterDBSettings[serverName][i]["faction"]
+		local faction = BeanCounterDBSettings[serverName][i]["faction"] or "unknown"
 		if settings.selectbox[2] == "alliance" and faction:lower() ~= settings.selectbox[2] then
 			--If looking for alliance and player is not alliance fall into this null
 		elseif settings.selectbox[2] == "horde" and faction:lower() ~= settings.selectbox[2] then
