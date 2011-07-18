@@ -4,7 +4,7 @@
 	This is an example addon. Use the below code to start your own
 	module should you wish.
 
-	This top section should bel deleted from any derivative code
+	This top section should be deleted from any derivative code
 	before you distribute it.
 
 ]]
@@ -19,7 +19,7 @@ end
 --[[
 	Auctioneer - Stat's API Example module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Example.lua 4828 2010-07-21 22:20:18Z Prowell $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer module that does something nifty.
@@ -53,74 +53,45 @@ if not AucAdvanced then return end
 
 --[[
 Convention Used to identify the addon to Auctioneer is a libType and a name.
-The name must be unique or else Auctioneer will return nil from NewModule.
+The name must be unique (case insensitive).
 Valid libType's are:
 	Filter	-- Allows removal of auctions from consideration by Stats modules for statistical use.
 	Stat	-- Gathers and reports statistics about items.  The heart of Auctioneer.
 	Util	-- This is a catch-all.  A module that doesn't do the additional items of the others.
 	Match	-- Module is used by Auctioneer to control pricing (set to some value).
 --]]
-local libName = "Example"
+local libName = "Example2" -- note: Auc-Util-Example has already taken the name "Example"!
 local libType = "Stat"
 
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
--- One case where this will happen is if the libType/libName combo has already been registered.
--- in fact, that should be the only case this happens.
+-- One case where this will happen is if the libName has already been registered.
 if not lib then return end
 
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 --[[
 The following functions are part of the module's exposed methods:
-	GetName()         (required) Should return this module's full name
+	GetName()         (created by NewModule) Returns libName. Should never be overridden
+	GetLocalName()    (optional) Returns a localized name (NewModule creates a default version, which may be overridden)
 	CommandHandler()  (optional) Slash command handler for this module
-	Processor()       (optional) Processes messages sent by Auctioneer
-	ScanProcessor()   (optional) Processes items from the scan manager
-*	GetPrice()        (required) Returns estimated price for item link
-*	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
+	Processors ={}    (optional) Table containing functions to process messages sent by Auctioneer
+	ScanProcessors={} (optional) Table containing functions to process items during a scan
+	GetPrice()        (optional) Returns estimated price for item link
+	GetPriceColumns() (optional) Returns the column names for GetPrice
+	OnLoad()          (optional) Receives load message for self, and for any modules specified by LoadTriggers table
+	OnUnload()        (optional) Called during logout, just before data gets saved
+	
+	GetPriceArray()   (*) Returns pricing and other statistical info in an array
+	GetItemPDF()      (**) Returns Probability Density Function for item link (see below)
+	AuctionFilter()   (##) Perform filtering on an auction entry
+	GetMatchArray()   ($$) Perform price matching on an item link
 
-	(*) Only implemented in stats modules; util modules do not provide
-]]
+	* Required for Stat modules, optional for other module types
+	** Required for Stat modules, not used by other module types
+	## Required for Filter modules, not used by other module types
+	$$ Required for Match modules, not used by other module types
 
-
---[[ 
-Function is required in ALL lib's created by AucAdvanced.NewModule
-This function should return the full name of this module.
-However, NewModule creates a default that returns the libName.
 ]]
---[[
-function lib.GetName()
-	return libName
-end
-]]
-
---[[
-lib.Processor is deprecated.  It will not be called at all if lib.Processors is defined.
-Support for this could be removed soon, so don't use in a new routine.
-A simple upgrade path for older modules is to 
-add a line
-lib.Processors.[callbackType] = lib.Processors
-for each callbackType.
-However, a more efficient method is to create new functions that do only what is needed for
-that specific callback type, as some of these callbacks are done very often.
-Also, for proper functioning, lib.Processor and/or lib.Processors.[callbackType] functions
-must be defined when the addon is registered and must not be added or removed after that point.
-Code inside the function must be used if you don't want to handle the message all the time.
-]]
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		--Called when the tooltip is being drawn.
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	elseif (callbackType == "listupdate") then
-		--Called when the AH Browse screen receives an update.
-	elseif (callbackType == "configchanged") then
-		--Called when your config options (if Configator) have been changed.
-	end
-end
 
 lib.Processors = {}
 lib.Processors.listupdate = function(callbackType) end
@@ -136,7 +107,7 @@ lib.Processors.bidplaced = function(callbackType, bidInfo) end
 lib.Processors.tooltip = function(callbackType, tooltip, name, hyperlink, quality, quantity, cost, extra) end
 -- Not yet in use.
 lib.Processors.SKtooltip = function(callbackType, serverKey, tooltip, name, hyperlink, quality, quantity, cost, extra) end
--- Called every frame while opened?
+-- Blizzard_AuctionUI has loaded. Use to hook into Blizzard auction code (e.g. AuctionFrame, etc.)
 lib.Processors.auctionui = function(callbackType) end
 -- An auctioneer addon has been loaded.
 lib.Processors.load = function(callbackType, addon) end
@@ -144,9 +115,9 @@ lib.Processors.load = function(callbackType, addon) end
 lib.Processors.auctionopen = function(callbackType) end
 -- Auction UI Closed
 lib.Processors.auctionclose = function(callbackType) end
--- Send a message that a module has been added.
-lib.Processors.newmodule = function(callbackType) end
--- Indicate post queue has been reduced
+-- A module has been registered with NewModule. Use to flush caches. Note: the module will not yet be fully loaded
+lib.Processors.newmodule = function(callbackType, libType, libName) end
+-- Indicate post queue lenght has changed
 lib.Processors.postqueue = function(callbackType, queuelength) end
 -- Indicate results of a post attempt
 lib.Processors.postresult = function(callbackType, successful, id, request, reason) end
@@ -180,33 +151,64 @@ end
 
 function lib.OnLoad()
 	--This function is called when your variables have been loaded.
+	--Localizations are now available
 	--You should also set your Configator defaults here
 
-	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("util.example.active", true)
-	AucAdvanced.Settings.SetDefault("util.example.slider", 50)
-	AucAdvanced.Settings.SetDefault("util.example.wideslider", 100)
-	AucAdvanced.Settings.SetDefault("util.example.hardselectbox", 5)
-	AucAdvanced.Settings.SetDefault("util.example.dynamicselectbox", 5)
-	AucAdvanced.Settings.SetDefault("util.example.label", "Label")
-	AucAdvanced.Settings.SetDefault("util.example.text", "")
-	AucAdvanced.Settings.SetDefault("util.example.numberbox", "5")
-	AucAdvanced.Settings.SetDefault("util.example.moneyframe", "50000000")
-	AucAdvanced.Settings.SetDefault("util.example.moneyframepinned", "010101")
+	-- note: this sort of announcement can get annoying, so should usually be avoided
+	aucPrint("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	
+	-- setting strings should be of the form "libType.libName.settingName"
+	-- they should contain exactly 2 '.' characters
+	AucAdvanced.Settings.SetDefault("stat.example2.active", true)
+	AucAdvanced.Settings.SetDefault("stat.example2.slider", 50)
+	AucAdvanced.Settings.SetDefault("stat.example2.wideslider", 100)
+	AucAdvanced.Settings.SetDefault("stat.example2.hardselectbox", 5)
+	AucAdvanced.Settings.SetDefault("stat.example2.dynamicselectbox", 5)
+	AucAdvanced.Settings.SetDefault("stat.example2.label", "Label")
+	AucAdvanced.Settings.SetDefault("stat.example2.text", "")
+	AucAdvanced.Settings.SetDefault("stat.example2.numberbox", "5")
+	AucAdvanced.Settings.SetDefault("stat.example2.moneyframe", "50000000")
+	AucAdvanced.Settings.SetDefault("stat.example2.moneyframepinned", "010101")
+end
+
+-- Example of making a Probability Density Function from mean and stddev
+local bellCurve = AucAdvanced.API.GenerateBellCurve();
+function lib.GetItemPDF(hyperlink, serverKey)
+	local mean, seen, stddev = private.GetInfo(hyperlink, serverKey)
+	-- you should check that mean and stddev are valid here, before continuing
+	local lower, upper = mean - 3*stddev, mean + 3*stddev
+	bellCurve:SetParameters(mean, stddev)
+	return bellCurve, lower, upper;
+end
+
+local array = {}
+function lib.GetPriceArray(hyperlink, serverKey)
+	local mean, seen, stddev = private.GetInfo(hyperlink, serverKey)
+	wipe(array)
+	-- expected entries
+	array.price = mean
+	array.seen = seen
 end
 
 --[[ Local functions ]]--
 
+function private.GetInfo(hyperlink, serverKey)
+	local mean, seen, stddev
+	-- do your processing here
+	return mean, seen, stddev
+end
+
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
+	-- Localizations will be available using _TRANS
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.example.active", "This is a checkbox, it has two settings true (selected) and false (cleared)")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.example2.active", "This is a checkbox, it has two settings true (selected) and false (cleared)")
 
 	gui:AddControl(id, "Subhead",    0,    "There are two kinds of sliders:")
-	gui:AddControl(id, "Slider",     0, 1, "util.example.slider", 0, 100, 1, "Normal Sliders: %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.example.wideslider",    0, 200, 1, "And Wide Sliders: %d%%")
+	gui:AddControl(id, "Slider",     0, 1, "stat.example2.slider", 0, 100, 1, "Normal Sliders: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "stat.example2.wideslider",    0, 200, 1, "And Wide Sliders: %d%%")
 
 	gui:AddControl(id, "Subhead",    0,    "There are also two ways to build a selection box:")
 	gui:AddControl(id, "Selectbox",  0, 1, {
@@ -220,23 +222,23 @@ function private.SetupConfigGui(gui)
 		{7, "Seven"},
 		{8, "Eight"},
 		{9, "Nine"}
-	}, "util.example.hardselectbox", "Statically, by hardcoding the values...")
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetNumbers, "util.example.dynamicselectbox", "Or dynamically by specifying a function instead of a table...")
+	}, "stat.example2.hardselectbox", "Statically, by hardcoding the values...")
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetNumbers, "stat.example2.dynamicselectbox", "Or dynamically by specifying a function instead of a table...")
 
 	gui:AddControl(id, "Subhead",    0,    "There are also a few ways to add text:\n  The Headers and SubHeaders that you've already seen...")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, "Notes...")
-	gui:AddControl(id, "Label",      0, 1, "util.example.label", "And Labels")
+	gui:AddControl(id, "Label",      0, 1, "stat.example2.label", "And Labels")
 
 	gui:AddControl(id, "Subhead",    0,    "There are two ways to get input via keyboard:")
-	gui:AddControl(id, "Text",       0, 1, "util.example.text", "Via the Text Control...")
-	gui:AddControl(id, "NumberBox",  0, 1, "util.example.numberbox", 0, 9, "Or using the NumberBox if you only need numbers.")
+	gui:AddControl(id, "Text",       0, 1, "stat.example2.text", "Via the Text Control...")
+	gui:AddControl(id, "NumberBox",  0, 1, "stat.example2.numberbox", 0, 9, "Or using the NumberBox if you only need numbers.")
 
 	gui:AddControl(id, "Subhead",          0,    "There are two kinds of Money Frames:")
-	gui:AddControl(id, "MoneyFrame",       0, 1, "util.example.moneyframe", "MoneyFrames...")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.example.moneyframepinned", 0, 101010, "And PinnedMoneyFrames.")
+	gui:AddControl(id, "MoneyFrame",       0, 1, "stat.example2.moneyframe", "MoneyFrames...")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "stat.example2.moneyframepinned", 0, 101010, "And PinnedMoneyFrames.")
 
 	gui:AddControl(id, "Subhead",    0,    "And finally...")
-	gui:AddControl(id, "Button",     0, 1, "util.example.button", "The Button!")
+	gui:AddControl(id, "Button",     0, 1, "stat.example2.button", "The Button!")
 end
 
 function private.GetNumbers()
@@ -252,4 +254,4 @@ end
 function private.Baz()
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Advanced/Modules/Auc-Util-Example/Example.lua $", "$Rev: 4828 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

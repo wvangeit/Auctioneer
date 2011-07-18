@@ -2,11 +2,11 @@
 	<Script>
 		AucAdvanced.EmbeddedModules = {
 			"Auc-Util-Example",
-			"Auc-Util-Graph"
+			"Auc-Stat-Example2"
 		}
 		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>
 
 	<Include file="Auc-Util-Example\Embed.xml"/>
-	<Include file="Auc-Util-Graph\Embed.xml"/>
+	<Include file="Auc-Stat-Example2\Embed.xml"/>
 </Ui>
