@@ -632,7 +632,8 @@ function private.LoadItemLink(itemLink, size)
 		private.SetIconCount(itemCount)
 
 		frame.name:SetText(itemName)
-		frame.name:SetTextColor(GetItemQualityColor(itemRarity))
+		local r, g, b = GetItemQualityColor(itemRarity)
+		frame.name:SetTextColor(r, g, b)
 	else
 		frame.icon.itemLink = nil
 		frame.icon:SetNormalTexture(nil)
