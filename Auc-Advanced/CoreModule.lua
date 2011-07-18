@@ -36,7 +36,7 @@
 	Auctioneer Core Module Support
 
 	This code helps maintain internal integrity of Auctioneer.  Allows a module to be created to support the Core
-	without hoisting variables into a public namespace.  
+	without hoisting variables into a public namespace.
 	Also creates an addon local (can only get a reference during auctioneers startup) tablespace, allowing more intermodule interaction
 	without hoisting the variables into the public tablespace.
 --]]
@@ -45,8 +45,9 @@
 if not AucAdvanced then return end
 local lib = AucAdvanced
 
+local _, internal = ...
+
 local modules = {}
-local internal = {}
 
 -- This is an initial creation function.  Create and return items once.  Expect the caller to store that value for use.
 function lib.GetCoreModule(moduleName)
@@ -63,14 +64,9 @@ end
 	Used to catch messages and pass them on to elements of the core
 --]]
 local coremoduleInternal = {}
-local coremodule = {
-	libType = "Util",
-	libName = "CoreModule",
-	GetName = function() return "CoreModule" end,
-	}
+local coremodule = {}
 
 
-	
 local function HasOnlyFunctions(tbl)
 	for _, elem in pairs(tbl) do
 		if not type(elem)=="function" then
@@ -120,7 +116,7 @@ function lib.CoreModuleOnLoad(addon)
 				elseif (tp=="function") then
 					if not coremoduleInternal[elem] then coremoduleInternal[elem] = {} end
 					local fs = coremoduleInternal[elem]
-					
+
 					if not coremodule[elem] then
 						local f = elem
 						coremodule[elem]=function(...)
@@ -133,8 +129,8 @@ function lib.CoreModuleOnLoad(addon)
 					table.insert(fs, dat)
 				end
 			else
-				if nLog then 
-					nLog.AddMessage("Auctioneer", "CoreModule", N_WARNING, "CoreModule did not match expected layout", 
+				if nLog then
+					nLog.AddMessage("Auctioneer", "CoreModule", N_WARNING, "CoreModule did not match expected layout",
 						("For %s, Baseline %s has type %s while %s has type %s"):format(
 							elem, ncheck[elem] or "??", tcheck[elem] or "??",
 							mdl, tp))
@@ -144,8 +140,7 @@ function lib.CoreModuleOnLoad(addon)
 	end
 
 	-- install as a Module
-	lib.Modules.Util.CoreModule = coremodule
-	lib.SendProcessorMessage("newmodule", "Util", "CoreModule")
+	AucAdvanced.NewModule("Util", "CoreModule", coremodule, true)
 
 	-- do OnLoad
 	if coremodule.OnLoad then
