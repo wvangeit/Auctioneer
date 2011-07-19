@@ -13,4 +13,3 @@
 ## X-Feedback: http://forums.norganna.org
 ##
 Embed.xml
-EasyBuyout.lua
