@@ -481,6 +481,16 @@ Recommended method:
 
 --]]
 
+-- local variables for module functions
+local moduleNameLookup = {}
+local moduleNameLower = {}
+local moduleTypeLookup = { -- to convert libtypes to correct case
+	filter = "Filter",
+	match = "Match",
+	stat = "Stat",
+	util = "Util",
+}
+
 --[[
 
 Usage:
@@ -489,40 +499,51 @@ Usage:
   local lib,parent,private = AucAdvanced.NewModule(libType, libName, libTable) -- caller may optionally provide its own libTable
 
   libType must be one of "Filter" "Match" "Stat" "Util"
+  libName must be unique
 
 --]]
 -- local moduleKit = {} -- currently unused
 function lib.NewModule(libType, libName, libTable, noPrivate)
-	if not lib.Modules[libType] then
+	libType = moduleTypeLookup[libType] or libType
+	local typeTable = lib.Modules[libType]
+	if not typeTable then
 		error("Invalid libType specified for NewModule: "..tostring(libType), 2)
+	end
+	if type(libName) ~= "string" then
+		error("Module name must be a string for NewModule", 2)
 	end
 	if libTable and type(libTable) ~= "table" then
 		error("Invalid module table provided to NewModule", 2)
 	end
-
-	if not lib.Modules[libType][libName] then
-		local module = libTable or {}
-		local modulePrivate
-		if not noPrivate then
-			modulePrivate = module.Private or {} -- if libTable includes a 'Private' entry, use that
-			module.Private = modulePrivate
-		end
-		module.libName = libName -- this is unused by anything - should we deprecate it?
-		module.libType = libType -- ditto
-		module.GetName = function() return libName end
-		if not module.GetLocalName then -- don't create if it already exists
-			module.GetLocalName = module.GetName
-		end
-		--[[ currently unused
-		for k,v in pairs(moduleKit) do
-			module[k] = v
-		end
-		--]]
-
-		lib.Modules[libType][libName] = module
-		lib.SendProcessorMessage("newmodule", libType, libName)
-		return module, lib, modulePrivate
+	local lowerName = libName:lower()
+	if moduleNameLower[lowerName] then
+		error("Module name "..lowerName.." already in use by NewModule", 2)
 	end
+	assert(not typeTable[libName]) -- temp
+
+	local module = libTable or {}
+	module.libName = libName -- this is unused by anything - should we deprecate it?
+	module.libType = libType -- ditto
+	module.GetName = function() return libName end
+	module.GetLibType = function() return libType end
+	if not module.GetLocalName then -- don't create if it already exists
+		module.GetLocalName = module.GetName
+	end
+	if not noPrivate and not module.Private then
+		module.Private = {} -- assign a private table if it is wanted and does not already exist
+	end
+	--[[ currently unused
+	for k,v in pairs(moduleKit) do
+		module[k] = v
+	end
+	--]]
+
+	typeTable[libName] = module
+	moduleNameLookup[libName] = module
+	moduleNameLower[lowerName] = module
+
+	lib.SendProcessorMessage("newmodule", libType, libName)
+	return module, lib, module.Private
 end
 
 --[[
@@ -620,8 +641,6 @@ function lib.GetAllModules(having, findSystem, findEngine)
 	return modules
 end
 
-
---[[ End of CoreModule ]]--
 
 local spmArray = {}
 function lib.SendProcessorMessage(spmMsg, ...)
