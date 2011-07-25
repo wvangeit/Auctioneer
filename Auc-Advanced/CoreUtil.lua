@@ -50,15 +50,20 @@ end
 coremodule.Processors = {}
 function coremodule.Processors.auctionopen()
 	private.isAHOpen = true
+	-- temporary check
+	if private.checkAuthorizedModules then
+		private.checkAuthorizedModules()
+	end
 end
 function coremodule.Processors.auctionclose()
 	private.isAHOpen = false
 end
 function coremodule.Processors.newmodule(event, libType, libName)
-	-- resetting caches here allows us to respond to modules that are not created by lib.NewModule,
-	-- as long as they correctly send a "newmodule" message when created
-	private.modulecache = nil
-	private.resetPriceModels()
+	-- the only newmodule messages should come from AucAdvanced.NewModule
+	-- this is a temporary check, until we are sure nothing else is still sending these messages
+	if private.newmoduleCheckName ~= libName then
+		error("Auctioneer has detected unauthorized newmodule message")
+	end
 end
 
 --Localization via babylonian
@@ -542,8 +547,27 @@ function lib.NewModule(libType, libName, libTable, noPrivate)
 	moduleNameLookup[libName] = module
 	moduleNameLower[lowerName] = module
 
+	private.modulecache = nil
+	private.resetPriceModels()
+	
+	private.newmoduleCheckName = libName -- ###
 	lib.SendProcessorMessage("newmodule", libType, libName)
+	private.newmoduleCheckName = nil -- ###
 	return module, lib, module.Private
+end
+
+function private.checkAuthorizedModules()
+	-- check the publicly accessible modules tables, notifying of any modules that have been inserted directly
+	-- called once per session, when auctionhouse first opened
+	private.checkAuthorizedModules = nil
+	for typeName, typeTable in pairs(lib.Modules) do
+		for moduleName, moduleTable in pairs(typeTable) do
+			if not moduleNameLookup[moduleName] then
+				geterrorhandler()(format("Auctioneer has detected unauthorized entry %s(%s) in AucAdvanced.Modules.%s",
+					tostring(moduleName), type(moduleTable), typeName))
+			end
+		end
+	end
 end
 
 --[[
