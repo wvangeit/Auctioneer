@@ -234,11 +234,9 @@ function private.OnLoad(addon)
 
 	-- Notify the actual module if it exists
 	local auc, sys, eng = strsplit("-", addon)
-	if (auc == "auc" and sys and eng) then
-		local engineLib = AucAdvanced.GetAllModules("OnLoad", sys, eng)
-		if engineLib then
-			engineLib.OnLoad(addon)
-		end
+	if auc == "auc" and sys and eng then
+		local engineLib = AucAdvanced.GetModule(sys, eng, "OnLoad")
+		if engineLib then engineLib.OnLoad(addon) end
 	end
 
 	-- Check all modules' load triggers and pass event to processors
@@ -252,7 +250,7 @@ function private.OnLoad(addon)
 	end
 
 	-- Notify all processors that an auctioneer addon has loaded
-	if auc == "auc" and sys and #sys > 0 then -- identifys names in both "auc-name" and "auc-system-name" formats
+	if auc == "auc" and sys and #sys > 0 then -- identify names in both "auc-name" and "auc-system-name" formats
 		AucAdvanced.SendProcessorMessage("load", addon)
 	end
 end

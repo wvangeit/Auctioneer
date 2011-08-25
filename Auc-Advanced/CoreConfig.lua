@@ -120,12 +120,9 @@ function private.CommandHandler(editbox, command, subcommand, ...)
 	elseif command == "getall" then
 		AucAdvanced.Scan.StartScan(nil, nil, nil, nil, nil, nil, nil, nil, true)
 	else
-		if command and subcommand then
-			local engineLib = AucAdvanced.GetAllModules("CommandHandler", command, subcommand)
-			if engineLib then
-				engineLib.CommandHandler(...)
-				return
-			end
+		if command ~= "" and subcommand then
+			local engineLib = AucAdvanced.GetModule(command, subcommand:lower(), "CommandHandler")
+			if engineLib then engineLib.CommandHandler(...) return end
 		end
 
 		-- No match found
