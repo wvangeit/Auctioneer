@@ -528,7 +528,7 @@ do -- Module Functions
 
 	-- function to store references to the module in multiple tables, for fast retrieval by GetModule and GetAllModules
 	local function UpdateModuleTables(moduleLib, moduleName, moduleType, lowerName)
-		-- update the inernal lookup tables
+		-- update the internal lookup tables
 		moduleNameLower[lowerName] = moduleLib
 		moduleNameLookups.All[moduleName] = moduleLib
 		moduleNameLookups[moduleType][moduleName] = moduleLib
@@ -698,15 +698,12 @@ do -- Module Functions
 		local modules
 
 		if useTable then
-			if type(useTable) == "table" then
+			local t = type(useTable)
+			if t == "table" then
 				modules = useTable
-			elseif type(useTable) == "string" then
+			elseif t == "string" then
 				lib.API.ShowDeprecationAlert("GetModule")
-				local module = lib.GetModule(findSystem, useTable)
-				if module and (not having or module[having]) then
-					return module
-				end
-				return
+				return lib.GetModule(findSystem, useTable, having)
 			else
 				return
 			end
