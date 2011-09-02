@@ -155,7 +155,10 @@ function lib.RefreshPage()
 		offset = 1
 	end
 
-	local page = private.pageCount - offset or 0
+	local page = private.pageCount - offset
+	if page < 0 then
+		page = 0
+	end
 	if get("realtime.reload.topscan") then
 		private.topScan = not private.topScan --flip the variable, so we alternate first and last pages
 	else
