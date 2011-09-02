@@ -1504,8 +1504,8 @@ function lib.MakeGuiConfig()
 		if gui.config.selectedCat == "Searchers" then
 			gui.Search:Enable()
 			--Check if rescan method is implemented
-			local searcher = gui.config.selectedTab
-			if lib.Searchers[searcher].Rescan then
+			local searcher = private.FindSearcher() -- find Selected searcher
+			if searcher.Rescan then
 				gui.Rescan:Show()
 				gui.Rescan:SetScript("OnClick", function()
 									if flagRescan then
@@ -1514,7 +1514,7 @@ function lib.MakeGuiConfig()
 										private.gui.Search:Enable()
 										lib.PerformSearch()
 									else
-										lib.Searchers[searcher].Rescan()
+										searcher.Rescan()
 										CooldownFrame_SetTimer(gui.Rescan.frame, GetTime(), 2, 1)
 										private.gui.Search:Disable()
 										flagRescan = GetTime()
