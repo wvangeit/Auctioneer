@@ -339,6 +339,38 @@ local function SetupConfigGui(gui)
 	ScrollFrame_OnLoad(AucFilterBasicScrollFrame)
 	gui:AddControl(id, "Custom", 0.55, 0, listframe)
 
+	StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
+		text = _TRANS("BASC_Interface_PlayerIgnoreLabel"),
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		hasEditBox = 1,
+		maxLetters = 12,
+
+		OnAccept = function(self)
+			lib.AddPlayerIgnore(self.editBox:GetText())
+		end,
+		OnShow = function(self)
+			self.editBox:SetFocus()
+		end,
+		OnHide = function(self)
+			ChatEdit_FocusActiveWindow();
+			self.editBox:SetText("");
+		end,
+		EditBoxOnEnterPressed = function(self)
+			local parent = self:GetParent()
+			lib.AddPlayerIgnore(parent.editBox:GetText())
+			parent:Hide()
+		end,
+		EditBoxOnEscapePressed = function(self)
+			self:GetParent():Hide();
+		end,
+
+		timeout = 0,
+		exclusive = 1,
+		whileDead = 1,
+		hideOnEscape = 1
+	}
+
 	GUILoaded = true
 	private.IgnoreListUpdate()
 end
@@ -384,37 +416,5 @@ private.IgnorePrompt.no = CreateFrame("Button", nil, private.IgnorePrompt, "AucP
 private.IgnorePrompt.no:SetPoint("BOTTOMRIGHT", private.IgnorePrompt, "BOTTOMRIGHT", -10, 8)
 private.IgnorePrompt.no:SetScript("OnClick", private.OnPromptNo)
 private.IgnorePrompt.no:SetText(NO)
-
-StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
-	text = ADD_IGNORE_LABEL,
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	hasEditBox = 1,
-	maxLetters = 12,
-
-	OnAccept = function(self)
-		lib.AddPlayerIgnore(self.editBox:GetText())
-	end,
-	OnShow = function(self)
-		self.editBox:SetFocus()
-	end,
-	OnHide = function(self)
-		ChatEdit_FocusActiveWindow();
-		self.editBox:SetText("");
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local parent = self:GetParent()
-		lib.AddPlayerIgnore(parent.editBox:GetText())
-		parent:Hide()
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide();
-	end,
-
-	timeout = 0,
-	exclusive = 1,
-	whileDead = 1,
-	hideOnEscape = 1
-}
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
