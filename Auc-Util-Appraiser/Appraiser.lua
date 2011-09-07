@@ -331,14 +331,14 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.displayauctiontab", true)
 	--Default sizes for the scrollframe column widths
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'), 71) --Seller
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'), 25) --Left
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_TimeLeft'), 27) --Left
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'), 27 ) --Stk
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea'), 65) --Min/ea
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea'), 65) --Cur/ea
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buy/ea'), 65) --Buy/ea
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_MinBid'), 65) --MinBid
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid'), 65) --CurBid
-	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 68) --Buyout
+	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 67) --Buyout
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0.05)
 end
 

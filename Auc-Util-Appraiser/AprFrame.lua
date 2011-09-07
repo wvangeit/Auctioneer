@@ -2550,7 +2550,7 @@ function private.CreateFrames()
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		--{ "Item",   "TEXT", get("util.appraiser.columnwidth.Item")}, -- Default width 105
 		{ _TRANS('APPR_Interface_Seller') , "TEXT", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Seller'))},
-		{ _TRANS('APPR_Interface_Left') ,   "INT",  get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Left'))},
+		{ _TRANS('APPR_Interface_TimeLeft') ,   "INT",  get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_TimeLeft'))},
 		{ _TRANS('APPR_Interface_Stk') ,    "INT",  get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Stk'))},
 		{ _TRANS('APPR_Interface_Min/ea') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Min/ea')), { DESCENDING=true } },
 		{ _TRANS('APPR_Interface_Cur/ea') , "COIN", get("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Cur/ea')), { DESCENDING=true } },
