@@ -114,6 +114,10 @@ function private.AHLoaded()
 	if AucAdvanced.Modules.Util.CompactUI and AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick and get("util.compactui.activated") then
 		orig_AB_OC = AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick
 		AucAdvanced.Modules.Util.CompactUI.Private.ButtonClick = private.BrowseButton_OnClick
+		for i = 1, NUM_BROWSE_TO_DISPLAY do -- should be 14 buttons
+			local button = _G["BrowseButton"..i]
+			button:SetScript("OnClick", private.BrowseButton_OnClick)
+		end
 		CompactUImode = true
 	else
 		assert(BrowseButton_OnClick, "BrowseButton_OnClick doesn't exist yet")
