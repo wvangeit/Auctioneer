@@ -66,10 +66,12 @@ local bitand = bit.band
 coremodule.Processors = {}
 function coremodule.Processors.scanstats()
 	lib.ClearMarketCache()
+	private.ResetAlgorithms()
 end
 function coremodule.Processors.configchanged(...)
 	lib.ClearMarketCache()
 	private.ResetMatchers(...)
+	private.ResetAlgorithms()
 end
 function coremodule.Processors.newmodule()
 	private.ClearEngineCache()
@@ -355,96 +357,98 @@ function lib.ClearData(command)
 	end
 end
 
+do --[[ Algorithm Functions ]]--
 
-function lib.GetAlgorithms(itemLink)
-	local saneLink = SanitizeLink(itemLink)
-	local engines = {}
-	local modules = AucAdvanced.GetAllModules()
-	for pos, engineLib in ipairs(modules) do
-		if engineLib.GetPrice or engineLib.GetPriceArray then
-			if not engineLib.IsValidAlgorithm
-			or engineLib.IsValidAlgorithm(saneLink) then
-				local engine = engineLib.GetName()
-				tinsert(engines, engine)
+	local lastAlgorithm, lastLink, lastKey, lastPrice, lastSeen
+	local lastNumber, lastNumberLink
+	function private.ResetAlgorithms()
+		lastLink = nil -- only need to nil this one entry to prevent any cache match
+	end
+
+	--[[
+		price, seen = AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)
+		algorithm is the Name of a module which has a pricing function
+		(pricing functions are GetPriceSeen, GetPriceArray, GetPrice)
+	--]]
+	function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
+		local price, seen
+		local module = AucAdvanced.GetModule(algorithm)
+		if not module then return end
+		if type(itemLink) == "number" then
+			if itemLink == lastNumber then -- last number cache, to reduce spamming of GetItemInfo
+				itemLink = lastNumberLink
+			else
+				local _, i = GetItemInfo(itemLink)
+				lastNumber = itemLink
+				itemLink = i
+				lastNumberLink = i
 			end
 		end
-	end
-	return engines
-end
+		if not itemLink then return end
+		serverKey = serverKey or GetFaction()
+		local saneLink = SanitizeLink(itemLink)
 
-function lib.IsValidAlgorithm(algorithm, itemLink)
-	local saneLink = SanitizeLink(itemLink)
-	local modules = AucAdvanced.GetAllModules()
-	for pos, engineLib in ipairs(modules) do
-		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
-			if engineLib.IsValidAlgorithm then
-				return engineLib.IsValidAlgorithm(saneLink)
-			end
-			return true
+		if saneLink == lastLink and algorithm == lastAlgorithm and serverKey == lastKey then -- last item cache
+			return lastPrice, lastSeen
 		end
-	end
-	return false
-end
 
---store the last data request and just return a cache value for the next 5 secs (5 secs is just arbitrary)
-local LastAlgorithmSig, LastAlgorithmTime, LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
-function lib.GetAlgorithmValue(algorithm, itemLink, serverKey, reserved)
-	if (not algorithm) then
-		if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No pricing algorithm supplied to GetAlgorithmValue") end
-		return
-	end
-	if type(itemLink) == "number" then
-		local _
-		_, itemLink = GetItemInfo(itemLink)
-	end
-	if (not itemLink) then
-		if nLog then nLog.AddMessage("Auctioneer", "API", N_ERROR, "Incorrect Usage", "No itemLink supplied to GetAlgorithmValue") end
-		return
-	end
-
-	if reserved then
-		lib.ShowDeprecationAlert("AucAdvanced.API.GetAlgorithmValue(algorithm, itemLink, serverKey)",
-		"The 'faction' and 'realm' parameters are deprecated in favor of the new 'serverKey' parameter. Use this instead."
-		);
-
-		serverKey = reserved.."-"..serverKey;
-	end
-	serverKey = serverKey or GetFaction()
-
-	local saneLink = SanitizeLink(itemLink)
-	--check if this was just retrieved and return that value
-	local algosig = strjoin(":", algorithm, saneLink, serverKey)
-	if algosig == LastAlgorithmSig and LastAlgorithmTime + 5 > time() then
-		return LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray
-	end
-
-	local modules = AucAdvanced.GetAllModules()
-	for pos, engineLib in ipairs(modules) do
-		if engineLib.GetName() == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
-			if engineLib.IsValidAlgorithm
-			and not engineLib.IsValidAlgorithm(saneLink) then
-				return
-			end
-
-			local price, seen, array
-			if (engineLib.GetPriceArray) then
-				array = engineLib.GetPriceArray(saneLink, serverKey)
-				if (array) then
+		local pricefunc = module.GetPriceSeen
+		if pricefunc then
+			price, seen = pricefunc(saneLink, serverKey)
+		else
+			pricefunc = module.GetPriceArray
+			if pricefunc then
+				local array = pricefunc(saneLink, serverKey)
+				if array then
 					price = array.price
 					seen = array.seen
 				end
 			else
-				price = engineLib.GetPrice(saneLink, serverKey)
+				pricefunc = module.GetPrice
+				if pricefunc then
+					price = pricefunc(saneLink, serverKey)
+				end
 			end
-			LastAlgorithmSig = algosig
-			LastAlgorithmTime = time()
-			LastAlgorithmPrice, LastAlgorithmSeen, LastAlgorithmArray = price, seen, array
-			return price, seen, array
+		end
+		if pricefunc then
+			lastAlgorithm, lastLink, lastKey = algorithm, saneLink, serverKey
+			lastPrice, lastSeen = price, seen
+			return price, seen
 		end
 	end
-	--error(("Cannot find pricing algorithm: %s"):format(algorithm))
-	return
-end
+
+	function lib.GetAlgorithms(itemLink)
+		local saneLink, getAll
+		if itemLink then
+			if itemLink == "ALL" then
+				getAll = true
+			else
+				saneLink = SanitizeLink(itemLink)
+			end
+		end
+		local engines = {}
+		local modules = AucAdvanced.GetAllModules()
+		for pos, engineLib in ipairs(modules) do
+			if engineLib.GetPrice or engineLib.GetPriceArray or engineLib.GetPriceSeen then
+				if getAll or not engineLib.IsValidAlgorithm or engineLib.IsValidAlgorithm(saneLink) then
+					tinsert(engines, engineLib.GetName())
+				end
+			end
+		end
+		return engines
+	end
+
+	function lib.IsValidAlgorithm(algorithm, itemLink)
+		local module = AucAdvanced.GetModule(algorithm)
+		if module and (module.GetPrice or module.GetPriceArray or module.GetPriceSeen) then
+			if module.IsValidAlgorithm then
+				return module.IsValidAlgorithm(SanitizeLink(itemLink))
+			end
+			return true
+		end
+		return false
+	end
+end -- of Algorithm functions
 
 --[[ resultsTable = AucAdvanced.API.QueryImage(queryTable, serverKey, reserved, ...)
 	'queryTable' specifies the query to perform
