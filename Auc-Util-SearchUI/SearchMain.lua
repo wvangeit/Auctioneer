@@ -85,7 +85,7 @@ local flagRescan
 -- Faction Resources
 -- Commonly used values which change depending whether you are at home or neutral Auctionhouse
 -- Modules should expect these to always contain valid values; nil tests should not be required
-resources.Realm = GetRealmName() -- will not change during session
+resources.Realm = Const.PlayerRealm -- will not change during session
 function private.UpdateFactionResources()
 	local serverKey, _, Faction = AucAdvanced.GetFaction()
 	if serverKey ~= resources.serverKey then
@@ -249,45 +249,6 @@ function lib.OnLoad(addon)
 
 	-- Initialize
 	private.UpdateFactionResources()
-end
-
-function lib.Processor(callbackType, ...)
-	if callbackType == "load" then
-		private.ResetPriceModelEnx()
-	elseif (callbackType == "auctionclose") then
-		if private.isAttached then
-			lib.DetachFromAH()
-		end
-		flagResourcesUpdateRequired = true
-	elseif callbackType == "auctionopen" then
-		flagResourcesUpdateRequired = true
-	elseif (callbackType == "auctionui") then
-		if lib.Searchers.RealTime then
-			lib.Searchers.RealTime.HookAH()
-		end
-
-		--we need to make sure that the GUI is made by the time the AH opens, as RealTime could be trying to add lines to it.
-		if not gui then
-			lib.MakeGuiConfig()
-		end
-
-		lib.CreateAuctionFrames()
-	elseif (callbackType == "pagefinished") then
-		if lib.Searchers.RealTime then
-			lib.Searchers.RealTime.FinishedPage(...)
-		end
-	elseif (callbackType == "bidcancelled") then --bid was cancelled, we need to ignore auction for current session
-		private.bidcancelled(...)
-	elseif (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	elseif callbackType == "scanstats" then
-		-- pass the message in next OnUpdate
-		flagScanStats = true
-	elseif callbackType == "scanprogress" and private.UpdateScanProgress then
-		private.UpdateScanProgress(...)
-	elseif callbackType == "buyqueue" and private.UpdateBuyQueue then
-		private.UpdateBuyQueue()
-	end
 end
 
 lib.Processors = {}
@@ -718,8 +679,8 @@ function private.removeline()
 	local total =  #private.sheetData
 	for i = gui.sheet.selected, total do
 		private.sheetStyle[i] = private.sheetStyle[i+1]
-		if i == total then private.sheetStyle[i+1] = nil end --remove extra style
 	end
+	private.sheetStyle[total+1] = nil --remove extra style
 	--gui.frame.remove:Disable()
 	gui.sheet.selected = nil
 	gui.sheet:SetData(private.sheetData, private.sheetStyle)
@@ -741,7 +702,7 @@ end
 function private.repaintSheet()
 	local wasEmpty = #gui.sheet.data < 1
 	gui.sheet:SetData(private.sheetData, private.sheetStyle)
-	if wasEmpty then --sheet was empty, so select the just added auction
+	if wasEmpty and #gui.sheet.data >= 1 then --sheet was empty, so select the just added auction
 		gui.sheet.selected = 1
 		gui.sheet:Render() --need to redraw, so the selection looks right
 		lib.UpdateControls()
