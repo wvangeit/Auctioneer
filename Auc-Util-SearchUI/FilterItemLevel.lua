@@ -60,13 +60,14 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
-			gui:AddControl(id, "Checkbox", 0, 1, "ignoreitemlevel.filter."..name, name)
+			local setting = "ignoreitemlevel.filter."..name
+			default(setting, false)
+			gui:AddControl(id, "Checkbox", 0, 1, setting, name)
 			gui:AddTip(id, "Filter Item Level when searching with "..name)
-			default("ignoreitemlevel.filter."..name, false)
 		end
 	end
 
--- Assume valid minimum item level is 0 and valid max item level is 300.
+-- Assume valid minimum item level is 0 and valid max item level is 400.
 -- Configure slider controls to reflect this range of values.
 -- See norganna.org JIRA ASER-106 and ASER-132 for additional info about this value range.
 	gui:AddControl(id, "Subhead",     0,  "Minimum itemLevels by Type")

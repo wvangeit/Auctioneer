@@ -66,9 +66,10 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",     .5, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
-			gui:AddControl(id, "Checkbox", 0.5, 1, "ignoretimeleft.filter."..name, name)
+			local setting = "ignoretimeleft.filter."..name
+			default(setting, false)
+			gui:AddControl(id, "Checkbox", 0.5, 1, setting, name)
 			gui:AddTip(id, "Filter Time-left when searching with "..name)
-			default("ignoretimeleft.filter."..name, false)
 		end
 	end
 end

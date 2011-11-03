@@ -70,9 +70,10 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
-			gui:AddControl(id, "Checkbox", 0, 1, "ignoreitemquality.filter."..name, name)
+			local setting = "ignoreitemquality.filter."..name
+			default(setting, false)
+			gui:AddControl(id, "Checkbox", 0, 1, setting, name)
 			gui:AddTip(id, "Filter Item Quality when searching with "..name)
-			default("ignoreitemquality.filter."..name, false)
 		end
 	end
 
