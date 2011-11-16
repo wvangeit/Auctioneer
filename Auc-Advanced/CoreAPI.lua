@@ -426,16 +426,17 @@ do --[[ Algorithm Functions ]]--
 				saneLink = SanitizeLink(itemLink)
 			end
 		end
-		local engines = {}
+		local engines, display = {}, {}
 		local modules = AucAdvanced.GetAllModules()
 		for pos, engineLib in ipairs(modules) do
 			if engineLib.GetPrice or engineLib.GetPriceArray or engineLib.GetPriceSeen then
 				if getAll or not engineLib.IsValidAlgorithm or engineLib.IsValidAlgorithm(saneLink) then
 					tinsert(engines, engineLib.GetName())
+					tinsert(display, engineLib.GetLocalName()) -- localized 'display' names in a parallel table
 				end
 			end
 		end
-		return engines
+		return engines, display
 	end
 
 	function lib.IsValidAlgorithm(algorithm, itemLink)
