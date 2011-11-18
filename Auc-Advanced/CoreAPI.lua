@@ -85,6 +85,9 @@ do
     local CORRECTION_FACTOR = 1000; -- 10 silver per gold, integration steps at tail
     local FALLBACK_ERROR = 1;       -- 1 silver per gold fallback error max
 
+	local INFP = math.huge -- fix for WoW4.3 (as 1/0 will cause an error)
+	local INFN = -math.huge
+
 	-- cache[serverKey][itemsig]={value, seen, #stats}
     local cache = setmetatable({}, { __index = function(tbl,key)
 			tbl[key] = {}
@@ -131,7 +134,7 @@ do
             for pos, engineLib in ipairs(modules) do
                 local fn = engineLib.GetItemPDF;
                 if fn then
-                    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray});
+                    tinsert(engines, {pdf = fn, array = engineLib.GetPriceArray, pseen = engineLib.GetPriceSeen});
                 elseif nLog then
                     nLog.AddMessage("Auctioneer", "Market Pricing", N_WARNING, "Missing PDF", "Auctioneer engine '"..engineLib.GetName().."' does not have a GetItemPDF() function. This check will be removed in the near future in favor of faster calls. Implement this function.");
                 end
@@ -151,21 +154,29 @@ do
                 else
                     convergedFallback = false;      -- Cannot converge on fallback pricing
                 end
-            end
 
-            local priceArray = engine.array(saneLink, serverKey);
-
-            if priceArray and (priceArray.seen or 0) > seen then
-                seen = priceArray.seen;
-            end
-
-            if i and type(i) ~= 'number' then   -- pdfList[++c] = i;
+            elseif i then -- type should be "function"
                 total = total + (area or 1);                                -- Add total area, assume 1 if not supplied
                 c = c + 1;
-                pdfList[c] =  i;
+                pdfList[c] =  i; -- pdfList[++c] = i;
                 if min < lowerLimit then lowerLimit = min; end
                 if max > upperLimit then upperLimit = max; end
-            end
+
+				if engine.pseen then
+					local _, s = engine.pseen(saneLink, serverKey)
+					if s and s > seen then
+						seen = s
+					end
+				elseif engine.array then
+					local priceArray = engine.array(saneLink, serverKey)
+					if priceArray then
+						local s = priceArray.seen
+						if s and s > seen then
+							seen = s
+						end
+					end
+				end
+			end
         end
 
         -- Clean out extras if needed
@@ -179,7 +190,7 @@ do
         end
 
 
-        if not (lowerLimit > -1/0 and upperLimit < 1/0) then
+        if not (lowerLimit > INFN and upperLimit < INFP) then
 			error("Invalid bounds detected while pricing "..(GetItemInfo(itemLink) or itemLink)..": "..tostring(lowerLimit).." to "..tostring(upperLimit))
 		end
 
