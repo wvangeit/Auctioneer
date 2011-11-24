@@ -1,5 +1,5 @@
 ## Title: Auctioneer:Stat:Example2
-## Interface: 40200
+## Interface: 40300
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
