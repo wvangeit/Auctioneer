@@ -291,7 +291,7 @@ end
 
 function private.EasyBuyoutAuction()
     local EasyBuyoutIndex = GetSelectedAuctionItem("list");
-    local EasyBuyoutPrice = select(9, GetAuctionItemInfo("list", EasyBuyoutIndex))
+    local EasyBuyoutPrice = select(10, GetAuctionItemInfo("list", EasyBuyoutIndex))
 
 	-- Easy Gold Limit for EasyBuyout
 	if get("util.EasyBuyout.EGL.EBuy.active") then
@@ -384,7 +384,7 @@ function private.NewOnDoubleClick(self, button)
 	end
 	local link = GetAuctionItemLink("list", id)
 	if button == 'LeftButton' then
-		if (select(11, GetAuctionItemInfo("list", id))) then
+		if (select(12, GetAuctionItemInfo("list", id))) then
 			private.EBMessage("You are already the highest bidder on this item!")
 			return
 		end
@@ -403,9 +403,9 @@ end
 
 -- Function to place a bid on a specific auction using EasyBid
 function private.EasyBidAuction(getID)
-    local EasyBidPrice = select(10, GetAuctionItemInfo("list", getID)) + select(8, GetAuctionItemInfo("list", getID))
+    local EasyBidPrice = select(11, GetAuctionItemInfo("list", getID)) + select(9, GetAuctionItemInfo("list", getID))
 	if EasyBidPrice == 0 then
-		EasyBidPrice = EasyBidPrice + select(7, GetAuctionItemInfo("list", getID))
+		EasyBidPrice = EasyBidPrice + select(8, GetAuctionItemInfo("list", getID))
 	end
 
 	-- Easy Gold Limit for EasyBid
