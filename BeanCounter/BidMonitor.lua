@@ -45,7 +45,7 @@ end
 -- Called after PlaceAuctionBid()
 -------------------------------------------------------------------------------
 function private.postPlaceAuctionBidHook(_, _, listType, index, bid)
-	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index)
+	local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index)
 	local itemLink = GetAuctionItemLink(listType, index)
 	local timeLeft = GetAuctionItemTimeLeft(listType, index)
 	if (name and count and bid) then
