@@ -131,7 +131,7 @@ function private.CreateFrames()
 		if frame.showAuctions then
 			local auctionStart = #ItemList + 1
 			for auc=1, GetNumAuctionItems("owner") do
-				local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", auc)
+				local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", auc)
 				local link = GetAuctionItemLink("owner", auc)
 
 				local sig = SigFromLink(link)

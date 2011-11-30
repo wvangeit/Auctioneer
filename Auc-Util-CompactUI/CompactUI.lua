@@ -530,7 +530,7 @@ function private.RetrievePage()
 			end
 
 			local name, texture, count, quality, canUse, level,
-				minBid, minIncrement, buyoutPrice, bidAmount,
+				_, minBid, minIncrement, buyoutPrice, bidAmount,
 				highBidder, owner  = GetAuctionItemInfo("list", i)
 			local itemName, itemLink, itemRarity, itemLevel,
 				itemMinLevel, itemType, itemSubType, itemStackCount,

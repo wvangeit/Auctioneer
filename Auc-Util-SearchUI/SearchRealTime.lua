@@ -257,7 +257,7 @@ function lib.ScanPage()
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		if link then
-			local name, _, count, quality, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
+			local name, _, count, quality, canUse, level, _, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
 			iEquip = Const.EquipEncode[iEquip]
 			local timeleft = GetAuctionItemTimeLeft("list", i)

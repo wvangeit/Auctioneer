@@ -326,7 +326,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, a
 		id = button:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame) --without CompactUI
 	end
 
-	local name, _, count, _, canUse, level, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
+	local name, _, count, _, canUse, level, _, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", id)
 	local price
 	if curBid > 0 then
 		price = curBid + minInc
