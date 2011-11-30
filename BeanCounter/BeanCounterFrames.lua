@@ -82,15 +82,15 @@ function private.AuctionUI()
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
 
-			if (AuctionDressUpFrame:IsVisible()) then
-				AuctionDressUpFrame:Hide()
-				AuctionDressUpFrame.reshow = true
+			if (SideDressUpFrame:IsVisible()) then
+				SideDressUpFrame:Hide()
+				SideDressUpFrame.reshow = true
 			end
 			private.displayGUI("ShowAHGUI")
 		else
-			if (AuctionDressUpFrame.reshow) then
-				AuctionDressUpFrame:Show()
-				AuctionDressUpFrame.reshow = nil
+			if (SideDressUpFrame.reshow) then
+				SideDressUpFrame:Show()
+				SideDressUpFrame.reshow = nil
 			end
 			--AuctionFrameMoneyFrame:Show() --we interfere with other addosn which hide this.
 			private.displayGUI("HideAHGUI")
