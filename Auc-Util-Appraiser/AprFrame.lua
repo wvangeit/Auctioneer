@@ -2619,17 +2619,17 @@ function private.CreateFrames()
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
 			AuctionFrameMoneyFrame:Show()
-			if (AuctionDressUpFrame:IsVisible()) then
-				AuctionDressUpFrame:Hide()
-				AuctionDressUpFrame.reshow = true
+			if (SideDressUpFrame:IsVisible()) then
+				SideDressUpFrame:Hide()
+				SideDressUpFrame.reshow = true
 			end
 			frame:Show()
 			AucAdvanced.Scan.LoadScanData()
 			frame.GenerateList(true)
 		else
-			if (AuctionDressUpFrame.reshow) then
-				AuctionDressUpFrame:Show()
-				AuctionDressUpFrame.reshow = nil
+			if (SideDressUpFrame.reshow) then
+				SideDressUpFrame:Show()
+				SideDressUpFrame.reshow = nil
 			end
 			AuctionFrameMoneyFrame:Show()
 			frame:Hide()
