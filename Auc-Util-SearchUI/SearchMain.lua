@@ -1998,52 +1998,68 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 end
 
 local PerformSearch = function()
-	if gui.tabs.active then
-		gui:ContractFrame(gui.tabs.active)
-	end
-	gui:ClearFocus()
-	--Perform the search.  We're not using API.QueryImage() because we need it to be a coroutine
-	local image = AucAdvanced.Scan.GetImageCopy()
-	local imagesize = #image
-	local speed = lib.GetSetting("processpriority") or 50
-	speed = (speed / 100)^2.5
-	local processingTime = speed * 0.1 + 0.02
-	local GetTime = GetTime
-	local nextPause = GetTime() + processingTime
-
 	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
 		print("No valid Searches selected")
 		return
 	end
+
+	if gui.tabs.active then
+		gui:ContractFrame(gui.tabs.active)
+	end
+	gui:ClearFocus()
+	local image = AucAdvanced.Scan.GetImageCopy() --GetImageCopy provides a table that can be used in coroutines
+	local imagesize = #image
+
+	--[[ old speed setup code disabled: we are temporarily using time() as a substitute for GetTime (which no longer works in this circumstance)
+	local speed = lib.GetSetting("processpriority") or 50
+	speed = (speed / 100)^2.5
+	local processingTime = speed * 0.1 + 0.02
+	local GetTime = GetTime
+	local nextPause = GetTime() + processingTime
+	--]]
+	-- temp code: throttle using time(): this can only measure whole seconds
+	local time = time
+	local lastPause = time()
+
+
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)
 	gui.frame.progressbar:Show()
 
 	--clear the results table
 	private.removeall()
 	local repaintSheet = false
-	local nextRepaint = 0	-- can do it immediately
+	--local nextRepaint = 0	-- can do it immediately
 
 	private.isSearching = true
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(image) do
-		if GetTime() > nextPause then
+		--if GetTime() > nextPause then
+		if time() > lastPause then
 			gui.frame.progressbar:SetValue((i/imagesize)*1000)
-
-			coroutine.yield()
-
-			nextPause = GetTime() + processingTime
-			if private.SearchCancel then
-				private.SearchCancel = nil
-				break
-			end
+			--[[ temporarily disabled as GetTime will not update between b and e
 			if repaintSheet and GetTime()>=nextRepaint then
 				local b=GetTime()
 				private.repaintSheet()
 				repaintSheet = false
 				local e=GetTime()
 				nextRepaint = e + ((e-b)*10)  -- only let repainting consume 10% of our total CPU
+			end
+			--]]
+			-- temp replacement for above
+			if repaintSheet then
+				private.repaintSheet()
+				repaintSheet = false
+			end
+
+			coroutine.yield()
+
+			--nextPause = GetTime() + processingTime
+			lastPause = time()
+			if private.SearchCancel then
+				private.SearchCancel = nil
+				break
 			end
 		end
 		if lib.SearchItem(searcher.name, data, true) then
