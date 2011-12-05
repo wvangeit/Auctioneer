@@ -1659,12 +1659,16 @@ function private.GetAuctionItem(list, page, i, itemLinksTried, itemData)
 			or not itemData[Const.MININC] or not itemData[Const.BUYOUT] or not itemData[Const.CURBID]
 			or not itemData[Const.AMHIGH] or not itemData[Const.SELLER]) then
 
-		local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
+		local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
 		itemData[Const.NAME] = name or itemData[Const.NAME]
 		itemData[Const.TEXTURE] = texture or itemData[Const.TEXTURE]
 		itemData[Const.COUNT] = (count and count ~= 0 and count) or itemData[Const.COUNT] or 1
 		itemData[Const.QUALITY] = quality or itemData[Const.QUALITY]
 		itemData[Const.CANUSE] = canUse or itemData[Const.CANUSE]
+		-- temp fix for level. todo: handle other possible values of levelColHeader
+		if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
+			level = 1
+		end
 		itemData[Const.ULEVEL] = level or itemData[Const.ULEVEL]
 		itemData[Const.CURBID] = bidAmount or 0
 		itemData[Const.AMHIGH] = highBidder and true or false
@@ -1775,7 +1779,7 @@ function lib.GetAuctionItem(list, i, skipGetInfo)
 			4 -- very long time (8 hours+)
 		]]
 		local timeLeft = GetAuctionItemTimeLeft(list, i)
-		local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
+		local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus = GetAuctionItemInfo(list, i)
 		local invType = Const.EquipEncode[itemEquipLoc]
 		buyoutPrice = buyoutPrice or 0
 		minBid = minBid or 0
@@ -1790,6 +1794,11 @@ function lib.GetAuctionItem(list, i, skipGetInfo)
 			nextBid = minBid
 		else
 			nextBid = 1
+		end
+		
+		-- temp fix for use level
+		if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
+			level = 1
 		end
 
 		if not count or count == 0 then count = 1 end

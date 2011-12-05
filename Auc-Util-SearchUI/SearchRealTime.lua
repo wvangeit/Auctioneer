@@ -257,7 +257,7 @@ function lib.ScanPage()
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		if link then
-			local name, _, count, quality, canUse, level, _, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
+			local name, _, count, quality, canUse, level, levelColHeader, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
 			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
 			iEquip = Const.EquipEncode[iEquip]
 			local timeleft = GetAuctionItemTimeLeft("list", i)
@@ -275,6 +275,9 @@ function lib.ScanPage()
 				price = minBid
 			else
 				price = 1
+			end
+			if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
+				level = 1
 			end
 
 			-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
