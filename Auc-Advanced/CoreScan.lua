@@ -872,6 +872,8 @@ local Commitfunction = function()
 	if (not private.itemLinkDB) then private.itemLinkDB = {} end
 	--local totalProcessingTime = 0 -- temp disabled, going to take some work to thread this back in with the broken GetTime / time changes
 	
+	local targetFPS = 101-get("scancommit.speed")
+	
 	--[[ temp disabled code
 	local lastPause = startTime
 	local speed = get("scancommit.speed")/100
@@ -881,7 +883,10 @@ local Commitfunction = function()
 	--]]
 	-- temp replacement for above:
 	local time = time
+	local loops_previous = 0
+	local loops_this_period = 0
 	local lastPause = time()
+	local startTime = time()
 	
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
@@ -1118,6 +1123,12 @@ local Commitfunction = function()
 	querySizeInfo.scanCount = scanCount
 	querySizeInfo.printSummary = printSummary
 
+	coroutine.yield()
+	lastPause = time()
+	startTime = lastPause
+	loops_previous = 0
+	loops_this_period = 0
+	
 	processBeginEndStats(processors, "begin", querySizeInfo, nil)
 	for index, data in ipairs(TempcurScan) do
 		local itemPos
@@ -1132,11 +1143,14 @@ local Commitfunction = function()
 		end
 		--]]
 		-- temp replacement for disabled code
-		if time() > lastPause then
+		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > (loops_previous/ (((lastPause-startTime) or 1)*targetFPS) ) ) then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
 			coroutine.yield()
 			lastPause = time()
+			loops_previous = loops_previous + loops_this_period
+			loops_this_period = 0
 		end
+		loops_this_period = loops_this_period + 1
 		-- end replacement
 		
 		itemPos = lib.FindItem(data, scandata.image, lut)
