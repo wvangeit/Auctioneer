@@ -163,6 +163,7 @@ local pairs, ipairs, next = _G.pairs, _G.ipairs, _G.next
 local tonumber = tonumber
 
 local GetTime = GetTime
+local baselineFPS = GetFramerate()
 
 private.isScanning = false
 private.auctionItemListUpdated = false
@@ -872,7 +873,9 @@ local Commitfunction = function()
 	if (not private.itemLinkDB) then private.itemLinkDB = {} end
 	--local totalProcessingTime = 0 -- temp disabled, going to take some work to thread this back in with the broken GetTime / time changes
 	
-	local targetFPS = 101-get("scancommit.speed")
+	local targetFPS = get("scancommit.targetFPS") or 1
+	if targetFPS > (baselineFPS*3)/4 then targetFPS = (baselineFPS*3)/4 end
+	if targetFPS < 1 then targetFPS = 1 end
 	
 	--[[ temp disabled code
 	local lastPause = startTime
@@ -883,6 +886,7 @@ local Commitfunction = function()
 	--]]
 	-- temp replacement for above:
 	local time = time
+	local previous_frames = 0
 	local loops_previous = 0
 	local loops_this_period = 0
 	local lastPause = time()
@@ -1143,11 +1147,22 @@ local Commitfunction = function()
 		end
 		--]]
 		-- temp replacement for disabled code
-		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > (loops_previous/ (((lastPause-startTime) or 1)*targetFPS) ) ) then
+		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
+if _G.nLog then
+	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
+		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
+end
 			coroutine.yield()
-			lastPause = time()
 			loops_previous = loops_previous + loops_this_period
+			previous_frames = previous_frames + 1
+			if lastPause-startTime > 10 then
+				loops_previous = loops_previous * 10 / (lastPause-startTime)
+				previous_frames = previous_frames * 10 / (lastPause-startTime)
+				if (previous_frames < 1) then previous = 1 end
+				startTime = lastPause - 10
+			end
+			lastPause = time()
 			loops_this_period = 0
 		end
 		loops_this_period = loops_this_period + 1
@@ -1218,11 +1233,25 @@ local Commitfunction = function()
 		end
 		--]]
 		-- temp replacement
-		if time() > lastPause then
+		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
 			coroutine.yield()
+if _G.nLog then
+	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
+		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
+end
+			loops_previous = loops_previous + loops_this_period
+			previous_frames = previous_frames + 1
+			if lastPause-startTime > 10 then
+				loops_previous = loops_previous * 10 / (lastPause-startTime)
+				previous_frames = previous_frames * 10 / (lastPause-startTime)
+				if (previous_frames < 1) then previous = 1 end
+				startTime = lastPause - 10
+			end
 			lastPause = time()
+			loops_this_period = 0
 		end
+		loops_this_period = loops_this_period + 1
 		-- end replacement
 		if (bitand(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
@@ -1888,11 +1917,21 @@ local StorePageFunction = function()
 
 	local curQuery, curScan, curPages = private.curQuery, private.curScan, private.curPages
 
+	local targetFPS = get("scancommit.targetFPS") or 1
+	if targetFPS > (baselineFPS*3)/4 then targetFPS = (baselineFPS*3)/4 end
+	if targetFPS < 1 then targetFPS = 1 end
+
 	--[[ temp disabled
 	local speed = get("scancommit.speed")/100
 	speed = speed^2.5
 	local processingTime = speed * 0.1 + 0.015
 	--]]
+	local time = time
+	local previous_frames = 0
+	local loops_previous = 0
+	local loops_this_period = 0
+	local lastPause = time()
+	local startTime = time()
 
 
 	local EventFramesRegistered = {}
@@ -1965,15 +2004,28 @@ local StorePageFunction = function()
 				end
 				--]]
 				-- temp replacement
-				if time() > lastPause then
+				if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
+if _G.nLog then
+	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
+		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
+end
+					loops_previous = loops_previous + loops_this_period
+					previous_frames = previous_frames + 1
+					if lastPause-startTime > 10 then
+						loops_previous = loops_previous * 10 / (lastPause-startTime)
+						previous_frames = previous_frames * 10 / (lastPause-startTime)
+						if (previous_frames < 1) then previous = 1 end
+						startTime = lastPause - 10
+					end
 					lastPause = time()
+					loops_this_period = 0
 					if private.breakStorePage then
 						break
 					end
 				end
-				
+				loops_this_period = loops_this_period + 1
 			end
 
 			local itemData = private.GetAuctionItem("list", page, i, itemLinksTried)
@@ -2036,11 +2088,26 @@ local StorePageFunction = function()
 				end
 				--]]
 				if isGetAll then
-					if time() > lastPause then
+					if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
 						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						coroutine.yield()
+if _G.nLog then
+	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
+		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
+end
+						loops_previous = loops_previous + loops_this_period
+						previous_frames = previous_frames + 1
+						if lastPause-startTime > 10 then
+							loops_previous = loops_previous * 10 / (lastPause-startTime)
+							previous_frames = previous_frames * 10 / (lastPause-startTime)
+							if (previous_frames < 1) then previous = 1 end
+							startTime = lastPause - 10
+						end
 						lastPause = time()
-						if private.breakStorePage then break end
+						loops_this_period = 0
+						if private.breakStorePage then
+							break
+						end
 					end
 				end
 				
@@ -2118,11 +2185,26 @@ local StorePageFunction = function()
 			end
 			--]]
 			if isGetAll then
-				if time() > lastPause then
+				if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
+if _G.nLog then
+	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
+		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
+end
+					loops_previous = loops_previous + loops_this_period
+					previous_frames = previous_frames + 1
+					if lastPause-startTime > 10 then
+						loops_previous = loops_previous * 10 / (lastPause-startTime)
+						previous_frames = previous_frames * 10 / (lastPause-startTime)
+						if (previous_frames < 1) then previous = 1 end
+						startTime = lastPause - 10
+					end
 					lastPause = time()
-					if private.breakStorePage then break end
+					loops_this_period = 0
+					if private.breakStorePage then
+						break
+					end
 				end
 			end
 			readCount = readCount + 1
@@ -2481,6 +2563,10 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		-- Optional bypass to handle compatibility problems with other AddOns
 		return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	end
+
+	-- Store a baseline FPS here as we aren't doing any heavy hitting yet so this gives an idea what kind of maximum FPS we can expect.
+	baselineFPS = GetFramerate()
+
 	private.isAuctioneerQuery = nil
 	if private.warnTaint then
 		_print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
