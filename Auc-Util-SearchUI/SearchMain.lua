@@ -36,7 +36,7 @@ local libType, libName = "Util", "SearchUI"
 local AucAdvanced = AucAdvanced
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local empty = wipe
@@ -213,7 +213,7 @@ end
 --The rescan method is a button that is displayed only if the searcher implements a rescan function. The searcher then passes any itemlinks it wants refrreshed data on
 --this will accept a text search term as well as a itemlink
 function lib.RescanAuctionHouse(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
-	if not name or type(name) ~= "string" then print("Invalid input SearchUI RescanAuctionHouse", name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) return end
+	if not name or type(name) ~= "string" then aucPrint("Invalid input SearchUI RescanAuctionHouse", name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex) return end
 	--if we are passed just a itemlink extract what data we can to filter our scan
 	if name and name:match("^(|c%x+|Hitem.+|h%[.+%])") then
 		--look up the itemlink info or pass it as a plain text if no info is returned
@@ -399,7 +399,7 @@ end
 
 -- Default setting values
 local settingDefaults = {
-	["processpriority"] = 80,
+	["processpriority"] = 60,
 	["reserve"] = 0,
 	["reserve.enable"] = false,
 	["global.createtab"] = true,
@@ -773,7 +773,7 @@ function private.purchase()
 	if ((balance-price) > reserve or not enableres) then
 		AucAdvanced.Buy.QueueBuy(private.data.link, private.data.seller, private.data.stack, private.data.minbid, private.data.buyout, price, private.cropreason(private.data.reason))
 	else
-		print("Purchase cancelled: Reserve reached")
+		aucPrint("Purchase cancelled: Reserve reached")
 	end
 	private.removeline()
 end
@@ -811,7 +811,7 @@ function private.purchaseall()
 			AucAdvanced.Buy.QueueBuy(link, seller, stack, minbid, buyout, price, private.cropreason(reason))
 
 		else
-			print("Purchase cancelled: Reserve reached")
+			aucPrint("Purchase cancelled: Reserve reached")
 		end
 	end
 	private.removeall()
@@ -831,14 +831,14 @@ function private.ignore()
 	local count = private.data.stack or 1
 	price = floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price)
-	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true))
+	aucPrint("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 	private.removeline()
 end
 
 function private.ignoreperm()
 	local sig = AucAdvanced.API.GetSigFromLink(private.data.link)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, 0)
-	print("SearchUI now ignoring "..private.data.link.." at any price")
+	aucPrint("SearchUI now ignoring "..private.data.link.." at any price")
 	private.removeline()
 end
 
@@ -849,7 +849,7 @@ function private.bidcancelled(callbackstring)
 	local price = floor(price/count) - 1
 	if AucSearchUI.Filters.ItemPrice then
 		AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
-		print("SearchUI now ignoring "..link.." at "..AucAdvanced.Coins(price, true).." for the session")
+		aucPrint("SearchUI now ignoring "..link.." at "..AucAdvanced.Coins(price, true).." for the session")
 	end
 
 end
@@ -869,7 +869,7 @@ function private.ignoretemp()
 	local count = private.data.stack or 1
 	price = floor(price/count)
 	AucSearchUI.Filters.ItemPrice.AddIgnore(sig, price, true)
-	print("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true).." for the session")
+	aucPrint("SearchUI now ignoring "..private.data.link.." at "..AucAdvanced.Coins(price, true).." for the session")
 	private.removeline()
 end
 
@@ -888,7 +888,7 @@ function private.snatch()
 	local count = private.data.stack or 1
 	price = floor(price/count) + 1 -- +1 so the current item also matches the search
 	lib.Searchers.Snatch.AddSnatch(link,price)
-	print("SearchUI will now snatch "..private.data.link.." at "..AucAdvanced.Coins(price, true))
+	aucPrint("SearchUI will now snatch "..private.data.link.." at "..AucAdvanced.Coins(price, true))
 end
 
 local function keyPairs(t,f)
@@ -1281,9 +1281,9 @@ function lib.MakeGuiConfig()
 	gui.saves.reset:SetScript("OnClick", function()
 		if IsShiftKeyDown() and IsControlKeyDown() and IsAltKeyDown() then
 			lib.ResetSearch()
-			print("All searchUI settings have been reset.")
+			aucPrint("All searchUI settings have been reset.")
 		else
-			print("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
+			aucPrint("This resets all searchUI settings, you must hold CTRL + SHIFT + ALT when clicking this button")
 		end
 	end)
 
@@ -1424,7 +1424,7 @@ function lib.MakeGuiConfig()
 
 	--If we have a saved order reapply
 	if lib.GetSetting("columnorder") then
-		--print("saved order applied")
+		--aucPrint("saved order applied")
 		gui.sheet:SetOrder(lib.GetSetting("columnorder") )
 	end
 	--Apply last column sort used
@@ -1952,8 +1952,8 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 						level, _, r, g, b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
 					end
 					if not r or not b or not g then
-					--print("price level failure in searchUI")
-					--print(r,g,b, item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
+					--aucPrint("price level failure in searchUI")
+					--aucPrint(r,g,b, item[Const.LINK], item[Const.COUNT], item[Const.PRICE], item[Const.BUYOUT], valueper)
 					r,g,b = 1,1,1
 					end
 					local total = #private.sheetData+1
@@ -2003,7 +2003,7 @@ end
 local PerformSearch = function()
 	local searcher, searcherName = private.FindSearcher()
 	if not searcher then
-		print("No valid Searches selected")
+		aucPrint("No valid Searches selected")
 		return
 	end
 
@@ -2011,55 +2011,47 @@ local PerformSearch = function()
 		gui:ContractFrame(gui.tabs.active)
 	end
 	gui:ClearFocus()
-	local image = AucAdvanced.Scan.GetImageCopy() --GetImageCopy provides a table that can be used in coroutines
-	local imagesize = #image
-
-	--[[ old speed setup code disabled: we are temporarily using time() as a substitute for GetTime (which no longer works in this circumstance)
-	local speed = lib.GetSetting("processpriority") or 50
-	speed = (speed / 100)^2.5
-	local processingTime = speed * 0.1 + 0.02
-	local GetTime = GetTime
-	local nextPause = GetTime() + processingTime
-	--]]
-	-- temp code: throttle using time(): this can only measure whole seconds
-	local time = time
-	local lastPause = time()
-
-
+	private.removeall() --clear the results table
 	gui.frame.progressbar.text:SetText("AucAdv SearchUI: Searching |cffffcc19"..gui.config.selectedTab)
 	gui.frame.progressbar:Show()
+	coroutine.yield() -- allow progress bar to be displayed
 
-	--clear the results table
-	private.removeall()
+	local image = AucAdvanced.Scan.GetImageCopy() --GetImageCopy provides a table that can be used in coroutines
+	local imagesize = #image
+	coroutine.yield() -- GetImageCopy can take some time, so allow a frame update just after
+
+	--[[ processing timer using debugprofilestop:
+	we do not call debugprofilestart, instead we check the difference between two calls to debugprofilestop
+	this should make it safer if another process actually wants to use debugprofilestart/stop for profiling
+
+	we must not attempt to time across a yield using this method, as during that yield another AddOn could call debugprofilestart
+	however GetTime *does* work across yields
+	--]]
+	local processingTime = 90 * (lib.GetSetting("processpriority")/100)^2 + 10 -- time in milliseconds (possible range 10.9 - 100)
+	local GetTime, debugprofilestop = GetTime, debugprofilestop
+	local nextPause = debugprofilestop() + processingTime
 	local repaintSheet = false
-	--local nextRepaint = 0	-- can do it immediately
+	local nextRepaint = 0	-- no delay for first repaint
 
 	private.isSearching = true
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(image) do
-		--if GetTime() > nextPause then
-		if time() > lastPause then
+		if debugprofilestop() > nextPause then
 			gui.frame.progressbar:SetValue((i/imagesize)*1000)
-			--[[ temporarily disabled as GetTime will not update between b and e
-			if repaintSheet and GetTime()>=nextRepaint then
-				local b=GetTime()
+			if repaintSheet and GetTime() >= nextRepaint then -- using GetTime here as this needs to track time across yields
+				local b=debugprofilestop()
 				private.repaintSheet()
 				repaintSheet = false
-				local e=GetTime()
-				nextRepaint = e + ((e-b)*10)  -- only let repainting consume 10% of our total CPU
-			end
-			--]]
-			-- temp replacement for above
-			if repaintSheet then
-				private.repaintSheet()
-				repaintSheet = false
+				local e=debugprofilestop()
+				-- we use debugprofilestop to calculate time taken by repaint (in ms; divide this by 1000 to convert for use by GetTime)
+				nextRepaint = GetTime() + ((e-b)*0.01)-- only let repainting consume 10% of our total CPU (0.01 == 10/1000)
 			end
 
 			coroutine.yield()
 
-			--nextPause = GetTime() + processingTime
-			lastPause = time()
+			nextPause = debugprofilestop() + processingTime
+
 			if private.SearchCancel then
 				private.SearchCancel = nil
 				break
@@ -2091,7 +2083,7 @@ function lib.PerformSearch(searcher)
             error("Error in search coroutine: "..result.."\n\n{{{Coroutine Stack:}}}\n"..debugstack(coSearch));
 		end
 	else
-		print("coroutine already running: "..coroutine.status(coSearch))
+		aucPrint("coroutine already running: "..coroutine.status(coSearch))
 	end
 end
 
