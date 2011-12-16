@@ -124,7 +124,7 @@ local settingDefaults = {
 	['scandata.summaryonmicro'] = false,
 	['scandata.summaryonpartial'] = true,
 	['clickhook.enable'] = true,
-	['scancommit.targetFPS'] = 1,
+	['scancommit.targetFPS'] = 25,
 --	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
 	['scancommit.ttl'] = 20,
@@ -517,8 +517,8 @@ function lib.MakeGuiConfig()
 
 --	gui:AddControl(id, "Slider",	0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
 --	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
-	gui:AddControl(id, "Slider",	0, 1, "scancommit.targetFPS", 1, 100, 1, _TRANS('ADV_Interface_ProcessingTargetFPS')) --"Desired FPS during scan: %d"
---	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessingTargetFPS')) --"Sets the target frame rate during the scan. Higher values take MORE time, but cause more lag"
+	gui:AddControl(id, "Slider",	0, 1, "scancommit.targetFPS", 5, 100, 5, _TRANS('ADV_Interface_ProcessingTargetFPS')) --"Desired FPS during scan: %d"
+--	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessingTargetFPS')) --"Sets the target frame rate during the scan. Higher values will be smoother, but will take more time overall."
 	gui:AddControl(id, "Slider",	0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 

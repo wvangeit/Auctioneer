@@ -161,9 +161,9 @@ local bitand, bitor, bitnot = bit.band, bit.bor, bit.bnot
 local type, wipe = type, wipe
 local pairs, ipairs, next = _G.pairs, _G.ipairs, _G.next
 local tonumber = tonumber
-
 local GetTime = GetTime
-local baselineFPS = GetFramerate()
+
+local baselineFPS = 25 -- dummy value, will be updated with GetFramerate() during QueryAuctionItems
 
 private.isScanning = false
 private.auctionItemListUpdated = false
@@ -869,29 +869,18 @@ private.CommitQueue = {}
 
 local CommitRunning = false
 local Commitfunction = function()
-	local startTime = GetTime()
+	local commitStarted = GetTime()
 	if (not private.itemLinkDB) then private.itemLinkDB = {} end
 	--local totalProcessingTime = 0 -- temp disabled, going to take some work to thread this back in with the broken GetTime / time changes
-	
-	local targetFPS = get("scancommit.targetFPS") or 1
-	if targetFPS > (baselineFPS*3)/4 then targetFPS = (baselineFPS*3)/4 end
-	if targetFPS < 1 then targetFPS = 1 end
-	
-	--[[ temp disabled code
-	local lastPause = startTime
-	local speed = get("scancommit.speed")/100
-	speed = speed^2.5
-	local processingTime = speed * 0.1 + 0.015
-		-- Min (1): 0.02s (~50 fps)      --    Max (100): 0.12s  (~8 fps).   Default (50):  0.037s (~25 fps)
-	--]]
-	-- temp replacement for above:
-	local time = time
-	local previous_frames = 0
-	local loops_previous = 0
-	local loops_this_period = 0
-	local lastPause = time()
-	local startTime = time()
-	
+
+	-- coroutine speed limiter using debugprofilestop
+	local targetFPS = get("scancommit.targetFPS")
+	if targetFPS > baselineFPS then targetFPS = baselineFPS end
+	if targetFPS < 5 then targetFPS = 5 end
+	local processingTime = 800 / targetFPS -- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	local debugprofilestop = debugprofilestop
+	local nextPause -- gets set before each processing loop, and after each yield within the loop
+
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
 	CommitRunning = true
@@ -940,24 +929,20 @@ local Commitfunction = function()
 	--[[ *** Stage 1 : pre-process the new scan ]]--
 	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 	coroutine.yield() -- yield here to allow the bar to display, and help the frame rate a little
-	
+	nextPause = debugprofilestop() + processingTime
 	local itemLinksTried, missingData = {}, false
 	local pos=#TempcurScan
 	while (pos > 0) do
---	for pos, data in ipairs(TempcurScan) do
+		if debugprofilestop() > nextPause then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
+			coroutine.yield()
+			nextPause = debugprofilestop() + processingTime
+		end
+
 		local data = TempcurScan[pos]
-		--local gt = GetTime()
 		local entryUnresolved = false
 		local entryUnusable = false
 		progresscounter = progresscounter + 1
-		--[[ temp disabled: this section is generally so brief that trying to throttle using time() probably won't help here
-		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
-			totalProcessingTime = totalProcessingTime + (gt - lastPause)
-			coroutine.yield()
-			lastPause = GetTime()
-		end
-		--]]
 		if (not data[Const.SELLER] or data[Const.SELLER]=="") then data[Const.SELLER], entryUnresolved = "", true end
 
 		if (data[Const.LINK] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB] and data[Const.IEQUIP]
@@ -1030,25 +1015,23 @@ local Commitfunction = function()
 		pos = pos -1
 	end
 
+
 	--[[ *** Stage 2 : Pre-process image table : Mark all matching auctions as DIRTY, and build a LookUpTable *** ]]--
 	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 2")
 	coroutine.yield() -- yield to allow updated bar to display
-	
+
 	local dirtyCount = 0
 	local lut = {}
 
+	nextPause = debugprofilestop() + processingTime
 	for pos, data in ipairs(scandata.image) do
+		if debugprofilestop() > nextPause then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 2")
+			coroutine.yield()
+			nextPause = debugprofilestop() + processingTime
+		end
 		local link = data[Const.LINK]
 		progresscounter = progresscounter + 1
-		--[[ temp disabled: as Stage 1
-		local gt = GetTime()
-		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 2")
-			totalProcessingTime = totalProcessingTime + (gt - lastPause)
-			coroutine.yield()
-			lastPause = GetTime()
-		end
-		--]]
 		if link then
 			if private.IsInQuery(TempcurQuery, data) then
 				-- Mark dirty
@@ -1073,10 +1056,11 @@ local Commitfunction = function()
 		end
 	end
 
+
 	--[[ *** Stage 3 : Merge new scan into ScanData *** ]]
-	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 3") -- change displayed text for reporting purposes
-	coroutine.yield() -- as above
-	
+	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
+	coroutine.yield()
+
 	local processors = {}
 	local modules = _G.AucAdvanced.GetAllModules("AuctionFilter", "Filter")
 	for pos, engineLib in ipairs(modules) do
@@ -1084,7 +1068,7 @@ local Commitfunction = function()
 		local x = {}
 		x.Name = engineLib.GetName()
 		x.Func = engineLib.AuctionFilter
-		table.insert(processors.Filter, x)
+		tinsert(processors.Filter, x)
 	end
 	modules = _G.AucAdvanced.GetAllModules("ScanProcessors")
 	for pos, engineLib in ipairs(modules) do
@@ -1093,7 +1077,7 @@ local Commitfunction = function()
 			local x = {}
 			x.Name = engineLib.GetName()
 			x.Func = func
-			table.insert(processors[op], x)
+			tinsert(processors[op], x)
 		end
 	end
 
@@ -1127,54 +1111,25 @@ local Commitfunction = function()
 	querySizeInfo.scanCount = scanCount
 	querySizeInfo.printSummary = printSummary
 
-	coroutine.yield()
-	lastPause = time()
-	startTime = lastPause
-	loops_previous = 0
-	loops_this_period = 0
-	
+	local maskNotDirtyUnseen = bitnot(bitor(Const.FLAG_DIRTY, Const.FLAG_UNSEEN)) -- only calculate mask for clearing these flags once
+
 	processBeginEndStats(processors, "begin", querySizeInfo, nil)
+
+	coroutine.yield()
+	nextPause = debugprofilestop() + processingTime
 	for index, data in ipairs(TempcurScan) do
-		local itemPos
+		if debugprofilestop() > nextPause then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
+			coroutine.yield()
+			nextPause = debugprofilestop() + processingTime
+		end
+		local itemPos = lib.FindItem(data, scandata.image, lut)
 		progresscounter = progresscounter + 4
-		--[[ temp disabled
-		local gt = GetTime()
-		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
-			totalProcessingTime = totalProcessingTime + (gt - lastPause)
-			coroutine.yield()
-			lastPause = GetTime()
-		end
-		--]]
-		-- temp replacement for disabled code
-		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
-if _G.nLog then
-	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
-		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
-end
-			coroutine.yield()
-			loops_previous = loops_previous + loops_this_period
-			previous_frames = previous_frames + 1
-			if lastPause-startTime > 10 then
-				loops_previous = loops_previous * 10 / (lastPause-startTime)
-				previous_frames = previous_frames * 10 / (lastPause-startTime)
-				if (previous_frames < 1) then previous = 1 end
-				startTime = lastPause - 10
-			end
-			lastPause = time()
-			loops_this_period = 0
-		end
-		loops_this_period = loops_this_period + 1
-		-- end replacement
-		
-		itemPos = lib.FindItem(data, scandata.image, lut)
-		data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
-		data[Const.FLAG] = bitand(data[Const.FLAG], bitnot(Const.FLAG_UNSEEN))
+
 		if (itemPos) then
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
-			data[Const.FLAG] = bitand(oldItem[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			data[Const.FLAG] = bitand(oldItem[Const.FLAG], maskNotDirtyUnseen)
 			if data[Const.SELLER] == "" then -- unknown seller name in new data; copy the old name if it exists
 				data[Const.SELLER] = oldItem[Const.SELLER]
 			end
@@ -1206,53 +1161,29 @@ end
 				filterNewCount = filterNewCount + 1
 			end
 			data[Const.ID] = private.GetNextID(idList)
+			data[Const.FLAG] = bitand(data[Const.FLAG], maskNotDirtyUnseen)
 			tinsert(scandata.image, replicate(data))
 		end
 	end
 
 
 	--[[ *** Stage 4 : Cleanup deleted auctions *** ]]
-	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Starting Stage 4")
+	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
 	coroutine.yield() -- as above
-	
 	local progressstep = 1
 	if #scandata.image > 0 then -- (avoid potential div0)
 		-- #scandata.image is probably now larger than when we originally calculated progresstotal -- adjust the step size to compensate
 		progressstep = (progresstotal - progresscounter) / #scandata.image
 	end
+	nextPause = debugprofilestop() + processingTime
 	for pos = #scandata.image, 1, -1 do
+		if debugprofilestop() > nextPause then
+			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
+			coroutine.yield()
+			nextPause = debugprofilestop() + processingTime
+		end
 		local data = scandata.image[pos]
 		progresscounter = progresscounter + progressstep
-		--[[ temp disabled code
-		local gt = GetTime()
-		if gt - lastPause >= processingTime then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
-			totalProcessingTime = totalProcessingTime + (gt - lastPause)
-			coroutine.yield()
-			lastPause = GetTime()
-		end
-		--]]
-		-- temp replacement
-		if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
-			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
-			coroutine.yield()
-if _G.nLog then
-	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
-		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
-end
-			loops_previous = loops_previous + loops_this_period
-			previous_frames = previous_frames + 1
-			if lastPause-startTime > 10 then
-				loops_previous = loops_previous * 10 / (lastPause-startTime)
-				previous_frames = previous_frames * 10 / (lastPause-startTime)
-				if (previous_frames < 1) then previous = 1 end
-				startTime = lastPause - 10
-			end
-			lastPause = time()
-			loops_this_period = 0
-		end
-		loops_this_period = loops_this_period + 1
-		-- end replacement
 		if (bitand(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
 			local dodelete = false
@@ -1321,7 +1252,7 @@ end
 		end
 	end
 
-	local now = time()
+	local endTimeStamp = time()
 	local scanTimeSecs = math.floor(GetTime() - scanStarted - totalPaused)
 	local scanTimeMins = floor(scanTimeSecs / 60)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
@@ -1330,7 +1261,6 @@ end
 
 	--Hides the end of scan summary if user is not interested
 	if (_G.nLog or printSummary) then
-		--totalProcessingTime = totalProcessingTime + (GetTime() - lastPause)
 
 		local scanTime = " "
 		local summaryLine
@@ -1421,9 +1351,9 @@ end
 			local eTime = GetTime()
 			_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO,
 			"Scan "..TempcurQuery.qryinfo.id.."("..TempcurQuery.qryinfo.sig..") Committed",
-			--("%s\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f\nTotal Commit Coroutine Execution Time (excluding yields): %f"):format(summary, eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-startTime, totalProcessingTime))
-			-- temporarily removed totalProcessingTime until other fixes go in and we can claculate it again
-			("%s\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f"):format(summary, eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-startTime))
+			--("%s\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f\nTotal Commit Coroutine Execution Time (excluding yields): %f"):format(summary, eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-commitStarted, totalProcessingTime))
+			-- temporarily removed totalProcessingTime until other fixes go in and we can calculate it again
+			("%s\nTotal Time: %f\nPaused Time: %f\nData Storage Time: %f\nData Store Time (our processing): %f\nTotal Commit Coroutine Execution Time: %f"):format(summary, eTime-scanStarted, totalPaused, scanStoreTime, storeTime, GetTime()-commitStarted))
 		end
 	end
 
@@ -1445,7 +1375,7 @@ end
 		wasIncomplete = wasIncomplete or false,
 		wasGetAll = wasGetAll or false,
 		startTime = scanStartTime,
-		endTime = now,
+		endTime = endTimeStamp,
 		started = scanStarted,
 		paused = totalPaused,
 		ended = GetTime(),
@@ -1461,11 +1391,11 @@ end
 		scandata.scanstats = scanstats
 	end
 
-	scanstats.LastScan = now
+	scanstats.LastScan = endTimeStamp
 	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0 then
-		scanstats.ImageUpdated = now
+		scanstats.ImageUpdated = endTimeStamp
 	end
-	if wasUnrestricted and not wasIncomplete then scanstats.LastFullScan = now end
+	if wasUnrestricted and not wasIncomplete then scanstats.LastFullScan = endTimeStamp end
 
 	-- keep 2 old copies for compatibility
 	scanstats[2] = scandata.scanstats[1]
@@ -1522,21 +1452,6 @@ function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
 	private.isScanning = false
 	if not (curQuery and curScan) then return end
 
---	local unresolved = curQuery.qryinfo.unresolved
---	local hadGetError = false
---	if unresolved then
---		local total = #curScan + unresolved
---		local tolerance = get("core.scan.unresolvedtolerance")
---		if total >= UNRESOLVED_UPPER_LIMIT then
---			hadGetError = unresolved > tolerance
---		elseif total > UNRESOLVED_LOWER_LIMIT then
---			hadGetError = unresolved > (tolerance * total / UNRESOLVED_UPPER_LIMIT)
---		else
---			hadGetError = unresolved > 0
---		end
---	end
-
-
 	tinsert(private.CommitQueue, {
 		Query = curQuery,
 		Scan = curScan,
@@ -1554,9 +1469,8 @@ function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
 
 	if not CoCommit or coroutine.status(CoCommit) == "dead" then
 		CoCommit = coroutine.create(Commitfunction)
-		--CoroutineResume(CoCommit) -- temp disabled - let it start from OnUpdate
 	end
-	-- in all other cases wait for the next update to resume CoCommit
+	-- wait for the next update to resume CoCommit
 end
 
 function private.QuerySent(query, isSearch, ...)
@@ -1838,7 +1752,7 @@ function lib.GetAuctionItem(list, i, skipGetInfo)
 		else
 			nextBid = 1
 		end
-		
+
 		-- temp fix for use level
 		if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
 			level = 1
@@ -1893,14 +1807,9 @@ local StorePageFunction = function()
 
 	if (not private.scanStarted) then private.scanStarted = GetTime() end
 	local queryStarted = private.scanStarted
+	local retrievalStarted = GetTime()
 
-
-	local startTime = GetTime()
-	-- temp changes for GetTime bug
---	local lastPause = startTime
-	local lastPause = time()
-	
-	local RunTime = 0
+	--local RunTime = 0 -- todo: reinstate RunTime calculations
 	private.sentQuery = false
 	local page = _G.AuctionFrameBrowse.page
 	if not private.curScan then
@@ -1910,29 +1819,11 @@ local StorePageFunction = function()
 		private.curPages = {}
 	end
 
-
 	if (_G.nLog) then
-		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage For Page %d Started %fs after Query Start"):format(page, startTime - queryStarted), ("StorePage (Page %d) Called\n%f seconds have elapsed since scan start"):format(page, startTime - queryStarted))
+		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage For Page %d Started %fs after Query Start"):format(page, retrievalStarted - queryStarted), ("StorePage (Page %d) Called\n%f seconds have elapsed since scan start"):format(page, retrievalStarted - queryStarted))
 	end
 
 	local curQuery, curScan, curPages = private.curQuery, private.curScan, private.curPages
-
-	local targetFPS = get("scancommit.targetFPS") or 1
-	if targetFPS > (baselineFPS*3)/4 then targetFPS = (baselineFPS*3)/4 end
-	if targetFPS < 1 then targetFPS = 1 end
-
-	--[[ temp disabled
-	local speed = get("scancommit.speed")/100
-	speed = speed^2.5
-	local processingTime = speed * 0.1 + 0.015
-	--]]
-	local time = time
-	local previous_frames = 0
-	local loops_previous = 0
-	local loops_this_period = 0
-	local lastPause = time()
-	local startTime = time()
-
 
 	local EventFramesRegistered = {}
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
@@ -1955,12 +1846,7 @@ local StorePageFunction = function()
 			frame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 		end
 		private.verifyStart = 1
-		local now = GetTime()
---		private.nextCheck = now
---		private.scanDelay = now + 30
-		--RunTime = RunTime + GetTime()-lastPause
 		coroutine.yield()
-		lastPause = GetTime()
 	end
 
 	--Update the progress indicator
@@ -1970,8 +1856,13 @@ local StorePageFunction = function()
 	--page, maxpages, name  lets a module know when a "scan" they have queued is actually in progress. scansQueued lets a module know how may scans are left to go
 	private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+1, maxPages, curQuery) --page starts at 0 so we need to add +1
 
-	local curTime = time()
-	--local getallspeed = (get("GetAllSpeed") or 500)*4
+	-- coroutine speed limiter using debugprofilestop
+	local targetFPS = get("scancommit.targetFPS")
+	if targetFPS > baselineFPS then targetFPS = baselineFPS end
+	if targetFPS < 5 then targetFPS = 5 end
+	local processingTime = 800 / targetFPS -- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	local debugprofilestop = debugprofilestop
+	local nextPause = debugprofilestop() + processingTime
 
 	local storecount = 0
 	local sellerOnly = true
@@ -1989,43 +1880,15 @@ local StorePageFunction = function()
 		local itemLinksTried = {}
 		local retries = { }
 		for i = 1, numBatchAuctions do
-			--if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 			if isGetAll then -- only yield for GetAll scans
-				--[[ temp disabled
-				local gt = GetTime()
-				if (gt-lastPause >= processingTime) then
+				if debugprofilestop() > nextPause then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
-					--RunTime = RunTime + GetTime() - lastPause
 					coroutine.yield()
-					lastPause = GetTime()
 					if private.breakStorePage then
 						break
 					end
+					nextPause = debugprofilestop() + processingTime
 				end
-				--]]
-				-- temp replacement
-				if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
-					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
-					coroutine.yield()
-if _G.nLog then
-	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
-		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
-end
-					loops_previous = loops_previous + loops_this_period
-					previous_frames = previous_frames + 1
-					if lastPause-startTime > 10 then
-						loops_previous = loops_previous * 10 / (lastPause-startTime)
-						previous_frames = previous_frames * 10 / (lastPause-startTime)
-						if (previous_frames < 1) then previous = 1 end
-						startTime = lastPause - 10
-					end
-					lastPause = time()
-					loops_this_period = 0
-					if private.breakStorePage then
-						break
-					end
-				end
-				loops_this_period = loops_this_period + 1
 			end
 
 			local itemData = private.GetAuctionItem("list", page, i, itemLinksTried)
@@ -2054,7 +1917,7 @@ end
 		local tryCount = 0
 		if _G.nLog and (#retries > 0) then
 			_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage Requires Retries Page %d"):format(page),
-				("Page: %d\nRetries Setting: %d\nUnresolved Entries:%d\nPage Elapsed Time: %.2fs"):format(page, maxTries, #retries, GetTime() - startTime))
+				("Page: %d\nRetries Setting: %d\nUnresolved Entries:%d\nPage Elapsed Time: %.2fs"):format(page, maxTries, #retries, GetTime() - retrievalStarted))
 		end
 
 		local newRetries = { }
@@ -2063,54 +1926,25 @@ end
 			sellerOnly = true
 			itemLinksTried = {}
 			tryCount = tryCount + 1
-			--RunTime = RunTime + GetTime()-lastPause
-			-- yeah, using GetTime for a Pause works here. confused yet?
-			lastPause = GetTime()
-			while (GetTime() - lastPause) < 1 do
+			-- must use GetTime to time this pause, as debugprofilestop is unsafe across yields
+			local nextWait = GetTime() + 1
+			while GetTime() < nextWait do
 				coroutine.yield() -- yielding updates GetTime, so this loop will still work
 				if private.breakStorePage then break end
 			end
-			--lastPause = GetTime()
-			lastPause = time()
-			
 			if private.breakStorePage then break end
+
+			nextPause = debugprofilestop() + processingTime
 			for _, i in ipairs(retries) do
-				--[[ temp disabled
-				if isGetAll and ((readCount % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
-					local gt = GetTime()
-					if (gt-lastPause >= processingTime) then
-						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
-						--RunTime = RunTime + GetTime()-lastPause
-						coroutine.yield()
-						lastPause = GetTime()
-						if private.breakStorePage then break end
-					end
-				end
-				--]]
 				if isGetAll then
-					if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
+					if debugprofilestop() > nextPause then
 						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						coroutine.yield()
-if _G.nLog then
-	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
-		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
-end
-						loops_previous = loops_previous + loops_this_period
-						previous_frames = previous_frames + 1
-						if lastPause-startTime > 10 then
-							loops_previous = loops_previous * 10 / (lastPause-startTime)
-							previous_frames = previous_frames * 10 / (lastPause-startTime)
-							if (previous_frames < 1) then previous = 1 end
-							startTime = lastPause - 10
-						end
-						lastPause = time()
-						loops_this_period = 0
-						if private.breakStorePage then
-							break
-						end
+						if private.breakStorePage then break end
+						nextPause = debugprofilestop() + processingTime
 					end
 				end
-				
+
 				readCount = readCount + 1
 
 				local itemData = private.GetAuctionItem("list", page, i[1], itemLinksTried, i[2])
@@ -2157,7 +1991,7 @@ end
 					_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO,
 						("StorePage Retry Successful Page %d"):format(page),
 						("Page: %d\nRetry Count: %d\nRecords Returned: %d\nRecords Left: %d\nPage Elapsed Time: %.2fs\nResolved:\n %s\nRemaining Unresolved:\n %s\nSeller Only Remaining: %s,   Wait on Only Seller: %s"):format(page, tryCount,
-							#retries - #newRetries, #newRetries, GetTime() - startTime, resolvedMap, missingMap, sellerOnly and "True" or "False", get("core.scan.sellernamedelay") and "True" or "False"))
+							#retries - #newRetries, #newRetries, GetTime() - retrievalStarted, resolvedMap, missingMap, sellerOnly and "True" or "False", get("core.scan.sellernamedelay") and "True" or "False"))
 				end
 				-- Found at least one.  Reset retry delay.
 				tryCount = 0
@@ -2171,40 +2005,14 @@ end
 		end
 
 		local names_missed, all_missed, ld_and_names_missed, links_missed, link_data_missed = 0,0,0,0,0
+		nextPause = debugprofilestop() + processingTime
 		for _, i in ipairs(retries) do
-			--[[ temp disabled
-			if isGetAll and ((readCount % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
-				local gt = GetTime()
-				if (gt-lastPause >= processingTime) then
-					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
-					--RunTime = RunTime + GetTime()-lastPause
-					coroutine.yield()
-					lastPause = GetTime()
-					if private.breakStorePage then break end
-				end
-			end
-			--]]
 			if isGetAll then
-				if time() > lastPause or (targetFPS > 1 and loops_previous>0 and loops_this_period > loops_previous * targetFPS / (previous_frames * previous_frames) + 2) then
+				if debugprofilestop() > nextPause then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
-if _G.nLog then
-	_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "Doing pause",
-		("Time to pause with loops_this_period=%d, loops_previous=%d, elapsed time=%d, targetFPS=%d, baselineFPS=%d, curFPS=%d, prevFrames=%d"):format(loops_this_period, loops_previous,lastPause-startTime, targetFPS, baselineFPS, GetFramerate(), previous_frames))
-end
-					loops_previous = loops_previous + loops_this_period
-					previous_frames = previous_frames + 1
-					if lastPause-startTime > 10 then
-						loops_previous = loops_previous * 10 / (lastPause-startTime)
-						previous_frames = previous_frames * 10 / (lastPause-startTime)
-						if (previous_frames < 1) then previous = 1 end
-						startTime = lastPause - 10
-					end
-					lastPause = time()
-					loops_this_period = 0
-					if private.breakStorePage then
-						break
-					end
+					if private.breakStorePage then break end
+					nextPause = debugprofilestop() + processingTime
 				end
 			end
 			readCount = readCount + 1
@@ -2270,10 +2078,12 @@ end
 		private.isGetAll = nil
 	end
 
+	coroutine.yield() -- update GetTime
+	local endTime = GetTime()
 	if not private.breakStorePage then
 		-- Send the next page query or finish scanning
 		if isGetAll then
-				elapsed = GetTime() - private.scanStarted - private.totalPaused
+				elapsed = endTime - private.scanStarted - private.totalPaused
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) -- page+2 signals that scan is done
 				private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
 				-- Clear the getall output. We don't want to create a new query so use the hook
@@ -2283,7 +2093,7 @@ end
 			if (page+1 < maxPages) then
 				private.ScanPage(page + 1)
 			else
-				elapsed = GetTime() - private.scanStarted - private.totalPaused
+				elapsed = endTime - private.scanStarted - private.totalPaused
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
 				private.Commit(false, curQuery.pageError or false, false, false)
 			end
@@ -2305,20 +2115,16 @@ end
 					end
 				end
 			end
-			elapsed = GetTime() - private.scanStarted - private.totalPaused
+			elapsed = endTime - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
 			private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
 		end
 	end
-	coroutine.yield() -- update GetTime (our runTime count will include time we were yielded here, but otherwise GetTime would not update)
-	local endTime = GetTime()
-	--RunTime = RunTime + endTime-lastPause
-	--private.storeTime = (private.storeTime or 0) + RunTime
-	private.storeTime = 0 -- temp hack fix later
+	private.storeTime = endTime-retrievalStarted -- temp hack as RunTime calculation is broken - this will include paused and other non-processing time!
 	if (_G.nLog) then
 		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage Page %d Complete"):format(page),
---		("Query Elapsed: %fs\nThis Page Store Elapsed: %fs\nThis Page Code Execution Time: %fs"):format(endTime-queryStarted, endTime-startTime, RunTime))
-		("Query Elapsed: %fs\nThis Page Store Elapsed: %fs"):format(endTime-queryStarted, endTime-startTime))
+--		("Query Elapsed: %fs\nThis Page Store Elapsed: %fs\nThis Page Code Execution Time: %fs"):format(endTime-queryStarted, endTime-retrievalStarted, RunTime))
+		("Query Elapsed: %fs\nThis Page Store Elapsed: %fs"):format(endTime-queryStarted, endTime-retrievalStarted))
 	end
 end
 
@@ -2662,7 +2468,6 @@ end
 private.unexpectedClose = false
 local timeoutCanSend = 0 -- part of fix for Blizzard bug {ADV-595}
 
-local flipb, flopb = false, false
 function private.OnUpdate(me, dur)
 	if CoCommit then
 		local costat = coroutine.status(CoCommit)
@@ -2677,12 +2482,13 @@ function private.OnUpdate(me, dur)
 			end
 		end
 	end
-	--local now = GetTime()
-	if not _G.AuctionFrame then return end
+	local auctionFrame = _G.AuctionFrame
+	if not auctionFrame then return end
 	if private.isPaused then return end
+	local isVisibleAucFrame = auctionFrame:IsVisible()
 
 	if private.queueScan then
-		if CanSendAuctionQuery() and (not private.CanSend or private.CanSend()) then
+		if isVisibleAucFrame and CanSendAuctionQuery() then
 			local queued = private.queueScan
 			private.queueScan = nil
 			lib.StartScan(unpack(queued, 1, private.queueScanParams)) -- explicit start and end points as some entries may be nil
@@ -2690,18 +2496,11 @@ function private.OnUpdate(me, dur)
 		return
 	end
 
-	if CoStore and coroutine.status(CoStore) == "suspended" and _G.AuctionFrame and _G.AuctionFrame:IsVisible() then
-		flipb = not flipb
-		if flipb then
-			flopb = not flopb
-			if flopb then
-				CoroutineResume(CoStore)
-			end
-		end
+	if CoStore and coroutine.status(CoStore) == "suspended" and isVisibleAucFrame then
+		CoroutineResume(CoStore)
 	end
 	if private.scanNext then
-		--if now > private.scanNext and CanSendAuctionQuery() then
-		if CanSendAuctionQuery() then
+		if isVisibleAucFrame and CanSendAuctionQuery() then
 			local nextPage = private.scanNextPage
 			private.scanNext = nil
 			private.ScanPage(nextPage, true)
@@ -2709,7 +2508,7 @@ function private.OnUpdate(me, dur)
 		return
 	end
 
-	if _G.AuctionFrame:IsVisible() then
+	if isVisibleAucFrame then
 		if private.unexpectedClose then
 			private.unexpectedClose = false
 			lib.PopScan()
@@ -2720,7 +2519,7 @@ function private.OnUpdate(me, dur)
 			if CanSendAuctionQuery() then
 				timeoutCanSend = 0
 				lib.StorePage()
-			elseif timeoutCanSend > 60 then
+			elseif timeoutCanSend > 15 then
 				-- Fix for Blizzard Auctionhouse bug {ADV-595}
 				-- CanSendAuctionQuery continues to return nil indefinitely. We use a timeout
 				timeoutCanSend = 0
