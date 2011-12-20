@@ -880,6 +880,9 @@ local Commitfunction = function()
 	local processingTime = 800 / targetFPS -- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
 	local debugprofilestop = debugprofilestop
 	local nextPause -- gets set before each processing loop, and after each yield within the loop
+	-- backup timer, in case debugprofilestop fails - can occur under (currently unknown) circumstances - only used in the merge and cleanup loops {ADV-637}
+	local time = time
+	local lastTime
 
 	local inscount, delcount = 0, 0
 	if #private.CommitQueue == 0 then CommitRunning = false return end
@@ -1117,11 +1120,13 @@ local Commitfunction = function()
 
 	coroutine.yield()
 	nextPause = debugprofilestop() + processingTime
+	lastTime = time()
 	for index, data in ipairs(TempcurScan) do
-		if debugprofilestop() > nextPause then
+		if debugprofilestop() > nextPause or time() > lastTime then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 3")
 			coroutine.yield()
 			nextPause = debugprofilestop() + processingTime
+			lastTime = time()
 		end
 		local itemPos = lib.FindItem(data, scandata.image, lut)
 		progresscounter = progresscounter + 4
@@ -1176,11 +1181,13 @@ local Commitfunction = function()
 		progressstep = (progresstotal - progresscounter) / #scandata.image
 	end
 	nextPause = debugprofilestop() + processingTime
+	lastTime = time()
 	for pos = #scandata.image, 1, -1 do
-		if debugprofilestop() > nextPause then
+		if debugprofilestop() > nextPause or time() > lastTime then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
 			coroutine.yield()
 			nextPause = debugprofilestop() + processingTime
+			lastTime = time()
 		end
 		local data = scandata.image[pos]
 		progresscounter = progresscounter + progressstep
