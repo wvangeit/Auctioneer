@@ -167,7 +167,7 @@ function getItem(itemID, static)
 	if cache[itemID] then return cache[itemID] end
 	
 	local baseData = self.database[itemID]
-	local buy, class, quality, stack, additional, usedby, quantity, limited, merchantlist,soulbind,specialbind
+	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist,soulbind,specialbind
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
 
 	if (baseData) then
