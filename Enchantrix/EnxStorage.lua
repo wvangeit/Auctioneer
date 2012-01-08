@@ -649,9 +649,10 @@ function saveNonDisenchantable(itemLink)
 	if (not NonDisenchantables[sig]) then
 		if (Enchantrix.Settings.GetSetting('chatShowFindings')) then
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtFoundNotDisenchant"):format(itemLink))
+			--Enchantrix.Util.DebugPrintQuick( itemLink, sig, NonDisenchantables[sig] )
 		end
-		NonDisenchantablesLocal[sig] = value;
-		NonDisenchantables[sig] = value;
+		NonDisenchantablesLocal[sig] = true;
+		NonDisenchantables[sig] = true;
 	end
 end
 
