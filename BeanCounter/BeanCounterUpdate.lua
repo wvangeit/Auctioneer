@@ -57,12 +57,6 @@ function private.UpgradeDatabaseVersion()
 			private.integrityCheck(true, server)
 		end
 	end
-	--check for tasks that need to run.
-	for server, serverData in pairs(BeanCounterDB) do
-		for player, playerData in pairs(serverData) do
-			private.startPlayerMaintenance(server, player)
-		end
-	end
 end
 
 function private.startPlayerUpgrade(server, player, playerData)
@@ -139,6 +133,11 @@ function private.startPlayerUpgrade(server, player, playerData)
  		private.update._3_02(server, player) --clear any data from the vendor tables
  		performedUpdate = true
 	end
+	if version < 3.03 then
+ 		private.update._3_03(server, player) --Removes the "profile.Default" table
+ 		performedUpdate = true
+	end
+	
 end
 
 function private.update._2_01(server, player)
@@ -386,4 +385,17 @@ function private.update._3_02(server, player)
 	BeanCounterDB[server][player]["vendorsell"] = {}
 	BeanCounterDB[server][player]["vendorbuy"] = {}	
 	BeanCounterDBSettings[server][player].version = 3.02
+end
+--new configuration settings/parser rewrite. Removes the "profile.Default" table, removes "maintenance" table
+function private.update._3_03(server, player)
+	if BeanCounterDBSettings["profile.Default"] then
+		for setting, value in pairs(BeanCounterDBSettings["profile.Default"]) do
+			BeanCounterDBSettings[setting] = value
+		end
+		BeanCounterDBSettings["profile.Default"] = nil
+	end
+	if BeanCounterDBSettings and BeanCounterDBSettings[server] and BeanCounterDBSettings[server][player] then
+		BeanCounterDBSettings[server][player].maintenance = nil
+		BeanCounterDBSettings[server][player].version = 3.03
+	end	
 end

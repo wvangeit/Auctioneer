@@ -34,7 +34,7 @@ LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
 
 local select,ipairs,pairs=select,ipairs,pairs
 local concat=table.concat
-local tonumber,tostring,strsplit,strjoin=tonumber,tostring,strsplit,strjoin
+local tonumber,tostring,strsplit,strjoin,UnitName,GetRealmName,GetMoney =tonumber,tostring,strsplit,strjoin,UnitName,GetRealmName,GetMoney
 local tinsert,tremove = tinsert,tremove
 
 local libName = "BeanCounter"
@@ -49,7 +49,7 @@ local private = {
 	realmName = GetRealmName(),
 	AucModule, --registers as an auctioneer module if present and stores module local functions
 	faction = nil,
-	version = 3.02,
+	version = 3.03,
 	wealth = 0, --This characters current net worth. This will be appended to each transaction.
 	compressed = false,
 
@@ -155,6 +155,7 @@ function lib.OnLoad(addon)
 	private.CreateFrames() --create our framework used for AH and GUI
 	private.createDeleteItemPrompt() --create the item delete prompt
 	private.slidebar() --create slidebar icon
+	private.maintenanceTasks() --run any scheduled tasks
 
 	private.scriptframe:RegisterEvent("PLAYER_MONEY")
 	private.scriptframe:RegisterEvent("PLAYER_ENTERING_WORLD")
