@@ -123,7 +123,7 @@ end
 
 function lib.GetDefault(setting)
 	local val = getDefault(setting);
-	return val;
+	return val
 end
 
 
@@ -163,8 +163,8 @@ local function setter(setting, value, server, player)
 		value = false
 	end
 
-	-- Don't save default values
-	if (value == 'default') or (value == getDefault(setting)) then
+	-- Don't save default values, still need to pass nil values on
+	if value ~= nil and (value == 'default' or value == getDefault(setting)) then
 		return
 	end
 
