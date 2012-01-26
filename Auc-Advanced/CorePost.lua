@@ -71,6 +71,7 @@ local GetItemInfo = GetItemInfo
 local ScanTip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
 local ScanTip2 = _G["AppraiserTipTextLeft2"]
 local ScanTip3 = _G["AppraiserTipTextLeft3"]
+local ScanTip4 = _G["AppraiserTipTextLeft4"]
 
 -- control constants used in the posting mechanism
 local LAG_ADJUST = (4 / 1000)
@@ -476,7 +477,7 @@ function lib.IsAuctionable(bag, slot)
 	ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
 	ScanTip:ClearLines()
 	ScanTip:SetBagItem(bag, slot)
-	local test = BindTypes[ScanTip2:GetText()] or BindTypes[ScanTip3:GetText()]
+	local test = BindTypes[ScanTip2:GetText()] or BindTypes[ScanTip3:GetText()] or BindTypes[ScanTip4:GetText()]
 	ScanTip:Hide()
 	if test then
 		return false, test
