@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - Item Suggest module
-	Version: <%version%> (<%codename%>)
+	Version: 5.13.5258 (BoldBandicoot)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -660,6 +660,224 @@ local function GetConvertValue(hyperlink, quantity, serverKey, additional)
 	return value
 end
 
+local findSmeltable = {}
+local smeltMinLevels = {}
+do -- Copied and modified from SearcherSmelting.lua
+	-- Set our constants
+	-- Motes/Primals
+	local PAIR = 22451
+	local MAIR = 22572
+	local PEARTH= 22452
+	local MEARTH = 22573
+	local PFIRE = 21884
+	local MFIRE = 22574
+	local PLIFE = 21886
+	local MLIFE = 22575
+	local PMANA = 22457
+	local MMANA = 22576
+	local PSHADOW = 22456
+	local MSHADOW = 22577
+	local PWATER = 21885
+	local MWATER = 22578
+	-- Ores/Bars/Reagents
+	local COPPERORE = 2770
+	local COPPERBAR = 2840
+	local TINORE = 2771
+	local TINBAR = 3576
+	local BRONZEBAR = 2841
+	local SILVERORE = 2775
+	local SILVERBAR = 2842
+	local IRONORE = 2772
+	local IRONBAR = 3575
+	local GOLDORE = 2776
+	local GOLDBAR = 3577
+	local STEELBAR = 3859
+	local MITHRILORE = 3858
+	local MITHRILBAR = 3860
+	local TRUESILVERORE = 7911
+	local TRUESILVERBAR = 6037
+	local THORIUMORE = 10620
+	local THORIUMBAR = 12359
+	local DARKIRONORE = 11370
+	local DARKIRONBAR = 11371
+	local DREAMDUST = 11176
+	local ETHORIUMBAR = 12655
+	local FELIRONORE = 23424
+	local FELIRONBAR = 23445
+	local ELEMENTIUMINGOT = 18562
+	local ARCANITEBAR = 12360
+	local FIERYCORE = 17010
+	local ELEMENTALFLUX = 18567
+	local EELEMENTIUMBAR = 17771
+	local ADAMANTITEORE = 23425
+	local ADAMANTITEBAR = 23446
+	local ETERNIUMORE = 23427
+	local ETERNIUMBAR = 23447
+	local FELSTEELBAR = 23448
+	local COBALTORE = 36909
+	local COBALTBAR = 36916
+	local KHORIUMORE = 23426
+	local KHORIUMBAR = 23449
+	local HADAMANTITEBAR = 23573
+	local SARONITEORE = 36912
+	local SARONITEBAR = 36913
+	local OBSIDIUMORE = 53038
+	local OBSIDIUMBAR = 54849
+	local TITANIUMORE = 36910
+	local TITANIUMBAR = 41163
+	local ETERNALFIRE = 36860
+	local ETERNALEARTH = 35624
+	local ETERNALSHADOW = 35627
+	local TITANSTEELBAR = 37663
+	local ELEMENTIUMORE = 52185
+	local ELEMENTIUMBAR = 52186
+	local VOLATILEEARTH = 52327
+	local HELEMENTIUMBAR = 53039
+	local PYRITEORE = 52183
+	local PYRIUMBAR = 51950
+	local HARDENEDKHORIUM = 35128
+
+
+	-- Temporary tables to help build the working table
+	-- To add new conversions, edit these tables
+
+
+	local primal2mote = {
+		[PEARTH] = MEARTH,
+		[PFIRE] = MFIRE,
+	}
+	local ore2bar = {
+		[COPPERORE] = COPPERBAR,
+		[TINORE] = TINBAR,
+		[IRONORE] = IRONBAR,
+		[SILVERORE] = SILVERBAR,
+		[GOLDORE] = GOLDBAR,
+		[MITHRILORE] = MITHRILBAR,
+		[TRUESILVERORE] = TRUESILVERBAR,
+		[THORIUMORE] = THORIUMBAR,
+		[COBALTORE] = COBALTBAR,
+	}
+	local twoore2bar = {
+		[FELIRONORE] = FELIRONBAR,
+		[ADAMANTITEORE] = ADAMANTITEBAR,
+		[ETERNIUMORE] = ETERNIUMBAR,
+		[KHORIUMORE] = KHORIUMBAR,
+		[SARONITEORE] = SARONITEBAR,
+		[OBSIDIUMORE] = OBSIDIUMBAR,
+		[TITANIUMORE] = TITANIUMBAR,
+		[ELEMENTIUMORE] = ELEMENTIUMBAR,
+		[PYRITEORE] = PYRIUMBAR,
+	}
+
+	smeltMinLevels = {
+		[COPPERORE] = 1,
+		[TINORE] = 50,
+		[IRONORE] = 100,
+		[SILVERORE] = 65,
+		[GOLDORE] = 115,
+		[MITHRILORE] = 150,
+		[TRUESILVERORE] = 165,
+		[THORIUMORE] = 230,
+		[COBALTORE] = 350,
+		[FELIRONORE] = 275,
+		[ADAMANTITEORE] = 325,
+		[ETERNIUMORE] = 350,
+		[KHORIUMORE] = 375,
+		[SARONITEORE] = 400,
+		[OBSIDIUMORE] = 425,
+		[TITANIUMORE] = 450,
+		[ELEMENTIUMORE] = 475,
+		[PYRITEORE] = 525,
+		[COPPERBAR] = 50,
+		[TINBAR] = 50,
+		[IRONBAR] = 125,
+		[THORIUMBAR] = 250,
+		[DREAMDUST] = 250,
+		[FELIRONBAR] = 350,
+		[ETERNIUMBAR] = 350,
+		[ADAMANTITEBAR] = 375,
+		[TITANIUMBAR] = 450,
+		[ETERNALFIRE] = 450,
+		[ETERNALEARTH] = 450,
+		[ETERNALSHADOW] = 450,
+		[ELEMENTIUMBAR] = 500,
+		[VOLATILEEARTH] = 500,
+		[DARKIRONORE] = 230,
+		[ELEMENTIUMINGOT] = 300,
+		[ARCANITEBAR] = 300,
+		[FIERYCORE] = 300,
+		[ELEMENTALFLUX] = 300,
+		[KHORIUMBAR] = 375,
+		[HADAMANTITEBAR] = 375,
+		[PEARTH] = 300,
+		[PFIRE] = 300,
+	}
+
+	-- Build the working table
+	for id, idto in pairs (primal2mote) do
+		findSmeltable[id] = {idto, 10, "smelting.enablePrimal"}
+	end
+	for id, idto in pairs (ore2bar) do
+		findSmeltable[id] = {idto, 1, "smelting.enableOre"}
+	end
+	for id, idto in pairs (twoore2bar) do
+		findSmeltable[id] = {idto, .5, "smelting.enableOre"}
+	end
+	-- Manually add the mutli items to the table
+	findSmeltable[COPPERBAR] = {BRONZEBAR, 1, "smelting.enableMulti"}
+	findSmeltable[TINBAR] = {BRONZEBAR, 1, "smelting.enableMulti"}
+	findSmeltable[IRONBAR] = {STEELBAR, .95, "smelting.enableMulti"} -- using 95% to make up for Coal costs
+	findSmeltable[THORIUMBAR] = {ETHORIUMBAR, .5, "smelting.enableMulti"}
+	findSmeltable[DREAMDUST] = {ETHORIUMBAR, 1/6, "smelting.enableMulti"}
+	findSmeltable[FELIRONBAR] = {FELSTEELBAR, 1/6, "smelting.enableMulti"}
+	findSmeltable[ETERNIUMBAR] = {FELSTEELBAR, .25, "smelting.enableMulti"}
+	findSmeltable[ADAMANTITEBAR] = {HADAMANTITEBAR, .1, "smelting.enableMulti"}
+	findSmeltable[TITANIUMBAR] = {TITANSTEELBAR, 1/12, "smelting.enableMulti"}
+	findSmeltable[ETERNALFIRE] = {TITANSTEELBAR, .25, "smelting.enableMulti"}
+	findSmeltable[ETERNALEARTH] = {TITANSTEELBAR, .25, "smelting.enableMulti"}
+	findSmeltable[ETERNALSHADOW] = {TITANSTEELBAR, .25, "smelting.enableMulti"}
+	findSmeltable[ELEMENTIUMBAR] = {HELEMENTIUMBAR, 1/20, "smelting.enableMulti"}
+	findSmeltable[VOLATILEEARTH] = {HELEMENTIUMBAR, 1/8, "smelting.enableMulti"}
+	-- Manually add Dark Iron Bar
+	findSmeltable[DARKIRONORE] = {DARKIRONBAR, 1/8, "smelting.enableDarkIron"}
+	-- Manually add Enchanted Elementium Bar
+	findSmeltable[ELEMENTIUMINGOT] = {EELEMENTIUMBAR, .25, "smelting.enableEElementium"}
+	findSmeltable[ARCANITEBAR] = {EELEMENTIUMBAR, 1/40, "smelting.enableEElementium"}
+	findSmeltable[FIERYCORE] = {EELEMENTIUMBAR, .25, "smelting.enableEElementium"}
+	findSmeltable[ELEMENTALFLUX] = {EELEMENTIUMBAR, 1/12, "smelting.enableEElementium"}
+	-- Manually add Hardened Khorium
+	findSmeltable[KHORIUMBAR] = {HARDENEDKHORIUM, 1/6, "smelting.enableHKhorium"}
+	findSmeltable[HADAMANTITEBAR] = {HARDENEDKHORIUM, 1/2, "smelting.enableHKhorium"}
+end
+
+local function GetSmeltValue(hyperlink, quantity, serverKey, additional)
+	local itemId = additional.itemId or tonumber(strmatch(hyperlink, "item:(%d+):"))
+	local smelt = findSmeltable[itemId]
+	if not smelt then return end
+	local newId = smelt[1] -- id of item we can smelt to
+	local yield = smelt[2] * quantity
+
+	local model = get("util.itemsuggest.auctionmodel")
+	local value = GetModelPrice(model, newId, serverKey)
+	if not value then return end
+	value = value * yield
+
+	if get("util.itemsuggest.includebrokerage") then
+		value = value * cutAdjust
+	end
+	if get("util.itemsuggest.includedeposit") then
+		local _, faction = SplitServerKey(serverKey)
+		-- to minimize problems with the 1 silver minimum deposit, we calculate for a stack of 10, then divide by 10 after
+		-- todo: not all results can be stacked to 10, but GetDepositCost should handle it for now
+		local deposit = GetDepositCost(newId, get("util.itemsuggest.deplength"), faction, 10)
+		if deposit then
+			value = value - get("util.itemsuggest.relisttimes") * deposit * yield / 10
+		end
+	end
+
+	return value
+end
+
 local function GetVendorValue(hyperlink, quantity, serverKey, additional)
 	local _,_,_,_,_,_,_,_,_,_,vendor = GetItemInfo(hyperlink)
 	if vendor then
@@ -674,6 +892,7 @@ lib.NewSuggest("Disenchant", GetDisenchantValue, "util.itemsuggest.disenchantwei
 lib.NewSuggest("Prospect", GetProspectValue, "util.itemsuggest.prospectweight")
 lib.NewSuggest("Mill", GetMillingValue, "util.itemsuggest.millingweight")
 lib.NewSuggest("Convert", GetConvertValue, "util.itemsuggest.convertweight")
+lib.NewSuggest("Smelt", GetSmeltValue, "util.itemsuggest.smeltweight")
 lib.NewSuggest("Vendor", GetVendorValue, "util.itemsuggest.vendorweight")
 
 local function OnLoadRunOnce()
@@ -689,6 +908,7 @@ local function OnLoadRunOnce()
 	default("util.itemsuggest.millingweight", 100)-- Used for item AI
 	default("util.itemsuggest.disenchantweight", 100)-- Used for item AI
 	default("util.itemsuggest.convertweight", 100)-- Used for item AI
+	default("util.itemsuggest.smeltweight", 100)-- Used for item AI
 	default("util.itemsuggest.relisttimes", 1)-- Used for item AI
 	default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
 	default("util.itemsuggest.includedeposit", 1)-- Used for item AI
@@ -709,6 +929,8 @@ local function OnLoadRunOnce()
 	lib.SetBiasSlider("Mill", nil, "Weight ItemSuggest recommendations for Milling higher or lower.")
 	lib.SetSuggestText("Convert", "Convert", "007fee") -- blue
 	lib.SetBiasSlider("Convert", nil, "Weight ItemSuggest recommendations for Conversion higher or lower.")
+	lib.SetSuggestText("Smelt", "Smelt", "007fee") -- blue
+	lib.SetBiasSlider("Smelt", nil, "Weight ItemSuggest recommendations for Smelting higher or lower.")
 	lib.SetSuggestText("Vendor", "Vendor", "9d9d9d") -- grey
 	lib.SetBiasSlider("Vendor", nil, "Weight ItemSuggest recommendations for vendor resale higher or lower.")
 end
@@ -721,7 +943,7 @@ local function SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what itemsuggest",
         "What is the ItemSuggest module?",
-        "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill or convert that item.")
+        "ItemSuggest adds a tooltip line that suggests whether or not to auction, vendor, disenchant, prospect, mill, smelt or convert that item.")
 
 	gui:AddControl(id, "Header", 0, "ItemSuggest Options")
 	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.enablett", "Display ItemSuggest tooltips")
