@@ -9,6 +9,7 @@
 	<Script file="SearcherProspect.lua"/>
 	<Script file="SearcherMilling.lua"/>
 	<Script file="SearcherConverter.lua"/>
+	<Script file="SearcherSmelting.lua"/>
 	<Script file="SearcherSnatch.lua"/>
     <Script file="SearcherVendor.lua"/>
 	<Script file="SearchRealTime.lua"/>
