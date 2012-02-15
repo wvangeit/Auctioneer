@@ -261,8 +261,6 @@ function lib.ClearScanData(key)
 end
 
 function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
-	if not private.scanStack then private.scanStack = {} end
-
 	name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex = private.QueryScrubParameters(
 		name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 
@@ -276,6 +274,8 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 				return
 			end
 		end
+	else
+		private.scanStack = {}
 	end
 
 	local query = private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
@@ -286,7 +286,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("Starting pushed scan %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 	end
 
-	tinsert(private.scanStack, {time(), false, query, {}, {}, GetTime(), 0, false, 0})
+	tinsert(private.scanStack, {time(), false, query, {}, {}, false, 0, false, 0})
 end
 
 function lib.PushScan()
@@ -341,6 +341,7 @@ function lib.PopScan()
 		private.storeTime = unpack(private.scanStack[1])
 		tremove(private.scanStack, 1)
 
+		private.scanStarted = private.scanStarted or now -- scans created by StartPushedScan measure start time from when first popped
 		local elapsed = pauseTime and (now - pauseTime) or 0
 		if elapsed > 300 then
 			-- 5 minutes old
@@ -1260,11 +1261,16 @@ local Commitfunction = function()
 	end
 
 	local endTimeStamp = time()
-	local scanTimeSecs = math.floor(GetTime() - scanStarted - totalPaused)
-	local scanTimeMins = floor(scanTimeSecs / 60)
-	scanTimeSecs =  mod(scanTimeSecs, 60)
-	local scanTimeHours = floor(scanTimeMins / 60)
-	scanTimeMins = mod(scanTimeMins, 60)
+	local scanTimeSecs, scanTimeMins, scanTimeHours = GetTime() - scanStarted - totalPaused, 0, 0
+	if scanTimeSecs < 1 then
+		scanTimeSecs = floor(scanTimeSecs*10)/10
+	else
+		scanTimeSecs = floor(scanTimeSecs)
+		scanTimeMins = floor(scanTimeSecs / 60)
+		scanTimeSecs =  mod(scanTimeSecs, 60)
+		scanTimeHours = floor(scanTimeMins / 60)
+		scanTimeMins = mod(scanTimeMins, 60)
+	end
 
 	--Hides the end of scan summary if user is not interested
 	if (_G.nLog or printSummary) then
@@ -2770,7 +2776,7 @@ function lib.GetScanCount()
 end
 
 function lib.GetStackedScanCount()
-	local scanCount = private.scanStack or 0
+	local scanCount = 0
 	if (private.scanStack) then scanCount = #private.scanStack end
 	return scanCount
 end
