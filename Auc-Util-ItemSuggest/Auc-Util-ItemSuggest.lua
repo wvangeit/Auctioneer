@@ -1,6 +1,6 @@
 --[[
 	Auctioneer - Item Suggest module
-	Version: 5.13.5258 (BoldBandicoot)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
@@ -37,6 +37,7 @@ local libType, libName = "Util", "ItemSuggest"
 local lib = AucAdvanced.NewModule(libType, libName, nil, true) -- noPrivate
 if not lib then return end
 local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
+local Const = AucAdvanced.Const
 
 local SplitServerKey = AucAdvanced.SplitServerKey
 local GetDepositCost = GetDepositCost
@@ -77,7 +78,7 @@ function lib.Suggest(hyperlink, quantity, serverKey, additional)
 		return
 	end
 	if type(quantity) ~= "number" or quantity < 1 then quantity = 1 end
-	serverKey = AucAdvanced.Const.ServerKeyHome -- temporary: peg to home faction for now
+	serverKey = Const.ServerKeyHome -- temporary: peg to home faction for now
 	if type(additional) ~= "table" then additional = emptyTable end -- ensure 'additional' is always a table, though it may be empty
 	if hyperlink == LastLink and quantity == LastQuantity and additional == LastAdditional then
 		-- caution: we don't check to see if the _contents_ of 'additional' have changed
@@ -158,6 +159,8 @@ function lib.SetSuggestText(key, text, colR, colG, colB)
 	end
 	if hex then
 		data.displaytext = format("|cff%s%s|r", hex, text)
+	else
+		data.displaytext = nil
 	end
 	return true
 end
@@ -241,6 +244,57 @@ do
 		end
 		return true
 	end
+end
+
+--[[ GetRelistTimes
+	Provides relist times (estimated number of lost deposits per sale) for the specified link
+	may be fixed, or variable based on BeanCounter record (if available)
+	hyperlink may be a link (string) or itemID (number)
+	Note: safe to use directly in formulae; *always* returns a number
+--]]
+function lib.GetRelistTimes(hyperlink)
+
+	local times = get( "util.itemsuggest.relisttimes" )
+	if not get( "util.itemsuggest.usebeancounter" ) or not BeanCounter or not BeanCounter.API.isLoaded then
+		return times
+	end
+	local check = type(hyperlink)
+	if check == "number" then
+		-- we must create a link, that getAHSoldFailed is going to decode back into this number...
+		-- todo: if getAHSoldFailed gets enhanced to accept itemID, we can do away with this conversion
+		local _, link = GetItemInfo(hyperlink)
+		if not link then
+			return times
+		end
+		hyperlink = link
+	elseif check ~= "string" then
+		return times
+	end
+
+	local numdays
+	if get("match.beancount.enable") and get("match.beancount.daterange") then
+		numdays = get( "match.beancount.numdays" )
+	end
+	local success, failed = BeanCounter.API.getAHSoldFailed(Const.PlayerName, hyperlink, numdays, nil )
+	if not success then
+		return times
+	end
+
+	-- algorithm and comments by wildcard_25 {AUIS-3}
+
+	--use expected # if not enough data for fails. Even if auction is always
+	--successful, the returned value very quickly starts to approach zero (much
+	--better than it was before)
+	if ( failed < times ) then
+		failed = times
+	end
+
+	--always assume that there will be a successful auction at the end of the fails
+	--(ie. +1). To be more accurate you would only add one if the last auction
+	--failed, adding one when it was a success skews the value slightly towards
+	--zero. However, I like to think of this as encouraging me to auction the same
+	--item again based on my recent success, and it keeps things simple :)
+	return failed / ( success + 1 )
 end
 
 --[[ Price Model Support ]]--
@@ -349,7 +403,7 @@ local function GetAuctionValue(hyperlink, quantity, serverKey, additional)
 		local _, faction = SplitServerKey(serverKey)
 		local deposit = GetDepositCost(hyperlink, get("util.itemsuggest.deplength"), faction, quantity)
 		if deposit then
-			value = value - deposit * get("util.itemsuggest.relisttimes")
+			value = value - deposit * lib.GetRelistTimes(hyperlink)
 		end
 	end
 
@@ -374,13 +428,20 @@ local function GetDisenchantValue(hyperlink, quantity, serverKey, additional)
 	if not total then return end
 	local totalNumber = total[1]
 	if totalNumber <= 0 then return end
-	local marketTotal = 0
+	local marketTotal, depositTotal = 0, 0
+	local includeDeposit = get("util.itemsuggest.includedeposit")
 	local model = get("util.itemsuggest.reagentmodel")
 	for result, resData in pairs(data) do
 		if result ~= "total" then
 			local market = GetModelPrice(model, result, serverKey)
+			local yield = resData[2] / totalNumber
 			if market then
-				marketTotal = marketTotal + market * resData[2] / totalNumber
+				marketTotal = marketTotal + market * yield
+			end
+			if includeDeposit then
+				-- For simplicity assume deposit is 1 silver for enchanting mats,
+				-- but adjust that for the relist times * yield for each result
+				depositTotal = depositTotal + 100 * lib.GetRelistTimes(result) * yield
 			end
 		end
 	end
@@ -388,10 +449,7 @@ local function GetDisenchantValue(hyperlink, quantity, serverKey, additional)
 	if get("util.itemsuggest.includebrokerage") then
 		marketTotal = marketTotal * cutAdjust
 	end
-	if get("util.itemsuggest.includedeposit") then
-		-- For simplicity assume deposit is 1 silver for enchanting mats
-		marketTotal = marketTotal - 100 * get("util.itemsuggest.relisttimes")
-	end
+	marketTotal = marketTotal - depositTotal
 
 	return marketTotal * quantity -- quantity may be more than 1 when mousing over Appraiser
 end
@@ -407,11 +465,10 @@ local function GetProspectValue(hyperlink, quantity, serverKey, additional)
 
 	local marketTotal, depositTotal = 0, 0
 	local model = get("util.itemsuggest.reagentmodel")
-	local depositAucLength, depositRelistTimes, depositFaction
+	local depositAucLength, depositFaction
 	local includeDeposit = get("util.itemsuggest.includedeposit")
 	if includeDeposit then
 		depositAucLength = get("util.itemsuggest.deplength")
-		depositRelistTimes = get("util.itemsuggest.relisttimes")
 		local _, faction = SplitServerKey(serverKey)
 		depositFaction = faction
 	end
@@ -430,7 +487,7 @@ local function GetProspectValue(hyperlink, quantity, serverKey, additional)
 			-- to minimize problems with the 1 silver minimum deposit, we calculate for a stack of 20, then divide by 20 after
 			local deposit = GetDepositCost(result, depositAucLength, depositFaction, 20)
 			if deposit then
-				depositTotal = depositTotal + deposit * yield * depositRelistTimes / 20
+				depositTotal = depositTotal + deposit * yield * lib.GetRelistTimes(result) / 20
 			end
 		end
 	end
@@ -455,11 +512,10 @@ local function GetMillingValue(hyperlink, quantity, serverKey, additional)
 
 	local marketTotal, depositTotal = 0, 0
 	local model = get("util.itemsuggest.reagentmodel")
-	local depositAucLength, depositRelistTimes, depositFaction
+	local depositAucLength, depositFaction
 	local includeDeposit = get("util.itemsuggest.includedeposit")
 	if includeDeposit then
 		depositAucLength = get("util.itemsuggest.deplength")
-		depositRelistTimes = get("util.itemsuggest.relisttimes")
 		local _, faction = SplitServerKey(serverKey)
 		depositFaction = faction
 	end
@@ -478,7 +534,7 @@ local function GetMillingValue(hyperlink, quantity, serverKey, additional)
 			-- to minimize problems with the 1 silver minimum deposit, we calculate for a stack of 20, then divide by 20 after
 			local deposit = GetDepositCost(result, depositAucLength, depositFaction, 20)
 			if deposit then
-				depositTotal = depositTotal + deposit * yield * depositRelistTimes / 20
+				depositTotal = depositTotal + deposit * yield * lib.GetRelistTimes(result) / 20
 			end
 		end
 	end
@@ -653,7 +709,7 @@ local function GetConvertValue(hyperlink, quantity, serverKey, additional)
 		-- todo: not all results can be stacked to 10, but GetDepositCost should handle it for now
 		local deposit = GetDepositCost(newId, get("util.itemsuggest.deplength"), faction, 10)
 		if deposit then
-			value = value - get("util.itemsuggest.relisttimes") * deposit * yield / 10
+			value = value - lib.GetRelistTimes(newId) * deposit * yield / 10
 		end
 	end
 
@@ -871,7 +927,7 @@ local function GetSmeltValue(hyperlink, quantity, serverKey, additional)
 		-- todo: not all results can be stacked to 10, but GetDepositCost should handle it for now
 		local deposit = GetDepositCost(newId, get("util.itemsuggest.deplength"), faction, 10)
 		if deposit then
-			value = value - get("util.itemsuggest.relisttimes") * deposit * yield / 10
+			value = value - lib.GetRelistTimes(newId) * deposit * yield / 10
 		end
 	end
 
@@ -910,6 +966,7 @@ local function OnLoadRunOnce()
 	default("util.itemsuggest.convertweight", 100)-- Used for item AI
 	default("util.itemsuggest.smeltweight", 100)-- Used for item AI
 	default("util.itemsuggest.relisttimes", 1)-- Used for item AI
+	default("util.itemsuggest.usebeancounter", false)
 	default("util.itemsuggest.includebrokerage", 1)-- Used for item AI
 	default("util.itemsuggest.includedeposit", 1)-- Used for item AI
 	default("util.itemsuggest.deplength", 48)
@@ -987,11 +1044,13 @@ local function SetupConfigGui(gui)
 	gui:AddControl(id, "Header", 0, "Deposit cost and fees")
 	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includedeposit", "Include deposit costs")
 	gui:AddTip(id, "Set whether or not to include Auction House deposit costs as part of ItemSuggest tooltip calculations.")
-	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "util.itemsuggest.deplength", "Base deposits on what length of auction.")
-	gui:AddTip(id, "If Auction House deposit costs are included, set the default Auction period used for purposes of calculating Auction House deposit costs.")
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "util.itemsuggest.deplength")
+	gui:AddTip(id, "Set the Auction period used for purposes of calculating Auction House deposit costs.")
 	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.relisttimes", 1, 20, 0.1, "Average # of listings: %0.1fx")
-	gui:AddTip(id, "Set the estimated average number of times an auction item is relisted.")
-	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includebrokerage", "Include AH brokerage costs")
+	gui:AddTip(id, "Set the estimated average number of times an auction item will have to be relisted before it sells. This is the estimated number of lost deposits")
+	gui:AddControl(id, "Checkbox", 0, 2, "util.itemsuggest.usebeancounter", "Use BeanCounter data for # of listings")
+	gui:AddTip(id, "Use BeanCounter records to adjust the number of listings based on past successes and failures.\nUses the date range from the BeanCount match module, if that module is enabled.")
+	gui:AddControl(id, "Checkbox", 0, 1, "util.itemsuggest.includebrokerage", "Include brokerage costs")
 	gui:AddTip(id, "Set whether or not to include Auction House brokerage costs as part of ItemSuggest tooltip calculations.")
 
 	for _, packed in ipairs(setupSliderSettings) do
