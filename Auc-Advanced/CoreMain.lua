@@ -214,7 +214,7 @@ function private.OnLoad(addon)
 	addon = addon:lower()
 
 	-- Check if the actual addon itself is loading
-	if (addon == "auc-advanced") then
+	if addon == "auc-advanced" then
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
 		Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, private.ClickBagHook)
 		hooksecurefunc("ChatFrame_OnHyperlinkShow", private.ClickLinkHook)
@@ -223,20 +223,28 @@ function private.OnLoad(addon)
 		--updated saved variables format
 		if not AucAdvancedConfig["version"] then AucAdvanced.Settings.upgradeSavedVariables() end
 
-		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
-			-- These embedded modules have also just been loaded
-			private.OnLoad(module)
-		end
-
 		-- Load the dummy CoreModule
 		AucAdvanced.CoreModuleOnLoad(addon)
 	end
 
-	-- Notify the actual module if it exists
+	-- Look for a matching module
 	local auc, sys, eng = strsplit("-", addon)
+	local moduleLib
 	if auc == "auc" and sys and eng then
-		local engineLib = AucAdvanced.GetModule(sys, eng, "OnLoad")
-		if engineLib then engineLib.OnLoad(addon) end
+		moduleLib = AucAdvanced.GetModule(sys, eng)
+	end
+	if not moduleLib then
+		moduleLib = internalStore.Util.GetModuleForName(addon)
+	end
+
+	-- Notify the actual module if it exists
+	if moduleLib and moduleLib.OnLoad then
+		moduleLib.OnLoad(addon)
+	end
+
+	-- Notify all processors that an auctioneer addon has loaded
+	if moduleLib or (auc == "auc" and sys and #sys > 0) then -- identify names in both "auc-name" and "auc-system-name" formats
+		AucAdvanced.SendProcessorMessage("load", addon)
 	end
 
 	-- Check all modules' load triggers and pass event to processors
@@ -249,9 +257,15 @@ function private.OnLoad(addon)
 		end
 	end
 
-	-- Notify all processors that an auctioneer addon has loaded
-	if auc == "auc" and sys and #sys > 0 then -- identify names in both "auc-name" and "auc-system-name" formats
-		AucAdvanced.SendProcessorMessage("load", addon)
+	if moduleLib then
+		internalStore.Util.SendModuleCallbacks(moduleLib)
+	end
+
+	if addon == "auc-advanced" then
+		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
+			-- These embedded modules have also just been loaded
+			private.OnLoad(module)
+		end
 	end
 end
 
@@ -266,7 +280,6 @@ private.Schedule = {}
 function private.OnEvent(self, event, arg1, arg2, ...)
 	if (event == "ADDON_LOADED") then
 		private.OnLoad(arg1)
-		AucAdvanced.ResetSPMArray()
 	elseif (event == "PLAYER_LOGIN") then
 		-- (used as an alternative to "ADDON_LOADED", to delay loading scandata.
 		-- as of 3.2 the LoadAddOn()  API  returned nil, nil when using "ADDON_LOADED" event)
