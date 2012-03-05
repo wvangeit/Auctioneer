@@ -34,7 +34,8 @@ Enchantrix_RegisterRevision("$URL$","$Rev$")
 
 -- Provide fixed price data by registering ourselves as a bonafide legitimate Auctioneer module.
 if not AucAdvanced then return end
-local lib = AucAdvanced.NewModule("Util", "Enchantrix", nil, true)
+local AddOnName = ...
+local lib = AucAdvanced.NewModule("Util", "Enchantrix", nil, true, AddOnName)
 if not lib then return end
 
 Enchantrix.AucUtil = lib
