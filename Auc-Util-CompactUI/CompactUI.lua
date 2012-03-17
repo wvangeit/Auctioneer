@@ -77,6 +77,7 @@ function private.OnLoadRunOnce()
 	default("util.compactui.tooltiphelp", true)
 	default("util.compactui.collapse", false)
 	default("util.compactui.bidrequired", true)
+	default("util.compactui.priceperitem", false)
 	default("util.browseoverride.activated", false)
 end
 function lib.OnLoad()
@@ -404,9 +405,12 @@ function private.HookAH()
 
 	local check = CreateFrame("CheckButton", nil, AuctionFrameBrowse, "OptionsCheckButtonTemplate")
 	private.PerItem = check
-	check:SetChecked(false)
+	check:SetChecked(get("util.compactui.priceperitem"))
 	check:SetPoint("TOPLEFT", tex, "TOPLEFT", 5, -5)
-	check:SetScript("OnClick", AuctionFrameBrowse_Update)
+	check:SetScript("OnClick", function()
+		set("util.compactui.priceperitem", check:GetChecked())
+		AuctionFrameBrowse_Update()
+	end)
 	tinsert(private.candy, check)
 
 	local text = AuctionFrameBrowse:CreateFontString(nil,nil,"GameFontNormal")
