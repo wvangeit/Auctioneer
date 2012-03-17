@@ -2028,8 +2028,9 @@ local PerformSearch = function()
 	however GetTime *does* work across yields
 	--]]
 	local processingTime = 90 * (lib.GetSetting("processpriority")/100)^2 + 10 -- time in milliseconds (possible range 10.9 - 100)
-	local GetTime, debugprofilestop = GetTime, debugprofilestop
+	local GetTime, debugprofilestop, time = GetTime, debugprofilestop, time
 	local nextPause = debugprofilestop() + processingTime
+	local lastTime = time()
 	local repaintSheet = false
 	local nextRepaint = 0	-- no delay for first repaint
 
@@ -2037,7 +2038,7 @@ local PerformSearch = function()
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
 	lib.NotifyCallbacks("search", "begin", searcherName)
 	for i, data in ipairs(image) do
-		if debugprofilestop() > nextPause then
+		if debugprofilestop() > nextPause or time() > lastTime then
 			gui.frame.progressbar:SetValue((i/imagesize)*1000)
 			if repaintSheet and GetTime() >= nextRepaint then -- using GetTime here as this needs to track time across yields
 				local b=debugprofilestop()
@@ -2051,6 +2052,7 @@ local PerformSearch = function()
 			coroutine.yield()
 
 			nextPause = debugprofilestop() + processingTime
+			lastTime = time()
 
 			if private.SearchCancel then
 				private.SearchCancel = nil
