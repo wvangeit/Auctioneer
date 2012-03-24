@@ -373,10 +373,14 @@ function private.CreateFrames()
 		frame.GenerateList(true)
 	end
 
+	local lastImageSig
 	function frame.UpdateImage()
-		if not frame.salebox.sig then return end
+		local sig = frame.salebox.sig
+		local sigChanged = lastImageSig ~= sig
+		lastImageSig = sig
+		if not sig then return end
 
-		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
+		local itemId, suffix, factor = strsplit(":", sig)
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
@@ -455,7 +459,10 @@ function private.CreateFrames()
 			end
 		end
 		frame.refresh:Enable()
-		frame.imageview.sheet:SetData(data, style)
+		local sheet = frame.imageview.sheet
+		sheet:EnableVerticalScrollReset(sigChanged)
+		sheet:SetData(data, style)
+		sheet:EnableVerticalScrollReset(false)
 	end
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
@@ -2459,8 +2466,8 @@ function private.CreateFrames()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
 	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
-	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
-	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
+	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT", 0, 2)
+	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT", 0, 2)
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0, 20)
 	--records the column width changes
 	--store width by header name, that way if column reorginizing is added we apply size to proper column
