@@ -163,8 +163,6 @@ local pairs, ipairs, next = _G.pairs, _G.ipairs, _G.next
 local tonumber = tonumber
 local GetTime = GetTime
 
-local baselineFPS = 25 -- dummy value, will be updated with GetFramerate() during QueryAuctionItems
-
 private.isScanning = false
 private.auctionItemListUpdated = false
 
@@ -875,10 +873,8 @@ local Commitfunction = function()
 	--local totalProcessingTime = 0 -- temp disabled, going to take some work to thread this back in with the broken GetTime / time changes
 
 	-- coroutine speed limiter using debugprofilestop
-	local targetFPS = get("scancommit.targetFPS")
-	if targetFPS > baselineFPS then targetFPS = baselineFPS end
-	if targetFPS < 5 then targetFPS = 5 end
-	local processingTime = 800 / targetFPS -- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	-- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	local processingTime = 800 / get("scancommit.targetFPS")
 	local debugprofilestop = debugprofilestop
 	local nextPause -- gets set before each processing loop, and after each yield within the loop
 	-- backup timer, in case debugprofilestop fails - can occur under (currently unknown) circumstances - only used in the merge and cleanup loops {ADV-637}
@@ -1870,10 +1866,8 @@ local StorePageFunction = function()
 	private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+1, maxPages, curQuery) --page starts at 0 so we need to add +1
 
 	-- coroutine speed limiter using debugprofilestop
-	local targetFPS = get("scancommit.targetFPS")
-	if targetFPS > baselineFPS then targetFPS = baselineFPS end
-	if targetFPS < 5 then targetFPS = 5 end
-	local processingTime = 800 / targetFPS -- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	-- time in milliseconds: 1000/FPS * 0.8 (80% rough adjustment to allow for other stuff happening during the frame)
+	local processingTime = 800 / get("scancommit.targetFPS")
 	local debugprofilestop = debugprofilestop
 	local nextPause = debugprofilestop() + processingTime
 
@@ -2382,9 +2376,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		-- Optional bypass to handle compatibility problems with other AddOns
 		return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	end
-
-	-- Store a baseline FPS here as we aren't doing any heavy hitting yet so this gives an idea what kind of maximum FPS we can expect.
-	baselineFPS = GetFramerate()
 
 	private.isAuctioneerQuery = nil
 	if private.warnTaint then
