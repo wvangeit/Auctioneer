@@ -34,13 +34,14 @@
 if not AucAdvanced then return end
 
 local libType, libName = "Util", "ScanData"
-local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+local AddOnName = ...
+local lib,parent,private = AucAdvanced.NewModule(libType, libName, nil, nil, AddOnName)
 if not lib then return end
 
 local DATABASE_VERSION = 1.3
 local INTERFACE_VERSION = "A" -- must match CoreScan's SCANDATA_VERSION
 
-local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 
 private.distributionCache = {}
 private.worthCache = {}
@@ -67,23 +68,10 @@ local colorDist = {
 --[[ MODULE FUNCTIONS ]]--
 
 lib.Processors = {}
---[[
-function lib.Processors.tooltip(callbackType, ...)
-	private.ProcessTooltip(...)
-end
---]]
 function lib.Processors.scanstats()
 	wipe(private.distributionCache)
 	wipe(private.worthCache)
 end
-function lib.Processors.load(callbackType, addon)
-	if addon == "auc-scandata" then
-		if private.OnLoad then
-			private.OnLoad()
-		end
-	end
-end
-
 
 local tmp = {}
 function lib.Colored(doIt, counts, alt, shorten)
@@ -449,12 +437,16 @@ function private.Unpack(scandata)
 	scandata.ropes = nil
 end
 
-function private.OnLoad()
-	private.OnLoad = nil
+local function OnLoadRunOnce()
+	OnLoadRunOnce = nil
+	aucPrint("Auctioneer: {{ScanData}} loaded.")
 	private.UpgradeDB()
 	if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
 	lib.GetScanData(Const.ServerKeyHome) -- force unpack of home faction data
 	private.isLoaded = true
+end
+function lib.OnLoad()
+	if OnLoadRunOnce then OnLoadRunOnce() end
 end
 
 function private.UpgradeDB()
