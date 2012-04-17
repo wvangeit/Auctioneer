@@ -88,13 +88,16 @@ local PROMPT_MIN_WIDTH = 400
 local BindTypes = {
 	[ITEM_SOULBOUND] = "Bound",
 	[ITEM_BIND_QUEST] = "Quest",
-	[ITEM_BIND_ON_PICKUP] = "Bound",
+--	[ITEM_BIND_ON_PICKUP] = "Bound", -- {ADV-641}
 	[ITEM_CONJURED] = "Conjured",
-	[ITEM_ACCOUNTBOUND] = "Accountbound",
-	[ITEM_BIND_TO_ACCOUNT] = "Accountbound",
-	[ITEM_BIND_TO_BNETACCOUNT] = "Accountbound",
+--	[ITEM_BIND_TO_ACCOUNT] = "Accountbound",
+--	[ITEM_BIND_TO_BNETACCOUNT] = "Accountbound",
 	[ITEM_BNETACCOUNTBOUND] = "Accountbound",
 }
+if ITEM_ACCOUNTBOUND then
+	-- may be obsolete, check in case it is removed by a patch
+	BindTypes[ITEM_ACCOUNTBOUND] = "Accountbound"
+end
 
 -- Info for handling UI_ERROR_MESSAGE errors
 local UIKnownErrors = {
@@ -695,7 +698,7 @@ do
 	function private.SigLockUpdate()
 		if not lockedsigs then return end
 		-- use longer timeout delays if connectivity is bad, but always at least 1 second
-		-- todo: is the lag adjustment really neccessary or useful?
+		-- todo: is the lag adjustment really necessary or useful?
 		local _,_, lag = GetNetStats()
 		lag = max(lag * LAG_ADJUST, 1)
 		if GetTime() > lastlocktime + lag * SIGLOCK_TIMEOUT then
