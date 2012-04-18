@@ -212,7 +212,7 @@ do
 		if not pricemodels then
 			-- delay creating table until function is first called, to give all modules a chance to load first
 			pricemodels = {}
-			tinsert(pricemodels,{"market", lib.localizations("UCUT_Interface_MarketValue")})--Market value {Reusing Undercut's existing localization string}
+			tinsert(pricemodels,{"market", lib.localizations("ADV_Interface_MarketPrice")})--Market Price
 			local algoList, algoNames = AucAdvanced.API.GetAlgorithms()
 			for pos, name in ipairs(algoList) do
 				tinsert(pricemodels,{name, format(lib.localizations("ADV_Interface_Algorithm_Price"), algoNames[pos])})--%s Price
@@ -647,8 +647,12 @@ do -- Module Functions
 				error("AddOn name must be a string or nil for NewModule", 2)
 			end
 			addonName = addonName:lower()
+			if moduleOnLoadNames and moduleOnLoadNames[addonName] then
+				error("AddOn name already registered with NewModule", 2)
+			end
 			-- if addonName matches the Auc naming convention we do not need to take any special action with it
-			if addonName == strjoin("-", "Auc", libType, libName):lower() then
+			-- also explicitly block "auc-advanced" as only Core modules should use that name, and they get special handling
+			if addonName == "auc-advanced" or addonName == strjoin("-", "Auc", libType, libName):lower() then
 				addonName = nil
 			end
 		end
@@ -824,7 +828,7 @@ do -- Module Functions
 			error("Module name must for a string for RegisterModuleCallback", 2)
 		end
 		if type(callback) ~= "function" then
-			error("Callback must be a fucntion for RegisterModuleCallback", 2)
+			error("Callback must be a function for RegisterModuleCallback", 2)
 		end
 		moduleName = moduleName:lower()
 
