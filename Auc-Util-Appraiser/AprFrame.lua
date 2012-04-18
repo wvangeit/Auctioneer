@@ -42,6 +42,7 @@ local NUM_ITEMS = 12
 
 local SigFromLink = AucAdvanced.API.GetSigFromLink
 local GetDistribution -- to be filled in when ScanData loads
+AucAdvanced.RegisterModuleCallback("scandata", function(lib) GetDistribution = lib.GetDistribution end)
 
 -- Check to see if we are embedded or not
 local embedded = false
@@ -70,13 +71,6 @@ function private.CreateFrames()
 		if not frame:IsVisible() then return end --If we don't have Appraiser open, we don't need to run this. It will run when we go to Appraiser tab
 		local ItemList = frame.list
 		wipe(ItemList)
-		if not GetDistribution then
-			-- ScanData is load-on-demand; check each time until it loads, then store the reference for GetDistribution
-			local scandata = AucAdvanced.GetModule("Util", "ScanData")
-			if scandata then
-				GetDistribution = scandata.GetDistribution
-			end
-		end
 
 		for bag=0, NUM_BAG_FRAMES do
 			for slot=1,GetContainerNumSlots(bag) do
