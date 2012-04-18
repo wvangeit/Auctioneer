@@ -340,6 +340,9 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_CurBid'), 65) --CurBid
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.".._TRANS('APPR_Interface_Buyout'), 67) --Buyout
 	AucAdvanced.Settings.SetDefault("util.appraiser.columnwidth.BLANK", 0.05)
+
+	local localName = _TRANS('APPR_Interface_Appraiser')
+	function lib.GetLocalName() return localName end
 end
 
 function lib.CanSupplyMarket()
