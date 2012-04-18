@@ -785,6 +785,7 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix requires Auctioneer version 4.0 or higher. Some features will be unavailable until you update your Auctioneer installation.";
 
 		-- Section: Help Text
+		["GuiAltChatlink"]	= "Open tooltips from chat links with Alt left-clicks";
 		["GuiClearall"]	= "Clear All Enchantrix Data";
 		["GuiClearallButton"]	= "Clear All";
 		["GuiClearallHelp"]	= "Click here to clear all of Enchantrix data for the current server-realm.";
@@ -810,6 +811,7 @@ EnchantrixLocalizations = {
 		["GuiValuateEnable"]	= "Enable Valuation";
 		["GuiValuateHeader"]	= "Valuation";
 		["GuiValuateMedian"]	= "Valuate with Auctioneer medians";
+		["HelpAltChatlink"]	= "Enables opening a tooltip by left-clicking on an item link in chat while the Alt key is pressed.";
 		["HelpClear"]	= "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 		["HelpDefault"]	= "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values.";
 		["HelpDisable"]	= "Stops enchantrix from automatically loading next time you log in";
@@ -1842,7 +1844,7 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "기타 Enchantrix 설정";
 		["GuiPrintin"]	= "원하는 메시지 창 선택";
 		["GuiPrintYieldsInChat"]	= "이득을 채팅창에 표시";
-		["GuiShowCraftReagents"]	= "툴팁에 제작 재료 보이기";
+		["GuiShowCraftReagents"]	= "툴팁에 제작될 재료 보이기";
 		["GuiTerse"]	= "간결 모드 사용";
 		["GuiValuateAverages"]	= "Auctioneer 평균으로 평가";
 		["GuiValuateBaseline"]	= "내장된 자료를 이용해 평가";
@@ -1905,12 +1907,13 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["Click"]	= "클릭";
-		["EnxMMTip"]	= "Enchantrix는 마력추출, 보석추출, 제분으로 생산될 재료를 보여줍니다. 또한 가격과 구매 의사 결정이 이루어질 수 있도록 Auctioneer에 통합하여 제공합니다.";
+		["EnxMMTip"]	= "Enchantrix는 마력추출, 보석추출, 제분으로 생산될 재료를 보여줍니다. 또한 가격 책정과 구매 의사 결정이 이루어질 수 있도록 Auctioneer에 통합하여 제공합니다.";
 		["FrmtBarkerPrice"]	= "가격 알림 (%d%% 마진)";
 		["FrmtDEItemLevels"]	= "%d에서 %d레벨 아이템에서 마력 추출 가능.";
 		["FrmtDisinto"]	= "마력 추출:";
 		["FrmtFound"]	= "%s|1이;가; 마력 추출되는 아이템: ";
 		["FrmtFoundNotDisenchant"]	= "%s는 마력 추출이 불가능합니다.";
+		["FrmtInkFrom"]	= "원재료: ";
 		["FrmtMillingFound"]	= "%s|1이;가; 제분되는 아이템: ";
 		["FrmtMillingValueAuctHsp"]	= "제분 가격(HSP)";
 		["FrmtMillingValueAuctMed"]	= "제분 가격 (중앙값)";
@@ -1937,6 +1940,9 @@ EnchantrixLocalizations = {
 		["FrmtWarnPriceUnavail"]	= "[일부 가격을 사용할 수 없음]";
 		["RightClick"]	= "우-클릭";
 		["ShiftClick"]	= "Shift-클릭";
+		["TipOpenConfig"]	= "설정창 열기";
+		["TipOpenEnchant"]	= "마법부여 창 열기";
+		["TipOpenJewel"]	= "보석세공 창 열기";
 		["TooltipMillingLevel"]	= "제분 요구 숙련도 %d";
 		["TooltipProspectLevel"]	= "보석 추출 요구 숙련도 %d";
 		["TooltipShowDisenchantLevel"]	= "마력 추출 요구 숙련도 %d";
@@ -1950,7 +1956,9 @@ EnchantrixLocalizations = {
 		["GuiAutoDeOptions"]	= "자동화";
 		["GuiAutoDePromptLine1"]	= "마력추출하겠습니까? : ";
 		["GuiAutoDePromptLine3"]	= "가치 : %s";
-		["GuiAutoMillingPromptLine1"]	= "제분 하겠습니까:";
+		["GuiAutoDeRareItems"]	= "희귀(파랑) 아이템 자동 마력 추출";
+		["GuiAutoDESuggestion"]	= "제안 : %s";
+		["GuiAutoMillingPromptLine1"]	= "제분 하겠습니까?";
 		["GuiAutoProspectPromptLine1"]	= "보석추출하겠습니까: ";
 		["GuiBBUnbiddedOnly"]	= "입찰이 없는 아이템으로 BidBroker를 한정합니다.";
 		["GuiConfigProfiles"]	= "설정 및 프로파일 수정";
@@ -1977,7 +1985,7 @@ EnchantrixLocalizations = {
 		["GuiMillingMaterials"]	= "제분 재료 정보를 툴팁에 보여줍니다.";
 		["GuiMillingOptions"]	= "제분 옵션";
 		["GuiMinBBProfitPercent"]	= "최소 중개 수익률: %d";
-		["GuiMinimapButtonAngle"]	= "버튼 위치 : %d";
+		["GuiMinimapButtonAngle"]	= "버튼 각도 : %d";
 		["GuiMinimapButtonDist"]	= "거리 : %d";
 		["GuiMinimapOptions"]	= "미니맵 표시 설정";
 		["GuiMinimapShowButton"]	= "미니맵 버튼을 표시합니다.";
@@ -2016,6 +2024,7 @@ EnchantrixLocalizations = {
 		["ModTTShow_alt"]	= "Alt 키가 눌렸을 때";
 		["ModTTShow_always"]	= "항상";
 		["ModTTShow_ctrl"]	= "Ctrl 키가 눌렸을 때";
+		["ModTTShow_never"]	= "표시안함";
 		["ModTTShow_noalt"]	= "Alt 키가 눌리지 않았을 때";
 		["ModTTShow_noctrl"]	= "Ctrl 키가 눌리지 않았을 때";
 		["ModTTShow_noshift"]	= "Shift 키가 눌리지 않았을 때";
@@ -2158,6 +2167,21 @@ EnchantrixLocalizations = {
 		["ModTTShow_always"]	= "Zawsze";
 		["ModTTShow_never"]	= "Nigdy";
 		["ModTTShow_noalt"]	= "Gdy klawisz Alt nie jest wciśnięty";
+
+	};
+
+	ptBR = {
+
+		-- Section: Game Constants
+		["ArgSpellMillingName"]	= "Triturar Ervas";
+		["ArgSpellname"]	= "Desencantar";
+		["ArgSpellProspectingName"]	= "Prospecção";
+		["Enchanting"]	= "Encantamento";
+		["Inscription"]	= "Escrivania";
+		["Jewelcrafting"]	= "Joalheria";
+		["PatReagents"]	= "Reagentes";
+		["TextCombat"]	= "Combate";
+		["TextGeneral"]	= "Geral";
 
 	};
 

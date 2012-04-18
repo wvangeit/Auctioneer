@@ -38,6 +38,9 @@ local tooltipFormat	-- Enchantrix.Tooltip.Format
 local itemTooltip
 local enchantTooltip
 local hookItemTooltip, hookSpellTooltip
+local callbackAltChatLinkTooltip
+
+local ALTCHATLINKTOOLTIP_OPEN
 
 local tooltip = LibStub("nTipHelper:1")
 
@@ -46,6 +49,8 @@ function addonLoaded()
 	tooltip:Activate()
 	tooltip:AddCallback( { type = "item", callback = hookItemTooltip }, 400)
 	tooltip:AddCallback( { type = "spell", callback = hookSpellTooltip }, 400)
+	tooltip:AltChatLinkRegister(callbackAltChatLinkTooltip)
+	ALTCHATLINKTOOLTIP_OPEN = tooltip:AltChatLinkConstants()
 end
 
 tooltipFormat = {
@@ -731,6 +736,17 @@ function hookSpellTooltip(tipFrame, link, name, rank)
 		enchantTooltip(tooltip, name, link, false)
 	end
 	tooltip:ClearFrame(tipFrame)
+end
+
+function callbackAltChatLinkTooltip(link, text, button, chatFrame)
+	if button == "LeftButton" and Enchantrix.Settings.GetSetting('AltChatlinkTooltip') then
+		local linkType = link:sub(1, 5)
+		-- only do one string.sub to limit the number of temp strings created
+		-- the test strings must all contain exactly 5 characters
+		if linkType == "item:" or linkType == "spell" or linkType == "encha" then
+			return ALTCHATLINKTOOLTIP_OPEN
+		end
+	end
 end
 
 Enchantrix.Tooltip = {
