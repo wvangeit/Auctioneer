@@ -979,8 +979,7 @@ function private.CreateFrames()
 					if (maxStax > 0) then
 						frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(maxStax, curSize))--%d lots of %dx stacks:
-						bidVal = lib.RoundBid(curBid * curSize)
-						buyVal = lib.RoundBuy(curBuy * curSize)
+						buyVal, bidVal = lib.RoundBuyBid(curBuy * curSize, curBid * curSize)
 						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
 
 						r,g,b=nil,nil,nil
@@ -1001,8 +1000,7 @@ function private.CreateFrames()
 						totalBuy = totalBuy + (buyVal * maxStax)
 					end
 					if curNumber == -1 and remain > 0 then
-						bidVal = lib.RoundBid(curBid * remain)
-						buyVal = lib.RoundBuy(curBuy * remain)
+						buyVal, bidVal = lib.RoundBuyBid(curBuy * remain, curBid * remain)
 						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, remain)
 
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks') :format(1, remain))--%d lots of %dx stacks:
@@ -1027,8 +1025,7 @@ function private.CreateFrames()
 					frame.salebox.number.label:SetText(_TRANS('APPR_Interface_NumberStacks'):format(curNumber, curNumber*curSize))--Number: %d stacks = %d
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(curNumber, curSize))--%d lots of %dx stacks:
-					bidVal = lib.RoundBid(curBid * curSize)
-					buyVal = lib.RoundBuy(curBuy * curSize)
+					buyVal, bidVal = lib.RoundBuyBid(curBuy * curSize, curBid * curSize)
 					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
 
 					r,g,b=nil,nil,nil
@@ -1065,8 +1062,7 @@ function private.CreateFrames()
 				if curNumber > 0 then
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_Items'):format(curNumber))--%d items
-					bidVal = lib.RoundBid(curBid)
-					buyVal = lib.RoundBuy(curBuy)
+					buyVal, bidVal = lib.RoundBuyBid(curBuy, curBid)
 					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction)
 
 					r,g,b=nil,nil,nil
@@ -1480,9 +1476,7 @@ function private.CreateFrames()
 
 			if (number < 0) then
 				if (fullStacks > 0) then
-					bidVal = lib.RoundBid(itemBid * stack)
-					buyVal = lib.RoundBuy(itemBuy * stack)
-					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
+					buyVal, bidVal = lib.RoundBuyBid(itemBuy * stack, itemBid * stack)
 
 					if helperPostRequest(sig, stack, bidVal, buyVal, duration, fullStacks, dryRun, singleclick) then
 						totalBid = totalBid + (bidVal * fullStacks)
@@ -1491,9 +1485,7 @@ function private.CreateFrames()
 					end
 				end
 				if (number == -1 and remain > 0) then
-					bidVal = lib.RoundBid(itemBid * remain)
-					buyVal = lib.RoundBuy(itemBuy * remain)
-					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
+					buyVal, bidVal = lib.RoundBuyBid(itemBuy * remain, itemBid * remain)
 
 					if helperPostRequest(sig, remain, bidVal, buyVal, duration, 1, dryRun, singleclick) then
 						totalBid = totalBid + bidVal
@@ -1502,9 +1494,7 @@ function private.CreateFrames()
 					end
 				end
 			else
-				bidVal = lib.RoundBid(itemBid * stack)
-				buyVal = lib.RoundBuy(itemBuy * stack)
-				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
+				buyVal, bidVal = lib.RoundBuyBid(itemBuy * stack, itemBid * stack)
 
 				if helperPostRequest(sig, stack, bidVal, buyVal, duration, number, dryRun, singleclick) then
 					totalBid = totalBid + (bidVal * number)
@@ -1514,9 +1504,7 @@ function private.CreateFrames()
 			end
 		else
 			if number < 0 then number = total end
-			bidVal = lib.RoundBid(itemBid)
-			buyVal = lib.RoundBuy(itemBuy)
-			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
+			buyVal, bidVal = lib.RoundBuyBid(itemBuy, itemBid)
 
 			if helperPostRequest(sig, 1, bidVal, buyVal, duration, number, dryRun, singleclick) then
 				totalBid = totalBid + (bidVal * number)

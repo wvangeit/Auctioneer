@@ -187,6 +187,18 @@ function lib.RoundBuy(value)
 	end
 end
 
+function lib.RoundBuyBid(buy, bid)
+	-- Combines RoundBuy and RoundBid, with a check to ensure bid doesn't exceed buy
+	buy = lib.RoundBuy(buy)
+	bid = lib.RoundBid(bid)
+
+	if buy > 0 and bid > buy then
+		bid = buy
+	end
+
+	return buy, bid
+end
+
 local scrollItems = {}
 function lib.UpdateList() -- dead code?
 	local n = #scrollItems
@@ -320,14 +332,14 @@ function private.SetupConfigGui(gui)
 	end
 	--This is the Tooltip tab provided by aucadvanced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
-	
+
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
 	if tooltipID then private.addTooltipControls(tooltipID) end
-	
+
 	gui:AddControl(id, "Checkbox",     0, 1, "util.appraiser.displayauctiontab", _TRANS('APPR_Interface_ShowAppraiserTab') )--Show Appraiser tab at the Auction House
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowAppraiserTab') )--Shows the appraiser tab on the auction house
-	
+
 	gui:AddControl(id, "Subhead",      0,    _TRANS('APPR_Interface_AppraiserFrameColoration') ) --Appraiser frame coloration
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", _TRANS('APPR_Interface_ColorAppraiserPriceLevel') )--Color Appraiser items by their PriceLevel data
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ColorAppraiserPriceLevel') )--This option will use information from PriceLevel to tint the current auction valuations by how far above/below the current priceing model's mean in shades from red to blue.
