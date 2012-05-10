@@ -51,17 +51,6 @@ function lib.CommandHandler(command, ...)
 	end
 end
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		private.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
-	end
-end
-
 lib.Processors = {}
 function lib.Processors.tooltip(callbackType, ...)
 	private.ProcessTooltip(...)
@@ -72,19 +61,38 @@ function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
 end
 
-function lib.Processors.load(callbackType, ...)
-	lib.OnLoad(...)
-end
-
-
-
-
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
-	-- This function is responsible for processing and storing the stats after each scan
+	-- This function is responsible for processing and storing the stats from each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
 	-- function returns.
+
+	-- We're only interested in items with buyouts.
+	local buyout = itemData.buyoutPrice
+	if not buyout or buyout == 0 then return end
+	local count = itemData.stackSize or 1
+	if count < 1 then count = 1 end
+
+	-- In this case, we're only interested in the initial create, other
+	-- Get the signature of this item and find it's stats.
+	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
+	local id = strjoin(":", itemId, property, factor)
+
+	local data = private.GetPriceData()
+	if not data[id] then data[id] = {} end
+
+	while (#data[id] >= 10) do table.remove(data[id], 1) end
+	table.insert(data[id], buyout/count)
+end
+
+function lib.ScanProcessors.fallbackcreate(operation, itemData, oldData)
+	-- This function is called instead of 'create' if ScanData is not loaded (CoreScan is in fallback mode)
+	-- Caution must be used with this function as it is possible to receive multiple 'fallbackcreate's for the same auction,
+	-- if the user reloads/relogs and rescans during the life of the auction.
+	-- In practive this function should not be used for cumulative stats (e.g. total seen count or total buyout)
+
+	-- As a Debug module, we've just copied the 'create' function here though
 
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
@@ -135,21 +143,13 @@ function lib.GetPriceArray(hyperlink)
 	return array
 end
 
-local function fakePDF()
-    return 0;               -- Always return 0 probability - never gets added.
-end
-
--- Send back a fake PDF. We don't want Debug to influence statistic scores
+-- Send back a nil PDF. We don't want Debug to influence statistic scores
 function lib.GetItemPDF(hyperlink)
-    return;
+    return
 end
 
-function lib.OnLoad(addon)
+function lib.OnLoad()
 
-end
-
-function lib.CanSupplyMarket()
-	return false
 end
 
 AucAdvanced.Settings.SetDefault("stat.debug.tooltip", true)
