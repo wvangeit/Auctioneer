@@ -171,7 +171,7 @@ function private.LoadScanData()
 		local _, _, _, enabled, load, reason = GetAddOnInfo("Auc-ScanData")
 		if not (enabled and load) then
 			private.loadingScanData = "fallback"
-			_G.message("The Auc-ScanData storage module could not be loaded: "..(reason or "Unknown reason"))
+			private.FallbackScanData = reason or "Unknown reason"
 		elseif IsAddOnLoaded("Auc-ScanData") then
 			-- if another AddOn has force-loaded Auc-ScanData
 			private.loadingScanData = "loading"
@@ -182,7 +182,7 @@ function private.LoadScanData()
 				private.loadingScanData = "loading"
 			elseif reason then
 				private.loadingScanData = "fallback"
-				_G.message("The Auc-ScanData storage module could not be loaded: "..reason)
+				private.FallbackScanData = reason
 			else
 				-- LoadAddOn sometimes returns nil, nil if called too early during game startup
 				-- assume it needs to be called again at a later stage
@@ -198,7 +198,7 @@ function private.LoadScanData()
 		end
 		if version ~= SCANDATA_VERSION then
 			private.loadingScanData = "fallback"
-			_G.message("The Auc-ScanData storage module could not be loaded: ".."Incorrect version")
+			private.FallbackScanData = "Incorrect version"
 		elseif ready then
 			-- install functions from Auc-ScanData
 			private.GetScanData = scanmodule.GetScanData
@@ -221,6 +221,13 @@ function private.LoadScanData()
 			scandata = {image = {}, scanstats = {ImageUpdated = time()}}
 			fallbackscandata[serverKey] = scandata
 			return scandata
+		end
+		-- fallback message
+		local text = format(_TRANS("ADV_Interface_ScanDataNotLoaded"), private.FallbackScanData) --The Auc-ScanData storage module could not be loaded: %s
+		if get("core.scan.disable_scandatawarning") then
+			_print("|cffff7f3f"..text.."|r")
+		else
+			message(text)
 		end
 		-- cleanup
 		private.loadingScanData = nil
@@ -255,7 +262,7 @@ end
 -- _G.AucAdvanced.Scan.ClearScanData("ALL")
 -- CAUTION: the following is a stub function, which will be overloaded with the real function by LoadScanData
 function lib.ClearScanData(key)
-	_print("Scan Data cannot be cleared because {{Auc-ScanData}} is not loaded")
+	_print(_TRANS("ADV_Interface_ScanDataNotCleared")) --Scan Data cannot be cleared because {{Auc-ScanData}} is not loaded
 end
 
 function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, NoSummary)
@@ -1110,8 +1117,10 @@ local Commitfunction = function()
 	querySizeInfo.matchCount = dirtyCount
 	querySizeInfo.scanCount = scanCount
 	querySizeInfo.printSummary = printSummary
+	querySizeInfo.FallbackScanData = private.FallbackScanData
 
 	local maskNotDirtyUnseen = bitnot(bitor(Const.FLAG_DIRTY, Const.FLAG_UNSEEN)) -- only calculate mask for clearing these flags once
+	local messageCreate = private.FallbackScanData and "fallbackcreate" or "create"
 
 	processBeginEndStats(processors, "begin", querySizeInfo, nil)
 
@@ -1156,7 +1165,7 @@ local Commitfunction = function()
 			end
 			scandata.image[itemPos] = replicate(data)
 		else
-			if (processStats(processors, "create", data)) then
+			if (processStats(processors, messageCreate, data)) then
 				newCount = newCount + 1
 			else -- processStats(processors, "create"...) filtered the auction: flag it
 				data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_FILTER)

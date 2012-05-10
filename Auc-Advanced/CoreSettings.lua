@@ -120,6 +120,7 @@ local settingDefaults = {
 	["tooltip.marketprice.show"] = true,
 	["tooltip.marketprice.stacksize"] = true,
 	['scandata.force'] = false,
+	["core.scan.disable_scandatawarning"] = false,
 	['scandata.summaryonfull'] = true,
 	['scandata.summaryonmicro'] = false,
 	['scandata.summaryonpartial'] = true,
@@ -505,6 +506,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
+	gui:AddControl(id, "Checkbox",   0, 1, "core.scan.disable_scandatawarning", _TRANS('ADV_Interface_NoScanDataWarning')) --Disable warning popup when scan data cannot load
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_NoScanDataWarning')) --Use this option if you often disable the Auc-ScanData AddOn to conserve memory. Warning: most Stats cannot be recorded if Auc-ScanData is not loaded
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
 
