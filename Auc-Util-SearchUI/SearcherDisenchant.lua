@@ -42,6 +42,8 @@ default("disenchant.level.custom", false)
 default("disenchant.level.min", 0)
 default("disenchant.level.max", 525)
 default("disenchant.adjust.brokerage", true)
+default("disenchant.adjust.deposit", true)
+default("disenchant.adjust.listings", 3)
 default("disenchant.allow.bid", true)
 default("disenchant.allow.buy", true)
 default("disenchant.maxprice", 10000000)
@@ -112,6 +114,8 @@ function lib:MakeGuiConfig(gui)
 
 	gui:AddControl(id, "Subhead",           0.42,    "Fees Adjustment")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.brokerage", "Subtract auction fees")
+	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.adjust.deposit", "Subtract deposit")
+	gui:AddControl(id, "Slider",            0.42, 1, "disenchant.adjust.listings", 1, 10, .1, "Ave relistings: %0.1fx")
 end
 
 function lib.Search(item)
@@ -177,6 +181,10 @@ function lib.Search(item)
 	--adjust for brokerage costs
 	if get("disenchant.adjust.brokerage") then
 		market = market * resources.CutAdjust
+	end
+	--adjust for deposit costs - for simplicity this is just (1 silver * relist times)
+	if get("disenchant.adjust.deposit") then
+		market = market - 100 * get("disenchant.adjust.listings")
 	end
 
 	-- check amount of profit
