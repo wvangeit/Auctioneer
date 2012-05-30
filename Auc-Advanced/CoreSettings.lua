@@ -296,6 +296,15 @@ local function setter(setting, value)
 
 		-- Refresh all values to reflect current data
 		gui:Refresh()
+	elseif a == "maintenance" then
+		if setting == "maintenance.clearscan" then
+			if IsAltKeyDown() and not IsShiftKeyDown() and not IsControlKeyDown() then -- Alt key and NO other mod keys
+				AucAdvanced.Scan.ClearScanData("ALL")
+				message("ScanData cleared")
+			else
+				message("You must hold down the Alt key to clear all ScanData")
+			end
+		end
 	elseif (a == "matcher") then
 		if internal.API.MatcherSetter(setting, value) then
 			gui:Refresh()
@@ -354,6 +363,9 @@ local function getter(setting)
 			end
 			return pList
 		end
+	elseif a == "maintenance" then
+		-- placeholder for use by Data Maintenance tab
+		return nil
 	elseif a == "matcher" then
 		return internal.API.MatcherGetter(setting)
 	end
@@ -425,6 +437,7 @@ function lib.MakeGuiConfig()
 	lib.Gui = gui
 	gui:AddCat("Core Options")
 
+
 	id = gui:AddTab("Profiles")
 
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_SetupProfile')) --"Setup, Configure and Edit Profiles"
@@ -464,6 +477,7 @@ function lib.MakeGuiConfig()
 		"You can delete a profile when you don't want to use it anymore. Deleting a profile will also affect any other characters who are using the profile."
 	)
 
+
 	id = gui:AddTab("General")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    _TRANS('ADV_Interface_AucOptions')) --"Main Auctioneer Options"
@@ -502,12 +516,24 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",    0, 2,  "post.confirmonclose", _TRANS('ADV_Interface_PostConfirmOnClose')) --"Ask before clearing the posting queue"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_PostConfirmOnClose')) --"When the Auctionhouse closes, presents a popup dialog asking if you really want to clear the posting queue"
 
-	-- todo: may change text of "Data Retrieval" to something more generic. Or may create new "Scanner" tab
-	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
-	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
-	gui:AddControl(id, "Checkbox",   0, 1, "core.scan.disable_scandatawarning", _TRANS('ADV_Interface_NoScanDataWarning')) --Disable warning popup when scan data cannot load
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_NoScanDataWarning')) --Use this option if you often disable the Auc-ScanData AddOn to conserve memory. Warning: most Stats cannot be recorded if Auc-ScanData is not loaded
+	gui:AddHelp(id, "what is preferred output frame",
+		_TRANS('ADV_Help_WhatPreferredChatFrame'), --"What is the Preferred Output Frame?",
+		_TRANS('ADV_Help_WhatPreferredChatFrameAnswer')) --"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer will print all subsequent output to that window."
+	gui:AddHelp(id, "what is preferred language",
+		_TRANS('ADV_Help_WhatPreferredLanguage'), --"What is the Preferred Language?",
+		_TRANS('ADV_Help_WhatPreferredLanguageAnswer')) --"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui"
+	gui:AddHelp(id, "what is clickhook",
+		_TRANS('ADV_Help_WhatClickHooks'), --"What are the click-hooks?",
+		_TRANS('ADV_Help_WhatClickHooksAnswer')) --"The click-hooks let you perform a search for an item either by Alt-right-clicking the item in your bags, or by Alt-clicking an item link in the chat pane.")
+	gui:AddHelp(id, "what is accuracy",
+        _TRANS('ADV_Help_WhatAccuracy'), --"What is Market Pricing error?",
+        _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
+
+
+	id = gui:AddTab("Scanner")
+	gui:AddControl(id, "Header", 0, _TRANS("ADV_Interface_ScanOptions"))--"Scanning Options"
+
+	gui:AddControl(id, "Subhead", 0, _TRANS("ADV_Interface_Displays"))--"Displays and Reports"
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", _TRANS('ADV_Interface_ProgressBar')) --"Enable processing progress bar"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProgressBar')) --"Displays a progress bar while Auctioneer is processing data"
 
@@ -518,10 +544,11 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summaryonmicro", _TRANS('ADV_Interface_ScanDataSummaryMicro')) --"Enables the display of the post scan summary"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataSummaryMicro')) --"Display the summation of an Auction House scan"
 
+	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_DataRetrieval')) --"Data Retrieval"
 --	gui:AddControl(id, "Slider",	0, 1, "scancommit.speed", 1, 100, 1, _TRANS('ADV_Interface_ProcessingPriority')) --"Processing priority: %d"
 --	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessPriority')) --"Sets the processing priority of the scan data. Higher values take less time, but cause more lag"
 	gui:AddControl(id, "Slider",	0, 1, "scancommit.targetFPS", 5, 100, 5, _TRANS('ADV_Interface_ProcessingTargetFPS')) --"Desired FPS during scan: %d"
---	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessingTargetFPS')) --"Sets the target frame rate during the scan. Higher values will be smoother, but will take more time overall."
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ProcessingTargetFPS')) --"Sets the target frame rate during the scan. Higher values will be smoother, but will take more time overall."
 	gui:AddControl(id, "Slider",	0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 
@@ -535,32 +562,40 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Maximum number of unresolvable auctions allowed for a full scan to still be treated as Complete. A lower tolerance is used for smaller scans.")
 	--]]
 
-	gui:AddHelp(id, "why force load",
-		_TRANS('ADV_Help_WhyForceLoad'), --"Why would you want to force load the scan data?"
-		_TRANS('ADV_Help_WhyForceLoadAnswer')) --"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded."
 	gui:AddHelp(id, "why show summation",
 		_TRANS('ADV_Help_WhyShowSummation'), --"What is the post scan summary?",
 		_TRANS('ADV_Help_WhyShowSummationAnswer')) --"It displays the number of new, updated, or unchanged auctions gathered from a scan of the auction house."
-	gui:AddHelp(id, "what is clickhook",
-		_TRANS('ADV_Help_WhatClickHooks'), --"What are the click-hooks?",
-		_TRANS('ADV_Help_WhatClickHooksAnswer')) --"The click-hooks let you perform a search for an item either by Alt-right-clicking the item in your bags, or by Alt-clicking an item link in the chat pane.")
+	--[[
 	gui:AddHelp(id, "what is priority",
 		_TRANS('ADV_Help_WhatPriority'), --"What is the Processing Priority?",
 		_TRANS('ADV_Help_WhatPriorityAnswer')) --"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete."
-	gui:AddHelp(id, "what is preferred output frame",
-		_TRANS('ADV_Help_WhatPreferredChatFrame'), --"What is the Preferred Output Frame?",
-		_TRANS('ADV_Help_WhatPreferredChatFrameAnswer')) --"The Preferred Output Frame allows you to designate which of your chat windows Auctioneer prints its output to.  Select one of the frames listed in the drop down menu and Auctioneer will print all subsequent output to that window."
-	gui:AddHelp(id, "what is preferred language",
-		_TRANS('ADV_Help_WhatPreferredLanguage'), --"What is the Preferred Language?",
-		_TRANS('ADV_Help_WhatPreferredLanguageAnswer')) --"The Preferred Language allows you to designate which of the supported translations you want Auctioneer to use. This can be handy if you prefer auctioneer to use a diffrent locale than the game client. This requires a restart or /console reloadui"
-
-	gui:AddHelp(id, "what is accuracy",
-        _TRANS('ADV_Help_WhatAccuracy'), --"What is Market Pricing error?",
-        _TRANS('ADV_Help_WhatAccuracyAnswer')) --"Market Pricing Error allows you to set the amount of error that will be tolerated while computing market prices. Because the algorithm is extremely complex, only an estimate can be made. Lowering this number will make the estimate more accurate, but will require more processing power (and may be slower for older computers)."
-
+	--]]
 	gui:AddHelp(id, "what is ttl",
-	_TRANS('ADV_Interface_ScanRetrieveTTL'), --Scan Retrieval Time-to-Live,
-	_TRANS('ADV_Help_ScanRetrieveTTL'))--After a fast (GetAll) scan, there are usually many items for which we did not receive data. We can try to get a complete scan by rechecking the items for new information.  This slider sets the time, in seconds, we will wait before giving up if we're unable to get new data.
+		_TRANS('ADV_Interface_ScanRetrieveTTL'), --Scan Retrieval Time-to-Live,
+		_TRANS('ADV_Help_ScanRetrieveTTL'))--After a fast (GetAll) scan, there are usually many items for which we did not receive data. We can try to get a complete scan by rechecking the items for new information.  This slider sets the time, in seconds, we will wait before giving up if we're unable to get new data.
+
+
+	-- Data Maintenance tab under development - do not localize yet
+	id = gui:AddTab("Data Maintenance")
+	gui:AddControl(id, "Header", 0, "Database Options and Maintenance")
+
+	gui:AddControl(id, "Subhead", 0, "ScanData Settings")
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.force", _TRANS('ADV_Interface_ScanDataForce')) --"Force load scan data"
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanDataForce')) --"Forces the scan data to load when Auctioneer is first loaded rather than on demand when first needed"
+	gui:AddControl(id, "Checkbox",   0, 1, "core.scan.disable_scandatawarning", _TRANS('ADV_Interface_NoScanDataWarning')) --Disable warning popup when scan data cannot load
+	gui:AddTip(id, _TRANS('ADV_HelpTooltip_NoScanDataWarning')) --Use this option if you often disable the Auc-ScanData AddOn to conserve memory. Warning: most Stats cannot be recorded if Auc-ScanData is not loaded
+
+	gui:AddControl(id, "Note", 0, 1, nil, 12, " ") -- blank line separator
+	gui:AddControl(id, "Button",     0, 1, "maintenance.clearscan", "Clear ALL ScanData")
+	gui:AddTip(id, "Clear ScanData for all realms and factions.\nThe Alt key must be held down to activate this button.")
+
+	gui:AddHelp(id, "why force load",
+		_TRANS('ADV_Help_WhyForceLoad'), --"Why would you want to force load the scan data?"
+		_TRANS('ADV_Help_WhyForceLoadAnswer')) --"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded."
+	gui:AddHelp(id, "why clear scandata",
+		"Why would you want to clear ScanData?",
+		"The ScanData image can become corrupted, causing slowdowns, errors or even disconnects while scanning. If you experience these problems, clearing ScanData may help.\nClearing ScanData will affect Stat recording, so it should only be used if there is a problem.")
+
 
 	--Tooltip category for all modules to add tooltip related settings too
 	id = gui:AddTab("Tooltip")
@@ -602,6 +637,7 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is exact",
 		_TRANS('ADV_Help_WhatExactMatch'), --"What is an exact match?"
 		_TRANS('ADV_Help_WhatExactMatchAnswer')) --"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg.: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same."
+
 
 	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")

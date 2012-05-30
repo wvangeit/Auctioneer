@@ -2049,6 +2049,7 @@ AuctioneerLocalizations = {
 		["ADV_Interface_CreateProfile"]	= "Create or replace a profile";
 		["ADV_Interface_DataRetrieval"]	= "Data Retrieval";
 		["ADV_Interface_Delete"]	= "Delete";
+		["ADV_Interface_Displays"]	= "Displays and Reports";
 		["ADV_Interface_Down"]	= "Down";
 		["ADV_Interface_FactionAlliance"]	= "Alliance";
 		["ADV_Interface_FactionHorde"]	= "Horde";
@@ -2092,6 +2093,7 @@ AuctioneerLocalizations = {
 		["ADV_Interface_ScanDataSummaryFull"]	= "Enables the display of the Post Scan Summary after a full scan.";
 		["ADV_Interface_ScanDataSummaryMicro"]	= "Enables the display of the Post Scan Summary after a single item scan.";
 		["ADV_Interface_ScanDataSummaryPartial"]	= "Enables the display of the Post Scan Summary after a scan larger than one item.";
+		["ADV_Interface_ScanOptions"]	= "Scanning Options";
 		["ADV_Interface_ScanRetrieveTTL"]	= "Scan Retriever Time-to-Live";
 		["ADV_Interface_ScanSellerNames"]	= "Additional scanning to retrieve more Seller names";
 		["ADV_Interface_SearchingClickHooks"]	= "Enable searching click-hooks";
@@ -4714,7 +4716,7 @@ AuctioneerLocalizations = {
 		["WECN_Interface_WOWEconOptions"]	= "WOWEcon 선택사항";
 
 		-- Section: Scanning Messages
-		["PSS_Complete"]	= "Auctioneer {{%s}}동안 {{%d}}건의 경매건 조사완료";
+		["PSS_Complete"]	= "Auctioneer {{%d}} 경매 스캔 완료. 시간은 {{%s}} 촬영";
 		["PSS_Complete_1"]	= "Auctioneer 조사 완료";
 		["PSS_Complete_2"]	= "경매 완료";
 		["PSS_Hours"]	= "시간";
@@ -6345,7 +6347,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Scanning Messages
 		["PSS_AtEnd"]	= "Fim";
-		["PSS_Complete"]	= "Auctionner terminou a pesquisa ";
+		["PSS_Complete"]	= "Auctioneer terminou a pesquisa {{%d}} leilões terminaram {{%s}}";
 		["PSS_Complete_1"]	= "Auctionner terminou a pesquisa ";
 		["PSS_Filtered"]	= "itens filtrados";
 		["PSS_Filtered_Removed"]	= "itens filtrados removidos";
