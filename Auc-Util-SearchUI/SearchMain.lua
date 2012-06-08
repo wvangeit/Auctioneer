@@ -273,11 +273,9 @@ function lib.Processors.auctionui(callbackType, ...)
 	end
 
 	--we need to make sure that the GUI is made by the time the AH opens, as RealTime could be trying to add lines to it.
-	if not gui then
-		lib.MakeGuiConfig()
-	end
+	lib.MakeGuiConfig()
 
-	lib.CreateAuctionFrames()
+	private.CreateAuctionFrames()
 end
 
 function lib.Processors.pagefinished(callbackType, ...)
@@ -288,10 +286,6 @@ end
 
 function lib.Processors.bidcancelled(callbackType, ...)
 	private.bidcancelled(...)
-end
-
-function lib.Processors.tooltip(callbackType, ...)
-	lib.ProcessTooltip(...)
 end
 
 function lib.Processors.scanstats(callbackType, ...)
@@ -311,7 +305,7 @@ function lib.Processors.buyqueue(callbackType, ...)
 	end
 end
 
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
+function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost, additional)
 	if not additional or additional.event ~= "SetAuctionItem" then
 		--this isn't an auction, so we're not interested
 		return
@@ -1059,7 +1053,8 @@ function lib.DetachFromAH()
 	private.isAttached = nil
 end
 
-function lib.CreateAuctionFrames()
+function private.CreateAuctionFrames()
+	private.CreateAuctionFrames = nil
 	if not lib.GetSetting("global.createtab") then return end
 
 	local frame = CreateFrame("Frame", "AucAdvSearchUiAuctionFrame", AuctionFrame)
@@ -1136,7 +1131,10 @@ function lib.CreateAuctionFrames()
 end
 
 function lib.MakeGuiConfig()
-	if gui then return end
+	if private.MakeGuiConfig then private.MakeGuiConfig() end
+end
+function private.MakeGuiConfig()
+	private.MakeGuiConfig = nil
 
 	local Configator = LibStub("Configator")
 	local ScrollSheet = LibStub("ScrollSheet")
@@ -1321,28 +1319,9 @@ function lib.MakeGuiConfig()
 				gui.frame.buyout:Disable()
 				gui.frame.buyoutbox:SetText(AucAdvanced.Coins(0, true))
 			end
-
-			if private.data.bid then
-				MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.bid)
-				gui.frame.bid:Enable()
-				gui.frame.bidbox:Show()
-			else
-				MoneyInputFrame_SetCopper(gui.frame.bidbox, 0)
-				gui.frame.bid:Disable()
-				gui.frame.bidbox:Hide()
-			end
-		elseif private.data.curbid then--bid price was changed, so make sure that it's allowable
-			if MoneyInputFrame_GetCopper(gui.frame.bidbox) < ceil(private.data.curbid*1.05) then
-				MoneyInputFrame_SetCopper(gui.frame.bidbox, ceil(private.data.curbid*1.05))
-			end
-			gui.frame.bid:Enable()
+			gui.frame.bid.ClearBid() -- reset bid box to force following UpdateEnable to recalculate it
 		end
-		--if bid >= buyout, it's going to be a buyout anyway, so disable bid button to indicate that
-		if private.data.buyout and (private.data.buyout > 0) and (MoneyInputFrame_GetCopper(gui.frame.bidbox) >= private.data.buyout) then
-			MoneyInputFrame_SetCopper(gui.frame.bidbox, private.data.buyout)
-			gui.frame.bid:Disable()
-			gui.frame.bidbox:Hide()
-		end
+		gui.frame.bid.UpdateEnable()
 		gui.frame.purchase.updateEnable()
 	end
 
@@ -1567,7 +1546,7 @@ function lib.MakeGuiConfig()
 				gui.frame.purchase:Disable()
 			end
 		else
-			if (gui.frame.bid:IsEnabled()==1) or (gui.frame.buyout:IsEnabled()==1) then
+			if gui.frame.bid.CanBid() or gui.frame.buyout:IsEnabled() then
 				gui.frame.purchase:Enable()
 			else
 				gui.frame.purchase:Disable()
@@ -1588,8 +1567,6 @@ function lib.MakeGuiConfig()
 		end
 		gui.frame.purchase.updateEnable()
 	end
-	Stubby.RegisterEventHook("MODIFIER_STATE_CHANGED", "Auc-Util-SearchUI", gui.frame.purchase.updateDisplay)
-
 
 	gui.frame.notnow = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.notnow:SetPoint("TOP", gui.frame.purchase, "BOTTOM", 0, -2)
@@ -1689,18 +1666,95 @@ function lib.MakeGuiConfig()
 	gui.frame.buyoutbox:SetPoint("LEFT", gui.frame.buyout, "RIGHT", 0, 0)
 	gui.frame.buyoutbox:SetWidth(100)
 
-	gui.frame.bid = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
-	gui.frame.bid:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 5, 0)
-	gui.frame.bid:SetText("Bid")
-	gui.frame.bid:SetScript("OnClick", private.bidauction)
-	gui.frame.bid:Disable()
-	gui.frame.bid.TooltipText = "Bid on selected auction using custom price"
-	gui.frame.bid:SetScript("OnEnter", showTooltipText)
-	gui.frame.bid:SetScript("OnLeave", hideTooltip)
+	do -- bid button and bid box
+		local bidbutton = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
+		gui.frame.bid = bidbutton
+		bidbutton:SetPoint("LEFT", gui.frame.purchase, "RIGHT", 5, 0)
+		local bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
+		gui.frame.bidbox = bidbox
+		bidbox:SetPoint("LEFT", bidbutton, "RIGHT", 10, 2)
 
-	gui.frame.bidbox = CreateFrame("Frame", "AucAdvSearchUIBidBox", gui.frame, "MoneyInputFrameTemplate")
-	gui.frame.bidbox:SetPoint("LEFT", gui.frame.bid, "RIGHT", 10, 2)
-	MoneyInputFrame_SetOnValueChangedFunc(gui.frame.bidbox, lib.UpdateControls)
+		bidbutton:SetText("Bid")
+		bidbutton:Disable()
+		bidbutton.TooltipText = "Bid on selected auction using custom price\nAlt click to reset bid price to default value"
+		bidbutton:SetScript("OnEnter", showTooltipText)
+		bidbutton:SetScript("OnLeave", hideTooltip)
+		bidbutton:SetScript("OnClick", function(self)
+			if self.toggleReset then
+				MoneyInputFrame_SetCopper(bidbox, private.data.bid) -- will trigger UpdateEnable via OnValueChangedFunc
+			else
+				private.bidauction()
+			end
+		end)
+		MoneyInputFrame_SetCopper(bidbox, 0)
+		bidbox:Hide()
+
+		-- functions controlling status of bid button and bidbox (attached to gui.frame.bid)
+		bidbutton.ClearBid = function()
+			bidbutton.itemCanBid = nil
+			bidbutton:Disable()
+			bidbox:Hide()
+			MoneyInputFrame_SetCopper(bidbox, 0)
+			-- Purchase button needs to be updated whenever itemCanBid changes
+			gui.frame.purchase.updateEnable()
+		end
+		bidbutton.CanBid = function()
+			return bidbutton.itemCanBid
+		end
+		bidbutton.UpdateEnable = function()
+			local price = private.data.bid
+			local buyout = private.data.buyout
+
+			if not (price and buyout) or (buyout > 0 and price >= buyout) then
+				-- no item selected, or only possible to 'buyout' item
+				if bidbutton.itemCanBid then
+					bidbutton.ClearBid()
+				end
+				return
+			end
+
+			if not bidbutton.itemCanBid then
+				bidbutton.itemCanBid = true
+				bidbox:Show()
+				-- Purchase button needs to be updated whenever itemCanBid changes
+				gui.frame.purchase.updateEnable()
+			end
+			local curbid = MoneyInputFrame_GetCopper(bidbox)
+			if curbid == 0 then -- flagged to be (re)set to default bid price
+				curbid = price
+				-- will trigger another call to UpdateEnable, but only after the current execution thread has finished
+				MoneyInputFrame_SetCopper(bidbox, curbid)
+			end
+
+			if bidbutton.toggleReset then -- in 'Reset Bid' mode
+				if curbid ~= price then
+					bidbutton:Enable()
+				else
+					bidbutton:Disable()
+				end
+			else
+				if curbid < price or (buyout > 0 and curbid >= buyout) then
+					bidbutton:Disable()
+				else
+					bidbutton:Enable()
+				end
+			end
+		end
+		bidbutton.UpdateDisplay = function()
+			local reset = IsAltKeyDown() and not IsShiftKeyDown() and not IsControlKeyDown()
+			if reset ~= bidbutton.toggleReset then
+				bidbutton.toggleReset = reset
+				if reset then
+					bidbutton:SetText("Reset Bid")
+				else
+					bidbutton:SetText("Bid")
+				end
+				bidbutton.UpdateEnable()
+			end
+		end
+
+		MoneyInputFrame_SetOnValueChangedFunc(bidbox, bidbutton.UpdateEnable)
+	end -- of bid button/box cluster
 
 	gui.frame.progressbar = CreateFrame("STATUSBAR", nil, gui.frame, "TextStatusBar")
 	gui.frame.progressbar:SetWidth(400)
@@ -1729,6 +1783,14 @@ function lib.MakeGuiConfig()
 	gui.frame.progressbar.cancel:SetPoint("TOPLEFT", gui.frame.progressbar, "TOPRIGHT", -25, -5)
 	gui.frame.progressbar.cancel:SetText("X")
 	gui.frame.progressbar.cancel:SetScript("OnClick", private.cancelSearch)
+
+
+	Stubby.RegisterEventHook("MODIFIER_STATE_CHANGED", "Auc-Util-SearchUI", function ()
+		if gui.frame:IsVisible() then
+			gui.frame.purchase.updateDisplay()
+			gui.frame.bid.UpdateDisplay()
+		end
+	end)
 
 	-- Alert our searchers?
 	for name, searcher in pairs(lib.Searchers) do
