@@ -290,7 +290,7 @@ function private.CreateFrames()
 
 	end
 
-	private.empty = {}
+	--private.empty = {}
 	function frame.ClearSelectedItem()
 		frame.selected = nil
 		frame.selectedPos = nil
@@ -305,7 +305,8 @@ function private.CreateFrames()
 			frame.salebox.info:SetText(_TRANS('APPR_Interface_SelectItemAuctioning') )--Select an item to begin auctioning...
 		end
 		frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
-		frame.imageview.sheet:SetData(private.empty)
+		frame.UpdateImage() -- will cause image to be cleared, as frame.salebox.sig is nil
+		--frame.imageview.sheet:SetData(private.empty)
 		--frame.UpdatePricing()
 		frame.UpdateDisplay()
 	end
@@ -368,11 +369,47 @@ function private.CreateFrames()
 	end
 
 	local lastImageSig
+	local throttleImageNext = GetTime()
+	local emptyData = {}
+	-- Main Image Update entry point
 	function frame.UpdateImage()
 		local sig = frame.salebox.sig
+		if not sig then
+			if lastImageSig then
+				frame.imageview.sheet:SetData(emptyData)
+			end
+			lastImageSig = nil
+			private.needImageUpdate = nil
+			return
+		end
+		-- schedule a call to DelayedImageUpdate for the next OnUpdate
+		-- this prevents multiple image renders in a single frame/update cycle
+		-- also creates an implied IsVisible check, as OnUpdate is only called for visible frames
+		private.needImageUpdate = sig
+	end
+	-- Function to check for a delayed update, and force it to happen immediately
+	-- Should be called only where the user is actually interacting with the image sheet, and we need to be certain it is up to date
+	function frame.CheckImageUpdate()
+		if private.needImageUpdate then -- there is an image update scheduled
+			throttleImageNext = GetTime() -- override any existing throttle, to force an immediate update
+			private.DelayedImageUpdate()
+		end
+	end
+	-- The actual image update function is always delayed:
+	-- Normally delayed by 1 frame (called from OnUpdate)
+	-- Multiple updates without changing the selected item are throttled to 3 seconds
+	-- Exception: CheckImageUpdate allows the throttle to be overridden if required
+	function private.DelayedImageUpdate()
+		local sig = private.needImageUpdate
 		local sigChanged = lastImageSig ~= sig
+		local now = GetTime()
+		if not sigChanged and now < throttleImageNext then
+			return
+		end
+
+		private.needImageUpdate = nil
+		throttleImageNext = now + 3 -- 3 second throttle
 		lastImageSig = sig
-		if not sig then return end
 
 		local itemId, suffix, factor = strsplit(":", sig)
 		itemId = tonumber(itemId)
@@ -620,9 +657,12 @@ function private.CreateFrames()
 		if frame.updated then
 			frame.CheckUpdates()
 		end
-		if frame.scanstatsEvent then
+		if frame.scanFinished then
 			frame.GenerateList()
-			frame.scanstatsEvent = false
+			frame.scanFinished = nil
+		end
+		if private.needImageUpdate then
+			private.DelayedImageUpdate()
 		end
 	end
 
@@ -2715,7 +2755,10 @@ function private.CreateFrames()
 	end
 	--callback functions for frame.imageview.sheet events, register for callbacks AFTER we have applied any saved changes
 	function frame.imageview.sheet.Processor(callback, self, button, column, row, order, curDir, ...)
-		if (callback == "OnMouseDownCell")  then
+		if callback == "OnEnterCell" then
+			-- Use this callback to detect that the user is interacting with the sheet
+			frame.CheckImageUpdate() -- If there is a scheduled (delayed) image update, do it now
+		elseif (callback == "OnMouseDownCell")  then
 			private.onSelect()
 		elseif (callback == "OnClickCell") then
 			private.onClick(button, row, column)

@@ -53,6 +53,7 @@ local GetItemInfo = GetItemInfo
 local pricecache -- cache for GetPrice; only used in certain circumstances
 local tooltipcache = {} -- cache for ProcessTooltip
 
+--[[
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
@@ -108,6 +109,7 @@ function lib.Processor(callbackType, ...)
 		pricecache = nil -- stop using cache when search ends
 	end
 end
+--]]
 
 lib.Processors = {}
 function lib.Processors.tooltip(callbackType, ...)
@@ -155,14 +157,19 @@ function lib.Processors.inventory(callbackType, ...)
 	end
 end
 
-function lib.Processors.scanstats(callbackType, ...)
+function lib.Processors.scanstats()
+	-- flush all caches
 	if private.frame then
 		private.frame.cache = {}
-		-- caution: other modules may not yet have flushed their caches
-		-- flag to update our display next OnUpdate
-		private.frame.scanstatsEvent = true
 	end
 	wipe(tooltipcache)
+end
+
+function lib.Processors.scanfinish()
+	-- schedule a refresh of the frame
+	if private.frame then
+		private.frame.scanFinished = true
+	end
 end
 
 function lib.Processors.postresult(callbackType, ...)
