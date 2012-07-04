@@ -261,10 +261,12 @@ function lib.Processors.auctionclose(callbackType, ...)
 		lib.DetachFromAH()
 	end
 	flagResourcesUpdateRequired = true
+	lib.NotifyCallbacks("auctionclose")
 end
 
 function lib.Processors.auctionopen(callbackType, ...)
 	flagResourcesUpdateRequired = true
+	lib.NotifyCallbacks("auctionopen")
 end
 
 function lib.Processors.auctionui(callbackType, ...)
@@ -538,9 +540,7 @@ function lib.GetSetting(setting, default)
 end
 
 function lib.Show()
-	if not gui then --no need to make the GUI if it already exists
-		lib.MakeGuiConfig()
-	end
+	lib.MakeGuiConfig()
 	gui:Show()
 	private.UpdateFactionResources()
 end
@@ -1111,7 +1111,7 @@ function private.CreateAuctionFrames()
 	frame.backing:SetBackdropColor(0,0,0, 0.60)
 
 	frame.scanslabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.scanslabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 72, -20)
+	frame.scanslabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 72, -19)
 	frame.scanslabel:SetText("Pending Scans")
 	frame.scanscount = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.scanscount:ClearAllPoints()
@@ -1127,6 +1127,11 @@ function private.CreateAuctionFrames()
 			frame.scanscount.last = scansQueued
 			frame.scanscount:SetText(scansQueued)
 		end
+	end
+
+	if lib.Searchers.RealTime then
+		local RTSButton = lib.Searchers.RealTime.CreateRTSButton(frame, true) -- norightclick option
+		RTSButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 218, -15)
 	end
 end
 
@@ -1510,7 +1515,7 @@ function private.MakeGuiConfig()
 	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 99999999, "Maximum Price")
 	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 
-	id = gui:AddTab("Global Settings", "Settings")
+	id = gui:AddTab("Global Settings", "Options")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",           0,    "Setup global options")
 
@@ -1526,8 +1531,6 @@ function private.MakeGuiConfig()
 
 	gui:AddControl(id, "Subhead",          0,    "Integration")
 	gui:AddControl(id, "Checkbox",          0, 1, "global.createtab", "Create tab in auction house (requires restart)")
-
---	gui:SetScript("OnKeyDown", lib.UpdateControls) --Why are we intercepting all keystrokes, this affects other addons that are not in dialog level
 
 	gui.frame.purchase = CreateFrame("Button", nil, gui.frame, "OptionsButtonTemplate")
 	gui.frame.purchase:SetPoint("BOTTOMLEFT", gui, "BOTTOMLEFT", 170, 35)
