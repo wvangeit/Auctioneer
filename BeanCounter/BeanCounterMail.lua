@@ -97,17 +97,18 @@ GetInboxText = private.PreGetInboxTextHook
 
 --New function to hide/unhide mail GUI.
 local HideMailGUI
+local MailCloseButton = InboxCloseButton or MailFrameCloseButton -- temp dual-mode patch for differences between WoW4.3 and WoW5.0
 function private.HideMailGUI( hide )
 	if hide then
 		HideMailGUI = true
-		InboxCloseButton:Hide()
+		MailCloseButton:Hide()
 		InboxFrame:Hide()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
 		private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 	else
 		HideMailGUI = false
-		InboxCloseButton:Show()
+		MailCloseButton:Show()
 		InboxFrame:Show()
 		MailFrameTab2:Show()
 		private.MailGUI:Hide()
