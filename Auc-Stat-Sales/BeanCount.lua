@@ -68,19 +68,27 @@ function lib.GetItemPDF(hyperlink, serverKey)
 	-- Get the data
 	local average, mean, stddev, variance, confidence, bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, serverKey)
 
-	-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
-	-- the std dev is 100% of the mean divided by square root of number of views
-	if stddev == 0 then stddev = mean / sqrt(soldqty); end
-
-	if not (mean and stddev) or mean == 0 or stddev == 0 then
-		return nil;                 -- No data, cannot determine pricing
+	if not mean or mean == 0 then
+		-- No data, cannot determine pricing
+		return
 	end
 
-	local lower, upper = mean - 3 * stddev, mean + 3 * stddev;
+	if not stddev or stddev == 0 then
+		if soldqty and soldqty > 0 then
+			-- If the standard deviation is zero, we'll have some issues, so we'll estimate it by saying
+			-- the std dev is 100% of the mean divided by square root of number of views
+			stddev = mean / sqrt(soldqty)
+		else
+			-- Cannot determine stddev
+			return
+		end
+	end
+
+	local lower, upper = mean - 3 * stddev, mean + 3 * stddev
 
 	-- Build the PDF based on standard deviation & mean
-	BellCurve:SetParameters(mean, stddev);
-	return BellCurve, lower, upper;   -- This has a __call metamethod so it's ok
+	BellCurve:SetParameters(mean, stddev)
+	return BellCurve, lower, upper -- This has a __call metamethod so it's ok
 end
 
 -----------------------------------------------------------------------------------
@@ -233,7 +241,9 @@ function lib.GetPrice(hyperlink, serverKey)
 			count = count + 1
 		end
 	end
-	variance = variance / count;
+	if count > 0 then
+		variance = variance / count
+	end
 	local stdev = variance ^ 0.5
 
 	local deviation = 1.5 * stdev
