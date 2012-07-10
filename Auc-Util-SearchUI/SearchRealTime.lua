@@ -145,6 +145,7 @@ function lib.RefreshPage()
 	--Check to see if AucAdv is already scanning
 	if AucAdvanced.Scan.IsScanning() or AucAdvanced.Scan.IsPaused() then
 		lib.SetTimerInterval(get("realtime.reload.manpause"))
+		private.findLast = nil
 		return
 	end
 
@@ -249,14 +250,14 @@ function lib.FinishedPage()
 	local always = get("realtime.always")
 	if not private.IsRefresh then
 		lib.SetTimerInterval(get("realtime.reload.manpause"))
+		private.findLast = nil
 	end
 	if (not private.IsScanning)
 			or (not always and (not private.IsRefresh or AucAdvanced.Scan.IsScanning())) then
 		lib.SetTimerInterval(get("realtime.reload.manpause"))
 		private.IsRefresh = false
+		private.findLast = nil
 		return
-	else
-		private.IsRefresh = false
 	end
 	--scan the current page
 	lib.ScanPage()
@@ -270,26 +271,26 @@ end
 	(NUM_AUCTION_ITEMS_PER_PAGE defined as 50 in Blizzard_AuctionUI.lua)
 ]]
 function lib.ScanPage()
-	if not private.IsScanning then return end
+	local isRefresh = private.IsRefresh
 	private.IsRefresh = false
+	if not private.IsScanning then return end
 	local batch, totalCount = GetNumAuctionItems("list")
 	if batch > NUM_AUCTION_ITEMS_PER_PAGE then
 		-- we don't want to freeze the computer by trying to process a getall, so return
 		return
 	end
 	if batch == 0 then -- found an empty page
-		if totalCount > 0 then
+		if isRefresh and totalCount > 0 then
 			lib.SetTimerInterval(.5) -- immediate refresh to find the last page
 			private.findLast = true
 		end
-		-- unlikely that totalCount == 0, except maybe on PTR
 		return
 	end
 
 	--this is a new page, so no alert sound has been played for it yet
 	private.playedsound = false
 
-	if private.findLast then
+	if isRefresh and private.findLast then
 		-- in findLast mode - hunting for the last page
 		local topPage = floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
 		if topPage < 0 then
