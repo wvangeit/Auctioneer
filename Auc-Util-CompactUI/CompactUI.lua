@@ -795,7 +795,11 @@ function private.MyAuctionFrameUpdate()
 		BrowseSearchCountText:Hide()
 	end
 
-	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/pagesize)))
+	if pagesize > 0 then -- temp hotfix {COMP-30}
+		private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/pagesize)))
+	else
+		private.PageNum:SetText("1")
+	end
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
 	BrowseScrollFrame:Show()
 	AucAdvanced.API.ListUpdate()
