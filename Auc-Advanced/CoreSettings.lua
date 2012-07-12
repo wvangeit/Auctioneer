@@ -140,6 +140,7 @@ local settingDefaults = {
 	["core.scan.sellernamedelay"] = true,
 --	["core.scan.unresolvedtolerance"] = 0,
 	["core.scan.scanallqueries"] = true,
+	["core.scan.hybridscans"] = true,
 	["core.tooltip.altchatlink_leftclick"] = false,
 }
 
@@ -552,6 +553,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Slider",	0, 1, "scancommit.ttl", 0, 300, 1, _TRANS('ADV_Interface_ScanRetrieveTTL').." %d ".._TRANS('ADV_Interface_seconds'))--Scan Retrieval Time-to-Live
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanRetrieveTTL') )--The number of seconds Auctioneer will spend trying to get data that was missing from the scan initially.
 
+	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.hybridscans", "Enable Hybrid scanning for very large Auction Houses")
+	gui:AddTip(id, "For very large Auction Houses, a GetAll scan will not be able to retrieve all the auctions.\nA Hybrid scan will start Normal scanning to retrive the auctions missed by the GetAll.")
 	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.sellernamedelay", _TRANS('ADV_Interface_ScanSellerNames'))--"Additional scanning to retrieve more Seller names"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanSellerNames')) --"Perform additional scanning to retrieve more data about the names of Sellers. If this option is disabled scans will finish sooner but some filters and searchers will not work"
 	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.scanallqueries", _TRANS('ADV_Interface_ScanAllQueries')) --"Scan manual searches and searches by other Addons"

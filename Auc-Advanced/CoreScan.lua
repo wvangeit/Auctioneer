@@ -354,7 +354,7 @@ function lib.PopScan()
 			if (_G.nLog) then
 				_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, ("Scan %d Too Old, committing what we have and aborting"):format(private.curQuery.qryinfo.id))
 			end
-			private.Commit(true, private.curQuery.pageError or false, false, false) -- Scan terminated early.
+			private.Commit(true, false, false) -- Scan terminated early.
 			return
 		end
 
@@ -419,7 +419,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			private.Commit(true, private.curQuery.pageError or false, false, false) -- sets private.curQuery to nil and commits prior cancelled query
+			private.Commit(true, false, false) -- sets private.curQuery to nil and commits prior cancelled query
 		end
 
 		private.isScanning = true
@@ -427,6 +427,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		local startPage = 0
 
 		lib.SetAuctioneerQuery() -- flag the following query as coming from Auctioneer
+		SortAuctionClearSort("list")
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
 		if not private.curQuery then
@@ -1461,7 +1462,7 @@ local function CoroutineResume(...)
 	return status, result
 end
 
-function private.Commit(wasEarlyTerm, reserved, wasEndPagesOnly, wasGetAll)
+function private.Commit(wasEarlyTerm, wasEndPagesOnly, wasGetAll)
 	private.StopStorePage()
 	local curScan, curQuery, storeTime = private.curScan, private.curQuery, private.storeTime
 	local scanStarted, scanStartTime, totalPaused = private.scanStarted, private.scanStartTime, private.totalPaused
@@ -1526,6 +1527,7 @@ function private.ScanPage(nextPage, really)
 		private.sentQuery = true
 		private.queryStarted = GetTime()
 		private.auctionItemListUpdated = false
+		SortAuctionClearSort("list")
 		private.Hook.QueryAuctionItems(private.curQuery.name or "",
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
 			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
@@ -1842,22 +1844,44 @@ local StorePageFunction = function()
 	end
 
 	local curQuery, curScan, curPages = private.curQuery, private.curScan, private.curPages
+	local qryinfo = curQuery.qryinfo
 
 	local EventFramesRegistered = {}
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
-	local maxPages = ceil(totalAuctions / 50)
+	local maxPages = ceil(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE)
 	local isGetAll = false
 	local isGetAllFail = false -- used to handle Blizzard bug {ADV-595}
-	if (numBatchAuctions > 50) then
+	local hybridStartScanPage
+	if (numBatchAuctions > NUM_AUCTION_ITEMS_PER_PAGE) then
 		isGetAll = true
 		maxPages = 1
 		if totalAuctions ~= numBatchAuctions then
 			-- Blizzard bug - these should be the same for a GetAll scan {ADV-595}
-			isGetAllFail = true
- 			curQuery.pageError = true
-			totalAuctions = numBatchAuctions
-			_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete|r")
-			_print("It may not be possible to complete a GetAll scan on this server at this time.")
+			if get("core.scan.hybridscans") then
+				qryinfo.hybrid = true
+				hybridStartScanPage = floor(numBatchAuctions / NUM_AUCTION_ITEMS_PER_PAGE) -- where to start paged part of hybrid scan from
+				local wholePageAuctions = hybridStartScanPage * NUM_AUCTION_ITEMS_PER_PAGE -- where to end scanning GetAll to match up with paged part (this may be less than numBatchAuctions)
+				if nLog then
+					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "StorePage commencing Hybrid scan",
+						format("Batch size %d\nHybrid start page %d\nGetAll limit %d\nReported total auctions %d",
+						numBatchAuctions, hybridStartScanPage, wholePageAuctions, totalAuctions))
+				end
+
+				numBatchAuctions = wholePageAuctions
+				totalAuctions = numBatchAuctions
+				_print("|cffff7f3fThe Server has not sent all data for this GetAll scan.|r")
+				_print("Auctioneer will use Hybrid scanning to retrieve the missing auctions.")
+			else
+				isGetAllFail = true
+				if nLog then
+					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "StorePage incomplete GetAll",
+						format("Batch size %d\nReported total auctions %d",
+						numBatchAuctions, totalAuctions))
+				end
+				totalAuctions = numBatchAuctions
+				_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete.|r")
+				_print("It may not be possible to complete a GetAll scan on this server at this time.")
+			end
 		end
 		EventFramesRegistered = {GetFramesRegisteredForEvent("AUCTION_ITEM_LIST_UPDATE")}
 		for _, frame in pairs(EventFramesRegistered) do
@@ -1892,7 +1916,7 @@ local StorePageFunction = function()
 		remissedCounts[i] = 0
 	end
 
-	if not private.breakStorePage and (page > curQuery.qryinfo.page) then
+	if not private.breakStorePage and (page > qryinfo.page) then
 		local itemLinksTried = {}
 		local retries = { }
 		for i = 1, numBatchAuctions do
@@ -2057,11 +2081,13 @@ local StorePageFunction = function()
 		end
 
 		if (storecount > 0) then
-			curQuery.qryinfo.page = page
+			qryinfo.page = page
 			curPages[page] = true -- we have pulled this page
 		end
-		if (#retries > 0) then
-			curQuery.pageError = true
+
+		if #retries > 0 then
+			-- for info only; CommitFunction does its own 'incomplete' detection
+			qryinfo.unresolved = (qryinfo.unresolved or 0) + all_missed + links_missed + link_data_missed + ld_and_names_missed
 		end
 	end
 
@@ -2075,12 +2101,6 @@ local StorePageFunction = function()
 			end
 		end
 		EventFramesRegistered=nil
-	end
-
-
-	-- Just updated the page if it was a new page, so record it as latest page.
-	if (page > curQuery.qryinfo.page) then
-		curQuery.qryinfo.page = page
 	end
 
 	--Send a Processor event to modules letting them know we are done with the page
@@ -2098,10 +2118,23 @@ local StorePageFunction = function()
 	local endTime = GetTime()
 	if not private.breakStorePage then
 		-- Send the next page query or finish scanning
-		if isGetAll then
+		if qryinfo.hybrid then
+			if hybridStartScanPage then
+				-- we've just done the GetAll part of the hybrid; start the paged part
+				private.ScanPage(hybridStartScanPage)
+			else
+				if (page+1 < maxPages) then
+					private.ScanPage(page + 1)
+				else
+					elapsed = endTime - private.scanStarted - private.totalPaused
+					private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
+					private.Commit(false, false, false)
+				end
+			end
+		elseif isGetAll then
 				elapsed = endTime - private.scanStarted - private.totalPaused
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) -- page+2 signals that scan is done
-				private.Commit(isGetAllFail, curQuery.pageError or false, false, true)
+				private.Commit(isGetAllFail, false, true)
 				-- Clear the getall output. We don't want to create a new query so use the hook
 				private.queryStarted = GetTime()
 				private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil)
@@ -2111,7 +2144,7 @@ local StorePageFunction = function()
 			else
 				elapsed = endTime - private.scanStarted - private.totalPaused
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
-				private.Commit(false, curQuery.pageError or false, false, false)
+				private.Commit(false, false, false)
 			end
 		elseif (maxPages == page+1) then
 			local incomplete = false
@@ -2133,7 +2166,12 @@ local StorePageFunction = function()
 			end
 			elapsed = endTime - private.scanStarted - private.totalPaused
 			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
-			private.Commit(incomplete, curQuery.pageError or false, wasEndOnly, false)
+			private.Commit(incomplete, wasEndOnly, false)
+		elseif maxPages == 0 and page == 0 and numBatchAuctions == 0 then
+			-- manual search, no auctions returned
+			elapsed = endTime - private.scanStarted - private.totalPaused
+			private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
+			private.Commit(false, false, false)
 		end
 	end
 	private.storeTime = endTime-retrievalStarted -- temp hack as RunTime calculation is broken - this will include paused and other non-processing time!
@@ -2264,6 +2302,7 @@ function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classInde
 	local class, subclass
 	local query, qryinfo = {}, {}
 	query.qryinfo = qryinfo
+	qryinfo.query = query
 
 	query.name = name
 	query.minUseLevel = minLevel
@@ -2416,7 +2455,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 				_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("Sending existing query %d (%s)"):format(query.qryinfo.id, query.qryinfo.sig))
 			end
 		else
-			private.Commit(true, private.curQuery.pageError or false, false, false)
+			private.Commit(true, false, false)
 		end
 	end
 	if not query then
@@ -2553,7 +2592,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 function lib.Cancel()
 	if (private.curQuery) then
 		_print("Cancelling current scan")
-		private.Commit(true, private.curQuery.pageError or false, false, false)
+		private.Commit(true, false, false)
 	end
 	private.ResetAll()
 end
@@ -2562,7 +2601,7 @@ function lib.Interrupt()
 	if private.curQuery and not _G.AuctionFrame:IsVisible() then
 		if private.isGetAll then
 			-- GetAll cannot be pushed/popped so we have to commit here instead
-			private.Commit(true, private.curQuery.pageError or false, false, true)
+			private.Commit(true, false, true)
 			private.sentQuery = false
 			if private.isGetAll then
 				-- If the StorePage function didn't run, we need to cleanup here instead
@@ -2575,7 +2614,7 @@ function lib.Interrupt()
 			private.unexpectedClose = true
 			lib.PushScan()
 		else
-			private.Commit(true, private.curQuery.pageError, false, false)
+			private.Commit(true, false, false)
 			private.sentQuery = false
 		end
 	end
@@ -2788,7 +2827,7 @@ end
 function lib.Logout()
 	_G.AucAdvancedData.Scandata = nil -- delete obsolete data. it's here because CoreScan doesn't have an OnLoad processor
 	if (private.curQuery) then
-		private.Commit(true, private.curQuery.pageError or false, false, false)
+		private.Commit(true, false, false)
 	end
 	if CoCommit then
 		while coroutine.status(CoCommit) == "suspended" do
