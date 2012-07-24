@@ -131,7 +131,7 @@ local validReagents =
 -- Set our defaults
 default("enchantmats.level.custom", false)
 default("enchantmats.level.min", 0)
-default("enchantmats.level.max", 525)
+default("enchantmats.level.max", Const.MAXSKILLLEVEL)
 default("enchantmats.allow.bid", true)
 default("enchantmats.allow.buy", true)
 default("enchantmats.maxprice", 10000000)
@@ -237,8 +237,8 @@ function lib:MakeGuiConfig(gui)
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Checkbox",          0, 1, "enchantmats.level.custom", "Use custom enchanting skill levels")
-	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.min", 0, 525, 25, "Minimum skill: %s")
-	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.max", 25, 525, 25, "Maximum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.min", 0, Const.MAXSKILLLEVEL, 25, "Minimum skill: %s")
+	gui:AddControl(id, "Slider",            0, 2, "enchantmats.level.max", 25, Const.MAXSKILLLEVEL, 25, "Maximum skill: %s")
 
 	-- spacer to allow for all the controls on the right hand side
 	gui:AddControl(id, "Note",              0, 0, nil, 40, "")
