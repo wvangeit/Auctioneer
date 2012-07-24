@@ -955,9 +955,9 @@ local function OnLoadRunOnce()
 	OnLoadRunOnce = nil
 
 	default("util.itemsuggest.enablett", 1) --Enables Item Suggest from Item AI to be displayed in tooltip
-	default("util.itemsuggest.enchantskill", 525) -- Used for item AI
-	default("util.itemsuggest.jewelcraftskill", 525)-- Used for item AI
-	default("util.itemsuggest.inscriptionskill", 525)-- Used for item AI
+	default("util.itemsuggest.enchantskill", Const.MAXSKILLLEVEL) -- Used for item AI
+	default("util.itemsuggest.jewelcraftskill", Const.MAXSKILLLEVEL)-- Used for item AI
+	default("util.itemsuggest.inscriptionskill", Const.MAXSKILLLEVEL)-- Used for item AI
 	default("util.itemsuggest.vendorweight", 100)-- Used for item AI
 	default("util.itemsuggest.auctionweight", 100)-- Used for item AI
 	default("util.itemsuggest.prospectweight", 100)-- Used for item AI
@@ -1017,11 +1017,11 @@ local function SetupConfigGui(gui)
 	SliderSpacer = gui:AddControl(id, "Note", 0 ,0 ,0, "") -- invisible control used to correctly space controls following the sliders
 
     gui:AddControl(id, "Header", 0, "Skill usage Limits")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 0, 525, 25, "Max Enchanting Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.enchantskill", 0, Const.MAXSKILLLEVEL, 25, "Max Enchanting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Enchanting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 0, 525, 25, "Max JewelCrafting Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.jewelcraftskill", 0, Const.MAXSKILLLEVEL, 25, "Max JewelCrafting Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Jewelcrafting skill for your characters on this realm.")
-	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 0, 525, 25, "Max Inscription Skill On Realm: %s")
+	gui:AddControl(id, "WideSlider", 0, 2, "util.itemsuggest.inscriptionskill", 0, Const.MAXSKILLLEVEL, 25, "Max Inscription Skill On Realm: %s")
 	gui:AddTip(id, "Set ItemSuggest limits based upon Inscription skill for your characters on this realm.")
 
 	gui:AddControl(id, "Header", 0, "Pricing Models")
