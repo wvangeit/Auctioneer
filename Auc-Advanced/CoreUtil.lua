@@ -40,6 +40,7 @@ if not (coremodule and internal) then return end -- Someone has explicitely brok
 internal.Util = internalUtil
 local tooltip = LibStub("nTipHelper:1")
 local Const = lib.Const
+local Resources = lib.Resources
 
 local _G = _G
 local pairs, ipairs, tinsert, wipe = pairs, ipairs, tinsert, wipe
@@ -56,14 +57,10 @@ end
 
 coremodule.Processors = {}
 function coremodule.Processors.auctionopen()
-	private.isAHOpen = true
 	-- temporary check
 	if private.checkAuthorizedModules then
 		private.checkAuthorizedModules()
 	end
-end
-function coremodule.Processors.auctionclose()
-	private.isAHOpen = false
 end
 function coremodule.Processors.newmodule(event, libType, libName)
 	-- the only newmodule messages should come from AucAdvanced.NewModule
@@ -280,47 +277,17 @@ do -- Faction and ServerKey related functions
 	end
 
 	function lib.GetFaction()
-		local factionGroup = lib.GetFactionGroup()
-		if not factionGroup then return end
-		if factionGroup ~= lib.curFactionGroup then
-			local curFaction
-			if (factionGroup == "Neutral") then
-				lib.cutRate = 0.15
-				lib.depositRate = 0.25 -- deprecated
-				curFaction = Const.ServerKeyNeutral
-			else
-				lib.cutRate = 0.05
-				lib.depositRate = 0.05 -- deprecated
-				curFaction = Const.ServerKeyHome
-			end
-			lib.curFaction = curFaction -- deprecated (it's a serverKey, so calling it curFaction is confusing)
-			lib.curFactionGroup = factionGroup
-			lib.curServerKey = curFaction
-		end
-		return lib.curServerKey, Const.PlayerRealm, factionGroup
+		-- Compatibility function
+		return Resources.ServerKeyCurrent, Const.PlayerRealm, Resources.CurrentFaction
 	end
 
-	local zonefactions = {}
 	function lib.GetFactionGroup()
-		if private.isAHOpen or not lib.Settings.GetSetting("alwaysHomeFaction") then
-			local currentZone = GetMinimapZoneText()
-			local factionGroup = zonefactions[currentZone]
-			if not factionGroup then
-				SetMapToCurrentZone()
-				local map = GetMapInfo()
-				if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn") or (map == "TheCapeOfStranglethorn")) then
-					factionGroup = "Neutral"
-				else
-					factionGroup = Const.PlayerFaction
-				end
-				zonefactions[currentZone] = factionGroup
-			end
-			return factionGroup
-		end
-		return Const.PlayerFaction
+		-- Compatibility function
+		return Resources.CurrentFaction
 	end
 
 	function private.FactionOnLoad()
+		private.FactionOnLoad = nil
 		local alliance = lib.localizations("ADV_Interface_FactionAlliance")
 		local horde = lib.localizations("ADV_Interface_FactionHorde")
 		local neutral = lib.localizations("ADV_Interface_FactionNeutral")

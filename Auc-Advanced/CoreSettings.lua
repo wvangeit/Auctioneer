@@ -129,7 +129,7 @@ local settingDefaults = {
 --	['scancommit.speed'] = 50,
 	['scancommit.progressbar'] = true,
 	['scancommit.ttl'] = 20,
-	['alwaysHomeFaction'] = true,
+	['core.general.alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
 	["core.marketvalue.tolerance"] = .08,
 	["ShowPurchaseDebug"] = true,
@@ -436,7 +436,7 @@ function lib.MakeGuiConfig()
 	local Configator = LibStub:GetLibrary("Configator")
 	gui = Configator:Create(setter, getter)
 	lib.Gui = gui
-	gui:AddCat("Core Options")
+	gui:AddCat("Core Options", nil, false)
 
 
 	id = gui:AddTab("Profiles")
@@ -495,7 +495,7 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
 
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
-	gui:AddControl(id, "Checkbox",		0, 1, 	"alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
+	gui:AddControl(id, "Checkbox",		0, 1, 	"core.general.alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 	gui:AddControl(id, "Slider", 0, 1, "core.marketvalue.tolerance", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
@@ -682,27 +682,30 @@ end
 
 --Changes the layout of saved var from a flat table to a nested set
 --called from coremain lua's onload. This also adds a version # to our saved variables for future use
-function lib.upgradeSavedVariables()
-	for p, data in pairs(AucAdvancedConfig) do
-		if type(p) == "string" then
-			local profile = strsplit(".",p)
-			if profile =="profile" then
-				local temp = {}
-				for setting, value in pairs(data) do
-					local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-					if  a and b and c then
-						if not temp[a] then temp[a] = {} end
-						if not temp[a][b] then temp[a][b] = {} end
-						temp[a][b][c] = value
-					else --still keep the improper keys
-						temp[setting] = value
+internal.Settings = {}
+function internal.Settings.upgradeSavedVariables()
+	if not AucAdvancedConfig["version"] then
+		for p, data in pairs(AucAdvancedConfig) do
+			if type(p) == "string" then
+				local profile = strsplit(".",p)
+				if profile =="profile" then
+					local temp = {}
+					for setting, value in pairs(data) do
+						local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
+						if  a and b and c then
+							if not temp[a] then temp[a] = {} end
+							if not temp[a][b] then temp[a][b] = {} end
+							temp[a][b][c] = value
+						else --still keep the improper keys
+							temp[setting] = value
+						end
 					end
+					AucAdvancedConfig[p] = temp
 				end
-				AucAdvancedConfig[p] = temp
 			end
 		end
+		AucAdvancedConfig["version"] = 1
 	end
-	AucAdvancedConfig["version"] = 1
 end
 
 -- Check for obsolete settings and either convert to new "triplet" version, or delete if no longer required
@@ -728,6 +731,13 @@ function private.CheckObsolete()
 			setter("core.marketvalue.tolerance", old)
 		end
 		setter("marketvalue.accuracy", nil)
+	end
+	old = getter("alwaysHomeFaction")
+	if old ~= nil then
+		if getter("core.general.alwaysHomeFaction") == getDefault("core.general.alwaysHomeFaction") then
+			setter("core.general.alwaysHomeFaction", old)
+		end
+		setter("alwaysHomeFaction", nil)
 	end
 end
 

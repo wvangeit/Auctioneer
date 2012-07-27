@@ -51,9 +51,10 @@ local modules = {}
 
 -- This is an initial creation function.  Create and return items once.  Expect the caller to store that value for use.
 function lib.GetCoreModule(moduleName)
-	local x = {}
+	local x
 	if (moduleName) then
 		if (modules[moduleName]) then return end
+		x = {}
 		modules[moduleName] = x
 	end
 	return x, internal

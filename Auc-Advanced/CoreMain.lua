@@ -43,7 +43,7 @@ if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 
-local _, internalStore = AucAdvanced.GetCoreModule() -- Don't need a module but do need the addon internal storage area.
+local _, internal = AucAdvanced.GetCoreModule() -- Don't need a module but do need the addon internal storage area.
 
 
 -- For our modular stats system, each stats engine should add their
@@ -206,7 +206,7 @@ local function OnLoad(addon)
 	-- Check if the actual addon itself is loading
 	if addon == "auc-advanced" then
 		--updated saved variables format
-		if not AucAdvancedConfig["version"] then AucAdvanced.Settings.upgradeSavedVariables() end
+		internal.Settings.upgradeSavedVariables()
 
 		-- Load the dummy CoreModule
 		AucAdvanced.CoreModuleOnLoad(addon)
@@ -219,7 +219,7 @@ local function OnLoad(addon)
 		moduleLib = AucAdvanced.GetModule(sys, eng)
 	end
 	if not moduleLib then
-		moduleLib = internalStore.Util.GetModuleForName(addon)
+		moduleLib = internal.Util.GetModuleForName(addon)
 	end
 
 	-- Notify the actual module if it exists
@@ -243,7 +243,7 @@ local function OnLoad(addon)
 	end
 
 	if moduleLib then
-		internalStore.Util.SendModuleCallbacks(moduleLib)
+		internal.Util.SendModuleCallbacks(moduleLib)
 	end
 
 	if addon == "auc-advanced" then
@@ -270,8 +270,6 @@ local function OnEnteringWorld(frame)
 		return
 	end
 
-	frame:RegisterEvent("AUCTION_HOUSE_SHOW")
-	frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	frame:RegisterEvent("ITEM_LOCK_CHANGED")
 	frame:RegisterEvent("BAG_UPDATE")
 	-- Following items are for experimental scan processor modifications
@@ -288,21 +286,18 @@ local function OnEnteringWorld(frame)
 	tooltip:AltChatLinkRegister(HookAltChatLinkTooltip)
 	ALTCHATLINKTOOLTIP_OPEN = tooltip:AltChatLinkConstants()
 
+	internal.Resources.Activate()
+
 	if AucAdvanced.Settings.GetSetting("scandata.force") then
 		AucAdvanced.Scan.LoadScanData()
 	end
 end
 
 local function OnEvent(self, event, arg1, arg2, ...)
-	if (event == "AUCTION_HOUSE_SHOW") then
-		AucAdvanced.SendProcessorMessage("auctionopen")
-	elseif (event == "AUCTION_HOUSE_CLOSED") then
-		AucAdvanced.SendProcessorMessage("auctionclose")
-		internalStore.Scan.AHClosed()
-	elseif event == "AUCTION_ITEM_LIST_UPDATE" then
-		if internalStore.Scan then internalStore.Scan.NotifyItemListUpdated() end
+	if event == "AUCTION_ITEM_LIST_UPDATE" then
+		internal.Scan.NotifyItemListUpdated()
 	elseif event == "AUCTION_OWNED_LIST_UPDATE" then
-		if internalStore.Scan then internalStore.Scan.NotifyOwnedListUpdated() end
+		internal.Scan.NotifyOwnedListUpdated()
 	elseif (event == "ITEM_LOCK_CHANGED" and arg2) or event == "BAG_UPDATE" then
 		if arg1 >= 0 and arg1 <= 4 then
 			ScheduleMessage("inventory", 0.05) -- collect multiple events for same bag change using a slight delay
@@ -310,7 +305,7 @@ local function OnEvent(self, event, arg1, arg2, ...)
 	elseif event == "ADDON_LOADED" then
 		OnLoad(arg1)
 	elseif event == "PLAYER_LOGOUT" then
-		internalStore.Scan.Logout()
+		internal.Scan.Logout()
 		OnUnload()
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		OnEnteringWorld(self)
