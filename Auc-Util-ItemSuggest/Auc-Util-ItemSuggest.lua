@@ -38,6 +38,7 @@ local lib = AucAdvanced.NewModule(libType, libName, nil, true) -- noPrivate
 if not lib then return end
 local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill,_TRANS = AucAdvanced.GetModuleLocals()
 local Const = AucAdvanced.Const
+local Resources = AucAdvanced.Resources
 
 local SplitServerKey = AucAdvanced.SplitServerKey
 local GetDepositCost = GetDepositCost
@@ -78,7 +79,7 @@ function lib.Suggest(hyperlink, quantity, serverKey, additional)
 		return
 	end
 	if type(quantity) ~= "number" or quantity < 1 then quantity = 1 end
-	serverKey = Const.ServerKeyHome -- temporary: peg to home faction for now
+	serverKey = Resources.ServerKeyHome -- temporary: peg to home faction for now
 	if type(additional) ~= "table" then additional = emptyTable end -- ensure 'additional' is always a table, though it may be empty
 	if hyperlink == LastLink and quantity == LastQuantity and additional == LastAdditional then
 		-- caution: we don't check to see if the _contents_ of 'additional' have changed
