@@ -37,7 +37,6 @@ local AucAdvanced = AucAdvanced
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
-local debugPrint = AucAdvanced.Debug.DebugPrint
 
 local empty = wipe
 local ipairs,pairs,type,select = ipairs,pairs,type,select
@@ -50,11 +49,8 @@ local tinsert,tremove = tinsert,tremove
 -- Our official name:
 AucSearchUI = lib
 
-function lib.GetName()
-	return libName
-end
-
 local Const = AucAdvanced.Const
+local coreResources = AucAdvanced.Resources -- the resources table inherited from AucAdvanced core
 local gui
 private.data = {}
 private.sheetData = {}
@@ -76,29 +72,27 @@ private.tleft = {
 
 lib.CleanTable = wipe -- for compatibility
 
-local resources = {}
+local resources = {} -- the resources table passed on to the Searcher & Filter submodules
 lib.Resources = resources
-local flagResourcesUpdateRequired = false
-local flagScanStats = false
+local flagScanFinished = false
 local flagRescan
 
 -- Faction Resources
 -- Commonly used values which change depending whether you are at home or neutral Auctionhouse
 -- Modules should expect these to always contain valid values; nil tests should not be required
+-- Actually handled by CoreResources, but we copy them into our own table for backward compatibility
 resources.Realm = Const.PlayerRealm -- will not change during session
 function private.UpdateFactionResources()
-	local serverKey, _, Faction = AucAdvanced.GetFaction()
-	if serverKey ~= resources.serverKey then
-		-- store new settings
-		resources.Faction = Faction
-		resources.faction = Faction:lower() -- lowercase for GetDepositCost
-		resources.serverKey = serverKey
-		resources.CutAdjust = 1 - AucAdvanced.cutRate -- multiply price by .CutAdjust to subtract the AH brokerage fees
-		-- notify the change
-		lib.NotifyCallbacks("resources", "faction", serverKey)
+	resources.Faction = coreResources.CurrentFaction
+	resources.faction = resources.Faction:lower() -- lowercase (deprecated - no longer needed by GetDepositCost)
+	resources.serverKey = coreResources.ServerKeyCurrent
+	resources.CutAdjust = coreResources.AHCutAdjust -- multiply price by .CutAdjust to subtract the AH brokerage fees
+	if private.isSearching then
+		-- if we're part way through a search, cancel it as we don't want to do the rest of the search with a different serverKey
+		private.SearchCancel = true
 	end
+	lib.NotifyCallbacks("resources", "faction", resources.serverKey)
 end
--- todo: we really should update when Zone changes, but there in't a processor event for that
 
 -- Selectbox Resources
 --[[ Usages:
@@ -260,14 +254,15 @@ function lib.Processors.auctionclose(callbackType, ...)
 	if private.isAttached then
 		lib.DetachFromAH()
 	end
-	flagResourcesUpdateRequired = true
 	lib.NotifyCallbacks("auctionclose")
 end
 
 function lib.Processors.auctionopen(callbackType, ...)
-	flagResourcesUpdateRequired = true
 	lib.NotifyCallbacks("auctionopen")
 end
+
+lib.Processors.serverkey = private.UpdateFactionResources
+lib.Processors.factionselect = private.UpdateFactionResources
 
 function lib.Processors.auctionui(callbackType, ...)
 	if lib.Searchers.RealTime then
@@ -290,9 +285,9 @@ function lib.Processors.bidcancelled(callbackType, ...)
 	private.bidcancelled(...)
 end
 
-function lib.Processors.scanstats(callbackType, ...)
+function lib.Processors.scanfinish(callbackType, ...)
 	-- pass the message in next OnUpdate
-	flagScanStats = true
+	flagScanFinished = true
 end
 
 function lib.Processors.scanprogress(callbackType, ...)
@@ -2072,6 +2067,7 @@ local PerformSearch = function()
 		return
 	end
 
+	private.SearchCancel = nil
 	if gui.tabs.active then
 		gui:ContractFrame(gui.tabs.active)
 	end
@@ -2165,14 +2161,8 @@ function private.OnUpdate(self, elapsed)
 			coSearch = nil
 		end
 	end
-	if flagResourcesUpdateRequired then
-		-- Update Faction resources following Auctionhouse open or close (to handle Neutral AH)
-		-- Delayed until OnUpdate handler to give GetFaction time to update its own internal settings
-		flagResourcesUpdateRequired = false
-		private.UpdateFactionResources()
-	end
-	if flagScanStats then
-		flagScanStats = false
+	if flagScanFinished then
+		flagScanFinished = false
 		lib.NotifyCallbacks("postscanupdate")
 	end
 
