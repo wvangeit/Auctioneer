@@ -1004,7 +1004,7 @@ local Commitfunction = function()
 				"Page %d, Index %d -- %s\n %s -- %d of %s sold by %s\n",
 				"Level %d, Quality %s, Item Level %s\n",
 				"Item Type %s, Sub Type %s, Equipment Position %s\n",
-				"Price %d, Bid %d, NextBid %d, MinInc %d, Buyout %d\n Time Left %s, Time %s\n",
+				"Price %s, Bid %s, NextBid %s, MinInc %s, Buyout %s\n Time Left %s, Time %s\n",
 				"High Bidder %s  Can Use: %s  ID %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
 				"Texture: %s")):format(
 				data.PAGE, data.PAGEINDEX, (entryUnusable and "too broken, can not use at all") or "using with missed items blanked",
