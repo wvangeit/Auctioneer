@@ -38,7 +38,7 @@ Icon on the minimap related bits
 
 ]]
 
-local miniIcon = CreateFrame("Button", "", Minimap);
+local miniIcon = CreateFrame("Button", "EnxMiniMapIcon", Minimap);
 Enchantrix.MiniIcon = miniIcon
 miniIcon.enxMoving = false
 

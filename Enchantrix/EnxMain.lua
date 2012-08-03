@@ -383,7 +383,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
 			local reagentList = {}
 			for i = 1, GetNumLootItems(), 1 do
-				if LootSlotIsItem(i) then
+				if GetLootSlotType(i) == LOOT_SLOT_ITEM then	-- LootSlotIsItem(i) 
 					local icon, name, quantity, rarity = GetLootSlotInfo(i)
 					local link = GetLootSlotLink(i)
 					if (chatPrintYield) then

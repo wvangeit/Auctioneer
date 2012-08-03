@@ -757,9 +757,23 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		return 0
 	end
 	
+-- ccox - Panda items, this is partly guesswork
+	if (quality == 2 and level >= 340) then
+		-- all greens
+		return 475;					-- 384 - 460
+	elseif (quality == 3 and level >= 400) then
+		-- blues
+		if (level > 425) then
+			return 550;					-- 426? - 463
+		else
+			return 500;					-- 404 - 425?		 Something is messed up for blues - armor and weapons don't have same levels
+		end
+	elseif (level >= 420) then
+		-- all epics
+		return 475;				-- 470 - 516 - epic DE too low, again.  Someone at Blizzard really isn't paying attention to disenchanting tables.
 
-	-- ccox - Cataclysm items, this is partly guesswork
-	if (level >= 270) then
+	-- Cataclysm items
+	elseif (level >= 270) then
 		if (quality == 3) then
 			-- all blues
 			return 450;				-- 279 - 346
@@ -768,11 +782,11 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 			return 425;				-- 270 - 318
 		else
 			-- all epics
-			return 475;				-- 353 - 372
+			return 475;				-- 346 - 416
 		end
 		
 	elseif (level >= 200) then
-		-- rares still bugged Nov 2009, and Nov 2010, guess they're going to stay that way
+		-- rares still bugged Nov 2011, guess they're going to stay that way
 		if (quality ~= 3) then
 			return 375;
 		else
@@ -883,63 +897,24 @@ function Enchantrix.Util.GetUserSkillByName( name )
 	end
 
 	local resultRank = 0
-	--[[ WOW 3.0  WOTLK server version runs the old code path SHIM REMOVE]]
-	if GetNumSkillLines then
-		local MyExpandedHeaders = {}
-		local i, j
-
-
-		-- search the skill tree for the named skill
-		for i=0, GetNumSkillLines(), 1 do
-			local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-			-- expand the header if necessary
-			if ( header and not isExpanded ) then
-				MyExpandedHeaders[i] = skillName
-			end
-		end
-
-		ExpandSkillHeader(0)
-		for i=1, GetNumSkillLines(), 1 do
-			local skillName, header, _, skillRank = GetSkillLineInfo(i)
-			-- check for the skill name
-			if (skillName and not header) then
-				if (skillName == name) then
-					resultRank = skillRank
-					-- no need to look at the rest of the skills
-					break
-				end
-			end
-		end
-
-		-- close headers expanded during search process
-		for i=0, GetNumSkillLines() do
-			local skillName, header, isExpanded = GetSkillLineInfo(i)
-			for j in pairs(MyExpandedHeaders) do
-				if ( header and skillName == MyExpandedHeaders[j] ) then
-					CollapseSkillHeader(i)
-					MyExpandedHeaders[j] = nil
-				end
-			end
-		end
-	else
+	
 	--WOW 4.0 Cataclysm uses the new profession system
-		local prof1, prof2 = GetProfessions()
-		local skillName1, _, rank1
-		local skillName2, _, rank2
-		if prof1 then
-			skillName1, _, rank1= GetProfessionInfo(prof1)
-		end
-		if prof2 then
-			skillName2, _, rank2 = GetProfessionInfo(prof2)
-		end
-
-		if name == skillName1 then
-			resultRank = rank1
-		elseif name == skillName2 then
-			resultRank = rank2
-		end
+	local prof1, prof2 = GetProfessions()
+	local skillName1, _, rank1
+	local skillName2, _, rank2
+	if prof1 then
+		skillName1, _, rank1= GetProfessionInfo(prof1)
+	end
+	if prof2 then
+		skillName2, _, rank2 = GetProfessionInfo(prof2)
 	end
 
+	if name == skillName1 then
+		resultRank = rank1
+	elseif name == skillName2 then
+		resultRank = rank2
+	end
+	
 	Enchantrix.Util.SkillCacheRank[ name ] = resultRank
 	Enchantrix.Util.SkillCacheTimeStamp[ name ] = GetTime()
 
@@ -974,6 +949,7 @@ local function balanceEssencePrices(scanReagentTable, style)
 		[22447] = 22446,	-- planar
 		[34056] = 34055,	-- cosmic
 		[52718] = 52719,	-- celestial
+		[74250] = 74251,	-- Mysterious
 	};
 
 	for lesser, greater in pairs(essenceTable) do

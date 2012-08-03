@@ -71,27 +71,21 @@ local function itemStringFromLink(link)
 	return itemString
 end
 
--- remove the uniqueID and viewer level from the link, but keep the reforging stat
--- WARNING - this needs to be updated whenever the link format changes, and that will invalidate the ignore list
--- "|cff1eff00|Hitem:59781:0:0:0:0:0:0:1111873024:81:0:0|h[Calanoid Shoulders]|h|r"
--- head = "|cff1eff00|Hitem:59781:0:0:0:0:0:0:"
--- tail = ":0|h[Calanoid Shoulders]|h|r"
 local function genericizeItemLink(link)
-	-- strip out unique id
-	local _, _, head, tail = string.find(link, "^(|c%x+|H.+:)[-%d]+:%d+(:%d+|h.+)")
-	return head .. "0:0" .. tail
+	local _, _, item = link:find("item:(%d+):")
+	return item
 end
 
 local function ignoreItemPermanent(link)
 	local genericLink = genericizeItemLink(link)
-	Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeIgnorePermanent"):format(genericLink))
+	Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeIgnorePermanent"):format(link))
 	AutoDisenchantIgnoreList[genericLink] = true
 end
 
 local function ignoreItemSession(link, silent)
 	local genericLink = genericizeItemLink(link)
 	if not silent then
-		Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeIgnoreSession"):format(genericLink))
+		Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeIgnoreSession"):format(link))
 	end
 	auto_de_session_ignore_list[genericLink] = true
 end
@@ -311,7 +305,7 @@ local function onEvent(...)
 				
 				-- make sure all results are DE/prospect/milling results
 				for slot = 1, GetNumLootItems() do
-					if (not LootSlotIsItem(slot)) then return end
+					if (GetLootSlotType(slot) ~= LOOT_SLOT_ITEM) then return end
 					local link = GetLootSlotLink(slot)
 					local _, itemID = auto_de_tooltip:DecodeLink(link)
 					if (not itemID) then return end

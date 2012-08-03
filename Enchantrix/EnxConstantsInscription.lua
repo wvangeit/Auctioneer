@@ -42,6 +42,7 @@ local SILVERY_PIGMENT = 39341
 local NETHER_PIGMENT = 39342
 local AZURE_PIGMENT = 39343
 local ASHEN_PIGMENT = 61979
+local SHADOW_PIGMENT = 79251
 
 local VERDANT_PIGMENT = 43103
 local BURNT_PIGMENT = 43104
@@ -51,6 +52,10 @@ local SAPPHIRE_PIGMENT = 43107
 local EBON_PIGMENT = 43108
 local ICY_PIGMENT = 43109
 local BURNING_EMBERS = 61980
+local MISTY_PIGMENT = 79253
+
+-- ccox - not sure if this is used, or just leftover
+-- local TIGERSBLOOD_PIGMENT = 87828
 
 local HERB_PEACEBLOOM = 2447
 local HERB_SILVERLEAF = 765
@@ -115,6 +120,14 @@ local HERB_HEARTBLOSSOM = 52986
 local HERB_TWILIGHTJASMINE = 52987
 local HERB_WHIPTAIL = 52988
 
+-- Panda herbs
+local HERB_RAINPOPPY = 72237
+local HERB_GREEN_TEA = 72234
+local HERB_SILKWEED = 72235
+local HERB_SNOWLILY = 79010
+local HERB_FOOLSCAP = 79011
+local HERB_GOLDENLOTUS = 72238
+
 
 -- only currently used for autoloot in EnxAutoDisenchant.lua
 -- Blizz normally provides the reverse data in the pigment tooltip
@@ -130,6 +143,7 @@ const.ReversePigmentList = {
 	[NETHER_PIGMENT] = 1,
 	[AZURE_PIGMENT] = 1,
 	[ASHEN_PIGMENT] = 1,
+	[SHADOW_PIGMENT] = 1,
 
 	-- rare
 	[VERDANT_PIGMENT] = 1,
@@ -140,6 +154,7 @@ const.ReversePigmentList = {
 	[EBON_PIGMENT] = 1,
 	[ICY_PIGMENT] = 1,
 	[BURNING_EMBERS] = 1,
+	[MISTY_PIGMENT] = 1,
 
 }
 
@@ -163,7 +178,8 @@ local	NETHER_PIGMENT_HIGH = "NETHER_PIGMENT_HIGH"
 local	AZURE_PIGMENT_HIGH = "AZURE_PIGMENT_HIGH"
 local	ASHEN_PIGMENT_HIGH = "ASHEN_PIGMENT_HIGH"
 local	ASHEN_PIGMENT_MID = "ASHEN_PIGMENT_MID"
-
+local	SHADOW_PIGMENT_LOW = "SHADOW_PIGMENT_LOW"
+local	SHADOW_PIGMENT_HIGH = "SHADOW_PIGMENT_HIGH"
 
 -- skill required, by bracket/result
 const.MillingSkillRequired = {
@@ -187,6 +203,8 @@ const.MillingSkillRequired = {
 	[ASHEN_PIGMENT_LOW] = 425,
 	[ASHEN_PIGMENT_MID] = 450,
 	[ASHEN_PIGMENT_HIGH] = 475,
+	[SHADOW_PIGMENT_LOW] = 500,
+	[SHADOW_PIGMENT_HIGH] = 550,
 
 }
 
@@ -260,6 +278,15 @@ const.MillableItems = {
 	
 	[HERB_TWILIGHTJASMINE] = ASHEN_PIGMENT_HIGH,
 	[HERB_WHIPTAIL] = ASHEN_PIGMENT_HIGH,
+	
+	[HERB_RAINPOPPY] = SHADOW_PIGMENT_LOW,
+	[HERB_GREEN_TEA] = SHADOW_PIGMENT_LOW,
+	[HERB_SILKWEED] = SHADOW_PIGMENT_LOW,
+	[HERB_SNOWLILY] = SHADOW_PIGMENT_LOW,
+	[HERB_FOOLSCAP] = SHADOW_PIGMENT_LOW,
+	[HERB_GOLDENLOTUS] = SHADOW_PIGMENT_LOW,
+	
+	
 }
 
 
@@ -357,7 +384,16 @@ const.MillGroupYields = {
 		[ASHEN_PIGMENT] = 3.0,
 		[BURNING_EMBERS] = 0.5,
 		},
-
+	
+	[SHADOW_PIGMENT_LOW] = {
+		[SHADOW_PIGMENT] = 2.5,
+		[MISTY_PIGMENT] = 0.25,
+		},
+	
+	[SHADOW_PIGMENT_HIGH] = {
+		[SHADOW_PIGMENT] = 3.0,
+		[MISTY_PIGMENT] = 0.5,
+		},
 }
 
 
@@ -379,6 +415,8 @@ local DAWNSTAR_INK = 43117
 local DARKFLAME_INK = 43125
 local BLACKFALLOW_INK = 61978
 local INFERNO_INK = 61981
+local INK_DREAMS = 79254
+local STARLIGHT_INK = 79253
 
 const.ReverseInkList = {
 
@@ -392,6 +430,7 @@ const.ReverseInkList = {
 	[ ETHEREAL_INK ] = { NETHER_PIGMENT },
 	[ INKOFTHESEA_INK ] = { AZURE_PIGMENT },
 	[ BLACKFALLOW_INK ] = { ASHEN_PIGMENT },
+	[ INK_DREAMS ] = { SHADOW_PIGMENT },
 	
 	[ HUNTERS_INK ] = { VERDANT_PIGMENT },
 	[ DAWNSTAR_INK ] = { BURNT_PIGMENT },
@@ -401,5 +440,5 @@ const.ReverseInkList = {
 	[ DARKFLAME_INK ] = { EBON_PIGMENT },
 	[ SNOWFALL_INK ] = { ICY_PIGMENT },
 	[ INFERNO_INK ] = { BURNING_EMBERS },
-
+	[ STARLIGHT_INK ] = { MISTY_PIGMENT },
 }
