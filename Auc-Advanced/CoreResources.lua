@@ -77,13 +77,14 @@ local WATCHED_SETTINGS = {
 local EventFrame
 local ZoneFactionCache = {}
 local LastSelectedFaction
+local PlayerCutRate -- will contain CUT_HOME or CUT_NEUTRAL depending on PlayerFaction
 
 -- local references to Globals
 local GetZoneText, GetCurrentMapAreaID, GetCurrentMapDungeonLevel = GetZoneText, GetCurrentMapAreaID, GetCurrentMapDungeonLevel
 local SetMapByID, SetDungeonMapLevel = SetMapByID, SetDungeonMapLevel
 
 -- Placeholders for local references (filled in by Activate function)
-local SendProcessorMessage, GetSetting
+local GetSetting
 
 
 --[[ Install AucAdvanced.Resources table ]]--
@@ -131,7 +132,7 @@ local function UpdateServerKey()
 		else -- SELECT_HOME
 			currentFaction = lib.PlayerFaction
 			serverKey = lib.ServerKeyHome
-			cutRate = CUT_HOME
+			cutRate = PlayerCutRate
 		end
 		LastSelectedFaction = factionSelect
 
@@ -146,7 +147,7 @@ local function UpdateServerKey()
 		AucAdvanced.cutRate = cutRate
 
 		-- notify the change
-		SendProcessorMessage("serverkey", serverKey)
+		AucAdvanced.SendProcessorMessage("serverkey", serverKey)
 	end
 end
 
@@ -155,11 +156,14 @@ local function SetFaction()
 	local opposingFaction
 	if playerFaction == "Alliance" then
 		opposingFaction = "Horde"
+		PlayerCutRate = CUT_HOME
 	elseif playerFaction == "Horde" then
 		opposingFaction = "Alliance"
+		PlayerCutRate = CUT_HOME
 	else
 		playerFaction = "Neutral" -- just in case it was nil
 		opposingFaction = "Neutral"
+		PlayerCutRate = CUT_NEUTRAL
 	end
 
 	lib.PlayerFaction = playerFaction
@@ -177,12 +181,12 @@ lib.ServerKeyNeutral = PLAYER_REALM.."-Neutral"
 -- it's too early in the load process to call UpdateServerKey; assume home faction for now
 lib.ServerKeyCurrent = lib.ServerKeyHome
 lib.CurrentFaction = lib.PlayerFaction
-lib.AHCutRate = CUT_HOME
-lib.AHCutAdjust = 1 - CUT_HOME
+lib.AHCutRate = PlayerCutRate
+lib.AHCutAdjust = 1 - PlayerCutRate
 -- For compatibility (### Deprecated ###)
 AucAdvanced.curFactionGroup = lib.PlayerFaction
 AucAdvanced.curServerKey = lib.ServerKeyHome
-AucAdvanced.cutRate = CUT_HOME
+AucAdvanced.cutRate = PlayerCutRate
 
 -- special handling for Pandaren characters, for the moment they choose their faction
 local function OnFactionSelect()
@@ -191,8 +195,9 @@ local function OnFactionSelect()
 	if SetFaction then
 		SetFaction()
 	end
+	LastSelectedFaction = nil -- force an update
 	UpdateServerKey()
-	SendProcessorMessage("factionselect", lib.PlayerFaction)
+	AucAdvanced.SendProcessorMessage("factionselect", lib.PlayerFaction)
 end
 
 --[[ Event handlers and other entry points ]]--
@@ -237,13 +242,13 @@ coremodule.Processors = {
 }
 
 internal.Resources = {
-	-- Activate: called by CoreMain near the end of the load process (probably during PLAYER_ENTERING_WORLD)
+	-- Activate: called by CoreMain near the end of the load process
+	-- (expected to be during PLAYER_ENTERING_WORLD or later)
 	Activate = function()
 		internal.Resources.Activate = nil -- only run once
 		lib.Active = true
 
 		-- Store local references to common functions (that weren't available at initial load time)
-		SendProcessorMessage = AucAdvanced.SendProcessorMessage
 		GetSetting = AucAdvanced.Settings.GetSetting
 
 		-- Setup Event handler
@@ -266,7 +271,5 @@ internal.Resources = {
 			OnFactionSelect = nil
 		end
 		UpdateServerKey()
-
-		SendProcessorMessage("gameactive")
 	end,
 }

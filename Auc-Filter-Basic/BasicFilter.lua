@@ -37,13 +37,15 @@ local libType, libName = "Filter", "Basic"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local Const = AucAdvanced.Const
+local Resources = AucAdvanced.Resources
 
-local IgnoreList, IgnoreLookup
+local IgnoreList, IgnoreLookup = {}, {}
 local SelectedIgnore = 0
 local GUILoaded = false
 
 local NUM_IGNORE_BUTTONS = 18
-local PLAYER_NAME = AucAdvanced.Const.PlayerName
+local PLAYER_NAME = Const.PlayerName
 
 --[[ Exported Library Functions ]]--
 
@@ -220,9 +222,23 @@ local function OnLoadRunOnce()
 	default("filter.basic.minquality", 1)
 	default("filter.basic.minlevel", 0)
 	default("filter.basic.ignoreself", false)
+end
+function lib.OnLoad(addon)
+	if OnLoadRunOnce then OnLoadRunOnce() end
+end
 
-	local realm = AucAdvanced.Const.PlayerRealm
-	local faction = AucAdvanced.Const.PlayerFaction
+lib.Processors = {}
+
+local function Activate()
+	local faction = Resources.PlayerFaction
+	if faction == "Neutral" then
+		-- special handling for Neutral player characters:
+		-- don't initialize until player chooses a faction
+		lib.Processors.factionselect = lib.Processors.gameactive
+		return
+	end
+
+	local realm = Const.PlayerRealm
 
 	if not AucAdvancedFilterBasic_IgnoreList then
 		_G["AucAdvancedFilterBasic_IgnoreList"] = {}
@@ -233,6 +249,10 @@ local function OnLoadRunOnce()
 		realmtable = {}
 		AucAdvancedFilterBasic_IgnoreList[realm] = realmtable
 	end
+
+	-- delete any Neutral entry - in case one was created by player using an outdated version
+	-- temp fix, to be removed at a later date -- ###
+	realmtable.Neutral = nil
 
 	IgnoreList = realmtable[faction]
 	if not IgnoreList then
@@ -245,9 +265,11 @@ local function OnLoadRunOnce()
 		IgnoreLookup[name] = i
 	end
 	private.IgnoreListUpdate()
+
+	Activate = nil
 end
-function lib.OnLoad(addon)
-	if OnLoadRunOnce then OnLoadRunOnce() end
+lib.Processors.gameactive = function()
+	if Activate then Activate() end
 end
 
 local function SetupConfigGui(gui)
@@ -357,11 +379,9 @@ local function SetupConfigGui(gui)
 	GUILoaded = true
 	private.IgnoreListUpdate()
 end
-lib.Processors = {
-	config = function(callbackType, gui)
-		if SetupConfigGui then SetupConfigGui(gui) end
-	end
-}
+lib.Processors.config = function(callbackType, gui)
+	if SetupConfigGui then SetupConfigGui(gui) end
+end
 
 --[[ Prompt and Dialog Setup ]]--
 

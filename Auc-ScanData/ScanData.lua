@@ -47,6 +47,7 @@ private.distributionCache = {}
 private.worthCache = {}
 
 local Const = AucAdvanced.Const
+local Resources = AucAdvanced.Resources
 local QueryImage = AucAdvanced.API.QueryImage
 local PriceCalcLevel = AucAdvanced.Modules.Util.PriceLevel and AucAdvanced.Modules.Util.PriceLevel.CalcLevel
 
@@ -299,7 +300,7 @@ function lib.GetScanData(serverKey)
 	local realmdata = AucScanData.scans[realm]
 	if not realmdata then return end -- not in database
 
-	local livedata = serverKey == Const.ServerKeyHome or serverKey == Const.ServerKeyNeutral -- 'live' data can be changed by scanning
+	local livedata = serverKey == Resources.ServerKeyHome or serverKey == Resources.ServerKeyNeutral -- 'live' data can be changed by scanning
 	local scandata = realmdata[faction]
 	if scandata then
 		if not livedata then
@@ -364,7 +365,7 @@ function lib.ClearScanData(command)
 		if keyword == "server" then
 			if extra == "" then extra = Const.PlayerRealm end
 		elseif keyword == "faction" then
-			if extra == "" then extra = AucAdvanced.GetFaction() end
+			if extra == "" then extra = Resources.ServerKeyCurrent end
 		end
 		if AucScanData.scans[extra] then -- it's a realm name in our database
 			AucScanData.scans[extra] = nil
@@ -386,7 +387,7 @@ function lib.ClearScanData(command)
 	wipe(private.dataCache)
 	-- Our functions expect home faction to exist - create a new one if it has just been deleted
 	if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
-	lib.GetScanData(Const.ServerKeyHome) -- force create (if needed) and put back in cache
+	lib.GetScanData(Resources.ServerKeyCurrent) -- force create (if needed) and put back in cache
 	if report then
 		aucPrint("Auctioneer: ScanData cleared for {{"..report.."}}.")
 		local clearstats = {
@@ -442,7 +443,7 @@ local function OnLoadRunOnce()
 	aucPrint("Auctioneer: {{ScanData}} loaded.")
 	private.UpgradeDB()
 	if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
-	lib.GetScanData(Const.ServerKeyHome) -- force unpack of home faction data
+	lib.GetScanData(Resources.ServerKeyCurrent) -- force unpack of current faction data
 	private.isLoaded = true
 end
 function lib.OnLoad()
@@ -479,7 +480,7 @@ function lib.OnUnload()
 	local rope = StringRope:New(-1)
 
 	local maxLen = 2^22
-	
+
 	local now = time()
 	local maxTime = 60 * 60 * 24 * 30 -- 30 days
 
@@ -495,7 +496,7 @@ function lib.OnUnload()
 				sData[faction] = nil
 			else
 				hasData = true
-				
+
 				if fData.image and type(fData.image) == "table" then
 					fData.ropes = {}
 					rope:Add("return {")
@@ -546,6 +547,16 @@ function lib.OnUnload()
 		if not hasData then
 			AucScanData.scans[server] = nil
 		end
+	end
+end
+
+-- Special handling for when a Neutral player character chooses a faction
+if Resources.PlayerFaction == "Neutral" then
+	lib.Processors.factionselect = function()
+		-- wipe scan data cache and reload using new value of ServerKeyCurrent
+		wipe(private.dataCache)
+		if not AucScanData.scans[Const.PlayerRealm] then AucScanData.scans[Const.PlayerRealm] = {} end
+		lib.GetScanData(Resources.ServerKeyCurrent)
 	end
 end
 
