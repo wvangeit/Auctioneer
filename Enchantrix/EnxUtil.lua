@@ -761,16 +761,18 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	if (quality == 2 and level >= 340) then
 		-- all greens
 		return 475;					-- 384 - 460
-	elseif (quality == 3 and level >= 400) then
+	elseif (quality == 3 and level >= 390) then
 		-- blues
 		if (level > 425) then
-			return 550;					-- 426? - 463
+			return 550;				-- 426? - 463
+		elseif (level >= 415) then
+			return 525;				-- 426? - 463
 		else
-			return 500;					-- 404 - 425?		 Something is messed up for blues - armor and weapons don't have same levels
+			return 500;				-- 404 - 425?		 Something is messed up for blues - armor and weapons don't have same levels (weap all 500)
 		end
 	elseif (level >= 420) then
 		-- all epics
-		return 475;				-- 470 - 516 - epic DE too low, again.  Someone at Blizzard really isn't paying attention to disenchanting tables.
+		return 475;					-- 420 - 516		475 armor, 575 weapons - boy did Blizz screw this up
 
 	-- Cataclysm items
 	elseif (level >= 270) then

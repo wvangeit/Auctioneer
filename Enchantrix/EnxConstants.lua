@@ -534,7 +534,7 @@ const.baseDisenchantTable = {
    [164] = { { SDREAM_SHARD,    1.00, 1.0 } },
    [200] = { { DREAM_SHARD ,    1.00, 1.0 } },	-- highest level LK blue is 200, first Cata blue is 288
    [316] = { { SHEAVENLY_SHARD, 1.00, 1.0 } },
-   [375] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 353, first Panda blue is 404
+   [375] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 353, first Panda blue is 390
    [450] = { { SETHERAL,        1.00, 1.0 } },
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 463, so far
   },
@@ -542,7 +542,7 @@ const.baseDisenchantTable = {
  [EPIC] = {
  	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
-   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 420, 600 },
+   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 600 },
    [40]  = { { SRADIANT,    1.00, 3.0 } },
    [45]  = { { SRADIANT,    1.00, 3.5 } },
    [50]  = { { LRADIANT,    1.00, 3.5 } },
@@ -552,7 +552,7 @@ const.baseDisenchantTable = {
    [99]  = { { VOID,        1.00, 1.0 } },
    [164] = { { VOID,        1.00, 1.5 } },	-- highest level BC epic is 164, first LK epic is 200
    [299] = { { ABYSS,       1.00, 1.0 } },	-- highest level LK epic is 284, first Cata epic is 300
-   [420] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic so far is 416, first Panda epic is 470
+   [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic so far is 416, first Panda epic is 420
    [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 516
    
   },
