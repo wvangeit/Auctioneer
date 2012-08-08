@@ -228,7 +228,10 @@ function private.UpdateScanProgress(state, _, _, _, _, _, _, scansQueued)
 			if not progressBarOptions.pending or progressBarOptions.pending < pending then
 				progressBarOptions.pending = pending or 0
 			end
-			local value = (100 - pending * 100 / progressBarOptions.pending) or 0
+			local value = 0
+			if progressBarOptions.pending >= 1 then -- avoid Div0
+				value = (100 - pending * 100 / progressBarOptions.pending)
+			end
 			AucAdvanced.API.ProgressBars("ScanButtonLuaStopCount", value, true, pending.." scans remaining", progressBarOptions)
 		end
 	end
