@@ -449,7 +449,7 @@ local EPIC = 4
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
 -- and yielding { { reagent type, drop probability, average drop quantity }, ... }
--- Thanks to Chardonnay, Tekkub and Wowhead, and many auctioneer forum contributors
+-- Thanks to Chardonnay, Tekkub, Wowhead, and many auctioneer forum contributors
 
 const.baseDisenchantTable = {
  [UNCOMMON] = {
@@ -471,18 +471,20 @@ const.baseDisenchantTable = {
    [151] = { { INFINITE, 0.20, 2.5 }, { LCOSMIC , 0.75, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
    [200] = { { INFINITE, 0.20, 5.5 }, { GCOSMIC , 0.75, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
    
-   -- so far, no shards from greens in Cata
+   -- no shards from greens in Cata
    [275] = { { HYPNOTIC, 0.25, 1.5 }, { LCELESTIAL , 0.75, 1.5 }, },
    [290] = { { HYPNOTIC, 0.25, 2.0 }, { LCELESTIAL , 0.75, 2.0 }, },
    [305] = { { HYPNOTIC, 0.25, 2.5 }, { LCELESTIAL , 0.75, 2.5 }, },
    [315] = { { HYPNOTIC, 0.25, 3.0 }, { GCELESTIAL , 0.75, 1.5 }, },
    [325] = { { HYPNOTIC, 0.25, 3.5 }, { GCELESTIAL , 0.75, 2.5 }, },
-   [350] = { { HYPNOTIC, 0.25, 4.0 }, { GCELESTIAL , 0.75, 3.0 }, },	-- highest level Cata green is 333
+   [350] = { { HYPNOTIC, 0.25, 4.0 }, { GCELESTIAL , 0.75, 3.0 }, },	-- highest level Cata green is 333, first Panda is 377
    
    --Panda, incomplete!
-   [400] = { { SPIRIT, 0.25, 2.0 }, { MYSTERIOUS , 0.75, 1.5 }, },
-   [450] = { { SPIRIT, 0.25, 3.0 }, { MYSTERIOUS , 0.75, 2.0 }, },	-- highest level Panda green is 437, so far
-   
+   -- As of August 12, 2012, weapons were giving the same drops as armor (mostly dust)
+   [400] = { { SPIRIT, 0.75, 2.5 }, { MYSTERIOUS , 0.25, 1.0 }, },
+   [450] = { { SPIRIT, 0.75, 3.5 }, { MYSTERIOUS , 0.25, 1.5 }, },	-- highest level Panda green is 437, so far
+   -- haven't seen Greater Mysterious at all
+
   },
   [const.ARMOR] = {
    ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 400, 450 },
@@ -508,11 +510,11 @@ const.baseDisenchantTable = {
    [305] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.25, 2.5 }, },
    [315] = { { HYPNOTIC, 0.75, 3.0 }, { GCELESTIAL , 0.25, 1.5 }, },
    [325] = { { HYPNOTIC, 0.75, 3.5 }, { GCELESTIAL , 0.25, 2.5 }, },
-   [350] = { { HYPNOTIC, 0.75, 4.0 }, { GCELESTIAL , 0.25, 3.0 }, },	-- highest level Cata green is 333, first Panda is 377
+   [350] = { { HYPNOTIC, 0.75, 4.0 }, { GCELESTIAL , 0.25, 3.0 }, },	-- highest level Cata green is 333, first Panda is 364
    
    --Panda, incomplete!
-   [400] = { { SPIRIT, 0.75, 2.0 }, { MYSTERIOUS , 0.25, 1.5 }, },
-   [450] = { { SPIRIT, 0.75, 3.0 }, { MYSTERIOUS , 0.25, 2.0 }, },	-- highest level Panda green is 437, so far
+   [400] = { { SPIRIT, 0.75, 2.5 }, { MYSTERIOUS , 0.25, 1.0 }, },
+   [450] = { { SPIRIT, 0.75, 3.5 }, { MYSTERIOUS , 0.25, 1.5 }, },	-- highest level Panda green is 437, so far
    
   },
  },
@@ -520,7 +522,7 @@ const.baseDisenchantTable = {
  	-- weapon lookups will fall back to the armor table
  	-- 1% chance for better shard appears to have been removed in Cataclysm
   [const.ARMOR] = {
-   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 375, 450, 500 },
+   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 375, 425, 500 },
    [25]  = { { SGLIMMERING,     1.00, 1.0 } },
    [30]  = { { LGLIMMERING,     1.00, 1.0 } },
    [35]  = { { SGLOWING,        1.00, 1.0 } },
@@ -534,8 +536,8 @@ const.baseDisenchantTable = {
    [164] = { { SDREAM_SHARD,    1.00, 1.0 } },
    [200] = { { DREAM_SHARD ,    1.00, 1.0 } },	-- highest level LK blue is 200, first Cata blue is 288
    [316] = { { SHEAVENLY_SHARD, 1.00, 1.0 } },
-   [375] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 353, first Panda blue is 390
-   [450] = { { SETHERAL,        1.00, 1.0 } },
+   [375] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 353, first Panda blue is 384
+   [425] = { { SETHERAL,        1.00, 1.0 } },
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 463, so far
   },
  },
@@ -552,7 +554,7 @@ const.baseDisenchantTable = {
    [99]  = { { VOID,        1.00, 1.0 } },
    [164] = { { VOID,        1.00, 1.5 } },	-- highest level BC epic is 164, first LK epic is 200
    [299] = { { ABYSS,       1.00, 1.0 } },	-- highest level LK epic is 284, first Cata epic is 300
-   [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic so far is 416, first Panda epic is 420
+   [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic is 416, first Panda epic is 420
    [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 516
    
   },
@@ -567,14 +569,14 @@ const.baseDisenchantTable = {
 const.ReverseDisenchantLevelList = {
 	
 -- ccox, needs update
-	[SHA_CRYSTAL] = { 421, 600 }, -- Sha Crystal
-	[MAELSTROM]   = { 300, 420 }, -- Maelstrom Crystal
+	[SHA_CRYSTAL] = { 420, 600 }, -- Sha Crystal
+	[MAELSTROM]   = { 300, 419 }, -- Maelstrom Crystal
 	[ABYSS]       = { 165, 299 }, -- Abyss Crystal
 	[VOID]        = {  95, 164 }, -- Void Crystal
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
-	[ETHERAL] 		  = { 451, 500 }, -- Etheral Shard
-	[SETHERAL]        = { 376, 450 }, -- Small Etheral Shard
+	[ETHERAL] 		  = { 426, 500 }, -- Etheral Shard
+	[SETHERAL]        = { 376, 425 }, -- Small Etheral Shard
 	[HEAVENLY_SHARD]  = { 317, 375 }, -- Heavenly Shard
 	[SHEAVENLY_SHARD] = { 201, 316 }, -- Small Heavenly Shard
 	[DREAM_SHARD]     = { 165, 200 }, -- Dream Shard

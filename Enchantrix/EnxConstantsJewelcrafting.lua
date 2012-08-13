@@ -354,8 +354,8 @@ const.ProspectableItems = {
 			},
 
 	[GHOST_IRON_ORE] = {
--- ccox - wild guess, needs update
-			[SPARKLING_SHARD] = 2.00,
+-- ccox - tested in beta August 12, 2012
+			[SPARKLING_SHARD] = 0.95,		-- why the heck isn't this 1 or greater?
 			
 			[TIGEROPAL] = 0.25,
 			[LAPISLAZULI] = 0.25,
@@ -364,17 +364,17 @@ const.ProspectableItems = {
 			[PANDARIANGARNET] = 0.25,
 			[ALEXANDRITE] = 0.25,
 			
-			[PRIMORDIALRUBY] = 0.013,
-			[RIVERSHEART] = 0.013,
-			[WILDJADE] = 0.013,
-			[VERMILIONONYX] = 0.013,
-			[IMPERIALAMETHYST] = 0.013,
-			[SUNSRADIANCE] = 0.013,
+			[PRIMORDIALRUBY] = 0.05,
+			[RIVERSHEART] = 0.05,
+			[WILDJADE] = 0.05,
+			[VERMILIONONYX] = 0.05,
+			[IMPERIALAMETHYST] = 0.05,
+			[SUNSRADIANCE] = 0.05,
 			},
 	
 	[KYPARITE_ORE] = {
 -- ccox - wild guess, needs update
-			[SPARKLING_SHARD] = 2.00,
+			[SPARKLING_SHARD] = 0.95,
 			
 			[TIGEROPAL] = 0.18,
 			[LAPISLAZULI] = 0.18,
@@ -383,18 +383,18 @@ const.ProspectableItems = {
 			[PANDARIANGARNET] = 0.18,
 			[ALEXANDRITE] = 0.18,
 			
-			[PRIMORDIALRUBY] = 0.04,
-			[RIVERSHEART] = 0.04,
-			[WILDJADE] = 0.04,
-			[VERMILIONONYX] = 0.04,
-			[IMPERIALAMETHYST] = 0.04,
-			[SUNSRADIANCE] = 0.04,
+			[PRIMORDIALRUBY] = 0.15,
+			[RIVERSHEART] = 0.15,
+			[WILDJADE] = 0.15,
+			[VERMILIONONYX] = 0.15,
+			[IMPERIALAMETHYST] = 0.15,
+			[SUNSRADIANCE] = 0.15,
 			},
 	
 	[WHITE_TRILLIUM_ORE] = {
 -- ccox - wild guess, needs update	
-			[SPARKLING_SHARD] = 2.00,
-
+			[SPARKLING_SHARD] = 0.95,
+			
 			[TIGEROPAL] = 0.18,
 			[LAPISLAZULI] = 0.18,
 			[SUNSTONE] = 0.18,
@@ -402,18 +402,18 @@ const.ProspectableItems = {
 			[PANDARIANGARNET] = 0.18,
 			[ALEXANDRITE] = 0.18,
 			
-			[PRIMORDIALRUBY] = 0.07,
-			[RIVERSHEART] = 0.07,
-			[WILDJADE] = 0.07,
-			[VERMILIONONYX] = 0.07,
-			[IMPERIALAMETHYST] = 0.07,
-			[SUNSRADIANCE] = 0.07,
+			[PRIMORDIALRUBY] = 0.15,
+			[RIVERSHEART] = 0.15,
+			[WILDJADE] = 0.15,
+			[VERMILIONONYX] = 0.15,
+			[IMPERIALAMETHYST] = 0.15,
+			[SUNSRADIANCE] = 0.15,
 			},
 	
 	[BLACK_TRILLIUM_ORE] = {
--- ccox - wild guess, needs update	
-			[SPARKLING_SHARD] = 2.00,
-
+-- ccox - wild guess, needs update
+			[SPARKLING_SHARD] = 0.95,
+			
 			[TIGEROPAL] = 0.18,
 			[LAPISLAZULI] = 0.18,
 			[SUNSTONE] = 0.18,
@@ -421,12 +421,12 @@ const.ProspectableItems = {
 			[PANDARIANGARNET] = 0.18,
 			[ALEXANDRITE] = 0.18,
 			
-			[PRIMORDIALRUBY] = 0.07,
-			[RIVERSHEART] = 0.07,
-			[WILDJADE] = 0.07,
-			[VERMILIONONYX] = 0.07,
-			[IMPERIALAMETHYST] = 0.07,
-			[SUNSRADIANCE] = 0.07,
+			[PRIMORDIALRUBY] = 0.15,
+			[RIVERSHEART] = 0.15,
+			[WILDJADE] = 0.15,
+			[VERMILIONONYX] = 0.15,
+			[IMPERIALAMETHYST] = 0.15,
+			[SUNSRADIANCE] = 0.15,
 			},
 
 }
