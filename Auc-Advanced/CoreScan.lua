@@ -901,7 +901,6 @@ local Commitfunction = function()
 
 	local wasIncomplete = TempcurCommit.wasIncomplete
 	local wasEarlyTerm = TempcurCommit.wasEarlyTerm
-	local hadGetError = TempcurCommit.hadGetError
 	local wasEndPagesOnly = TempcurCommit.wasEndPagesOnly
 
 	local wasGetAll = TempcurCommit.wasGetAll
@@ -925,6 +924,7 @@ local Commitfunction = function()
 		lib.ProgressBars("CommitProgressBar", 0, true)
 	end
 	local unresolvedCount = 0
+	local hadGetError = false
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
 
@@ -1021,6 +1021,10 @@ local Commitfunction = function()
 			progresscounter = progresscounter + 2 -- We just wiped the entry from the db, so other steps won't see it.
 		end
 		pos = pos -1
+	end
+	if unresolvedCount > 0 then
+		hadGetError = true
+		wasIncomplete = true
 	end
 
 
@@ -1358,14 +1362,17 @@ local Commitfunction = function()
 			summary = summary.."\n"..summaryLine
 		end
 		if (missedCount > 0) then
-			if (wasIncomplete) then
-				summaryLine = "  ".._TRANS("PSS_Incomplete_Missed_1").." "..missedCount.."}} ".._TRANS("PSS_Incomplete_Missed_2")
-			else
+			if not wasIncomplete then
 				summaryLine = "  {{"..missedCount.."}} ".._TRANS("PSS_MissedItems")
+			elseif not wasEndPagesOnly then
+				summaryLine = "  ".._TRANS("PSS_Incomplete_Missed_1").." "..missedCount.."}} ".._TRANS("PSS_Incomplete_Missed_2")
 			end
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
+
+
+
 		if (_G.nLog) then
 			local eTime = GetTime()
 			_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO,
@@ -1474,9 +1481,8 @@ function private.Commit(wasEarlyTerm, wasEndPagesOnly, wasGetAll)
 	tinsert(private.CommitQueue, {
 		Query = curQuery,
 		Scan = curScan,
-		wasIncomplete = wasEarlyTerm or wasEndPagesOnly or false,
+		wasIncomplete = wasEarlyTerm or wasEndPagesOnly,
 		wasEarlyTerm = wasEarlyTerm,
-		hadGetError = false,
 		wasEndPagesOnly = wasEndPagesOnly,
 		wasGetAll = wasGetAll,
 		scanStarted = scanStarted,
