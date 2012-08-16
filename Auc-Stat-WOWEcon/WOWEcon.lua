@@ -4,7 +4,7 @@
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
-	This is an Auctioneer statistic module that returns a price based on 
+	This is an Auctioneer statistic module that returns a price based on
 	any WoWEcon data you have.  You must have the WoWEcon addon installed
 	for this statistic to have any affect.
 
@@ -112,35 +112,21 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	return array
 end
 
+-- Stat modules must have a GetItemPDF function
+-- todo: figure out how to make it work when we don't know the stddev
+function lib.GetItemPDF(hyperlink)
+    return
+end
+
 function lib.IsValidAlgorithm()
 	if not (Wowecon and Wowecon.API) then return false end
 	return true
-end
-
-function lib.CanSupplyMarket()
-	if not (Wowecon and Wowecon.API) then return false end
-	return true
-end
-
-function lib.Processor(callbackType, ...)
-	if (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	elseif (callbackType == "load") then
-		lib.OnLoad(...)
-	elseif (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	end
 end
 
 lib.Processors = {}
 function lib.Processors.config(callbackType, ...)
 	--Called when you should build your Configator tab.
 	private.SetupConfigGui(...)
-end
-
-function lib.Processors.load(callbackType, ...)
-	lib.OnLoad(...)
 end
 
 function lib.Processors.tooltip(callbackType, ...)
@@ -181,7 +167,7 @@ function private.SetupConfigGui(gui)
 	function private.addTooltipControls(id)
 		gui:AddControl(id, "Header",     0,    _TRANS('WECN_Interface_WOWEconOptions') )--WOWEcon options
 		gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-		
+
 		gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.enable", _TRANS('WECN_Interface_EnableWOWEconStats') )--Enable WOWEcon Stats
 		gui:AddTip(id, _TRANS('WECN_HelpTooltip_EnableWOWEconStats') )--Allow WOWEcon to gather and return price data
 
@@ -195,7 +181,7 @@ function private.SetupConfigGui(gui)
 	end
 	--This is the Tooltip tab provided by aucadvnced so all tooltip configuration is in one place
 	local tooltipID = AucAdvanced.Settings.Gui.tooltipID
-	
+
 	--now we create a duplicate of these in the tooltip frame
 	private.addTooltipControls(id)
 	if tooltipID then private.addTooltipControls(tooltipID) end

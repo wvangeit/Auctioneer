@@ -77,6 +77,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
+	if itemType ~= "item" then return end
 	local id = strjoin(":", itemId, property, factor)
 
 	local data = private.GetPriceData()

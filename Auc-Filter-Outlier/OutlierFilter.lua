@@ -116,21 +116,6 @@ function lib.AuctionFilter(operation, itemData)
 	if price < maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
-	-- We need to see if this auction is to be ignored or not.
-	if nLog then
-		nLog.AddMessage(
-			"auc-"..libType.."-"..libName,
-			"AuctionFilter",
-			N_INFO,
-			"Filtered Data",
-			"Auction Filter Removed Data for ", itemData.itemName,
-			" from ", (itemData.sellerName or "UNKNOWN"),
-			", quality ", tostring(quality or 0),
-			", item level ", tostring(itemData.itemLevel or 0),
-			".\n",
-			"Price ", price, " > Cap ", maxcap
-		)
-	end
 	return true
 end
 

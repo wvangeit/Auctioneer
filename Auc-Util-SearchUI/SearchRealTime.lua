@@ -313,69 +313,71 @@ function lib.ScanPage()
 	for i = 1, batch do
 		local link = GetAuctionItemLink("list", i)
 		if link then
-			local name, _, count, quality, canUse, level, levelColHeader, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
-			local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
-			iEquip = Const.EquipEncode[iEquip]
-			local timeleft = GetAuctionItemTimeLeft("list", i)
-			local _, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-			owner = owner or ""
-			count = count or 1
+			local linkType, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+			if linkType == "item" then -- temp fix: ignore battlepets
+				local name, _, count, quality, canUse, level, levelColHeader, minBid, minInc, buyout, curBid, isHigh, owner = GetAuctionItemInfo("list", i)
+				local _, _, quality, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(link)
+				iEquip = Const.EquipEncode[iEquip]
+				local timeleft = GetAuctionItemTimeLeft("list", i)
+				owner = owner or ""
+				count = count or 1
 
-			local price
-			if curBid > 0 then
-				price = curBid + minInc
-				if buyout > 0 and price > buyout then
-					price = buyout
+				local price
+				if curBid > 0 then
+					price = curBid + minInc
+					if buyout > 0 and price > buyout then
+						price = buyout
+					end
+				elseif minBid > 0 then
+					price = minBid
+				else
+					price = 1
 				end
-			elseif minBid > 0 then
-				price = minBid
-			else
-				price = 1
-			end
-			if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
-				level = 1
-			end
+				if not level or levelColHeader ~= "REQ_LEVEL_ABBR" then
+					level = 1
+				end
 
-			-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
-			private.ItemTable[Const.LINK]    = link
-			private.ItemTable[Const.ILEVEL]  = iLevel
-			private.ItemTable[Const.ITYPE]   = iType
-			private.ItemTable[Const.ISUB]    = iSubType
-			private.ItemTable[Const.IEQUIP]  = iEquip
-			private.ItemTable[Const.PRICE]   = price
-			private.ItemTable[Const.TLEFT]   = timeleft
-			private.ItemTable[Const.NAME]    = name
-			private.ItemTable[Const.COUNT]   = count
-			private.ItemTable[Const.QUALITY] = quality
-			private.ItemTable[Const.CANUSE]  = canUse
-			private.ItemTable[Const.ULEVEL]  = level
-			private.ItemTable[Const.MINBID]  = minBid
-			private.ItemTable[Const.MININC]  = minInc
-			private.ItemTable[Const.BUYOUT]  = buyout
-			private.ItemTable[Const.CURBID]  = curBid
-			private.ItemTable[Const.AMHIGH]  = isHigh
-			private.ItemTable[Const.SELLER]  = owner
-			private.ItemTable[Const.ITEMID]  = id
-			private.ItemTable[Const.SUFFIX]  = suffix
-			private.ItemTable[Const.FACTOR]  = factor
-			private.ItemTable[Const.ENCHANT]  = enchant
-			private.ItemTable[Const.SEED]  = seed
+				-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
+				private.ItemTable[Const.LINK]    = link
+				private.ItemTable[Const.ILEVEL]  = iLevel
+				private.ItemTable[Const.ITYPE]   = iType
+				private.ItemTable[Const.ISUB]    = iSubType
+				private.ItemTable[Const.IEQUIP]  = iEquip
+				private.ItemTable[Const.PRICE]   = price
+				private.ItemTable[Const.TLEFT]   = timeleft
+				private.ItemTable[Const.NAME]    = name
+				private.ItemTable[Const.COUNT]   = count
+				private.ItemTable[Const.QUALITY] = quality
+				private.ItemTable[Const.CANUSE]  = canUse
+				private.ItemTable[Const.ULEVEL]  = level
+				private.ItemTable[Const.MINBID]  = minBid
+				private.ItemTable[Const.MININC]  = minInc
+				private.ItemTable[Const.BUYOUT]  = buyout
+				private.ItemTable[Const.CURBID]  = curBid
+				private.ItemTable[Const.AMHIGH]  = isHigh
+				private.ItemTable[Const.SELLER]  = owner
+				private.ItemTable[Const.ITEMID]  = id
+				private.ItemTable[Const.SUFFIX]  = suffix
+				private.ItemTable[Const.FACTOR]  = factor
+				private.ItemTable[Const.ENCHANT]  = enchant
+				private.ItemTable[Const.SEED]  = seed
 
-			for i, searcher in pairs(private.searchertable) do
-				if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false, skipresults) then
-					private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])
-					if skipresults then
-						AucAdvanced.Buy.QueueBuy(private.ItemTable[Const.LINK],
-							private.ItemTable[Const.SELLER],
-							private.ItemTable[Const.COUNT],
-							private.ItemTable[Const.MINBID],
-							private.ItemTable[Const.BUYOUT],
-							private.ItemTable["cost"],
-							AucSearchUI.Private.cropreason(private.ItemTable["reason"]),
-							true -- do not trigger a search if CoreBuy is unable to find this auction
-							)
-					else
-						AucSearchUI.Private.repaintSheet()
+				for i, searcher in pairs(private.searchertable) do
+					if AucSearchUI.SearchItem(searcher.name, private.ItemTable, false, skipresults) then
+						private.alert(private.ItemTable[Const.LINK], private.ItemTable["cost"], private.ItemTable["reason"])
+						if skipresults then
+							AucAdvanced.Buy.QueueBuy(private.ItemTable[Const.LINK],
+								private.ItemTable[Const.SELLER],
+								private.ItemTable[Const.COUNT],
+								private.ItemTable[Const.MINBID],
+								private.ItemTable[Const.BUYOUT],
+								private.ItemTable["cost"],
+								AucSearchUI.Private.cropreason(private.ItemTable["reason"]),
+								true -- do not trigger a search if CoreBuy is unable to find this auction
+								)
+						else
+							AucSearchUI.Private.repaintSheet()
+						end
 					end
 				end
 			end

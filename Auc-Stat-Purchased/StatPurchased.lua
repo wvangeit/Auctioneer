@@ -134,6 +134,7 @@ function lib.ScanProcessors.delete(operation, itemData, oldData)
 
 	local pricedata = private.GetPriceData(GetFaction())
 	local itemType, itemId, property, factor = decode(itemData.link)
+	if itemType ~= "item" then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 	if not pricedata.daily[itemId] then pricedata.daily[itemId] = "" end
 	local stats = private.UnpackStats(pricedata.daily[itemId])

@@ -109,9 +109,9 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 
 	-- Get the signature of this item and find it's stats.
 	local iLevel, quality, equipPos = itemData.itemLevel, itemData.quality, itemData.equipPos
-	if quality < 1 then return end
 	if not equipPos then return end
 	if equipPos < 1 then return end
+	if quality < 1 then return end
 	local itemSig = ("%d:%d"):format(equipPos, quality)
 
 	local serverKey = GetFaction()

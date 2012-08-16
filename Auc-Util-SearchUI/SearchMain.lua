@@ -333,10 +333,12 @@ function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality,
 		level = 1
 	end
 	owner = owner or ""
+	local linkType, itemid, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
+	if linkType ~= "item" then return end -- temp fix: ignore battlepet links
 	local timeleft = GetAuctionItemTimeLeft("list", id)
 	local _, _, _, iLevel, _, iType, iSubType, stack, iEquip = GetItemInfo(hyperlink)
+	if not iType then return end
 	iEquip = Const.EquipEncode[iEquip]
-	local _, itemid, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
 	local ItemTable = {}
 	-- put the data into a table laid out the same way as the AAdv Scandata, as that's what the searchers need
 	ItemTable[Const.LINK]    = hyperlink
