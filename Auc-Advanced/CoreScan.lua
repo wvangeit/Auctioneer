@@ -1699,11 +1699,14 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 				itemData[Const.ENCHANT] = enchant
 				itemData[Const.SEED] = seed
 			else
+				-- unrecognised link type - if this is happening then we'll need to investigate the link type
+				-- and install a special exception for it (similar to battlepet links, as above)
 				if isLogging then
 					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "GetAuctionItem could not decode link",
 						("Page %d, Index %d\nLink %s, itemId %d (from GetAuctionItemInfo)\ntype %s, id %s, suffix %s, factor %s, enchant %s, seed %s (from Decode)"):format(
 							page, index, itemLink, itemId, tostringall(linkType, id, suffix, factor, enchant, seed)))
 				end
+				-- Note: SEED is still set to nil - scanner will discard this auction as Unresolved
 			end
 		end
 	end
@@ -1728,9 +1731,27 @@ function lib.GetAuctionItem(list, index, fillTable)
 		fillTable = nil
 	end
 	local itemData = private.GetAuctionItem(list, nil, index, nil, fillTable)
+	if not itemData[Const.TLEFT] then
+		-- missing TLEFT indicates a failure was detected for one of the GetAuctionItemX functions
+		return
+	end
 	if not itemData[Const.SELLER] then
 		itemData[Const.SELLER] = ""
 	end
+	-- for this function we will fill certain (less important) missing entries with 0 or ""
+	if not itemData[Const.SEED] then
+		itemData[Const.SUFFIX] = itemData[Const.SUFFIX] or 0
+		itemData[Const.FACTOR] = itemData[Const.FACTOR] or 0
+		itemData[Const.ENCHANT] = itemData[Const.ENCHANT] or 0
+		itemData[Const.SEED] = 0
+	end
+	if not itemData[Const.ITYPE] then
+		itemData[Const.ITYPE] = ""
+		itemData[Const.ISUB] = ""
+		itemData[Const.ULEVEL] = itemData[Const.ULEVEL] or 0
+		itemData[Const.ILEVEL] = itemData[Const.ILEVEL] or 0
+	end
+
 	return itemData
 end
 
