@@ -57,7 +57,7 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 
-	gui:AddControl(id, "MoneyFramePinned",  0, 1, "vendor.profit.min", 1, 99999999, "Minimum Profit")
+	gui:AddControl(id, "MoneyFramePinned",  0, 1, "vendor.profit.min", 1, 999999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "vendor.profit.pct", 0, 100, .5, "Min Discount: %0.01f%%")
 
 	gui:SetLast(id, last)
@@ -66,7 +66,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "vendor.allow.buy", "Allow Buyouts")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "vendor.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Vendor searcher")
-	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "vendor.maxprice", 1, 99999999, "Maximum Price for Vendor")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "vendor.maxprice", 1, 999999999, "Maximum Price for Vendor")
 end
 
 function lib.Search(item)

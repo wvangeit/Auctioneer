@@ -92,7 +92,7 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 
-	gui:AddControl(id, "MoneyFramePinned",  0, 1, "disenchant.profit.min", 1, 99999999, "Minimum Profit")
+	gui:AddControl(id, "MoneyFramePinned",  0, 1, "disenchant.profit.min", 1, 999999999, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "disenchant.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "disenchant.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "disenchant.level.min", 0, Const.MAXSKILLLEVEL, 25, "Minimum skill: %s")
@@ -106,7 +106,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "disenchant.allow.buy", "Allow Buyouts")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "disenchant.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Disenchant searcher")
-	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "disenchant.maxprice", 1, 99999999, "Maximum Price for Disenchant")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "disenchant.maxprice", 1, 999999999, "Maximum Price for Disenchant")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "disenchant.model")
