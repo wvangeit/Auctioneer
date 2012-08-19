@@ -63,7 +63,7 @@ const.StaticPrices = {
 	[11138] =   1000, -- Small Glowing Shard
 	[10978] =    700, -- Small Glimmering Shard
 
-	[74251] = 500000, -- Greater Mysterious Essence
+--	[74251] = 500000, -- Greater Mysterious Essence - doesn't seem to be used
 	[52719] = 200000, -- Greater Celestial Essence
 	[34055] = 200000, -- Greater Cosmic Essence
 	[22446] = 120000, -- Greater Planar Essence
@@ -376,7 +376,7 @@ local SHA_CRYSTAL = 74248
 local ETHERAL = 74247
 local SETHERAL = 74252
 local SPIRIT = 74249
-local GMYSTERIOUS = 74251
+--local GMYSTERIOUS = 74251		-- doesn't seem to be used
 local MYSTERIOUS = 74250
 
 
@@ -408,7 +408,7 @@ const.DisenchantReagentList = {
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
 
-	74251, -- Greater Mysterious Essence
+--	74251, -- Greater Mysterious Essence - doesn't seem to be used
 	52719, -- Greater Celestial Essence
 	34055, -- Greater Cosmic Essence
 	22446, -- Greater Planar Essence
@@ -592,8 +592,8 @@ const.ReverseDisenchantLevelList = {
 	[LGLIMMERING]     = {  26,  30 }, -- Large Glimmering Shard
 	[SGLIMMERING]     = {  1,   25 }, -- Small Glimmering Shard
 	
-	[GMYSTERIOUS] = { 401, 450 }, -- Greater Mysterious Essence
-	[MYSTERIOUS]  = { 351, 400 }, -- Lesser Mysterious Essence
+--	[GMYSTERIOUS] = { 401, 450 }, -- Greater Mysterious Essence - doesn't seem to be used
+	[MYSTERIOUS]  = { 351, 450 }, -- Lesser Mysterious Essence
 	[GCELESTIAL]  = { 306, 350 }, -- Greater Celestial Essence
 	[LCELESTIAL]  = { 201, 305 }, -- Lesser Celestial Essence
 	[GCOSMIC]     = { 152, 200 }, -- Greater Cosmic Essence

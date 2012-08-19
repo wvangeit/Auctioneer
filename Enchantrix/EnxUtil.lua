@@ -764,15 +764,13 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	elseif (quality == 3 and level >= 390) then
 		-- blues
 		if (level > 425) then
-			return 550;				-- 426? - 463
-		elseif (level >= 415) then
-			return 525;				-- 426? - 463
+			return 550;
 		else
-			return 500;				-- 404 - 425?		 Something is messed up for blues - armor and weapons don't have same levels (weap all 500)
+			return 525;
 		end
 	elseif (level >= 420) then
 		-- all epics
-		return 475;					-- 420 - 516		475 armor, 575 weapons - boy did Blizz screw this up
+		return 525;					-- 420 - 516		525 armor, 575 weapons - well, it's less screwed up than it was; a few more weeks and Blizz will get it right
 
 	-- Cataclysm items
 	elseif (level >= 270) then
@@ -801,7 +799,7 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 			return 350;
 		else
 			return 325;
-		end			-- ccox - rare/blue items are still 325 due to a Blizzard bug, hope it gets fixed soon
+		end
 
 	elseif (level >= 130) then
 		return 325;
@@ -951,7 +949,7 @@ local function balanceEssencePrices(scanReagentTable, style)
 		[22447] = 22446,	-- planar
 		[34056] = 34055,	-- cosmic
 		[52718] = 52719,	-- celestial
-		[74250] = 74251,	-- Mysterious
+--		[74250] = 74251,	-- Mysterious	-- greater doesn't seem to be used
 	};
 
 	for lesser, greater in pairs(essenceTable) do

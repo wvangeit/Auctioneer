@@ -656,10 +656,15 @@ local function initUI()
 	-- SecureActionButton (auto_de_prompt.Yes) to perform the spellcast
 
 	local function copyButtonVisuals(dest, source)
+		
 		dest:ClearAllPoints()
 		dest:SetPoint("TOPLEFT", source, "TOPLEFT")
 		dest:SetPoint("BOTTOMRIGHT", source, "BOTTOMRIGHT")
-		dest:SetNormalTexture(source:GetNormalTexture())
+		
+--		local tex = source:GetNormalTexture()		-- this is returning NIL in 5.0.4
+		local tex = dest:CreateTexture(nil, nil, "UIPanelButtonUpTexture")
+		dest:SetNormalTexture(tex)
+		
 		dest:SetHighlightTexture(source:GetHighlightTexture())
 		dest:SetPushedTexture(source:GetPushedTexture())
 		dest:SetText(source:GetText())
@@ -674,11 +679,11 @@ local function initUI()
 	auto_de_prompt.DummyYes:SetPoint("BOTTOMRIGHT", auto_de_prompt, "BOTTOMRIGHT", -10, 10)
 	auto_de_prompt.DummyYes:Hide()
 
-	auto_de_prompt.Yes = CreateFrame("Button", "AutoDEPromptYes", auto_de_prompt, "SecureActionButtonTemplate")
+	auto_de_prompt.Yes = CreateFrame("Button", "AutoDEPromptYes", auto_de_prompt, "SecureActionButtonTemplate")	
 	copyButtonVisuals(auto_de_prompt.Yes, auto_de_prompt.DummyYes)
 	auto_de_prompt.Yes:SetAttribute("unit", "none")
 	auto_de_prompt.Yes:SetAttribute("type", "spell")
-
+	
 	auto_de_prompt.No = CreateFrame("Button", "AutoDEPromptNo", auto_de_prompt, "OptionsButtonTemplate")
 	auto_de_prompt.No:SetText(_ENCH("GuiNo"))
 	auto_de_prompt.No:SetPoint("BOTTOMRIGHT", auto_de_prompt.Yes, "BOTTOMLEFT", -5, 0)
