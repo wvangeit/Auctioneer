@@ -550,14 +550,12 @@ function private.RetrievePage()
 
 			local name, texture, count, quality, canUse, level,
 				levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount,
-				highBidder, owner  = GetAuctionItemInfo("list", i)
-			local itemName, itemLink, itemRarity, itemLevel,
-				itemMinLevel, itemType, itemSubType, itemStackCount,
-				itemEquipLoc, itemTexture = GetItemInfo(link)
+				highBidder, owner, saleStatus, itemId  = GetAuctionItemInfo("list", i)
+			local _, _, _, itemLevel, itemMinLevel = GetItemInfo(itemId)
 
 			if levelColHeader == "ITEM_LEVEL_ABBR" then
 				itemLevel = level
-			else
+			elseif levelColHeader == "REQ_LEVEL_ABBR" then
 				itemMinLevel = level
 			end
 			itemLevel = tonumber(itemLevel) or 1 -- extra safety checking - these values may be used by our sort function
@@ -598,7 +596,7 @@ function private.RetrievePage()
 
 			item[3] = count
 			item[4] = texture
-			item[5] = itemRarity
+			item[5] = quality
 			item[6] = name
 			item[7] = link
 			item[8] = itemMinLevel
