@@ -953,13 +953,29 @@ local Commitfunction = function()
 		if (not data[Const.SELLER] or data[Const.SELLER]=="") then data[Const.SELLER], entryUnresolved = "", true end
 
 		if data[Const.ITEMID] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB]) then
-			local itemInfo = private.GetItemInfoCache(itemId) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
-			if itemInfo then
-				data[Const.ITYPE] = itemInfo[1]
-				data[Const.ISUB] = itemInfo[2]
-				data[Const.IEQUIP] = itemInfo[3]
-				data[Const.ILEVEL] = data[Const.ILEVEL] or itemInfo[4]
-				data[Const.ULEVEL] = data[Const.ULEVEL] or itemInfo[5]
+			if data[Const.ITEMID] == 82800 then -- Pet Cage
+				local cType, cSubtypeLookup, cUseLevel = private.GetPetCageInfo()
+				if cType then
+					data[Const.ITYPE] = cType
+					data[Const.IEQUIP] = nil
+					data[Const.ULEVEL] = cUseLevel
+					local _, speciesID, level = strsplit(":", data[Const.LINK])
+					speciesID, level = tonumber(speciesID), tonumber(level)
+					data[Const.ILEVEL] = data[Const.ILEVEL] or level -- should have been obtained from GetAuctionItemInfo anyway
+					local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+					if petType then
+						data[Const.ISUB] = cSubtypeLookup[petType]
+					end
+				end
+			else
+				local itemInfo = private.GetItemInfoCache(data[Const.ITEMID]) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
+				if itemInfo then
+					data[Const.ITYPE] = data[Const.ITYPE] or itemInfo[1]
+					data[Const.ISUB] = data[Const.ISUB] or itemInfo[2]
+					data[Const.IEQUIP] = data[Const.IEQUIP] or itemInfo[3]
+					data[Const.ILEVEL] = data[Const.ILEVEL] or itemInfo[4]
+					data[Const.ULEVEL] = data[Const.ULEVEL] or itemInfo[5]
+				end
 			end
 		end
 		for i = 1, Const.LASTENTRY, 1 do
@@ -1524,31 +1540,52 @@ function private.ScanPage(nextPage, really)
 	end
 end
 
-local ItemInfoCache = {}
-function private.ResetItemInfoCache()
-	wipe(ItemInfoCache)
-end
-function private.GetItemInfoCache(itemId, itemLinksTried)
-	-- we use itemId instead of itemLink - this reduces the number of entries in the cache
-	local data = ItemInfoCache[itemId]
-	if data then
+do
+	local ItemInfoCache = {}
+	function private.ResetItemInfoCache()
+		wipe(ItemInfoCache)
+	end
+	function private.GetItemInfoCache(itemId, itemLinksTried)
+		-- we use itemId instead of itemLink - this reduces the number of entries in the cache
+		local data = ItemInfoCache[itemId]
+		if data then
+			return data
+		end
+		if itemLinksTried and itemLinksTried[itemId] then
+			-- if GetItemInfo previously failed for this itemId in this scanning pass (itemLinksTried is reset each pass)
+			return
+		end
+		local _,_,rarity,iLevel,uLevel,iType,iSubtype,stack,equipLoc = GetItemInfo(itemId)
+		if not iType then
+			if itemLinksTried then
+				itemLinksTried[itemId] = true
+			end
+			return
+		end
+		-- not all values are used; only store the ones we want
+		data = {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel or 0}
+		ItemInfoCache[itemId] = data
 		return data
 	end
-	if itemLinksTried and itemLinksTried[itemId] then
-		-- if GetItemInfo previously failed for this itemId in this scanning pass (itemLinksTried is reset each pass)
-		return
-	end
-	local _,_,rarity,iLevel,uLevel,iType,iSubtype,stack,equipLoc = GetItemInfo(itemId)
-	if not iType then
-		if itemLinksTried then
-			itemLinksTried[itemId] = true
+
+	local cageType, cageSubtypeLookup, cageUseLevel
+	function private.GetPetCageInfo()
+		-- returns generic info for the Pet Cage item 82800 - info that is the same for every pet
+		-- info for a specific pet will need to be extracted from the battlepet link
+		-- cageSubtypeLookup can be used to convert numeric subtype to localized string for ISUB
+		if cageType then
+			return cageType, cageSubtypeLookup, cageUseLevel
 		end
-		return
+		local _,_,_,_,uLevel, iType = GetItemInfo(82800)
+		if iType and uLevel then
+			cageSubtypeLookup = Const.SUBCLASSES[Const.CLASSESREV[iType]]
+			if cageSubtypeLookup then
+				cageType = iType
+				cageUseLevel = uLevel -- always 0, but we check here in case Blizzard changes it
+				return cageType, cageSubtypeLookup, cageUseLevel
+			end
+		end
 	end
-	-- not all values are used; only store the ones we want
-	data = {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel or 0}
-	ItemInfoCache[itemId] = data
-	return data
 end
 
 --[[ private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
@@ -1669,29 +1706,49 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 		-- todo: handle other possible values for levelColHeader
 	end
 
-	local itemInfo = private.GetItemInfoCache(itemId, itemLinksTried) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
-	if itemInfo then
-		itemData[Const.ITYPE] = itemInfo[1]
-		itemData[Const.ISUB] = itemInfo[2]
-		itemData[Const.IEQUIP] = itemInfo[3]
-		-- use iLevel and/or uLevel from GetItemInfo, if not provided by GetAuctionItemInfo
-		-- because we used itemId, it is possible for values from GetAuctionItemInfo to be different from those provided by GetItemInfo
-		iLevel = iLevel or itemInfo[4]
-		uLevel = uLevel or itemInfo[5]
-	end
+	if itemId == 82800 then -- "Pet Cage"
+		-- requires special handling: the link will be a battlepet link, not an item link
+		local cType, cSubtypeLookup, cUseLevel = private.GetPetCageInfo()
+		if cType then
+			itemData[Const.ITYPE] = cType -- string, localized to client
+			itemData[Const.IEQUIP] = nil -- always nil for Pet Cages
+			uLevel = uLevel or cUseLevel
+			-- get the proper subtype
+			local header, speciesID = strsplit(":", itemLink)
+			if header:sub(-4) == "item" then
+				-- extra special handling for certain bugged pet cages on the Beta, that have an "item" link type
+				-- these are all Pet Cages for pets that cannot be caged! (created before Blizzard decided to make some pets non-tradeable)
+				-- ### this section of code to be removed when the beta ends ###
+				itemData[Const.ISUB] = "BattlePet"
+			else
+				speciesID = tonumber(speciesID)
+				local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+				if petType then
+					itemData[Const.ISUB] = cSubtypeLookup[petType]
+				end
+			end
+			-- we should get the real iLevel from GetAuctionItemInfo (could be extracted from link, if required though)
+		end
+		-- Cannot use DecodeLink on a battlepet link, but entries should all be 0 anyway
+		-- (note: there must be a hidden unique seed, but I can't find a way to access it)
+		itemData[Const.SUFFIX] = 0
+		itemData[Const.FACTOR] = 0
+		itemData[Const.ENCHANT] = 0
+		itemData[Const.SEED] = 0
+	else
 
-	itemData[Const.ULEVEL] = uLevel
-	itemData[Const.ILEVEL] = iLevel
+		local itemInfo = private.GetItemInfoCache(itemId, itemLinksTried) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
+		if itemInfo then
+			itemData[Const.ITYPE] = itemInfo[1]
+			itemData[Const.ISUB] = itemInfo[2]
+			itemData[Const.IEQUIP] = itemInfo[3]
+			-- use iLevel and/or uLevel from GetItemInfo, if not provided by GetAuctionItemInfo
+			-- because we used itemId, it is possible for values from GetAuctionItemInfo to be different from those provided by GetItemInfo
+			iLevel = iLevel or itemInfo[4]
+			uLevel = uLevel or itemInfo[5]
+		end
 
-	if not itemData[Const.SEED] then
-		if itemId == 82800 then -- "Pet Cage"
-			-- requires special handling: the link will be a battlepet link, not an item link, so we cannot use DecodeLink
-			-- instead set all to 0
-			itemData[Const.SUFFIX] = 0
-			itemData[Const.FACTOR] = 0
-			itemData[Const.ENCHANT] = 0
-			itemData[Const.SEED] = 0
-		else
+		if not itemData[Const.SEED] then
 			local linkType, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
 			if linkType == "item" and id == itemId then
 				itemData[Const.SUFFIX] = suffix
@@ -1710,6 +1767,9 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 			end
 		end
 	end
+
+	itemData[Const.ULEVEL] = uLevel
+	itemData[Const.ILEVEL] = iLevel
 
 	--[[
 		Returns Integer giving range of time left for query
@@ -1791,7 +1851,6 @@ local StorePageFunction = function()
 	if (not private.curQuery) or (private.curQuery.name == "empty page") then
 		return
 	end
-	if (not private.itemDataDb) then private.itemDataDb = {} end
 
 	if (not private.scanStarted) then private.scanStarted = GetTime() end
 	local queryStarted = private.scanStarted
@@ -1871,6 +1930,8 @@ local StorePageFunction = function()
 	local processingTime = 800 / get("scancommit.targetFPS")
 	local debugprofilestop = debugprofilestop
 	local nextPause = debugprofilestop() + processingTime
+	local time = time
+	local lastTime = time()
 
 	local storecount = 0
 	local sellerOnly = true
@@ -1889,13 +1950,14 @@ local StorePageFunction = function()
 		local retries = { }
 		for i = 1, numBatchAuctions do
 			if isGetAll then -- only yield for GetAll scans
-				if debugprofilestop() > nextPause then
+				if debugprofilestop() > nextPause or time() > lastTime then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
 					if private.breakStorePage then
 						break
 					end
 					nextPause = debugprofilestop() + processingTime
+					lastTime = time()
 				end
 			end
 
@@ -1943,13 +2005,15 @@ local StorePageFunction = function()
 			if private.breakStorePage then break end
 
 			nextPause = debugprofilestop() + processingTime
+			lastTime = time()
 			for _, i in ipairs(retries) do
 				if isGetAll then
-					if debugprofilestop() > nextPause then
+					if debugprofilestop() > nextPause or time() > lastTime then
 						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						coroutine.yield()
 						if private.breakStorePage then break end
 						nextPause = debugprofilestop() + processingTime
+						lastTime = time()
 					end
 				end
 
@@ -2753,8 +2817,18 @@ local ItemUsableCached = {
 			this:RegisterChatString(_G.ERR_SKILL_UP_SI)
 		end
 
-		local itemType, id = _G.AucAdvanced.DecodeLink(link)
-		if not itemType or itemType ~= "item" then return end
+		local linkType, id = strsplit(":", link)
+		linkType = linkType:sub(-4) -- get last 4 characters
+		if linkType == "epet" then
+			-- battlepet : assume anyone can use it
+			-- todo: do we need to check if user has enabled battlepets?
+			-- I think you can still "use" the Pet Cage to learn the pet, even if you haven't enabled battlepets yet
+			return true
+		elseif linkType ~= "item" then
+			return
+		end
+		id = tonumber(id)
+		if not id then return end
 
 		-- check cache first. failing that, do a tooltip scan
 		if this.cache[id] == nil then
