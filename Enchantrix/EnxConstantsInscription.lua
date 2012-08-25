@@ -54,9 +54,6 @@ local ICY_PIGMENT = 43109
 local BURNING_EMBERS = 61980
 local MISTY_PIGMENT = 79253
 
--- ccox - not sure if this is used, or just leftover
--- local TIGERSBLOOD_PIGMENT = 87828
-
 local HERB_PEACEBLOOM = 2447
 local HERB_SILVERLEAF = 765
 local HERB_EARTHROOT = 2449
@@ -126,7 +123,6 @@ local HERB_GREEN_TEA = 72234
 local HERB_SILKWEED = 72235
 local HERB_SNOWLILY = 79010
 local HERB_FOOLSCAP = 79011
-local HERB_GOLDENLOTUS = 72238
 local HERB_DESECRATED = 89639
 
 
@@ -205,7 +201,7 @@ const.MillingSkillRequired = {
 	[ASHEN_PIGMENT_MID] = 450,
 	[ASHEN_PIGMENT_HIGH] = 475,
 	[SHADOW_PIGMENT_LOW] = 500,
-	[SHADOW_PIGMENT_HIGH] = 550,
+	[SHADOW_PIGMENT_HIGH] = 500,
 
 }
 
@@ -284,9 +280,8 @@ const.MillableItems = {
 	[HERB_GREEN_TEA] = SHADOW_PIGMENT_LOW,
 	[HERB_DESECRATED] = SHADOW_PIGMENT_LOW,
 	[HERB_SILKWEED] = SHADOW_PIGMENT_LOW,
-	[HERB_SNOWLILY] = SHADOW_PIGMENT_HIGH,
+	[HERB_SNOWLILY] = SHADOW_PIGMENT_LOW,
 	[HERB_FOOLSCAP] = SHADOW_PIGMENT_HIGH,
-	[HERB_GOLDENLOTUS] = SHADOW_PIGMENT_HIGH,	-- may not remain millable
 	
 }
 
@@ -386,15 +381,15 @@ const.MillGroupYields = {
 		[BURNING_EMBERS] = 0.5,
 		},
 
--- ccox - still guesswork
+-- measured beta August 25, 2012
 	[SHADOW_PIGMENT_LOW] = {
 		[SHADOW_PIGMENT] = 2.5,
-		[MISTY_PIGMENT] = 0.4,
+		[MISTY_PIGMENT] = 0.3,
 		},
 	
 	[SHADOW_PIGMENT_HIGH] = {
 		[SHADOW_PIGMENT] = 3.0,
-		[MISTY_PIGMENT] = 0.5,
+		[MISTY_PIGMENT] = 0.6,
 		},
 }
 

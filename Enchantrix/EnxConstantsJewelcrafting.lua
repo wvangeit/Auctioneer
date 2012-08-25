@@ -354,8 +354,8 @@ const.ProspectableItems = {
 			},
 
 	[GHOST_IRON_ORE] = {
--- ccox - tested in beta August 12, 2012
-			[SPARKLING_SHARD] = 0.95,		-- why the heck isn't this 1 or greater?
+-- ccox - tested in beta August 25, 2012
+			[SPARKLING_SHARD] = 1.1,
 			
 			[TIGEROPAL] = 0.25,
 			[LAPISLAZULI] = 0.25,
@@ -364,36 +364,36 @@ const.ProspectableItems = {
 			[PANDARIANGARNET] = 0.25,
 			[ALEXANDRITE] = 0.25,
 			
-			[PRIMORDIALRUBY] = 0.05,
-			[RIVERSHEART] = 0.05,
-			[WILDJADE] = 0.05,
-			[VERMILIONONYX] = 0.05,
-			[IMPERIALAMETHYST] = 0.05,
-			[SUNSRADIANCE] = 0.05,
+			[PRIMORDIALRUBY] = 0.04,
+			[RIVERSHEART] = 0.04,
+			[WILDJADE] = 0.04,
+			[VERMILIONONYX] = 0.04,
+			[IMPERIALAMETHYST] = 0.04,
+			[SUNSRADIANCE] = 0.04,
 			},
 	
 	[KYPARITE_ORE] = {
--- ccox - wild guess, needs update
-			[SPARKLING_SHARD] = 0.95,
+-- ccox - tested in beta August 25, 2012
+			[SPARKLING_SHARD] = 1.4,
 			
-			[TIGEROPAL] = 0.18,
-			[LAPISLAZULI] = 0.18,
-			[SUNSTONE] = 0.18,
-			[ROGUESTONE] = 0.18,
-			[PANDARIANGARNET] = 0.18,
-			[ALEXANDRITE] = 0.18,
+			[TIGEROPAL] = 0.25,
+			[LAPISLAZULI] = 0.25,
+			[SUNSTONE] = 0.25,
+			[ROGUESTONE] = 0.25,
+			[PANDARIANGARNET] = 0.25,
+			[ALEXANDRITE] = 0.25,
 			
-			[PRIMORDIALRUBY] = 0.15,
-			[RIVERSHEART] = 0.15,
-			[WILDJADE] = 0.15,
-			[VERMILIONONYX] = 0.15,
-			[IMPERIALAMETHYST] = 0.15,
-			[SUNSRADIANCE] = 0.15,
+			[PRIMORDIALRUBY] = 0.04,
+			[RIVERSHEART] = 0.04,
+			[WILDJADE] = 0.04,
+			[VERMILIONONYX] = 0.04,
+			[IMPERIALAMETHYST] = 0.04,
+			[SUNSRADIANCE] = 0.04,
 			},
 	
 	[WHITE_TRILLIUM_ORE] = {
 -- ccox - wild guess, needs update	
-			[SPARKLING_SHARD] = 0.95,
+			[SPARKLING_SHARD] = 1.7,
 			
 			[TIGEROPAL] = 0.18,
 			[LAPISLAZULI] = 0.18,
@@ -409,10 +409,10 @@ const.ProspectableItems = {
 			[IMPERIALAMETHYST] = 0.15,
 			[SUNSRADIANCE] = 0.15,
 			},
-	
+
 	[BLACK_TRILLIUM_ORE] = {
 -- ccox - wild guess, needs update
-			[SPARKLING_SHARD] = 0.95,
+			[SPARKLING_SHARD] = 1.7,
 			
 			[TIGEROPAL] = 0.18,
 			[LAPISLAZULI] = 0.18,
