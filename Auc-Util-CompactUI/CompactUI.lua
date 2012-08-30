@@ -481,6 +481,7 @@ function private.IconLeave(this)
 	button.Icon:SetWidth(16)
 	button.Icon:SetHeight(16)
 	GameTooltip:Hide()
+	BattlePetTooltip:Hide()
 	ResetCursor()
 end
 

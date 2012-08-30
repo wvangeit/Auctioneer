@@ -157,8 +157,13 @@ local function HookClickBag(hookParams, returnValue, self, button, ignoreShift)
 			local bag = self:GetParent():GetID()
 			local slot = self:GetID()
 			local link = GetContainerItemLink(bag, slot)
-			if link and link:match("item:%d") then
-				local itemName = GetItemInfo(link)
+			if link then
+				local itemName
+				if link:match("item:%d") then
+					itemName = GetItemInfo(link)
+				else
+					itemName = link:match("|Hbattlepet:[^|]+|h%[(.+)%]")
+				end
 				if itemName then
 					AuctionFrameBrowse_Reset(BrowseResetButton)
 					AuctionFrameBrowse.page = 0
@@ -173,14 +178,17 @@ end
 local function HookClickLink(self, item, link, button)
 	if button == "RightButton" and IsAltKeyDown() and AucAdvanced.Settings.GetSetting("clickhook.enable") then
 		if AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible() then
+			local itemName
 			if link:match("item:%d") then
-				local itemName = GetItemInfo(link)
-				if itemName then
-					AuctionFrameBrowse_Reset(BrowseResetButton)
-					AuctionFrameBrowse.page = 0
-					BrowseName:SetText(itemName)
-					AuctionFrameBrowse_Search()
-				end
+				itemName = GetItemInfo(link)
+			else
+				itemName = link:match("|Hbattlepet:[^|]+|h%[(.+)%]")
+			end
+			if itemName then
+				AuctionFrameBrowse_Reset(BrowseResetButton)
+				AuctionFrameBrowse.page = 0
+				BrowseName:SetText(itemName)
+				AuctionFrameBrowse_Search()
 			end
 		end
 	end
@@ -189,7 +197,7 @@ end
 local function HookAltChatLinkTooltip(link, text, button, chatFrame)
 	if button == "LeftButton"
 	and AucAdvanced.Settings.GetSetting("core.tooltip.altchatlink_leftclick")
-	and link:sub(1, 4) == "item" then
+	and (link:sub(1, 4) == "item" or link:sub(1, 9) == "battlepet") then
 		return ALTCHATLINKTOOLTIP_OPEN
 	end
 end

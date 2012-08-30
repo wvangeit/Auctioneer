@@ -74,7 +74,7 @@ local lib = AucAdvanced
 
 lib.Version="<%version%>";
 if (lib.Version == "<".."%version%>") then
-	lib.Version = "5.12.DEV";
+	lib.Version = "5.14.DEV";
 end
 local major, minor, release, revision = strsplit(".", lib.Version)
 lib.MajorVersion = major

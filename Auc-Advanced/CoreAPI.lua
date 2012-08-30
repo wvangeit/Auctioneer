@@ -897,47 +897,73 @@ end
 function lib.GetSigFromLink(link)
 	local ptype = type(link)
 	if ptype == "number" then
-		return ("%d"):format(link)
+		return ("%d"):format(link), "item"
 	elseif ptype ~= "string" then
 		return
 	end
-	local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed = strsplit(":", link)
-	if not id or lType:sub(-4) ~= "item" then
+	local header,id,enchant,gem1,gem2,gem3,gem4,suffix,seed = strsplit(":", link)
+	if not id then
 		return
 	end
-
-	if suffix and suffix ~= "0" then
-		local factor = "0"
-		if suffix:byte(1) == 45 then -- look for '-' to see if it is a negative number
-			local nseed = tonumber(seed)
-			if nseed then
-				factor = ("%d"):format(bitand(nseed, 65535)) -- here format is faster than tostring
+	local lType = header:sub(-4)
+	if lType == "item" then
+		local sig
+		if suffix and suffix ~= "0" then
+			local factor = "0"
+			if suffix:byte(1) == 45 then -- look for '-' to see if it is a negative number
+				local nseed = tonumber(seed)
+				if nseed then
+					factor = ("%d"):format(bitand(nseed, 65535)) -- here format is faster than tostring
+				end
+			end
+			if enchant and enchant ~= "0" then
+				-- concat is slightly faster than using strjoin with this many parameters, and far faster than format
+				sig = id..":"..suffix..":"..factor..":"..enchant
+			elseif factor ~= "0" then
+				sig = id..":"..suffix..":"..factor
+			else
+				sig = id..":"..suffix
+			end
+		else
+			if enchant and enchant ~= "0" then
+				sig = id..":0:0:"..enchant
+			else
+				sig = id
 			end
 		end
-		if enchant and enchant ~= "0" then
-			-- concat is slightly faster than using strjoin with this many parameters, and far faster than format
-			return id..":"..suffix..":"..factor..":"..enchant
-		elseif factor ~= "0" then
-			return id..":"..suffix..":"..factor
-		else
-			return id..":"..suffix
-		end
-	else
-		if enchant and enchant ~= "0" then
-			return id..":0:0:"..enchant
-		else
-			return id
+		return sig, "item"
+	elseif lType == "epet" then -- last 4 characters of battlepet
+		-- speciesID = id, level = enchant, breedQuality = gem1, maxHealth = gem2, power = gem3, speed = gem4
+		-- if any are missing then the link is broken - check that the last one exists
+		-- all should always be non-zero, so just rebuild with the battlepet sig "P" marker
+		if gem4 then
+			-- strjoin starts to become efficient with this many parameters
+			return strjoin(":", "P", id, enchant, gem1, gem2, gem3, gem4), "battlepet"
 		end
 	end
 end
 
 -- Creates an item link from an AucAdvanced signature
 function lib.GetLinkFromSig(sig)
-	local id, suffix, factor, enchant = strsplit(":", sig)
-	local itemstring = format("item:%s:%s:0:0:0:0:%s:%s:80:0", id, enchant or "0", suffix or "0", factor or "0")
-	local name, link = GetItemInfo(itemstring)
-	if link then
-		return SanitizeLink(link), name -- name is ignored by most calls
+	local s1, s2, s3, s4, s5, s6, s7 = strsplit(":", sig)
+	if s1 == "P" then -- battlepet link
+		-- speciesID = s2, level = s3, breedQuality = s4, maxHealth = s5, power = s6, speed = s7
+		if not s7 then return end -- incomplete link
+		local speciesID = tonumber(s2)
+		if not speciesID then return end
+		local qual_col = ITEM_QUALITY_COLORS[tonumber(s4)]
+		if not qual_col then return end
+		local name = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+		if not name then return end
+		local petlink = format("%s|Hbattlepet:%s:%s:%s:%s:%s:%s:0|h[%s]|h|r", qual_col.hex, s2, s3, s4, s5, s6, s7, name)
+		return petlink, name, "battlepet"
+	else
+		-- id = s1, suffix = s2, factor = s3, enchant = s4
+		local itemstring = format("item:%s:%s:0:0:0:0:%s:%s:80:0", s1, s4 or "0", s2 or "0", s3 or "0")
+		local name, link = GetItemInfo(itemstring)
+		if link then
+			return SanitizeLink(link), name, "item" -- name is ignored by most calls
+		end
 	end
 end
 
@@ -979,7 +1005,7 @@ end
 
 function lib.SigToShortSig(sig)
 	-- strip off enchant field, then strip off any trailing "0"
-	local id, suffix, factor, enchant = strsplit(sig)
+	local id, suffix, factor, enchant = strsplit(":", sig)
 	if not enchant then -- already in ssig format
 		return sig
 	end

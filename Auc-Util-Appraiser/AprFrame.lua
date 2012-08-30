@@ -82,7 +82,7 @@ function private.CreateFrames()
 					end
 
 					if AucAdvanced.Post.IsAuctionable(bag, slot) or isDirect then
-						local sig = SigFromLink(link)
+						local sig, linkType = SigFromLink(link)
 						if sig then
 							local texture, itemCount, locked, special, readable = GetContainerItemInfo(bag,slot)
 							if not itemCount or itemCount < 0 then itemCount = 1 end
@@ -100,18 +100,31 @@ function private.CreateFrames()
 								local ignore = get('util.appraiser.item.'..sig..".ignore")
 
 								if frame.showHidden or (not ignore) or isDirect then
-									local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
-									local item = {sig, name, texture, rarity, stack, itemCount, link}
-									if ignore then
-										item.ignore = true
+									local name, rarity, stack
+									if linkType == "item" then
+										local na, _,ra,_,_,_,_, st = GetItemInfo(link)
+										name, rarity, stack = na, ra, st
+									elseif linkType == "battlepet" then
+										local _, id, _, qu = strsplit(":", link)
+										name = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
+										rarity = tonumber(qu)
+										stack = 1
 									end
-									table.insert(ItemList, item)
+									if name and rarity then
+										local item = {sig, name, texture, rarity, stack, itemCount, link}
+										if ignore then
+											item.ignore = true
+										end
+										table.insert(ItemList, item)
 
-									if GetDistribution and not frame.cache[sig] then
-										local exact, suffix, base, colorDist = GetDistribution(link)
-										frame.cache[sig] = { exact, suffix, base, {} }
-										for k,v in pairs(colorDist.exact) do
-											frame.cache[sig][4][k] = v
+										if GetDistribution and not frame.cache[sig] then
+											local exact, suffix, base, colorDist = GetDistribution(link)
+												if exact then
+												frame.cache[sig] = { exact, suffix, base, {} }
+												for k,v in pairs(colorDist.exact) do
+													frame.cache[sig][4][k] = v
+												end
+											end
 										end
 									end
 								end
@@ -125,10 +138,10 @@ function private.CreateFrames()
 		if frame.showAuctions then
 			local auctionStart = #ItemList + 1
 			for auc=1, GetNumAuctionItems("owner") do
-				local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", auc)
+				local name, texture, count, quality, _, _, _, _, _, _, _, _, _, _, itemId  = GetAuctionItemInfo("owner", auc)
 				local link = GetAuctionItemLink("owner", auc)
 
-				local sig = SigFromLink(link)
+				local sig, linkType = SigFromLink(link)
 				if sig then
 					local found = false
 					for i = auctionStart, #ItemList do
@@ -141,10 +154,9 @@ function private.CreateFrames()
 					end
 
 					if not found then
-						local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
-
+						local _,_,_,_,_,_,_,stack = GetItemInfo(itemId)
 						local item = {
-							sig,name,texture,rarity,stack,count,link,
+							sig, name, texture, quality, stack or 1, count, link,
 							auction=true
 						}
 						if get('util.appraiser.item.'..sig..".ignore") then
@@ -154,9 +166,11 @@ function private.CreateFrames()
 
 						if GetDistribution and not frame.cache[sig] then
 							local exact, suffix, base, colorDist = GetDistribution(link)
-							frame.cache[sig] = { exact, suffix, base, {} }
-							for k,v in pairs(colorDist.exact) do
-								frame.cache[sig][4][k] = v
+							if exact then
+								frame.cache[sig] = { exact, suffix, base, {} }
+								for k,v in pairs(colorDist.exact) do
+									frame.cache[sig][4][k] = v
+								end
 							end
 						end
 					end
@@ -256,7 +270,7 @@ function private.CreateFrames()
 			end
 			frame.selectedRawLink = nil
 		elseif rawlink then
-			sig = SigFromLink(rawlink)
+			sig, linkType = SigFromLink(rawlink)
 			if not sig then return end
 			for i,itm in ipairs(frame.list) do
 				if itm[1]==sig then
@@ -266,11 +280,23 @@ function private.CreateFrames()
 				end
 			end
 			if not item then
-				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-					itemEquipLoc, itemTexture = GetItemInfo(rawlink)
+				local name, texture, rarity, stack
+				if linkType == "item" then
+					local na, _,ra,_,_,_,_,st,_,tx = GetItemInfo(rawlink)
+					name, rarity, stack, texture = na, ra, st, tx
+				elseif linkType == "battlepet" then
+					local _, id, _, qu = strsplit(":", rawlink)
+					name, texture = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
+					rarity = tonumber(qu)
+					stack = 1
+				end
+				if not name and rarity then
+					return
+				end
 				local myCount = AucAdvanced.Post.CountAvailableItems(sig)
 				item = {
-					sig, itemName, itemTexture, itemRarity, itemStackCount, myCount, rawlink
+					sig, name, texture, rarity, stack, myCount, rawlink,
+					raw = true,
 				}
 			end
 			frame.selectedRawLink = rawlink -- rawlinked item should stay selected until manually deselected
@@ -412,7 +438,12 @@ function private.CreateFrames()
 		lastImageSig = sig
 
 		local itemId, suffix, factor = strsplit(":", sig)
+		-- ### todo: handle Pet Cages (needs update of QueryImage)
 		itemId = tonumber(itemId)
+		if not itemId then
+			frame.imageview.sheet:SetData(emptyData)
+			return
+		end
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
 
@@ -498,7 +529,7 @@ function private.CreateFrames()
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
 		if get('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
-			local _, link = GetItemInfo(itemID)
+			local _, link = GetItemInfo(itemID) -- ### todo: will have to do something different for battlepets, depending how CalcLevel supports them
 			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 
 			local direction = get("util.appraiser.colordirection")
@@ -625,6 +656,7 @@ function private.CreateFrames()
 	function frame.ShowOwnAuctionDetails(itemString)
         local colored = (get('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel)
 
+		-- ### todo: fix for battlepets
 		local itemName, itemLink = GetItemInfo(itemString)
 
 		local results = lib.ownResults[itemName]
@@ -932,11 +964,15 @@ function private.CreateFrames()
 		end
 
 		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
+		local itemKey
 		itemId = tonumber(itemId)
-		suffix = tonumber(suffix) or 0
-		factor = tonumber(factor) or 0
+		if itemId then
+			-- ### todo: fix for battlepets
+			suffix = tonumber(suffix) or 0
+			factor = tonumber(factor) or 0
 
-		local itemKey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
+			itemKey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
+		end
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
 		local curDurationMins = private.durations[curDurationIdx][1]
@@ -958,6 +994,11 @@ function private.CreateFrames()
 		local r,g,b,a = 0,0,0,0
 		local colored = get('util.appraiser.manifest.color')
 		local tinted = get('util.appraiser.tint.color')
+		if not itemKey then
+			-- ### workaround for battlepets
+			colored = nil
+			tinted = nil
+		end
 		if tinted then
 			r,g,b = frame.SetPriceColor(itemKey, 1, curBuy, curBuy, r,g,b)
 			if r then a = 0.4 end
@@ -1144,7 +1185,10 @@ function private.CreateFrames()
 			end
 		end
 
-		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
+		if itemKey then
+			-- ### todo: fix for battlepets
+			frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
+		end
 
 		frame.salebox.warn:SetText("")
 		local warnvendor
@@ -1281,6 +1325,7 @@ function private.CreateFrames()
 	end
 
 	function frame.RefreshView(background,link)
+		local itemName, itemMinLevel, itemMinLevel, itemTypeId, itemSubId, itemRarity
 		if not link then
 			link = frame.salebox.link
 			if not link then
@@ -1288,32 +1333,57 @@ function private.CreateFrames()
 			    aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
 				frame.refresh:Enable()
 				return
-			-- else
-				-- aucPrint(("Got link from salebox: {{%s}}"):format(link))
 			end
-		-- else
-			-- aucPrint(("Got link from parameter: {{%s}}"):format(link))
 		end
-		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack = GetItemInfo(link)
-		local itemTypeId, itemSubId
-		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
-			if catName == itemType then
-				itemTypeId = catId
-				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[itemTypeId]) do
-					if subName == itemSubType then
-						itemSubId = subId
-						break
-					end
+
+		if strmatch(link, "|Hitem:") then
+			local name, _, quality, _, minlevel, classname, subclassname = GetItemInfo(link)
+			if not name then
+				-- Reuse same error message as above
+			    aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
+				frame.refresh:Enable()
+				return
+			end
+			itemName = name
+			itemMinLevel = minlevel
+			itemTypeId = AucAdvanced.Const.CLASSESREV[classname]
+			if itemTypeId then
+				itemSubId = AucAdvanced.Const.SUBCLASSESREV[classname][subclassname]
+			end
+			itemRarity = quality
+		else
+			local lType, speciesID, _, petQuality = strsplit(":", link)
+			lType = lType:sub(-9)
+			if lType == "battlepet" and speciesID then
+				-- it's a pet
+				local _,_,_,_,iMin, iType = GetItemInfo(82800) -- Pet Cage
+				-- all caged pets should have the default pet name (custom names are removed when caging)
+				local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(speciesID))
+				if not petName then
+					-- Reuse same error message as above
+					aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
+					frame.refresh:Enable()
+					return
 				end
-				break
+				itemName = petName
+				itemMinLevel = iMin
+				itemTypeId = AucAdvanced.Const.CLASSESREV[iType]
+				itemSubId = petType
+				itemRarity = tonumber(petQuality)
+			else
+				-- Reuse same error message as above
+			    aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
+				frame.refresh:Enable()
+				return
 			end
 		end
-		aucPrint(_TRANS('APPR_Interface_RefreshingView') :format(name))--Refreshing view of {{%s}}
+
+		aucPrint(_TRANS('APPR_Interface_RefreshingView') :format(itemName))--Refreshing view of {{%s}}
 		if background and type(background) == 'boolean' then
-			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
+			AucAdvanced.Scan.StartPushedScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity)
 		else
 			AucAdvanced.Scan.PushScan()
-			AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, rarity)
+			AucAdvanced.Scan.StartScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity)
 		end
 	end
 
@@ -1652,34 +1722,42 @@ function private.CreateFrames()
 	end
 
 	frame.DoTooltip = function(self)
+		local link, count, point, relFrame, relPoint, xoff, yoff
 		if not self.id then self = self:GetParent() end
 		if self.id then --we're mousing over the itemlist
 			local id = self.id
 			local pos = math.floor(frame.scroller:GetValue())
 			local item = frame.list[pos + id]
 			if item then
-				--local name = item[2]
-				local link = item[7]
-				local count = item[6]
-				GameTooltip:SetOwner(frame.itembox, "ANCHOR_NONE")
-				AucAdvanced.ShowItemLink(GameTooltip, link, count)
-				GameTooltip:ClearAllPoints()
-				GameTooltip:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0)
+				link = item[7]
+				count = item[6]
+				point, relFrame, relPoint, xoff, yoff = "TOPLEFT", frame.itembox, "TOPRIGHT", 10, 0
 			end
 		else --we're mousing over the itemslot
 			if frame.salebox.sig then
-				local link = frame.salebox.link
-				local count = frame.salebox.count
-				--local _,name = strsplit("[",(strsplit("]",frame.salebox.name:GetText()))) --isolates the text between the []
-				GameTooltip:SetOwner(frame.salebox.icon, "ANCHOR_NONE")
+				link = frame.salebox.link
+				count = frame.salebox.count
+				point, relFrame, relPoint, xoff, yoff = "TOPRIGHT", frame.salebox.icon, "TOPLEFT", -10, 0
+			end
+		end
+		if link then
+			if strmatch(link, "|Hitem:") then
+				GameTooltip:SetOwner(relFrame, "ANCHOR_NONE")
 				AucAdvanced.ShowItemLink(GameTooltip, link, count)
 				GameTooltip:ClearAllPoints()
-				GameTooltip:SetPoint("TOPRIGHT", frame.salebox.icon, "TOPLEFT", -10, 0)
+				GameTooltip:SetPoint(point, relFrame, relPoint, xoff, yoff)
+			elseif strmatch(link, "|Hbattlepet") then
+				local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
+				BattlePetToolTip_Show(tonumber(speciesID), tonumber(level), tonumber(breedQuality), tonumber(maxHealth), tonumber(power), tonumber(speed), string.gsub(string.gsub(link, "^(.*)%[", ""), "%](.*)$", ""))
+				-- somewhat hacky - BattlePetToolTip_Show anchors to GameTooltip's anchor point, but we want to specify our own anchor
+				BattlePetTooltip:ClearAllPoints()
+				BattlePetTooltip:SetPoint(point, relFrame, relPoint, xoff, yoff)
 			end
 		end
 	end
 	frame.UndoTooltip = function ()
 		GameTooltip:Hide()
+		BattlePetTooltip:Hide()
 	end
 
 	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 10,-70)

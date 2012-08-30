@@ -436,7 +436,7 @@ function private.GetPriceCore(sig, link, serverKey, match)
 			stack = 1
 		end
 	else
-		stack = maxStack
+		stack = maxStack or 1
 	end
 	if number == "maxplus" then
 		number = -1
