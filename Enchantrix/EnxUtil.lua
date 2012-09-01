@@ -408,7 +408,8 @@ end
 -- Return item id as integer
 function getItemIdFromSig(sig)
 	if type(sig) == "string" then
-		_, _, sig = sig:find("(%d+)")
+		local _, _, sig2 = sig:find("(%d+)")
+		sig = sig2
 	end
 	return tonumber(sig)
 end
