@@ -150,6 +150,7 @@ local lib = _G.AucAdvanced.Scan
 local private = {}
 
 local Const = _G.AucAdvanced.Const
+local Resources = AucAdvanced.Resources
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = _G.AucAdvanced.GetModuleLocals()
 local GetFaction = _G.AucAdvanced.GetFaction
 local EquipCodeToInvIndex = _G.AucAdvanced.Const.EquipCodeToInvIndex
@@ -721,16 +722,19 @@ private.prevQuery = {}
 -- private.queryResults is nil initially
 -- private.prevQueryServerKey is nil initially
 
-function private.clearImageCaches(scanstats)
-	local serverKey = scanstats and scanstats.serverKey
-	if serverKey then
-		local cache = private.scandataIndex[serverKey]
-		if cache then
-			wipe(cache)
-		end
-	else -- no serverKey provided: affects multiple serverKeys (or unknown source), clear all caches
-		for _, cache in pairs(private.scandataIndex) do
-			wipe(cache)
+function private.clearImageCaches(event, scanstats)
+	if event == "factionselect" then
+		-- if cache for home serverKey exists at this point it is a weak table - just dump the cache and let it rebuild
+		private.scandataIndex[Resources.ServerKeyHome] = nil
+	else
+		local serverKey = scanstats and scanstats.serverKey
+		if serverKey then
+			local cache = private.scandataIndex[serverKey]
+			if cache then
+				wipe(cache)
+			end
+		else -- no serverKey provided: affects multiple serverKeys (or unknown source), dump all caches
+			wipe(private.scandataIndex)
 		end
 	end
 
@@ -738,16 +742,16 @@ function private.clearImageCaches(scanstats)
 	private.queryResults = nil -- not required but frees some memory
 end
 
--- ensure home and neutral factions for current realm are always present
--- unlike the tables for other serverKeys, these tables are *not* weak
-private.scandataIndex[GetRealmName().."-"..UnitFactionGroup("player")] = {}
-private.scandataIndex[GetRealmName().."-Neutral"] = {}
 local weaktablemeta = {__mode="kv"}
 function private.SubImageCache(itemId, serverKey)
 	local indexResults = private.scandataIndex[serverKey]
 	if not indexResults then
 		if not _G.AucAdvanced.SplitServerKey(serverKey) then return end -- valid serverKey format?
-		indexResults = setmetatable({}, weaktablemeta) -- use weak tables for other serverKeys
+		indexResults = {}
+		if serverKey ~= Resources.ServerKeyHome and serverKey ~= Resources.ServerKeyNeutral then
+			-- use weak tables for other serverKeys
+			indexResults = setmetatable(indexResults, weaktablemeta)
+		end
 		private.scandataIndex[serverKey] = indexResults
 	end
 
@@ -802,9 +806,34 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 	private.prevQueryServerKey = serverKey
 
 	-- get image to search - may be the whole snapshot or a subset
+	local itemId = tonumber(query.itemId)
+	local stringSpeciesID
+	if query.speciesID then
+		-- looking for a battlepet
+		-- we will need to split the link for each data item, resulting in a _string contaning the speciesID_
+		-- make sure the test value is also a string
+		stringSpeciesID = tostring(query.speciesID)
+		-- also, all battlepets have the same itemId
+		if not itemId then
+			itemId = 82800
+		elseif itemId ~= 82800 then
+			-- wrong itemId! return empty results table
+			return queryResults
+		end
+	end
+	local saneQueryLink
+	if query.link then
+		saneQueryLink = SanitizeLink(query.link)
+		if not itemId then
+			-- it should be more efficient to extract itemId from the link
+			-- so we can use SubImageCache
+			local header, id = strsplit(":", saneQueryLink)
+			itemId = tonumber(id)
+		end
+	end
 	local image
-	if query.itemId then
-		image = private.SubImageCache(query.itemId, serverKey)
+	if itemId then
+		image = private.SubImageCache(itemId, serverKey)
 	else
 		local scandata = private.GetScanData(serverKey)
 		if scandata then
@@ -812,11 +841,6 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 		end
 	end
 	if not image then return queryResults end -- return empty results table
-
-	local saneQueryLink
-	if query.link then
-		saneQueryLink = SanitizeLink(query.link)
-	end
 
 	local lowerName
 	if query.name then
@@ -847,6 +871,12 @@ function lib.QueryImage(query, serverKey, reserved, ...)
 			if lowerName then
 				local name = data[Const.NAME]
 				if not (name and name:lower():find(lowerName, 1, true)) then break end
+			end
+			if stringSpeciesID then
+				local _, id = strsplit(":", data[Const.LINK])
+				if id ~= stringSpeciesID then
+					break
+				end
 			end
 
 			local stack = data[Const.COUNT]
@@ -1820,19 +1850,21 @@ function lib.GetAuctionSellItem(minBid, buyoutPrice, runTime)
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
 
 	if name and itemLink then
-		itemLink = _G.AucAdvanced.SanitizeLink(itemLink)
-		local _,_,_,itemLevel,level,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
-		local _, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = _G.AucAdvanced.DecodeLink(itemLink)
-		local timeLeft = 4
-		if runTime <= 12*60 then timeLeft = 3 end
-		local curTime = time()
+		local linkType, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed = _G.AucAdvanced.DecodeLink(itemLink)
+		if linkType == "item" then
+			itemLink = _G.AucAdvanced.SanitizeLink(itemLink)
+			local _,_,_,itemLevel,level,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+			local timeLeft = 4
+			if runTime <= 12*60 then timeLeft = 3 end
+			local curTime = time()
 
-		return {
-			itemLink, itemLevel, itemType, itemSubType, nil, minBid,
-			timeLeft, curTime, name, texture, count, quality, canUse, level,
-			minBid, 0, buyoutPrice, 0, nil, UnitName("player"),
-			0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
-		}, price
+			return {
+				itemLink, itemLevel, itemType, itemSubType, nil, minBid,
+				timeLeft, curTime, name, texture, count, quality, canUse, level,
+				minBid, 0, buyoutPrice, 0, nil, UnitName("player"),
+				0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
+			}, price
+		end
 	end
 end
 
@@ -2823,6 +2855,7 @@ local ItemUsableCached = {
 			-- battlepet : assume anyone can use it
 			-- todo: do we need to check if user has enabled battlepets?
 			-- I think you can still "use" the Pet Cage to learn the pet, even if you haven't enabled battlepets yet
+			-- todo: what if the user has reached the max pet limit?
 			return true
 		elseif linkType ~= "item" then
 			return
@@ -2880,13 +2913,20 @@ end
 
 
 coremodule.Processors = {}
-function coremodule.Processors.scanstats(event, ...)
-	private.clearImageCaches(...)
+function coremodule.Processors.scanstats(event, scanstats)
+	private.clearImageCaches(event, scanstats)
 end
 
-function coremodule.Processors.auctionclose()
+function coremodule.Processors.auctionclose(event)
 	-- clearup memory usage when AH closed
 	private.ResetItemInfoCache()
+	private.clearImageCaches(event)
+end
+
+if Resources.PlayerFaction == "Neutral" then
+	coremodule.Processors.factionselect = function(event)
+		private.clearImageCaches(event)
+	end
 end
 
 
