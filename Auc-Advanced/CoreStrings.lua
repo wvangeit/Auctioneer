@@ -881,10 +881,10 @@ AuctioneerLocalizations = {
 
 		-- Section: HelpTooltip
 		["AAMU_HelpTooltip_AutoSellBOP"]	= "Unbenutzbare seelengebundene Gegenstände automatisch verkaufen";
-		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "Es wird keine Bestätigung für den Verkauf von seelengebundenen Gegenständen erscheinen, die diese Charakterklasse diese nicht benutzen kann. ";
+		["AAMU_HelpTooltip_AutoSellBOPNoPrompt"]	= "Es wird keine Bestätigung für den Verkauf von seelengebundenen Gegenständen erscheinen, die diese Charakterklasse nicht benutzen kann. ";
 		["AAMU_HelpTooltip_AutoSellGrey"]	= "Graue Gegenstände automatisch beim Händler verkaufen.";
 		["AAMU_HelpTooltip_AutoSellList"]	= "Markiere die Box, um die Auto-Sell-Einstellungen anzupassen.";
-		["AAMU_HelpTooltip_AutoSellListItems"]	= "Gegenstände auf der ständigen Händlerliste automatisch verkaufen";
+		["AAMU_HelpTooltip_AutoSellListItems"]	= "Gegenstände auf der ständigen Händlerliste automatisch verkaufen.";
 		["AAMU_HelpTooltip_AutoSellListNoPrompt"]	= "Es wird kein Bestätigungsfenster eingeblendet, wenn Gegenstände auf der ständigen Händlerliste verkauft werden.";
 		["AAMU_HelpTooltip_AutoSellReason"]	= "Mit Hilfe der Händlersuche gekaufte Gegenstände automatisch verkaufen";
 		["AAMU_HelpTooltip_AutoSellReasonNoPrompt"]	= "Für Gegenstände mit \"zum Verkauf gekauft\"-Tag wird kein Bestätigungsfenster eingeblendet.";
@@ -905,9 +905,11 @@ AuctioneerLocalizations = {
 		["ADV_HelpTooltip_ModTTShow"]	= "Immer: Auctioneer-Tooltips werden immer angezeigt\nbei gedrückter ALT-Taste: Auctioneer-Tooltips werden angezeigt, wenn ALT gedrückt wird\nbei NICHT gedrückter ALT-Taste: Auctioneer-Tooltips werden angezeigt, wenn ALT NICHT gedrückt wird\nNie: Auctioneer-Tooltips werden nie angezeigt.";
 		["ADV_HelpTooltip_MultiplyStack"]	= "Vervielfacht um die momentane Stapelgröße, wenn aktiviert";
 		["ADV_HelpTooltip_NewProfile"]	= "Erstelle oder überschereibe ein Profil mit dem angegebenen Profilnamen. Alle Einstellungen werden zurückgesetzt.";
+		["ADV_HelpTooltip_NoScanDataWarning"]	= "Wähle diese Option, wenn Du häufig das Auc-ScanData AddOn deaktivierst um Speicher zu sparen. Warnung: Die meisten Statistiken können nicht aufgezeichnet werden, wenn ScanData nicht geladen ist.";
 		["ADV_HelpTooltip_PostClearOnClose"]	= "Wenn das Auktionshaus geschlossen wird, wird das Abarbeiten der Warteschlange beendet";
 		["ADV_HelpTooltip_PostConfirmOnClose"]	= "Wenn das Auktionshaus geschlossen wird, fragt ein Popup-Dialog, ob das Abarbeiten der Warteschlange beendet werden soll.";
 		["ADV_HelpTooltip_PreferredLanguage"]	= "Wählt die Sprache, die von Auctioneer benutzt wird. Eine Änderung wird erst nach Neustart oder /reloadui aktiv.";
+		["ADV_HelpTooltip_ProcessingTargetFPS"]	= "Stellt die Frame Rate während des Scans ein. Höhere Werte führen zu einer gleichmäßigeren Anzeige, aber der Scan benötigt mehr Zeit.";
 		["ADV_HelpTooltip_ProcessPriority"]	= "Priorität der Datenerfassung. Höhere Werte verschlechtern die Verbindungsqualität, benötigen aber weniger Zeit.";
 		["ADV_HelpTooltip_ProgressBar"]	= "Fortschrittsbalken anzeigen, während Auctioneer Daten erfasst.";
 		["ADV_HelpTooltip_ResetProfile"]	= "Setze alle Einstellungen im aktuellen Profil zurück.";
@@ -1110,6 +1112,7 @@ AuctioneerLocalizations = {
 		["ADV_Interface_CreateProfile"]	= "Ein Profil erstellen oder ersetzen";
 		["ADV_Interface_DataRetrieval"]	= "Datenabruf";
 		["ADV_Interface_Delete"]	= "Löschen";
+		["ADV_Interface_Displays"]	= "Anzeigen und Berichte";
 		["ADV_Interface_Down"]	= "Runter";
 		["ADV_Interface_FactionAlliance"]	= "Allianz";
 		["ADV_Interface_FactionHorde"]	= "Horde";
@@ -1131,6 +1134,7 @@ AuctioneerLocalizations = {
 		["ADV_Interface_mts_shift"]	= "Wenn Shift gedrückt wird";
 		["ADV_Interface_MultiplyStack"]	= "Multipliziert mit Stack-Größe";
 		["ADV_Interface_NewProfile"]	= "Neu";
+		["ADV_Interface_NoScanDataWarning"]	= "Schalte Warnungsfenster aus, wenn ScanData nicht geladen werden kann";
 		["ADV_Interface_PostClearOnClose"]	= "Gebote einstellen-Warteschlange löschen, wenn das Auktionshaus geschlossen wird.";
 		["ADV_Interface_PostConfirmOnClose"]	= "Nachfragen, bevor die Gebote einstellen-Warteschlange gelöscht wird.";
 		["ADV_Interface_PostingOptions"]	= "Optionen beim";
@@ -1146,10 +1150,13 @@ AuctioneerLocalizations = {
 		["ADV_Interface_ScanDataDisplay"]	= "Scandaten-Tooltip anzeigen";
 		["ADV_Interface_ScanDataForce"]	= "Erzwinge Laden der Scandaten";
 		["ADV_Interface_ScanDataModifier"]	= "Außer beim Drücken der UMSCHALTTASTE nur genaue Übereinstimmungen anzeigen";
+		["ADV_Interface_ScanDataNotCleared"]	= "Gescannte Daten können nicht gelöscht werden, weil {{Auc-ScanData}} nicht geladen ist";
+		["ADV_Interface_ScanDataNotLoaded"]	= "Das Seichermodul für Auc-ScanData konnte nicht geladen werden: %s";
 		["ADV_Interface_ScanDataSummary"]	= "Aktiviert die Anzeige der Scan-Zusammenfassung";
 		["ADV_Interface_ScanDataSummaryFull"]	= "Aktiviert die Anzeige der Scan-Zusammenfassung für einen vollständigem Scan";
 		["ADV_Interface_ScanDataSummaryMicro"]	= "Aktiviert die Anzeige der Scan-Zusammenfassung für eine Abfrage eines einzelnen Items.";
 		["ADV_Interface_ScanDataSummaryPartial"]	= "Aktiviert die Anzeige der Scan-Zusammenfassung für eine Abfrage mehrerer Items.";
+		["ADV_Interface_ScanOptions"]	= "Scan Optionen";
 		["ADV_Interface_ScanRetrieveTTL"]	= "Laufzeitdauer der Scandaten-Wiederherstellung";
 		["ADV_Interface_ScanSellerNames"]	= "Weiteres scannen um mehr Verkäufernamen zu erhalten";
 		["ADV_Interface_SearchingClickHooks"]	= "Click-Hook-Suche erlauben";
@@ -4077,7 +4084,11 @@ AuctioneerLocalizations = {
 	itIT = {
 
 		-- Section: Help
+		["AAMU_Help_VendorOptions"]	= "Opzioni Venditore";
+		["AAMU_Help_VendorOptionsAnswer"]	= "AutoMagic venderà automaticamente gli oggetti comprati per essere venduti al venditore. Ha anche un'opzione per vendere in automatico tutti gli oggetti grigi o gli oggetti presenti nella lista personalizzata.";
 		["AAMU_Help_WhatAutoMagic"]	= "Cos'è AutoMagic?";
+		["AAMU_Help_WhatAutoMagicAnswer"]	= "AutoMagic è ancora in sviluppo. Il suo scopo è automatizzare i compiti noiosi che i venditori compiono, sempre rispettando i limiti posti da Blizzard. \n\nAutoMagic al momento vendo in automatico ogni oggetto comprato tramite SearchUI per i venditori, ogni oggetto grigio (se l'opzione è attiva) o ogni oggetto nella lista di auto vendita. Se attivata, quando apri la finestra di un mercante, vedrai una lista di oggetti da vendere.";
+		["AAMU_Help_WhatMailGUI"]	= "Cos'è l'interfaccia Mail?";
 
 		-- Section: Interface
 		["AAMU_Interface_AutoSellList"]	= "Lista degli oggetti auto-vendenti";
@@ -5638,6 +5649,17 @@ AuctioneerLocalizations = {
 		["AHWC_Help_RemberLastPositionAnswer"]	= "Se esta caixa está marcada, o quadro de leilões será reaberto na última posição para a qual foi movido.";
 		["AHWC_Help_SearchUIScale"]	= "Escala da IU de Pesquisa";
 		["AHWC_Help_SearchUIScaleAnswer"]	= "A barra de escala da IU de Pesquisa ajusta o tamanho geral da janela de IU de Pesquisa diferente da casa de leilões. O tamanho padrão é 1.";
+		["AHWC_Help_whatisthis"]	= "O que é a ferramenta de Controle de Janelas da AH?";
+		["APPR_Help_BatchFollowingWouldPosted"]	= "Os seguintes itens poderiam ser colocados automaticamente:";
+		["APPR_Help_BatchPostHelp2"]	= "Você deve segurar uma das seguintes teclas enquanto clica no botão:";
+		["SIMP_Help_SlashHelp2"]	= "esta ajuda Simples";
+		["UCUT_Help_WhatUndercut"]	= "O que é esse módulo de desconto?";
+		["UCUT_Help_WhatUndercutAnswer"]	= "O módulo de desconto permite a você reduzir o menor preço de todos os itens atualmente disponíveis, baseado no seu ajuste. É recomendado rodar o desconto após qualquer outro módulo de busca.";
+		["WECN_Help_WhatGlobalPrices"]	= "O que são preços globais?";
+		["WECN_Help_WhatGlobalPricesAnswer"]	= "Wowecon provê dois tipos diferentes de preço: um preço global, uma média através de todos os servidores, e um preço específico, para somente seu servidor ou facção.";
+		["WECN_Help_WhyGlobalPrices"]	= "Porque eu deveria usar os preços globais?";
+		["WECN_Help_WhyWOWEcon"]	= "Porque eu deveria mostrar o preço WOWEcon na tooltip?";
+		["WECN_Help_WhyWOWEconAnswer"]	= "Os dados de preço que o Appraiser utiliza para os itens podem ser diferentes dos dados que o WOWEcon mostra por padrão, desde que o WOWEcon pode ser muito específico com os dados mostrados. Habilitando esta opção pertimitirá você ver o preço exato que este módulo reporta para o item atual.";
 
 		-- Section: HelpTooltip
 		["AAMU_HelpTooltip_AutoSellBOP"]	= "Auto-vender equipamentos vinculados inutilizáveis";
@@ -5647,6 +5669,17 @@ AuctioneerLocalizations = {
 		["AAMU_HelpTooltip_AutoSellListItems"]	= "Auto-Vender itens na lista de sempre vender.";
 		["AAMU_HelpTooltip_AutoSellListNoPrompt"]	= "Nenhuma janela de confirmação será exibida para itens na lista de sempre vender";
 		["AAMU_HelpTooltip_AutoSellReason"]	= "Auto-vender itens comprados utilizando o buscador de vendedores";
+		["AAMU_HelpTooltip_AutoStop12"]	= "Permite que você compre de volta uma venda acidental, pois o server grava as últimas 12 vendas para o vendedor";
+		["AAMU_HelpTooltip_BeginnerTooltip"]	= "Mostra as dicas para iniciantes ao passar o mouse";
+		["AAMU_HelpTooltip_Chatspam"]	= "Mostra mensagens de chat do AutoMagic";
+		["AAMU_HelpTooltip_DepositTooltip"]	= "Remove o custo de depósito do item na dica.";
+		["AAMU_HelpTooltip_MailGUI"]	= "Mostra a janela de auto-correio na caixa de correio.";
+		["AAMU_HelpTooltip_Vendoring"]	= "Habilita as opções de auto-venda.";
+		["ADV_HelpTooltip_AltChatLinkLeft"]	= "Habilita a abertura de dicas ao clicar com botão esquerdo em um link na janela de chat enquanto a tecla Alt é pressionada.";
+		["ADV_HelpTooltip_ChatOutputFrame"]	= "Permite selecionar para qual janela de chat que o Auctioneer deve usar para enviar mensagem";
+		["ADV_HelpTooltip_CopyProfile"]	= "Crie ou sobrescreva um perfil com o nome especificado. Todas configurações serão copiadas a partir do perfil atual.";
+		["ADV_HelpTooltip_MarketValueAccuracy"]	= "Define o valor da precisão para o preço do mercado. Indica a tolerância máxima de erro. Valores altos reduzem a quantidade de processamento necessária para o computador (melhorando a performance do frame rate enquanto calcula) ao custo do cálculo preciso.";
+		["ADV_HelpTooltip_MktPrice"]	= "Habilita a exibição do Preço de Mercado no tooltip. Ao segurar a tecla shift também exibirá os preços que foram dentro do Preço de Mercado";
 
 		-- Section: Interface
 		["AAMU_HelpTooltip_AutoSellGreyNoPrompt"]	= "Sem janela de confirmação para vender itens cinza (lixo).";
