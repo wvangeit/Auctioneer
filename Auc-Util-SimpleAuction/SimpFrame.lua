@@ -868,8 +868,8 @@ function private.CreateFrames()
 	frame:SetScript("OnUpdate", private.OnUpdate)
 
 	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.title:SetPoint("TOP", frame,  "TOP", 0, -20)
-	frame.title:SetText("Simple Auction - Simplified auction posting interface.")
+	frame.title:SetPoint("TOP", frame,  "TOP", 15, -20)
+	frame.title:SetText("Simple Auction - Simplified auction posting interface")
 
 	frame.slot = frame:CreateTexture(nil, "BORDER")
 	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -45)
@@ -1034,9 +1034,9 @@ function private.CreateFrames()
 	frame.create:Disable()
 
 	frame.clear = CreateFrame("Button", "AucAdvSimpFrameRemember", frame, "OptionsButtonTemplate")
-	frame.clear:SetPoint("BOTTOMRIGHT", frame.create, "TOPRIGHT", 0, 5)
-	frame.clear:SetWidth(140)
-	frame.clear:SetText("Clear Setting")
+	frame.clear:SetPoint("TOPLEFT", frame, "TOPLEFT", 69, -13)
+	--frame.clear:SetWidth(85)
+	frame.clear:SetText("Clear Settings")
 	frame.clear:SetScript("OnClick", function() private.ClearSetting() private.RemoveConfig() end)
 
 	MoneyInputFrame_SetPreviousFocus(frame.minprice, frame.stacks.size)
