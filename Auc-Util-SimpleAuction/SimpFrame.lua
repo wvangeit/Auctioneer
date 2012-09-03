@@ -100,17 +100,15 @@ function private.GetMyPrice(link, items)
 		for i = 1, n do
 			local item = AucAdvanced.Scan.GetAuctionItem("owner", i)
 			if item and item[const.NAME] == searchname then
-				if items then table.insert(items, item) end
 				local stack = item[const.COUNT]
 				if stack and stack > 0 then
+					-- stack may be 0 for a sold auction - only try to calculate bid or buy for auction with non-zero stack counts
 					local bid, buy = item[const.MINBID], item[const.BUYOUT]
-					if bid and bid > 0 then
+					if bid and bid > 0 then -- check for rare bug where you could get an invalid bid
+						if items then tinsert(items, item) end -- only insert items with valid stack and bid values
 						bid = bid / stack
 						uBid = uBid and min(uBid, bid) or bid
-						-- only check buy value if the bid value is valid
-						-- avoids including buy prices for "sold" auctions,
-						-- due to problems with invalid stack counts from Blizzard API
-						if buy and buy > 0 then
+						if buy and buy > 0 then -- buyout of 0 is valid, but don't include in our min buyout
 							buy = buy / stack
 							uBuy = uBuy and min(uBuy, buy) or buy
 						end
@@ -134,6 +132,7 @@ end
 local query = {}
 function private.GetItems(link)
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+	if itype ~= "item" then return end
 	local aSeen, lBid, lBuy, uBid, uBuy, aBuy, aveBuy = 0
 	local player = UnitName("player")
 	local items = {}
@@ -155,37 +154,38 @@ function private.GetItems(link)
 	end
 	for pos, item in ipairs(matching) do
 		local bid, buy, owner, stk = item[const.MINBID], item[const.BUYOUT], item[const.SELLER], item[const.COUNT]
-		stk = stk or 1
-		local bidea, buyea
-		if bid and bid > 0 then
-			bidea = bid/stk
-		end
-		if buy and buy > 0 then
-			buyea = buy/stk
-		end
+		if stk and stk >= 1 then
+			local bidea, buyea
+			if bid and bid > 0 then
+				bidea = bid/stk
+			end
+			if buy and buy > 0 then
+				buyea = buy/stk
+			end
 
-		if owner and owner == player then
-			if not live then
-				if not uBid then uBid = bidea elseif bidea then uBid = min(uBid, bidea) end
-				if not uBuy then uBuy = buyea elseif buyea then uBuy = min(uBuy, buyea) end
+			if owner and owner == player then
+				if not live then
+					if not uBid then uBid = bidea elseif bidea then uBid = min(uBid, bidea) end
+					if not uBuy then uBuy = buyea elseif buyea then uBuy = min(uBuy, buyea) end
+					table.insert(items, item)
+				end
+			else
+				if not lBid then
+					lBid = bidea
+				elseif bidea then
+					lBid = min(lBid, bidea)
+				end
+				if not lBuy then
+					lBuy = buyea
+				elseif buyea then
+					lBuy = min(lBuy, buyea)
+				end
+				if buy then
+					aBuy = (aBuy or 0) + buy
+					aSeen = (aSeen or 0)+ stk
+				end
 				table.insert(items, item)
 			end
-		else
-			if not lBid then
-				lBid = bidea
-			elseif bidea then
-				lBid = min(lBid, bidea)
-			end
-			if not lBuy then
-				lBuy = buyea
-			elseif buyea then
-				lBuy = min(lBuy, buyea)
-			end
-			if buy then
-				aBuy = (aBuy or 0) + buy
-				aSeen = (aSeen or 0)+ stk
-			end
-			table.insert(items, item)
 		end
 	end
 	aveBuy = (aBuy and aSeen>=1) and aBuy/aSeen or 0
@@ -335,6 +335,7 @@ function private.UpdateCompetition(image)
 		elseif (tLeft == 4) then tLeft = "48h"
 		end
 		local count = result[Const.COUNT]
+		if count < 1 then count = 1 end -- in case a 0 slips through
 		data[i] = {
 			--result[Const.NAME],
 			result[Const.SELLER],
