@@ -171,10 +171,6 @@ function lib.GetErrorText(code)
 	return "Unknown Errorcode ("..code..")"
 end
 
-
-function private.NewRequestTable(sig, count, bid, buyout, duration, numStacks)
-end
-
 do
 --[[
 	Functions to safely handle the Post Request queue
@@ -901,7 +897,7 @@ function private.LoadAuctionSlot(request)
 	if private.lastUIError then
 		-- error can only have come from ClickAuctionSellItemButton or GetAuctionSellItemInfo
 		-- but item in slot appears to be correct
-		-- report for debugging  - ### consider if it should be removed or reduced in severity
+		-- report for debugging
 		private.ClearAuctionSlot() -- Put it back in the bags
 		private.QueueRemove()
 		return nil, "UnknownError", private.lastUIError

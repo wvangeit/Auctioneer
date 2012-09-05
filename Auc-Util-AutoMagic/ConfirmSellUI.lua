@@ -74,8 +74,8 @@ function lib.ASCConfirmContinue()
 			return
 		end
 
-		local _, iID = decode( itemdata[1] ) --check if item is to be ignored
-		if not get("util.automagic.vidignored"..iID) then --will be nil if not on ignore list
+		local linkType, iID = decode( itemdata[1] ) --check if item is to be ignored
+		if linkType == "item" and not get("util.automagic.vidignored"..iID) then --will be nil if not on ignore list
 
 			if (get("util.automagic.chatspam")) then
 				print("AutoMagic is selling:", itemdata[1], "reason:", itemdata[6])
@@ -101,8 +101,10 @@ end
 
 function lib.ASCIgnoreItem()
 	if selecteditem then
-		local _, iID = decode(selecteditem)
-		set("util.automagic.vidignored"..iID, true)
+		local linkType, iID = decode(selecteditem)
+		if linkType == "item" then
+			set("util.automagic.vidignored"..iID, true)
+		end
 	end
 
 	lib.ASCRefreshSheet()
@@ -110,8 +112,10 @@ end
 
 function lib.ASCUnIgnoreItem()
 	if selecteditem then
-		local _, iID = decode(selecteditem)
-		set("util.automagic.vidignored"..iID, nil)
+		local linkType, iID = decode(selecteditem)
+		if linkType == "item" then
+			set("util.automagic.vidignored"..iID, nil)
+		end
 	end
 
 	lib.ASCRefreshSheet()
@@ -126,24 +130,26 @@ function lib.ASCRefreshSheet()
 	local ASCtempstorage, style = {}, {}
 	for k, v in pairs(lib.vendorlist) do
 		local itemLink, itemSig, count, bag, slot, reason = unpack(v)
-		local _, iID = decode(itemLink)
-		local vendor = GetSellValue and GetSellValue(iID) or 0
-		local abuy, abid = GetPrice(itemLink, nil, true)
-		local vendorignored = "YES"
-		local styleColor = {0,1,0}
-		if get("util.automagic.vidignored"..iID) == true then
-			vendorignored = "NO"
-			styleColor = {1,0,0}
+		local linkType, iID = decode(itemLink)
+		if linkType == "item" then
+			local vendor = GetSellValue and GetSellValue(iID) or 0
+			local abuy, abid = GetPrice(itemLink, nil, true)
+			local vendorignored = "YES"
+			local styleColor = {0,1,0}
+			if get("util.automagic.vidignored"..iID) == true then
+				vendorignored = "NO"
+				styleColor = {1,0,0}
+			end
+			table.insert(ASCtempstorage,{
+			itemLink, --link form for mouseover tooltips to work
+			vendor,
+			tonumber(abuy) or tonumber(abid),
+			reason,
+			vendorignored,
+			})
+			style[#ASCtempstorage] = {}
+			style[#ASCtempstorage][5] = {["textColor"] = styleColor}
 		end
-		table.insert(ASCtempstorage,{
-		itemLink, --link form for mouseover tooltips to work
-		vendor,
-		tonumber(abuy) or tonumber(abid),
-		reason,
-		vendorignored,
-		})
-		style[#ASCtempstorage] = {}
-		style[#ASCtempstorage][5] = {["textColor"] = styleColor}
 	end
 
 	lib.confirmsellui.resultlist.sheet:SetData(ASCtempstorage, style) --Set the GUI scrollsheet

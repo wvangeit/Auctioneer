@@ -177,15 +177,6 @@ end
 
 CompileInvTypes(GetAuctionInvTypes(2, 1))
 
---[ Hybrid code for transition from WoW4.3 to WoW5.0 - remove after 5.0 goes live
-local _,_,_,tocVersion = GetBuildInfo()
-if tocVersion < 50001 then
-	lib.MAXSKILLLEVEL = 525
-	lib.MAXUSERLEVEL = 85
-	lib.MAXITEMLEVEL = 416
-end
---]]
-
 AucAdvanced.Const = lib
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
