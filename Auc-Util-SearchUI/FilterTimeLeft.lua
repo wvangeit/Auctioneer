@@ -60,7 +60,7 @@ function lib:MakeGuiConfig(gui)
 			{1, "less than 30 min"},
 			{2, "2 hours"},
 			{3, "12 hours"},
-		}, "ignoretimeleft.maxtime", "Max time left")
+		}, "ignoretimeleft.maxtime")
 
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Subhead",     .5, "Filter for:")

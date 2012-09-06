@@ -520,7 +520,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",     0,    _ENCH("GuiConfigProfiles"))
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiActivateProfile"))
-	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile")
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", _ENCH("GuiDeleteProfileButton"))
 	gui:AddControl(id, "Button",     0, 1, "profile.default", _ENCH("GuiResetProfileButton"))
 
@@ -546,7 +546,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowMatSources", _ENCH("GuiShowMatSources") )
 
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
-	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
+	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType")
 
 	-- TODO: locale -- what are the allowed values?
 	-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
@@ -577,7 +577,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "autoLootDE", _ENCH("GuiAutoLootDE"))
 
 	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
-	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", "this string isn't shown but needs to be long for layout")
+	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem")
 	gui:AddControl(id, "Button",     0, 1, "autode.deleteItem", "remove item")
 	gui:AddControl(id, "Button",     0, 1, "autode.reset", "reset all items")
 

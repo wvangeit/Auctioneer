@@ -99,7 +99,7 @@ function private.MakeGuiConfig(gui)
 		{"AuctionWindowClose", "AuctionHouse Close"},
 		{"RaidWarning", "Raid Warning"},
 		{"DoorBell", "DoorBell (BottomScan-style)"},
-	}, "realtime.alert.sound", "Pick the sound to play")
+	}, "realtime.alert.sound")
 	gui:AddTip(id, "The selected sound will play whenever a bargain is found")
 	gui:AddControl(id, "Subhead",       0,    "Power-user setting: One-Click Buying")
 	gui:AddControl(id, "Checkbox",      0, 1, "realtime.skipresults", "Skip results and go straight to purchase confirmation !Power-user setting!")

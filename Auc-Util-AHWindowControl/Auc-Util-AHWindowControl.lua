@@ -148,7 +148,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Selectbox", 0, 1, {
 		{1, _TRANS("AHWC_Interface_Never") }, --Never
 		{2, _TRANS("AHWC_Interface_Always") }, --Always
-	}, "util.protectwindow.protectwindow", _TRANS("AHWC_Interface_PreventClosingAuctionHouse") ) --"Prevent other windows from closing the Auction House window."
+	}, "util.protectwindow.protectwindow" ) --"Prevent other windows from closing the Auction House window."
 	gui:AddTip(id, _TRANS("AHWC_HelpToolTip_PreventClosingAuctionHouse") ) --This will prevent other windows from closing the Auction House window when you open them, according to your settings.
 	gui:AddHelp(id, "What is ProtectWindow",
 		_TRANS("AHWC_Help_ProtectWindow"), --What does Protecting the AH Window do?

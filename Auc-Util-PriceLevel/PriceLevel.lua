@@ -136,17 +136,17 @@ function private.SetupConfigGui(gui)
 		{"RIGHT", "Right"},
 		{"TOP", "Top"},
 		{"BOTTOM", "Bottom"},
-	}, "util.pricelevel.direction", "Pick the gradient direction")
+	}, "util.pricelevel.direction")
 	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the Auction Browse window (if enabled).")
 	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
-	gui:AddControl(id, "Selectbox",  0, 1, parent.selectorPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
+	gui:AddControl(id, "Selectbox",  0, 1, parent.selectorPriceModels, "util.pricelevel.model")
 	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the Auction House.")
 	gui:AddControl(id, "Subhead",    0,    "Price level basis:")
 	gui:AddControl(id, "Selectbox",  0, 1, {
 		{"cur", "Next bid price"},
 		{"buy", "Buyout only"},
 		{"try", "Buyout or bid"},
-	}, "util.pricelevel.basis", "Which price to use for the PriceLevel")
+	}, "util.pricelevel.basis")
 	gui:AddTip(id, "Selects which price to base the PriceLevel calculation off of.")
 
 	gui:AddHelp(id, "what is basis",

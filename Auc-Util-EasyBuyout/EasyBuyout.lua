@@ -149,7 +149,7 @@ function private.SetupConfigGui(gui)
 		{0, "Shift"},
 		{1, "Alt"},
 		{2, "Shift+Alt"}
-	}, "util.EasyBuyout.modifier.select", "testing here")
+	}, "util.EasyBuyout.modifier.select")
     gui:AddTip(id, "Select your key modifier for EasyBuyout")
 
  	-- EasyCancel
@@ -164,7 +164,7 @@ function private.SetupConfigGui(gui)
 		{0, "Shift"},
 		{1, "Alt"},
 		{2, "Shift+Alt"}
-	}, "util.EasyBuyout.EC.modifier.select", "testing here")
+	}, "util.EasyBuyout.EC.modifier.select")
     gui:AddTip(id, "Select your key modifier for EasyCancel")
 
 	-- EasyBid

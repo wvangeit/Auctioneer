@@ -140,16 +140,16 @@ function lib:MakeGuiConfig(gui)
 	last = cont
 
 	gui:AddControl(id, "Note",       0.0, 1, 100, 14, "Type:")
-	gui:AddControl(id, "Selectbox",   0.0, 1, private.getTypes, "general.type", "ItemType")
+	gui:AddControl(id, "Selectbox",   0.0, 1, private.getTypes, "general.type")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Note",       0.3, 1, 100, 14, "SubType:")
-	gui:AddControl(id, "Selectbox",   0.3, 1, private.getSubTypes, "general.subtype", "ItemSubType")
+	gui:AddControl(id, "Selectbox",   0.3, 1, private.getSubTypes, "general.subtype")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Note",       0.7, 1, 100, 14, "TimeLeft:")
-	gui:AddControl(id, "Selectbox",  0.7, 1, private.getTimeLeft(), "general.timeleft", "TimeLeft")
+	gui:AddControl(id, "Selectbox",  0.7, 1, private.getTimeLeft(), "general.timeleft")
 
 	gui:AddControl(id, "Note",       0.0, 1, 100, 14, "Quality:")
-	gui:AddControl(id, "Selectbox",   0.0, 1, private.getQuality(), "general.quality", "ItemQuality")
+	gui:AddControl(id, "Selectbox",   0.0, 1, private.getQuality(), "general.quality")
 
 	last = gui:GetLast(id)
 	gui:SetControlWidth(0.37)

@@ -155,8 +155,8 @@ function private.SetupConfigGui(gui)
 		{7, "Seven"},
 		{8, "Eight"},
 		{9, "Nine"}
-	}, "util.example.hardselectbox", "Statically, by hardcoding the values...")
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetNumbers, "util.example.dynamicselectbox", "Or dynamically by specifying a function instead of a table...")
+	}, "util.example.hardselectbox")
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetNumbers, "util.example.dynamicselectbox")
 
 	gui:AddControl(id, "Subhead",    0,    "There are also a few ways to add text:\n  The Headers and SubHeaders that you've already seen...")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, "Notes...")

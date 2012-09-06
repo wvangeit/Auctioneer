@@ -497,7 +497,7 @@ function private.SetupConfigGui(gui)
 	{0, "Disable"},
 	{1, "30 Minutes"},
 	{2, "2 Hours"}
-	}, "util.glypher.pricemodel.ignoretime", "Ignore competitor auctions when time left is less than time selected.")
+	}, "util.glypher.pricemodel.ignoretime")
 	gui:AddTip(id, "Ignore competitor auctions when time left is less than time selected.")
 
 	gui:AddControl(id, "Subhead", 0, "Misc options")

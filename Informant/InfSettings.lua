@@ -412,7 +412,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",     0,    _TRANS('INF_Interface_SetupProfile')) --"Setup, Configure and Edit Profiles"
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('INF_Interface_ActivateProfile')) --"Activate a current profile"
-	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to the given profile") --This string isn't shown?
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile")
 	gui:AddTip(id, _TRANS('INF_HelpTooltip_ActivateProfile')) --"Select the profile that you wish to use for this character"
 
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", _TRANS('INF_Interface_Delete')) --"Delete"

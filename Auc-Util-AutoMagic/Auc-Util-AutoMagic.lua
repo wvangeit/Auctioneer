@@ -180,7 +180,7 @@ function lib.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.depositTT", _TRANS('AAMU_Interface_DepositTooltip')) --"Disable deposit costs in the tooltip"
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_DepositTooltip')) --'Remove item deposit costs from the tooltip.'
 
-		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength", _TRANS('AAMU_Interface_DepositLength')) --"Base deposits on what length of auction."
+		gui:AddControl(id, "Selectbox",		0, 1, 	ahdeplength, "util.automagic.deplength") --"Base deposits on what length of auction."
 		gui:AddTip(id, _TRANS('AAMU_HelpTooltip_DepositLength')) --'Select the auction length deposit cost you want to display in the tooltip.'
 
 		gui:AddControl(id, "Header",     0,    _TRANS('AAMU_Interface_VendorOptions')) --" Vendor Options"

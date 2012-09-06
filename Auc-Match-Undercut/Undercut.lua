@@ -270,7 +270,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip",_TRANS('UCUT_Interface_ShowInTooltip') )--Show undercut status in tooltip
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_ShowInTooltip') )--Add a line to the tooltip showing whether the current competition is undercuttable
 	gui:AddControl(id, "Note",       0, 2, 500, 15, _TRANS('UCUT_Interface_TooltipValuationMethod') )--Tooltip price valuation method
-	gui:AddControl(id, "Selectbox",  0, 2, parent.selectorPriceModels, "match.undercut.model", _TRANS('UCUT_Interface_PricingModel') )--Pricing model to use
+	gui:AddControl(id, "Selectbox",  0, 2, parent.selectorPriceModels, "match.undercut.model" )--Pricing model to use
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_PricingModel'))--The pricing model to use to compare the competition against.  Should be set to the model most often used for posting.  --Note: this is ONLY for basing the tooltip on, nothing else
 
 end

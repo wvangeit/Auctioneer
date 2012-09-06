@@ -586,7 +586,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Selectbox",  0, 1, {
 		{1, "Either"},
 		{0, "Both"}
-	}, "util.askprice.smartOr", "Either or both SmartWords") --1/0 instead of true/false due to limitations in the Configator API
+	}, "util.askprice.smartOr") --1/0 instead of true/false due to limitations in the Configator API
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_EitherBoth')) --"Both SmartWords are required to be present for just one or the other in order for it to trigger a query."
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_Miscellaneous')) --"Miscellaneous:")

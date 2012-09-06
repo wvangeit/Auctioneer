@@ -107,7 +107,7 @@ function private.SetupConfigGui(gui)
 		gui:AddTip(id, _T(trans.."Tip"))
 	end
 	local function addSelect(setting, trans, menu)
-		gui:AddControl(id, "Selectbox", 0, 1, menu, setting, _T(trans))
+		gui:AddControl(id, "Selectbox", 0, 1, menu, setting)
 		gui:AddTip(id, _T(trans.."Tip"))
 	end
 

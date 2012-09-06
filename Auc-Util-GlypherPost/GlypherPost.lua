@@ -210,7 +210,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Slider", 0, 1, "util.glypherpost.duration", 1, 3, 1, "Duration: %s hours", private.durationFormat)
 	gui:AddTip(id, "The number of hours to post for.")
 	gui:SetLast(id,last)
-	gui:AddControl(id, "Selectbox", 0.5, 1, private.GetExtraPriceModels, "util.glypherpost.model", "Pricing Model")
+	gui:AddControl(id, "Selectbox", 0.5, 1, private.GetExtraPriceModels, "util.glypherpost.model")
 	gui:AddTip(id, "The pricing model to use for posting.")
 
 	gui:AddControl(id, "Checkbox", 0, 1, "util.glypherpost.salesbased", "Base number of stacks on sales")

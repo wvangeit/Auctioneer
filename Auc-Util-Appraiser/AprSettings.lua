@@ -349,7 +349,7 @@ function private.SetupConfigGui(gui)
 		{"TOP", _TRANS('APPR_Interface_Top') },--Top
 		{"BOTTOM", _TRANS('APPR_Interface_Bottom') },--Bottom
 		{"OFF", _TRANS('APPR_Interface_Off') },--Off
-	}, "util.appraiser.colordirection", _TRANS('APPR_Interface_PickGradientDirection') )--Pick the gradient direction
+	}, "util.appraiser.colordirection" )--Pick the gradient direction
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_PickGradientDirection') )--This determines the direction that the above gradient is drawn in for the Appraiser Browse window (if enabled).
 
 	gui:AddControl(id, "Checkbox",  0, 1, "util.appraiser.manifest.color", _TRANS('APPR_Interface_ColorManifestByPriceLevel') )--Color bid and buy prices in the manifest frame by their PriceLevel data
@@ -366,16 +366,16 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_ShowTooltipControls') )--This option will enable help tooltips for the Appraiser controls.
 
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_DefaultPricingModel') )--Default pricing model
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", _TRANS('APPR_Interface_DefaultModelAppraisals') )--Default pricing model to use for appraisals
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model" )--Default pricing model to use for appraisals
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_DefaultModelAppraisals') )--You may select a default and alternate pricing model for items that do not have a specific model set.
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_AlternatePricingModel') )--Alternate pricing model
-	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.altModel", _TRANS('APPR_Interface_AlternatePricingModelSelectBox') )--Alternate pricing model to use for appraisals
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.altModel" )--Alternate pricing model to use for appraisals
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_AlternatePricingModelSelectBox') )--You may select a default and alternate pricing model for items that do not have a specific model set.
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_UseMatchingDefault') )--Use Matching by Default
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.match", _TRANS('APPR_Interface_UseMatchingDefault') )--Use Matching by Default
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_UseMatchingDefault') )--This option determines whether to default to checking or unchecking the match competition checkbox.
 	gui:AddControl(id, "Subhead",    0,   _TRANS('APPR_Interface_DefaultListingTime') )--Default Listing Time
-	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", _TRANS('APPR_Interface_DefaultListingDuration') )--Default listing duration
+	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration" )--Default listing duration
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_DefaultListingDuration') )--You may set a default auction listing duration for items that do not have a specific duration set.
 	gui:AddControl(id, "Subhead",    0,    _TRANS('APPR_Interface_DefaultStackSize') )--Default Stack Size
 	gui:AddControl(id, "Text",       0, 1, "util.appraiser.stack")
@@ -421,7 +421,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Selectbox",  0, 1, {
 				{"unit",_TRANS('APPR_Interface_StopValue') },--Stop value
 				{"div",_TRANS('APPR_Interface_Divisions') }--Divisions
-				}, "util.appraiser.round.method", _TRANS('APPR_Interface_RoundingMethodUse') )--Rounding method to use
+				}, "util.appraiser.round.method" )--Rounding method to use
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_RoundingMethodUse') )--You select the rounding algorithm to use for rounding the selected stack prices.
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0.01, 1.00, 0.01, _TRANS('APPR_Interface_Rounding').." %0.02f" )--Rounding at:
 	gui:AddTip(id, _TRANS('APPR_HelpTooltip_Rounding') )--This slider allows you to select the position that the rounding algorithm will use to round at
