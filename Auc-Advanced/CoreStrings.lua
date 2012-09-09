@@ -5694,8 +5694,11 @@ AuctioneerLocalizations = {
 		["AHWC_Help_SearchUIScale"]	= "Escala da IU de Pesquisa";
 		["AHWC_Help_SearchUIScaleAnswer"]	= "A barra de escala da IU de Pesquisa ajusta o tamanho geral da janela de IU de Pesquisa diferente da casa de leilões. O tamanho padrão é 1.";
 		["AHWC_Help_whatisthis"]	= "O que é a ferramenta de Controle de Janelas da AH?";
-		["APPR_Help_BatchFollowingWouldPosted"]	= "Os seguintes itens poderiam ser colocados automaticamente:";
+		["AHWC_Help_whatisthisAnswer"]	= "Esta utilidade permite que você arraste e reposicione o quadro de leilões para essa sessão. Apenas clique e mova para onde desejar. Ela também permite que a Casa de Leilões seja fechada ao abrir certas janelas da Blizzard.";
+		["APPR_Help_BatchFollowingWouldPosted"]	= "Os seguintes itens teriam que ser colocados automaticamente:";
 		["APPR_Help_BatchPostHelp2"]	= "Você deve segurar uma das seguintes teclas enquanto clica no botão:";
+		["APPR_Help_BatchPostHelp3"]	= "-Alt = Auto-atualiza todos os lotes de itens leiloaveis.";
+		["APPR_Help_BatchPostHelp4"]	= "- Shift = Lista todos os leilões que seriam postados sem realmente leiloa-los.";
 		["SIMP_Help_SlashHelp2"]	= "esta ajuda Simples";
 		["UCUT_Help_WhatUndercut"]	= "O que é esse módulo de desconto?";
 		["UCUT_Help_WhatUndercutAnswer"]	= "O módulo de desconto permite a você reduzir o menor preço de todos os itens atualmente disponíveis, baseado no seu ajuste. É recomendado rodar o desconto após qualquer outro módulo de busca.";
