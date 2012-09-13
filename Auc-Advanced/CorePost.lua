@@ -302,26 +302,22 @@ local function AnalyzeItem(item)
 			local sig, linkType = GetSigFromLink(item)
 			if sig then
 				if linkType == "battlepet" then
-					return sig, 82800, linkType, item
+					return sig, 82800, "battlepet", item
 				else
-					local id = DecodeSig(sig)
-					if id then
-						return sig, id, linkType, item
+					local sigType, id = DecodeSig(sig)
+					if sigType == "item" then
+						return sig, id, "item", item
 					end
 				end
 			end
 
 		else -- check it it's a sig
-			if item:sub(1,2) == "P:" then
-				-- looks like a battlepet sig
-				-- todo: improve this test?
+			local sigType, id = DecodeSig(item)
+			if sigType == "battlepet" then
 				return item, 82800, "battlepet"
-			else
-				local id = DecodeSig(item)
-				if id then
-					-- it's an item sig
-					return item, id, "item"
-				end
+
+			elseif sigType == "item" then
+				return item, id, "item"
 			end
 		end
 	elseif iType == "number" then
