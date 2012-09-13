@@ -40,24 +40,6 @@ local data, _
 local ownResults = {}
 local ownCounts = {}
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "auctionui") then
-        private.CreateFrames(...)
-	elseif (callbackType == "config") then
-		private.SetupConfigGui(...)
-	elseif (callbackType == "configchanged") then
-		private.UpdateConfig(...)
-	elseif (callbackType == "inventory") then
-	elseif (callbackType == "scanstats") then
-		private.clearcache()
-		private.delayedUpdatePricing = true -- Note: calling private.UpdatePricing is unsafe inside "scanstats"
-	elseif (callbackType == "postresult") then
-		private.clearcache()
-	end
-end
-
 lib.Processors = {}
 function lib.Processors.tooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
@@ -83,6 +65,8 @@ end
 function lib.Processors.postresult(callbackType, ...)
 	private.clearcache()
 end
+lib.Processors.auctionclose = lib.Processors.postresult
+lib.Processors.serverkey = lib.Processors.postresult
 
 local function whitespace(length)
 	local spaces = ""
@@ -95,7 +79,7 @@ end
 function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
 	if not get("util.simpleauc.tooltip") then return end
 	local realm = AucAdvanced.GetFaction()
-	local id = private.SigFromLink(link)
+	local id = AucAdvanced.API.GetSigFromLink(link)
 	local settingstr = get("util.simpleauc."..realm.."."..id)
 	local market, seen, fixbuy, fixbid, stack
 	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aSeen, aveBuy = private.GetItems(link)
