@@ -152,7 +152,11 @@ function private.searchByItemID(id, settings, queryReturn, count, itemTexture, c
 	
 	--store profit for this item, need to do this before we reduce number of results for display
 	local player = private.frame.SelectBoxSetting[2]
-	profit, low, high = lib.API.getAHProfit(player, data)
+	if get("util.beancounter.ButtonuseDateCheck") and (settings.dateFilterLow or settings.dateFilterHigh) then
+		profit, low, high = lib.API.getAHProfit(player, data, settings.dateFilterLow, settings.dateFilterHigh)
+	else
+		profit, low, high = lib.API.getAHProfit(player, data)
+	end
 	
 	--filter by dates
 	if settings.dateFilterLow or settings.dateFilterHigh then
