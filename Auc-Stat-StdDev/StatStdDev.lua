@@ -32,13 +32,18 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 if not AucAdvanced then return end
-local AucAdvanced = AucAdvanced
 
 local libType, libName = "Stat", "StdDev"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
 
 local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local Resources = AucAdvanced.Resources
+local AucGetStoreKeyFromLink = AucAdvanced.API.GetStoreKeyFromLink
+
+local PET_BAND = 5
+local MAX_DATAPOINTS = 100
+
 local tonumber,strsplit,select,pairs=tonumber,strsplit,select,pairs
 local setmetatable=setmetatable
 local wipe=wipe
@@ -47,16 +52,27 @@ local concat=table.concat
 local tinsert,tremove=table.insert,table.remove
 -- GLOBALS: AucAdvancedStatStdDevData
 
-local GetFaction = AucAdvanced.GetFaction
 
 local SSDRealmData
 
-local cache = {} -- setmetatable({}, {__mode="v"})
+local cache = {}
 
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
 
+-- Wrapper around AucAdvanced.API.GetStoreKeyFromLink to customize it for Stat-StdDev
+local GetStoreKey = function(link)
+	local id, property, linktype = AucGetStoreKeyFromLink(link, PET_BAND)
+	if linktype == "item" then
+		-- use number here so we don't need to convert older database
+		return tonumber(id), property
+	elseif linktype == "battlepet" then
+		-- add "P" marker to battlepet ID
+		return "P"..id, property
+	end
+end
+
 function lib.CommandHandler(command, ...)
-	local serverKey = GetFaction()
+	local serverKey = Resources.ServerKeyCurrent
 	local _,_,keyText = AucAdvanced.SplitServerKey(serverKey)
 	if (command == "help") then
 		aucPrint(_TRANS('SDEV_Help_SlashHelp1') )--Help for Auctioneer - StdDev
@@ -68,16 +84,6 @@ function lib.CommandHandler(command, ...)
 	end
 end
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	elseif (callbackType == "scanstats") then
-		wipe(cache)
-	end
-end
 lib.Processors = {}
 function lib.Processors.tooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
@@ -90,46 +96,40 @@ function lib.Processors.scanstats(callbackType, ...)
 	wipe(cache)
 end
 
-
-
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
-
-	-- This function is responsible for processing and storing the stats after each scan
-	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
-	-- it in places where you rely on it. Make a deep copy of it if you need it after this
-	-- function returns.
+	if not get("stat.stddev.enable") then return end
 
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
 	if (itemData.stackSize > 1) then
 		buyout = buyout.."/"..itemData.stackSize
+	else
+		buyout = tostring(buyout)
 	end
 
-	-- Get the signature of this item and find it's stats.
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
-	if (linkType ~= "item") then return end
-	if (factor and factor ~= 0) then property = property.."x"..factor end
-
-	local serverKey = GetFaction()
+	-- Get the key for this item and find it's stats.
+	local keyId, property = GetStoreKey(itemData.link)
+	if not keyId then return end
+	local serverKey = Resources.ServerKeyCurrent
 	if not SSDRealmData[serverKey] then SSDRealmData[serverKey] = {} end
-	local stats = private.UnpackStats(SSDRealmData[serverKey][itemId])
+	local stats = private.UnpackStats(SSDRealmData[serverKey][keyId])
 	if not stats[property] then stats[property] = {} end
-	if #stats[property] >= 100 then
+
+	if #stats[property] >= MAX_DATAPOINTS then
 		tremove(stats[property], 1)
 	end
 	tinsert(stats[property], buyout)
-	SSDRealmData[serverKey][itemId] = private.PackStats(stats)
+	SSDRealmData[serverKey][keyId] = private.PackStats(stats)
 end
 
-local BellCurve = AucAdvanced.API.GenerateBellCurve();
+local BellCurve = AucAdvanced.API.GenerateBellCurve()
 -----------------------------------------------------------------------------------
 -- The PDF for standard deviation data, standard bell curve
 -----------------------------------------------------------------------------------
 function lib.GetItemPDF(hyperlink, serverKey)
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
+	if not get("stat.stddev.enable") then return end
 	-- Get the data
 	local average, mean, _, stddev, variance, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
@@ -170,23 +170,22 @@ local datapoints_price = {}	-- used temporarily in .GetPrice() to avoid unpackin
 local datapoints_stack = {}
 
 function lib.GetPrice(hyperlink, serverKey)
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
+	if not get("stat.stddev.enable") then return end
 
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return end
-	if (factor and factor ~= 0) then property = property.."x"..factor end
+	local keyId, property = GetStoreKey(hyperlink)
+	if not keyId then return end
 
-	if not serverKey then serverKey = GetFaction() end
+	if not serverKey then serverKey = Resources.ServerKeyCurrent end
 
 	if not SSDRealmData[serverKey] then return end
-	if not SSDRealmData[serverKey][itemId] then return end
+	if not SSDRealmData[serverKey][keyId] then return end
 
-	local cacheKey = serverKey ..":"..itemId..":"..property
+	local cacheKey = serverKey ..":"..keyId..":"..property
 	if cache[cacheKey] then
-		return unpack(cache[cacheKey])
+		return unpack(cache[cacheKey], 1, 7)
 	end
 
-	local stats = private.UnpackStats(SSDRealmData[serverKey][itemId])
+	local stats = private.UnpackStats(SSDRealmData[serverKey][keyId])
 	if not stats[property] then return end
 
 	local count = #stats[property]
@@ -205,7 +204,9 @@ function lib.GetPrice(hyperlink, serverKey)
 	end
 	local mean = total / number
 
-	if (count < 2) then return 0,0,0, mean, count end
+	if (count < 2) then
+		return nil, mean, false, 0, 0, count, 0
+	end
 
 	local variance = 0
 	for i = 1, count do
@@ -241,12 +242,12 @@ function lib.GetPrice(hyperlink, serverKey)
 end
 
 function lib.GetPriceColumns()
-	return "Average", "Mean", false, "Std Deviation", "Variance", "Count"
+	return "Average", "Mean", false, "Std Deviation", "Variance", "Count", "Confidence"
 end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, serverKey)
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.enable") then return end
+	if not get("stat.stddev.enable") then return end
 	-- Clean out the old array
 	wipe(array)
 
@@ -338,33 +339,33 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.tooltip") then return end
+	if not get("stat.stddev.tooltip") then return end
 
 	if not quantity or quantity < 1 then quantity = 1 end
-	if not AucAdvanced.Settings.GetSetting("stat.stddev.quantmul") then quantity = 1 end
+	if not get("stat.stddev.quantmul") then quantity = 1 end
 	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
 
 	if (mean and mean > 0) then
 		tooltip:AddLine(_TRANS('SDEV_Tooltip_PricesPoints'):format(count) )--StdDev prices %d points:
 
-		if AucAdvanced.Settings.GetSetting("stat.stddev.mean") then
+		if get("stat.stddev.mean") then
 			tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_MeanPrice'), mean*quantity)-- Mean price
 		end
 		if (average and average > 0) then
-			if AucAdvanced.Settings.GetSetting("stat.stddev.normal") then
+			if get("stat.stddev.normal") then
 				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Normalized'), average*quantity)--  Normalized
 				if (quantity > 1) then
 					tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Individually'), average)--  (or individually)
 				end
 			end
-			if AucAdvanced.Settings.GetSetting("stat.stddev.stdev") then
+			if get("stat.stddev.stdev") then
 				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_StdDeviation'), stdev*quantity)--  Std Deviation
                 if (quantity > 1) then
                     tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Individually'), stdev)--  (or individually)
                 end
 
 			end
-			if AucAdvanced.Settings.GetSetting("stat.stddev.confid") then
+			if get("stat.stddev.confid") then
 				tooltip:AddLine("  ".._TRANS('SDEV_Tooltip_Confidence')..(floor(confidence*1000))/1000)-- Confidence:
 			end
 		end
@@ -374,29 +375,27 @@ end
 function lib.OnLoad(addon)
 	if SSDRealmData then return end
 
-	AucAdvanced.Settings.SetDefault("stat.stddev.tooltip", false)
-	AucAdvanced.Settings.SetDefault("stat.stddev.mean", false)
-	AucAdvanced.Settings.SetDefault("stat.stddev.normal", false)
-	AucAdvanced.Settings.SetDefault("stat.stddev.stdev", true)
-	AucAdvanced.Settings.SetDefault("stat.stddev.confid", true)
-	AucAdvanced.Settings.SetDefault("stat.stddev.quantmul", true)
-	AucAdvanced.Settings.SetDefault("stat.stddev.enable", true)
+	default("stat.stddev.tooltip", false)
+	default("stat.stddev.mean", false)
+	default("stat.stddev.normal", false)
+	default("stat.stddev.stdev", true)
+	default("stat.stddev.confid", true)
+	default("stat.stddev.quantmul", true)
+	default("stat.stddev.enable", true)
 
 	private.InitData()
 end
 
 function lib.ClearItem(hyperlink, serverKey)
-	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then
-		return
-	end
-	if (factor ~= 0) then property = property.."x"..factor end
-	if not serverKey then serverKey = GetFaction() end
-	if SSDRealmData[serverKey] and SSDRealmData[serverKey][itemID] then
-		local stats = private.UnpackStats(SSDRealmData[serverKey][itemID])
+	local keyId, property = GetStoreKey(hyperlink)
+	if not keyId then return end
+
+	if not serverKey then serverKey = Resources.ServerKeyCurrent end
+	if SSDRealmData[serverKey] and SSDRealmData[serverKey][keyId] then
+		local stats = private.UnpackStats(SSDRealmData[serverKey][keyId])
 		if stats[property] then
 			stats[property] = nil
-			SSDRealmData[serverKey][itemID] = private.PackStats(stats)
+			SSDRealmData[serverKey][keyId] = private.PackStats(stats)
 			wipe(cache)
 			local _, _, keyText = AucAdvanced.SplitServerKey(serverKey)
 			aucPrint(libType.._TRANS('SDEV_Interface_ClearingData'):format(hyperlink, keyText))--- StdDev: clearing data for %s for {{%s}}
@@ -405,7 +404,7 @@ function lib.ClearItem(hyperlink, serverKey)
 end
 
 function lib.ClearData(serverKey)
-	serverKey = serverKey or GetFaction()
+	serverKey = serverKey or Resources.ServerKeyCurrent
 	wipe(cache)
 	if AucAdvanced.API.IsKeyword(serverKey, "ALL") then
 		wipe(SSDRealmData)
@@ -417,7 +416,7 @@ function lib.ClearData(serverKey)
 	end
 end
 
---[[ Local functions ]]--
+--[[ Private functions ]]--
 
 function private.UnpackStatIter(data, ...)
 	local c = select("#", ...)
@@ -425,14 +424,9 @@ function private.UnpackStatIter(data, ...)
 	for i = 1, c do
 		v = select(i, ...)
 		local property, info = strsplit(":", v)
-		property = tonumber(property) or property
 		if (property and info) then
 			data[property] = {strsplit(";", info)}
-			local item
-			for i=1, #data[property] do
-				item = data[property][i]
-				data[property][i] = tonumber(item) or item
-			end
+			-- don't tonumber the entries in this table yet
 		end
 	end
 end
