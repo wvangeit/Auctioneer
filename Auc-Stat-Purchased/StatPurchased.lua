@@ -637,7 +637,8 @@ function private.InitData()
 			end
 			if type(data.means) == "table" then
 				for id, packed in pairs(data.means) do
-					if type(id) ~= "number" or type(packed) ~= "string" then
+					-- id type checking currently removed to allow for battlepets
+					if type(packed) ~= "string" then
 						data.means[id] = nil
 					end
 				end
@@ -646,7 +647,8 @@ function private.InitData()
 			end
 			if type(data.daily) == "table" then
 				for id, packed in pairs(data.daily) do
-					if id ~= "created" and (type(id) ~= "number" or type(packed) ~= "string") then
+					-- id type checking currently removed to allow for battlepets
+					if type(packed) ~= "string" then
 						data.daily[id] = nil
 					end
 				end
