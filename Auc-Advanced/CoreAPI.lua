@@ -979,12 +979,12 @@ function lib.DecodeSig(sig)
 		-- battlepet sig
 		s2 = tonumber(s2) -- speciesID
 		if not s2 or s2 == 0 then return end
-		s3 = tonumber(s3) or 0 -- level
+		s3 = tonumber(s3) or 0 -- level : 0 signifies unknown level
 		s4 = tonumber(s4) or -1 -- quality : -1 signifies unknown quality
 		s5 = tonumber(s5) or 0 -- health
 		s6 = tonumber(s6) or 0 -- power
 		s7 = tonumber(s7) or 0 -- speed
-		return "battlepet", s1,s2,s3,s4,s5,s6,s7
+		return "battlepet", s2,s3,s4,s5,s6,s7
 	else
 		-- should be an item sig
 		s1 = tonumber(s1) -- itemId

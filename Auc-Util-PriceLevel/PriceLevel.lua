@@ -39,20 +39,6 @@ local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdva
 
 local data
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		private.SetupConfigGui(...)
-	elseif (callbackType == "listupdate") then
-		private.ListUpdate(...)
-	elseif (callbackType == "configchanged") then
-		if (AuctionFrameBrowse_Update) then
-			AuctionFrameBrowse_Update()
-		end
-	end
-end
-
 lib.Processors = {}
 function lib.Processors.tooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
@@ -282,11 +268,10 @@ function private.ListUpdate()
 	end
 end
 
-function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
+function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth, serverKey)
 	if not quantity or quantity < 1 then quantity = 1 end
 
-	local priceModel = AucAdvanced.Settings.GetSetting("util.pricelevel.model")
-	local priceBasis = AucAdvanced.Settings.GetSetting("util.pricelevel.basis")
+	local priceBasis = get("util.pricelevel.basis")
 
 	local stackPrice
 	if (priceBasis == "cur") then
@@ -303,10 +288,11 @@ function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 	if not stackPrice then return end
 
 	if not itemWorth then
+		local priceModel = get("util.pricelevel.model")
 		if (priceModel == "market") then
-			itemWorth = AucAdvanced.API.GetMarketValue(link)
+			itemWorth = AucAdvanced.API.GetMarketValue(link, serverKey)
 		else
-			itemWorth = AucAdvanced.API.GetAlgorithmValue(priceModel, link)
+			itemWorth = AucAdvanced.API.GetAlgorithmValue(priceModel, link, serverKey)
 		end
 		if not itemWorth then return end
 	end
@@ -317,13 +303,13 @@ function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 	local r, g, b, lvl
 
 	r,g,b,lvl = 0.2,0.6,1.0, "blue"
-	if priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.red") then
+	if priceLevel > get("util.pricelevel.red") then
 		r,g,b,lvl = 1.0,0.0,0.0, "red"
-	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.orange") then
+	elseif priceLevel > get("util.pricelevel.orange") then
 		r,g,b,lvl = 1.0,0.6,0.1, "orange"
-	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.yellow") then
+	elseif priceLevel > get("util.pricelevel.yellow") then
 		r,g,b,lvl = 1.0,1.0,0.0, "yellow"
-	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.green") then
+	elseif priceLevel > get("util.pricelevel.green") then
 		r,g,b,lvl = 0.1,1.0,0.1, "green"
 	end
 

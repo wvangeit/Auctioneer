@@ -181,10 +181,82 @@ function lib.GetImageCounts(hyperlink, maxPrice, items, serverKey)
 end
 
 local query1 = {} -- only 1 field itemId
-function lib.GetDistribution(hyperlink)
+function private.GetPetDistribution(hyperlink, serverKey, iSpeciesId, iLevel, iQuality)
+	-- in future it may be possible to merge this function back into GetDistribution
+	iSpeciesId = tostring(iSpeciesId) -- we're going to be comparing this to strings
+	local sig = serverKey..iSpeciesId.."^"..iLevel.."^"..iQuality -- we're sharing a cache with items, so use different dividers
+	if private.distributionCache[sig] then return unpack(private.distributionCache[sig]) end
+
+	local exact, suffix, base, myColors = 0,0,0,{}
+	for k,v in pairs(colorDist) do
+		myColors[k] = {}
+		for c,n in pairs(v) do
+			myColors[k][c] = 0
+		end
+	end
+
+	query1.itemId = 82800
+	local image = QueryImage(query1, serverKey)
+	local sigTemplate = serverKey..iSpeciesId.."^%d^%d" -- different dividers than for item sigs
+	for i=1, #image do
+		local item = image[i]
+		local vLink = item[Const.LINK]
+		local _, vSpeciesId = strsplit(":", vLink)
+		if vSpeciesId == iSpeciesId then
+			local vLevel = item[Const.ILEVEL]
+			local vQuality = item[Const.QUALITY]
+			-- Pet Cages are not stackable so count is always 1
+
+			local vColor
+			if (PriceCalcLevel) then
+				local _
+				local vBid = item[Const.PRICE]
+				local vBuy = item[Const.BUYOUT]
+				local vSig = sigTemplate:format(vLevel, vQuality)
+				_,_,_,_,_, vColor, private.worthCache[vSig] = PriceCalcLevel(vLink, 1, vBid, vBuy, private.worthCache[vSig], serverKey)
+			end
+
+			if (vQuality == iQuality) then
+				if (vLevel == iLevel) then
+					exact = exact + 1
+					if (vColor) then
+						myColors.exact[vColor] = myColors.exact[vColor] + 1
+					end
+				else
+					suffix = suffix + 1
+					if (vColor) then
+						-- keeping this as .suffix, even though it actually represents a match in quality
+						myColors.suffix[vColor] = myColors.suffix[vColor] + 1
+					end
+				end
+			else
+				base = base + 1
+				if (vColor) then
+					myColors.base[vColor] = myColors.base[vColor] + 1
+				end
+			end
+			if (vColor) then
+				myColors.all[vColor] = myColors.all[vColor] + 1
+				-- Set up colours per stack size as well
+				-- todo: Pet Cages don't stack, do we really need to do this? kept for now as cloned from GetDistribution
+				if not myColors.stack[1] then myColors.stack[1] =  { red=0, orange=0, yellow=0, green=0, blue=0 } end
+				myColors.stack[1][vColor] = myColors.stack[1][vColor] + 1
+			end
+		end
+	end
+
+	private.distributionCache[sig] = {exact, suffix, base, myColors}
+	return exact, suffix, base, myColors
+end
+function lib.GetDistribution(hyperlink, serverKey)
+	serverKey = serverKey or Resources.ServerKeyCurrent
 	local iType, iID, iSuffix, iFactor = decode(hyperlink)
-	if iType ~= "item" then return end
-	local sig = strjoin(":", iID, iSuffix, iFactor)
+	if iType == "battlepet" then
+		return private.GetPetDistribution(hyperlink, serverKey, iID, iSuffix, iFactor)
+	elseif iType ~= "item" then
+		return
+	end
+	local sig = serverKey..iID..":"..iSuffix..":"..iFactor
 	if private.distributionCache[sig] then return unpack(private.distributionCache[sig]) end
 
 	local exact, suffix, base, myColors = 0,0,0,{}
@@ -196,8 +268,8 @@ function lib.GetDistribution(hyperlink)
 	end
 
 	query1.itemId = iID
-	local image = QueryImage(query1)
-	local sigTemplate = iID..":%d:%d"
+	local image = QueryImage(query1, serverKey)
+	local sigTemplate = serverKey..iID..":%d:%d"
 	for i=1, #image do
 		local item = image[i]
 		local vSuffix = item[Const.SUFFIX]
@@ -211,7 +283,7 @@ function lib.GetDistribution(hyperlink)
 			local vBid = item[Const.PRICE]
 			local vBuy = item[Const.BUYOUT]
 			local vSig = sigTemplate:format(vSuffix, vFactor)
-			_,_,_,_,_, vColor, private.worthCache[vSig] = PriceCalcLevel(vLink, vCount, vBid, vBuy, private.worthCache[vSig])
+			_,_,_,_,_, vColor, private.worthCache[vSig] = PriceCalcLevel(vLink, vCount, vBid, vBuy, private.worthCache[vSig], serverKey)
 		end
 
 		if (vSuffix == iSuffix) then
@@ -251,6 +323,7 @@ function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality,
 
 	local doColor = true
 	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
+	if not exact then return end
 
 	if base+suffix+exact <= 0 then
 		tooltip:AddLine("No matches in image.")

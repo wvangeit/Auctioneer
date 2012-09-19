@@ -425,33 +425,47 @@ function private.CreateFrames()
 	-- Normally delayed by 1 frame (called from OnUpdate)
 	-- Multiple updates without changing the selected item are throttled to 3 seconds
 	-- Exception: CheckImageUpdate allows the throttle to be overridden if required
+	local query = {} -- query table used for QueryImage
 	function private.DelayedImageUpdate()
-		local sig = private.needImageUpdate
-		local sigChanged = lastImageSig ~= sig
+		local sig = frame.salebox.sig
+		if not sig then -- sanity check
+			frame.UpdateImage()
+			return
+		end
+		local sigChanged = lastImageSig ~= sig or private.needImageUpdate ~= sig
 		local now = GetTime()
 		if not sigChanged and now < throttleImageNext then
+			-- private.needImageUpdate is still set to sig
 			return
 		end
 
 		private.needImageUpdate = nil
 		throttleImageNext = now + 3 -- 3 second throttle
 		lastImageSig = sig
-
-		local itemId, suffix, factor = strsplit(":", sig)
-		-- ### todo: handle Pet Cages (needs update of QueryImage)
-		itemId = tonumber(itemId)
-		if not itemId then
+		
+		local sigType, property1, property2, property3 = AucAdvanced.API.DecodeSig(sig)
+		if sigType == "item" then
+			query.itemId = property1
+			query.suffix = property2
+			query.factor = property3
+			query.speciesID = nil
+			query.quality = nil
+			query.minItemLevel = nil
+			query.maxItemLevel = nil
+		elseif sigType == "battlepet" then
+			query.speciesID = property1
+			query.quality = property3
+			query.minItemLevel = property2
+			query.maxItemLevel = property2
+			query.itemId = 82800
+			query.suffix = nil
+			query.factor = nil
+		else
 			frame.imageview.sheet:SetData(emptyData)
 			return
 		end
-		suffix = tonumber(suffix) or 0
-		factor = tonumber(factor) or 0
-
-		local results = AucAdvanced.API.QueryImage({
-			itemId = itemId,
-			suffix = suffix,
-			factor = factor,
-		})
+		
+		local results = AucAdvanced.API.QueryImage(query)
 		local seen
 		local seentext = ""
 		if results[1] then
@@ -476,7 +490,6 @@ function private.CreateFrames()
 		end
 		frame.age:SetText(seentext)
 
-		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 
 		local data = {}
 		local style = {}
@@ -507,7 +520,7 @@ function private.CreateFrames()
 				curbid = result[Const.MINBID]
 			end
 			--price level color item
-			local r, g, b, Alpha1, Alpha2, direction = frame.SetPriceColor(itemkey, count, curbid, result[Const.BUYOUT])
+			local r, g, b, Alpha1, Alpha2, direction = frame.SetPriceColor(result[Const.LINK], count, curbid, result[Const.BUYOUT])
 			if direction and r then
 				style[i] = {}
 				style[i][1] = {}
@@ -527,9 +540,13 @@ function private.CreateFrames()
 		sheet:EnableVerticalScrollReset(false)
 	end
 
-	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
+	function frame.SetPriceColor(link, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
 		if get('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
-			local _, link = GetItemInfo(itemID) -- ### todo: will have to do something different for battlepets, depending how CalcLevel supports them
+			if type(link) == "number" then
+				local _, l = GetItemInfo(link)
+				link = l
+			end
+			if not link then return end
 			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 
 			local direction = get("util.appraiser.colordirection")
