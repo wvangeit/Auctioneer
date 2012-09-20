@@ -651,7 +651,7 @@ function private.InitData()
 			if type(data.daily) == "table" then
 				for id, packed in pairs (data.daily) do
 					-- id type checking currently removed to allow for battlepets
-					if type(packed) ~= "string" then
+					if id ~= "created" and type(packed) ~= "string" then
 						data.daily[id] = nil
 					end
 				end
