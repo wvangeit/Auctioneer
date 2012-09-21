@@ -658,7 +658,7 @@ local function ShowTooltip()
 	if not link then return end
 	if strmatch(link, "|Hitem:") then
 		GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
-		GameTooltip:SetHyperlink(private.CurRequest.link)
+		GameTooltip:SetHyperlink(link)
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPRIGHT", private.Prompt.Item, "TOPLEFT", -10, -20)
 	elseif strmatch(link, "|Hbattlepet:") then

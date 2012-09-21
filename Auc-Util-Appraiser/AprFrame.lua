@@ -442,7 +442,7 @@ function private.CreateFrames()
 		private.needImageUpdate = nil
 		throttleImageNext = now + 3 -- 3 second throttle
 		lastImageSig = sig
-		
+
 		local sigType, property1, property2, property3 = AucAdvanced.API.DecodeSig(sig)
 		if sigType == "item" then
 			query.itemId = property1
@@ -464,7 +464,7 @@ function private.CreateFrames()
 			frame.imageview.sheet:SetData(emptyData)
 			return
 		end
-		
+
 		local results = AucAdvanced.API.QueryImage(query)
 		local seen
 		local seentext = ""
@@ -1764,9 +1764,7 @@ function private.CreateFrames()
 				GameTooltip:ClearAllPoints()
 				GameTooltip:SetPoint(point, relFrame, relPoint, xoff, yoff)
 			elseif strmatch(link, "|Hbattlepet") then
-				local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
-				BattlePetToolTip_Show(tonumber(speciesID), tonumber(level), tonumber(breedQuality), tonumber(maxHealth), tonumber(power), tonumber(speed), string.gsub(string.gsub(link, "^(.*)%[", ""), "%](.*)$", ""))
-				-- somewhat hacky - BattlePetToolTip_Show anchors to GameTooltip's anchor point, but we want to specify our own anchor
+				AucAdvanced.ShowPetLink(BattlePetTooltip, link, count)
 				BattlePetTooltip:ClearAllPoints()
 				BattlePetTooltip:SetPoint(point, relFrame, relPoint, xoff, yoff)
 			end

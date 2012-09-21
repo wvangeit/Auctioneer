@@ -944,6 +944,7 @@ function lib.GetSigFromLink(link)
 end
 
 -- Creates an item or battlepet link from an AucAdvanced signature
+-- Due to the lossy nature of sigs, the link created will not be exactly the same as the link originally used to generate the sig
 function lib.GetLinkFromSig(sig)
 	local s1, s2, s3, s4, s5, s6, s7 = strsplit(":", sig)
 	if s1 == "P" then -- battlepet link
@@ -951,7 +952,13 @@ function lib.GetLinkFromSig(sig)
 		if not s7 then return end -- incomplete link
 		local speciesID = tonumber(s2)
 		if not speciesID then return end
-		local qual_col = ITEM_QUALITY_COLORS[tonumber(s4)] -- "|cffxxxxxx"
+		local qual = tonumber(s4)
+		local qual_col
+		if qual == -1 then
+			qual_col = NORMAL_FONT_COLOR_CODE
+		else
+			qual_col = ITEM_QUALITY_COLORS[tonumber(s4)] -- "|cffxxxxxx"
+		end
 		if not qual_col then return end
 		local name = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 		if not name then return end

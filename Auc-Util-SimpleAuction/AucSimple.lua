@@ -34,16 +34,20 @@ if not AucAdvanced then return end
 local libType, libName = "Util", "SimpleAuction"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
+local Resources = AucAdvanced.Resources
+local GetSigFromLink = AucAdvanced.API.GetSigFromLink
+local GetMarketValue = AucAdvanced.API.GetMarketValue
 
 local data, _
 local ownResults = {}
 local ownCounts = {}
 
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
+function lib.Processors.itemtooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
 end
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 
 function lib.Processors.auctionui(callbackType, ...)
 	private.CreateFrames(...)
@@ -76,18 +80,18 @@ local function whitespace(length)
 	return spaces
 end
 
-function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additional)
+function lib.ProcessTooltip(tooltip, link, serverKey, quantity, decoded, additional, order)
 	if not get("util.simpleauc.tooltip") then return end
-	local realm = AucAdvanced.GetFaction()
-	local id = AucAdvanced.API.GetSigFromLink(link)
-	local settingstr = get("util.simpleauc."..realm.."."..id)
+	if serverKey ~= Resources.ServerKeyCurrent then return end -- only support current serverKey - consider handling other keys for future
+	local id = GetSigFromLink(link)
+	local settingstr = get("util.simpleauc."..serverKey.."."..id)
 	local market, seen, fixbuy, fixbid, stack
 	local imgseen, image, matchBid, matchBuy, lowBid, lowBuy, aSeen, aveBuy = private.GetItems(link)
 	local reason = "Market"
 
 	tooltip:SetColor(0.4, 1.0, 0.9)
 
-	market, seen = AucAdvanced.API.GetMarketValue(link)
+	market, seen = GetMarketValue(link)
 	if (not market) or (market <= 0) or (not (seen > 5 or aSeen < 3)) then
 		market = aveBuy
 		reason = "Current"
@@ -112,11 +116,11 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 		coinsBuyEa = private.coins(market)
 	end
 	if quantity == 1 then
-		local text = string.format("%s: %s bid/%s buyout", libName, coinsBid, coinsBuy)
+		local text = format("%s: %s bid/%s buyout", libName, coinsBid, coinsBuy)
 		tooltip:AddLine(text)
 	else
-		local text = string.format("%s x%d: %s bid/%s buyout", libName, quantity, coinsBid, coinsBuy)
-		local textea =  string.format("%s(Or individually: %s/%s)", whitespace(5), coinsBidEa, coinsBuyEa)
+		local text = format("%s x%d: %s bid/%s buyout", libName, quantity, coinsBid, coinsBuy)
+		local textea =  format("%s(Or individually: %s/%s)", whitespace(5), coinsBidEa, coinsBuyEa)
 		tooltip:AddLine(text)
 		tooltip:AddLine(textea, 0.3, 0.8, 0.7)
 	end
@@ -134,10 +138,10 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 			coinsBuy = private.coins(fixbuy*quantity)
 		end
 		if quantity == 1 then
-			local text = string.format("%sFixed: %s bid/%s buyout", whitespace(12), coinsBid, coinsBuy)
+			local text = format("%sFixed: %s bid/%s buyout", whitespace(12), coinsBid, coinsBuy)
 			tooltip:AddLine(text)
 		else
-			local text = string.format("%sFixed x%d: %s bid/%s buyout", whitespace(12), quantity, coinsBid, coinsBuy)
+			local text = format("%sFixed x%d: %s bid/%s buyout", whitespace(12), quantity, coinsBid, coinsBuy)
 			tooltip:AddLine(text)
 		end
 	end
@@ -149,10 +153,10 @@ function lib.ProcessTooltip(tooltip, name, link, quality, quantity, cost, additi
 				coinsBuy = private.coins(lowBuy*quantity)
 			end
 			if quantity == 1 then
-				local text = string.format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
+				local text = format("%sUndercut: %s bid/%s buyout", whitespace(8), coinsBid, coinsBuy)
 				tooltip:AddLine(text)
 			else
-				local text = string.format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
+				local text = format("%sUndercut x%d: %s bid/%s buyout", whitespace(8), quantity, coinsBid, coinsBuy)
 				tooltip:AddLine(text)
 			end
 		else

@@ -51,6 +51,7 @@ local PushScan = AucAdvanced.Scan.PushScan
 local AucIsScanning = AucAdvanced.Scan.IsScanning
 local PostAuctionClick = AucAdvanced.Post.PostAuctionClick
 local ShowItemLink = AucAdvanced.ShowItemLink
+local ShowPetLink = AucAdvanced.ShowPetLink
 
 local IsPlayerIgnored -- to be filled in when Auc-Filter-Basic loads
 AucAdvanced.RegisterModuleCallback("basic", function(lib) IsPlayerIgnored = lib.IsPlayerIgnored end)
@@ -724,9 +725,7 @@ function private.DoTooltip()
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 10, 0)
 	elseif strmatch(link, "|Hbattlepet:") then
-		local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
-		BattlePetToolTip_Show(tonumber(speciesID), tonumber(level), tonumber(breedQuality), tonumber(maxHealth), tonumber(power), tonumber(speed), string.gsub(string.gsub(link, "^(.*)%[", ""), "%](.*)$", ""))
-		-- somewhat hacky - BattlePetToolTip_Show anchors to GameTooltip's anchor point, but we want to specify our own anchor
+		ShowPetLink(BattlePetTooltip, link, frame.CurItem.count)
 		BattlePetTooltip:ClearAllPoints()
 		BattlePetTooltip:SetPoint("TOPLEFT", frame.icon, "TOPRIGHT", 10, 0)
 	end
