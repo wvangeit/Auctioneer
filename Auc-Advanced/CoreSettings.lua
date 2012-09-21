@@ -143,6 +143,7 @@ local settingDefaults = {
 	["core.scan.hybridscans"] = true,
 	["core.scan.pregetalldelay"] = 0,
 	["core.tooltip.altchatlink_leftclick"] = false,
+	["core.tooltip.enableincombat"] = false,
 }
 
 local function getDefault(setting)
@@ -617,6 +618,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",     0,	_TRANS('ADV_Interface_ModTTShow')) --"Show Tooltip:"
 	gui:AddControl(id, "Selectbox", 0, 1, { { "always", _TRANS('ADV_Interface_mts_always') }, {"alt", _TRANS('ADV_Interface_mts_alt') }, { "noalt", _TRANS('ADV_Interface_mts_noalt') }, {"shift", _TRANS('ADV_Interface_mts_shift') }, {"noshift", _TRANS('ADV_Interface_mts_noshift')}, {"ctrl", _TRANS('ADV_Interface_mts_ctrl')},{"noctrl", _TRANS('ADV_Interface_mts_noctrl')}, { "never", _TRANS('ADV_Interface_mts_never')} }, "ModTTShow")
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ModTTShow')) --"Determines Tooltip behavior. Always: Show Auctioneer's Tooltip every time. When <mod> is pressed: Only show Auctioneer's tooltip if the specified modifier is pressed. When <mod> is not pressed: Only show Auctioneer's tooltip if the specified modifier is not pressed. Never: Never show Auctioneer's tooltip."
+	gui:AddControl(id, "Checkbox",   0, 1, "core.tooltip.enableincombat", _TRANS("ADV_Interface_ShowTooltipInCombat")) --Show Auctioneer's tooltip when in combat
+	gui:AddTip(id, _TRANS("ADV_HelpTooltip_ShowTooltipInCombat")) --Enable the display of Auctioneer's extended tooltips while in combat. Auctioneer tooltips can occasionally cause brief screen freezes so they are best left disabled during combat.
 	gui:AddControl(id, "Checkbox",   0, 1, "core.tooltip.altchatlink_leftclick", _TRANS('ADV_Interface_AltChatLinkLeft')) --"Open tooltips from chat links with Alt left-clicks"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AltChatLinkLeft')) --"Enables opening a tooltip by left-clicking on an item link in chat while the Alt key is pressed."
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", _TRANS('ADV_Interface_ScanDataDisplay')) --"Display scan data tooltip"

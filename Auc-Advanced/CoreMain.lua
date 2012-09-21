@@ -61,6 +61,7 @@ local ALTCHATLINKTOOLTIP_OPEN
 local ScheduleMessage -- function("event", delay)
 
 local function OnTooltip(calltype, tip, hyperlink, quantity, name, quality)
+	if InCombatLockdown() and not AucAdvanced.Settings.GetSetting("core.tooltip.enableincombat") then return end
 	if not tip then return end
 	local ModTTShow = AucAdvanced.Settings.GetSetting("ModTTShow")
 	if ModTTShow then
