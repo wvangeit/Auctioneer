@@ -237,8 +237,9 @@ function lib.SanitizeLink(...) return tooltip:SanitizeLink(...) end
 function lib.DecodeLink(...) return tooltip:DecodeLink(...) end
 function lib.GetLinkQuality(...) return tooltip:GetLinkQuality(...) end
 function lib.ShowItemLink(...) return tooltip:ShowItemLink(...) end
-function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end
-lib.breakHyperlink = lib.BreakHyperlink
+function lib.ShowPetLink(...) return tooltip:ShowPetLink(...) end
+function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end -- Deprecated
+lib.breakHyperlink = lib.BreakHyperlink -- Deprecated
 
 do -- Faction and ServerKey related functions
 	local splitcache = {}

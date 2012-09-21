@@ -2427,6 +2427,8 @@ AuctioneerLocalizations = {
 		["PSS_Updated_NoMissed"]	= "updated items";
 
 		-- Section: Tooltip
+		["ADV_Tooltip_NotAvailable"]	= "Not Available";
+		["ADV_Tooltip_SeenBrackets"]	= "(seen %s)";
 		["APPR_Tooltip_AppraiserCurModel"]	= "Appraiser ({{%s}}x{{%s}})";
 		["APPR_Tooltip_PostedCount"]	= "Posted %2d at avg/ea %s";
 		["APPR_Tooltip_StartingBid"]	= "Starting bid x {{%d}}";
