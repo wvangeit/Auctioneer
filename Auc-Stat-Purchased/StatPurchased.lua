@@ -95,9 +95,10 @@ function lib.CommandHandler(command, ...)
 end
 
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
+function lib.Processors.itemtooltip(callbackType, ...)
 	private.ProcessTooltip(...)
 end
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 function lib.Processors.config(callbackType, ...)
 	--Called when you should build your Configator tab.
 	private.SetupConfigGui(...)
@@ -411,12 +412,12 @@ function private.SetupConfigGui(gui)
 end
 
 --[[ Local functions ]]--
-function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	if not get("stat.purchased.tooltip") then return end
 
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not get("stat.purchased.quantmul") then quantity = 1 end
-	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
+	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then

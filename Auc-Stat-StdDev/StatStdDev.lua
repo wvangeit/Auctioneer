@@ -85,9 +85,10 @@ function lib.CommandHandler(command, ...)
 end
 
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
+function lib.Processors.itemtooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
 end
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 function lib.Processors.config(callbackType, ...)
 	--Called when you should build your Configator tab.
 	private.SetupConfigGui(...)
@@ -334,7 +335,7 @@ function private.SetupConfigGui(gui)
 	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -343,7 +344,7 @@ function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, .
 
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not get("stat.stddev.quantmul") then quantity = 1 end
-	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
+	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	if (mean and mean > 0) then
 		tooltip:AddLine(_TRANS('SDEV_Tooltip_PricesPoints'):format(count) )--StdDev prices %d points:

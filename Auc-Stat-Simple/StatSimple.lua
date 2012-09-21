@@ -90,13 +90,14 @@ function lib.CommandHandler(command, ...)
 end
 
 lib.Processors = {
-	tooltip = function(callbackType, ...)
+	itemtooltip = function(callbackType, ...)
 		private.ProcessTooltip(...)
 	end,
 	config = function(callbackType, ...)
 		private.SetupConfigGui(...)
 	end,
 }
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
@@ -413,7 +414,7 @@ end
 
 --[[ Local functions ]]--
 
-function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost)
+function private.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -423,7 +424,6 @@ function private.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cos
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not get("stat.simple.quantmul") then quantity = 1 end
 
-	local serverKey = Resources.ServerKeyCurrent
 	local dayAverage, avg3, avg7, avg14, minBuyout, avgmins, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
 	local dispAvg3 = get("stat.simple.avg3")
 	local dispAvg7 = get("stat.simple.avg7")
