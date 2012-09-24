@@ -389,7 +389,7 @@ const.MillGroupYields = {
 	
 	[SHADOW_PIGMENT_HIGH] = {
 		[SHADOW_PIGMENT] = 3.0,
-		[MISTY_PIGMENT] = 0.6,
+		[MISTY_PIGMENT] = 0.56,
 		},
 }
 
