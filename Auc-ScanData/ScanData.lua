@@ -128,23 +128,35 @@ function lib.Colored(doIt, counts, alt, shorten)
 	return text
 end
 
-local query3 = {} -- 3 fields itemId, suffix & factor
+local query = {} -- resuable table
 function lib.GetImageCounts(hyperlink, maxPrice, items, serverKey)
 	if type(hyperlink) == "number" then
-		query3.itemId = hyperlink
-		query3.suffix = 0
-		query3.factor = 0
+		query.itemId = hyperlink
+		query.suffix = 0
+		query.factor = 0
 	else
-		local iType, iID, iSuffix, iFactor = decode(hyperlink)
-		if iType == "item" then
-			query3.itemId = iID
-			query3.suffix = iSuffix
-			query3.factor = iFactor
+		local linkType, id, suffix, factor = decode(hyperlink)
+		if linkType == "item" then
+			query.itemId = id
+			query.suffix = suffix
+			query.factor = factor
+			query.speciesID = nil
+			query.quality = nil
+			query.minItemLevel = nil
+			query.maxItemLevel = nil
+		elseif linkType == "battlepet" then
+			query.speciesID = id
+			query.quality = factor
+			query.minItemLevel = suffix
+			query.maxItemLevel = suffix
+			query.itemId = 82800
+			query.suffix = nil
+			query.factor = nil
 		else
 			return
 		end
 	end
-	local image = QueryImage(query3, serverKey)
+	local image = QueryImage(query, serverKey)
 
 	local totalBid, totalBuy = 0, 0
 
@@ -316,13 +328,13 @@ function lib.GetDistribution(hyperlink, serverKey)
 	return exact, suffix, base, myColors
 end
 
-function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality, quantity, cost)
+function lib.Processors.itemtooltip(callbackType, tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	if not get("scandata.tooltip.display") then return  end
 
 	tooltip:SetColor(0.3, 0.9, 0.8)
 
 	local doColor = true
-	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
+	local exact, suffix, base, dist = lib.GetDistribution(hyperlink, serverKey)
 	if not exact then return end
 
 	if base+suffix+exact <= 0 then
@@ -353,6 +365,7 @@ function lib.Processors.tooltip(callbackType, tooltip, name, hyperlink, quality,
 		end
 	end
 end
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 
 --[[ DATABASE FUNCTIONS ]]--
 function lib.GetAddOnInfo()
