@@ -40,9 +40,10 @@ local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdva
 local data
 
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
+function lib.Processors.itemtooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
 end
+lib.Processors.battlepettooltip = lib.Processors.itemtooltip
 
 function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
@@ -59,15 +60,12 @@ function lib.Processors.configchanged(callbackType, ...)
 end
 
 
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, additional)
-	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
-	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
-	-- display in the tooltip.
+function lib.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	if not  get("util.pricelevel.single") then return end
 
 	if not additional or not additional.buyoutPrice or not additional.minBid then return end
 
-	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, additional.minBid, additional.buyoutPrice)
+	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, additional.minBid, additional.buyoutPrice, nil, serverKey)
 	if (not priceLevel) then return end
 
 	tooltip:AddLine(("Price Level: %d%%"):format(priceLevel), perItem, r,g,b)

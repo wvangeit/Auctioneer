@@ -64,20 +64,8 @@ function lib.CommandHandler(command, ...)
 	end
 end
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		if private.SetupConfigGui then -- only call it once
-			private.SetupConfigGui(...)
-		end
-	elseif (callbackType == "scanstats") then
-		private.ResetCache()
-		private.RepackStats()
-	end
-end
 lib.Processors = {}
-function lib.Processors.tooltip(callbackType, ...)
+function lib.Processors.itemtooltip(callbackType, ...)
 	lib.ProcessTooltip(...)
 end
 function lib.Processors.config(callbackType, ...)
@@ -326,12 +314,12 @@ function private.SetupConfigGui(gui)
 	if tooltipID then private.addTooltipControls(tooltipID) end
 end
 
-function lib.ProcessTooltip(tooltip, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	if not get("stat.ilevel.tooltip") then return end
 
 	if not quantity or quantity < 1 then quantity = 1 end
 	if not get("stat.ilevel.quantmul") then quantity = 1 end
-	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
+	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink, serverKey)
 
 	if (mean and mean > 0) then
 		tooltip:SetColor(0.3, 0.9, 0.8)
