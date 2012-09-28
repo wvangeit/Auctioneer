@@ -248,6 +248,7 @@ local isClass = {
 	["PRIEST"] = CLOTH,
 	["WARLOCK"] = CLOTH,
 	["DRUID"] = LEATHER,
+	["MONK"] = LEATHER,
 	["ROGUE"] = LEATHER,
 	--lvl 40
 	["WARRIOR"] = PLATE,
