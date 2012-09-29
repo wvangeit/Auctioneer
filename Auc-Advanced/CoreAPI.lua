@@ -1043,6 +1043,29 @@ function lib.GetStoreKeyFromLink(link, petBand)
 	end
 end
 
+-- Generate Store Key as above, but from a sig
+function lib.GetStoreKeyFromSig(sig, petBand)
+	local s1,s2,s3,s4 = strsplit(":", sig)
+	if s1 == "P" then -- battlepet sig
+		if petBand and s4 and s4 ~= "-1" then
+			local level = tonumber(s3) -- level
+			if not level or level < 1 then return end
+			if petBand > 1 then
+				level = ceil(level / petBand)
+			end
+			return s2, format("%d", level).."p"..s4, "battlepet" -- "speciesID", "compressedLevel..p..quality", linktype
+		end
+	else -- item sig
+		if s3 and s3 ~= "0" then -- factor
+			return s1, s2.."x"..s3, "item" -- "itemId", "suffix..x..factor", linktype
+		elseif s2 then
+			return s1, s2, "item" -- "itemId", "suffix", linktype
+		else
+			return s1, "0", "item" -- "itemId", "suffix", linktype
+		end
+	end
+end
+
 -------------------------------------------------------------------------------
 -- Statistical devices created by Matthew 'Shirik' Del Buono
 -- For Auctioneer
