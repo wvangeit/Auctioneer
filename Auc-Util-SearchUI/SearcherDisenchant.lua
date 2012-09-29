@@ -29,6 +29,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
+if not AucSearchUI then return end
 local lib, parent, private = AucSearchUI.NewSearcher("Disenchant")
 if not lib then return end
 --local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
@@ -68,14 +69,6 @@ function lib.Processor(event, subevent)
 		end
 	end
 end
-
-lib.Processors = {}
-function lib.Processors.selecttab(event, subevent)
-	if subevent == lib.tabname and private.doValidation then
-		private.doValidation()
-	end
-end
-
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)

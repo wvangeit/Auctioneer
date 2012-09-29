@@ -29,6 +29,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 -- Create a new instance of our lib with our parent
+if not AucSearchUI then return end
 local lib, parent, private = AucSearchUI.NewSearcher("General")
 if not lib then return end
 local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
@@ -216,18 +217,10 @@ function lib.Rescan()
 	local searchtype = get("general.type")
 	local searchsubtype = get("general.subtype")
 
-	local classIndex, subclassIndex
-	for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
-		if catName == searchtype then
-			classIndex = catId
-			for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[catId]) do
-				if subName == searchsubtype then
-					subclassIndex = subId
-					break
-				end
-			end
-			break
-		end
+	local classIndex = AucAdvanced.Const.CLASSESREV[searchtype]
+	local subclassIndex
+	if classIndex then
+		subclassIndex = AucAdvanced.Const.SUBCLASSESREV[searchtype][searchsubtype]
 	end
 
 	if name then
