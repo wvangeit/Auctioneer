@@ -152,7 +152,7 @@ do -- limit scope of locals
 
 	local function EnchantrixFunc(model, link, serverKey)
 		-- GetReagentPrice does not handle serverKey, and it does not return a seen count
-		if serverKey ~= coreResources.ServerKeyCurrent then return end
+		if serverKey and serverKey ~= coreResources.ServerKeyCurrent then return end
 		local extra, mkt, five, _
 		_, extra = Enchantrix.Util.GetPricingModel()
 		_, _, mkt, five = Enchantrix.Util.GetReagentPrice(link, extra)
