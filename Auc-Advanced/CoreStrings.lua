@@ -2441,7 +2441,7 @@ AuctioneerLocalizations = {
 		["PSS_Updated_NoMissed"]	= "updated items";
 
 		-- Section: Tooltip
-		["ADV_Tooltip_HourDepositCost"]	= "%dhr Deposit:";
+		["ADV_Tooltip_HourDepositCost"]	= "%dhr Deposit";
 		["ADV_Tooltip_NotAvailable"]	= "Not Available";
 		["ADV_Tooltip_SeenBrackets"]	= "(seen %s)";
 		["ADV_Tooltip_UnknownDepositCost"]	= "Unknown deposit cost";
@@ -9515,7 +9515,7 @@ AuctioneerLocalizations = {
 		["PSS_Updated_NoMissed"]	= "更新的物品";
 
 		-- Section: Tooltip
-		["ADV_Tooltip_HourDepositCost"]	= "%d小時的保證金：";
+		["ADV_Tooltip_HourDepositCost"]	= "%d小時的保證金";
 		["ADV_Tooltip_NotAvailable"]	= "無法取得";
 		["ADV_Tooltip_SeenBrackets"]	= "(已見 %s)";
 		["ADV_Tooltip_UnknownDepositCost"]	= "保證金未知";
