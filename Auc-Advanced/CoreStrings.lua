@@ -1099,6 +1099,7 @@ AuctioneerLocalizations = {
 		["AAMU_Interface_DepositTooltip"]	= "Einstellgebühr nicht im Tooltip anzeigen";
 		["AAMU_Interface_GeneralOptions"]	= "Allgemeine Optionen";
 		["AAMU_Interface_GUIOptions"]	= "GUI-Optionen";
+		["AAMU_Interface_MailButtons"]	= "Benutzerdefinierte Post-Knöpfe";
 		["AAMU_Interface_MailGUI"]	= "Post-GUI mit zusätzlichen Briefkastenfunktionen aktivieren";
 		["AAMU_Interface_OverrideSUIMail"]	= "Benutze ItemSuggest-Werte statt der SearchUI-Gründe für den Mail-Loader";
 		["AAMU_Interface_Vendoring"]	= "AutoMagic-Verkauf aktivieren (A C H T U N G: VORHER HILFE LESEN!)";
