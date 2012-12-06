@@ -1490,8 +1490,10 @@ AuctioneerLocalizations = {
 		["PSS_Updated_NoMissed"]	= "Geänderte Gegenstände";
 
 		-- Section: Tooltip
+		["ADV_Tooltip_HourDepositCost"]	= "%dhr Gebür";
 		["ADV_Tooltip_NotAvailable"]	= "nicht verfügbar";
 		["ADV_Tooltip_SeenBrackets"]	= "%s mal gesehen";
+		["ADV_Tooltip_UnknownDepositCost"]	= "weiß keine Höhe der Gebür";
 		["APPR_Tooltip_AppraiserCurModel"]	= "Appraiser ({{%s}}x{{%s}})";
 		["APPR_Tooltip_PostedCount"]	= "%2d eingestellt zu avg/ea %s";
 		["APPR_Tooltip_StartingBid"]	= "Startgebot x {{%d}}";
