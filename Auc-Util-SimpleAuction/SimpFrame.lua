@@ -101,7 +101,9 @@ function private.GetKey(link)
 	-- for items this matches itemId, suffix and factor
 	-- for pets this matches speciesId, level and quality
 	local id, property = GetStoreKeyFromLink(link, 1)
-	return id..":"..property
+	if id then -- only need to check id, property should also be non nil in this case
+		return id..":"..property
+	end
 end
 function private.IsMatchingKey(key, item)
 	itemlink = item[Const.LINK]
@@ -114,6 +116,7 @@ function private.GetMyPrice(link, items)
 	local uBid, uBuy
 	if not link then return end
 	local searchkey = private.GetKey(link)
+	if not searchkey then return end
 	local n = GetNumAuctionItems("owner")
 	if n and n > 0 then
 		for i = 1, n do
