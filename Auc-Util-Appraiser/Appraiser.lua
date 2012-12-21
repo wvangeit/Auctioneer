@@ -366,23 +366,25 @@ function private.GetPriceCore(sig, link, serverKey, match)
 	local stack = get("util.appraiser.item."..sig..".stack") or get("util.appraiser.stack")
 	local number = get("util.appraiser.item."..sig..".number") or get("util.appraiser.number")
 	local  _, _, _, _, _, _, _, maxStack = GetItemInfo(link)
+	if not maxStack then maxStack = 1 end
 	--we only officially accept "max" or a number, but user could have input any random string, so add some sanitization
 	stack = tonumber(stack)
 	if stack then
-		if maxStack and stack > maxStack then
+		if stack > maxStack then
 			stack = maxStack --never allow a saved stack value larger than the item can really stack to
 		elseif stack < 1 then
 			stack = 1
 		end
 	else
-		stack = maxStack or 1
+		stack = maxStack
 	end
 	if number == "maxplus" then
 		number = -1
 	elseif number == "maxfull" then
 		number = -2
+	else
+		number = tonumber(number)
 	end
-	number = tonumber(number)
 
 	-- generate bid value
 	if curModel ~= "fixed" and newBuy then
