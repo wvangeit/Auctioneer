@@ -286,38 +286,6 @@ local isHerb =
 	[89639] = true,--Desecrated Herb
 	}
 
---what armor each class can use localized
-local _, CLOTH, LEATHER, MAIL, PLATE = GetAuctionItemSubClasses(2) --only way I found to get a localized subtype
-local isClass = {
-	["DEATHKNIGHT"] = PLATE,
-	["MAGE"] = CLOTH,
-	["PRIEST"] = CLOTH,
-	["WARLOCK"] = CLOTH,
-	["DRUID"] = LEATHER,
-	["MONK"] = LEATHER,
-	["ROGUE"] = LEATHER,
-	--lvl 40
-	["WARRIOR"] = PLATE,
-	["WARRIORLOW"] = MAIL, --warriors and paladins plate does not appear before 40,
-	["PALADIN"] = PLATE,
-	["PALADINLOW"] = MAIL,
-	["HUNTER"] = MAIL,
-	["HUNTERLOW"] = LEATHER,
-	["SHAMAN"] = MAIL,
-	["SHAMANLOW"] = LEATHER,
-}
-
-local playerArmorType
-function lib.playerArmor()
-	local _, class =  UnitClass("player")
-	local level = UnitLevel("player")
-	if not isClass[class] then print("Unknown player class..", class) return end
-
-	if level < 40 and (class == "WARRIOR" or class == "PALADIN" or class == "HUNTER" or class == "SHAMAN") then
-		class = class.."LOW"
-	end
-	return isClass[class]
-end
 --Inv slot types, used to help define what gear is usable via tooltip parse
 local InventoryTypes = {
 	[INVTYPE_2HWEAPON] = INVTYPE_2HWEAPON,
@@ -357,13 +325,6 @@ local ScanTip3 = AppraiserTipTextLeft3
 local ScanTipRight2  = AppraiserTipTextRight2
 local ScanTipRight3 = AppraiserTipTextRight3
 function lib.cannotUse(itemSubType)
-	--check desirable armor types
-	if itemSubType == CLOTH or itemSubType == LEATHER or itemSubType == MAIL or itemSubType == PLATE then
-		if playerArmorType ~= itemSubType then
---~ 			print(1, AppraiserTipTextLeft1:GetText(), ScanTip2:GetText(), playerArmorType ,itemSubType)
-			return true
-		end
-	end
 	--scan tooltip  if its a valid equip text, look at color
 	if InventoryTypes[ScanTip2:GetText()] or InventoryTypes[ScanTip3:GetText()] then
 		local hex,r,g,b
@@ -416,9 +377,7 @@ end
 
 lib.vendorlist = {}
 function lib.vendorAction(autovendor)
-	if not playerArmorType then
-		 playerArmorType = lib.playerArmor()--create the players localized usable armor
-	end
+
 	empty(lib.vendorlist) --this needs to be cleared on every vendor open
 --~ 	local  ignoredItemsFound --used to alert players that some vendor items were skipped
 	for bag=0,4 do
