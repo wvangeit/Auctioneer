@@ -110,12 +110,12 @@ function lib.makeMailGUI()
 	lib.ammailgui.mguimailfor = lib.mguimailfor
 	
 	
-	lib.createMailButton("Disenchant", "Add all items tagged \nfor DE to the mail.", lib.disenchantAction)
-	lib.createMailButton("Gems", "Add all Gems to the mail.", lib.gemAction)
-	lib.createMailButton("Herbs", "Add all items classified \nas herbs to the mail", lib.herbAction)
-	lib.createMailButton("Prospect", "Add all items tagged \nfor Prospect to the mail.", lib.prospectAction)
-	lib.createMailButton("Chant Mats", "Add all Enchanting mats \nto the mail.", lib.dematAction)
-	lib.createMailButton("Pigments", "Add all Pigments \nto the mail.", lib.pigmentAction)
+	lib.createMailButton("Disenchant", "Add all items tagged \nfor DE to the mail.", function() lib.scanBags(lib.disenchantAction) end )
+	lib.createMailButton("Gems", "Add all Gems to the mail.", function() lib.scanBags(lib.gemAction) end )
+	lib.createMailButton("Herbs", "Add all items classified \nas herbs to the mail", function() lib.scanBags(lib.herbAction) end )
+	lib.createMailButton("Prospect", "Add all items tagged \nfor Prospect to the mail.", function() lib.scanBags(lib.prospectAction) end )
+	lib.createMailButton("Chant Mats", "Add all Enchanting mats \nto the mail.", function() lib.scanBags(lib.dematAction) end )
+	lib.createMailButton("Pigments", "Add all Pigments \nto the mail.", function() lib.scanBags(lib.pigmentAction) end )
 	
 	--Lets make the Reason code based buttons a  different color Blue for SUI rule based, Green for default lists
 	do
