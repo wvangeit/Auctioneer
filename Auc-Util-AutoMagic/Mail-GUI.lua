@@ -197,7 +197,7 @@ function lib.makeMailGUI()
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 	
 	function frame.slotclear()
-		frame.slot:SetNormalTexture("Interface\\Buttons\\UI-EmptySlot-Disabled")
+		frame.slot:SetNormalTexture(nil)
 		frame.slot.help:SetText("Drop item into box")
 		frame.slot.workingItem = nil
 		frame.addButton:Disable()
@@ -391,14 +391,17 @@ function lib.makeMailGUI()
 	frame.slot:SetWidth(38)
 	frame.slot:SetHeight(38)
 	frame.slot:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
-	frame.slot:SetScript("OnClick", frame.slotclear)
-	frame.slot:SetScript("OnReceiveDrag", function(self, data) 
-					local objtype, itemID = GetCursorInfo()
-					ClearCursor()
-					if objtype == "item" then
-						frame.slotadd(itemID, true)
-					end
-				end)
+		function frame.slotIconDrop(self, data, ...)
+			local objtype, itemID = GetCursorInfo()
+			ClearCursor()
+			if objtype == "item" then
+				frame.slotadd(itemID, true)
+			else
+				frame.slotclear()
+			end
+		end
+	frame.slot:SetScript("OnClick", frame.slotIconDrop)
+	frame.slot:SetScript("OnReceiveDrag", frame.slotIconDrop)
 
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
