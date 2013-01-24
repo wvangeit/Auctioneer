@@ -1429,6 +1429,7 @@ EnchantrixLocalizations = {
 		["GuiValuateEnable"]	= "Activer l'évaluation";
 		["GuiValuateHeader"]	= "Évaluation";
 		["GuiValuateMedian"]	= "Évaluer avec les moyennes d'Auctioneer";
+		["HelpAltChatlink"]	= "Permet l'ouverture d'une info-bulle par un clic gauche sur un lien d'objet dans le chat pendant que la touche Alt est enfoncée.";
 		["HelpClear"]	= "Efface les données de l'objet spécifié (vous devez maj-cliquer le ou les objets dans la ligne de commande) Vous pouvez également spécifier le mot-clef \"tout\"";
 		["HelpDefault"]	= "Réinitialise une option d'Enchantrix à sa valeur par défaut. Vous pouvez spécifier le mot-clef \"tout\" pour réinitialiser toutes les options d'Enchantrix.";
 		["HelpDisable"]	= "Empêche le chargement automatique d'Enchantrix lors de votre prochaine connexion.";
@@ -2792,7 +2793,7 @@ EnchantrixLocalizations = {
 		-- Section: Commands
 		["CmdClear"]	= "Очистить";
 		["CmdDefault"]	= "Стандартные";
-		["CmdDisable"]	= "выведите из строя";
+		["CmdDisable"]	= "Выключить";
 		["CmdFindBidauct"]	= "bidbroker";
 		["CmdFindBidauctShort"]	= "bb";
 		["CmdFindBuyauct"]	= "percentless";
@@ -2807,6 +2808,7 @@ EnchantrixLocalizations = {
 		["ShowDEMaterials"]	= "материалы";
 		["ShowEmbed"]	= "вставлять";
 		["ShowGuessAuctioneerVal"]	= "оценить-val";
+		["ShowGuessBaseline"]	= "базовая оценка";
 		["ShowTerse"]	= "сжатый";
 		["ShowUI"]	= "показать";
 		["ShowValue"]	= "Оценка стоимости";
@@ -2814,9 +2816,9 @@ EnchantrixLocalizations = {
 		["StatOn"]	= "Показывать сконфигурированные данные по зачаровыванию";
 
 		-- Section: Config Text
-		["GuiLoad"]	= "Load Enchantrix";
-		["GuiLoad_Always"]	= "always";
-		["GuiLoad_Never"]	= "never";
+		["GuiLoad"]	= "Загрузка Enchantrix";
+		["GuiLoad_Always"]	= "всегда";
+		["GuiLoad_Never"]	= "никогда";
 
 		-- Section: Game Constants
 		["ArgSpellMillingName"]	= "Измельчение";
