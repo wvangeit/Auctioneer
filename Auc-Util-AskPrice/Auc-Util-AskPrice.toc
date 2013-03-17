@@ -1,7 +1,7 @@
 ## Title: Auc:Util:Ask Price
 ## Notes: Auctioneer utility that automatically responds to requests for pricing via the guild and, or, party chat channesl.
 ##
-## Interface: 50100
+## Interface: 50200
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)

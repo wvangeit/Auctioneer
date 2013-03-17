@@ -1,5 +1,5 @@
 ## Title: Auc:Util:ItemSuggest
-## Interface: 50100
+## Interface: 50200
 ## OptionalDependencies:
 ## Dependencies: Auc-Advanced
 ##
