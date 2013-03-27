@@ -957,7 +957,7 @@ function lib.GetLinkFromSig(sig)
 		if qual == -1 then
 			qual_col = NORMAL_FONT_COLOR_CODE
 		else
-			qual_col = ITEM_QUALITY_COLORS[tonumber(s4)] -- "|cffxxxxxx"
+			qual_col = ITEM_QUALITY_COLORS[qual] -- "|cffxxxxxx"
 		end
 		if not qual_col then return end
 		local name = C_PetJournal.GetPetInfoBySpeciesID(speciesID)

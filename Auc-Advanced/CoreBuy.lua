@@ -228,11 +228,12 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosear
 		else
 			local lType, speciesID, _, petQuality = strsplit(":", link)
 			lType = lType:sub(-9)
+			speciesID = tonumber(speciesID)
 			if lType == "battlepet" and speciesID then
 				-- it's a pet
 				local _,_,_,_,iMin, iType = GetItemInfo(82800) -- Pet Cage
 				-- all caged pets should have the default pet name (custom names are removed when caging)
-				local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(speciesID))
+				local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 				if not petType then
 					-- indicates it's not a recognized Pet species
 					return QueueBuyErrorHelper(link, "NoPet")

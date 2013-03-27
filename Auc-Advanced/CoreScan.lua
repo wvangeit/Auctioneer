@@ -995,9 +995,11 @@ local Commitfunction = function()
 					local _, speciesID, level = strsplit(":", data[Const.LINK])
 					speciesID, level = tonumber(speciesID), tonumber(level)
 					data[Const.ILEVEL] = data[Const.ILEVEL] or level -- should have been obtained from GetAuctionItemInfo anyway
-					local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
-					if petType then
-						data[Const.ISUB] = cSubtypeLookup[petType]
+					if speciesID then
+						local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+						if petType then
+							data[Const.ISUB] = cSubtypeLookup[petType]
+						end
 					end
 				end
 			else
@@ -1749,14 +1751,9 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 			itemData[Const.IEQUIP] = nil -- always nil for Pet Cages
 			uLevel = uLevel or cUseLevel
 			-- get the proper subtype
-			local header, speciesID = strsplit(":", itemLink)
-			if header:sub(-4) == "item" then
-				-- extra special handling for certain bugged pet cages on the Beta, that have an "item" link type
-				-- these are all Pet Cages for pets that cannot be caged! (created before Blizzard decided to make some pets non-tradeable)
-				-- ### this section of code to be removed when the beta ends ###
-				itemData[Const.ISUB] = "BattlePet"
-			else
-				speciesID = tonumber(speciesID)
+			local _, speciesID = strsplit(":", itemLink)
+			speciesID = tonumber(speciesID)
+			if speciesID then
 				local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 				if petType then
 					itemData[Const.ISUB] = cSubtypeLookup[petType]
@@ -1771,7 +1768,6 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 		itemData[Const.ENCHANT] = 0
 		itemData[Const.SEED] = 0
 	else
-
 		local itemInfo = private.GetItemInfoCache(itemId, itemLinksTried) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
 		if itemInfo then
 			itemData[Const.ITYPE] = itemInfo[1]

@@ -902,8 +902,11 @@ function private.LoadAuctionSlot(request)
 	if itemId == 82800 then
 		-- battlepet special handling
 		local _, speciesID, _, breedQuality = strsplit(":", link)
-		checkname = C_PetJournal.GetPetInfoBySpeciesID(tonumber(speciesID))
-		checkquality = tonumber(breedQuality)
+		speciesID = tonumber(speciesID)
+		if speciesID then
+			checkname = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+			checkquality = tonumber(breedQuality)
+		end
 	else
 		local na,_,qu = GetItemInfo(link)
 		checkname, checkquality = na, qu
