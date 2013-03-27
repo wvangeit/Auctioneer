@@ -413,7 +413,7 @@ local DARKFLAME_INK = 43125
 local BLACKFALLOW_INK = 61978
 local INFERNO_INK = 61981
 local INK_DREAMS = 79254
-local STARLIGHT_INK = 79253
+local STARLIGHT_INK = 79255
 
 const.ReverseInkList = {
 
