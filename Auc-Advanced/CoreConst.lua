@@ -135,7 +135,7 @@ local lib = {
 
 	MAXSKILLLEVEL = 600,
 	MAXUSERLEVEL = 90,
-	MAXITEMLEVEL = 510,
+	MAXITEMLEVEL = 550,
 }
 
 lib.InvTypes = lib.EquipEncode -- backward compatibility - deprecated entry
