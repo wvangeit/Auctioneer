@@ -639,10 +639,10 @@ local function initUI()
 		auto_de_prompt.Lines[i] = auto_de_prompt:CreateFontString("AutoDisenchantPromptLine"..i, "HIGH")
 		if (i == 1) then
 			auto_de_prompt.Lines[i]:SetPoint("TOPLEFT", auto_de_prompt.Item, "TOPRIGHT", 5, 5)
-			auto_de_prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",16)
+			auto_de_prompt.Lines[i]:SetFont(STANDARD_TEXT_FONT,16)
 		else
 			auto_de_prompt.Lines[i]:SetPoint("TOPLEFT", auto_de_prompt.Lines[i-1], "BOTTOMLEFT", 0, -5)
-			auto_de_prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",13)
+			auto_de_prompt.Lines[i]:SetFont(STANDARD_TEXT_FONT,13)
 		end
 		auto_de_prompt.Lines[i]:SetWidth(350)
 		auto_de_prompt.Lines[i]:SetJustifyH("LEFT")
