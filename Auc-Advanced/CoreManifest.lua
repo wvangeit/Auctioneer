@@ -55,7 +55,7 @@ if (tocVersion < 30000) then
 	msg.Text = msg:CreateFontString(nil, "HIGH")
 	msg.Text:SetPoint("TOPLEFT", msg, "TOPLEFT", 20, -20)
 	msg.Text:SetPoint("BOTTOMRIGHT", msg.Done, "TOPRIGHT", -10, 10)
-	msg.Text:SetFont("Fonts\\FRIZQT__.TTF",17)
+	msg.Text:SetFont(STANDARD_TEXT_FONT,17)
 	msg.Text:SetJustifyH("LEFT")
 	msg.Text:SetJustifyV("TOP")
 	msg.Text:SetShadowColor(0,0,0)
@@ -74,7 +74,7 @@ local lib = AucAdvanced
 
 lib.Version="<%version%>";
 if (lib.Version == "<".."%version%>") then
-	lib.Version = "5.15.DEV";
+	lib.Version = "5.16.DEV";
 end
 local major, minor, release, revision = strsplit(".", lib.Version)
 lib.MajorVersion = major

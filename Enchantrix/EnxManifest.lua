@@ -76,7 +76,7 @@ function manifest.ShowMessage(msg)
 		messageFrame.text = messageFrame:CreateFontString("", "HIGH")
 		messageFrame.text:SetPoint("TOPLEFT", messageFrame, "TOPLEFT", 10, -10)
 		messageFrame.text:SetPoint("BOTTOMRIGHT", messageFrame.done, "TOPRIGHT")
-		messageFrame.text:SetFont("Fonts\\FRIZQT__.TTF",13)
+		messageFrame.text:SetFont(STANDARD_TEXT_FONT,13)
 		messageFrame.text:SetJustifyH("LEFT")
 		messageFrame.text:SetJustifyV("TOP")
 	end
