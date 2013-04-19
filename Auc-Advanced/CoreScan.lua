@@ -2162,7 +2162,7 @@ local StorePageFunction = function()
 				maxTries, #retries, all_missed, names_missed, links_missed, ld_and_names_missed, link_data_missed ))
 		end
 
-		if (storecount > 0) then
+		if storecount > 0 or page == 0 then
 			qryinfo.page = page
 			curPages[page] = true -- we have pulled this page
 		end
