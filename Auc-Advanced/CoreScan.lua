@@ -146,7 +146,7 @@ if (not _G.AucAdvanced.Scan) then _G.AucAdvanced.Scan = {} end
 
 local SCANDATA_VERSION = "A" -- must match Auc-ScanData INTERFACE_VERSION
 
-local TOLERANCE_LOWERLIMIT = 250
+local TOLERANCE_LOWERLIMIT = 50
 local TOLERANCE_TAPERLIMIT = 10000
 
 local lib = _G.AucAdvanced.Scan
@@ -576,7 +576,9 @@ local function processBeginEndStats(processors, operation, querySizeInfo, Tempcu
 			local f = x.Func
 			local pOK, errormsg = pcall(f, operation, querySizeInfo, TempcurScanStats)
 			if (not pOK) then
-				if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, "ScanProcessor Error", ("ScanProcessor %s Returned Error %s"):format(x and x.Name or "??", errormsg)) end
+				local text = ("Error trapped for ScanProcessor '%s' in module %s:\n%s"):format(operation, x.Name, errormsg)
+				if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "ScanProcessor Error", text) end
+				geterrorhandler()(text)
 			end
 		end
 	end
@@ -610,7 +612,9 @@ local function processStats(processors, operation, curItem, oldItem)
 				end
 			else
 				if (_G.nLog) then
-					_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, "AuctionFilter Error", ("AuctionFilter %s Returned Error %s"):format(x and x.Name or "??", result or "??"))
+					local text = ("Error trapped for AuctionFilter in module %s:\n%s"):format(x.Name, errormsg)
+					if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "AuctionFilter Error", text) end
+					geterrorhandler()(text)
 				end
 			end
 		end
@@ -628,13 +632,10 @@ local function processStats(processors, operation, curItem, oldItem)
 			local x = po[i]
 			local f = x.Func
 			local pOK, errormsg = pcall(f, operation, statItem, oldItem and statItemOld or nil)
-			--if (oldItem) then
-			--	pOK, errormsg = pcall(func,operation, statItem, statItemOld)
-			--else
-			--	pOK, errormsg = pcall(func,operation, statItem)
-			--end
 			if (not pOK) then
-				if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, "ScanProcessor Error", ("ScanProcessor %s Returned Error %s"):format(x and x.Name or "??", errormsg)) end
+				local text = ("Error trapped for ScanProcessor '%s' in module %s:\n%s"):format(operation, x.Name, errormsg)
+				if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "ScanProcessor Error", text) end
+				geterrorhandler()(text)
 			end
 		end
 	end
@@ -1056,7 +1057,7 @@ local Commitfunction = function()
 	if scanCount > TOLERANCE_LOWERLIMIT then -- don't use tolerance for tiny scans
 		tolerance = get("core.scan.unresolvedtolerance")
 		if scanCount < TOLERANCE_TAPERLIMIT then -- taper tolerance for smaller scans
-			tolerance = tolerance * scanCount / TOLERANCE_TAPERLIMIT
+			tolerance = ceil(tolerance * scanCount / TOLERANCE_TAPERLIMIT)
 		end
 	end
 	if unresolvedCount > tolerance then
