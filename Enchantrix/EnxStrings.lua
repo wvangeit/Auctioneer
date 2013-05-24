@@ -1076,6 +1076,7 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix requiere la versión 3.4 o mayor de Auctioneer. Algunas características no estarán disponibles hasta que actualices tu instalación de Auctioneer.";
 
 		-- Section: Help Text
+		["GuiAltChatlink"]	= "Mostrar herramientas desde los links del chat pulsando Alt-Click-Izquierdo";
 		["GuiClearall"]	= "Elimina toda la información de Enchantrix";
 		["GuiClearallButton"]	= "Eliminar Todo";
 		["GuiClearallHelp"]	= "Clic aquí para eliminar toda la información de Enchantrix sobre el reino-facción actual.";
@@ -1101,6 +1102,7 @@ EnchantrixLocalizations = {
 		["GuiValuateEnable"]	= "Activa Valoración";
 		["GuiValuateHeader"]	= "Valoración";
 		["GuiValuateMedian"]	= "Valora con Promedios de Auctioneer";
+		["HelpAltChatlink"]	= "Habilita el abrir una herramienta haciendo Click-Izquierdo en el link de un item en el chat mientras la tecla Alt esta siendo presionada";
 		["HelpClear"]	= "Elimina la información sobre el objeto especificado (debes usar clic-mayúsculas para incluir el/los objeto(s) en el comando) También puedes especificar las palabra clave \"todo\"";
 		["HelpDefault"]	= "Establece una opción de Enchantrix a su valor por defecto. También puedes especificar la palabra clave especial \"todo\" para establecer todas las opciones de Enchantrix a sus valores por defecto.";
 		["HelpDisable"]	= "Impide que Enchantrix se cargue automáticamente la próxima vez que te conectes";
@@ -1156,6 +1158,7 @@ EnchantrixLocalizations = {
 		["FrmtPctlessSkipped"]	= "Saltadas %d subastas que están por debajo del margen de beneficios (%s)";
 
 		-- Section: Tooltip Messages
+		["Click"]	= "Click";
 		["FrmtBarkerPrice"]	= "Precio de Pregonero (margen de %d%%)";
 		["FrmtDEItemLevels"]	= "Se desencantan de niveles %d a %d del artículo.";
 		["FrmtDisinto"]	= "Se desencanta en:";
@@ -1186,6 +1189,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer no se ha cargado, usando los precios guardados]";
 		["FrmtWarnNoPrices"]	= "[No hay precios disponibles]";
 		["FrmtWarnPriceUnavail"]	= "[Algunos precios no están disponibles]";
+		["RightClick"]	= "Click-Derecho";
+		["ShiftClick"]	= "Shift-click";
+		["TipOpenConfig"]	= "Para editar la configuracion.";
+		["TipOpenEnchant"]	= "para abrir la ventana de encantamiento.";
+		["TipOpenJewel"]	= "para abrir la ventana de jollería.";
 		["TooltipMillingLevel"]	= "Habilidad de moler requerida %d";
 		["TooltipProspectLevel"]	= "Habilidad de prospección requerida %d";
 		["TooltipShowDisenchantLevel"]	= "Habilidad de desencantamiento requerida %d";
@@ -1268,6 +1276,14 @@ EnchantrixLocalizations = {
 		["GuiWeightSettings"]	= "Conveniencia de desencantar reactivo";
 		["GuiYes"]	= "Si";
 		["ModTTShow"]	= "Solo mostrar el globo de ayuda extra si Alt está pulsado.";
+		["ModTTShow_alt"]	= "Cuando se presiona la tecla Alt";
+		["ModTTShow_always"]	= "Siempre";
+		["ModTTShow_ctrl"]	= "Cuando se presiona la tecla Ctrl";
+		["ModTTShow_never"]	= "Nunca";
+		["ModTTShow_noalt"]	= "Cuando la tecla Alt no está siendo presionada";
+		["ModTTShow_noctrl"]	= "Cuando la tecla Ctrl no está siendo presionada";
+		["ModTTShow_noshift"]	= "Cuando la tecla Shift no está siendo presionada";
+		["ModTTShow_shift"]	= "Cuando la tecla Shift está siendo presionada";
 
 	};
 
