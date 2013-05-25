@@ -3,7 +3,6 @@
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://localizer.norganna.org/
 
-
 	AddOn: Auctioneer
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
