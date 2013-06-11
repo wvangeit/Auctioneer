@@ -93,37 +93,39 @@ local function debugPrint(...)
 end
 
 --used to allow beancounter to recive Processor events from Auctioneer. Allows us to send a search request to BC GUI
-if AucAdvanced and AucAdvanced.NewModule then
-	private.AucModule = AucAdvanced.NewModule(libType, libName) --register as an Adv Module for callbacks
-	local get, set, default = select(7, AucAdvanced.GetModuleLocals()) --Get locals for use getting settings
-	private.AucModule.locals = {["get"] = get, ["set"] = set, ["default"] = default}
+if AucAdvanced then
+	private.AucModule = AucAdvanced.NewModule(libType, libName, nil, true) --register as an Adv Module for callbacks
+	if private.AucModule then
+		local get, set, default = select(7, AucAdvanced.GetModuleLocals()) --Get locals for use getting settings
+		private.AucModule.locals = {["get"] = get, ["set"] = set, ["default"] = default}
 
-	function private.AucModule.Processor(callbackType, ...)
-		if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
-			local item = ...
-			if item.name then
-				if item.name ~= "" then
-					lib.API.search(item.name)
+		function private.AucModule.Processor(callbackType, ...)
+			if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself dont try looking for auction House links
+				local item = ...
+				if item.name then
+					if item.name ~= "" then
+						lib.API.search(item.name)
+					end
 				end
-			end
-		elseif (callbackType == "bidplaced") and lib.API.isLoaded then
-			private.storeReasonForBid(...)
-		end
-	end
-	private.AucModule.Processors = {}
-	function private.AucModule.Processors.querysent(callbackType, ...)
-		if lib.API.isLoaded then
-			local item = ...
-			if item.name then
-				if item.name ~= "" then
-					lib.API.search(item.name)
-				end
+			elseif (callbackType == "bidplaced") and lib.API.isLoaded then
+				private.storeReasonForBid(...)
 			end
 		end
-	end
-	function private.AucModule.Processors.bidplaced(callbackType, ...)
-		if lib.API.isLoaded then
-			private.storeReasonForBid(...)
+		private.AucModule.Processors = {}
+		function private.AucModule.Processors.querysent(callbackType, ...)
+			if lib.API.isLoaded then
+				local item = ...
+				if item.name then
+					if item.name ~= "" then
+						lib.API.search(item.name)
+					end
+				end
+			end
+		end
+		function private.AucModule.Processors.bidplaced(callbackType, ...)
+			if lib.API.isLoaded then
+				private.storeReasonForBid(...)
+			end
 		end
 	end
 end
