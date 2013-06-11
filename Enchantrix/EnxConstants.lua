@@ -73,7 +73,7 @@ const.StaticPrices = {
 	[10939] =   6000, -- Greater Magic Essence
 
 	[74250] = 300000, -- Mysterious Essence
-	[52717] =  80000, -- Lesser Celestial Essence
+	[52718] =  80000, -- Lesser Celestial Essence
 	[34056] =  75000, -- Lesser Cosmic Essence
 	[22447] =  38000, -- Lesser Planar Essence
 	[16202] =  52500, -- Lesser Eternal Essence
