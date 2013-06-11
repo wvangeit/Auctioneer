@@ -31,6 +31,7 @@
 if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
+if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local AppraiserValue, DisenchantValue, ProspectValue, VendorValue, bestmethod, bestvalue, runstop, _
 
@@ -238,6 +239,7 @@ local isHerb =
 	[8839] = true, --  Blindweed
 	[8845] = true, --  Ghost Mushroom
 	[8846] = true, --  Gromsblood
+	[10286] = true, -- Heart of the Wild
 	[13463] = true, --  Dreamfoil
 	[13464] = true, --  Golden Sansam
 	[13465] = true, --  Mountain Silversage

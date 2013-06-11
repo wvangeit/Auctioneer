@@ -31,6 +31,7 @@
 if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.AutoMagic
+if not lib then return end
 local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local GetPrice = function() return 0,0 end --fake getPrice when Appraiser is not available
 if AucAdvanced.Modules.Util.Appraiser then

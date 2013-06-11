@@ -32,6 +32,7 @@
 if not AucAdvanced then return end
 
 local lib = AucAdvanced.Modules.Util.SimpleAuction
+if not lib then return end
 local private = lib.Private
 local aucPrint,decode,_,_,replicate,_,get,set,default,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local Const = AucAdvanced.Const
