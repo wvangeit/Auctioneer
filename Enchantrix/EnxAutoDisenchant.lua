@@ -523,11 +523,13 @@ function showPrompt(link, bag, slot, value, spell)
 		end
 	end
 
-	if (AucAdvanced and AucAdvanced.Modules and AucAdvanced.Modules.Util
-		and AucAdvanced.Modules.Util.ItemSuggest) then
-		local suggestion = AucAdvanced.Modules.Util.ItemSuggest.itemsuggest( link, count )
-		if (suggestion) then
-			auto_de_prompt.Lines[5]:SetText( format( _ENCH("GuiAutoDESuggestion"), suggestion)  );
+	if AucAdvanced then
+		local itemSuggest = AucAdvanced.GetModule("ItemSuggest")
+		if itemSuggest then
+			local suggestion = itemSuggest.GetSuggestText(itemSuggest.Suggest( link, count ), "auto")
+			if suggestion ~= "Unknown" then
+				auto_de_prompt.Lines[5]:SetText( format( _ENCH("GuiAutoDESuggestion"), suggestion)  );
+			end
 		end
 	end
 
