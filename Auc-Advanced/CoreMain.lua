@@ -37,7 +37,6 @@
 	See CoreAPI.lua for a description of the modules API
 ]]
 local AucAdvanced = AucAdvanced
-if not AucAdvanced then return end
 
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
@@ -45,18 +44,10 @@ if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 
 local _, internal = AucAdvanced.GetCoreModule() -- Don't need a module but do need the addon internal storage area.
 
-
--- For our modular stats system, each stats engine should add their
--- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
--- data table in AucAdvancedData.Stats.<type><name>
-if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Filter={}, Match={}, Stat={}, Util={}} end
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
--- Load DebugLib
-local DebugLib = LibStub("DebugLib")
-
-local tooltip
+local tooltip = AucAdvanced.Libraries.TipHelper
 local ALTCHATLINKTOOLTIP_OPEN
 local ScheduleMessage -- function("event", delay)
 
@@ -347,7 +338,6 @@ local function OnEnteringWorld(frame)
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, HookClickBag)
 	hooksecurefunc("ChatFrame_OnHyperlinkShow", HookClickLink)
 
-	tooltip = AucAdvanced.GetTooltip()
 	tooltip:Activate()
 	tooltip:AddCallback({type = "item", callback = OnItemTooltip}, 600)
 	tooltip:AddCallback({type = "battlepet", callback = OnPetTooltip}, 600)
@@ -408,67 +398,5 @@ do -- ScheduleMessage handler
 	EventFrame:SetScript("OnUpdate", OnUpdate)
 end
 
-
--- Auctioneer's debug functions
-AucAdvanced.Debug = {}
-local addonName = "Auctioneer" -- the addon's name as it will be displayed in
-                               -- the debug messages
--------------------------------------------------------------------------------
--- Prints the specified message to nLog.
---
--- syntax:
---    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
---
--- parameters:
---    message   - (string) the error message
---                nil, no error message specified
---    category  - (string) the category of the debug message
---                nil, no category specified
---    title     - (string) the title for the debug message
---                nil, no title specified
---    errorCode - (number) the error code
---                nil, no error code specified
---    level     - (string) nLog message level
---                         Any nLog.levels string is valid.
---                nil, no level specified
---
--- returns:
---    errorCode - (number) errorCode, if one is specified
---                nil, otherwise
---    message   - (string) message, if one is specified
---                nil, otherwise
--------------------------------------------------------------------------------
-function AucAdvanced.Debug.DebugPrint(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
-end
-
--------------------------------------------------------------------------------
--- Used to make sure that conditions are met within functions.
--- If test is false, the error message will be written to nLog and the user's
--- default chat channel.
---
--- Brings the Level parameter into the auctioneer API fold.
-AucAdvanced.Debug.Level = DebugLib.Level
-
--------------------------------------------------------------------------------
--- Used to make sure that conditions are met within functions.
--- If test is false, the error message will be written to nLog and the user's
--- default chat channel.
---
--- syntax:
---    assertion = assert(test, message)
---
--- parameters:
---    test    - (any)     false/nil, if the assertion failed
---                        anything else, otherwise
---    message - (string)  the message which will be output to the user
---
--- returns:
---    assertion - (boolean) true, if the test passed
---                          false, otherwise
--------------------------------------------------------------------------------
-function AucAdvanced.Debug.Assert(test, message)
-	return DebugLib.Assert(addonName, test, message)
-end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
