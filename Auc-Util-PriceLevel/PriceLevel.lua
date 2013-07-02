@@ -294,6 +294,7 @@ function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth, serverKey)
 		end
 		if not itemWorth then return end
 	end
+	if itemWorth < 1 then return end -- avoid 0 or very small itemWorth
 
 	local perItem = stackPrice / quantity
 	local priceLevel = perItem / itemWorth * 100
