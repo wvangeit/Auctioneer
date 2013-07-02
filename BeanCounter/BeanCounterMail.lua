@@ -304,7 +304,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][itemString][index])
 					postDeposit, postBuy, postBid, postTime = tonumber(postDeposit), tonumber(postBuy), tonumber(postBid), tonumber(postTime)
 					--if the deposits and buyouts match, check if time range would make this a possible match
-					if postDeposit == soldDeposit and postBuy >= soldBuy and postBid <= soldBuy then --We may have sold it on a bid so we need to loosen this search
+					if postDeposit == soldDeposit and (not postBuy or postBuy >= soldBuy) and postBid <= soldBuy then --We may have sold it on a bid so we need to loosen this search
 						if (soldTime > postTime) and (oldestPossible < postTime) then
 							tremove(private.playerData[key][itemID][itemString], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][itemString][index] = private.playerData[key][itemID][itemString][index]..";USED Sold"
