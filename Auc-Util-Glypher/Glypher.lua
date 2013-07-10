@@ -3,7 +3,7 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
-	
+
 	Glypher - Inscriptionist's 'Swiss Army Knife'
 	Tools for managing mass sales and production of glyphs
 
@@ -129,7 +129,9 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		totalPages = math.floor(totalPages)
 	end
 
+	if secondsElapsed < 1 then secondsElapsed = 1 end -- patch to avoid div 0
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
+	if auctionsScannedPerSecond < 1 then auctionsScannedPerSecond = 1 end -- patch to avoid div 0
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
 	timeRemaining = SecondsToTime(secondsToScanCompletion)
 	--print(timeRemaining .. " - " .. secondsToScanCompletion) -- debug to figure out how to eliminate the -hugenumber Sec
@@ -335,7 +337,7 @@ function private.round(num,idp)
 	local mult = 10^(idp or 0)
 	return math.floor(num * mult + 0.5) / mult
 end
-	
+
 
 local frame
 function private.SetupConfigGui(gui)
@@ -835,7 +837,7 @@ function private.cofindGlyphs()
 				local priceAppraiser = 0
 				if AucAdvanced.Modules.Util.Appraiser then
 					if forceGlypher then
-						priceAppraiser = AucAdvanced.Modules.Util.Glypher.GetPrice(link, AucAdvanced.GetFaction()) or 0 
+						priceAppraiser = AucAdvanced.Modules.Util.Glypher.GetPrice(link, AucAdvanced.GetFaction()) or 0
 					else
 						priceAppraiser = AucAdvanced.Modules.Util.Appraiser.GetPrice(link, AucAdvanced.GetFaction()) or 0
 					end
@@ -854,7 +856,7 @@ function private.cofindGlyphs()
 							bcProfit = bcProfit + (BeanCounter.API.getAHProfit(characterName, itemName, historyTime, time()) or 0)
 						end
 					end
-                else    
+                else
 					bcSold = BeanCounter.API.getAHSoldFailed(UnitName("player"), link, history) or 0
 					bcProfit, tmpLow, tmpHigh = BeanCounter.API.getAHProfit(UnitName("player"), itemName, historyTime, time()) or 0
 				end
@@ -927,8 +929,8 @@ function private.cofindGlyphs()
 					elseif makemaxstock then
 						make = maxstock - inventory
 					elseif (want > 0 or hardminstock) and want < minstock then
-						-- *must* gate minimum against the ceiling of our calculated want, not 
-						-- (want - inventory). If we calculate that we want 0.7 and we have 2 in 
+						-- *must* gate minimum against the ceiling of our calculated want, not
+						-- (want - inventory). If we calculate that we want 0.7 and we have 2 in
 						-- inventory, ceil(want - inventory) will be < 0, and we won't respect our
 						-- minimum-stock rule.
 						make = minstock - inventory
@@ -938,15 +940,15 @@ function private.cofindGlyphs()
 
 					-- Respect mincraft and maxstock
 					if inventory + mincraft > maxstock then
-						-- if mincraft would put us over the limit don't make anything (this 
+						-- if mincraft would put us over the limit don't make anything (this
 						-- avoids repeatedly topping off stacks)
 						make = 0
 					elseif make > 0 and make < mincraft then
 						make = mincraft
-					elseif make + inventory > maxstock then 
+					elseif make + inventory > maxstock then
 						make = maxstock - inventory
 					end
-					
+
 					assert(make <= 0 or make + inventory <= maxstock, "planned to make more than maxstock, logic error")
 					assert(make <= 0 or make >= mincraft, "planned to make less than mincraft, logic error")
 
@@ -983,7 +985,7 @@ function private.cofindGlyphs()
 				DEFAULT_CHAT_FRAME:AddMessage(messneed,0.8,0.33,0.33)
 				DEFAULT_CHAT_FRAME:AddMessage(messavail,0.8,0.33,0.33)
 				DEFAULT_CHAT_FRAME:AddMessage(messstock,0.8,0.33,0.33)
-		end 
+		end
 	end
 	private.frame.glypher.sheet:SetData(private.Display, Style)
 	private.frame.searchButton:Enable()
