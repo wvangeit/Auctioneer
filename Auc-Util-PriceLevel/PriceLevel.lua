@@ -255,7 +255,7 @@ function private.ListUpdate()
 			else
 				link =  GetAuctionItemLink("list", offset + i)
 				if link then
-					_,_, quantity, _,_,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)
+					_,_, quantity, _,_,_,_, minBid, minInc, buyPrice, bidPrice =  AucAdvanced.GetAuctionItemInfo("list", offset + i)
 					if bidPrice>0 then bidPrice = bidPrice + minInc
 					else bidPrice = minBid end
 					priceLevel, perItem, r,g,b = lib.CalcLevel(link, quantity, bidPrice, buyPrice)

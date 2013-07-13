@@ -1684,7 +1684,7 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 		return itemData
 	end
 
-	local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus, itemId = GetAuctionItemInfo(list, index)
+	local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus, itemId = AucAdvanced.GetAuctionItemInfo(list, index)
 	-- Check critical values (if we got those, assume we got the rest as well - except possibly owner)
 	if not (itemId and minBid) then
 		return itemData
@@ -2984,3 +2984,17 @@ internal.Scan.Logout = lib.Logout
 internal.Scan.AHClosed = lib.AHClosed
 
 _G.AucAdvanced.RegisterRevision("$URL$", "$Rev$")
+
+-- Hybrid mode GetAuctionItemInfo for transition from WoW 5.3 to 5.4
+-- Temporary - do not use in new code!
+local _,_,_,toc = GetBuildInfo()
+if toc < 50400 then
+	print("GetAuctionItemInfo for version 5.3")
+	AucAdvanced.GetAuctionItemInfo = GetAuctionItemInfo
+else
+	print("GetAuctionItemInfo for version 5.4")
+	function AucAdvanced.GetAuctionItemInfo(...)
+		local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId, hasAllInfo =  GetAuctionItemInfo(...)
+		return name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus, itemId, hasAllInfo
+	end
+end

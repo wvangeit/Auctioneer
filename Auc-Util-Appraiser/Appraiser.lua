@@ -439,7 +439,7 @@ function lib.GetOwnAuctionDetails()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("owner");
 	if totalAuctions >0 then
 		for i=1, totalAuctions do
-			local name, _, count, _, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
+			local name, _, count, _, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = AucAdvanced.GetAuctionItemInfo("owner", i)
 			if name and (count>0) then
 				if not results[name] then
 					results[name] = {}

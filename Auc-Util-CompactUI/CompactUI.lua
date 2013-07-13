@@ -549,7 +549,7 @@ function private.RetrievePage()
 
 			local name, texture, count, quality, canUse, level,
 				levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount,
-				highBidder, owner, saleStatus, itemId  = GetAuctionItemInfo("list", i)
+				highBidder, owner, saleStatus, itemId  = AucAdvanced.GetAuctionItemInfo("list", i)
 			local _, _, _, itemLevel, itemDetail = GetItemInfo(itemId)
 
 			if levelColHeader == "ITEM_LEVEL_ABBR" then
