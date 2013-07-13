@@ -44,8 +44,20 @@ end
 -------------------------------------------------------------------------------
 -- Called after PlaceAuctionBid()
 -------------------------------------------------------------------------------
+-- Hybrid mode GetAuctionItemInfo for transition from WoW 5.3 to 5.4
+-- Temporary - do not use in new code!
+local _,_,_,toc = GetBuildInfo()
+local hybridGetAuctionItemInfo
+if toc < 50400 then
+	hybridGetAuctionItemInfo = GetAuctionItemInfo
+else
+	function hybridGetAuctionItemInfo(...)
+		local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId, hasAllInfo =  GetAuctionItemInfo(...)
+		return name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, saleStatus, itemId, hasAllInfo
+	end
+end
 function private.postPlaceAuctionBidHook(_, _, listType, index, bid)
-	local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index)
+	local name, texture, count, quality, canUse, level, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = hybridGetAuctionItemInfo(listType, index)
 	local itemLink = GetAuctionItemLink(listType, index)
 	local timeLeft = GetAuctionItemTimeLeft(listType, index)
 	if (name and count and bid) then
