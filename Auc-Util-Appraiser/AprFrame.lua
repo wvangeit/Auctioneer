@@ -2057,6 +2057,36 @@ function private.CreateFrames()
 	frame.salebox.warn:SetJustifyH("RIGHT")
 	frame.salebox.warn:SetJustifyV("BOTTOM")
 
+	-- Options Slider helper functions
+	local function SliderValueChanged(self, value)
+		if self.isReEntering then
+			self.isReEntering = nil
+		else
+			local minValue, maxValue = self:GetMinMaxValues()
+			if value > minValue and value < maxValue then
+				-- value is no longer aligned to SetValueStep after WoW5.4, we need to check it ourselves
+				local step = self:GetValueStep()
+				local newValue = floor(value / step + 0.5) * step
+				-- check to see if realigning the value has pushed it outside min/max limits
+				if newValue < minValue then
+					newValue = minValue
+				elseif newValue > maxValue then
+					newValue = maxValue
+				end
+				if value ~= newValue then
+					-- setting a new value will trigger a re-entrant call to OnValueChanged...
+					self.isReEntering = true -- notify the triggered call that we are re-entering
+					self:SetValue(newValue)
+					return -- let the triggered call take over
+				end
+			end
+		end
+		frame.updated = true
+	end
+	local function SliderMouseWheel(self, delta)
+		self:SetValue(self:GetValue() - delta)
+	end
+
 	frame.salebox.stack = CreateFrame("Slider", "AppraiserSaleboxStack", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.stack:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -5)
 	frame.salebox.stack:SetHitRectInsets(0,0,0,0)
@@ -2064,17 +2094,13 @@ function private.CreateFrames()
 	frame.salebox.stack:SetValueStep(1)
 	frame.salebox.stack:SetValue(20)
 	frame.salebox.stack:SetWidth(180)
-	frame.salebox.stack:SetScript("OnValueChanged", function() frame.updated = true end)
+	frame.salebox.stack:SetScript("OnValueChanged", SliderValueChanged)
 	frame.salebox.stack:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
 	frame.salebox.stack:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
-
 	frame.salebox.stack:EnableMouseWheel(1)
-	frame.salebox.stack:SetScript("OnMouseWheel", function(self, delta)
-		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + -delta)
-	end)
-
+	frame.salebox.stack:SetScript("OnMouseWheel", SliderMouseWheel)
 	AppraiserSaleboxStackLow:SetText("")
 	AppraiserSaleboxStackHigh:SetText("")
 
@@ -2083,6 +2109,34 @@ function private.CreateFrames()
 	frame.salebox.stack.label:SetJustifyH("LEFT")
 	frame.salebox.stack.label:SetJustifyV("CENTER")
 
+	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.stackentry:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 10, 0)
+	frame.salebox.stackentry:SetNumeric(true)
+	frame.salebox.stackentry:SetNumber(0)
+	frame.salebox.stackentry:SetHeight(16)
+	frame.salebox.stackentry:SetWidth(32)
+	frame.salebox.stackentry:SetAutoFocus(false)
+	frame.salebox.stackentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
+	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
+		frame.salebox.stackentry:ClearFocus()
+		frame.updated = true
+	end)
+	frame.salebox.stackentry:SetScript("OnTabPressed", function()
+		frame.salebox.numberentry:SetFocus()
+		frame.updated = true
+	end)
+	frame.salebox.stackentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.stackentry:GetText()
+		if text ~= "" then
+			frame.updated = true
+		end
+	end)
+	frame.salebox.stackentry:SetScript("OnEscapePressed", function()
+		frame.salebox.stackentry:ClearFocus()
+	end)
+	frame.salebox.stackentry:Hide()
+
 	frame.salebox.number = CreateFrame("Slider", "AppraiserSaleboxNumber", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0, -15)
 	frame.salebox.number:SetHitRectInsets(0,0,0,0)
@@ -2090,14 +2144,13 @@ function private.CreateFrames()
 	frame.salebox.number:SetValueStep(1)
 	frame.salebox.number:SetValue(1)
 	frame.salebox.number:SetWidth(180)
-	frame.salebox.number:SetScript("OnValueChanged", function() frame.updated = true end)
+	frame.salebox.number:SetScript("OnValueChanged", SliderValueChanged)
 	frame.salebox.number:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
 	frame.salebox.number:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.number.element = "number"
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
-
 	function frame.salebox.number:GetAdjustedValue()
 		local maxStax = self.maxStax or 0
 		local value = self:GetValue()
@@ -2130,16 +2183,41 @@ function private.CreateFrames()
 		self:SetMinMaxValues(1, maxStax+n)
 		self:SetAdjustedValue(math.min(curVal, maxStax))
 	end
-
 	frame.salebox.number:EnableMouseWheel(1)
-	frame.salebox.number:SetScript("OnMouseWheel", function(self, delta)
-		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + -delta)
-	end)
+	frame.salebox.number:SetScript("OnMouseWheel", SliderMouseWheel)
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.number.label:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,-4)
 	frame.salebox.number.label:SetJustifyH("LEFT")
 	frame.salebox.number.label:SetJustifyV("CENTER")
+
+	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.numberentry:SetPoint("LEFT", frame.salebox.number, "RIGHT", 10, 0)
+	frame.salebox.numberentry:SetNumeric(false)
+	frame.salebox.numberentry:SetHeight(16)
+	frame.salebox.numberentry:SetWidth(32)
+	frame.salebox.numberentry:SetNumber(0)
+	frame.salebox.numberentry:SetAutoFocus(false)
+	frame.salebox.numberentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
+	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
+	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
+		frame.salebox.numberentry:ClearFocus()
+		frame.updated = true
+	end)
+	frame.salebox.numberentry:SetScript("OnTabPressed", function()
+		frame.salebox.stackentry:SetFocus()
+		frame.updated = true
+	end)
+	frame.salebox.numberentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.numberentry:GetText():lower()
+		if (text ~= "") then
+			frame.updated = true
+		end
+	end)
+	frame.salebox.numberentry:SetScript("OnEscapePressed", function()
+		frame.salebox.numberentry:ClearFocus()
+	end)
+	frame.salebox.numberentry:Hide()
 
    	frame.salebox.numberonly = CreateFrame("CheckButton", "AppraiserSaleboxNumberOnly", frame.salebox, "OptionsCheckButtonTemplate")
  	frame.salebox.numberonly:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_RestrictActiveAuctions') ) end)--Restrict active auctions to the 'number' value
@@ -2164,7 +2242,7 @@ function private.CreateFrames()
 	frame.salebox.duration:SetValueStep(1)
 	frame.salebox.duration:SetValue(3)
 	frame.salebox.duration:SetWidth(80)
-	frame.salebox.duration:SetScript("OnValueChanged", function() frame.updated = true end)
+	frame.salebox.duration:SetScript("OnValueChanged", SliderValueChanged)
 	frame.salebox.duration:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetTimePostItem') ) end)--Set the time to post this item for
 	frame.salebox.duration:SetScript("OnLeave", function() return GameTooltip:Hide() end)
 	frame.salebox.duration.element = "duration"
@@ -2173,9 +2251,7 @@ function private.CreateFrames()
 	AppraiserSaleboxDurationHigh:SetText("")
 
 	frame.salebox.duration:EnableMouseWheel(1)
-	frame.salebox.duration:SetScript("OnMouseWheel", function(self, delta)
-		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() - delta)
-	end)
+	frame.salebox.duration:SetScript("OnMouseWheel", SliderMouseWheel)
 
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.duration.label:SetPoint("LEFT", frame.salebox.duration, "RIGHT", 3,2)
@@ -2760,62 +2836,6 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
-
-	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
-	frame.salebox.numberentry:SetPoint("LEFT", frame.salebox.number, "RIGHT", 10, 0)
-	frame.salebox.numberentry:SetNumeric(false)
-	frame.salebox.numberentry:SetHeight(16)
-	frame.salebox.numberentry:SetWidth(32)
-	frame.salebox.numberentry:SetNumber(0)
-	frame.salebox.numberentry:SetAutoFocus(false)
-	frame.salebox.numberentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberStacksPosted') ) end)--Set the number of stacks to be posted
-	frame.salebox.numberentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
-		frame.salebox.numberentry:ClearFocus()
-		frame.updated = true
-	end)
-	frame.salebox.numberentry:SetScript("OnTabPressed", function()
-		frame.salebox.stackentry:SetFocus()
-		frame.updated = true
-	end)
-	frame.salebox.numberentry:SetScript("OnTextChanged", function()
-		local text = frame.salebox.numberentry:GetText():lower()
-		if (text ~= "") then
-			frame.updated = true
-		end
-	end)
-	frame.salebox.numberentry:SetScript("OnEscapePressed", function()
-		frame.salebox.numberentry:ClearFocus()
-	end)
-	frame.salebox.numberentry:Hide()
-
-	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
-	frame.salebox.stackentry:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 10, 0)
-	frame.salebox.stackentry:SetNumeric(true)
-	frame.salebox.stackentry:SetNumber(0)
-	frame.salebox.stackentry:SetHeight(16)
-	frame.salebox.stackentry:SetWidth(32)
-	frame.salebox.stackentry:SetAutoFocus(false)
-	frame.salebox.stackentry:SetScript("OnEnter", function(self) return frame.SetButtonTooltip(self, _TRANS('APPR_HelpTooltip_SetNumberPerStack') ) end)--Set the number of items per posted stack
-	frame.salebox.stackentry:SetScript("OnLeave", function() return GameTooltip:Hide() end)
-	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
-		frame.salebox.stackentry:ClearFocus()
-		frame.updated = true
-	end)
-	frame.salebox.stackentry:SetScript("OnTabPressed", function()
-		frame.salebox.numberentry:SetFocus()
-		frame.updated = true
-	end)
-	frame.salebox.stackentry:SetScript("OnTextChanged", function()
-		local text = frame.salebox.stackentry:GetText()
-		if text ~= "" then
-			frame.updated = true
-		end
-	end)
-	frame.salebox.stackentry:SetScript("OnEscapePressed", function()
-		frame.salebox.stackentry:ClearFocus()
-	end)
-	frame.salebox.stackentry:Hide()
 
 	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
