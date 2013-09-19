@@ -42,6 +42,7 @@ local data
 
 local reset = true
 local cache, model, minseen, levels
+local CFromZ = {};
 
 function lib.Processor(callbackType, ...)
 	if callbackType == "config" then
@@ -66,20 +67,16 @@ function lib.AuctionFilter(operation, itemData)
 		return
 	end
 	if reset then
-		model = get("filter.outlier.model")
-		if model ~= "market" and not AucAdvanced.API.IsValidAlgorithm(model) then
-			model = "market"
-		end
 		minseen = get("filter.outlier.minseen")
 		cache = {}
 		levels = {}
-		if get("filter.outlier.poor.enabled") then levels[0] = get("filter.outlier.poor.level")/100 end
-		if get("filter.outlier.common.enabled") then levels[1] = get("filter.outlier.common.level")/100 end
-		if get("filter.outlier.uncommon.enabled") then levels[2] = get("filter.outlier.uncommon.level")/100 end
-		if get("filter.outlier.rare.enabled") then levels[3] = get("filter.outlier.rare.level")/100 end
-		if get("filter.outlier.epic.enabled") then levels[4] = get("filter.outlier.epic.level")/100 end
-		if get("filter.outlier.legendary.enabled") then levels[5] = get("filter.outlier.legendary.level")/100 end
-		if get("filter.outlier.artifact.enabled") then levels[6] = get("filter.outlier.artifact.level")/100 end
+		if get("filter.outlier.poor.enabled") then levels[0] = get("filter.outlier.poor.level") end
+		if get("filter.outlier.common.enabled") then levels[1] = get("filter.outlier.common.level") end
+		if get("filter.outlier.uncommon.enabled") then levels[2] = get("filter.outlier.uncommon.level") end
+		if get("filter.outlier.rare.enabled") then levels[3] = get("filter.outlier.rare.level") end
+		if get("filter.outlier.epic.enabled") then levels[4] = get("filter.outlier.epic.level") end
+		if get("filter.outlier.legendary.enabled") then levels[5] = get("filter.outlier.legendary.level") end
+		if get("filter.outlier.artifact.enabled") then levels[6] = get("filter.outlier.artifact.level") end
 		reset = false
 	end
 
@@ -91,11 +88,7 @@ function lib.AuctionFilter(operation, itemData)
 	local value = cache[link]
 	if not value then
 		local seen
-		if model == "market" then
-			value, seen = AucAdvanced.API.GetMarketValue(link)
-		else
-			value, seen = AucAdvanced.API.GetAlgorithmValue(model, link)
-		end
+		value, seen = AucAdvanced.API.GetMarketValue(link, nil, CFromZ[levels[quality]])
 
 		if not value or not seen or seen < minseen then
 			value = 0
@@ -108,20 +101,26 @@ function lib.AuctionFilter(operation, itemData)
 
 	-- Check to see if the item price is below the price
 	local price = itemData.buyoutPrice or itemData.price
-	local level = levels[quality]
-	local maxcap = value * level
+	local maxcap = value
 
 	-- If the price is acceptible then allow it
 	if itemData.stackSize > 1 then price = math.floor(price / itemData.stackSize) end
-	if price < maxcap then return false end
+	if price <= maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
+	nLog.AddMessage("Auctioneer", "Outlier", N_DEBUG, "Filtered item", string.format("Outlier filtered out item %s: price %d is above %d%% confidence level %d",
+		link, price, CFromZ[levels[quality]] * 100, value));
 	return true
 end
 
 function lib.OnLoad(addon)
+	local function boundConfiguration(name, max, default)
+		if get(name) > max then
+			set(name, default)
+		end
+	end
+
 	default("filter.outlier.activated", true)
-	default("filter.outlier.model", "market")
 	default("filter.outlier.minseen", 10)
 	default("filter.outlier.poor.enabled", true)
 	default("filter.outlier.common.enabled", true)
@@ -130,13 +129,21 @@ function lib.OnLoad(addon)
 	default("filter.outlier.epic.enabled", true)
 	default("filter.outlier.legendary.enabled", true)
 	default("filter.outlier.artifact.enabled", true)
-	default("filter.outlier.poor.level", 200)
-	default("filter.outlier.common.level", 200)
-	default("filter.outlier.uncommon.level", 200)
-	default("filter.outlier.rare.level", 250)
-	default("filter.outlier.epic.level", 300)
-	default("filter.outlier.legendary.level", 300)
-	default("filter.outlier.artifact.level", 300)
+	default("filter.outlier.poor.level", 2.17)
+	default("filter.outlier.common.level", 2.17)
+	default("filter.outlier.uncommon.level", 2.17)
+	default("filter.outlier.rare.level", 2.17)
+	default("filter.outlier.epic.level", 2.17)
+	default("filter.outlier.legendary.level", 3)
+	default("filter.outlier.artifact.level", 3)
+
+	boundConfiguration("filter.outlier.poor.level", 10, 2.17)
+	boundConfiguration("filter.outlier.common.level", 10, 2.17)
+	boundConfiguration("filter.outlier.uncommon.level", 10, 2.17)
+	boundConfiguration("filter.outlier.rare.level", 10, 2.17)
+	boundConfiguration("filter.outlier.epic.level", 10, 2.17)
+	boundConfiguration("filter.outlier.legendary.level", 10, 3)
+	boundConfiguration("filter.outlier.artifact.level", 10, 3)
 end
 
 function private.SetupConfigGui(gui)
@@ -155,10 +162,6 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.activated", _TRANS('OUTL_Interface_EnableOutlierFilter') )--Enable use of the outlier filter
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableOutlierFilter') )--Ticking this box will enable the outlier filter to perform filtering of your auction scans
 
-	gui:AddControl(id, "Subhead",    0,    _TRANS('OUTL_Interface_PriceMethod') )--Price valuation method:
-	gui:AddControl(id, "Selectbox",  0, 1, parent.selectorPriceModels, "filter.outlier.model" )--Pricing model to use for the valuation
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_PricingModel') )--The pricing model that will be used to determine the base pricing level
-
 	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.minseen", 1, 50, 1, _TRANS('OUTL_Interface_MinimumSeen') )--Minimum seen: %d
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MinimumSeen') )--If an item has been seen less than this many times, it will not be filtered
 
@@ -167,45 +170,76 @@ function private.SetupConfigGui(gui)
 	local _,_,_, hex = GetItemQualityColor(0)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.poor.enabled", _TRANS('OUTL_Interface_EnablePoor'):format("|c"..hex, "|r") )--Enable filtering %s poor %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnablePoor') )--Ticking this box will enable outlier filtering on poor quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.poor.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an item's price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.poor.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an item's price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(1)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.common.enabled", _TRANS('OUTL_Interface_EnableCommon'):format("|c"..hex, "|r") )--Enable filtering %s common %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableCommon') )--Ticking this box will enable outlier filtering on common quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.common.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an item's price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.common.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an item's price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(2)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.uncommon.enabled", _TRANS('OUTL_Interface_EnableUnCommon'):format("|c"..hex, "|r") )--Enable filtering %s uncommon %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableUnCommon') )--Ticking this box will enable outlier filtering on uncommon quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.uncommon.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an items price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.uncommon.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an items price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(3)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.rare.enabled", _TRANS('OUTL_Interface_EnableRare'):format("|c"..hex, "|r") )--Enable filtering %s rare %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableRare') )--Ticking this box will enable outlier filtering on rare quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.rare.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an items price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.rare.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an items price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(4)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.epic.enabled", _TRANS('OUTL_Interface_EnableEpic'):format("|c"..hex, "|r") )--Enable filtering %s epic %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableEpic') )--Ticking this box will enable outlier filtering on epic quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.epic.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an items price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.epic.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an items price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(5)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.legendary.enabled", _TRANS('OUTL_Interface_EnableLegendary'):format("|c"..hex, "|r") )--Enable filtering %s legendary %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableLegendary') )--Ticking this box will enable outlier filtering on legendary quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.legendary.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an items price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.legendary.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an items price can grow before being filtered
 
 	local _,_,_, hex = GetItemQualityColor(6)
 	gui:AddControl(id, "Checkbox",   0, 1, "filter.outlier.artifact.enabled", _TRANS('OUTL_Interface_EnableArtifact'):format("|c"..hex, "|r") )--Enable filtering %s artifact %s quality items
 	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_EnableArtifact') )--Ticking this box will enable outlier filtering on artifact quality items
-	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.artifact.level", 100, 5000, 25, _TRANS('OUTL_Interface_CapGrowth').." %d%%")--Cap growth to:
-	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumPct') )--Set the maximum percentage that an items price can grow before being filtered
+	gui:AddControl(id, "WideSlider", 0, 1, "filter.outlier.artifact.level", 0.25, 5, .01, _TRANS('OUTL_Interface_CapGrowthParam'))--Cap growth to:
+	gui:AddTip(id, _TRANS('OUTL_HelpTooltip_MaximumAmt') )--Set the maximum amount that an items price can grow before being filtered
 
 end
+
+-- Shamelessly stolen from StatStdDev. 
+-- Approximation of C from Z.
+local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
+function private.GetCfromZ(Z)
+	--C = 0.05*i
+	if (not Z) then
+		return .05
+	end
+	if (Z > 10) then
+		return .99
+	end
+	local i = 1
+	while Z > ZValues[i] do
+		i = i + 1
+	end
+	if i == 1 then
+		return .05
+	else
+		i = i - 1 + ((Z - ZValues[i-1]) / (ZValues[i] - ZValues[i-1]))
+		return i*0.05
+	end
+end
+
+-- Memoizing implementation of private.GetCFromZ()
+setmetatable(CFromZ, {__index = function(t,k)
+	local value = private.GetCfromZ(k);
+	t[k] = value;
+	return value;
+end});
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

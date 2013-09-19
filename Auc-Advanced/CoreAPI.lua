@@ -106,16 +106,28 @@ do
         using the algorithms in each of the STAT modules as specified
         by the GetItemPDF() function.
 
-        AucAdvanced.API.GetMarketValue(itemLink, serverKey)
+        AucAdvanced.API.GetMarketValue(itemLink, serverKey, confidence)
+
+	The confidence parameter is the probability that the actual price is less than the returned value.
+	In most cases you will want this to be 50% (and that is the default), representing a 50% chance the
+	value is higher than the returned price, and a 50% chance the value is lower. However, sometimes you
+	may be curious of a different limit (for example, filter modules). In these cases, pass in a different
+	value for confidence. 0.5 = 50%, 0.75 = 75%, etc.
     ]]
-    function lib.GetMarketValue(itemLink, serverKey)
+    function lib.GetMarketValue(itemLink, serverKey, confidence)
         local _;
         if type(itemLink) == 'number' then _, itemLink = GetItemInfo(itemLink) end
-		if not itemLink then return end
+	if not itemLink then return end
 
-		local cacheSig = lib.GetSigFromLink(itemLink)
-		if not cacheSig then return end -- not a valid item link
-		serverKey = serverKey or GetFaction() -- call GetFaction once here, instead of in every Stat module
+	local cacheSig = lib.GetSigFromLink(itemLink)
+	if not cacheSig then return end -- not a valid item link
+
+	-- need to append confidence level so we don't mix them up later
+	-- Rounded to a level that is effectively irrelevant to avoid FP errors
+	confidence = confidence or 0.5;
+	cacheSig = cacheSig .. (confidence == 0.5 and "" or ("-" .. math.floor(confidence * 10000)));
+
+	serverKey = serverKey or GetFaction() -- call GetFaction once here, instead of in every Stat module
 
         local cacheEntry = cache[serverKey][cacheSig]
         if cacheEntry then
@@ -201,7 +213,7 @@ do
             return;                 -- No PDFs available for this item
         end
 
-        local limit = total/2;
+        local limit = total * confidence;
         local midpoint, lastMidpoint = 0, 0;
 
         -- Now find the 50% point
@@ -1182,5 +1194,6 @@ do
     end
 
 end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
