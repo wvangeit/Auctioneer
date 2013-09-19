@@ -612,7 +612,7 @@ local function processStats(processors, operation, curItem, oldItem)
 				end
 			else
 				if (_G.nLog) then
-					local text = ("Error trapped for AuctionFilter in module %s:\n%s"):format(x.Name, errormsg)
+					local text = ("Error trapped for AuctionFilter in module %s:\n%s"):format(x.Name, result)
 					if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "AuctionFilter Error", text) end
 					geterrorhandler()(text)
 				end
