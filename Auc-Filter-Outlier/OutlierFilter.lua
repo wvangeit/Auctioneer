@@ -108,7 +108,7 @@ function lib.AuctionFilter(operation, itemData)
 	if price <= maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
-	nLog.AddMessage("Auctioneer", "Outlier", N_DEBUG, "Filtered item", string.format("Outlier filtered out item %s: price %d is above %d%% confidence level %d",
+	nLog.AddMessage("Auctioneer", "Outlier", N_DEBUG, "Filtered item", string.format("Outlier filtered out item %s: price %f is above %d%% confidence level %f",
 		link, price, CFromZ[levels[quality]] * 100, value));
 	return true
 end
@@ -211,26 +211,26 @@ function private.SetupConfigGui(gui)
 
 end
 
--- Shamelessly stolen from StatStdDev. 
--- Approximation of C from Z.
-local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
-function private.GetCfromZ(Z)
-	--C = 0.05*i
-	if (not Z) then
-		return .05
-	end
-	if (Z > 10) then
-		return .99
-	end
-	local i = 1
-	while Z > ZValues[i] do
-		i = i + 1
-	end
-	if i == 1 then
-		return .05
-	else
-		i = i - 1 + ((Z - ZValues[i-1]) / (ZValues[i] - ZValues[i-1]))
-		return i*0.05
+do 
+	local abs = math.abs;
+	local sqrt = math.sqrt;
+	local exp = math.exp;
+
+	function private.GetCfromZ(Z)
+		-- Estimation of the normal curve CDF based on a magic formula
+		-- Adapted courtesy http://www.johndcook.com/cpp_phi.html
+		local a1 = 0.254829592;
+		local a2 = -0.284496736;
+		local a3 = 1.421413741;
+		local a4 = -1.453152027;
+		local a5 = 1.061405429;
+		local p =  0.3275911;
+
+		local x = abs(Z) / sqrt(2);
+		local t = 1 / (1 + p * x);
+		local y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * exp(-x * x);
+
+		return 0.5 * (1 + (Z < 0 and -y or y));
 	end
 end
 
