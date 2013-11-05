@@ -760,11 +760,11 @@ function private.CreateFrames()
 			frame.valuecache.numberentry = frame.salebox.numberentry:GetText()
 			set("util.appraiser.item."..frame.salebox.sig..".number", number)
 		elseif numberentry ~= frame.valuecache.numberentry then
-			if numberentry:lower() == _TRANS('APPR_Interface_Full') then --Full
+			if numberentry:lower() == _TRANS('APPR_Interface_Full'):lower() then --Full
 				frame.salebox.number:SetAdjustedValue(-2)
 				numberentry = _TRANS('APPR_Interface_Full') --Full
 				set("util.appraiser.item."..frame.salebox.sig..".number", -2)
-			elseif numberentry:lower() == _TRANS('APPR_Interface_All') then --All
+			elseif numberentry:lower() == _TRANS('APPR_Interface_All'):lower() then --All
 				frame.salebox.number:SetAdjustedValue(-1)
 				numberentry = _TRANS('APPR_Interface_All') --All
 				set("util.appraiser.item."..frame.salebox.sig..".number", -1)
@@ -777,6 +777,7 @@ function private.CreateFrames()
 					frame.salebox.number:SetMinMaxValues(1, numberentry + n)
 				end
 				frame.salebox.number:SetAdjustedValue(numberentry)
+				numberentry = frame.salebox.number:GetAdjustedValue()
 				set("util.appraiser.item."..frame.salebox.sig..".number", numberentry)
 			end
 			frame.salebox.numberentry:SetText(numberentry)
@@ -2059,28 +2060,19 @@ function private.CreateFrames()
 
 	-- Options Slider helper functions
 	local function SliderValueChanged(self, value)
-		if self.isReEntering then
-			self.isReEntering = nil
-		else
-			local minValue, maxValue = self:GetMinMaxValues()
-			if value > minValue and value < maxValue then
-				-- value is no longer aligned to SetValueStep after WoW5.4, we need to check it ourselves
-				local step = self:GetValueStep()
-				local newValue = floor(value / step + 0.5) * step
-				-- check to see if realigning the value has pushed it outside min/max limits
-				if newValue < minValue then
-					newValue = minValue
-				elseif newValue > maxValue then
-					newValue = maxValue
-				end
-				if value ~= newValue then
-					-- setting a new value will trigger a re-entrant call to OnValueChanged...
-					self.isReEntering = true -- notify the triggered call that we are re-entering
-					self:SetValue(newValue)
-					return -- let the triggered call take over
-				end
-			end
-		end
+		-- From WoW 5.4, dragging the slider's thumb results in values that are not correctly aligned to ValueStep [APPR-343]
+		-- Values set by calling SetValue will be correctly aligned: use this to correct any erroneous values
+		-- When calling SetValue from within OnValueChanged, protect against function re-entry
+		-- Retrieve corrected value from GetValue; check it has actually changed before continuing
+		if self.isReEntering then return end
+		self.isReEntering = true
+		self:SetValue(value)
+		self.isReEntering = nil
+		value = self:GetValue()
+		if value == self.prevValue then return end
+		self.prevValue = value
+		-- (this correction code should be removed when Blizzard fixes the problem)
+
 		frame.updated = true
 	end
 	local function SliderMouseWheel(self, delta)
