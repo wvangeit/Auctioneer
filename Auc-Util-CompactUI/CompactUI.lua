@@ -274,24 +274,24 @@ function private.HookAH()
 			local dir = private.headers.dir
 			local col = ""
 			if sort then
-				if sort == 1 then            col = "quantity"       -- Count
-				elseif sort == 2 then                      --
-					local pos = private.headers.pos    --
-					if pos == 1 then     col = "name"       -- Name
-					elseif pos == 2 then col = "quality"       -- Quality
-					end                                --
-				elseif sort == 3 then        col = "level"       -- MinLevel
-				--elseif sort == 4 then        col = 9       -- ItemLevel
-				elseif sort == 5 then        col = "duration"      -- TimeLeft
-				elseif sort == 6 then        col = "seller"      -- Owner
-				elseif sort == 7 then                      --
-					local pos = private.headers.pos    --
-					if pos == 1 then     col = "buyoutthenbid"     -- Buy
-					elseif pos == 2 then col = "bid"      -- Bid
-					--elseif pos == 3 then col = 18      -- BuyEach
-					--elseif pos == 4 then col = 17      -- BidEach
-					end                                --
-				--elseif sort == 8 then        col = 21      -- PriceLevel
+				if sort == 1 then col = "quantity" -- Count
+				elseif sort == 2 then
+					local pos = private.headers.pos
+					if pos == 1 then col = "name" -- Name
+					elseif pos == 2 then col = "quality" -- Quality
+					end
+				elseif sort == 3 then col = "level" -- MinLevel
+				--elseif sort == 4 then <?> -- ItemLevel
+				elseif sort == 5 then col = "duration" -- TimeLeft
+				elseif sort == 6 then col = "seller" -- Owner
+				elseif sort == 7 then
+					local pos = private.headers.pos
+					if pos == 1 then col = "minbidbuyout" -- Buy
+					elseif pos == 2 then col = "bid" -- Bid
+					--elseif pos == 3 then <?> -- BuyEach
+					--elseif pos == 4 then <?> -- BidEach
+					end
+				--elseif sort == 8 then <?> -- PriceLevel
 				end
 			end
 			if dir > 0 then
