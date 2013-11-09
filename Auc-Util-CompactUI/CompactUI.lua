@@ -278,7 +278,9 @@ function private.HookAH()
 				elseif sort == 2 then
 					local pos = private.headers.pos
 					if pos == 1 then col = "name" -- Name
-					elseif pos == 2 then col = "quality" -- Quality
+					elseif pos == 2 then
+						col = "quality" -- Quality
+						dir = - dir -- server's default quality sort order is the opposite of CompactUI's - so invert to make them match
 					end
 				elseif sort == 3 then col = "level" -- MinLevel
 				--elseif sort == 4 then <?> -- ItemLevel
