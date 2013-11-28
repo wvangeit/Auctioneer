@@ -51,9 +51,9 @@
 AucAdvanced = {Modules = {Filter={}, Match={}, Stat={}, Util={}}}
 local lib = AucAdvanced
 
-local DEV_VERSION = "5.18.DEV"
-local MINIMUM_TOC = 50200
-local MINIMUM_CLIENT = "5.2"
+local DEV_VERSION = "5.19.DEV"
+local MINIMUM_TOC = 50400
+local MINIMUM_CLIENT = "5.4"
 
 lib.Version="<%version%>";
 if (lib.Version == "<".."%version%>") then
@@ -81,7 +81,7 @@ end
 if not Stubby then
 	-- Can only occur if the Stubby AddOn has loaded, but failed to create the Stubby global table
 	-- Assume Stubby has already thrown an error in this case.
-	lib.ABORTLOAD = "Missing library: Stubby"
+	if not lib.ABORTLOAD then lib.ABORTLOAD = "Missing library: Stubby" end
 end
 
 -- Test load libraries
