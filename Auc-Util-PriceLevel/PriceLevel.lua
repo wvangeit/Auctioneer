@@ -249,7 +249,7 @@ function private.ListUpdate()
 		if (index <= numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) then
 			if AucAdvanced.Modules.Util.CompactUI
 			and AucAdvanced.Modules.Util.CompactUI.inUse then
-				_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
+				_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
 				priceLevel,_,r,g,b = AucAdvanced.Modules.Util.CompactUI.GetContents(offset+i)
 				lib.SetBar(i, r,g,b, priceLevel)
 			else
