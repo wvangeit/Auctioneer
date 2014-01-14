@@ -312,7 +312,7 @@ function private.onEventHook(_, _, self, event, arg1, ...)
 end
 
 function private.getData(itemLink)
-	local marketValue, seenCount = AucAdvanced.API.GetMarketValue(itemLink, AucAdvanced.GetFaction())
+	local marketValue, seenCount = AucAdvanced.API.GetMarketValue(itemLink)
 	local vendorPrice = GetSellValue and GetSellValue(itemLink)
 
 	return seenCount or 0, marketValue or 0, vendorPrice or 0
