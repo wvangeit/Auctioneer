@@ -565,7 +565,7 @@ function lib.OnUnload()
 	local StringRope = LibStub:GetLibrary("StringRope")
 	local rope = StringRope:New(-1)
 
-	local maxLen = 2^22
+	local maxLen = 2^20
 
 	local now = time()
 	local maxTime = 60 * 60 * 24 * 30 -- 30 days
