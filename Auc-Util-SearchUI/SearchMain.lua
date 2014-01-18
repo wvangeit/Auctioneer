@@ -1353,7 +1353,10 @@ function private.MakeGuiConfig()
 			local itemName
 			local header, id = strsplit(":", link)
 			if header:sub(-9) == "battlepet" then
-				itemName = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
+				id = tonumber(id)
+				if id then
+					itemName = C_PetJournal.GetPetInfoBySpeciesID(id)
+				end
 			else
 				itemName = GetItemInfo(link)
 			end

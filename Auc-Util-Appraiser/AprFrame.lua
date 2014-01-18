@@ -107,9 +107,12 @@ function private.CreateFrames()
 										name, rarity, stack = na, ra, st
 									elseif linkType == "battlepet" then
 										local _, id, _, qu = strsplit(":", link)
-										name = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
-										rarity = tonumber(qu)
-										stack = 1
+										id = tonumber(id)
+										if id then
+											name = C_PetJournal.GetPetInfoBySpeciesID(id)
+											rarity = tonumber(qu)
+											stack = 1
+										end
 									end
 									if name and rarity then
 										local item = {sig, name, texture, rarity, stack, itemCount, link}
@@ -287,9 +290,12 @@ function private.CreateFrames()
 					name, rarity, stack, texture = na, ra, st, tx
 				elseif linkType == "battlepet" then
 					local _, id, _, qu = strsplit(":", rawlink)
-					name, texture = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
-					rarity = tonumber(qu)
-					stack = 1
+					id = tonumber(id)
+					if id then
+						name, texture = C_PetJournal.GetPetInfoBySpeciesID(id)
+						rarity = tonumber(qu)
+						stack = 1
+					end
 				end
 				if not name and rarity then
 					return
@@ -679,7 +685,10 @@ function private.CreateFrames()
 		if lType == "item" then
 			itemName = GetItemInfo(itemLink)
 		elseif lType == "epet" then -- battlepet
-			itemName = C_PetJournal.GetPetInfoBySpeciesID(tonumber(id) or 0)
+			id = tonumber(id)
+			if id then
+				itemName = C_PetJournal.GetPetInfoBySpeciesID(id)
+			end
 		end
 		if not itemName then return end
 
@@ -1362,11 +1371,12 @@ function private.CreateFrames()
 		else
 			local lType, speciesID, _, petQuality = strsplit(":", link)
 			lType = lType:sub(-9)
+			speciesID = tonumber(speciesID)
 			if lType == "battlepet" and speciesID then
 				-- it's a pet
 				local _,_,_,_,iMin, iType = GetItemInfo(82800) -- Pet Cage
 				-- all caged pets should have the default pet name (custom names are removed when caging)
-				local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(speciesID))
+				local petName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 				if not petName then
 					-- Reuse same error message as above
 					aucPrint(_TRANS('APPR_Interface_NoItemsSelected') )--No items were selected for refresh.
