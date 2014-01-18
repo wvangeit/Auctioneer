@@ -971,7 +971,6 @@ local Commitfunction = function()
 	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 	coroutine.yield() -- yield here to allow the bar to display, and help the frame rate a little
 	nextPause = debugprofilestop() + processingTime
-	local missingData = false
 	local pos=#TempcurScan
 	while (pos > 0) do
 		if debugprofilestop() > nextPause then
@@ -981,10 +980,9 @@ local Commitfunction = function()
 		end
 
 		local data = TempcurScan[pos]
-		local entryUnresolved = false
 		local entryUnusable = false
 		progresscounter = progresscounter + 1
-		if (not data[Const.SELLER] or data[Const.SELLER]=="") then data[Const.SELLER], entryUnresolved = "", true end
+		if not data[Const.SELLER] then data[Const.SELLER] = "" end
 
 		if data[Const.ITEMID] and not (data[Const.ILEVEL] and data[Const.ITYPE] and data[Const.ISUB]) then
 			if data[Const.ITEMID] == 82800 then -- Pet Cage
@@ -992,7 +990,7 @@ local Commitfunction = function()
 				if cType then
 					data[Const.ITYPE] = cType
 					data[Const.IEQUIP] = nil
-					data[Const.ULEVEL] = cUseLevel
+					data[Const.ULEVEL] = data[Const.ULEVEL] or cUseLevel
 					local _, speciesID, level = strsplit(":", data[Const.LINK])
 					speciesID, level = tonumber(speciesID), tonumber(level)
 					data[Const.ILEVEL] = data[Const.ILEVEL] or level -- should have been obtained from GetAuctionItemInfo anyway
@@ -1015,14 +1013,10 @@ local Commitfunction = function()
 			end
 		end
 		for i = 1, Const.LASTENTRY, 1 do
-			if (i ~= Const.MININC and i ~= Const.BUYOUT and i ~= Const.CURBID and i ~= Const.IEQUIP and i ~= Const.AMHIGH and i ~= Const.CANUSE and i ~= Const.FLAG) then
-				if ((not data[i]) or data[i]=="") then
-					missingData = true
-					entryUnresolved = true
-					if (i ~= Const.SELLER) then
-						entryUnusable = true
-						break
-					end
+			if not data[i] then
+				if i ~= Const.IEQUIP and i ~= Const.AMHIGH and i ~= Const.CANUSE then
+					entryUnusable = true
+					break
 				end
 			end
 		end
