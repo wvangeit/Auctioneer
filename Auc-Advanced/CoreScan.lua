@@ -1158,6 +1158,7 @@ local Commitfunction = function()
 
 	local maskNotDirtyUnseen = bitnot(bitor(Const.FLAG_DIRTY, Const.FLAG_UNSEEN)) -- only calculate mask for clearing these flags once
 	local messageCreate = private.FallbackScanData and "fallbackcreate" or "create"
+	local undirtyCount = 0
 
 	processBeginEndStats(processors, "begin", querySizeInfo, nil)
 
@@ -1178,6 +1179,7 @@ local Commitfunction = function()
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
 			data[Const.FLAG] = bitand(oldItem[Const.FLAG], maskNotDirtyUnseen)
+			undirtyCount = undirtyCount + 1
 			if data[Const.SELLER] == "" then -- unknown seller name in new data; copy the old name if it exists
 				data[Const.SELLER] = oldItem[Const.SELLER]
 			end
@@ -1223,9 +1225,21 @@ local Commitfunction = function()
 		-- #scandata.image is probably now larger than when we originally calculated progresstotal -- adjust the step size to compensate
 		progressstep = (progresstotal - progresscounter) / #scandata.image
 	end
+	local loopBegin, loopEnd, loopDirection = #scandata.image, 1, -1
+	local keepmodeImage
+	--[[ Keep mode test
+		Using tremove is extremely inefficient when there are a large number of deletions (particularly if the number of kept entries is also large).
+		If we estimate this will be the case, switch to Keep mode, where we copy the entries we want to keep into a new image, which then replaces the old one.
+
+		Test version 1: use keep mode if scan is complete, and if number of remaining dirty entries exceeds a fixed threshold
+	--]]
+	if not wasIncomplete and (dirtyCount - undirtyCount) > 1000 then
+		loopBegin, loopEnd, loopDirection = 1, #scandata.image, 1 -- process Keep mode in ascending order to keep the new table in the same order
+		keepmodeImage = {} -- new image table; also acts as a flag for Keep mode
+	end
 	nextPause = debugprofilestop() + processingTime
 	lastTime = time()
-	for pos = #scandata.image, 1, -1 do
+	for pos = loopBegin, loopEnd, loopDirection do
 		if debugprofilestop() > nextPause or time() > lastTime then
 			lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 4")
 			coroutine.yield()
@@ -1233,10 +1247,10 @@ local Commitfunction = function()
 			lastTime = time()
 		end
 		local data = scandata.image[pos]
+		local dodelete = false
 		progresscounter = progresscounter + progressstep
 		if (bitand(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
-			local dodelete = false
 
 			if data[Const.TIME] and (now - data[Const.TIME] > auctionmaxtime) then
 				-- delete items that have passed their expiry time - even if scan was incomplete
@@ -1266,16 +1280,26 @@ local Commitfunction = function()
 					end
 				else
 					data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
+					data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
 					missedCount = missedCount + 1
 				end
 			end
-			if dodelete then
-				if not (bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
-					processStats(processors, "delete", data)
-				end
+		end
+		if dodelete then
+			if not (bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
+				processStats(processors, "delete", data)
+			end
+			if not keepmodeImage then
 				tremove(scandata.image, pos)
 			end
+		else -- keep
+			if keepmodeImage then
+				tinsert(keepmodeImage, data)
+			end
 		end
+	end
+	if keepmodeImage then
+		scandata.image = keepmodeImage
 	end
 
 
