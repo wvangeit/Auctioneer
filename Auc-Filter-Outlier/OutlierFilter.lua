@@ -108,8 +108,8 @@ function lib.AuctionFilter(operation, itemData)
 	if price <= maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
-	nLog.AddMessage("Auctioneer", "Outlier", N_DEBUG, "Filtered item", string.format("Outlier filtered out item %s: price %f is above %d%% confidence level %f",
-		link, price, CFromZ[levels[quality]] * 100, value));
+	debugPrint(format("Outlier filtered out item %s: price %s is above %.2f%% confidence level %s", link, tostring(price), CFromZ[levels[quality]] * 100, tostring(value)),
+		"Outlier", "Filtered item", "Info")
 	return true
 end
 
