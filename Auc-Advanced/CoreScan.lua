@@ -611,11 +611,9 @@ local function processStats(processors, operation, curItem, oldItem)
 					break
 				end
 			else
-				if (_G.nLog) then
-					local text = ("Error trapped for AuctionFilter in module %s:\n%s"):format(x.Name, result)
-					if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "AuctionFilter Error", text) end
-					geterrorhandler()(text)
-				end
+				local text = ("Error trapped for AuctionFilter in module %s:\n%s"):format(x.Name, result)
+				if (_G.nLog) then _G.nLog.AddMessage("Auctioneer", "Scan", _G.N_ERROR, "AuctionFilter Error", text) end
+				geterrorhandler()(text)
 			end
 		end
 	elseif curItem and bitand(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
@@ -655,32 +653,6 @@ function private.IsInQuery(curQuery, data)
 		return true
 	end
 	return false
-end
-
-local idLists = {}
-function private.BuildIDList(scandata, serverKey)
-	local idList = idLists[serverKey]
-	if idList then return idList end
-	idList = {0} -- dummy entry ensures that list is never empty and that counting starts from 1
-	idLists[serverKey] = idList
-	local image = scandata.image
-	for i = 1, #image do
-		tinsert(idList, image[i][Const.ID])
-	end
-	table.sort(idList)
-	return idList
-end
-
-function private.GetNextID(idList)
-	local nextId = idList[1] + 1
-	local second = idList[2]
-	while second == nextId do
-		nextId = second + 1
-		tremove(idList, 1)
-		second = idList[2]
-	end
-	idList[1] = nextId
-	return nextId
 end
 
 function lib.GetScanStats(serverKey)
@@ -951,7 +923,6 @@ local Commitfunction = function()
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
 	local scandata = private.GetScanData(serverKey)
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
-	local idList = private.BuildIDList(scandata, serverKey)
 	local now = time()
 	if get("scancommit.progressbar") then
 		lib.ProgressBars("CommitProgressBar", 0, true)
@@ -1177,7 +1148,6 @@ local Commitfunction = function()
 
 		if (itemPos) then
 			local oldItem = scandata.image[itemPos]
-			data[Const.ID] = oldItem[Const.ID]
 			data[Const.FLAG] = bitand(oldItem[Const.FLAG], maskNotDirtyUnseen)
 			undirtyCount = undirtyCount + 1
 			if data[Const.SELLER] == "" then -- unknown seller name in new data; copy the old name if it exists
@@ -1202,7 +1172,7 @@ local Commitfunction = function()
 					end
 				end
 			end
-			scandata.image[itemPos] = replicate(data)
+			scandata.image[itemPos] = data
 		else
 			if (processStats(processors, messageCreate, data)) then
 				newCount = newCount + 1
@@ -1210,11 +1180,11 @@ local Commitfunction = function()
 				data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_FILTER)
 				filterNewCount = filterNewCount + 1
 			end
-			data[Const.ID] = private.GetNextID(idList)
 			data[Const.FLAG] = bitand(data[Const.FLAG], maskNotDirtyUnseen)
-			tinsert(scandata.image, replicate(data))
+			tinsert(scandata.image, data)
 		end
 	end
+	lut = nil -- release some memory
 
 
 	--[[ *** Stage 4 : Cleanup deleted auctions *** ]]
@@ -1666,7 +1636,7 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 		return itemData
 	end
 	itemData[Const.FLAG] = itemData[Const.FLAG] or 0
-	itemData[Const.ID] = itemData[Const.ID] or -1
+	itemData[Const.ID] = 0 -- deprecated entry
 
 	local isLogging = nLog and page and list == "list"
 	if isLogging then
