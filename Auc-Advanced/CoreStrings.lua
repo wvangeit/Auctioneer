@@ -187,6 +187,8 @@ AuctioneerLocalizations = {
 		["SBTN_Interface_Options"]	= "Nastavení";
 
 		-- Section: Tooltip
+		["ADV_Tooltip_NotAvailable"]	= "Nedostupné";
+		["ADV_Tooltip_UnknownDepositCost"]	= "Neznáma depositná cena(poplatok za vloženie do aukcie)";
 		["APPR_Tooltip_AppraiserCurModel"]	= "Appraiser ({{%s}}x{{%s}})";
 		["APPR_Tooltip_PostedCount"]	= "Vystavené %2d za avg/ea %s";
 		["APPR_Tooltip_StartingBid"]	= "Začiatočná ponuka x {{%d}}";
@@ -8337,6 +8339,7 @@ AuctioneerLocalizations = {
 		["OUTL_HelpTooltip_EnablePoor"]	= "勾选此框将使异常过滤器能够过滤垃圾物品";
 		["OUTL_HelpTooltip_EnableRare"]	= "勾选此框将使异常过滤器能够过滤精良物品";
 		["OUTL_HelpTooltip_EnableUnCommon"]	= "勾选此框将使异常过滤器能够过滤优秀物品";
+		["OUTL_HelpTooltip_MaximumAmt"]	= "设置一个物品的价格的最大数量可以偏离之前被过滤";
 		["OUTL_HelpTooltip_MaximumPct"]	= "设定物品价格在被过滤之前能够达到的最大百分比";
 		["OUTL_HelpTooltip_MinimumSeen"]	= "如果一个物品已经被浏览过至少这么多次,那么它不会被过滤";
 		["OUTL_HelpTooltip_PricingModel"]	= "定价模式将被用于制定基础定价级别";

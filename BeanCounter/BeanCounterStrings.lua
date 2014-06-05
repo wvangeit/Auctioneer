@@ -1168,7 +1168,7 @@ BeanCounterLocalizations = {
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Casa de Leilões da Aliança";
 		["MailHordeAuctionHouse"]	= "Casa de Leilões da Horda";
-		["MailNeutralAuctionHouse"]	= "Casa de Leilões de Blackwater";
+		["MailNeutralAuctionHouse"]	= "Casa de Leilões de Aguanegra";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Entre o formato que você gostaria que o campo de data fosse mostrado. O padrão é %c.";
@@ -1197,7 +1197,7 @@ BeanCounterLocalizations = {
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeacnCounter: Banco de Dados do Histórico de Leilões";
 		["UiAucExpired"]	= "Leilão Expirado";
-		["UiAucSuccessful"]	= "Leilão Bem-sucedido";
+		["UiAucSuccessful"]	= "Leilão bem-sucedido";
 		["UiAuctions"]	= "Leilões";
 		["UiAuctionTransaction"]	= "Leilão";
 		["UiBids"]	= "Lances";
