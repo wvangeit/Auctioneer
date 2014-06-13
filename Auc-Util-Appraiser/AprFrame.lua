@@ -142,7 +142,7 @@ function private.CreateFrames()
 		if frame.showAuctions then
 			local auctionStart = #ItemList + 1
 			for auc=1, GetNumAuctionItems("owner") do
-				local name, texture, count, quality, _, _, _, _, _, _, _, _, _, _, itemId  = AucAdvanced.GetAuctionItemInfo("owner", auc)
+				local name, texture, count, quality, _, _, _, _, _, _, _, _, _, _, _, _, itemId = GetAuctionItemInfo("owner", auc)
 				local link = GetAuctionItemLink("owner", auc)
 
 				local sig, linkType = SigFromLink(link)
