@@ -36,31 +36,29 @@ if not AucAdvanced then return end
 local libType, libName = "Filter", "Outlier"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
 if not lib then return end
-local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
 local data
 
 local reset = true
-local cache, model, minseen, levels
+local valuecache, model, minseen, levels
 local CFromZ = {};
 
-function lib.Processor(callbackType, ...)
-	if callbackType == "config" then
-		private.SetupConfigGui(...)
-	elseif callbackType == "scanstats" then
-		reset = true
-	end
-end
+local GetMarketValue = AucAdvanced.API.GetMarketValue
+local GetSigFromLink = AucAdvanced.API.GetSigFromLink
 
 lib.Processors = {}
 function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
 end
-
-function lib.Processors.scanstats(callbackType, ...)
+local function doReset()
+	valuecache = nil
+	levels = nil
 	reset = true
 end
-
+lib.Processors.scanstats = doReset
+lib.Processors.auctionclose = doReset
+lib.Processors.configchanged = doReset
 
 function lib.AuctionFilter(operation, itemData)
 	if not get("filter.outlier.activated") then
@@ -68,7 +66,7 @@ function lib.AuctionFilter(operation, itemData)
 	end
 	if reset then
 		minseen = get("filter.outlier.minseen")
-		cache = {}
+		valuecache = {}
 		levels = {}
 		if get("filter.outlier.poor.enabled") then levels[0] = get("filter.outlier.poor.level") end
 		if get("filter.outlier.common.enabled") then levels[1] = get("filter.outlier.common.level") end
@@ -85,15 +83,16 @@ function lib.AuctionFilter(operation, itemData)
 	if not levels[quality] then return false end
 
 	local link = itemData.link
-	local value = cache[link]
+	local key = GetSigFromLink(link)
+	local value = valuecache[key]
 	if not value then
 		local seen
-		value, seen = AucAdvanced.API.GetMarketValue(link, nil, CFromZ[levels[quality]])
+		value, seen = GetMarketValue(link, nil, CFromZ[levels[quality]])
 
 		if not value or not seen or seen < minseen then
 			value = 0
 		end
-		cache[link] = value
+		valuecache[key] = value
 	end
 
 	-- If there's no value then we can't filter it
@@ -108,8 +107,12 @@ function lib.AuctionFilter(operation, itemData)
 	if price <= maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
+
+	-- debug line commented out: this module is under development so we may need still it
+	--[=[
 	debugPrint(format("Outlier filtered out item %s: price %s is above %.2f%% confidence level %s", link, tostring(price), CFromZ[levels[quality]] * 100, tostring(value)),
 		"Outlier", "Filtered item", "Info")
+	--]=]
 	return true
 end
 
@@ -211,7 +214,7 @@ function private.SetupConfigGui(gui)
 
 end
 
-do 
+do
 	local abs = math.abs;
 	local sqrt = math.sqrt;
 	local exp = math.exp;
