@@ -472,7 +472,6 @@ end
 
 function private.Unpack(item, storage)
 	if not storage then storage = {} end
-	storage.id = item[Const.ID]
 	storage.link = item[Const.LINK]
 	storage.useLevel = item[Const.ULEVEL]
 	storage.itemLevel = item[Const.ILEVEL]
@@ -1002,14 +1001,14 @@ local Commitfunction = function()
 					"Level %d, Quality %s, Item Level %s\n",
 					"Item Type %s, Sub Type %s, Equipment Position %s\n",
 					"Price %s, Bid %s, NextBid %s, MinInc %s, Buyout %s\n Time Left %s, Time %s\n",
-					"High Bidder %s  Can Use: %s  ID %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
+					"High Bidder %s  Can Use: %s  (Dep1) %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
 					"Texture: %s")):format(
 					data.PAGE, data.PAGEINDEX, "too broken, can not use at all",
 					data[Const.LINK] or "(nil)", data[Const.COUNT] or -1, data[Const.NAME] or "(nil)", data[Const.SELLER] or "(UNKNOWN)",
 					data[Const.ULEVEL] or -1, data[Const.QUALITY] or -1, data[Const.ILEVEL] or -1,data[Const.ITYPE] or "(UNKNOWN)", data[Const.ISUB] or "(UNKNOWN)", data[Const.IEQUIP] or '(n/a)',
 					data[Const.PRICE] or -1, data[Const.CURBID] or -1, data[Const.MINBID] or -1, data[Const.MININC] or -1, data[Const.BUYOUT] or -1,
 					data[Const.TLEFT] or -1, data[Const.TIME] or "(nil)", data[Const.AMHIGH] and "Yes" or "No",
-					(data[Const.CANUSE]==false and "Yes") or (data[Const.CANUSE] and "No" or "(nil)"), data[Const.ID] or '(nil)', data[Const.ITEMID] or '(nil)',
+					(data[Const.CANUSE]==false and "Yes") or (data[Const.CANUSE] and "No" or "(nil)"), data[Const.DEP1] or '(nil)', data[Const.ITEMID] or '(nil)',
 					data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.TEXTURE] or '(nil)'))
 			end
 			tremove(TempcurScan, pos)
@@ -1636,7 +1635,7 @@ function private.GetAuctionItem(list, page, index, itemLinksTried, itemData)
 		return itemData
 	end
 	itemData[Const.FLAG] = itemData[Const.FLAG] or 0
-	itemData[Const.ID] = 0 -- deprecated entry
+	itemData[Const.DEP1] = 0 -- deprecated entry
 
 	local isLogging = nLog and page and list == "list"
 	if isLogging then

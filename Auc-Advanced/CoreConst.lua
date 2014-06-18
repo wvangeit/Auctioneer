@@ -113,7 +113,7 @@ local lib = {
 	AMHIGH = 19,
 	SELLER = 20,
 	FLAG = 21,
-	ID = 22,
+	DEP1 = 22, -- deprecated entry, currently unused
 	ITEMID = 23,
 	SUFFIX = 24,
 	FACTOR = 25,
@@ -122,11 +122,13 @@ local lib = {
 	LASTENTRY = 27, -- Used to determine how many entries the table has when copying (some entries can be nil so # won't work)
 
 	ScanPosLabels = {"LINK", "ILEVEL", "ITYPE", "ISUB", "IEQUIP", "PRICE", "TLEFT", "TIME", "NAME", "TEXTURE", "COUNT", "QUALITY", "CANUSE", "ULEVEL", "MINBID", "MININC",
-		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "ID", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
+		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "DEP1", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
 
-	FLAG_DIRTY = 1,
+	-- Permanent flags (stored in save file)
 	FLAG_UNSEEN = 2,
 	FLAG_FILTER = 4,
+	-- Temporary flags (only used during processing - higher values to leave lower ones free for permanent flags)
+	FLAG_DIRTY = 64,
 
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
