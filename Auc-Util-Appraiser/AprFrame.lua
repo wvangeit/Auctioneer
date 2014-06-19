@@ -42,8 +42,8 @@ local frame
 local NUM_ITEMS = 12
 
 local SigFromLink = AucAdvanced.API.GetSigFromLink
-local GetDistribution -- to be filled in when ScanData loads
-AucAdvanced.RegisterModuleCallback("scandata", function(lib) GetDistribution = lib.GetDistribution end)
+local GetDistribution, GetColored -- to be filled in when ScanData loads
+AucAdvanced.RegisterModuleCallback("scandata", function(lib) GetDistribution = lib.GetDistribution; GetColored = lib.Colored end)
 
 -- Check to see if we are embedded or not
 local embedded = false
@@ -64,7 +64,8 @@ function private.CreateFrames()
 	local DiffFromModel = 0
 	local MatchString = ""
 	frame.list = {}
-	frame.cache = {}
+	frame.distributioncache = {}
+	frame.distributionqueue = {}
 	frame.valuecache = {}
 
 	function frame.GenerateList(repos)
@@ -120,16 +121,6 @@ function private.CreateFrames()
 											item.ignore = true
 										end
 										table.insert(ItemList, item)
-
-										if GetDistribution and not frame.cache[sig] then
-											local exact, suffix, base, colorDist = GetDistribution(link)
-												if exact then
-												frame.cache[sig] = { exact, suffix, base, {} }
-												for k,v in pairs(colorDist.exact) do
-													frame.cache[sig][4][k] = v
-												end
-											end
-										end
 									end
 								end
 							end
@@ -167,16 +158,6 @@ function private.CreateFrames()
 							item.ignore = true
 						end
 						table.insert(ItemList, item)
-
-						if GetDistribution and not frame.cache[sig] then
-							local exact, suffix, base, colorDist = GetDistribution(link)
-							if exact then
-								frame.cache[sig] = { exact, suffix, base, {} }
-								for k,v in pairs(colorDist.exact) do
-									frame.cache[sig][4][k] = v
-								end
-							end
-						end
 					end
 				end
 			end
@@ -251,7 +232,7 @@ function private.CreateFrames()
 			frame.scroller:Show()
 		end
 		-- redraw list buttons
-		frame:SetScroll()
+		frame.SetScroll()
 
 		return pos
 	end
@@ -721,6 +702,9 @@ function private.CreateFrames()
 	function frame.OnUpdate()
 		if frame.updated then
 			frame.CheckUpdates()
+		end
+		if private.needDistributionUpdate then
+			private.DelayedDistributionUpdate()
 		end
 		if frame.scanFinished then
 			frame.GenerateList()
@@ -1667,15 +1651,98 @@ function private.CreateFrames()
 		aucPrint("-----------------------------------")
 	end
 
+	local function ShowDistInfoOnButton(distinfo, button, item) -- helper function for SetScroll and DelayedDistributionUpdate
+		local info = ""
+		if distinfo then
+			local exact, suffix, base, colordist = unpack(distinfo)
+			if colordist then
+				info = GetColored(true, colordist, nil, true) -- use shortened format
+			end
+			if not info or info == "" then
+				if suffix + base > 0 then
+					-- we need to know what the itemtype is, to determine what suffix and base represent
+					-- inspect the first byte of the sig
+					local firstbyte = strbyte(item[1],1)
+					if firstbyte == 80 then -- 'P' indicates battlepet
+						-- suffix represents same breed and quality but different levels
+						-- base represents different qualities - only possible for some pets
+						if base > 0 then
+							info = exact.." ("..suffix.." lvl + "..base.." qual)"
+						else
+							info = exact.." ("..suffix.." lvl)"
+						end
+					elseif firstbyte >= 48 and firstbyte <= 57 then -- numeric indicates normal item
+						-- base represents same base item with different suffixes
+						-- suffix represents same base item and suffix but different factors - this should never happen!
+						info = exact.." ("..base.." base)"
+					else
+						-- unknown itemtype
+						info = exact.." ???"
+					end
+				else
+					info = tostring(exact)
+				end
+			end
+		end
+		button.info:SetText(info)
+	end
+
+	function private.DelayedDistributionUpdate()
+		private.needDistributionUpdate = false
+		local allow = true -- only allow one GetDistribution call per update
+
+		for button, item in pairs(frame.distributionqueue) do
+			local sig = item[1]
+			local distinfo = frame.distributioncache[sig]
+			if distinfo ~= nil then
+				frame.distributionqueue[button] = nil
+				ShowDistInfoOnButton(distinfo, button, item)
+			elseif allow then
+				local exact, suffix, base, colorDist = GetDistribution(item[7])
+				if exact then
+					distinfo = {exact, suffix, base, nil}
+					frame.distributioncache[sig] = distinfo
+					if exact > 0 then
+						-- colorDist.exact can contain all 0 even if exact > 0 (e.g. if PriceLevel not installed)
+						local hasDist = false
+						for k,v in pairs(colorDist.exact) do
+							if v > 0 then
+								hasDist = true
+								break
+							end
+						end
+						if hasDist then
+							-- only create & copy colordisttable if there were non-zero values
+							local colordisttable = {}
+							for k,v in pairs(colorDist.exact) do
+								colordisttable[k] = v
+							end
+							distinfo[4] = colordisttable
+						end
+					end
+				else -- no distribution info returned for this sig
+					frame.distributioncache[sig] = false
+				end
+				frame.distributionqueue[button] = nil
+				allow = false
+				ShowDistInfoOnButton(distinfo, button, item)
+			else -- distinfo is nil, cannot call GetDistribution again this cycle, schedule another update
+				private.needDistributionUpdate = true
+			end
+		end
+	end
+
 	function frame.SetScroll(...)
+		wipe(frame.distributionqueue)
 		local pos = floor(frame.scroller:GetValue())
 		for i = 1, NUM_ITEMS do
 			local item = frame.list[pos+i]
 			local button = frame.items[i]
 			if item then
+				local sig = item[1]
 				local curIgnore = item.ignore
 				local curAuction = item.auction
-				local curBulk = get('util.appraiser.item.'..item[1]..".bulk") or false
+				local curBulk = get('util.appraiser.item.'..sig..".bulk") or false
 
 				button.icon:SetTexture(item[3])
 				button.icon:SetDrawLayer("ARTWORK");
@@ -1709,16 +1776,21 @@ function private.CreateFrames()
 					button.size:SetAlpha(1)
 				end
 
-				local info = ""
-				if frame.cache[item[1]] and not curIgnore then
-					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
-					info = "Counts: "..exact.." +"..suffix.." +"..base
-					if (dist) then
-						info = AucAdvanced.Modules.Util.ScanData.Colored(true, dist, nil, true)	-- use shortened format
+				local distinfo
+				if GetDistribution and not curIgnore then
+					distinfo = frame.distributioncache[sig]
+					if not distinfo then
+						frame.distributionqueue[button] = item
+						private.needDistributionUpdate = true
+						if frame.olddistributioncache then
+							-- see if there's an old cached entry for this sig that we can use temporarily
+							-- this will be overwritten as soon as we can fetch updated distribution info
+							-- doing this will help prevent the text from flickering after every scan
+							distinfo = frame.olddistributioncache[sig]
+						end
 					end
 				end
-
-				button.info:SetText(info)
+				ShowDistInfoOnButton(distinfo, button, item)
 
 				local background = button.bg
 				local alpha = 0.2
@@ -1729,7 +1801,7 @@ function private.CreateFrames()
 					background:SetVertexColor(1,1,1)
 				end
 
-				if (item[1] == frame.selected) then
+				if (sig == frame.selected) then
 					alpha = 0.6
 				elseif curIgnore then
 					alpha = 0.1
@@ -1743,6 +1815,7 @@ function private.CreateFrames()
 				button:Hide()
 			end
 		end
+		frame.olddistributioncache = nil
 	end
 
 	function frame.SetButtonTooltip(self, text)
@@ -1979,7 +2052,7 @@ function private.CreateFrames()
 		item.info:SetJustifyV("BOTTOM")
 		item.info:SetPoint("BOTTOMLEFT", item.icon, "BOTTOMRIGHT", 3,2)
 		item.info:SetPoint("RIGHT", item, "RIGHT", -10,0)
-		item.info:SetText("11/23/55/112" )
+		item.info:SetText("" )
 
 		item.bg = item:CreateTexture(nil, "ARTWORK")
 		item.bg:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")

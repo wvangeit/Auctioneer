@@ -103,7 +103,8 @@ end
 function lib.Processors.scanstats()
 	-- flush all caches
 	if private.frame then
-		private.frame.cache = {}
+		private.frame.olddistributioncache = private.frame.distributioncache
+		private.frame.distributioncache = {}
 	end
 	wipe(tooltipcache)
 end
