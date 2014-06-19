@@ -182,9 +182,16 @@ function lib.About(all)
 	end
 end
 
-SLASH_AUCADVANCED1 = "/auc"
-SLASH_AUCADVANCED2 = "/aadv"
-SLASH_AUCADVANCED3 = "/auctioneer"
-SlashCmdList["AUCADVANCED"] = function(msg, editbox) private.CommandHandler(editbox, strsplit(" ", msg)) end
+function private.Activate()
+	private.Activate = nil
+	SLASH_AUCADVANCED1 = "/auc"
+	SLASH_AUCADVANCED2 = "/aadv"
+	SLASH_AUCADVANCED3 = "/auctioneer"
+	SlashCmdList["AUCADVANCED"] = function(msg, editbox) private.CommandHandler(editbox, strsplit(" ", msg)) end
+end
+
+coremodule.Processors = {
+	gameactive = function() private.Activate() end,
+}
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
