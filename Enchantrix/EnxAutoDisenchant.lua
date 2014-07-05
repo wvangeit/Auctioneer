@@ -129,7 +129,7 @@ local function isAutoDisenchantAllowed(link, count)
 end
 
 local function nameFromIgnoreListItem(item)
-	local _, _, name = string.find(item, "%[(.+)%]")
+	local name = GetItemInfo(item)
 	return name
 end
 
