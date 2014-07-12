@@ -41,6 +41,7 @@ local strsplit = strsplit
 local time = time
 local GetTime = GetTime
 local floor = floor
+local bitand = bit.band
 
 local function debugPrint(...)
     if get("util.beancounter.debugMail") then
@@ -270,6 +271,17 @@ function private.matchDB(text, itemKey)
 	return nil
 end
 
+function private.getSuffixFactor(suffixId, uniqueId)
+	local suffixFactor = 0
+	suffixId = tonumber(suffixId) or 0
+	uniqueId = tonumber(uniqueId) or 0
+	if (suffixId < 0) then
+		suffixFactor = bitand(uniqueId, 65535)
+	end
+	return suffixFactor
+end
+
+
 function private.sortCompletedAuctions( i )
 	--Get itemID from database
 	local itemName = private.reconcilePending[i].subject:match(successLocale.."(.*)")
@@ -332,14 +344,14 @@ end
 function private.sortFailedAuctions( i )
 	local itemID =  lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
 	if itemID then
-		local stack, bid, buyout, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
+		local stack, bid, buyout, deposit, itemString = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], "", private.reconcilePending[i]["auctionHouse"])
 			if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
-				private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
+				private.databaseAdd("failedAuctions", nil, itemString, value)
 				--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 			else
-				private.databaseAdd("failedAuctionsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+				private.databaseAdd("failedAuctionsNeutral", nil, itemString, value)
 			end
 		else
 			debugPrint("Failure for failedAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
@@ -351,19 +363,26 @@ end
 function private.findStackfailedAuctions(key, itemID, itemLink, returnedStack, expiredTime)
 	if not private.playerData[key][itemID] then return end --if no keys present abort
 	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
- 	for i,v in pairs (private.playerData[key][itemID]) do
-		if i:match(itemString) or i == itemString then --we still stack check and data range check but match should be assured by now
- 			for index, text in pairs(v) do
-				if not text:match(".*USED.*") then
+	local _, incomingSuffixId, incomingUniqueId = lib.API.decodeLink(itemLink)
+	local incomingSuffixFactor = private.getSuffixFactor(incomingSuffixId, incomingUniqueId)
 
-				local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
+	for i,v in pairs (private.playerData[key][itemID]) do
+		local _, _, _, _, _, _, _, dbSuffixId, dbUniqueId, _, _, _ = strsplit(":", i)
+		local currentSuffixFactor = private.getSuffixFactor(dbSuffixId, dbUniqueId)
+		local adjustedUniqueId = tonumber(incomingUniqueId) - tonumber(incomingSuffixFactor) + tonumber(currentSuffixFactor)
+		local adjustedItemString = itemString:gsub(incomingUniqueId, adjustedUniqueId)
+
+		if i:match(itemString) or i == itemString or i:match(adjustedItemString) or i == adjustedItemString then --we still stack check and data range check but match should be assured by now
+			for index, text in pairs(v) do
+				if not text:match(".*USED.*") then
+					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
 						local timeAuctionPosted, timeFailedAuctionStarted = tonumber(postTime), tonumber(expiredTime - (postRunTime * 60)) --Time this message should have been posted
 						if (timeAuctionPosted - 21600) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 21600) then
 							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Failed"
 							--debugPrint("postedAuction removed as Failed", itemID, itemLink )
-							return postStack, postBid, postBuy, postDeposit
+							return postStack, postBid, postBuy, postDeposit, i
 						end
 					end
 
@@ -377,14 +396,14 @@ end
 function private.sortCancelledAuctions( i )
 	local itemID =  lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
 	if itemID then
-		local stack, bid, buyout, deposit = private.findStackCancelledAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
+		local stack, bid, buyout, deposit, itemString = private.findStackCancelledAuctions("postedAuctions", itemID, private.reconcilePending[i]["itemLink"], private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"])
 		if stack then
 			local value = private.packString(stack, "", deposit , "", buyout, bid, "", private.reconcilePending[i]["time"], _BC('Cancelled'), private.reconcilePending[i]["auctionHouse"])
 			if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
-				private.databaseAdd("failedAuctions", private.reconcilePending[i]["itemLink"], nil, value)
+				private.databaseAdd("failedAuctions", nil, itemString, value)
 				--debugPrint("databaseAdd failedAuctions", itemID, private.reconcilePending[i]["itemLink"])
 			else
-				private.databaseAdd("failedAuctionsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+				private.databaseAdd("failedAuctionsNeutral", nil, itemString, value)
 			end
 		else
 			debugPrint("Failure for cancelledAuctions", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
@@ -396,9 +415,15 @@ end
 function private.findStackCancelledAuctions(key, itemID, itemLink, returnedStack, expiredTime)
 	if not private.playerData[key][itemID] then return end --if no keys present abort
 	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
+	local _, incomingSuffixId, incomingUniqueId = lib.API.decodeLink(itemLink)
+	local incomingSuffixFactor = private.getSuffixFactor(incomingSuffixId, incomingUniqueId)
  	for i,v in pairs (private.playerData[key][itemID]) do
-		if i:match(itemString) or i == itemString then --we still stack check and data range check but match should be assured by now
- 			for index, text in pairs(v) do
+		local _, _, _, _, _, _, _, dbSuffixId, dbUniqueId, _, _, _ = strsplit(":", i)
+		local currentSuffixFactor = private.getSuffixFactor(dbSuffixId, dbUniqueId)
+		local adjustedUniqueId = tonumber(incomingUniqueId) - tonumber(incomingSuffixFactor) + tonumber(currentSuffixFactor)
+		local adjustedItemString = itemString:gsub(incomingUniqueId, adjustedUniqueId)
+		if i:match(itemString) or i == itemString or i:match(adjustedItemString) or i == adjustedItemString then --we still stack check and data range check but match should be assured by now
+			for index, text in pairs(v) do
 				if not text:match(".*USED.*") then
 					local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", private.playerData[key][itemID][i][index])
 					if returnedStack == tonumber(postStack) then --stacks same see if we can match time
@@ -407,7 +432,7 @@ function private.findStackCancelledAuctions(key, itemID, itemLink, returnedStack
 							tremove(private.playerData[key][itemID][i], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][i][index] = private.playerData[key][itemID][i][index]..";USED Cancelled"
 							--debugPrint("postedAuction removed as Cancelled", itemID, itemLink )
-							return postStack, postBid, postBuy, postDeposit
+							return postStack, postBid, postBuy, postDeposit, i
 						end
 					end
 
@@ -487,7 +512,7 @@ function private.findFailedBids(itemName, gold)
 		end
 
 		if not itemID or not private.playerData["postedBids"] then
-			debugPrint("Missing critical data for FailedBid lookup.", itemID, private.playerData["postedBids"], private.playerData["postedBids"][itemID]) 
+			debugPrint("Missing critical data for FailedBid lookup.", itemID, private.playerData["postedBids"], private.playerData["postedBids"][itemID])
 			return
 		end
 
