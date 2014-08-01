@@ -65,6 +65,7 @@ function private.mailMonitor(event,arg1)
 
 	elseif (event == "MAIL_SHOW") then
 		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
+		private.mailReadOveride = {}
 		if not registeredInboxFrameHook then --make sure we only ever register this hook once
 			registeredInboxFrameHook = true
 			hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
@@ -83,11 +84,8 @@ private.mailReadOveride = {}
 function private.PreGetInboxTextHook(n, ...)
 	if n and n > 0 then
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if sender and subject and not wasRead then
-			--print("they read", n, sender, subject)
-			private.mailReadOveride[n] = sender..n
-		elseif wasRead then
-			--print("Already read", n, sender, subject)
+		if not wasRead then
+			private.mailReadOveride[n] = true
 		end
 	end
 	return private.GetInboxText(n, ...)
@@ -134,6 +132,7 @@ function private.updateInboxStart()
 			if auctionHouse then
 				private.HideMailGUI(true)
 				wasRead = wasRead or 0 --its nil unless its has been read
+				private.mailReadOveride[n] = false -- set back to false so we don't read the same message more than once
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
 				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
@@ -149,10 +148,8 @@ function private.updateInboxStart()
 		end
 		private.lastCheckedMail = GetTime() --this keeps us from hiding the mail UI to early and causing flicker
 	end
-	private.mailReadOveride = {}
 	private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 end
-
 function private.getInvoice(n, sender, subject)
 	if sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse')) then
 		if subject:match(successLocale) or subject:match(wonLocale) then
