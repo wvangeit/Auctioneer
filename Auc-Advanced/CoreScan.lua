@@ -172,13 +172,25 @@ private.auctionItemListUpdated = false
 
 function private.LoadScanData()
 	if not private.loadingScanData then
-		local _, _, _, enabled, load, reason = GetAddOnInfo("Auc-ScanData")
-		if not (enabled and load) then
-			private.loadingScanData = "fallback"
-			private.FallbackScanData = reason or "Unknown reason"
-		elseif IsAddOnLoaded("Auc-ScanData") then
-			-- if another AddOn has force-loaded Auc-ScanData
+		local _, _, _, load, reason, security = GetAddOnInfo("Auc-ScanData")
+		if AucAdvanced.HYBRID5 then -- Hybrid mode for WoW5.4; review once WoW6.0 goes live
+			load = load and reason
+			reason = security
+		else
+			load = reason == "DEMAND_LOADED"
+		end
+
+		if IsAddOnLoaded("Auc-ScanData") then
+			-- another AddOn has force-loaded Auc-ScanData
 			private.loadingScanData = "loading"
+		elseif not load then
+			private.loadingScanData = "fallback"
+			if reason then
+				reason = _G["ADDON_"..reason] or reason
+			else
+				reason = "Unknown reason"
+			end
+			private.FallbackScanData = reason
 		else
 			private.loadingScanData = "block" -- prevents re-entry to this function during the LoadAddOn call
 			load, reason = LoadAddOn("Auc-ScanData")
@@ -186,7 +198,7 @@ function private.LoadScanData()
 				private.loadingScanData = "loading"
 			elseif reason then
 				private.loadingScanData = "fallback"
-				private.FallbackScanData = reason
+				private.FallbackScanData = _G["ADDON_"..reason] or reason
 			else
 				-- LoadAddOn sometimes returns nil, nil if called too early during game startup
 				-- assume it needs to be called again at a later stage
