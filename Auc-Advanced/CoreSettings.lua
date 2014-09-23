@@ -88,6 +88,10 @@ local UserSig = format("users.%s.%s", Const.PlayerRealm, Const.PlayerName)
 
 local aucPrint,decode,_,_,replicate,empty,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 
+local strsplit = strsplit
+local next = next
+local type = type
+
 function coremodule.OnLoad(addon)
 	if not AucAdvancedConfig then AucAdvancedConfig = {} end
 	if addon == "auc-advanced" then
@@ -184,8 +188,6 @@ function lib.SetDefault(setting, default)
 end
 
 local function setter(setting, value)
-	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
@@ -209,7 +211,7 @@ local function setter(setting, value)
 		value = nil
 	end
 
-	local a,b,c = strsplit(".", setting)
+	local a, b, c = strsplit(".", setting, 3)
 	if (a == "profile") then
 		if setting == "profile.save" or setting == "profile.duplicate" then
 			-- User clicked either the New Profile or Copy Profile button
@@ -322,17 +324,36 @@ local function setter(setting, value)
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
-		--lets change the settings to be inside module branches not all in the same tree
-		local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-		if a and b and c then
-			if db[a] and db[a][b] and db[a][b][c] == value then return end
-			--create array
-			if not db[a] then db[a] = {} end
-			if not db[a][b] then db[a][b] = {} end
-			--store value
-			db[a][b][c] = value
-		else
-			--non valid format saved variables are stored here.  All modules should use  type.modulename.setting
+
+		if c then -- All modules should be using tripart-style "type.modulename.setting"
+			if value == nil then -- delete an entry: special handling to avoid empty tables
+				local dba = db[a]
+				if not dba then return end
+				local dbab = dba[b]
+				if not dbab then return end
+				if dbab[c] == value then return end -- value unchanged
+				dbab[c] = value
+				if not next(dbab) then
+					dba[b] = nil
+					if not next(dba) then
+						db[a] = nil
+					end
+				end
+			else -- create or replace an entry
+				local dba = db[a]
+				if not dba then
+					dba = {}
+					db[a] = dba
+				end
+				local dbab = dba[b]
+				if not dbab then
+					dbab = {}
+					dba[b] = dbab
+				end
+				if dbab[c] == value then return end -- value unchanged
+				dbab[c] = value
+			end
+		else --non valid format saved variables are stored in flat mode here.
 			if db[setting] == value then return end
 			db[setting] = value
 		end
@@ -341,7 +362,11 @@ local function setter(setting, value)
 		lib.SetSetting("SelectedLocale", value)
 	end
 
-	AucAdvanced.SendProcessorMessage("configchanged", setting, callbackValue)
+	if not c then
+		c = setting
+		b = "flat"
+	end
+	AucAdvanced.SendProcessorMessage("configchanged", setting, callbackValue, c, b)
 end
 
 function lib.SetSetting(...)
@@ -353,8 +378,6 @@ end
 
 
 local function getter(setting)
-	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-	if not setting then return end
 
 	--Is the setting actually a function reference? If so, call it.
 	-- This was added to enable Protect Window to update its
@@ -364,9 +387,11 @@ local function getter(setting)
 		return setting("getsetting")
 	end
 
-	local a,b,c = strsplit(".", setting)
+	local a, b, c = strsplit(".", setting, 3)
 	if (a == 'profile') then
-		if (b == 'profiles') then
+		if not b then -- (setting == 'profile')
+			return getUserProfileName()
+		elseif (b == 'profiles') then
 			local pList = AucAdvancedConfig["profiles"]
 			if (not pList) then
 				pList = { "Default" }
@@ -380,21 +405,27 @@ local function getter(setting)
 		return internal.API.MatcherGetter(setting)
 	end
 
-	if (setting == 'profile') then
-		return getUserProfileName()
-	end
-
 	local db = getUserProfile()
-	--string.split does not always work depending on format of setting
-	local a, b, c = setting:match("(.-)%.(.-)%.(.*)")
-	if a and b and c and db[a] and db[a][b] and db[a][b][c] ~= nil then --the nil check just allows it to fall through to the getDefault check
-		return db[a][b][c] --return setting
-	end
-	--NON valid format saved variables are stored here.  All modules should use  type.modulename.setting
-	if ( db[setting] ~= nil ) then
+
+	-- All modules should now be using "type.modulename.setting" format
+	if c then
+		-- valid tripart setting - look for it in the nested tables of db
+		local dba = db[a]
+		if dba then
+			local dbab = dba[b]
+			if dbab then
+				local dbabc = dbab[c]
+				if dbabc ~= nil then
+					return dbabc
+				end
+			end
+		end
+	elseif ( db[setting] ~= nil ) then
+		-- invalid (flat) format saved variables are stored here
 		return db[setting]
 	end
-	--return default values if all else fails
+
+	-- return default values if all else fails
 	return getDefault(setting)
 end
 
