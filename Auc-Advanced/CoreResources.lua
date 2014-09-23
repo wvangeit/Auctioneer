@@ -99,7 +99,7 @@ AucAdvanced.Resources = lib
 --[[ Faction handlers ]]--
 local function UpdateServerKey()
 	local factionSelect
-	if lib.AuctionHouseOpen or not GetSetting("core.general.alwaysHomeFaction") then
+	if AucAdvanced.HYBRID5 and (lib.AuctionHouseOpen or not GetSetting("core.general.alwaysHomeFaction")) then
 		local currentZone = GetZoneText()
 		factionSelect = ZoneFactionCache[currentZone]
 		if not factionSelect then
