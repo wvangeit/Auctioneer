@@ -192,8 +192,14 @@ end
 if Enchantrix and Enchantrix.Storage and Enchantrix.Util then
 	resources.isEnchantrixLoaded = true
 else
-	local _, _, _, enabled, loadable = GetAddOnInfo("Enchantrix") -- check it's actually possible to load
-	if enabled and loadable then
+	local _, _, _, loadable, reason = GetAddOnInfo("Enchantrix") -- check it's actually possible to load
+	if AucAdvanced.HYBRID5 then
+		-- Hybrid mode for WoW5.4; remove once WoW6.0 goes live
+		loadable = loadable and reason
+	else
+		loadable = reason == "DEMAND_LOADED"
+	end 
+	if loadable then
 		Stubby.RegisterAddOnHook("Enchantrix", "Auc-Util-SearchUI", function()
 			if Enchantrix and Enchantrix.Storage and Enchantrix.Util then
 				Stubby.UnregisterAddOnHook("Enchantrix", "Auc-Util-SearchUI")
