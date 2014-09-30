@@ -319,7 +319,6 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 	local DBitemID, DBSuffix = lib.API.decodeLink(itemLink)
 	for itemString,v in pairs (private.playerData[key][itemID]) do
 		local SearchID, SearchSuffix = lib.API.decodeLink(itemString)
-		--print(SearchID, DBitemID,SearchSuffix ,DBSuffix, itemLink, itemString)
 		if SearchID == DBitemID and  SearchSuffix == DBSuffix then
 			for index, text in pairs(v) do
 				if not text:match(".*USED.*") then
@@ -460,43 +459,98 @@ function private.findStackReturnedAuctions(checkfunc, itemID, itemLink, returned
 	end
 end
 
- --No need to reconcile, all needed data has been provided in the invoice We do need to clear entries so outbid has less to wade through
+-- Most data for won bids/buyouts should be provided in the invoice. We still need to reconcile postedBids entries
 function private.sortCompletedBidsBuyouts( i )
-	local itemID = lib.API.decodeLink(private.reconcilePending[i]["itemLink"])
-	local reason = private.findCompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["itemLink"])
+	local mailPending = private.reconcilePending[i]
+	local mailItemLink = mailPending.itemLink
+	local itemID = lib.API.decodeLink(mailItemLink)
 	if itemID then
-		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
-		local value = private.packString(private.reconcilePending[i]["stack"], private.reconcilePending[i]["money"], nil, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], reason, private.reconcilePending[i]["auctionHouse"])
-		if private.reconcilePending[i]["auctionHouse"] == "A" or private.reconcilePending[i]["auctionHouse"] == "H" then
-			private.databaseAdd("completedBidsBuyouts", private.reconcilePending[i]["itemLink"], nil, value)
-		else
-			private.databaseAdd("completedBidsBuyoutsNeutral", private.reconcilePending[i]["itemLink"], nil, value)
+		local reason, itemString = private.findCompletedBids(itemID, mailPending.bid, mailItemLink)
+		if not itemString then
+			debugPrint("No postedBids entry for completedBidsBuyouts", itemID, mailItemLink, "index", mailPending.n)
+			itemString = lib.API.getItemString(mailItemLink)
 		end
-		--debugPrint("databaseAdd completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"])
+		local auctionHouse = mailPending.auctionHouse
+		--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
+		local value = private.packString(mailPending.stack, mailPending.money, nil, mailPending.fee, mailPending.buyout, mailPending.bid, mailPending["Seller/buyer"], mailPending.time, reason, auctionHouse)
+		if auctionHouse == "A" or auctionHouse == "H" then
+			private.databaseAdd("completedBidsBuyouts", nil, itemString, value)
+		else
+			private.databaseAdd("completedBidsBuyoutsNeutral", nil, itemString, value)
+		end
+		--debugPrint("databaseAdd completedBidsBuyouts", itemID, mailItemLink)
 	else
-		debugPrint("Failure for completedBidsBuyouts", itemID, private.reconcilePending[i]["itemLink"], "index", private.reconcilePending[i].n)
+		debugPrint("Failure for completedBidsBuyouts", mailItemLink, "index", mailPending.n)
 	end
 
 	tremove(private.reconcilePending,i)
 end
---Used only to clear postedBid entries so failed bids is less likely to miss
-function private.findCompletedBids(itemID, seller, bid, itemLink)
-	local bid = tonumber(bid)
-	local itemString = lib.API.getItemString(itemLink) --use the UniqueID stored to match this
-	--debugPrint("Starting search to remove posted Bid")
-	if private.playerData["postedBids"][itemID] and private.playerData["postedBids"][itemID][itemString] then
-		for index, text in pairs(private.playerData["postedBids"][itemID][itemString]) do
-			if not text:match(".*USED.*") then
-				local postStack, postBid, postSeller, isBuyout, postTimeLeft, postTime, reason = private.unpackString(text)
-				postStack, postBid = tonumber(postStack), tonumber(postBid)
-				--if seller ==  postSeller and postBid == bid then --Seller is mostly useless thanks to blizzards item name cahce chamges. Can often be nil  esp after a getall
-				if postBid == bid then
-					tremove(private.playerData["postedBids"][itemID][itemString], index) --remove the matched item From postedBids DB
-					--private.playerData["postedBids"][itemID][itemString][index] = private.playerData["postedBids"][itemID][itemString][index] ..";USED WON"
-					--debugPrint("posted Bid removed as Won", itemString, index, reason)
-					return reason --return the reason code provided for why we bid/bought item
+-- Clear postedBid entries, return reason (if any)
+function private.findCompletedBids(itemID, bid, itemLink)
+	local dataItemBase = private.playerData.postedBids[itemID]
+	if not dataItemBase then return end
+	local mailItemString = lib.API.getItemString(itemLink) -- entries in database are keyed by itemString
+	bid = tonumber(bid)
+
+	-- see if there is an exact match
+	local datalist = dataItemBase[mailItemString]
+	if datalist then
+		local reason = private.checkCompletedBidsBuyouts(datalist, bid)
+		if reason then
+			return reason, mailItemString
+		end
+	end
+
+	-- no exact matches, keep looking for a fuzzy match
+	local mailSuffix, mailUniqueId, mailCleanId = private.getSuffixHelper(mailItemString)
+	local mailAdjustedString
+	if mailSuffix then
+		mailAdjustedString = mailItemString:gsub(mailUniqueId, mailCleanId)
+	end
+
+	for dbItemString, datalist in pairs(dataItemBase) do
+		if dbItemString ~= mailItemString then -- we've already tested that case above so don't test it again
+
+			if strfind(mailItemString, dbItemString, 1, true) then
+				-- mailItemString contains dbItemString, most likely due to change in itemString format after a patch
+				local reason = private.checkCompletedBidsBuyouts(datalist, bid)
+				if reason then
+					return reason, mailItemString
 				end
 			end
+
+			if mailSuffix then
+				-- suffixed item; for some items the uniqueId gets mangled by the Mail API
+				local dbSuffix, dbUniqueId, dbCleanId = private.getSuffixHelper(dbItemString)
+				if mailSuffix == dbSuffix and mailCleanId == dbCleanId then
+					local dbAdjustedString = dbItemString:gsub(dbUniqueId, dbCleanId)
+					if mailAdjustedString == dbAdjustedString or strfind(mailAdjustedString, dbAdjustedString, 1, true) then
+						local reason = private.checkCompletedBidsBuyouts(datalist, bid)
+						if reason then
+							-- mailItemString is mangled, determine the correct itemString
+							local correctItemString
+							if mailAdjustedString == dbAdjustedString then
+								correctItemString = dbItemString
+							else
+								-- dbItemString is not correct, most likely due to change in itemString format after a patch
+								-- dbUniqueId is the correct uniqueId, mailUniqueId is mangled
+								local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, tail = strsplit(":", mailItemString, 10)
+								correctItemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, dbUniqueId, tail)
+							end
+							return reason, correctItemString
+						end
+					end
+				end
+			end
+		end
+	end
+end
+function private.checkCompletedBidsBuyouts(datalist, bid)
+	for index = #datalist, 1, -1 do -- check entries from oldest to newest
+		local postStack, postBid, postBuy, postRunTime, postDeposit, postTime, postReason = strsplit(";", datalist[index])
+		if tonumber(postBid) == bid then
+			tremove(datalist, index) --remove the matched item From postedBids DB
+			return postReason --return the reason code provided for why we bid/bought item
 		end
 	end
 end
