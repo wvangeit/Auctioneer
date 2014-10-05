@@ -135,9 +135,9 @@ local lib = {
 	CLASSESREV = { }, -- Table mapping names to index in CLASSES table
 	SUBCLASSESREV = { }, -- Table mapping from CLASS and SUBCLASSES names to index number in SUBCLASSES
 
-	MAXSKILLLEVEL = 600,
-	MAXUSERLEVEL = 90,
-	MAXITEMLEVEL = 550,
+	MAXSKILLLEVEL = 700,
+	MAXUSERLEVEL = 100,
+	MAXITEMLEVEL = 700,
 }
 
 lib.InvTypes = lib.EquipEncode -- backward compatibility - deprecated entry
