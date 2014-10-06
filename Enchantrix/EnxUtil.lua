@@ -754,11 +754,13 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
 
 	if (not level or not quality) then
-		--Enchantrix.Util.DebugPrintQuick( "nil level or quality", level, quality )
+		-- Enchantrix.Util.DebugPrintQuick( "nil level or quality", level, quality )		-- DEBUGGING
 		return 0
 	end
+
+-- TODO - ccox - WoD items?
 	
--- ccox - Panda items, this is partly guesswork
+-- ccox - Panda items
 	if (quality == 2 and level >= 340) then
 		-- all greens
 		return 475;					-- 384 - 460

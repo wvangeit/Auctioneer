@@ -51,6 +51,12 @@ local KYPARITE_ORE = 72093
 local WHITE_TRILLIUM_ORE = 72103
 local BLACK_TRILLIUM_ORE = 72094
 
+-- TODO - ccox - what all is new for WOD?
+local BLACKROCK = 109118
+local TRUEIRON = 109119
+--local BLACKROCK_FRAGMENT = 109992
+
+
 local COPPERPOWDER = 24186
 local TINPOWDER = 24188
 local IRONPOWDER = 24190
@@ -124,7 +130,7 @@ local EMBERTOPAZ = 52193
 local DEMONSEYE = 52194
 local AMBERJEWEL = 52195
 
--- new for Panda
+-- new for Pandaria
 local TIGEROPAL = 76130
 local LAPISLAZULI = 76133
 local SUNSTONE = 76134
@@ -138,6 +144,9 @@ local WILDJADE = 76139
 local VERMILIONONYX = 76140
 local IMPERIALAMETHYST = 76141
 local SUNSRADIANCE = 76142
+
+-- TODO - ccox - new gems for Warlords of Draenor
+-- Currently no prospectable gems, only craftable gems
 
 
 --[[
@@ -162,6 +171,8 @@ const.ProspectMinLevels = {
 	[KYPARITE_ORE] = 550,
 	[WHITE_TRILLIUM_ORE] = 600,
 	[BLACK_TRILLIUM_ORE] = 600,
+--	[BLACKROCK] = 600,			-- currently not prospectable
+--	[TRUEIRON] = 600,			-- currently not prospectable
 }
 
 
@@ -354,7 +365,6 @@ const.ProspectableItems = {
 			},
 
 	[GHOST_IRON_ORE] = {
--- ccox - tested in beta Sept 23, 2012
 			[SPARKLING_SHARD] = 1.14,
 			
 			[TIGEROPAL] = 0.25,
@@ -373,7 +383,6 @@ const.ProspectableItems = {
 			},
 	
 	[KYPARITE_ORE] = {
--- ccox - tested in beta Sept 23, 2012
 			[SPARKLING_SHARD] = 1.46,
 			
 			[TIGEROPAL] = 0.25,
@@ -392,8 +401,6 @@ const.ProspectableItems = {
 			},
 	
 	[WHITE_TRILLIUM_ORE] = {
--- ccox - tested in beta Sept 23, 2012
--- ccox - wild guess, needs update	
 			[SPARKLING_SHARD] = 1.65,
 			
 			[TIGEROPAL] = 0.18,
@@ -412,8 +419,6 @@ const.ProspectableItems = {
 			},
 
 	[BLACK_TRILLIUM_ORE] = {
--- ccox - tested in beta Sept 23, 2012
--- ccox - wild guess, needs update
 			[SPARKLING_SHARD] = 1.65,
 			
 			[TIGEROPAL] = 0.18,
@@ -528,6 +533,7 @@ const.ReverseProspectingSources = {
 
 
 -- items that have no use, sell to vendor, and thus get vendor prices
+-- most have now been removed from yields
 const.VendorTrash =  {
 	[COPPERPOWDER] = true,
 	[TINPOWDER] = true,

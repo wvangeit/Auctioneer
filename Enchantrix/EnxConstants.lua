@@ -38,12 +38,15 @@ local const = Enchantrix.Constants
 const.StaticPrices = {
 
 -- needs update
+	[113588] =  10000, -- Temporal Crystal
+	[115504] =    100, -- Fractured Temporal Crystal
 	[74248] = 8000000, -- Sha Crystal
 	[52722] = 800000, -- Maelstrom Crystal
 	[34057] =  50000, -- Abyss Crystal
 	[22450] =  10000, -- Void Crystal
 	[20725] =  10000, -- Nexus Crystal
 
+	[111245] = 10000, -- Luminous Shard
 	[74247] = 800000, -- Etheral Shard
 	[52721] = 200000, -- Heavenly Shard
 	[34052] = 140000, -- Dream Shard
@@ -53,6 +56,8 @@ const.StaticPrices = {
 	[11139] =  10000, -- Large Glowing Shard
 	[11084] =   6000, -- Large Glimmering Shard
 
+	[115502] = 10000, -- Small Luminous Shard
+	[113589] =   100, -- Azurian Shard				-- not used
 	[74252] = 400000, -- Small Etheral Shard
 	[52720] = 120000, -- Small Heavenly Shard
 	[34053] =  60000, -- Small Dream Shard
@@ -62,7 +67,8 @@ const.StaticPrices = {
 	[11138] =   1000, -- Small Glowing Shard
 	[10978] =    700, -- Small Glimmering Shard
 
---	[74251] = 500000, -- Greater Mysterious Essence - doesn't seem to be used
+	[111247] = 10000, -- Blackfire Essence			-- not used
+--	[74251] = 500000, -- Greater Mysterious Essence - never used
 	[52719] = 200000, -- Greater Celestial Essence
 	[34055] = 200000, -- Greater Cosmic Essence
 	[22446] = 120000, -- Greater Planar Essence
@@ -82,6 +88,7 @@ const.StaticPrices = {
 	[10998] =   5000, -- Lesser Astral Essence
 	[10938] =   4000, -- Lesser Magic Essence
 
+	[109693] = 10000, -- Draenic Dust
 	[74249] = 200000, -- Spirit Dust
 	[52555] =  10000, -- Hypnotic Dust
 	[34054] =  47500, -- Infinite Dust
@@ -91,6 +98,8 @@ const.StaticPrices = {
 	[11137] =  11000, -- Vision Dust
 	[11083] =   5000, -- Soul Dust
 	[10940] =   3000, -- Strange Dust
+
+-- TODO - ccox - WoD materials
 
 -- needs update
 	[2772] =   11500, -- Iron Ore
@@ -191,9 +200,9 @@ const.StaticPrices = {
 	[43109] =  30000, 	-- ICY_PIGMENT
 	[61979] =  40000,   -- ASHEN_PIGMENT
 	[61980] =  90000,   -- BURNING_EMBERS
--- needs update, prices in flux due to expansion
 	[79251] = 200000,   -- SHADOW_PIGMENT
 	[79253] = 500000,   -- MISTY_PIGMENT
+	[114931] = 10000, 	-- Cerulean Pigment
 
 -- needs update, prices in flux due to expansion
 	[818] =      7500, 	-- TIGERSEYE
@@ -272,7 +281,8 @@ const.StaticPrices = {
 	[76140] =  500000,	-- VERMILIONONYX
 	[76141] =  500000,	-- IMPERIALAMETHYST
 	[76142] =  500000,	-- SUNSRADIANCE
-	
+
+-- TODO - ccox - WoD gems
 
 }
 
@@ -375,21 +385,34 @@ local SHA_CRYSTAL = 74248
 local ETHERAL = 74247
 local SETHERAL = 74252
 local SPIRIT = 74249
---local GMYSTERIOUS = 74251		-- doesn't seem to be used
+--local GMYSTERIOUS = 74251		-- never used
 local MYSTERIOUS = 74250
+
+-- TODO - ccox - get more data on WoD materials
+local DRAENIC = 109693
+local SLUMINOUS = 115502
+local LUMINOUS = 111245
+--local AZURIAN = 113589		-- no longer used, may be taken out
+local TEMPORAL = 113588
+local FRACTEMPORAL = 115504
+--local BLACKFIRE = 111247		-- doesn't seem to be used
+
 
 
 -- and in a form we can iterate over, with a fixed order for the UI
 
 const.DisenchantReagentList = {
 
-	74248, -- Sha Crystal
-	52722, -- Maelstrom Crystal
-	34057, -- Abyss Crystal
-	22450, -- Void Crystal
-	20725, -- Nexus Crystal
+	TEMPORAL,
+	FRACTEMPORAL,
+	SHA_CRYSTAL,
+	MAELSTROM,
+	ABYSS,
+	VOID,
+	NEXUS,
 
-	74247, -- Etheral Shard
+	LUMINOUS,
+	ETHERAL,
 	52721, -- Heavenly Shard
 	34052, -- Dream Shard
 	22449, -- Large Prismatic Shard
@@ -398,7 +421,9 @@ const.DisenchantReagentList = {
 	11139, -- Large Glowing Shard
 	11084, -- Large Glimmering Shard
 
-	74252, -- Small Etheral Shard
+	SLUMINOUS,
+--	AZURIAN, -- not used, may be taken out
+	SETHERAL,
 	52720, -- Small Heavenly Shard
 	34053, -- Small Dream Shard
 	22448, -- Small Prismatic Shard
@@ -407,7 +432,8 @@ const.DisenchantReagentList = {
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
 
---	74251, -- Greater Mysterious Essence - doesn't seem to be used
+--	BLACKFIRE, -- currently not used
+--	GMYSTERIOUS, -- never used
 	52719, -- Greater Celestial Essence
 	34055, -- Greater Cosmic Essence
 	22446, -- Greater Planar Essence
@@ -427,7 +453,8 @@ const.DisenchantReagentList = {
 	10998, -- Lesser Astral Essence
 	10938, -- Lesser Magic Essence
 
-	74249, -- Spirit Dust
+	DRAENIC,
+	SPIRIT,
 	52555, -- Hypnotic Dust
 	34054, -- Infinite Dust
 	22445, -- Arcane Dust
@@ -453,7 +480,7 @@ local EPIC = 4
 const.baseDisenchantTable = {
  [UNCOMMON] = {
   [const.WEAPON] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 450 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 500, 800 },
    [15]  = { { STRANGE , 0.20, 1.5 }, { LMAGIC  , 0.80, 1.5 }, },
    [20]  = { { STRANGE , 0.20, 2.5 }, { GMAGIC  , 0.75, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.15, 5.0 }, { LASTRAL , 0.75, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -478,17 +505,18 @@ const.baseDisenchantTable = {
    [325] = { { HYPNOTIC, 0.25, 3.5 }, { GCELESTIAL , 0.75, 2.5 }, },
    [350] = { { HYPNOTIC, 0.25, 4.0 }, { GCELESTIAL , 0.75, 3.0 }, },	-- highest level Cata green is 333, first Panda is 377
    
-   -- As of Sept 23, 2012, weapons were giving almost the same drops as armor (mostly dust)
-   -- weapons do seem to drop more dusts
--- tested beta Sept 23, 2012
+	-- Panda
    [380] = { { SPIRIT, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [390] = { { SPIRIT, 0.85, 3.0 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [410] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 1.5 }, },
-   [450] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 437, so far
+   [500] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
+   
+   -- WoD - FAKE - TODO - ccox - get real data
+   [ 800 ] = { { DRAENIC, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
 
   },
   [const.ARMOR] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 450 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 500, 800 },
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
    [20]  = { { STRANGE , 0.75, 2.5 }, { GMAGIC  , 0.20, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.75, 5.0 }, { LASTRAL , 0.15, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -513,11 +541,14 @@ const.baseDisenchantTable = {
    [325] = { { HYPNOTIC, 0.75, 3.5 }, { GCELESTIAL , 0.25, 2.5 }, },
    [350] = { { HYPNOTIC, 0.75, 4.0 }, { GCELESTIAL , 0.25, 3.0 }, },	-- highest level Cata green is 333, first Panda is 364
    
--- tested beta Sept 23, 2012
+	-- Panda
    [380] = { { SPIRIT, 0.85, 2.0 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [390] = { { SPIRIT, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [410] = { { SPIRIT, 0.85, 3.0 }, { MYSTERIOUS , 0.15, 1.5 }, },
-   [450] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 437, so far
+   [500] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
+   
+   -- WoD - FAKE - TODO - ccox - get real data
+   [ 800 ] = { { DRAENIC, 0.85, 2.5 }, { SLUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far
    
   },
  },
@@ -525,7 +556,7 @@ const.baseDisenchantTable = {
  	-- weapon lookups will fall back to the armor table
  	-- 1% chance for better shard appears to have been removed in Cataclysm
   [const.ARMOR] = {
-   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 380, 424, 449, 450, 500 },
+   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 380, 424, 449, 450, 500, 800 },
    [25]  = { { SGLIMMERING,     1.00, 1.0 } },
    [30]  = { { LGLIMMERING,     1.00, 1.0 } },
    [35]  = { { SGLOWING,        1.00, 1.0 } },
@@ -541,19 +572,20 @@ const.baseDisenchantTable = {
    [316] = { { SHEAVENLY_SHARD, 1.00, 1.0 } },
    [380] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 377, first Panda blue is 384
 
--- tested beta, Spet 23, 2012
--- something weird is going on, some items have steady drops, while others seem random small and large
--- need a lot more data, could be crafted vs. drop?  Dragonling seems most mixed
+	-- Panda
    [424] = { { SETHERAL,        1.00, 1.0 } },	-- this seems solid
    [449] = { { ETHERAL,         1.00, 1.0 } },	-- this seems solid
    [450] = { { ETHERAL,         0.20, 1.0 }, { SETHERAL,        0.80, 1.0 } },	-- this is mixed
-   [500] = { { ETHERAL,         1.00, 1.0 } },	-- this seems solid, highest level Panda blue is 463, so far
+   [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 476
+   
+   -- WoD - FAKE - TODO - ccox - get real data
+   [ 800 ] = { { LUMINOUS, 1.0, 1.0 } },	-- lowest WoD blue is 508, highest is 645 so far
   },
  },
  [EPIC] = {
  	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
-   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 600 },
+   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 600, 800 },
    [40]  = { { SRADIANT,    1.00, 3.0 } },
    [45]  = { { SRADIANT,    1.00, 3.5 } },
    [50]  = { { LRADIANT,    1.00, 3.5 } },
@@ -564,7 +596,10 @@ const.baseDisenchantTable = {
    [164] = { { VOID,        1.00, 1.5 } },	-- highest level BC epic is 164, first LK epic is 200
    [299] = { { ABYSS,       1.00, 1.0 } },	-- highest level LK epic is 284, first Cata epic is 300
    [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic is 416, first Panda epic is 420
-   [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 516, so far
+   [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 600
+   
+   -- WoD - FAKE - TODO - ccox - get real data
+   [ 800 ] = { { TEMPORAL, 1.00, 1.0 } },	-- first WoD epic is , highest is 695 so far
    
   },
  },
@@ -578,12 +613,17 @@ const.baseDisenchantTable = {
 const.ReverseDisenchantLevelList = {
 	
 -- ccox, needs update
+	[TEMPORAL]	  = { 601, 800 }, -- Temporal Crystal						TODO - ccox - what is highest WoD item level?
+	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			TODO - ccox - what is highest WoD item level?
 	[SHA_CRYSTAL] = { 420, 600 }, -- Sha Crystal
 	[MAELSTROM]   = { 300, 419 }, -- Maelstrom Crystal
 	[ABYSS]       = { 165, 299 }, -- Abyss Crystal
 	[VOID]        = {  95, 164 }, -- Void Crystal
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
+	[LUMINOUS]		  = { 501, 800 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
+	[SLUMINOUS]		  = { 501, 800 }, -- Small Luminous Shards		TODO - ccox - what is highest WoD item level?
+--	[AZURIAN]		  =	{ 501, 800 }, -- Azurian Shards				TODO - ccox - what is highest WoD item level?	-- not used
 	[ETHERAL] 		  = { 425, 500 }, -- Etheral Shard
 	[SETHERAL]        = { 380, 424 }, -- Small Etheral Shard
 	[HEAVENLY_SHARD]  = { 317, 379 }, -- Heavenly Shard
@@ -601,7 +641,8 @@ const.ReverseDisenchantLevelList = {
 	[LGLIMMERING]     = {  26,  30 }, -- Large Glimmering Shard
 	[SGLIMMERING]     = {  1,   25 }, -- Small Glimmering Shard
 	
-	[MYSTERIOUS]  = { 351, 450 }, -- Lesser Mysterious Essence
+--	[BLACKFIRE]	  = { 451, 800 }, -- Blackfire Essence						TODO - ccox - what is highest WoD item level? -- not used
+	[MYSTERIOUS]  = { 351, 450 }, -- Mysterious Essence
 	[GCELESTIAL]  = { 306, 350 }, -- Greater Celestial Essence
 	[LCELESTIAL]  = { 201, 305 }, -- Lesser Celestial Essence
 	[GCOSMIC]     = { 152, 200 }, -- Greater Cosmic Essence
@@ -619,6 +660,7 @@ const.ReverseDisenchantLevelList = {
 	[GMAGIC]      = {  16,  20 }, -- Greater Magic Essence
 	[LMAGIC]      = {   1,  15 }, -- Lesser Magic Essence
 	
+	[DRAENIC]  = { 451, 800 }, -- Draenic Dust						TODO - ccox - what is highest WoD item level?
 	[SPIRIT]   = { 351, 450 }, -- Spirit Dust
 	[HYPNOTIC] = { 201, 350 }, -- Hypnotic Dust
 	[INFINITE] = { 121, 200 }, -- Infinite Dust
