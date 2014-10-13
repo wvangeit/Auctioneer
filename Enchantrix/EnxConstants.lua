@@ -38,68 +38,69 @@ local const = Enchantrix.Constants
 const.StaticPrices = {
 
 -- needs update
-	[113588] =  10000, -- Temporal Crystal
-	[115504] =    100, -- Fractured Temporal Crystal
-	[74248] = 8000000, -- Sha Crystal
-	[52722] = 800000, -- Maelstrom Crystal
-	[34057] =  50000, -- Abyss Crystal
-	[22450] =  10000, -- Void Crystal
-	[20725] =  10000, -- Nexus Crystal
+	[113588] =1000000, -- Temporal Crystal
+	[115504] = 100000, -- Fractured Temporal Crystal
+	[74248] =  400000, -- Sha Crystal
+	[105718] =  40000, -- Sha Crystal Fragment
+	[52722] =  100000, -- Maelstrom Crystal
+	[34057] =   50000, -- Abyss Crystal
+	[22450] =   10000, -- Void Crystal
+	[20725] =   10000, -- Nexus Crystal
 
-	[111245] = 10000, -- Luminous Shard
-	[74247] = 800000, -- Etheral Shard
-	[52721] = 200000, -- Heavenly Shard
-	[34052] = 140000, -- Dream Shard
-	[22449] =  60000, -- Large Prismatic Shard
-	[14344] =  25000, -- Large Brilliant Shard
-	[11178] = 110000, -- Large Radiant Shard
-	[11139] =  10000, -- Large Glowing Shard
-	[11084] =   6000, -- Large Glimmering Shard
+	[111245] = 500000, -- Luminous Shard
+	[74247] =  100000, -- Etheral Shard
+	[52721] =   50000, -- Heavenly Shard
+	[34052] =   70000, -- Dream Shard
+	[22449] =   50000, -- Large Prismatic Shard
+	[14344] =   25000, -- Large Brilliant Shard
+	[11178] =  110000, -- Large Radiant Shard
+	[11139] =   10000, -- Large Glowing Shard
+	[11084] =    6000, -- Large Glimmering Shard
 
-	[115502] = 10000, -- Small Luminous Shard
-	[113589] =   100, -- Azurian Shard				-- not used
-	[74252] = 400000, -- Small Etheral Shard
-	[52720] = 120000, -- Small Heavenly Shard
-	[34053] =  60000, -- Small Dream Shard
-	[22448] =  16000, -- Small Prismatic Shard
-	[14343] =  23000, -- Small Brilliant Shard
-	[11177] =  70000, -- Small Radiant Shard
-	[11138] =   1000, -- Small Glowing Shard
-	[10978] =    700, -- Small Glimmering Shard
+	[115502] = 100000, -- Small Luminous Shard
+	[113589] =    100, -- Azurian Shard				-- not used
+	[74252] =   40000, -- Small Etheral Shard
+	[52720] =   12000, -- Small Heavenly Shard
+	[34053] =   10000, -- Small Dream Shard
+	[22448] =   20000, -- Small Prismatic Shard
+	[14343] =   23000, -- Small Brilliant Shard
+	[11177] =   20000, -- Small Radiant Shard
+	[11138] =    1000, -- Small Glowing Shard
+	[10978] =     700, -- Small Glimmering Shard
 
-	[111247] = 10000, -- Blackfire Essence			-- not used
---	[74251] = 500000, -- Greater Mysterious Essence - never used
-	[52719] = 200000, -- Greater Celestial Essence
-	[34055] = 200000, -- Greater Cosmic Essence
-	[22446] = 120000, -- Greater Planar Essence
-	[16203] = 110000, -- Greater Eternal Essence
-	[11175] =  95000, -- Greater Nether Essence
-	[11135] =  11000, -- Greater Mystic Essence
-	[11082] =   6000, -- Greater Astral Essence
-	[10939] =   6000, -- Greater Magic Essence
+--	[111247] =    100, -- Blackfire Essence			-- never used
+--	[74251] =  500000, -- Greater Mysterious Essence - never used
+	[52719] =   50000, -- Greater Celestial Essence
+	[34055] =   40000, -- Greater Cosmic Essence
+	[22446] =   30000, -- Greater Planar Essence
+	[16203] =   20000, -- Greater Eternal Essence
+	[11175] =   15000, -- Greater Nether Essence
+	[11135] =   11000, -- Greater Mystic Essence
+	[11082] =    6000, -- Greater Astral Essence
+	[10939] =    8000, -- Greater Magic Essence
 
-	[74250] = 300000, -- Mysterious Essence
-	[52718] =  80000, -- Lesser Celestial Essence
-	[34056] =  75000, -- Lesser Cosmic Essence
-	[22447] =  38000, -- Lesser Planar Essence
-	[16202] =  52500, -- Lesser Eternal Essence
-	[11174] =  35000, -- Lesser Nether Essence
-	[11134] =   7500, -- Lesser Mystic Essence
-	[10998] =   5000, -- Lesser Astral Essence
-	[10938] =   4000, -- Lesser Magic Essence
+	[74250] =  100000, -- Mysterious Essence
+	[52718] =   50000, -- Lesser Celestial Essence
+	[34056] =   45000, -- Lesser Cosmic Essence
+	[22447] =   38000, -- Lesser Planar Essence
+	[16202] =   32500, -- Lesser Eternal Essence
+	[11174] =   25000, -- Lesser Nether Essence
+	[11134] =    7500, -- Lesser Mystic Essence
+	[10998] =    5000, -- Lesser Astral Essence
+	[10938] =    6000, -- Lesser Magic Essence
 
-	[109693] = 10000, -- Draenic Dust
-	[74249] = 200000, -- Spirit Dust
-	[52555] =  10000, -- Hypnotic Dust
-	[34054] =  47500, -- Infinite Dust
-	[22445] =  12500, -- Arcane Dust
-	[16204] =  15000, -- Illusion Dust
-	[11176] =   5000, -- Dream Dust
-	[11137] =  11000, -- Vision Dust
-	[11083] =   5000, -- Soul Dust
-	[10940] =   3000, -- Strange Dust
-
--- TODO - ccox - WoD materials
+	[109693] = 100000, -- Draenic Dust
+	[74249] =  100000, -- Spirit Dust
+	[52555] =   10000, -- Hypnotic Dust
+	[34054] =   27500, -- Infinite Dust
+	[22445] =   12500, -- Arcane Dust
+	[16204] =   15000, -- Illusion Dust
+	[11176] =   10000, -- Dream Dust
+	[11137] =    8000, -- Vision Dust
+	[11083] =    5000, -- Soul Dust
+	[10940] =    7000, -- Strange Dust
+ 
+-- TODO - ccox - other WoD materials?
 
 -- needs update
 	[2772] =   11500, -- Iron Ore
@@ -182,39 +183,38 @@ const.StaticPrices = {
 	[24243] =  17500, 	-- ADAMANTITEPOWDER
 	[46849] =  20000,	-- TITANIUMPOWDER
 
--- updated Jan 2011
-	[39151] =   3500,	-- ALABASTER_PIGMENT
-	[39334] =   3500,	-- DUSKY_PIGMENT
-	[39338] =  10000,	-- GOLDEN_PIGMENT
-	[39339] =  20000,	-- EMERALD_PIGMENT
-	[39340] =  30000,	-- VIOLET_PIGMENT
-	[39341] =  15000, 	-- SILVERY_PIGMENT
-	[43103] =  17500,	-- VERDANT_PIGMENT
-	[43104] =  20000,	-- BURNT_PIGMENT
-	[43105] =  20000,	-- INDIGO_PIGMENT
-	[43106] =  40000,	-- RUBY_PIGMENT
-	[43107] =  80000, 	-- SAPPHIRE_PIGMENT
-	[39342] =  20000, 	-- NETHER_PIGMENT
-	[43108] =  20000, 	-- EBON_PIGMENT
-	[39343] =  90000, 	-- AZURE_PIGMENT
-	[43109] =  30000, 	-- ICY_PIGMENT
-	[61979] =  40000,   -- ASHEN_PIGMENT
-	[61980] =  90000,   -- BURNING_EMBERS
-	[79251] = 200000,   -- SHADOW_PIGMENT
-	[79253] = 500000,   -- MISTY_PIGMENT
-	[114931] = 10000, 	-- Cerulean Pigment
+	[39151] =    3500,	-- ALABASTER_PIGMENT
+	[39334] =    3500,	-- DUSKY_PIGMENT
+	[39338] =   10000,	-- GOLDEN_PIGMENT
+	[39339] =   20000,	-- EMERALD_PIGMENT
+	[39340] =   20000,	-- VIOLET_PIGMENT
+	[39341] =   15000, 	-- SILVERY_PIGMENT
+	[43103] =   17500,	-- VERDANT_PIGMENT
+	[43104] =   20000,	-- BURNT_PIGMENT
+	[43105] =   20000,	-- INDIGO_PIGMENT
+	[43106] =   30000,	-- RUBY_PIGMENT
+	[43107] =   40000, 	-- SAPPHIRE_PIGMENT
+	[39342] =   20000, 	-- NETHER_PIGMENT
+	[43108] =   20000, 	-- EBON_PIGMENT
+	[39343] =   40000, 	-- AZURE_PIGMENT
+	[43109] =   30000, 	-- ICY_PIGMENT
+	[61979] =   40000,   -- ASHEN_PIGMENT
+	[61980] =   50000,   -- BURNING_EMBERS
+	[79251] =   70000,   -- SHADOW_PIGMENT
+	[79253] =  100000,   -- MISTY_PIGMENT
+	[114931] = 500000, 	-- Cerulean Pigment
 
--- needs update, prices in flux due to expansion
+-- needs update
 	[818] =      7500, 	-- TIGERSEYE
 	[774] =      5000, 	-- MALACHITE
 	[1210] =    20000,	-- SHADOWGEM
 	[1705] =    25000, 	-- LESSERMOONSTONE
-	[1206] =    35000, 	-- MOSSAGATE
-	[3864] =    35000, 	-- CITRINE
-	[1529] =    40000, 	-- JADE
-	[7909] =    50000, 	-- AQUAMARINE
-	[7910] =    70000, 	-- STARRUBY
-	[12800] =  100000, 	-- AZEROTHIANDIAMOND
+	[1206] =    25000, 	-- MOSSAGATE
+	[3864] =    25000, 	-- CITRINE
+	[1529] =    30000, 	-- JADE
+	[7909] =    40000, 	-- AQUAMARINE
+	[7910] =    50000, 	-- STARRUBY
+	[12800] =   70000, 	-- AZEROTHIANDIAMOND
 	[12361] =   50000, 	-- BLUESAPPHIRE
 	[12799] =   70000, 	-- LARGEOPAL
 	[12364] =   50000, 	-- HUGEEMERALD
@@ -247,42 +247,42 @@ const.StaticPrices = {
 	[36924] =   10000, 	-- Sky Sapphire
 	[36921] =   10000, 	-- Autumn's Glow
 	
-	[36925] =   80000, 	-- MAJESTICZIRCON
-	[36931] =   80000, 	-- AMETRINE
-	[36922] =   80000, 	-- KINGSAMBER
-	[36928] =   80000, 	-- DREADSTONE
-	[36919] =   80000, 	-- CARDINALRUBY
-	[36934] =   80000, 	-- EYEOFZUL
-	
-	[52177] =   20000,  -- CARNELIAN
-	[52178] =   20000,  -- ZEPHYRITE
-	[52179] =   20000,  -- ALICITE
-	[52180] =   20000,  -- NIGHTSTONE
-	[52181] =   20000,  -- HESSONITE
-	[52182] =   20000,  -- JASPER
+	[36925] =   20000, 	-- MAJESTICZIRCON
+	[36931] =   20000, 	-- AMETRINE
+	[36922] =   20000, 	-- KINGSAMBER
+	[36928] =   20000, 	-- DREADSTONE
+	[36919] =   20000, 	-- CARDINALRUBY
+	[36934] =   20000, 	-- EYEOFZUL
 
-	[52190] =  100000,  -- INFERNORUBY
-	[52191] =  100000,  -- OCEANSAPPHIRE
-	[52192] =  100000,  -- DREAMEMERALD
-	[52193] =  100000,  -- EMBERTOPAZ
-	[52194] =  100000,  -- DEMONSEYE
-	[52195] =  100000,  -- AMBERJEWEL
-	
-	[76130] =  100000,	-- TIGEROPAL
-	[76133] =  100000,	-- LAPISLAZULI
-	[76134] =  100000,	-- SUNSTONE
-	[76135] =  100000,	-- ROGUESTONE
-	[76136] =  100000,	-- PANDARIANGARNET
-	[76137] =  100000,	-- ALEXANDRITE
-	
-	[76131] =  500000,	-- PRIMORDIALRUBY
-	[76138] =  500000,	-- RIVERSHEART
-	[76139] =  500000,	-- WILDJADE
-	[76140] =  500000,	-- VERMILIONONYX
-	[76141] =  500000,	-- IMPERIALAMETHYST
-	[76142] =  500000,	-- SUNSRADIANCE
+	[52177] =   10000,  -- CARNELIAN
+	[52178] =   10000,  -- ZEPHYRITE
+	[52179] =   10000,  -- ALICITE
+	[52180] =   10000,  -- NIGHTSTONE
+	[52181] =   10000,  -- HESSONITE
+	[52182] =   10000,  -- JASPER
 
--- TODO - ccox - WoD gems
+	[52190] =   10000,  -- INFERNORUBY
+	[52191] =   10000,  -- OCEANSAPPHIRE
+	[52192] =   10000,  -- DREAMEMERALD
+	[52193] =   10000,  -- EMBERTOPAZ
+	[52194] =   10000,  -- DEMONSEYE
+	[52195] =   10000,  -- AMBERJEWEL
+	
+	[76130] =   10000,	-- TIGEROPAL
+	[76133] =   10000,	-- LAPISLAZULI
+	[76134] =   10000,	-- SUNSTONE
+	[76135] =   10000,	-- ROGUESTONE
+	[76136] =   10000,	-- PANDARIANGARNET
+	[76137] =   10000,	-- ALEXANDRITE
+	
+	[76131] =  100000,	-- PRIMORDIALRUBY
+	[76138] =  100000,	-- RIVERSHEART
+	[76139] =  100000,	-- WILDJADE
+	[76140] =  100000,	-- VERMILIONONYX
+	[76141] =  100000,	-- IMPERIALAMETHYST
+	[76142] =  100000,	-- SUNSRADIANCE
+
+-- TODO - ccox - WoD gems?
 
 }
 
@@ -387,15 +387,15 @@ local SETHERAL = 74252
 local SPIRIT = 74249
 --local GMYSTERIOUS = 74251		-- never used
 local MYSTERIOUS = 74250
+local SHA_FRAGMENT = 105718		-- added in a dot release
 
--- TODO - ccox - get more data on WoD materials
 local DRAENIC = 109693
 local SLUMINOUS = 115502
 local LUMINOUS = 111245
---local AZURIAN = 113589		-- no longer used, may be taken out
 local TEMPORAL = 113588
 local FRACTEMPORAL = 115504
---local BLACKFIRE = 111247		-- doesn't seem to be used
+--local AZURIAN = 113589		-- no longer used, may be taken out
+--local BLACKFIRE = 111247		-- never used
 
 
 
@@ -406,6 +406,7 @@ const.DisenchantReagentList = {
 	TEMPORAL,
 	FRACTEMPORAL,
 	SHA_CRYSTAL,
+	SHA_FRAGMENT,
 	MAELSTROM,
 	ABYSS,
 	VOID,
@@ -422,7 +423,7 @@ const.DisenchantReagentList = {
 	11084, -- Large Glimmering Shard
 
 	SLUMINOUS,
---	AZURIAN, -- not used, may be taken out
+--	AZURIAN, -- not used, appears to have been taken out
 	SETHERAL,
 	52720, -- Small Heavenly Shard
 	34053, -- Small Dream Shard
@@ -432,7 +433,7 @@ const.DisenchantReagentList = {
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
 
---	BLACKFIRE, -- currently not used
+--	BLACKFIRE, -- not used, appears to have been taken out
 --	GMYSTERIOUS, -- never used
 	52719, -- Greater Celestial Essence
 	34055, -- Greater Cosmic Essence
@@ -512,7 +513,7 @@ const.baseDisenchantTable = {
    [500] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
    
    -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { DRAENIC, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
+   [ 800 ] = { { DRAENIC, 0.85, 3.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
 
   },
   [const.ARMOR] = {
@@ -533,7 +534,7 @@ const.baseDisenchantTable = {
    [151] = { { INFINITE, 0.75, 2.5 }, { LCOSMIC , 0.20, 1.5 }, { SDREAM_SHARD, 0.05, 1.0 }, },
    [200] = { { INFINITE, 0.75, 5.5 }, { GCOSMIC , 0.20, 1.5 }, { DREAM_SHARD , 0.05, 1.0 }, },	-- highest level LK green is 182
    
-   -- no shards from greens in Cata
+   -- no shards from greens in Cataclysm
    [275] = { { HYPNOTIC, 0.75, 1.5 }, { LCELESTIAL , 0.25, 1.5 }, },
    [290] = { { HYPNOTIC, 0.75, 2.0 }, { LCELESTIAL , 0.25, 2.0 }, },
    [305] = { { HYPNOTIC, 0.75, 2.5 }, { LCELESTIAL , 0.25, 2.5 }, },
@@ -548,7 +549,7 @@ const.baseDisenchantTable = {
    [500] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
    
    -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { DRAENIC, 0.85, 2.5 }, { SLUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far
+   [ 800 ] = { { DRAENIC, 0.85, 3.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far
    
   },
  },
@@ -573,9 +574,9 @@ const.baseDisenchantTable = {
    [380] = { { HEAVENLY_SHARD,  1.00, 1.0 } },	-- highest level Cata blue is 377, first Panda blue is 384
 
 	-- Panda
-   [424] = { { SETHERAL,        1.00, 1.0 } },	-- this seems solid
-   [449] = { { ETHERAL,         1.00, 1.0 } },	-- this seems solid
-   [450] = { { ETHERAL,         0.20, 1.0 }, { SETHERAL,        0.80, 1.0 } },	-- this is mixed
+   [424] = { { SETHERAL,        1.00, 1.0 } },
+   [449] = { { ETHERAL,         1.00, 1.0 } },
+   [450] = { { ETHERAL,         0.20, 1.0 }, { SETHERAL,        0.80, 1.0 } },	-- this is mixed for some reason
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 476
    
    -- WoD - FAKE - TODO - ccox - get real data
@@ -585,7 +586,7 @@ const.baseDisenchantTable = {
  [EPIC] = {
  	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
-   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 600, 800 },
+   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 495, 600, 800 },
    [40]  = { { SRADIANT,    1.00, 3.0 } },
    [45]  = { { SRADIANT,    1.00, 3.5 } },
    [50]  = { { LRADIANT,    1.00, 3.5 } },
@@ -596,6 +597,7 @@ const.baseDisenchantTable = {
    [164] = { { VOID,        1.00, 1.5 } },	-- highest level BC epic is 164, first LK epic is 200
    [299] = { { ABYSS,       1.00, 1.0 } },	-- highest level LK epic is 284, first Cata epic is 300
    [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic is 416, first Panda epic is 420
+   [495] = { { SHA_FRAGMENT,   1.00, 1.0 } },
    [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 600
    
    -- WoD - FAKE - TODO - ccox - get real data
@@ -614,15 +616,16 @@ const.ReverseDisenchantLevelList = {
 	
 -- ccox, needs update
 	[TEMPORAL]	  = { 601, 800 }, -- Temporal Crystal						TODO - ccox - what is highest WoD item level?
-	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			TODO - ccox - what is highest WoD item level?
-	[SHA_CRYSTAL] = { 420, 600 }, -- Sha Crystal
+--	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting
+	[SHA_CRYSTAL] = { 496, 600 }, -- Sha Crystal
+	[SHA_FRAGMENT] = { 420, 495 }, -- Sha Crystal Fragment
 	[MAELSTROM]   = { 300, 419 }, -- Maelstrom Crystal
 	[ABYSS]       = { 165, 299 }, -- Abyss Crystal
 	[VOID]        = {  95, 164 }, -- Void Crystal
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
 	[LUMINOUS]		  = { 501, 800 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
-	[SLUMINOUS]		  = { 501, 800 }, -- Small Luminous Shards		TODO - ccox - what is highest WoD item level?
+--	[SLUMINOUS]		  = { 501, 800 }, -- Small Luminous Shards		TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting
 --	[AZURIAN]		  =	{ 501, 800 }, -- Azurian Shards				TODO - ccox - what is highest WoD item level?	-- not used
 	[ETHERAL] 		  = { 425, 500 }, -- Etheral Shard
 	[SETHERAL]        = { 380, 424 }, -- Small Etheral Shard
@@ -660,8 +663,8 @@ const.ReverseDisenchantLevelList = {
 	[GMAGIC]      = {  16,  20 }, -- Greater Magic Essence
 	[LMAGIC]      = {   1,  15 }, -- Lesser Magic Essence
 	
-	[DRAENIC]  = { 451, 800 }, -- Draenic Dust						TODO - ccox - what is highest WoD item level?
-	[SPIRIT]   = { 351, 450 }, -- Spirit Dust
+	[DRAENIC]  = { 501, 800 }, -- Draenic Dust						TODO - ccox - what is highest WoD item level?
+	[SPIRIT]   = { 351, 500 }, -- Spirit Dust
 	[HYPNOTIC] = { 201, 350 }, -- Hypnotic Dust
 	[INFINITE] = { 121, 200 }, -- Infinite Dust
 	[ARCANE]   = {  66, 120 }, -- Arcane Dust

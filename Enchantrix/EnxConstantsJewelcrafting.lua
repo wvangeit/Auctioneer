@@ -51,10 +51,9 @@ local KYPARITE_ORE = 72093
 local WHITE_TRILLIUM_ORE = 72103
 local BLACK_TRILLIUM_ORE = 72094
 
--- TODO - ccox - what all is new for WOD?
-local BLACKROCK = 109118
-local TRUEIRON = 109119
---local BLACKROCK_FRAGMENT = 109992
+-- prospectable Draenor ores
+--local BLACKROCK = 109118	-- not prospectable
+--local TRUEIRON = 109119	-- not prospectable
 
 
 local COPPERPOWDER = 24186

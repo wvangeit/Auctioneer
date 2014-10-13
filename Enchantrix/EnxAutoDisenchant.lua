@@ -198,7 +198,7 @@ local function getDisenchantOrProspectValue(link, count)
 					local value = (hsp or 0) * yield
 					prospectValue = prospectValue + value
 				end
---if (prospectValue == 0) then debugSpam("Item ", link, "has zero prospect value?" ); end	-- TODO - DEBUGGING
+				--if (prospectValue == 0) then debugSpam("Item ", link, "has zero prospect value?" ); end	-- TODO - DEBUGGING
 				return prospectValue, _ENCH('ArgSpellProspectingName')
 			end
 		end
@@ -222,7 +222,7 @@ local function getDisenchantOrProspectValue(link, count)
 					local value = (hsp or 0) * yield
 					millingValue = millingValue + value
 				end
---if (millingValue == 0) then debugSpam("Item ", link, "has zero milling value?" ); end	-- TODO - DEBUGGING
+				--if (millingValue == 0) then debugSpam("Item ", link, "has zero milling value?" ); end	-- TODO - DEBUGGING
 				return millingValue, _ENCH('ArgSpellMillingName')
 			end
 		end
