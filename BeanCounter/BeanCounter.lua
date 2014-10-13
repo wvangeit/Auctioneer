@@ -529,7 +529,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress, server,
 		compress = true
 	end
 
-	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel, reforged = strsplit(":", itemString)
+	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, tail = strsplit(":", itemString, 10)
 	--if this will be a compressed entry replace uniqueID with 0 or its scaling factor
 	if compress then
 		suffixID = tonumber(suffixID)
@@ -538,7 +538,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress, server,
 		else
 			uniqueID = 0
 		end
-		itemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, linkLevel, reforged)
+		itemString = strjoin(":", item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, tail)
 	end
 	--use current player unless we pass in a server, player
 	local db = private.playerData
