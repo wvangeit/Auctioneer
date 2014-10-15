@@ -131,7 +131,7 @@ function private.updateInboxStart()
 
 			if auctionHouse then
 				private.HideMailGUI(true)
-				wasRead = wasRead or 0 --its nil unless its has been read
+				wasRead = wasRead and 1 or 0 -- three possible states 0=unread 1=read by addon 2=read by player
 				private.mailReadOveride[n] = false -- set back to false so we don't read the same message more than once
 				local itemLink = GetInboxItemLink(n, 1)
 				local _, _, stack, _, _ = GetInboxItem(n)
@@ -673,7 +673,7 @@ function private.mailFrameUpdate()
 		if db["mailbox"][itemindex] then
 			local sender = db["mailbox"][itemindex]["sender"]
 			if sender and (sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse'))) then
-				if (db["mailbox"][itemindex]["read"] < 2) then
+				if (db["mailbox"][itemindex]["read"] ~= 2) then
 					if get("util.beancounter.mailrecolor") == "icon" or get("util.beancounter.mailrecolor") == "both" then
 						_G[basename.."ButtonSlot"]:SetVertexColor(1.0, 0.82, 0)
 						SetDesaturation(buttonIcon, nil)
@@ -697,7 +697,7 @@ function private.mailBoxColorStart()
 
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
-		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead or 0 }
+		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead and 1 or 0 }
 	end
 
 	--Fix reported errors of mail DB not existing for some reason.
@@ -725,7 +725,7 @@ function private.mailBoxColorStart()
 					--debugPrint("This is marked read so removing ", i)
 					tremove(db["mailbox"], i)
 					break
-				elseif db["mailbox"][i]["read"] < 2 then
+				elseif db["mailbox"][i]["read"] ~= 2 then
 	--This message has not been read, so we have a sequence of messages with the same name. Need to go back recursivly till we find the "Real read" message that need removal
 					for V = group["end"], group["start"], -1 do
 						if db["mailbox"][V]["read"] == 2 then
