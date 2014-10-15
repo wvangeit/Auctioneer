@@ -333,6 +333,7 @@ BeanCounterLocalizations = {
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
 		["MailNeutralAuctionHouse"]	= "Blackwater Auction House";
+		["MailSenderAuctionHouse"]	= "Auction House";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Enter the format that you would like your date field to show. Default is %c.";

@@ -58,6 +58,12 @@ local wonLocale = AUCTION_WON_MAIL_SUBJECT:gsub("%%s", "")
 
 local reportTotalMail, reportReadMail = 0, 0 --Used as a debug check on mail scanning engine
 
+-- usage: factionEncode[private.playerSettings.faction]
+local factionEncode = {
+	Alliance = "A",
+	Horde = "H",
+}
+
 local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
@@ -66,6 +72,7 @@ function private.mailMonitor(event,arg1)
 	elseif (event == "MAIL_SHOW") then
 		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
 		private.mailReadOveride = {}
+		private.lastSkipString = nil
 		if not registeredInboxFrameHook then --make sure we only ever register this hook once
 			registeredInboxFrameHook = true
 			hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
@@ -116,18 +123,29 @@ end
 --Mailbox Snapshots
 function private.updateInboxStart()
 	reportTotalMail = GetInboxNumItems()
+	local skipString = ""
 	for n = reportTotalMail, 1, -1 do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
-		if subject == "" then debugPrint("Skipping mail #", n, "The server is not sending the subject data. Mail will be left unread and we will retry") end
+		if subject == "" then
+			if skipString == "" then
+				skipString = tostring(n)
+			else
+				skipString = tostring(n) .. "," .. skipString
+			end
+		end
 		if sender and subject and subject ~= "" and (not wasRead or private.mailReadOveride[n]) then -- subject ~= "" when the server fails, this will prevent us from reading the mail giving the server more time to get its shit togather
 			local auctionHouse --A, H, N flag for which AH the trxn came from
-			if sender ==_BC('MailAllianceAuctionHouse') then
-				auctionHouse = "A"
-			elseif sender == _BC('MailHordeAuctionHouse') then
-				auctionHouse = "H"
-			elseif sender == _BC('MailNeutralAuctionHouse') then
-				auctionHouse = "N"
+			-- if sender ==_BC('MailAllianceAuctionHouse') then
+				-- auctionHouse = "A"
+			-- elseif sender == _BC('MailHordeAuctionHouse') then
+				-- auctionHouse = "H"
+			-- elseif sender == _BC('MailNeutralAuctionHouse') then
+				-- auctionHouse = "N"
+			-- end
+			if sender ==_BC('MailSenderAuctionHouse') then
+				auctionHouse = factionEncode[private.playerSettings.faction]
 			end
+			
 
 			if auctionHouse then
 				private.HideMailGUI(true)
@@ -148,10 +166,14 @@ function private.updateInboxStart()
 		end
 		private.lastCheckedMail = GetTime() --this keeps us from hiding the mail UI to early and causing flicker
 	end
+	if skipString ~= "" and skipString ~= private.lastSkipString then
+		debugPrint("Skipping mail #", skipString, "The server is not sending the subject data. Mail will be left unread and we will retry")
+		private.lastSkipString = skipString
+	end
 	private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 end
 function private.getInvoice(n, sender, subject)
-	if sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse')) then
+	if sender:match(_BC('MailSenderAuctionHouse')) then
 		if subject:match(successLocale) or subject:match(wonLocale) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
 			if invoiceType and playerName and playerName ~= "" and bid and bid > 0 then --Silly name throttling lead to missed invoice lookups
@@ -170,7 +192,7 @@ private.lastCheckedMail = GetTime()
 function private.mailonUpdate()
 	local total = #private.inboxStart
 	if total > 0 then
-		for i = total, 1, -1 do -- in pairs(private.inboxStart) do
+		for i = total, 1, -1 do
 			--update mail GUI Count
 			local count = #private.inboxStart
 			--private.CountGUI:SetText("Recording: "..total-count.." of "..total.." items")
@@ -221,7 +243,8 @@ function private.mailSort()
 		local messageAgeInSeconds = floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
 
-		if private.reconcilePending[i]["sender"]:match(_BC('MailAllianceAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailHordeAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailNeutralAuctionHouse')) then
+		--if private.reconcilePending[i]["sender"]:match(_BC('MailAllianceAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailHordeAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailNeutralAuctionHouse')) then
+		if private.reconcilePending[i]["sender"]:match(_BC('MailSenderAuctionHouse')) then
 			if private.reconcilePending[i].subject:match(successLocale) and (private.reconcilePending[i].retrieved == "yes" or private.reconcilePending[i].retrieved == "failed") then
 				private.sortCompletedAuctions( i )
 
@@ -672,7 +695,8 @@ function private.mailFrameUpdate()
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
 		if db["mailbox"][itemindex] then
 			local sender = db["mailbox"][itemindex]["sender"]
-			if sender and (sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse'))) then
+			--if sender and (sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse'))) then
+			if sender and sender:match(_BC('MailSenderAuctionHouse')) then
 				if (db["mailbox"][itemindex]["read"] ~= 2) then
 					if get("util.beancounter.mailrecolor") == "icon" or get("util.beancounter.mailrecolor") == "both" then
 						_G[basename.."ButtonSlot"]:SetVertexColor(1.0, 0.82, 0)
