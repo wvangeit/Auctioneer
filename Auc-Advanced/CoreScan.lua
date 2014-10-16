@@ -948,6 +948,11 @@ local Commitfunction = function()
 	local wasUnrestricted = not (TempcurQuery.class or TempcurQuery.subclass or TempcurQuery.minUseLevel
 		or TempcurQuery.name or TempcurQuery.isUsable or TempcurQuery.invType or TempcurQuery.quality) -- no restrictions, potentially a full scan
 
+	-- ### temp fix, until we figure out what isUsable flag is now doing
+	if TempcurQuery.isUsable then
+		wasIncomplete = true -- always treat as incomplete
+	end
+
 
 	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
 	local scandata = private.GetScanData(serverKey)
@@ -1935,7 +1940,7 @@ local StorePageFunction = function()
 	local curQuery, curScan, curPages = private.curQuery, private.curScan, private.curPages
 	local qryinfo = curQuery.qryinfo
 
-	local EventFramesRegistered = {}
+	local EventFramesRegistered = nil
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local maxPages = ceil(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE)
 	local isGetAll = false
@@ -2192,7 +2197,7 @@ local StorePageFunction = function()
 	end
 
 
-	if isGetAll then
+	if EventFramesRegistered then
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 			local eventscript = frame:GetScript("OnEvent")
@@ -2200,7 +2205,7 @@ local StorePageFunction = function()
 				pcall(eventscript, frame, "AUCTION_ITEM_LIST_UPDATE")
 			end
 		end
-		EventFramesRegistered=nil
+		EventFramesRegistered = nil
 	end
 
 	--Send a Processor event to modules letting them know we are done with the page
@@ -2236,8 +2241,11 @@ local StorePageFunction = function()
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) -- page+2 signals that scan is done
 				private.Commit(isGetAllFail, false, true)
 				-- Clear the getall output. We don't want to create a new query so use the hook
-				private.queryStarted = GetTime()
-				private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil, nil, nil)
+				-- ### temp fix: isUsable flag appears to be acting like a mini-getall, in this case we don't want to blank the results
+				if not curQuery.isUsable then
+					private.queryStarted = GetTime()
+					private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil, nil, nil)
+				end -- ###
 		elseif private.isScanning then
 			if (page+1 < maxPages) then
 				private.ScanPage(page + 1)
@@ -2363,12 +2371,12 @@ function private.QueryScrubParameters(name, minLevel, maxLevel, invTypeIndex, cl
 	invTypeIndex = tonumber(invTypeIndex) or Const.EquipLocToInvIndex[invTypeIndex] -- accepts "INVTYPE_*" strings
 	if invTypeIndex and invTypeIndex < 1 then invTypeIndex = nil end
 	if isUsable and isUsable ~= 0 then
-		isUsable = 1
+		isUsable = true
 	else
 		isUsable = nil
 	end
 	if name and exactMatch and exactMatch ~= 0 then
-		exactMatch = 1 -- exactMatch is only valid if we have a name
+		exactMatch = true -- exactMatch is only valid if we have a name
 	else
 		exactMatch = nil
 	end
@@ -2386,9 +2394,9 @@ function private.CreateQuerySig(name, minLevel, maxLevel, invTypeIndex, classInd
 		invTypeIndex or "",
 		classIndex or "",
 		subclassIndex or "",
-		isUsable or "",
+		isUsable and "1" or "", -- can't concatenate booleans
 		qualityIndex or "",
-		exactMatch or ""
+		exactMatch and "1" or ""
 	) -- can use strsplit("#", sig) to extract params
 end
 
