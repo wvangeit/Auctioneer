@@ -64,6 +64,20 @@ local factionEncode = {
 	Horde = "H",
 }
 
+local senderAuctionHouse
+function private.isAuctionHouseMail(sender, subject)
+	-- take both sender and subject strings, but currently only use sender
+	-- in future consider using subject:match(successLocale) etc. instead - slower but less dependent on up-to-date localizer files
+	if not senderAuctionHouse then
+		senderAuctionHouse = {}
+		senderAuctionHouse[_BC('MailSenderAuctionHouse')] = true -- from BeanCounterStrings.lua
+		if BUTTON_LAG_AUCTIONHOUSE then -- from GlobalStrings.lua: looks like this may be a viable localized string for "Auction House"?
+			senderAuctionHouse[BUTTON_LAG_AUCTIONHOUSE] = true
+		end
+	end
+	return senderAuctionHouse[sender]
+end
+
 local registeredInboxFrameHook = false
 function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
@@ -135,17 +149,10 @@ function private.updateInboxStart()
 		end
 		if sender and subject and subject ~= "" and (not wasRead or private.mailReadOveride[n]) then -- subject ~= "" when the server fails, this will prevent us from reading the mail giving the server more time to get its shit togather
 			local auctionHouse --A, H, N flag for which AH the trxn came from
-			-- if sender ==_BC('MailAllianceAuctionHouse') then
-				-- auctionHouse = "A"
-			-- elseif sender == _BC('MailHordeAuctionHouse') then
-				-- auctionHouse = "H"
-			-- elseif sender == _BC('MailNeutralAuctionHouse') then
-				-- auctionHouse = "N"
-			-- end
-			if sender ==_BC('MailSenderAuctionHouse') then
+			if private.isAuctionHouseMail(sender, subject) then
 				auctionHouse = factionEncode[private.playerSettings.faction]
 			end
-			
+
 
 			if auctionHouse then
 				private.HideMailGUI(true)
@@ -173,7 +180,7 @@ function private.updateInboxStart()
 	private.wipeSearchCache() --clear the search cache, we are updating data so it is now outdated
 end
 function private.getInvoice(n, sender, subject)
-	if sender:match(_BC('MailSenderAuctionHouse')) then
+	if private.isAuctionHouseMail(sender, subject) then
 		if subject:match(successLocale) or subject:match(wonLocale) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
 			if invoiceType and playerName and playerName ~= "" and bid and bid > 0 then --Silly name throttling lead to missed invoice lookups
@@ -243,8 +250,7 @@ function private.mailSort()
 		local messageAgeInSeconds = floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
 
-		--if private.reconcilePending[i]["sender"]:match(_BC('MailAllianceAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailHordeAuctionHouse')) or private.reconcilePending[i]["sender"]:match(_BC('MailNeutralAuctionHouse')) then
-		if private.reconcilePending[i]["sender"]:match(_BC('MailSenderAuctionHouse')) then
+		if private.isAuctionHouseMail(private.reconcilePending[i].sender, private.reconcilePending[i].subject) then
 			if private.reconcilePending[i].subject:match(successLocale) and (private.reconcilePending[i].retrieved == "yes" or private.reconcilePending[i].retrieved == "failed") then
 				private.sortCompletedAuctions( i )
 
@@ -352,7 +358,7 @@ function private.findStackcompletedAuctions(key, itemID, itemLink, soldDeposit, 
 						if (soldTime > postTime) and (oldestPossible < postTime) then
 							tremove(private.playerData[key][itemID][itemString], index) --remove the matched item From postedAuctions DB
 							--private.playerData[key][itemID][itemString][index] = private.playerData[key][itemID][itemString][index]..";USED Sold"
-							debugPrint("postedAuction removed as sold", itemID, itemLink, itemString)
+							--debugPrint("postedAuction removed as sold", itemID, itemLink, itemString)
 							return tonumber(postStack), tonumber(postBid), itemString   --itemString is the "real" itemlink
 						end
 					end
@@ -692,11 +698,11 @@ function private.mailFrameUpdate()
 		button:Show()
 
 		local itemindex = ((InboxFrame.pageNum * 7) - 7 + i) --this gives us the actual itemindex as oposed to teh 1-7 button index
-		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
+		--local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex)
 		if db["mailbox"][itemindex] then
 			local sender = db["mailbox"][itemindex]["sender"]
-			--if sender and (sender:match(_BC('MailHordeAuctionHouse')) or sender:match(_BC('MailAllianceAuctionHouse')) or sender:match(_BC('MailNeutralAuctionHouse'))) then
-			if sender and sender:match(_BC('MailSenderAuctionHouse')) then
+			local subject = db["mailbox"][itemindex]["subject"]
+			if private.isAuctionHouseMail(sender, subject) then
 				if (db["mailbox"][itemindex]["read"] ~= 2) then
 					if get("util.beancounter.mailrecolor") == "icon" or get("util.beancounter.mailrecolor") == "both" then
 						_G[basename.."ButtonSlot"]:SetVertexColor(1.0, 0.82, 0)
