@@ -557,7 +557,8 @@ function private.RetrievePage()
 	local pagesize = GetNumAuctionItems("list")
 	if pagesize < 50 then
 		pagesize = 50
-	elseif pagesize > 50 then --If doing a GetAll, don't show anything
+	--elseif pagesize > 50 then --If doing a GetAll, don't show anything
+	elseif pagesize > 3000 then -- ### temp fix for "Usable Items" setting returning more than 50 results at a time [ADV-686]
 		pagesize = 0
 	end
 	for i = 1, pagesize do
@@ -760,7 +761,8 @@ function private.MyAuctionFrameUpdate()
 	local index, button
 	BrowseBidButton:Disable()
 	BrowseBuyoutButton:Disable()
-	if (numBatchAuctions > 50) then
+	--if (numBatchAuctions > 50) then
+	if (numBatchAuctions > 3000) then -- ### temp fix for "Usable Items" [ADV-686]
 		numBatchAuctions = 0
 		totalAuctions = 0
 	end
