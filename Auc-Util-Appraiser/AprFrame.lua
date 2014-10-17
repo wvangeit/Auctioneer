@@ -1176,7 +1176,7 @@ function private.CreateFrames()
 			else
 				frame.manifest.lines:Add("  ".._TRANS('APPR_Interface_UnknownDeposit'))--Unknown deposit cost
 			end
-			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
+			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()) and (DiffFromModel)) then
 				local MatchStringList = {strsplit("\n", MatchString)}
 				for i in pairs(MatchStringList) do
 					frame.manifest.lines:Add((MatchStringList[i]))
