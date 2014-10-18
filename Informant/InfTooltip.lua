@@ -128,7 +128,10 @@ function Informant.TooltipHandler(frame, item, count, name, link, quality)
 	end
 
 	if (getFilter('show-link')) then
-		tooltip:AddLine(_TRANS('INF_Tooltip_ItemLink'):format((":"):join(itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus, randomProp, uniqID)), nil, embedded)
+		local showlink = link:match("item:([^|]+)")
+		if showlink then
+			tooltip:AddLine(_TRANS('INF_Tooltip_ItemLink'):format(showlink), nil, embedded)
+		end
 	end
 
 	--DEFAULT_CHAT_FRAME:AddMessage("Got vendor: "..(buy or 0).."/"..(sell or 0))
