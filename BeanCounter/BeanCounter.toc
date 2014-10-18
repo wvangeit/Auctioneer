@@ -1,5 +1,5 @@
 ## Title: BeanCounter
-## Notes: Auction House transaction history to include purchases and sales, failures and successes.  Data viewable in game and stored for use within other Auctioneer Modules and other AddOns.
+## Notes: Auction House transaction history to include purchases and sales, failures and successes.
 ##
 ## Interface: 60000
 ## Dependencies: Stubby

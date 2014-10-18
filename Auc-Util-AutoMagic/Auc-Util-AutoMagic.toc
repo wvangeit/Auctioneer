@@ -1,5 +1,5 @@
 ## Title: Auc:Util:AutoMagic
-## Notes: Automates some repetitive tasks, such as auto-selling grays, unusable quest rewards, or other items you designate.  Bulk mail items to Alternate Characters based upon the reason for which they were purchased.
+## Notes: Automates some repetitive tasks, such as auto-selling and bulk mailing.
 ##
 ## Interface: 60000
 ## Dependancies: Auc-Advanced
