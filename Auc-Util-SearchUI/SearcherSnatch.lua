@@ -323,7 +323,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddTip(id, "Allow Snatch searcher to suggest buyouts")
 	gui:AddControl(id, "Checkbox", 0, 1, "snatch.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Snatch searcher")
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "snatch.maxprice", 1, 999999999, "Maximum Price for Snatch")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "snatch.maxprice", 1, Const.MAXBIDPRICE, "Maximum Price for Snatch")
 
 	gui:AddControl(id, "Subhead", 0, "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox", 0, 1, resources.selectorPriceModels, "snatch.price.model")

@@ -198,7 +198,7 @@ else
 		loadable = loadable and reason
 	else
 		loadable = reason == "DEMAND_LOADED"
-	end 
+	end
 	if loadable then
 		Stubby.RegisterAddOnHook("Enchantrix", "Auc-Util-SearchUI", function()
 			if Enchantrix and Enchantrix.Storage and Enchantrix.Util then
@@ -1510,10 +1510,10 @@ function private.MakeGuiConfig()
 	gui:AddControl(id, "WideSlider",       0, 1, "processpriority", 10, 100, 10, "Search process priority: %s")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "reserve.enable", "Enable reserve amount:")
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "reserve", 0, 999999999, "Reserve Amount")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "reserve", 0, Const.MAXBIDPRICE, "Reserve Amount")
 	gui:AddTip(id, "Sets the amount that you don't want your cash-on-hand to fall below")
 	gui:AddControl(id, "Checkbox",         0, 1, "maxprice.enable", "Enable maximum price:")
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, 999999999, "Maximum Price")
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "maxprice", 1, Const.MAXBIDPRICE, "Maximum Price")
 	gui:AddTip(id, "Sets the amount that you don't want to spend more than")
 
 	id = gui:AddTab("Global Settings", "Options")

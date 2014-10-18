@@ -86,7 +86,7 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 
-	gui:AddControl(id, "MoneyFramePinned",  0, 1, "prospect.profit.min", 1, 999999999, "Minimum Profit")
+	gui:AddControl(id, "MoneyFramePinned",  0, 1, "prospect.profit.min", 1, Const.MAXBIDPRICE, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "prospect.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "prospect.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "prospect.level.min", 0, Const.MAXSKILLLEVEL, 25, "Minimum skill: %s")
@@ -100,7 +100,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "prospect.allow.buy", "Allow Buyouts")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "prospect.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Prospect searcher")
-	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "prospect.maxprice", 1, 999999999, "Maximum Price for Prospect")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "prospect.maxprice", 1, Const.MAXBIDPRICE, "Maximum Price for Prospect")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "prospect.model")

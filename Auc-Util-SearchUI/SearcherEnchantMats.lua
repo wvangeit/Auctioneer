@@ -271,7 +271,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "enchantmats.allow.buy", "Allow Buyouts")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "enchantmats.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the EnchantMats searcher")
-	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "enchantmats.maxprice", 1, 999999999, "Maximum Price for EnchantMats")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "enchantmats.maxprice", 1, Const.MAXBIDPRICE, "Maximum Price for EnchantMats")
 
 	gui:AddControl(id, "Label",             0.42, 1, nil, "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "enchantmats.model")

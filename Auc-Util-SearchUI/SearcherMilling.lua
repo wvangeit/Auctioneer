@@ -86,7 +86,7 @@ function lib:MakeGuiConfig(gui)
 
 	local last = gui:GetLast(id)
 
-	gui:AddControl(id, "MoneyFramePinned",  0, 1, "milling.profit.min", 1, 999999999, "Minimum Profit")
+	gui:AddControl(id, "MoneyFramePinned",  0, 1, "milling.profit.min", 1, Const.MAXBIDPRICE, "Minimum Profit")
 	gui:AddControl(id, "Slider",            0, 1, "milling.profit.pct", 1, 100, .5, "Min Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",          0, 1, "milling.level.custom", "Use custom levels")
 	gui:AddControl(id, "Slider",            0, 2, "milling.level.min", 0, Const.MAXSKILLLEVEL, 25, "Minimum skill: %s")
@@ -100,7 +100,7 @@ function lib:MakeGuiConfig(gui)
 	gui:AddControl(id, "Checkbox",          0.56, 1, "milling.allow.buy", "Allow Buyouts")
 	gui:AddControl(id, "Checkbox",          0.42, 1, "milling.maxprice.enable", "Enable individual maximum price:")
 	gui:AddTip(id, "Limit the maximum amount you want to spend with the Milling searcher")
-	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "milling.maxprice", 1, 999999999, "Maximum Price for Milling")
+	gui:AddControl(id, "MoneyFramePinned",  0.42, 2, "milling.maxprice", 1, Const.MAXBIDPRICE, "Maximum Price for Milling")
 
 	gui:AddControl(id, "Subhead",           0.42,    "Price Valuation Method:")
 	gui:AddControl(id, "Selectbox",         0.42, 1, resources.selectorPriceModelsEnx, "milling.model")
