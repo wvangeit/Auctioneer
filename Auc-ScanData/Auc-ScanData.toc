@@ -1,5 +1,5 @@
 ## Title: Auc:ScanData
-## Notes: Allows Auctioneer to delay loading the, probably, large auction scan dataset until it is needed. [<%version%>] This AddOn is licensed under the GNU GPL, see GPL.txt for details.
+## Notes: Allows Auctioneer to delay loading the, probably, large auction scan dataset until it is needed.
 ##
 ## Interface: 60000
 ## LoadOnDemand: 1
