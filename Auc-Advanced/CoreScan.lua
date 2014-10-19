@@ -1908,6 +1908,8 @@ local StorePageFunction = function()
 		return
 	end
 
+	local GetTime = GetTime
+
 	if (not private.scanStarted) then private.scanStarted = GetTime() end
 	local queryStarted = private.scanStarted
 	local retrievalStarted = GetTime()
@@ -1926,12 +1928,20 @@ local StorePageFunction = function()
 		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage For Page %d Started %fs after Query Start"):format(page, retrievalStarted - queryStarted), ("StorePage (Page %d) Called\n%f seconds have elapsed since scan start"):format(page, retrievalStarted - queryStarted))
 	end
 
+	local scannerthrottle = get("core.scan.scannerthrottle")
 	if private.isGetAll then
 		--[[
 			pre-store delay before starting to store a getall query to give the client a bit of time to sort itself out
 			we want to call it before GetNumAuctionItems, so we must use private.isGetAll for detection
 		--]]
 		coroutine.yield()
+		if scannerthrottle then
+			local nextWait = GetTime() + 3
+			while GetTime() < nextWait do
+				coroutine.yield() -- yielding updates GetTime, so this loop will still work
+				if private.breakStorePage then break end
+			end
+		end
 		if private.warningCanSendBug and CanSendAuctionQuery() then -- check it again after delay
 			private.warningCanSendBug = nil
 		end
@@ -1999,6 +2009,12 @@ local StorePageFunction = function()
 	local nextPause = debugprofilestop() + processingTime
 	local time = time
 	local lastTime = time()
+	local breakcount = 5000 -- additional limiter: yield every breakcount auctions scanned
+
+	if scannerthrottle then
+		breakcount = 1000
+		processingTime = processingTime / 5
+	end
 
 	local storecount = 0
 	local sellerOnly = true
@@ -2017,7 +2033,7 @@ local StorePageFunction = function()
 		local retries = { }
 		for i = 1, numBatchAuctions do
 			if isGetAll then -- only yield for GetAll scans
-				if debugprofilestop() > nextPause or time() > lastTime then
+				if debugprofilestop() > nextPause or time() > lastTime or (storecount > 0 and storecount % breakcount == 0) then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
 					if private.breakStorePage then
@@ -2077,7 +2093,7 @@ local StorePageFunction = function()
 			lastTime = time()
 			for _, i in ipairs(retries) do
 				if isGetAll then
-					if debugprofilestop() > nextPause or time() > lastTime then
+					if debugprofilestop() > nextPause or time() > lastTime or storecount % breakcount == 0 then
 						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						coroutine.yield()
 						if private.breakStorePage then break end
