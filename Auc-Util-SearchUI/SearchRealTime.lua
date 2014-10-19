@@ -359,9 +359,7 @@ function private.alert(link, cost, reason)
 	if SoundPath and (SoundPath ~= "none") and not private.playedsound then
 		private.playedsound = true
 		if SoundPath == "DoorBell" then
-			SoundPath = embedpath.."Auc-Util-SearchUI\\DoorBell.mp3"
-			PlaySound("GAMEHIGHLIGHTFRIENDLYUNIT")
-			PlaySoundFile(SoundPath)
+			PlaySoundFile(embedpath.."Auc-Util-SearchUI\\DoorBell.ogg")
 		else
 			PlaySound(SoundPath)
 		end
