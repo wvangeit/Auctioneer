@@ -4,7 +4,7 @@
 ## Interface: 60000
 ## Dependencies: Stubby
 ## OptionalDeps: !nLog, Babylonian, DebugLib, SlideBar, Auc-Advanced, Configator, LibExtraTip, TipHelper, LibDataBroker
-## SavedVariables: BeanCounterDB, BeanCounterDBSettings, BeanCounterDBNames, BeanCounterAccountDB
+## SavedVariables: BeanCounterDB, BeanCounterDBSettings, BeanCounterDBNames, BeanCounterAccountDB, BeanCounterMailPatch
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

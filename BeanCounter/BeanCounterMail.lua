@@ -66,16 +66,36 @@ local factionEncode = {
 
 local senderAuctionHouse
 function private.isAuctionHouseMail(sender, subject)
-	-- take both sender and subject strings, but currently only use sender
-	-- in future consider using subject:match(successLocale) etc. instead - slower but less dependent on up-to-date localizer files
 	if not senderAuctionHouse then
 		senderAuctionHouse = {}
 		senderAuctionHouse[_BC('MailSenderAuctionHouse')] = true -- from BeanCounterStrings.lua
 		if BUTTON_LAG_AUCTIONHOUSE then -- from GlobalStrings.lua: looks like this may be a viable localized string for "Auction House"?
 			senderAuctionHouse[BUTTON_LAG_AUCTIONHOUSE] = true
 		end
+		if BeanCounterMailPatch then -- recorded value(s) from known AH mail
+			for _, s in ipairs(BeanCounterMailPatch) do
+				senderAuctionHouse[s] = true
+			end
+		end
 	end
-	return senderAuctionHouse[sender]
+	if senderAuctionHouse[sender] then
+		return true
+	end
+
+	-- try to 'learn' Auction House sender localized name by inspecting subject
+	-- temporary fix - this is slow and will trigger for every non-AH mail
+	-- also, potentially prone to accidental matches?
+	if subject and subject ~= "" then
+		if subject:match(expiredLocale) or subject:match(outbidLocale) or subject:match(successLocale) or subject:match(wonLocale) or subject:match(cancelledLocale) then
+			if not BeanCounterMailPatch then
+				BeanCounterMailPatch = {}
+			end
+			tinsert(BeanCounterMailPatch, sender)
+			senderAuctionHouse[sender] = true
+
+			return true
+		end
+	end
 end
 
 local registeredInboxFrameHook = false
