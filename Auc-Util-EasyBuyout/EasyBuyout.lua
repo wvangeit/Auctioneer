@@ -41,26 +41,6 @@ local CompactUImode = false
 local orig_AB_OC;
 local ebModifier = false
 
-function lib.GetName()
-	return libName
-end
-
-function lib.Processor(callbackType, ...)
-    if (callbackType == "listupdate") then
-		private.EasyCancelMain()
-        private.EasyBuyout()
-	elseif (callbackType == "auctionui") then
-		private.AHLoaded()
-		private.EasyBuyout()
-		private.EasyCancelMain()
-	elseif (callbackType == "config") then
-		private.SetupConfigGui(...)
-	elseif (callbackType == "configchanged") then
-		private.EasyBuyout()
-		private.EasyCancelMain()
-	end
-end
-
 lib.Processors = {}
 function lib.Processors.listupdate(callbackType, ...)
 	private.EasyCancelMain()
@@ -180,12 +160,12 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead", 0, "Set a limit on EasyBid & EasyBuyout to prevent accidental purchases of expensive auctions.")
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBuy.active", "Enable EasyGoldLimit for EasyBuyout")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBuyout")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBuy.limit", 0, 999999999, "Set EasyBuyout Limit")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBuy.limit", 0, AucAdvanced.Const.MAXBIDPRICE, "Set EasyBuyout Limit")
 	gui:AddTip(id, "Use this box to set the max amount of gold you want to spend when using EasyBuyout")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox", 0,1, "util.EasyBuyout.EGL.EBid.active", "Enable EasyGoldLimit for EasyBid")
 	gui:AddTip(id, "Ticking this box will enable or disable EasyGoldLimit for EasyBid")
-	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBid.limit", 0, 999999999, "Set EasyBid Limit")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.EasyBuyout.EGL.EBid.limit", 0, AucAdvanced.Const.MAXBIDPRICE, "Set EasyBid Limit")
 	gui:AddTip(id, "Use this box to set the max amount of gold you want to spend when using EasyBid")
 
 	-- Silent Mode

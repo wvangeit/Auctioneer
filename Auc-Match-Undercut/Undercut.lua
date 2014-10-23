@@ -282,7 +282,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", _TRANS('UCUT_Interface_UndercutAmount') )--Specify undercut amount by coin value
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_UndercutAmount') )--Specify the amount to undercut by a specific amount, instead of by a percentage
 
-	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, _TRANS('UCUT_Interface_CurrentValue') )--Undercut Amount
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, Const.MAXBIDPRICE, _TRANS('UCUT_Interface_CurrentValue') )--Undercut Amount
 	gui:AddControl(id, "Subhead",    0,    _TRANS('UCUT_Interface_UndercutTooltipSettings') )--Tooltip Setting
 	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.tooltip",_TRANS('UCUT_Interface_ShowInTooltip') )--Show undercut status in tooltip
 	gui:AddTip(id, _TRANS('UCUT_HelpTooltip_ShowInTooltip') )--Add a line to the tooltip showing whether the current competition is undercuttable
