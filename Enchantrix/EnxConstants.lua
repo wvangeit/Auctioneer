@@ -481,7 +481,7 @@ local EPIC = 4
 const.baseDisenchantTable = {
  [UNCOMMON] = {
   [const.WEAPON] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 500, 800 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 480, 500, 800 },
    [15]  = { { STRANGE , 0.20, 1.5 }, { LMAGIC  , 0.80, 1.5 }, },
    [20]  = { { STRANGE , 0.20, 2.5 }, { GMAGIC  , 0.75, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.15, 5.0 }, { LASTRAL , 0.75, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -510,14 +510,16 @@ const.baseDisenchantTable = {
    [380] = { { SPIRIT, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [390] = { { SPIRIT, 0.85, 3.0 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [410] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 1.5 }, },
-   [500] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
+   [480] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },
    
-   -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { DRAENIC, 0.85, 3.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
+   [500] = { { SPIRIT, 0.5, 4.0 }, { MYSTERIOUS , 0.1, 2.0 }, { DRAENIC, 0.4, 2.75 },},	-- mixed results here (483-494), highest level Panda green is 483
+   
+   -- WoD - TODO - ccox - need more data
+   [ 800 ] = { { DRAENIC, 0.9, 3.25 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
 
   },
   [const.ARMOR] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 500, 800 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 480, 500, 800 },
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
    [20]  = { { STRANGE , 0.75, 2.5 }, { GMAGIC  , 0.20, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.75, 5.0 }, { LASTRAL , 0.15, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -546,10 +548,12 @@ const.baseDisenchantTable = {
    [380] = { { SPIRIT, 0.85, 2.0 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [390] = { { SPIRIT, 0.85, 2.5 }, { MYSTERIOUS , 0.15, 1.0 }, },
    [410] = { { SPIRIT, 0.85, 3.0 }, { MYSTERIOUS , 0.15, 1.5 }, },
-   [500] = { { SPIRIT, 0.85, 3.5 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483
+   [480] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },
    
-   -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { DRAENIC, 0.85, 3.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest green is 494, highest green is 610 so far
+   [500] = { { SPIRIT, 0.5, 4.0 }, { MYSTERIOUS , 0.1, 2.0 }, { DRAENIC, 0.4, 2.75 },},	-- mixed results here (483-494), highest level Panda green is 483
+   
+   -- WoD - TODO - ccox - need more data
+   [ 800 ] = { { DRAENIC, 0.9, 3.25 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
    
   },
  },
@@ -579,8 +583,8 @@ const.baseDisenchantTable = {
    [450] = { { ETHERAL,         0.20, 1.0 }, { SETHERAL,        0.80, 1.0 } },	-- this is mixed for some reason
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 476
    
-   -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { LUMINOUS, 1.0, 1.0 } },	-- lowest WoD blue is 508, highest is 645 so far
+   -- WoD - TODO - ccox - need more data
+   [ 800 ] = { { LUMINOUS, 1.0, 1.0 } },	-- lowest WoD blue is 505, highest is 645 so far
   },
  },
  [EPIC] = {
@@ -597,11 +601,11 @@ const.baseDisenchantTable = {
    [164] = { { VOID,        1.00, 1.5 } },	-- highest level BC epic is 164, first LK epic is 200
    [299] = { { ABYSS,       1.00, 1.0 } },	-- highest level LK epic is 284, first Cata epic is 300
    [419] = { { MAELSTROM,   1.00, 1.0 } },	-- highest level CATA epic is 416, first Panda epic is 420
-   [495] = { { SHA_FRAGMENT,   1.00, 1.0 } },
+   [495] = { { SHA_FRAGMENT,   1.00, 1.0 } },	-- changed in a dot release
    [600] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 600
    
-   -- WoD - FAKE - TODO - ccox - get real data
-   [ 800 ] = { { TEMPORAL, 1.00, 1.0 } },	-- first WoD epic is , highest is 695 so far
+   -- WoD - TODO - ccox - need more data
+   [ 800 ] = { { TEMPORAL, 1.00, 1.0 } },	-- first WoD epic is , highest is 695 so far, WoD has upgraded item qualities that can cause confusion
    
   },
  },
