@@ -1935,13 +1935,6 @@ local StorePageFunction = function()
 			we want to call it before GetNumAuctionItems, so we must use private.isGetAll for detection
 		--]]
 		coroutine.yield()
-		if scannerthrottle then
-			local nextWait = GetTime() + 3
-			while GetTime() < nextWait do
-				coroutine.yield() -- yielding updates GetTime, so this loop will still work
-				if private.breakStorePage then break end
-			end
-		end
 		if private.warningCanSendBug and CanSendAuctionQuery() then -- check it again after delay
 			private.warningCanSendBug = nil
 		end
@@ -2007,8 +2000,6 @@ local StorePageFunction = function()
 	local processingTime = 800 / get("scancommit.targetFPS")
 	local debugprofilestop = debugprofilestop
 	local nextPause = debugprofilestop() + processingTime
-	local time = time
-	local lastTime = time()
 	local breakcount = 5000 -- additional limiter: yield every breakcount auctions scanned
 
 	if scannerthrottle then
@@ -2033,14 +2024,13 @@ local StorePageFunction = function()
 		local retries = { }
 		for i = 1, numBatchAuctions do
 			if isGetAll then -- only yield for GetAll scans
-				if debugprofilestop() > nextPause or time() > lastTime or (storecount > 0 and storecount % breakcount == 0) then
+				if debugprofilestop() > nextPause or i % breakcount == 0 then
 					lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 					coroutine.yield()
 					if private.breakStorePage then
 						break
 					end
 					nextPause = debugprofilestop() + processingTime
-					lastTime = time()
 				end
 			end
 
@@ -2090,15 +2080,13 @@ local StorePageFunction = function()
 			if private.breakStorePage then break end
 
 			nextPause = debugprofilestop() + processingTime
-			lastTime = time()
-			for _, i in ipairs(retries) do
+			for pos, i in ipairs(retries) do
 				if isGetAll then
-					if debugprofilestop() > nextPause or time() > lastTime or storecount % breakcount == 0 then
+					if debugprofilestop() > nextPause or pos % breakcount == 0 then
 						lib.ProgressBars("GetAllProgressBar", 100*storecount/numBatchAuctions, true)
 						coroutine.yield()
 						if private.breakStorePage then break end
 						nextPause = debugprofilestop() + processingTime
-						lastTime = time()
 					end
 				end
 
