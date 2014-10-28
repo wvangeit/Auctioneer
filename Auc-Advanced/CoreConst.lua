@@ -36,7 +36,6 @@ if not AucAdvanced then return end
 local lib = {
 	PlayerName = UnitName("player"),
 	PlayerRealm = GetRealmName(),
-	PlayerFaction = UnitFactionGroup("player"),
 
 	AucMinTimes = {
 		0,
@@ -139,18 +138,10 @@ local lib = {
 	MAXUSERLEVEL = 100,
 	MAXITEMLEVEL = 700,
 	MAXBIDPRICE = 9999999999, -- copy from Blizzard_AuctionUI.lua, so it is available before AH loads
+
 }
 
-lib.InvTypes = lib.EquipEncode -- backward compatibility - deprecated entry
-
-lib.ServerKeyHome = lib.PlayerRealm .."-".. lib.PlayerFaction
-lib.ServerKeyNeutral = lib.PlayerRealm .."-Neutral"
-if lib.PlayerFaction == "Alliance" then
-	lib.OpposingFaction = "Horde"
-else
-	lib.OpposingFaction = "Alliance"
-end
-lib.ServerKeyOpposing = lib.PlayerRealm .."-".. lib.OpposingFaction
+lib.CompactRealm = lib.PlayerRealm:gsub(" ", "") -- CompactRealm is realm name with spaces removed
 
 for i = 1, #lib.CLASSES do
 	lib.CLASSESREV[lib.CLASSES[i]] = i

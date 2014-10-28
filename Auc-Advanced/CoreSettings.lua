@@ -137,7 +137,6 @@ local settingDefaults = {
 	['scancommit.targetFPS'] = 25,
 	['scancommit.progressbar'] = true,
 	['scancommit.ttl'] = 5,
-	['core.general.alwaysHomeFaction'] = true,
 	['printwindow'] = 1,
 	["core.marketvalue.tolerance"] = .08,
 	["ShowPurchaseDebug"] = true,
@@ -531,8 +530,6 @@ function private._MakeGuiConfig() -- Name mangled to block gui creation at first
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_SearchClickHooks')) --"Enables the click-hooks for searching"
 
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MktPriceOptions')) --"Market Price Options"
-	gui:AddControl(id, "Checkbox",		0, 1, 	"core.general.alwaysHomeFaction", _TRANS('ADV_Interface_AlwaysHomeFaction')) --"See home faction data everywhere unless at a neutral AH"
-	gui:AddTip(id, _TRANS('ADV_HelpTooltip_AlwaysHomeFaction')) --"This allows the ability to see home data everywhere, however it disables itself while a neutral AH window is open to allow you to see the neutral AH data."
 	gui:AddControl(id, "Slider", 0, 1, "core.marketvalue.tolerance", 0.001, 1, 0.001, _TRANS('ADV_Interface_MarketValueAccuracy')) --"Market Pricing Error: %5.3f%%"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MarketValueAccuracy')) --"Sets the accuracy of computations for market pricing. This indicates the maximum error that will be tolerated. Higher numbers reduce the amount of processing required by your computer (improving frame rate while calculating) at the cost of some accuracy."
 	gui:AddControl(id, "Subhead",     0,    _TRANS('ADV_Interface_MatchOrder')) --"Matcher Order"
@@ -764,6 +761,13 @@ function private.CheckObsolete()
 	if getter("matcherdynamiclist") then
 		setter("matcherdynamiclist", nil)
 	end
+	if getter("alwaysHomeFaction") then
+		setter("alwaysHomeFaction", nil)
+	end
+	if getter("core.general.alwaysHomeFaction") then
+		setter("core.general.alwaysHomeFaction", nil)
+	end
+	
 	local old
 	local old = getter("matcherlist")
 	if old then
@@ -778,13 +782,6 @@ function private.CheckObsolete()
 			setter("core.marketvalue.tolerance", old)
 		end
 		setter("marketvalue.accuracy", nil)
-	end
-	old = getter("alwaysHomeFaction")
-	if old ~= nil then
-		if getter("core.general.alwaysHomeFaction") == getDefault("core.general.alwaysHomeFaction") then
-			setter("core.general.alwaysHomeFaction", old)
-		end
-		setter("alwaysHomeFaction", nil)
 	end
 end
 
