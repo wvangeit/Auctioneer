@@ -585,9 +585,9 @@ function private.CheckUpdate()
 		frame.CurItem.match = match
 		if match then --turn off other checkboxes
 			frame.CurItem.manual = false
-			frame.CurItem.undercut = nil
+			frame.CurItem.undercut = false
 			frame.options.undercut:SetChecked(false)
-			frame.CurItem.remember = nil
+			frame.CurItem.remember = false
 			frame.options.remember:SetChecked(false)
 		end
 		private.UpdatePricing()
@@ -596,9 +596,9 @@ function private.CheckUpdate()
 		frame.CurItem.undercut = undercut
 		if undercut then --turn off other checkboxes
 			frame.CurItem.manual = false
-			frame.CurItem.match = nil
+			frame.CurItem.match = false
 			frame.options.matchmy:SetChecked(false)
-			frame.CurItem.remember = nil
+			frame.CurItem.remember = false
 			frame.options.remember:SetChecked(false)
 		end
 		private.UpdatePricing()
@@ -608,14 +608,14 @@ function private.CheckUpdate()
 		private.UpdatePricing()
 	end
 	if  frame.CurItem.remember ~= remember then
-		frame.CurItem.manual = true
 		frame.CurItem.remember = remember
 		if remember then
 			private.SaveConfig()
-			frame.CurItem.match = nil
+			frame.CurItem.match = false
 			frame.options.matchmy:SetChecked(false)
-			frame.CurItem.undercut = nil
+			frame.CurItem.undercut = false
 			frame.options.undercut:SetChecked(false)
+			frame.CurItem.manual = true
 		else
 			private.RemoveConfig()
 		end
@@ -709,11 +709,11 @@ function private.LoadItemLink(itemLink, size)
 			frame.options.matchmy:SetChecked(true)
 			frame.options.undercut:SetChecked(false)
 			frame.CurItem.match = true
-			frame.CurItem.undercut = nil
+			frame.CurItem.undercut = false
 		elseif get("util.simpleauc.auto.undercut") then
 			frame.options.matchmy:SetChecked(false)
 			frame.options.undercut:SetChecked(true)
-			frame.CurItem.match = nil
+			frame.CurItem.match = false
 			frame.CurItem.undercut = true
 		end
 	end
@@ -794,8 +794,8 @@ function private.LoadConfig()
 	frame.CurItem.duration = duration
 	frame.CurItem.number = number
 	frame.CurItem.stack = stack
-	frame.CurItem.match = nil
-	frame.CurItem.undercut = nil
+	frame.CurItem.match = false
+	frame.CurItem.undercut = false
 	frame.CurItem.remember = true
 	frame.CurItem.manual = true
 	private.UpdatePricing()
@@ -827,10 +827,10 @@ function private.ClearSetting()
 	frame.CurItem.buyper = nil
 	frame.CurItem.stack = nil
 	frame.CurItem.number = nil
-	frame.CurItem.match = nil
-	frame.CurItem.undercut = nil
-	frame.CurItem.remember = nil
-	frame.CurItem.manual = nil
+	frame.CurItem.match = false
+	frame.CurItem.undercut = false
+	frame.CurItem.remember = false
+	frame.CurItem.manual = false
 	frame.CurItem.duration = nil
 	MoneyInputFrame_ResetMoney(frame.minprice)
 	MoneyInputFrame_ResetMoney(frame.buyout)
@@ -924,7 +924,7 @@ function private.CreateFrames()
 	local MatchString = ""
 	frame.list = {}
 	frame.cache = {}
-	frame.CurItem = {}
+	frame.CurItem = {match = false, undercut = false, remember = false}
 	frame.detail = {0,0,0,"",""}
 	Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
 
@@ -1194,7 +1194,6 @@ function private.CreateFrames()
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight")
 			AuctionFrameMoneyFrame:Show()
 			frame:Show()
-			AucAdvanced.Scan.LoadScanData()
 			private.UpdateDisplay() -- update for any bag changes while frame was hidden
 		else
 			AuctionFrameMoneyFrame:Show()
