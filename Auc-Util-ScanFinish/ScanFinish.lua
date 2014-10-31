@@ -41,9 +41,9 @@ local strAucClassicPath
 local AddOnName = ...
 AddOnName = AddOnName:lower()
 if AddOnName == "auc-util-scanfinish" then
-	strAucClassicPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.ogg"
+	strAucClassicPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
 elseif AddOnName == "auc-advanced" then -- embedded
-	strAucClassicPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.ogg"
+	strAucClassicPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"
 else -- unknown
 	return
 end
