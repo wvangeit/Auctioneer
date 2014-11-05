@@ -186,6 +186,7 @@ BeanCounterLocalizations = {
 		["MailAllianceAuctionHouse"]	= "Auktionshaus der Allianz";
 		["MailHordeAuctionHouse"]	= "Auktionshaus der Horde";
 		["MailNeutralAuctionHouse"]	= "Auktionshaus der Schwarzmeerräuber";
+		["MailSenderAuctionHouse"]	= "Auktionshaus";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "Trage das Format ein, wie das Datum dargestellt werden soll. Standard ist %c";
@@ -1504,6 +1505,7 @@ BeanCounterLocalizations = {
 		["MailAllianceAuctionHouse"]	= "联盟拍卖行";
 		["MailHordeAuctionHouse"]	= "部落拍卖行";
 		["MailNeutralAuctionHouse"]	= "黑水拍卖行";
+		["MailSenderAuctionHouse"]	= "拍卖行";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "键入你期望的日期显示格式.默认为%c";
