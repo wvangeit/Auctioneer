@@ -149,6 +149,8 @@ local settingDefaults = {
 	["core.scan.scanallqueries"] = true,
 	["core.scan.hybridscans"] = false,
 	["core.scan.scannerthrottle"] = false,
+	["core.scan.stage3garbage"] = Const.ALEVEL_OFF,
+	["core.scan.stage5garbage"] = false,
 	["core.tooltip.altchatlink_leftclick"] = false,
 	["core.tooltip.enableincombat"] = false,
 	["core.tooltip.depositcost"] = true,
@@ -592,8 +594,14 @@ function private._MakeGuiConfig() -- Name mangled to block gui creation at first
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanAllQueries')) --Enable to perform scanning of every Auctionhouse search. Disable to only scan Auctioneer's own searches.\nYou may need to disable this option if you have compatibility problems with other AddOns
 
 	gui:AddControl(id, "Subhead", 0, "Experimental Settings (consult the forums before using these)")
-	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.scannerthrottle", "Throttle Scanning stage during fast scans")
+	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.scannerthrottle", "Scanner stage: Throttle during fast scans")
 	gui:AddTip(id, "Slow down the Scanning stage during Getall scans. May help avoid disconnects during this stage. May result in missed auctions and incomplete scans")
+
+	gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.selectorActivityLevelA, "core.scan.stage3garbage", 80, "Processing Stage 3: Extra memory cleanup")
+	gui:AddTip(id, "Perform extra memory cleanup during Processing Stage 3. Will cause momentary freezes, and will cause Processing to take longer")
+	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.stage5garbage", "Processing Finished: Extra memory cleanup")
+	gui:AddTip(id, "Perform extra memory cleanup when scan processing finishes. Will cause a momentary freeze at the end of every scan")
+
 	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.hybridscans", _TRANS("ADV_Interface_HybridScanning")) --Enable Hybrid scanning for very large Auction Houses
 	gui:AddTip(id, _TRANS("ADV_HelpTooltip_HybridScanning")) --For very large Auction Houses, a GetAll scan will not be able to retrieve all the auctions. A Hybrid scan will start Normal scanning to retrive the auctions missed by the GetAll
 
@@ -667,7 +675,7 @@ function private._MakeGuiConfig() -- Name mangled to block gui creation at first
 	gui:AddControl(id, "Checkbox",   0, 2, "tooltip.marketprice.stacksize", _TRANS('ADV_Interface_MultiplyStack')) --"Multiply by Stack Size"
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_MultiplyStack')) --"Multiplies by current stack size if enabled"
 	gui:AddControl(id, "Checkbox",   0, 1, "core.tooltip.depositcost", _TRANS('ADV_Interface_ShowDepositInTooltip')) --Show deposit cost in tooltip
-	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "core.tooltip.depositduration", _TRANS("ADV_Interface_DepositDuration")) --Auction duration for deposit cost
+	gui:AddControl(id, "Selectbox", 0, 1, AucAdvanced.selectorAuctionLength, "core.tooltip.depositduration", 90, _TRANS("ADV_Interface_DepositDuration")) --Auction duration for deposit cost
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 
 	gui:AddHelp(id, "what is scandata",
@@ -767,7 +775,7 @@ function private.CheckObsolete()
 	if getter("core.general.alwaysHomeFaction") then
 		setter("core.general.alwaysHomeFaction", nil)
 	end
-	
+
 	local old
 	local old = getter("matcherlist")
 	if old then

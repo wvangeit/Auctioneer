@@ -129,6 +129,11 @@ local lib = {
 	-- Temporary flags (only used during processing - higher values to leave lower ones free for permanent flags)
 	FLAG_DIRTY = 64,
 
+	ALEVEL_OFF = 0,
+	ALEVEL_LOW = 1,
+	ALEVEL_MED = 2,
+	ALEVEL_HI = 3,
+
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
 	CLASSESREV = { }, -- Table mapping names to index in CLASSES table

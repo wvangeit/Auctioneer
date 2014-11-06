@@ -232,18 +232,34 @@ do
 	end
 end
 
--- Creates the list of Auction Durations for use in deposit cost dropdowns
--- Usage: gui:AddControl(id, "Selectbox",  column, indent, AucAdvanced.selectorAuctionLength, "util.modulename.deplength")
+-- Common Dropdown Tables
+-- Usage: gui:AddControl(id, "Selectbox",  column, indent, AucAdvanced.selectorXXXX, "libtype.modulename.yyyy")
 do
 	local auctionlength = {
-			{12, FORMATED_HOURS:format(12)},
-			{24, FORMATED_HOURS:format(24)},
-			{48, FORMATED_HOURS:format(48)},
-		}
+		{12, FORMATED_HOURS:format(12)},
+		{24, FORMATED_HOURS:format(24)},
+		{48, FORMATED_HOURS:format(48)},
+	}
+	-- List of Auction Durations for use in deposit cost dropdowns
 	function lib.selectorAuctionLength()
 		return auctionlength
 	end
+
+	local alevel = {
+		{Const.ALEVEL_OFF, "Off"},
+		{Const.ALEVEL_LOW, "Low"},
+		{Const.ALEVEL_MED, "Medium"},
+		{Const.ALEVEL_HI, "High"},
+	}
+	-- Creates a list of Activity Levels for general use
+	-- ALEVEL constants are numbers of increasing value, so modules may test for example: value >= Const.ALEVEL_MED
+	-- Proposed to introduce variations of this table in future, with different combinations of values
+	-- thus this variant has been called type 'A', having values OFF, LOW, MED, HI
+	function lib.selectorActivityLevelA()
+		return alevel
+	end
 end
+
 
 function lib.GetFactor(...) return tooltip:GetFactor(...) end
 function lib.SanitizeLink(...) return tooltip:SanitizeLink(...) end
