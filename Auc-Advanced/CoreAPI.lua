@@ -1086,6 +1086,42 @@ function lib.GetStoreKeyFromSig(sig, petBand)
 	end
 end
 
+-- Store key style 'B'
+-- returns id, property, linktype (all strings)
+-- items:
+--    id will be a string containing a plain number
+--    property will be a string containing a number, which may be either "0" or a negative number
+--    *Note* positive suffixes are considered invalid; if one is detected the function will return nil
+-- battlepets:
+--    id will be a string of format "P"..number
+--    property will be a string of format number.."p"..number
+--    if petBand is a number it will be used to compress the petLevel such that pets of a similar level get the same key
+--    if petBand is nil, function will return nil for all battlepets
+function lib.GetStoreKeyFromLinkB(link, petBand)
+	local header,s1,s2,s3,s4,s5,s6,s7 = strsplit(":", link)
+	local lType = header:sub(-4)
+	if lType == "item" then
+		if s7 and s7 ~= "0" then -- s7 = suffix
+			if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
+				return s1, s7, "item" -- "itemId", "suffix", linktype
+			end
+		elseif s1 then
+			return s1, "0", "item" -- "itemId", "suffix", linktype
+		end
+	elseif lType == "epet" then -- last 4 characters of "battlepet"
+		-- check that caller wants pet keys
+		-- also check valid quality (-1 represents 'unknown' and so is not valid for store key)
+		if petBand and s3 and s3 ~= "-1" then
+			local level = tonumber(s2) -- level
+			if not level or level < 1 then return end
+			if petBand > 1 then
+				level = ceil(level / petBand)
+			end
+			return "P"..s1, format("%d", level).."p"..s3, "battlepet" -- "P..speciesID", "compressedLevel..p..quality", linktype
+		end
+	end
+end
+
 -------------------------------------------------------------------------------
 -- Statistical devices created by Matthew 'Shirik' Del Buono
 -- For Auctioneer
