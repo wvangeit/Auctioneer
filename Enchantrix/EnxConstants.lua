@@ -58,7 +58,7 @@ const.StaticPrices = {
 	[11084] =    6000, -- Large Glimmering Shard
 
 	[115502] = 100000, -- Small Luminous Shard
-	[113589] =    100, -- Azurian Shard				-- not used
+--	[113589] =    100, -- Azurian Shard				-- not used
 	[74252] =   40000, -- Small Etheral Shard
 	[52720] =   12000, -- Small Heavenly Shard
 	[34053] =   10000, -- Small Dream Shard
@@ -99,8 +99,6 @@ const.StaticPrices = {
 	[11137] =    8000, -- Vision Dust
 	[11083] =    5000, -- Soul Dust
 	[10940] =    7000, -- Strange Dust
- 
--- TODO - ccox - other WoD materials?
 
 -- needs update
 	[2772] =   11500, -- Iron Ore
@@ -515,7 +513,7 @@ const.baseDisenchantTable = {
    [500] = { { SPIRIT, 0.5, 4.0 }, { MYSTERIOUS , 0.1, 2.0 }, { DRAENIC, 0.4, 2.75 },},	-- mixed results here (483-494), highest level Panda green is 483
    
    -- WoD - TODO - ccox - need more data
-   [ 800 ] = { { DRAENIC, 0.9, 3.25 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
+   [ 800 ] = { { DRAENIC, 0.9, 3.0 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
 
   },
   [const.ARMOR] = {
@@ -553,7 +551,7 @@ const.baseDisenchantTable = {
    [500] = { { SPIRIT, 0.5, 4.0 }, { MYSTERIOUS , 0.1, 2.0 }, { DRAENIC, 0.4, 2.75 },},	-- mixed results here (483-494), highest level Panda green is 483
    
    -- WoD - TODO - ccox - need more data
-   [ 800 ] = { { DRAENIC, 0.9, 3.25 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
+   [ 800 ] = { { DRAENIC, 0.9, 3.0 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest green is 494, highest green is 610 so far, but break appears to be at 500
    
   },
  },
@@ -620,7 +618,7 @@ const.ReverseDisenchantLevelList = {
 	
 -- ccox, needs update
 	[TEMPORAL]	  = { 601, 800 }, -- Temporal Crystal						TODO - ccox - what is highest WoD item level?
---	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting
+--	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting, unless underskilled
 	[SHA_CRYSTAL] = { 496, 600 }, -- Sha Crystal
 	[SHA_FRAGMENT] = { 420, 495 }, -- Sha Crystal Fragment
 	[MAELSTROM]   = { 300, 419 }, -- Maelstrom Crystal
@@ -629,7 +627,7 @@ const.ReverseDisenchantLevelList = {
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
 	[LUMINOUS]		  = { 501, 800 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
---	[SLUMINOUS]		  = { 501, 800 }, -- Small Luminous Shards		TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting
+--	[SLUMINOUS]		  = { 501, 800 }, -- Small Luminous Shards		TODO - ccox - what is highest WoD item level?	-- doesn't seem to come from Disenchanting, unless underskilled
 --	[AZURIAN]		  =	{ 501, 800 }, -- Azurian Shards				TODO - ccox - what is highest WoD item level?	-- not used
 	[ETHERAL] 		  = { 425, 500 }, -- Etheral Shard
 	[SETHERAL]        = { 380, 424 }, -- Small Etheral Shard

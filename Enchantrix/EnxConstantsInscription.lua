@@ -419,11 +419,11 @@ const.MillGroupYields = {
 
 -- WoD - TODO - ccox - need more data
 	[CERULEAN_PEGMENT_LOW] = {
-		[CERULEAN_PIGMENT] = 2.0,
+		[CERULEAN_PIGMENT] = 2.10,
 		},
 	
 	[CERULEAN_PEGMENT_HIGH] = {
-		[CERULEAN_PIGMENT] = 2.15,
+		[CERULEAN_PIGMENT] = 2.10,
 		},
 }
 
