@@ -5,7 +5,7 @@
 ## LoadOnDemand: 0
 ## Dependencies: Stubby
 ## OptionalDependencies: !nLog, SlideBar, Configator, Babylonian, DebugLib, TipHelper, LibExtraTip, LibDataBroker
-## SavedVariables: AucAdvancedConfig, AucAdvancedData
+## SavedVariables: AucAdvancedConfig, AucAdvancedData, AucAdvancedServers
 ## SavedVariablesPerCharacter: AucAdvancedLocal
 ##
 ## Version: <%version%> (<%codename%>)
@@ -23,6 +23,7 @@ CoreModule.lua
 CoreStrings.lua
 CoreConst.lua
 CoreResources.lua
+CoreServers.lua
 
 CoreMain.lua
 CoreUtil.lua

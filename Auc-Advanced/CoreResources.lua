@@ -176,6 +176,6 @@ internal.Resources = {
 	-- SetResource: permits other Core files to set a resource
 	-- Other Cores/Modules must never modify AucAdvanced.Resources directly (or I may make it a read-only table in future!)
 	SetResource = function(key, value)
-		lib.key = value
+		lib[key] = value
 	end
 }

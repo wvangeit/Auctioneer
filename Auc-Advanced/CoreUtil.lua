@@ -270,27 +270,7 @@ function lib.ShowPetLink(...) return tooltip:ShowPetLink(...) end
 function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end -- Deprecated
 lib.breakHyperlink = lib.BreakHyperlink -- Deprecated
 
-do -- Faction and ServerKey related functions
-	local splitcache = {}
-	local localizedfactions = {
-		-- the following entries are placeholders
-		["Alliance"] = "Alliance",
-		["Horde"] = "Horde",
-		["Neutral"] = "Neutral",
-	}
-	function lib.SplitServerKey(serverKey)
-		local split = splitcache[serverKey]
-		if not split then
-			if type(serverKey) ~= "string" then return end
-			local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")
-			local transfaction = localizedfactions[faction]
-			if not transfaction then return end
-			split = {realm, faction, realm.." - "..transfaction}
-			splitcache[serverKey] = split
-		end
-		return split[1], split[2], split[3]
-	end
-
+do -- Faction related functions
 	local lookupfaction = {
 		["alliance"] = "Alliance",
 		[FACTION_ALLIANCE:lower()] = "Alliance",
@@ -322,15 +302,9 @@ do -- Faction and ServerKey related functions
 		local horde = lib.localizations("ADV_Interface_FactionHorde")
 		local neutral = lib.localizations("ADV_Interface_FactionNeutral")
 
-		localizedfactions.Alliance = alliance
-		localizedfactions.Horde = horde
-		localizedfactions.Neutral = neutral
-
 		lookupfaction[alliance:lower()] = "Alliance"
 		lookupfaction[horde:lower()] = "Horde"
 		lookupfaction[neutral:lower()] = "Neutral"
-
-		wipe(splitcache)
 	end
 end
 

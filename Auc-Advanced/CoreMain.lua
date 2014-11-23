@@ -344,8 +344,9 @@ local function OnEnteringWorld(frame)
 	tooltip:AltChatLinkRegister(HookAltChatLinkTooltip)
 	ALTCHATLINKTOOLTIP_OPEN = tooltip:AltChatLinkConstants()
 
-	-- CoreResources must be activated first, in case other modules need to use the resources
+	-- CoreResources & CoreServers must be activated first
 	internal.Resources.Activate()
+	internal.Servers.Activate()
 
 	-- send general activate message
 	AucAdvanced.SendProcessorMessage("gameactive")
