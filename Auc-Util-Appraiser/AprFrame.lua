@@ -1215,8 +1215,14 @@ function private.CreateFrames()
 			canAuction = false
 		elseif warnvendor == "buyout" then
 			frame.salebox.warn:SetText("|cffff8010".._TRANS('APPR_Interface_NoteBuyoutLessVendor'))--Note: Buyout <= Vendor
+			if AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then 
+				canAuction = false 
+			end
 		elseif warnvendor == "bid" then
 			frame.salebox.warn:SetText("|cffeec900".._TRANS('APPR_Interface_NoteMinBidLessVendor'))--Note: Min Bid <= Vendor
+			if AucAdvanced.Settings.GetSetting("util.appraiser.bid.vendor") then 
+				canAuction = false 
+			end
 		else
 			frame.salebox.warn:SetText("")
 		end
