@@ -301,12 +301,12 @@ function private.PushSearch()
 	-- (when the scan finishes, only requests with .querysig entries may be deleted)
 	for _, req in ipairs(private.BuyRequests) do
 		if not req.querysig then
-			req.querysig = AucAdvanced.Scan.CreateQuerySig(req.itemname, req.uselevel, req.uselevel, nil, req.classindex, req.subclassindex, nil, req.quality)
+			req.querysig = AucAdvanced.Scan.CreateQuerySig(req.itemname, req.uselevel, req.uselevel, nil, req.classindex, req.subclassindex, nil, req.quality, true)
 		end
 	end
 
 	private.Searching = request.querysig
-	AucAdvanced.Scan.StartScan(request.itemname, request.uselevel, request.uselevel, nil, request.classindex, request.subclassindex, nil, request.quality)
+	AucAdvanced.Scan.StartScan(request.itemname, request.uselevel, request.uselevel, nil, request.classindex, request.subclassindex, nil, request.quality, nil, true)
 end
 
 function private.FinishedSearch(complete, querysig, query)
