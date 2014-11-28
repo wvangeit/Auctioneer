@@ -595,27 +595,24 @@ local depositDurationMultiplier = {
 	[2880] = 12,
 }
 --[[
-    GetDepositCost(item, duration, faction, count)
+    GetDepositCost(item, duration, unused, count)
     item: itemID or "itemString" or "itemName" or "itemLink" [Required]
 	duration: 1, 2, 3 (Blizzard auction duration codes), 12, 24, 48 (hours), 720, 1440, 2880 (minutes) [defaults to 2]
-	faction: "home" or "neutral" or "Neutral" [defaults to home]
     count: <stacksize> [defaults to 1]
 ]]
-function GetDepositCost(item, duration, faction, count)
+function GetDepositCost(item, duration, unused, count)
 	if not item then return end
 	--[[
-	Deposit Cost = RoundDown(VendorPrice * FactionMultiplier * StackSize, 3) * DurationMultiplier
-	FactionMultiplier = (0.15 for Home, 0.75 for Neutral)
+	Deposit Cost = RoundDown(0.15 * VendorPrice * StackSize, 3) * DurationMultiplier
 	DurationMultiplier = (1 for 12hrs, 2 for 24hrs, 4 for 48hrs)
 	However as there is no lua function for "round down to the nearest multiple of 3",
-	we shall implement this by dividing the FactionMultiplier by 3 (0.05 and 0.25)
+	we shall implement this by dividing the constant multiplier by 3 (0.15 / 3 = 0.05)
 	using 'floor' to round down to the nearest integer
 	and then multiplying the DurationMultiplier by 3 (3, 6 and 12) - [see lookup table above]
 	--]]
 
 	-- Set up function defaults if not specifically provided
 	duration = depositDurationMultiplier[duration] or 6
-	if faction == "neutral" or faction == "Neutral" then faction = .25 else faction = .05 end
 	count = count or 1
 
 	local _,_,_,_,_,_,_,_,_,_,gsv = GetItemInfo(item)
@@ -629,7 +626,7 @@ function GetDepositCost(item, duration, faction, count)
 		end
 	end
 	if gsv then
-		local deposit = floor(faction * gsv * count) * duration
+		local deposit = floor(0.05 * gsv * count) * duration
 		if deposit < MINIMUM_DEPOSIT then
 			deposit = MINIMUM_DEPOSIT
 		end
