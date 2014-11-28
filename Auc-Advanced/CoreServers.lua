@@ -270,6 +270,10 @@ internal.Servers = {
 		for compact, expanded in pairs(ExpandedNames) do
 			cacheKnown[expanded] = cacheKnown[compact]
 		end
+		if Resources.PlayerFaction == "Alliance" or Resources.PlayerFaction == "Horde" then
+			-- ensure we can recognise old style home serverKey
+			cacheKnown[Resources.ServerKeyHome] = sessionKey
+		end
 	end,
 }
 
