@@ -2105,6 +2105,7 @@ local PerformSearch = function()
 	local lastTime = time()
 	local repaintSheet = false
 	local nextRepaint = 0	-- no delay for first repaint
+	local nextMemory = GetTime() + 2
 
 	private.isSearching = true
 	AucAdvanced.SendProcessorMessage("searchbegin", searcherName)
@@ -2122,6 +2123,12 @@ local PerformSearch = function()
 			end
 
 			coroutine.yield()
+
+			if memorycleanup and GetTime() > nextMemory then
+				collectgarbage()
+				coroutine.yield()
+				nextMemory = GetTime() + 2
+			end
 
 			nextPause = debugprofilestop() + processingTime
 			lastTime = time()
