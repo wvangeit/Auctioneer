@@ -909,10 +909,10 @@ function private.Refresh(background)
 	if not name then return end
 	aucPrint(("Refreshing view of {{%s}}"):format(name))--Refreshing view of {{%s}}
 	if background and type(background) == 'boolean' then
-		StartPushedScan(name, minLevel, minLevel, nil, typeId, subtypeId, nil, quality)
+		StartPushedScan(name, minLevel, minLevel, nil, typeId, subtypeId, nil, quality, true)
 	else
 		PushScan()
-		StartScan(name, minLevel, minLevel, nil, typeId, subtypeId, nil, quality)
+		StartScan(name, minLevel, minLevel, nil, typeId, subtypeId, nil, quality, nil, true)
 	end
 end
 

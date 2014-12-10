@@ -1388,10 +1388,10 @@ function private.CreateFrames()
 
 		aucPrint(_TRANS('APPR_Interface_RefreshingView') :format(itemName))--Refreshing view of {{%s}}
 		if background and type(background) == 'boolean' then
-			AucAdvanced.Scan.StartPushedScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity)
+			AucAdvanced.Scan.StartPushedScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity, true)
 		else
 			AucAdvanced.Scan.PushScan()
-			AucAdvanced.Scan.StartScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity)
+			AucAdvanced.Scan.StartScan(itemName, itemMinLevel, itemMinLevel, nil, itemTypeId, itemSubId, nil, itemRarity, nil, true)
 		end
 	end
 
@@ -2906,7 +2906,6 @@ function private.CreateFrames()
 				SideDressUpFrame.reshow = true
 			end
 			frame:Show()
-			AucAdvanced.Scan.LoadScanData()
 			frame.GenerateList(true)
 		else
 			if (SideDressUpFrame.reshow) then
