@@ -1196,7 +1196,7 @@ end
 --                nil, otherwise
 -------------------------------------------------------------------------------
 function infDebugPrint(message, category, title, errorCode, level)
-	return debug(addonName, message, category, title, errorCode, level)
+	return debug(message, category, title, errorCode, level)
 end
 
 -------------------------------------------------------------------------------
