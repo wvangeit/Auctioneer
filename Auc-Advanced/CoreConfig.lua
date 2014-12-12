@@ -169,15 +169,14 @@ function lib.GetCommandLead(llibType, llibName)
 end
 
 function lib.About(all)
-	local rev = AucAdvanced.GetCurrentRevision()
-	private.Print(("Auctioneer rev.%d loaded"):format(rev))
+	private.Print(("Auctioneer version {{%s}}, revision %d"):format(AucAdvanced.Version, AucAdvanced.GetCurrentRevision()))
 
 	if (all) then
 		local revisionsList = AucAdvanced.GetRevisionList()
 
 		for file, revision in pairs(revisionsList) do
-			local shortName = file:match(".-/(%u.*)")
-			private.Print(("    File \"%s\", revision: %d"):format(shortName, revision))
+			local shortName = file:match(".-/(%u.*)") or file
+			private.Print(("    File \"%s\", revision %d"):format(shortName, revision))
 		end
 	end
 end
