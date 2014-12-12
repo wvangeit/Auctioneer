@@ -577,8 +577,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "autoLootDE", _ENCH("GuiAutoLootDE"))
 
 	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
-	local autoDElist = gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem")
-	autoDElist:SetWidth(280) -- Wider width needed for very long item names (SetWidth not directly supported by AddControl)
+	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", 280)
 	gui:AddControl(id, "Button",     0, 1, "autode.deleteItem", "remove item")
 	gui:AddControl(id, "Button",     0, 1, "autode.reset", "reset all items")
 
