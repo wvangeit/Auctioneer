@@ -39,25 +39,26 @@ local print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill = AucAdva
 
 local data
 
-lib.Processors = {}
-function lib.Processors.itemtooltip(callbackType, ...)
-	lib.ProcessTooltip(...)
-end
+lib.Processors = {
+	itemtooltip = function(callbackType, ...)
+		lib.ProcessTooltip(...)
+	end,
+
+	config = function(callbackType, gui)
+		private.SetupConfigGui(gui)
+	end,
+
+	listupdate = function()
+		private.ListUpdate()
+	end,
+
+	configchanged = function(callbackType, setting, value, subsetting, module)
+		if module == "pricelevel" and AuctionFrameBrowse:IsVisible() then
+			private.ListUpdate()
+		end
+	end,
+}
 lib.Processors.battlepettooltip = lib.Processors.itemtooltip
-
-function lib.Processors.config(callbackType, ...)
-	private.SetupConfigGui(...)
-end
-
-function lib.Processors.listupdate(callbackType, ...)
-	private.ListUpdate(...)
-end
-
-function lib.Processors.configchanged(callbackType, ...)
-	if (AuctionFrameBrowse_Update) then
-		AuctionFrameBrowse_Update()
-	end
-end
 
 
 function lib.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
