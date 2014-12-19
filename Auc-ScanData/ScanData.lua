@@ -377,6 +377,7 @@ end
 
 private.dataCache = {}
 function lib.GetScanData(serverKey)
+	if not private.isLoaded then return end
 	serverKey = ResolveServerKey(serverKey)
 	if not serverKey then
 		debugPrint("AucScanData: invalid serverKey passed to GetScanData", "ScanData", "Invalid serverKey", "Error")
@@ -412,8 +413,9 @@ end
 
 function lib.ClearScanData(command)
 	local report, serverKey
-	local keyword, extra = "server", "" -- default
+	if not private.isLoaded then return end
 
+	local keyword, extra = "server", "" -- default
 	if type(command) == "string" then
 		local _, ind, key = strfind(command, "(%S+)")
 		if key then
@@ -537,8 +539,8 @@ local function OnLoadRunOnce()
 	aucPrint("Auctioneer: {{ScanData}} loaded.")
 	private.UpgradeDB()
 	if LookForOldData then LookForOldData() end
+	private.isLoaded = Resources.Active
 	lib.GetScanData() -- force unpack of home data
-	private.isLoaded = true
 end
 function lib.OnLoad()
 	if OnLoadRunOnce then OnLoadRunOnce() end
@@ -547,6 +549,7 @@ end
 lib.Processors.gameactive = function()
 	wipe(private.dataCache)
 	if LookForOldData then LookForOldData() end
+	private.isLoaded = true
 	lib.GetScanData() -- force unpack of home data
 end
 -- Special handling for when a Neutral player character chooses a faction
@@ -652,6 +655,8 @@ function lib.OnUnload()
 			AucScanData.scans[serverKey] = nil
 		end
 	end
+
+	private.isLoaded = false
 end
 
 -- Support GetServerKeyList and ChangeServerKey, even though we load too late for CoreServers to use them at startup
