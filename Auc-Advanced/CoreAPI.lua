@@ -914,21 +914,27 @@ end
 
 -- Creates an AucAdvanced signature from an item or battlepet link
 function lib.GetSigFromLink(link)
+	local sig, bonus
 	local ptype = type(link)
 	if ptype == "number" then
 		return ("%d"):format(link), "item"
 	elseif ptype ~= "string" then
 		return
 	end
-	local header,s1,s2,s3,s4,s5,s6,s7,s8 = strsplit(":", link)
+	local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12 = strsplit(":", link, 13)
 	if not s1 then
 		return
 	end
 	local lType = header:sub(-4)
 	if lType == "item" then
-		-- itemId = s1, enchant = s2, gems s3,s4,s5,s6 (not used), suffix = s7
-		local sig
-		if s7 and s7 ~= "0" then -- suffix
+		-- sig format: itemID:suffix:factor:enchant:bonus1:...:bonusX {any trailing ":0" are ommitted}
+		-- s1 = itemID, s2 = enchant, s3,s4,s5,s6 = gems, s7 = suffix, s8 = uniqueID(factor), s9 = level, s10 = upgrades, s11 = instance, s12 = bonuses
+		-- some entries are not used: gems, level, upgrades, instance
+		-- for compatibility with old or partial links, test for nils
+		if s12 and s12:byte(1) ~= 48 then -- bonus counter is not '0'
+			bonus = s12:match("%d+:([^|]+)")
+		end
+		if s8 and s7 ~= "0" then -- suffix
 			local factor = "0"
 			if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
 				local nseed = tonumber(s8) -- seed
@@ -936,7 +942,9 @@ function lib.GetSigFromLink(link)
 					factor = ("%d"):format(bitand(nseed, 65535)) -- here format is faster than tostring
 				end
 			end
-			if s2 and s2 ~= "0" then -- enchant
+			if bonus then
+				sig = s1..":"..s7..":"..factor..":"..s2..":"..bonus
+			elseif s2 ~= "0" then -- enchant
 				-- concat is slightly faster than using strjoin with this many parameters, and far faster than format
 				sig = s1..":"..s7..":"..factor..":"..s2
 			elseif factor ~= "0" then
@@ -945,7 +953,9 @@ function lib.GetSigFromLink(link)
 				sig = s1..":"..s7
 			end
 		else
-			if s2 and s2 ~= "0" then
+			if bonus then -- (if bonus then s12 exists, therefore s2 must exist)
+				sig = s1..":0:0:"..s2..":"..bonus
+			elseif s2 and s2 ~= "0" then
 				sig = s1..":0:0:"..s2
 			else
 				sig = s1
@@ -953,7 +963,8 @@ function lib.GetSigFromLink(link)
 		end
 		return sig, "item"
 	elseif lType == "epet" then -- last 4 characters of battlepet
-		-- speciesID = s1, level = s2, breedQuality = s3, maxHealth = s4, power = s5, speed = s6
+		-- sig format: "P":speciesID:level:quality:health:power:speed
+		-- s1 = speciesID, s2 = level, s3 = quality, s4 = health, s5 = power, s6 = speed
 		-- if any are missing then the link is broken - check that the last one exists
 		-- all should always be non-zero, so just rebuild with the battlepet sig "P" marker
 		if s7 then -- although s7 is not used, it should exist (contains battlepetID and tail)
@@ -966,13 +977,12 @@ end
 -- Creates an item or battlepet link from an AucAdvanced signature
 -- Due to the lossy nature of sigs, the link created will not be exactly the same as the link originally used to generate the sig
 function lib.GetLinkFromSig(sig)
-	local s1, s2, s3, s4, s5, s6, s7 = strsplit(":", sig)
-	if s1 == "P" then -- battlepet link
-		-- speciesID = s2, level = s3, breedQuality = s4, maxHealth = s5, power = s6, speed = s7
-		if not s7 then return end -- incomplete link
-		local speciesID = tonumber(s2)
+	if sig:byte(1) == 80 then -- "P" is battlepet tag
+		local _, speciesID, level, quality, health, power, speed = strsplit(":", sig)
+		if not speed then return end -- incomplete link
+		local speciesID = tonumber(speciesID)
 		if not speciesID then return end
-		local qual = tonumber(s4)
+		local qual = tonumber(quality)
 		local qual_col
 		if qual == -1 then
 			qual_col = NORMAL_FONT_COLOR_CODE
@@ -982,11 +992,16 @@ function lib.GetLinkFromSig(sig)
 		if not qual_col then return end
 		local name = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
 		if not name then return end
-		local petlink = format("%s|Hbattlepet:%s:%s:%s:%s:%s:%s:0|h[%s]|h|r", qual_col.hex, s2, s3, s4, s5, s6, s7, name)
+		local petlink = format("%s|Hbattlepet:%s:%s:%s:%s:%s:%s:0|h[%s]|h|r", qual_col.hex, speciesID, level, quality, health, power, speed, name)
 		return petlink, name, "battlepet"
 	else
-		-- id = s1, suffix = s2, factor = s3, enchant = s4
-		local itemstring = format("item:%s:%s:0:0:0:0:%s:%s:80:0", s1, s4 or "0", s2 or "0", s3 or "0")
+		local itemID, suffix, factor, enchant, tail = strsplit(":", sig, 5)
+		local bonus = "0"
+		if tail then -- sig includes bonus info, reconstruct the counter
+			local _, count = tail:gsub(":", ":")
+			bonus = (count + 1) .. ":" .. tail
+		end
+		local itemstring = format("item:%s:%s:0:0:0:0:%s:%s:80:0:0:%s", itemID, enchant or "0", suffix or "0", factor or "0", bonus)
 		local name, link = GetItemInfo(itemstring)
 		if link then
 			return SanitizeLink(link), name, "item" -- name is ignored by most calls
