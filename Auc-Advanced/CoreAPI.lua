@@ -1015,26 +1015,29 @@ end
 -- Subsequent return values have different meanings depending on the linkType
 function lib.DecodeSig(sig)
 	if type(sig) ~= "string" then return end
-
-	local s1,s2,s3,s4,s5,s6,s7 = strsplit(":", sig)
-	if s1 == "P" then
-		-- battlepet sig
-		s2 = tonumber(s2) -- speciesID
-		if not s2 or s2 == 0 then return end
-		s3 = tonumber(s3) or 0 -- level : 0 signifies unknown level
-		s4 = tonumber(s4) or -1 -- quality : -1 signifies unknown quality
-		s5 = tonumber(s5) or 0 -- health
-		s6 = tonumber(s6) or 0 -- power
-		s7 = tonumber(s7) or 0 -- speed
-		return "battlepet", s2,s3,s4,s5,s6,s7
+	if sig:byte(1) == 80 then -- "P" is battlepet tag
+		local _, speciesID, level, quality, health, power, speed = strsplit(":", sig)
+		speciesID = tonumber(speciesID)
+		if not speciesID or speciesID == 0 then return end
+		level = tonumber(level) or 0 -- 0 signifies unknown level
+		quality = tonumber(quality) or -1 -- -1 signifies unknown quality
+		health = tonumber(health) or 0
+		power = tonumber(power) or 0
+		speed = tonumber(speed) or 0
+		return "battlepet", speciesID, level, quality, health, power, speed
 	else
 		-- should be an item sig
-		s1 = tonumber(s1) -- itemId
-		if not s1 or s1 == 0 then return end
-		s2 = tonumber(s2) or 0 -- suffix
-		s3 = tonumber(s3) or 0 -- factor
-		s4 = tonumber(s4) or 0 -- enchant
-		return "item", s1,s2,s3,s4
+		local itemID, suffix, factor, enchant, bonus = strsplit(":", sig, 5)
+		itemID = tonumber(itemID)
+		if not itemID or itemID == 0 then return end
+		suffix = tonumber(suffix) or 0
+		factor = tonumber(factor) or 0
+		enchant = tonumber(enchant) or 0
+		-- bonus may be a string or nil
+
+		-- linkType,itemId, suffix,factor,enchant,seed, gem1,gem2,gem3,gemBonus, bonuses(string)
+		-- (to match return values we need to pad with 0s, we can fake 'seed' with factor)
+		return "item",itemID, suffix,factor,enchant,factor, 0,0,0,0, bonus
 	end
 end
 
