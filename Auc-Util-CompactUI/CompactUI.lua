@@ -584,8 +584,8 @@ function private.RetrievePage()
 			item[1] = i
 			item[2] = selected == i
 
-			local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId =  GetAuctionItemInfo("list", i)
-			local _, _, _, itemLevel, itemDetail = GetItemInfo(itemId) -- itemDetail = minUseLevel
+			local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName =  GetAuctionItemInfo("list", i)
+			local _, _, _, itemLevel, itemDetail = GetItemInfo(link) -- itemDetail = minUseLevel
 
 			if levelColHeader == "ITEM_LEVEL_ABBR" then
 				itemLevel = level
