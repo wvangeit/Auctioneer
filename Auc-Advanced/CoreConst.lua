@@ -112,7 +112,7 @@ local lib = {
 	AMHIGH = 19,
 	SELLER = 20,
 	FLAG = 21,
-	DEP1 = 22, -- deprecated entry, currently unused
+	BONUSES = 22,
 	ITEMID = 23,
 	SUFFIX = 24,
 	FACTOR = 25,
@@ -121,7 +121,7 @@ local lib = {
 	LASTENTRY = 27, -- Used to determine how many entries the table has when copying (some entries can be nil so # won't work)
 
 	ScanPosLabels = {"LINK", "ILEVEL", "ITYPE", "ISUB", "IEQUIP", "PRICE", "TLEFT", "TIME", "NAME", "TEXTURE", "COUNT", "QUALITY", "CANUSE", "ULEVEL", "MINBID", "MININC",
-		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "DEP1", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
+		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "BONUSES", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
 
 	-- Permanent flags (stored in save file)
 	FLAG_UNSEEN = 2,
@@ -130,9 +130,11 @@ local lib = {
 	FLAG_DIRTY = 64,
 
 	ALEVEL_OFF = 0,
-	ALEVEL_LOW = 1,
-	ALEVEL_MED = 2,
-	ALEVEL_HI = 3,
+	ALEVEL_MIN = 1,
+	ALEVEL_LOW = 2,
+	ALEVEL_MED = 3,
+	ALEVEL_HI = 4,
+	ALEVEL_MAX = 5,
 
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
@@ -141,7 +143,7 @@ local lib = {
 
 	MAXSKILLLEVEL = 700,
 	MAXUSERLEVEL = 100,
-	MAXITEMLEVEL = 700,
+	MAXITEMLEVEL = 710,
 	MAXBIDPRICE = 9999999999, -- copy from Blizzard_AuctionUI.lua, so it is available before AH loads
 
 }
