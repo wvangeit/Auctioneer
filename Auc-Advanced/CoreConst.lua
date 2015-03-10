@@ -128,6 +128,8 @@ local lib = {
 	FLAG_FILTER = 4,
 	-- Temporary flags (only used during processing - higher values to leave lower ones free for permanent flags)
 	FLAG_DIRTY = 64,
+	FLAG_EXPIRED = 128,
+	FLAG_CORRUPT = 256,
 
 	ALEVEL_OFF = 0,
 	ALEVEL_MIN = 1,

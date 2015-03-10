@@ -966,7 +966,6 @@ local Commitfunction = function()
 	if get("scancommit.progressbar") then
 		lib.ProgressBars("CommitProgressBar", 0, true)
 	end
-	local unresolvedCount = 0
 	local hadGetError = false
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
@@ -974,8 +973,10 @@ local Commitfunction = function()
 	local progresscounter = 0
 	local progresstotal = 3*oldCount + 7*scanCount
 
-	local filterDeleteCount,filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0,0,0,0
-
+	local filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount = 0,0,0,0, 0,0,0,0
+	local unresolvedCount = 0
+	local dirtyCount, undirtyCount, expiredCount, corruptCount, matchedCount = 0, 0, 0, 0, 0
+	local filterDeleteCount, earlyDeleteCount, expiredDeleteCount, corruptDeleteCount = 0, 0, 0, 0
 
 	do --[[ *** Stage 1 : pre-process the new scan ]]--
 		lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
@@ -1003,7 +1004,7 @@ local Commitfunction = function()
 			local success, reason, linkType = private.GetAuctionItemFillIn(TempcurScan[pos], true)
 			progresscounter = progresscounter + 1
 		end
-		
+
 		-- Stage 1 Second Pass
 		private.InitItemInfoCache()
 		for pos = scanCount, 1, -1 do
@@ -1017,7 +1018,7 @@ local Commitfunction = function()
 			local data = TempcurScan[pos]
 			local success, reason, linkType = private.GetAuctionItemFillIn(data, true)
 			progresscounter = progresscounter + 1
-			
+
 			if not success then
 				entryUnusable = true
 			else
@@ -1074,7 +1075,6 @@ local Commitfunction = function()
 	lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 2")
 	coroutine.yield() -- yield to allow updated bar to display
 
-	local dirtyCount = 0
 	local lut = {}
 
 	nextPause = debugprofilestop() + processingTime
@@ -1085,28 +1085,42 @@ local Commitfunction = function()
 			nextPause = debugprofilestop() + processingTime
 		end
 		local link = data[Const.LINK]
+		local flags = data[Const.FLAG]
 		progresscounter = progresscounter + 1
-		if link then
+		if link and flags then
 			if private.IsInQuery(TempcurQuery, data) then
-				-- Mark dirty
-				data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_DIRTY)
-				dirtyCount = dirtyCount+1
+				matchedCount = matchedCount + 1
 
-				-- Build lookup table
-				local list = lut[link]
-				if (not list) then
-					lut[link] = pos
+				-- Test for expired
+				local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
+				if not data[Const.TIME] or (now - data[Const.TIME] > auctionmaxtime) then
+					data[Const.FLAG] = bitor(flags, Const.FLAG_EXPIRED)
+					expiredCount = expiredCount + 1
 				else
-					if (type(list) == "number") then
-						lut[link] = {}
-						tinsert(lut[link], list)
+					-- Mark dirty
+					data[Const.FLAG] = bitor(flags, Const.FLAG_DIRTY)
+					dirtyCount = dirtyCount+1
+
+					-- Build lookup table
+					local list = lut[link]
+					if (not list) then
+						lut[link] = pos
+					else
+						if (type(list) == "number") then
+							lut[link] = {}
+							tinsert(lut[link], list)
+						end
+						tinsert(lut[link], pos)
 					end
-					tinsert(lut[link], pos)
 				end
 			else
 				-- Mark NOT dirty
-				data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
+				data[Const.FLAG] = bitand(flags, bitnot(Const.FLAG_DIRTY))
 			end
+		else
+			-- corrupt entry
+			data[Const.FLAG] = bitor(flags or 0, Const.FLAG_CORRUPT)
+			corruptCount = corruptCount + 1
 		end
 	end
 
@@ -1168,7 +1182,6 @@ local Commitfunction = function()
 
 	local maskNotDirtyUnseen = bitnot(bitor(Const.FLAG_DIRTY, Const.FLAG_UNSEEN)) -- only calculate mask for clearing these flags once
 	local messageCreate = private.FallbackScanData and "fallbackcreate" or "create"
-	local undirtyCount = 0
 
 	local garbageinterval
 	local stage3garbage = get("core.scan.stage3garbage")
@@ -1273,8 +1286,9 @@ local Commitfunction = function()
 		If we estimate this will be the case, switch to Keep mode, where we copy the entries we want to keep into a new image, which then replaces the old one.
 
 		Test version 1: use keep mode if scan is complete, and if number of remaining dirty entries exceeds a fixed threshold
+		Test version 2: Test for expired in Stage 2; expiredCount is now available to decide whether to use keep mode
 	--]]
-	if not wasIncomplete and (dirtyCount - undirtyCount) > 1000 then
+	if (expiredCount + corruptCount) > 1000 or (not wasIncomplete and (expiredCount + corruptCount + dirtyCount - undirtyCount) > 1000) then
 		loopBegin, loopEnd, loopDirection = 1, #scandata.image, 1 -- process Keep mode in ascending order to keep the new table in the same order
 		keepmodeImage = {} -- new image table; also acts as a flag for Keep mode
 	end
@@ -1288,46 +1302,47 @@ local Commitfunction = function()
 			lastTime = time()
 		end
 		local data = scandata.image[pos]
+		local flags = data[Const.FLAG] -- *caution* if we modify data[Const.FLAG] below, be sure to set flags to the same value again
 		local dodelete = false
 		progresscounter = progresscounter + progressstep
-		if (bitand(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
-			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
-
-			if data[Const.TIME] and (now - data[Const.TIME] > auctionmaxtime) then
-				-- delete items that have passed their expiry time - even if scan was incomplete
-				dodelete = true
-				if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
-					filterDeleteCount = filterDeleteCount + 1
-				else
-					expiredDeleteCount = expiredDeleteCount + 1
-				end
-			elseif wasIncomplete then
+		if bitand(flags, Const.FLAG_CORRUPT) ~= 0 then
+			dodelete = true
+			corruptDeleteCount = corruptDeleteCount + 1
+		elseif bitand(flags, Const.FLAG_EXPIRED) ~= 0 then
+			dodelete = true
+			if bitand(flags, Const.FLAG_FILTER) ~= 0 then
+				filterDeleteCount = filterDeleteCount + 1
+			else
+				expiredDeleteCount = expiredDeleteCount + 1
+			end
+		elseif bitand(flags, Const.FLAG_DIRTY) ~= 0  then
+			if wasIncomplete then
 				missedCount = missedCount + 1
 			elseif wasOnePage then
 				-- a *completed* one-page scan should not have missed any auctions
 				dodelete = true
-				if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+				if bitand(flags, Const.FLAG_FILTER) ~= 0 then
 					filterDeleteCount = filterDeleteCount + 1
 				else
 					earlyDeleteCount = earlyDeleteCount + 1
 				end
 			else
-				if bitand(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+				if bitand(flags, Const.FLAG_UNSEEN) ~= 0 then
 					dodelete = true
-					if bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
+					if bitand(flags, Const.FLAG_FILTER) ~= 0 then
 						filterDeleteCount = filterDeleteCount + 1
 					else
 						earlyDeleteCount = earlyDeleteCount + 1
 					end
 				else
-					data[Const.FLAG] = bitor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
-					data[Const.FLAG] = bitand(data[Const.FLAG] or 0, bitnot(Const.FLAG_DIRTY))
+					flags = bitor(bitand(flags, bitnot(Const.FLAG_DIRTY)), Const.FLAG_UNSEEN)
+					data[Const.FLAG] = flags
 					missedCount = missedCount + 1
 				end
 			end
 		end
 		if dodelete then
-			if not (bitand(data[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER) then
+			if bitand(flags, Const.FLAG_FILTER) == 0 then
 				processStats(processors, "delete", data)
 			end
 			if not keepmodeImage then
@@ -1349,10 +1364,23 @@ local Commitfunction = function()
 	-- final yield to update GetTime for the stats
 	-- (though we should be aware that whatever else happens during this yield gets added to our final time, we can't get an update of GetTime *without* yielding here!)
 	coroutine.yield()
+	local endTimeStamp = time()
+	local scanTimeSecs, scanTimeMins, scanTimeHours = GetTime() - scanStarted - totalPaused, 0, 0
+
 	-- optionally do a final collection here (as above, we want it surrounded by yields)
 	if get("core.scan.stage5garbage") then
 		collectgarbage()
 		coroutine.yield()
+	end
+
+	if scanTimeSecs < 1 then
+		scanTimeSecs = floor(scanTimeSecs*10)/10
+	else
+		scanTimeSecs = floor(scanTimeSecs)
+		scanTimeMins = floor(scanTimeSecs / 60)
+		scanTimeSecs =  mod(scanTimeSecs, 60)
+		scanTimeHours = floor(scanTimeMins / 60)
+		scanTimeMins = mod(scanTimeMins, 60)
 	end
 
 	local currentCount = #scandata.image
@@ -1365,24 +1393,12 @@ local Commitfunction = function()
 	end
 
 	-- image contains filtered items now.  Need to account for new entries that are flagged as filtered (not shown to stats modules)
-	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
+	if (oldCount - earlyDeleteCount - expiredDeleteCount - corruptDeleteCount + newCount + filterNewCount - filterDeleteCount ~= currentCount) then
 		if _G.nLog then
 			_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, "Current Count Discrepency Seen",
 				("%d - %d - %d + %d + %d - %d != %d"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
 					newCount, filterNewCount, filterDeleteCount, currentCount))
 		end
-	end
-
-	local endTimeStamp = time()
-	local scanTimeSecs, scanTimeMins, scanTimeHours = GetTime() - scanStarted - totalPaused, 0, 0
-	if scanTimeSecs < 1 then
-		scanTimeSecs = floor(scanTimeSecs*10)/10
-	else
-		scanTimeSecs = floor(scanTimeSecs)
-		scanTimeMins = floor(scanTimeSecs / 60)
-		scanTimeSecs =  mod(scanTimeSecs, 60)
-		scanTimeHours = floor(scanTimeMins / 60)
-		scanTimeMins = mod(scanTimeMins, 60)
 	end
 
 	--Hides the end of scan summary if user is not interested
@@ -1416,7 +1432,7 @@ local Commitfunction = function()
 		if (printSummary) then _print(summaryLine) end
 		summary = summaryLine
 
-		summaryLine = "  {{"..oldCount.."}} ".._TRANS("PSS_StartItems").."{{"..dirtyCount.."}} ".._TRANS("PSS_MatchedItems").." {{"..currentCount.."}} ".._TRANS("PSS_AtEnd")
+		summaryLine = "  {{"..oldCount.."}} ".._TRANS("PSS_StartItems").."{{"..matchedCount.."}} ".._TRANS("PSS_MatchedItems").." {{"..currentCount.."}} ".._TRANS("PSS_AtEnd")
 		if (printSummary) then _print(summaryLine) end
 		summary = summary.."\n"..summaryLine
 
@@ -1476,6 +1492,11 @@ local Commitfunction = function()
 			if (printSummary) then _print(summaryLine) end
 			summary = summary.."\n"..summaryLine
 		end
+		if corruptDeleteCount > 0 then
+			summaryLine = "  {{"..corruptDeleteCount.."}} Corrupt entries found and removed"
+			if (printSummary) then _print(summaryLine) end
+			summary = summary.."\n"..summaryLine
+		end
 
 		if (_G.nLog) then
 			local eTime = GetTime()
@@ -1496,7 +1517,7 @@ local Commitfunction = function()
 		sameCount = sameCount,
 		newCount = newCount,
 		updateCount = updateCount,
-		matchedCount = dirtyCount,
+		matchedCount = matchedCount,
 		earlyDeleteCount = earlyDeleteCount,
 		expiredDeleteCount = expiredDeleteCount,
 		currentCount = currentCount,
@@ -1522,7 +1543,7 @@ local Commitfunction = function()
 	end
 
 	scanstats.LastScan = endTimeStamp
-	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0 then
+	if oldCount ~= currentCount or scanCount > 0 or dirtyCount > 0 or expiredCount > 0 or corruptCount > 0 then
 		scanstats.ImageUpdated = endTimeStamp
 	end
 	if wasUnrestricted and not wasIncomplete then scanstats.LastFullScan = endTimeStamp end
@@ -1647,7 +1668,7 @@ do
 	local ItemInfoCache, PetInfoCache = {}, {}
 	local ItemTried, PetTried
 	local cageType, cageSubtypeLookup, cageUseLevel
-	
+
 	function private.ResetItemInfoCache()
 		wipe(ItemInfoCache)
 		wipe(PetInfoCache)
@@ -1679,7 +1700,7 @@ do
 		ItemInfoCache[cachekey] = data
 		return data
 	end
-	
+
 	function private.GetPetInfoCache(speciesID, scanthrottle)
 		if not cageType then
 			-- generic info for the Pet Cage item 82800 - info that is the same for every pet
@@ -1708,10 +1729,10 @@ do
 				if scanthrottle then
 					PetTried[speciesID] = true
 				end
-				return				
+				return
 			end
 		end
-		
+
 		return cageType, subtype, cageUseLevel
 	end
 
@@ -1859,7 +1880,7 @@ function private.GetAuctionItemFillIn(itemData, scanthrottle)
 	if not (itemID and itemLink and itemData[Const.TLEFT]) then
 		return nil, "Invalid", "unknown"
 	end
-	
+
 	if itemID == 82800 then -- "Pet Cage"
 		linkType = "battlepet"
 		if not itemData[Const.SEED] then
@@ -1923,7 +1944,7 @@ function private.GetAuctionItemFillIn(itemData, scanthrottle)
 	if not itemData[Const.ITYPE] then
 		return nil, "Retry", linkType
 	end
-	
+
 	if not itemData[Const.SELLER] then itemData[Const.SELLER] = "" end
 
 	return true, nil, linkType
