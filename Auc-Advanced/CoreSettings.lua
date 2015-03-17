@@ -148,7 +148,7 @@ local settingDefaults = {
 	["core.scan.unresolvedtolerance"] = 0,
 	["core.scan.scanallqueries"] = true,
 	["core.scan.hybridscans"] = false,
-	["core.scan.scannerthrottle"] = false,
+	["core.scan.scannerthrottle"] = Const.ALEVEL_MIN,
 	["core.scan.stage1throttle"] = Const.ALEVEL_OFF,
 	["core.scan.stage3garbage"] = Const.ALEVEL_OFF,
 	["core.scan.stage5garbage"] = false,
@@ -595,7 +595,7 @@ function private._MakeGuiConfig() -- Name mangled to block gui creation at first
 	gui:AddTip(id, _TRANS('ADV_HelpTooltip_ScanAllQueries')) --Enable to perform scanning of every Auctionhouse search. Disable to only scan Auctioneer's own searches.\nYou may need to disable this option if you have compatibility problems with other AddOns
 
 	gui:AddControl(id, "Subhead", 0, "Experimental Settings (consult the forums before using these)")
-	gui:AddControl(id, "Checkbox",	0, 1, "core.scan.scannerthrottle", "Scanner stage: Throttle during fast scans")
+	gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.selectorActivityLevelB, "core.scan.scannerthrottle", 80, "Scanner stage: Throttle during fast scans")
 	gui:AddTip(id, "Slow down the Scanning stage during Getall scans. May help avoid disconnects during this stage. May result in missed auctions and incomplete scans")
 
 	gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.selectorActivityLevelA, "core.scan.stage1throttle", 80, "Processing Stage 1: Throttle processing speed")
@@ -777,6 +777,9 @@ function private.CheckObsolete()
 	end
 	if getter("core.general.alwaysHomeFaction") then
 		setter("core.general.alwaysHomeFaction", nil)
+	end
+	if getter("core.scan.scannerthrottle") == true then
+		setter("core.scan.scannerthrottle", Const.ALEVEL_MED)
 	end
 
 	local old

@@ -245,7 +245,7 @@ do
 		return auctionlength
 	end
 
-	local alevel = {
+	local alevelA = {
 		{Const.ALEVEL_OFF, "Off"},
 		{Const.ALEVEL_LOW, "Low"},
 		{Const.ALEVEL_MED, "Medium"},
@@ -256,8 +256,20 @@ do
 	-- Proposed to introduce variations of this table in future, with different combinations of values
 	-- thus this variant has been called type 'A', having values OFF, LOW, MED, HI
 	function lib.selectorActivityLevelA()
-		return alevel
+		return alevelA
 	end
+
+	-- MIN, LOW, MED, HI - for settings where 'OFF' would be inappropriate
+	local alevelB = {
+		{Const.ALEVEL_MIN, "Minimum"},
+		{Const.ALEVEL_LOW, "Low"},
+		{Const.ALEVEL_MED, "Medium"},
+		{Const.ALEVEL_HI, "High"},
+	}
+	function lib.selectorActivityLevelB()
+		return alevelB
+	end
+
 end
 
 
@@ -267,8 +279,6 @@ function lib.DecodeLink(...) return tooltip:DecodeLink(...) end
 function lib.GetLinkQuality(...) return tooltip:GetLinkQuality(...) end
 function lib.ShowItemLink(...) return tooltip:ShowItemLink(...) end
 function lib.ShowPetLink(...) return tooltip:ShowPetLink(...) end
-function lib.BreakHyperlink(...) return tooltip:BreakHyperlink(...) end -- Deprecated
-lib.breakHyperlink = lib.BreakHyperlink -- Deprecated
 
 do -- Faction related functions
 	local lookupfaction = {

@@ -100,7 +100,7 @@ local lib = {
 	TLEFT = 7,
 	TIME = 8,
 	NAME = 9,
-	TEXTURE = 10,
+	DEP2 = 10,
 	COUNT = 11,
 	QUALITY = 12,
 	CANUSE = 13,
@@ -120,7 +120,7 @@ local lib = {
 	SEED = 27,
 	LASTENTRY = 27, -- Used to determine how many entries the table has when copying (some entries can be nil so # won't work)
 
-	ScanPosLabels = {"LINK", "ILEVEL", "ITYPE", "ISUB", "IEQUIP", "PRICE", "TLEFT", "TIME", "NAME", "TEXTURE", "COUNT", "QUALITY", "CANUSE", "ULEVEL", "MINBID", "MININC",
+	ScanPosLabels = {"LINK", "ILEVEL", "ITYPE", "ISUB", "IEQUIP", "PRICE", "TLEFT", "TIME", "NAME", "DEP2", "COUNT", "QUALITY", "CANUSE", "ULEVEL", "MINBID", "MININC",
 		"BUYOUT", "CURBID", "AMHIGH", "SELLER", "FLAG", "BONUSES", "ITEMID", "SUFFIX", "FACTOR", "ENCHANT", "SEED" },
 
 	-- Permanent flags (stored in save file)

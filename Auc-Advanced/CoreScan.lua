@@ -175,7 +175,7 @@ local ItemDataAllowedNil = {
 	[Const.IEQUIP] = true,
 	[Const.AMHIGH] = true,
 	[Const.CANUSE] = true,
-	[Const.BONUSES] = true,
+	[Const.DEP2] = true,
 }
 
 function private.LoadScanData()
@@ -508,7 +508,6 @@ function private.Unpack(item, storage)
 	storage.timeLeft = item[Const.TLEFT]
 	storage.seenTime = item[Const.TIME]
 	storage.itemName = item[Const.NAME]
-	storage.texture = item[Const.TEXTURE]
 	storage.stackSize = item[Const.COUNT]
 	storage.quality = item[Const.QUALITY]
 	storage.canUse = item[Const.CANUSE]
@@ -986,32 +985,65 @@ local Commitfunction = function()
 		if stage1throttle >= Const.ALEVEL_HI then
 			breakinterval, timeadjust = 500, 0.1
 		elseif stage1throttle >= Const.ALEVEL_MED then
-			breakinterval, timeadjust = 1250, 0.25
+			breakinterval, timeadjust = 2000, 0.4
 		elseif stage1throttle >= Const.ALEVEL_LOW then
-			breakinterval, timeadjust = 2500, 0.5
-		else -- OFF
 			breakinterval, timeadjust = 5000, 1
+		else -- OFF
+			breakinterval, timeadjust = nil, 1
 		end
+		local breakcount = 0
+		local doYield = false
+		local battlepetYield = true
+		local firstfailureYield = true
 		nextPause = debugprofilestop() + processingTime * timeadjust
 		-- Stage 1 First Pass
 		private.InitItemInfoCache()
 		for pos = scanCount, 1, -1 do
-			if pos % breakinterval == 0 or debugprofilestop() > nextPause then
+			if breakinterval then
+				breakcount = (breakcount + 1) % breakinterval
+				if breakcount == 0 then
+					doYield = true
+				end
+			end
+			if doYield or debugprofilestop() > nextPause then
 				lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 				coroutine.yield()
 				nextPause = debugprofilestop() + processingTime * timeadjust
+				doYield = false
 			end
 			local success, reason, linkType = private.GetAuctionItemFillIn(TempcurScan[pos], true)
 			progresscounter = progresscounter + 1
+			if breakinterval then
+				if linkType == "battlepet" and battlepetYield then
+					-- experimental: yield on finding first battlepet
+					-- first time battlepet API is used, it appears to trigger a small amount of lag
+					doYield = true
+					battlepetYield = false
+				elseif not success and firstfailureYield then
+					-- experimental: yield after first failure detected
+					-- todo: fiddle with this, perhaps yielding every X failures, see if it appears to help
+					doYield = true
+					firstfailureYield = false
+				end
+			end
 		end
 
 		-- Stage 1 Second Pass
+		breakcount = 0
+		doYield = false
 		private.InitItemInfoCache()
 		for pos = scanCount, 1, -1 do
-			if pos % breakinterval == 0 or debugprofilestop() > nextPause then
+			if breakinterval then
+				breakcount = (breakcount + 1) % breakinterval
+				if breakcount == 0 then
+					doYield = true
+				end
+			end
+			if doYield or debugprofilestop() > nextPause then
 				lib.ProgressBars("CommitProgressBar", 100*progresscounter/progresstotal, true, "Auctioneer: Processing Stage 1")
 				coroutine.yield()
 				nextPause = debugprofilestop() + processingTime * timeadjust
+				doYield = false
 			end
 
 			local entryUnusable = false
@@ -1042,14 +1074,14 @@ local Commitfunction = function()
 						"Item Type %s, Sub Type %s, Equipment Position %s\n",
 						"Price %s, Bid %s, NextBid %s, MinInc %s, Buyout %s\n Time Left %s, Time %s\n",
 						"High Bidder %s  Can Use: %s  Bonuses %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
-						"Texture: %s")):format(
+						"Deprecated2: %s")):format(
 						data.PAGE, data.PAGEINDEX, "too broken, can not use at all",
 						data[Const.LINK] or "(nil)", data[Const.COUNT] or -1, data[Const.NAME] or "(nil)", data[Const.SELLER] or "(UNKNOWN)",
 						data[Const.ULEVEL] or -1, data[Const.QUALITY] or -1, data[Const.ILEVEL] or -1,data[Const.ITYPE] or "(UNKNOWN)", data[Const.ISUB] or "(UNKNOWN)", data[Const.IEQUIP] or '(n/a)',
 						data[Const.PRICE] or -1, data[Const.CURBID] or -1, data[Const.MINBID] or -1, data[Const.MININC] or -1, data[Const.BUYOUT] or -1,
 						data[Const.TLEFT] or -1, data[Const.TIME] or "(nil)", data[Const.AMHIGH] and "Yes" or "No",
 						(data[Const.CANUSE]==false and "Yes") or (data[Const.CANUSE] and "No" or "(nil)"), data[Const.BONUSES] or '(nil)', data[Const.ITEMID] or '(nil)',
-						data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.TEXTURE] or '(nil)'))
+						data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.DEP2] or '(nil)'))
 				end
 				tremove(TempcurScan, pos)
 				unresolvedCount = unresolvedCount + 1
@@ -1677,9 +1709,9 @@ do
 	function private.InitItemInfoCache()
 		ItemTried, PetTried = {}, {}
 	end
-	function private.GetItemInfoCache(link, itemID, bonuses, scanthrottle)
+	local function GetItemInfoCache(link, itemID, bonuses, scanthrottle)
 		local cachekey = itemID
-		if bonuses then cachekey = cachekey .. ":" .. bonuses end
+		if bonuses and bonuses ~= "" then cachekey = cachekey .. ":" .. bonuses end
 		local data = ItemInfoCache[cachekey]
 		if data then
 			return data
@@ -1688,7 +1720,7 @@ do
 			-- if GetItemInfo previously failed for a link with this cachekey in this processing pass (ItemTried is reset each pass)
 			return
 		end
-		local _,_,rarity,iLevel,uLevel,iType,iSubtype,stack,equipLoc = GetItemInfo(link)
+		local _,_,_,iLevel,uLevel,iType,iSubtype,_,equipLoc = GetItemInfo(link)
 		if not iType then
 			if scanthrottle then
 				ItemTried[cachekey] = true
@@ -1701,7 +1733,7 @@ do
 		return data
 	end
 
-	function private.GetPetInfoCache(speciesID, scanthrottle)
+	local function GetPetInfoCache(speciesID, scanthrottle)
 		if not cageType then
 			-- generic info for the Pet Cage item 82800 - info that is the same for every pet
 			-- cageSubtypeLookup can be used to convert numeric subtype to localized string for ISUB
@@ -1736,6 +1768,85 @@ do
 		return cageType, subtype, cageUseLevel
 	end
 
+	-- Called on a data table that has been processed by private.GetAuctionItem
+	-- Fills in certain entries that can be calculated from other entries, and so do not need to be determined at scan time
+	-- In particular, we avoid calling APIs GetItemInfo or C_PetJournal.GetPetInfoBySpeciesID duing the scan; we can delay them until processing
+	function private.GetAuctionItemFillIn(itemData, scanthrottle)
+		local linkType
+		local itemID = itemData[Const.ITEMID]
+		local itemLink = itemData[Const.LINK]
+		if not (itemID and itemLink and itemData[Const.TLEFT]) then
+			return nil, "Invalid", "unknown"
+		end
+
+		if itemID == 82800 then -- "Pet Cage"
+			linkType = "battlepet"
+			if not itemData[Const.SEED] then
+				-- following entries are not relevant to battlepets
+				itemData[Const.BONUSES] = ""
+				itemData[Const.SUFFIX] = 0
+				itemData[Const.FACTOR] = 0
+				itemData[Const.ENCHANT] = 0
+				itemData[Const.SEED] = 0 -- there must be a hidden unique seed, but I can't find a way to access it
+			end
+			if not itemData[Const.ITYPE] then
+				local _, speciesID = strsplit(":", itemLink)
+				speciesID = tonumber(speciesID)
+				if speciesID then
+					local cType, cSubtype, cUseLevel = GetPetInfoCache(speciesID, scanthrottle)
+					if cType then
+						itemData[Const.ITYPE] = cType -- string, localized to client
+						itemData[Const.IEQUIP] = nil -- always nil for Pet Cages
+						itemData[Const.ULEVEL] = itemData[Const.ULEVEL] or cUseLevel
+						itemData[Const.ISUB] = cSubtype
+						-- iLevel should have been obtained from GetAuctionItemInfo (could be extracted from link, if required though)
+					end
+				end
+			end
+		else
+			linkType = "item"
+			if not itemData[Const.SEED] then
+				local lkt, id, suffix, factor, enchant, seed, _, _, _, _, bonuses = AucAdvanced.DecodeLink(itemLink)
+				if lkt == "item" and id == itemID then
+					itemData[Const.BONUSES] = bonuses or ""
+					itemData[Const.SUFFIX] = suffix
+					itemData[Const.FACTOR] = factor
+					itemData[Const.ENCHANT] = enchant
+					itemData[Const.SEED] = seed
+				else
+					-- unrecognised link type - if this is happening then we'll need to investigate the link type
+					-- and install a special exception for it (similar to battlepet links, as above)
+					if nLog then
+						nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "GetAuctionItemFillIn could not decode link",
+							("Page %d, Index %d\nLink %s, itemID %d (from GetAuctionItemInfo)\ntype %s, id %s, suffix %s, factor %s, enchant %s, seed %s (from Decode)"):format(
+								page, index, itemLink, itemID, tostringall(lkt, id, suffix, factor, enchant, seed)))
+					end
+					-- Note: SEED is still set to nil
+					return nil, "UnknownLinkType", "unknown"
+				end
+			end
+			if not itemData[Const.ITYPE] then
+				local itemInfo = GetItemInfoCache(itemLink, itemID, itemData[Const.BONUSES], scanthrottle) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
+				if itemInfo then
+					itemData[Const.ITYPE] = itemInfo[1]
+					itemData[Const.ISUB] = itemInfo[2]
+					itemData[Const.IEQUIP] = itemInfo[3]
+					-- Prefer iLevel and/or uLevel values provided by GetAuctionItemInfo over those from GetItemInfo
+					-- (because we used itemID, it is possible for values from GetItemInfo to be incorrect)
+					itemData[Const.ILEVEL] = itemData[Const.ILEVEL] or itemInfo[4]
+					itemData[Const.ULEVEL] = itemData[Const.ULEVEL] or itemInfo[5]
+				end
+			end
+		end
+
+		if not itemData[Const.ITYPE] then
+			return nil, "Retry", linkType
+		end
+
+		if not itemData[Const.SELLER] then itemData[Const.SELLER] = "" end
+
+		return true, nil, linkType
+	end
 end
 
 --[[ private.GetAuctionItem(list, page, index, itemData)
@@ -1818,7 +1929,7 @@ function private.GetAuctionItem(list, page, index, itemData)
 	itemData[Const.MINBID] = minBid
 
 	itemData[Const.NAME] = name
-	itemData[Const.TEXTURE] = texture
+	itemData[Const.DEP2] = nil
 	itemData[Const.QUALITY] = quality
 	itemData[Const.CANUSE] = canUse
 	itemData[Const.AMHIGH] = highBidder and true or false
@@ -1868,86 +1979,6 @@ function private.GetAuctionItem(list, page, index, itemData)
 	itemData[Const.TIME] = time()
 
 	return itemData
-end
-
--- Called on a data table that has been processed by private.GetAuctionItem
--- Fills in certain entries that can be calculated from other entries, and so do not need to be determined at scan time
--- In particular, we avoid calling APIs GetItemInfo or C_PetJournal.GetPetInfoBySpeciesID duing the scan; we can delay them until processing
-function private.GetAuctionItemFillIn(itemData, scanthrottle)
-	local linkType
-	local itemID = itemData[Const.ITEMID]
-	local itemLink = itemData[Const.LINK]
-	if not (itemID and itemLink and itemData[Const.TLEFT]) then
-		return nil, "Invalid", "unknown"
-	end
-
-	if itemID == 82800 then -- "Pet Cage"
-		linkType = "battlepet"
-		if not itemData[Const.SEED] then
-			-- following entries are not relevant to battlepets
-			itemData[Const.BONUSES] = nil
-			itemData[Const.SUFFIX] = 0
-			itemData[Const.FACTOR] = 0
-			itemData[Const.ENCHANT] = 0
-			itemData[Const.SEED] = 0 -- there must be a hidden unique seed, but I can't find a way to access it
-		end
-		if not itemData[Const.ITYPE] then
-			local _, speciesID = strsplit(":", itemLink)
-			speciesID = tonumber(speciesID)
-			if speciesID then
-				local cType, cSubtype, cUseLevel = private.GetPetInfoCache(speciesID, scanthrottle)
-				if cType then
-					itemData[Const.ITYPE] = cType -- string, localized to client
-					itemData[Const.IEQUIP] = nil -- always nil for Pet Cages
-					itemData[Const.ULEVEL] = itemData[Const.ULEVEL] or cUseLevel
-					itemData[Const.ISUB] = cSubtype
-					-- iLevel should have been obtained from GetAuctionItemInfo (could be extracted from link, if required though)
-				end
-			end
-		end
-	else
-		linkType = "item"
-		if not itemData[Const.SEED] then
-			local lkt, id, suffix, factor, enchant, seed, _, _, _, _, bonuses = AucAdvanced.DecodeLink(itemLink)
-			if lkt == "item" and id == itemID then
-				itemData[Const.BONUSES] = bonuses
-				itemData[Const.SUFFIX] = suffix
-				itemData[Const.FACTOR] = factor
-				itemData[Const.ENCHANT] = enchant
-				itemData[Const.SEED] = seed
-			else
-				-- unrecognised link type - if this is happening then we'll need to investigate the link type
-				-- and install a special exception for it (similar to battlepet links, as above)
-				if nLog then
-					nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "GetAuctionItemFillIn could not decode link",
-						("Page %d, Index %d\nLink %s, itemID %d (from GetAuctionItemInfo)\ntype %s, id %s, suffix %s, factor %s, enchant %s, seed %s (from Decode)"):format(
-							page, index, itemLink, itemID, tostringall(lkt, id, suffix, factor, enchant, seed)))
-				end
-				-- Note: SEED is still set to nil
-				return nil, "UnknownLinkType", "unknown"
-			end
-		end
-		if not itemData[Const.ITYPE] then
-			local itemInfo = private.GetItemInfoCache(itemLink, itemID, itemData[Const.BONUSES], scanthrottle) -- {iType, iSubtype, Const.EquipEncode[equipLoc], iLevel, uLevel}
-			if itemInfo then
-				itemData[Const.ITYPE] = itemInfo[1]
-				itemData[Const.ISUB] = itemInfo[2]
-				itemData[Const.IEQUIP] = itemInfo[3]
-				-- Prefer iLevel and/or uLevel values provided by GetAuctionItemInfo over those from GetItemInfo
-				-- (because we used itemID, it is possible for values from GetItemInfo to be incorrect)
-				itemData[Const.ILEVEL] = itemData[Const.ILEVEL] or itemInfo[4]
-				itemData[Const.ULEVEL] = itemData[Const.ULEVEL] or itemInfo[5]
-			end
-		end
-	end
-
-	if not itemData[Const.ITYPE] then
-		return nil, "Retry", linkType
-	end
-
-	if not itemData[Const.SELLER] then itemData[Const.SELLER] = "" end
-
-	return true, nil, linkType
 end
 
 function lib.GetAuctionItem(list, index, fillTable)
@@ -2023,7 +2054,6 @@ local StorePageFunction = function()
 		_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, ("StorePage For Page %d Started %fs after Query Start"):format(page, retrievalStarted - queryStarted), ("StorePage (Page %d) Called\n%f seconds have elapsed since scan start"):format(page, retrievalStarted - queryStarted))
 	end
 
-	local scannerthrottle = get("core.scan.scannerthrottle")
 	if private.isGetAll then
 		--[[
 			pre-store delay before starting to store a getall query to give the client a bit of time to sort itself out
@@ -2095,11 +2125,18 @@ local StorePageFunction = function()
 	local processingTime = 800 / get("scancommit.targetFPS")
 	local debugprofilestop = debugprofilestop
 	local nextPause = debugprofilestop() + processingTime
-	local breakcount = 5000 -- additional limiter: yield every breakcount auctions scanned
 
-	if scannerthrottle then
-		breakcount = 1000
-		processingTime = processingTime / 5
+	local breakcount = 10000 -- additional limiter: yield every breakcount auctions scanned
+	local scannerthrottle = get("core.scan.scannerthrottle")
+	if scannerthrottle >= Const.ALEVEL_HI then
+		breakcount = 500
+		processingTime = processingTime * 0.1
+	elseif scannerthrottle >= Const.ALEVEL_MED then
+		breakcount = 2000
+		processingTime = processingTime * 0.2
+	elseif scannerthrottle >= Const.ALEVEL_LOW then
+		breakcount = 5000
+		processingTime = processingTime * 0.5
 	end
 
 	local storecount = 0
