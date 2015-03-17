@@ -1925,8 +1925,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 
 	--buyorbid must be either "bid", "buy", true, false, or nil
 	--if string is returned for buyorbid, value must be number or nil (in which case value will be Marketprice)
-	local buyorbid, value, pct, reason
-	buyorbid, value, pct, reason = searcher.Search(item)
+	local buyorbid, value, pct, reason = searcher.Search(item)
 	if buyorbid then
 		--give the filters a second chance to filter out, based on bid/buy differences
 		for filtername, filter in pairs(lib.Filters) do
@@ -1940,9 +1939,10 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 
 		local cost
 		if type(buyorbid) == "string" then
-			item["reason"] = searcher.tabname..":"..buyorbid
 			if reason then
-				item["reason"] = item["reason"]..":"..reason
+				item["reason"] = reason..":"..buyorbid
+			else
+				item["reason"] = searcher.tabname..":"..buyorbid
 			end
 			if buyorbid == "bid" then
 				--don't show result if we're already the highest bidder
@@ -1954,7 +1954,7 @@ function lib.SearchItem(searcherName, item, nodupes, skipresults)
 				cost = item[Const.BUYOUT]
 			end
 		else --the searcher only returned that it matches the criteria, so assume buyout if possible.
-			item["reason"] = searcher.tabname
+			item["reason"] = reason or searcher.tabname
 			if item[Const.BUYOUT] and item[Const.BUYOUT] > 0 then
 				cost = item[Const.BUYOUT]
 			elseif item[Const.PRICE] and item[Const.PRICE] > 0 then
