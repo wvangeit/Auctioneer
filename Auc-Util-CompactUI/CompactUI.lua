@@ -138,11 +138,25 @@ function private.HookAH()
 	local button, lastButton, origButton
 	local line
 
-	BrowseQualitySort:Hide()
-	BrowseLevelSort:Hide()
-	BrowseDurationSort:Hide()
-	BrowseHighBidderSort:Hide()
-	BrowseCurrentBidSort:Hide()
+	local function HideBlizzardColumnHeaders()
+		BrowseQualitySort:Hide()
+		BrowseLevelSort:Hide()
+		BrowseDurationSort:Hide()
+		BrowseHighBidderSort:Hide()
+		BrowseCurrentBidSort:Hide()
+	end
+	HideBlizzardColumnHeaders()
+	BrowseResetButton:HookScript("OnClick", HideBlizzardColumnHeaders)
+	hooksecurefunc("AuctionFrameBrowse_Reset", HideBlizzardColumnHeaders) -- hook this too, in case it's called by a third party AddOn
+	hooksecurefunc("AuctionFrameFilter_OnClick", function()
+		HideBlizzardColumnHeaders()
+		if AuctionFrameBrowse.selectedClass == TOKEN_FILTER_LABEL then
+			for pos, candy in ipairs(private.candy) do candy:Hide() end
+			BrowsePrevPageButton:Hide()
+			BrowseNextPageButton:Hide()
+			BrowseSearchCountText:Hide()
+		end
+	end) -- AuctionFrameFilter_OnClick
 
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
@@ -748,65 +762,67 @@ function private.SetAuction(button, pos)
 end
 
 function private.MyAuctionFrameUpdate()
-	if not BrowseScrollFrame then return end
+	if AuctionFrameBrowse.selectedClass ~= TOKEN_FILTER_LABEL then
+		if not BrowseScrollFrame then return end
 
-	if WOWEcon_AH_PerItem_Enable
-	and WOWEcon_AH_PerItem_Enable:IsVisible() then
-		WOWEcon_AH_PerItem_Enable:Hide()
-	end
-
-	if AucAdvanced.API.IsBlocked() then
-		for pos, candy in ipairs(private.candy) do candy:Hide() end
-		BrowsePrevPageButton:Hide()
-		BrowseNextPageButton:Hide()
-		BrowseSearchCountText:Hide()
-		return
-	end
-
-	local numBatchAuctions, totalAuctions = private.RetrievePage()
-	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
-
-	BrowseBidButton:Disable()
-	BrowseBuyoutButton:Disable()
-
-	BrowseNoResultsText:SetShown(numBatchAuctions == 0)
-
-	private.RetrievePage()
-	for i=1, NUM_BROWSE_TO_DISPLAY do
-		local index = offset + i
-		local button = private.buttons[i]
-		if index > numBatchAuctions then
-			button:SetAuction() -- empty auction
-		else
-			button:SetAuction(index)
+		if WOWEcon_AH_PerItem_Enable
+		and WOWEcon_AH_PerItem_Enable:IsVisible() then
+			WOWEcon_AH_PerItem_Enable:Hide()
 		end
-	end
 
-	if totalAuctions > 0 then
-		for _, candy in ipairs(private.candy) do candy:Show() end
-		BrowsePrevPageButton:Show()
-		BrowseNextPageButton:Show()
-		BrowseSearchCountText:Show()
-		local itemsMin = AuctionFrameBrowse.page * NUM_AUCTION_ITEMS_PER_PAGE + 1
-		local itemsMax = itemsMin + numBatchAuctions - 1
-		local pageMax = ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)
-		BrowseSearchCountText:SetFormattedText(NUMBER_OF_RESULTS_TEMPLATE, itemsMin, itemsMax, totalAuctions)
-		if totalAuctions > NUM_AUCTION_ITEMS_PER_PAGE then
-			BrowsePrevPageButton.isEnabled = AuctionFrameBrowse.page > 0
-			BrowseNextPageButton.isEnabled = AuctionFrameBrowse.page < pageMax - 1
-		else
-			BrowsePrevPageButton.isEnabled = false
-			BrowseNextPageButton.isEnabled = false
+		if AucAdvanced.API.IsBlocked() then
+			for pos, candy in ipairs(private.candy) do candy:Hide() end
+			BrowsePrevPageButton:Hide()
+			BrowseNextPageButton:Hide()
+			BrowseSearchCountText:Hide()
+			return
 		end
-		private.PageNum:SetFormattedText("%d/%d", AuctionFrameBrowse.page+1, pageMax)
-	else
-		for _, candy in ipairs(private.candy) do candy:Hide() end
-		BrowsePrevPageButton:Hide()
-		BrowseNextPageButton:Hide()
-		BrowseSearchCountText:Hide()
+
+		local numBatchAuctions, totalAuctions = private.RetrievePage()
+		local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
+
+		BrowseBidButton:Disable()
+		BrowseBuyoutButton:Disable()
+
+		BrowseNoResultsText:SetShown(numBatchAuctions == 0)
+
+		private.RetrievePage()
+		for i=1, NUM_BROWSE_TO_DISPLAY do
+			local index = offset + i
+			local button = private.buttons[i]
+			if index > numBatchAuctions then
+				button:SetAuction() -- empty auction
+			else
+				button:SetAuction(index)
+			end
+		end
+
+		if totalAuctions > 0 then
+			for _, candy in ipairs(private.candy) do candy:Show() end
+			BrowsePrevPageButton:Show()
+			BrowseNextPageButton:Show()
+			BrowseSearchCountText:Show()
+			local itemsMin = AuctionFrameBrowse.page * NUM_AUCTION_ITEMS_PER_PAGE + 1
+			local itemsMax = itemsMin + numBatchAuctions - 1
+			local pageMax = ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)
+			BrowseSearchCountText:SetFormattedText(NUMBER_OF_RESULTS_TEMPLATE, itemsMin, itemsMax, totalAuctions)
+			if totalAuctions > NUM_AUCTION_ITEMS_PER_PAGE then
+				BrowsePrevPageButton.isEnabled = AuctionFrameBrowse.page > 0
+				BrowseNextPageButton.isEnabled = AuctionFrameBrowse.page < pageMax - 1
+			else
+				BrowsePrevPageButton.isEnabled = false
+				BrowseNextPageButton.isEnabled = false
+			end
+			private.PageNum:SetFormattedText("%d/%d", AuctionFrameBrowse.page+1, pageMax)
+		else
+			for _, candy in ipairs(private.candy) do candy:Hide() end
+			BrowsePrevPageButton:Hide()
+			BrowseNextPageButton:Hide()
+			BrowseSearchCountText:Hide()
+		end
+		FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
+		AucAdvanced.API.ListUpdate()
 	end
-	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
-	AucAdvanced.API.ListUpdate()
 end
 
 --create the configure UI button.
