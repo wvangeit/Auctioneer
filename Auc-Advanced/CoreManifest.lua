@@ -51,12 +51,14 @@
 AucAdvanced = {Modules = {Filter={}, Match={}, Stat={}, Util={}}}
 local lib = AucAdvanced
 
-local DEV_VERSION = "5.21.DEV"
-local MINIMUM_TOC = 60000
-local MINIMUM_CLIENT = "6.0"
+local DEV_VERSION = "5.22.DEV"
+local MINIMUM_TOC = 60100
+local MINIMUM_CLIENT = "6.1.2"
+-- MINIMUM_BUILD is optional, and should only be used where TOC is not sufficient; otherwise it should be commented out
+local MINIMUM_BUILD = 19802
 
 lib.Version="<%version%>";
-if (lib.Version == "<".."%version%>") then
+if lib.Version:byte(1) == 60 then -- 60 = '<'
 	lib.Version = DEV_VERSION
 end
 local major, minor, release, revision = strsplit(".", lib.Version)
@@ -71,8 +73,8 @@ lib.NOPFUNCTION = function() end
 -- Test for load failure conditions in priority order
 
 -- Check TOC version meets minimum requirements
-local _,_,_,tocVersion = GetBuildInfo()
-if (tocVersion < MINIMUM_TOC) then
+local _,build,_,tocVersion = GetBuildInfo()
+if tocVersion < MINIMUM_TOC or (MINIMUM_BUILD and tonumber(build) < MINIMUM_BUILD) then
 	message("Auctioneer requires game client version "..MINIMUM_CLIENT.." or higher.")
 	lib.ABORTLOAD = "Incorrect WoW client version"
 end
