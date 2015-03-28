@@ -1646,6 +1646,7 @@ BeanCounterLocalizations = {
 		["MailAllianceAuctionHouse"]	= "聯盟拍賣場";
 		["MailHordeAuctionHouse"]	= "部落拍賣場";
 		["MailNeutralAuctionHouse"]	= "中立拍賣場";
+		["MailSenderAuctionHouse"]	= "拍賣場";
 
 		-- Section: Tooltip Messages
 		["TTDateString"]	= "键入你期望的日期显示格式.默认为%c";
