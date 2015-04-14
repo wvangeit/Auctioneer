@@ -286,7 +286,9 @@ end
 
 function lib.GetPrice(hyperlink, serverKey)
 	if not get("stat.purchased.enable") then return end --disable purchased if desired
+
 	serverKey = ResolveServerKey(serverKey)
+	if not serverKey then return end
 
 	local data = private.GetServerData(serverKey)
 	if not data then return end
@@ -298,26 +300,36 @@ function lib.GetPrice(hyperlink, serverKey)
 	if pricecache[cachesig] then
 		local dayAverage, avg3, avg7, avg14, dayTotal, dayCount, seenDays, seenCount = unpack(pricecache[cachesig], 1, 8)
 		return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
+	elseif pricecache[cachesig] == false then
+		return
 	end
 
 	local dayTotal, dayCount, dayAverage = 0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
+	local found = false
 
 	if data.daily[keyId] then
 		local stats = private.UnpackStats(data.daily[keyId])
 		if stats[property] then
 			dayTotal, dayCount = unpack(stats[property])
 			dayAverage = dayTotal/dayCount
+			found = true
 		end
 	end
 	if data.means[keyId] then
 		local stats = private.UnpackStats(data.means[keyId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14 = unpack(stats[property])
+			found = true
 		end
 	end
-	pricecache[cachesig] = {dayAverage, avg3, avg7, avg14, dayTotal, dayCount, seenDays, seenCount}
-	return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
+
+	if found then
+		pricecache[cachesig] = {dayAverage, avg3, avg7, avg14, dayTotal, dayCount, seenDays, seenCount}
+		return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
+	else
+		pricecache[cachesig] = false
+	end
 end
 
 function lib.GetPriceColumns()
@@ -326,11 +338,11 @@ end
 
 local pricearray={} -- used to return stuff in
 function lib.GetPriceArray(hyperlink, serverKey)
-	if not get("stat.purchased.enable") then return end --disable purchased if desired
-	wipe(pricearray)
-
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, serverKey)
+	if not seenCount then return end -- if seenCount is not nil then all other values should be non-nil (may be 0 instead)
+
+	wipe(pricearray)
 
 	-- pricearray.price and pricearray.seen are the ones that most algorithms will look for
 	pricearray.seen = seenCount
