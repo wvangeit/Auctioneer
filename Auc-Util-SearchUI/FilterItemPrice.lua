@@ -45,8 +45,7 @@ default("ignoreitemprice.enable", true)
 local SHEET_RETRY_THROTTLE = 1
 
 local ignorelist = {}
-private.tempignorelist = {}
-private.sheetdata = {}
+local tempignorelist = {}
 
 function private.UpdateSheet(retryOnly)
 	local missing
@@ -55,17 +54,17 @@ function private.UpdateSheet(retryOnly)
 			return
 		end
 	end
-	private.sheetdata = {} -- not worth using 'wipe' here as all the subtables get discarded anyway
+	local sheetdata = {}
 	for item, cost in pairs(ignorelist) do
 		local link = AucAdvanced.API.GetLinkFromSig(item)
 		if not link then
 			link = item
 			missing = true
 		end
-		tinsert(private.sheetdata, {link, cost})
+		tinsert(sheetdata, {link, cost})
 	end
 	if private.ignorelistGUI and private.ignorelistGUI.sheet then
-		private.ignorelistGUI.sheet:SetData(private.sheetdata)
+		private.ignorelistGUI.sheet:SetData(sheetdata)
 	end
 	if missing then
 		-- private.sheetThrottle serves double duty as a flag that we need to redo the sheet, and a throttle/timer to prevent us retrying it too soon
@@ -125,7 +124,7 @@ end
 --if price==nil, item will be removed from the list
 function lib.AddIgnore(sig, price, temp)
 	if temp then
-		private.tempignorelist[sig] = price
+		tempignorelist[sig] = price
 	else
 		ignorelist[sig] = price
 		set("ignoreitemprice.ignorelist", ignorelist) -- not required to save the table, but may trigger notification
@@ -133,8 +132,8 @@ function lib.AddIgnore(sig, price, temp)
 	end
 end
 
---private.remove()
---removes the selected item from the ignore list
+-- private.remove()
+-- removes the selected item from the ignore list
 function private.remove()
 	local link = private.ignorelistGUI.sheet:GetSelection()[1]
 	if link then
@@ -145,6 +144,15 @@ function private.remove()
 			lib.AddIgnore(link)
 		end
 	end
+end
+
+-- private.removeall()
+-- wipes both the ignore list and the temp ignore list
+function private.removeall()
+	wipe(ignorelist)
+	wipe(tempignorelist)
+	set("ignoreitemprice.ignorelist", ignorelist) -- not required to save the table, but may trigger notification
+	private.UpdateSheet()
 end
 
 -- This function is automatically called when we need to create our search parameters
@@ -167,9 +175,10 @@ function private.MakeGuiConfig(gui)
 		"What does this filter do?",
 		"This filter provides the ability to exclude specific items that exceed a certain \"ignore\" price. You can selectively apply this filter to specific searches.")
 
-	gui:AddControl(id, "Header",     0,      "ItemPrice Filter Criteria")
+	gui:AddControl(id, "Header", 0, "ItemPrice Filter Criteria")
 
-	gui:AddControl(id, "Checkbox",    0, 1,  "ignoreitemprice.enable", "Enable ItemPrice filtering")
+	gui:AddControl(id, "Checkbox", 0, 1, "ignoreitemprice.enable", "Enable ItemPrice filtering")
+	gui:AddControl(id, "Note", 0, 1, nil, 20, "")
 	gui:AddControl(id, "Subhead",     0, "Filter for:")
 	for name, searcher in pairs(AucSearchUI.Searchers) do
 		if searcher and searcher.Search then
@@ -205,14 +214,21 @@ function private.MakeGuiConfig(gui)
 		{ "Ignore Price", "COIN", 90},
 	}, private.OnEnterSheet, private.OnLeaveSheet, private.OnClickSheet, nil, private.UpdateControls)
 	private.ignorelistGUI.sheet:EnableSelect(true)
-	private.ignorelistGUI.sheet:SetData(private.sheetdata)
 
-	private.removebutton = CreateFrame("Button", nil, gui.tabs[id][3], "OptionsButtonTemplate")
-	private.removebutton:SetPoint("TOPRIGHT", private.ignorelistGUI, "TOPLEFT", -10, -20)
+	private.removebutton = CreateFrame("Button", nil, gui.tabs[id].content, "OptionsButtonTemplate")
+	private.removebutton:SetPoint("TOPRIGHT", private.ignorelistGUI, "TOPLEFT", -5, -20)
 	private.removebutton:SetText("Remove Selected")
 	private.removebutton:SetWidth(150)
 	private.removebutton:SetScript("OnClick", private.remove)
 	private.removebutton:Disable()
+
+	private.removeallbutton = CreateFrame("Button", nil, gui.tabs[id].content, "OptionsButtonTemplate")
+	private.removeallbutton:SetPoint("TOPLEFT", private.removebutton, "BOTTOMLEFT", 0, -5)
+	private.removeallbutton:SetText("Remove All")
+	private.removeallbutton:SetWidth(150)
+	private.removeallbutton:SetScript("OnClick", private.removeall)
+	private.removeallbutton:Enable()
+
 end
 
 --lib.Filter(item, searcher)
@@ -236,9 +252,9 @@ function lib.Filter(item, searcher)
 			return true, "Item ignored at "..AucAdvanced.Coins(ignorelist[sig], true)
 		end
 	end
-	if private.tempignorelist[sig] then
-		if price >= private.tempignorelist[sig] then
-			return true, "Item ignored for session at "..AucAdvanced.Coins(private.tempignorelist[sig], true)
+	if tempignorelist[sig] then
+		if price >= tempignorelist[sig] then
+			return true, "Item ignored for session at "..AucAdvanced.Coins(tempignorelist[sig], true)
 		end
 	end
 end
@@ -265,9 +281,9 @@ function lib.PostFilter(item, searcher, buyorbid)
 			return true, "Item ignored at "..AucAdvanced.Coins(ignorelist[sig], true)
 		end
 	end
-	if private.tempignorelist[sig] then
-		if price >= private.tempignorelist[sig] then
-			return true, "Item ignored for session at "..AucAdvanced.Coins(private.tempignorelist[sig], true)
+	if tempignorelist[sig] then
+		if price >= tempignorelist[sig] then
+			return true, "Item ignored for session at "..AucAdvanced.Coins(tempignorelist[sig], true)
 		end
 	end
 end
