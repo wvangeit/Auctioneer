@@ -22,6 +22,7 @@ CoreManifest.lua
 CoreModule.lua
 CoreStrings.lua
 CoreConst.lua
+DataBonusIDs.lua
 CoreResources.lua
 CoreServers.lua
 

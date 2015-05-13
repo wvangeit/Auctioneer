@@ -45,6 +45,7 @@ local libinternal = internal.API
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
+local Data = AucAdvanced.Data
 local GetFaction = AucAdvanced.GetFaction
 local GetSetting = AucAdvanced.Settings.GetSetting
 local SanitizeLink = AucAdvanced.SanitizeLink
@@ -76,6 +77,10 @@ function coremodule.Processors.newmodule()
 	private.ClearEngineCache()
 	lib.ClearMarketCache()
 	private.ResetMatchers()
+end
+
+function coremodule.Processors.gameactive()
+	if private.InitBonusIDHandlers then private.InitBonusIDHandlers() end
 end
 
 do
@@ -1104,41 +1109,186 @@ function lib.GetStoreKeyFromSig(sig, petBand)
 	end
 end
 
--- Store key style 'B'
--- returns id, property, linktype (all strings)
--- items:
---    id will be a string containing a plain number
---    property will be a string containing a number, which may be either "0" or a negative number
---    *Note* positive suffixes are considered invalid; if one is detected the function will return nil
--- battlepets:
---    id will be a string of format "P"..number
---    property will be a string of format number.."p"..number
---    if petBand is a number it will be used to compress the petLevel such that pets of a similar level get the same key
---    if petBand is nil, function will return nil for all battlepets
-function lib.GetStoreKeyFromLinkB(link, petBand)
-	local header,s1,s2,s3,s4,s5,s6,s7 = strsplit(":", link)
-	local lType = header:sub(-4)
-	if lType == "item" then
-		if s7 and s7 ~= "0" then -- s7 = suffix
-			if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
-				return s1, s7, "item" -- "itemId", "suffix", linktype
+do -- Store key style 'B'
+	-- returns id, property, linktype (all strings)
+	-- items:
+	--    id will be a string containing a plain number
+	--    property will be a string, which may be "0", a negative suffix, or a set of bonusIDs (separated by ':' if more than one)
+	--    *Note* old-style positive suffixes are considered invalid links, and will cause a nil return. However, suffixes from bonusIDs are positive
+	-- battlepets:
+	--    id will be a string of format "P"..number
+	--    property will be a string of format number.."p"..number
+	--    if petBand is a number it will be used to compress the petLevel such that pets of a similar level get the same key
+	--    if petBand is nil, function will return nil for all battlepets
+	local lastLink, lastPetband, lastID, lastProperty, lastLinktype
+	function lib.GetStoreKeyFromLinkB(link, petBand)
+		-- check if link is in last call cache
+		if link == lastLink then
+			if lastLinktype == "item" then
+				return lastID, lastProperty, lastLinktype
+			elseif lastLinktype == "battlepet" then
+				-- only check petBand for battlepets (actually unlikely to match as most Stat modules use different petBands)
+				if petBand == lastPetband then
+					return lastID, lastProperty, lastLinktype
+				end
 			end
-		elseif s1 then
-			return s1, "0", "item" -- "itemId", "suffix", linktype
 		end
-	elseif lType == "epet" then -- last 4 characters of "battlepet"
-		-- check that caller wants pet keys
-		-- also check valid quality (-1 represents 'unknown' and so is not valid for store key)
-		if petBand and s3 and s3 ~= "-1" then
-			local level = tonumber(s2) -- level
-			if not level or level < 1 then return end
-			if petBand > 1 then
-				level = ceil(level / petBand)
+		-- otherwise analyze link
+		local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12 = strsplit(":", link, 13)
+		if not s1 then return end
+		local lType = header:sub(-4)
+		if lType == "item" then
+			if s7 and s7 ~= "0" then -- s7 = suffix
+				if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
+					lastLink, lastID, lastProperty, lastLinktype = link, s1, s7, "item" -- link, itemId, suffix, linktype
+					return lastID, lastProperty, lastLinktype
+				end
+				-- if suffix is not 0 and not negative, then link is corrupt - will return nil
+			else
+				if s12 and s12:byte(1) ~= 48 then -- bonus counter is not '0'
+					local bonuses = s12:match("%d+:([^|]+)") -- extract just the bonusIDs
+					if bonuses then
+						local property = lib.GetBonusIDPropertyB(bonuses)
+						if property then
+							lastLink, lastID, lastProperty, lastLinktype = link, s1, property, "item" -- link, itemID, bonusIDproperty, linktype
+							return lastID, lastProperty, lastLinktype
+						end
+					end
+				end
+				lastLink, lastID, lastProperty, lastLinktype = link, s1, "0", "item" -- itemID, 'suffix', linktype
+				return lastID, lastProperty, lastLinktype
 			end
-			return "P"..s1, format("%d", level).."p"..s3, "battlepet" -- "P..speciesID", "compressedLevel..p..quality", linktype
+		elseif lType == "epet" then -- last 4 characters of "battlepet"
+			-- check that caller wants pet keys
+			-- also check valid quality (-1 represents 'unknown' and so is not valid for store key)
+			if petBand and s3 and s3 ~= "-1" then
+				local level = tonumber(s2) -- level
+				if not level or level < 1 then return end
+				if petBand > 1 then
+					level = ceil(level / petBand)
+				end
+				-- link, petBand, "P"..speciesID, compressedLevel.."p"..quality, linktype (lastPetband is only recorded for battlepets, as it's ignored by other type(s))
+				lastLink, lastPetband, lastID, lastProperty, lastLinktype = link, petBand, "P"..s1, format("%d", level).."p"..s3, "battlepet"
+				return lastID, lastProperty, lastLinktype
+			end
 		end
 	end
 end
+
+do -- Auctioneer bonusID handling functions
+	local LookupSuffix, LookupStat, LookupTierX, LookupWarforged = {}, {}, {}, {}
+
+	function private.InitBonusIDHandlers()
+		private.InitBonusIDHandlers = nil
+		-- Build Lookups
+		for _, x in ipairs(Data.BonusSingleSuffixList) do
+			local y = tostring(x)
+			LookupSuffix[y] = y
+		end
+		for _, x in ipairs(Data.BonusPrimaryStatList) do
+			local y = tostring(x)
+			LookupStat[y] = y
+		end
+		for _, x in ipairs(Data.BonusWarforgedList) do
+			local y = tostring(x)
+			LookupWarforged[y] = y
+		end
+		for _, x in ipairs(Data.BonusTierList) do
+			local y = tostring(x)
+			LookupTierX[y] = y
+		end
+		for _, x in ipairs(Data.BonusCraftedStageList) do
+			local y = tostring(x)
+			if y ~= "525" then -- special exception: do not include Stage 1 (basic item)
+				LookupTierX[y] = y
+			end
+		end
+	end
+
+	-- Function to identify bonusIDs representing suffixes, and to return a normlized version of that suffix
+	-- For suffixes representing pairs of secondary stats, there are 21 variants of each pair (i.e. there are 21 variants of "of the Fireflash")
+	-- We map these 21 variants to a single value: the middle (11th) variant is chosen (i.e. all bonusIDs representing "of the Fireflash" return "29")
+	-- For bonusIDs representing a single secondary stat there is only one bonusID for each stat, so we use a lookup table for those
+	-- The parameter 'bonus' must be a string containing a single bonusID, not the full 'bonuses' string
+	function lib.GetNormalizedBonusIDSuffix(bonus)
+		local suffix = LookupSuffix[bonus]
+		if suffix then return suffix end
+
+		bonus = tonumber(bonus)
+		if not bonus then return end
+
+		if bonus >= 19 and bonus <= 39 then -- Fireflash block
+			suffix = "29" -- middle of the range
+		elseif bonus >= 45 and bonus <= 170 then
+			suffix = tostring(floor((bonus - 45) / 21) * 21 + 55)
+		elseif bonus >= 175 and bonus <= 447 then
+			suffix = tostring(floor((bonus - 175) / 21) * 21 + 185)
+		end
+
+		return suffix
+	end
+
+	-- Generate a 'property' string for a type B StoreKey from the bonuses string
+	-- Primarily used in GetStoreKeyFromLinkB
+	-- Exported for use by other modules, could be used as a sort of sig to identify "similar" items
+	function lib.GetBonusIDPropertyB(bonuses)
+		local property, suffix, stat, tier, warforged
+		if type(bonuses) ~= "string" then return end
+
+		-- parse the bonuses string to pick out suffix, stat, tier and/or warforged entries
+		for bonus in bonuses:gmatch("%d+") do
+			local x = LookupTierX[bonus]
+			if x then
+				tier = x
+			else
+				x = LookupStat[bonus]
+				if x then
+					stat = x
+				else
+					x = LookupWarforged[bonus]
+					if x then
+						warforged = x
+					else
+						x = lib.GetNormalizedBonusIDSuffix(bonus)
+						if x then
+							suffix = x
+						end
+					end
+				end
+			end
+		end
+
+		-- compile the property string in a specific order: suffix, stat, tier, warforged
+		-- from experimentation, the most common combinations are: suffix, suffix + stat, tier, tier + warforged
+		if suffix then
+			property = suffix
+		end
+		if stat then
+			if property then
+				property = property..":"..stat
+			else
+				property = stat
+			end
+		end
+		if tier then
+			if property then
+				property = property..":"..tier
+			else
+				property = "0"..tier -- tag "optional" bonusIDs with a leading 0
+			end
+		end
+		if warforged then
+			if property then
+				property = property..":"..warforged
+			else
+				property = "0"..warforged -- tag "optional" bonusIDs with a leading 0
+			end
+		end
+
+		return property
+	end
+
+end -- end bonusID functions
 
 -------------------------------------------------------------------------------
 -- Statistical devices created by Matthew 'Shirik' Del Buono

@@ -48,7 +48,7 @@
 		This should, in most cases, avoid large (and confusing) error cascades.
 ]]
 
-AucAdvanced = {Modules = {Filter={}, Match={}, Stat={}, Util={}}}
+AucAdvanced = {Modules = {Filter={}, Match={}, Stat={}, Util={}}, Data = {}}
 local lib = AucAdvanced
 
 local DEV_VERSION = "5.22.DEV"
