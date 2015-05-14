@@ -39,7 +39,7 @@
 	queueable fashion.
 
 	This code takes "sigs" as input to most of it's functions. A "sig" is a string containing
-	a colon seperated concatenation of itemId:suffixId:suffixFactor:enchantId
+	a colon seperated concatenation of itemID:suffixId:suffixFactor:enchantId
 	A sig must be shortened by truncating trailing 0's - this is required for equality testing
 	Any missing values at the end will be set to zero when the sig is decoded
 	The function AucAdvanced.API.GetSigFromLink(link) may be used to construct a valid sig
@@ -140,6 +140,7 @@ local ErrorText = {
 	Accountbound = "Cannot auction an Account Bound item",
 	Conjured = "Cannot auction a Conjured item",
 	Quest = "Cannot auction a Quest item",
+	Token = "Auctioneer cannot post a WoW Token. Use the Auctions tab instead.",
 	Lootable = "Cannot auction a Lootable item",
 	Damaged = "Cannot auction a Damaged item",
 	InvalidBid = "Bid value is invalid",
@@ -334,6 +335,9 @@ function private.GetRequest(item, size, bid, buyout, duration, multiple)
 	local sig, id, linkType, exactLink = AnalyzeItem(item)
 	if not (sig and id) then
 		return nil, "InvalidItem"
+	elseif C_WowTokenPublic.IsAuctionableWowToken(id) then
+		-- WoW tokens require special handling, which Auctioneer currently doesn't support
+		return nil, "Token"
 	elseif type(size) ~= "number" or size < 1 then
 		return nil, "InvalidSize"
 	elseif type(bid) ~= "number" or bid < 1 then
@@ -513,10 +517,15 @@ end
     then the item is definately not auctionable.
 ]]
 function lib.IsAuctionable(bag, slot)
-	if GetContainerItemID(bag, slot) == 82800 then
+	local itemID = GetContainerItemID(bag, slot)
+	if itemID == 82800 then
 		-- battlepet cage always sellable
 		-- we test for it specially, as battlepets may break the other tests :(
 		return true
+	elseif C_WowTokenPublic.IsAuctionableWowToken(itemID) then
+		-- WoW tokens are technically auctionable, but not by Auctioneer currently
+		-- For now we shall report them as NOT auctionable
+		return false, "Token"
 	end
 
 	local _,_,_,_,_,lootable = GetContainerItemInfo(bag, slot)
@@ -890,13 +899,13 @@ function private.LoadAuctionSlot(request)
 	end
 
 	local link = GetContainerItemLink(bag, slot)
-	local itemId = GetContainerItemID(bag, slot)
-	if not (link and itemId) then
+	local itemID = GetContainerItemID(bag, slot)
+	if not (link and itemID) then
 		private.QueueRemove()
 		return nil, "NotFound", nil
 	end
 	local checkname, checkquality
-	if itemId == 82800 then
+	if itemID == 82800 then
 		-- battlepet special handling
 		local _, speciesID, _, breedQuality = strsplit(":", link)
 		speciesID = tonumber(speciesID)
@@ -928,8 +937,8 @@ function private.LoadAuctionSlot(request)
 	ClickAuctionSellItemButton()
 
 	-- verify that the contents of the Auction slot are what we expect
-	local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount = GetAuctionSellItemInfo()
-	if name ~= checkname or quality ~= checkquality then
+	local name, texture, count, quality, canUse, price, pricePerUnit, stackCount, totalCount, slotItemID = GetAuctionSellItemInfo()
+	if slotItemID ~= itemID or name ~= checkname or quality ~= checkquality then
 		-- failed to drop item in auction slot, probably because item is not auctionable (but was missed by our checks)
 		private.ClearAuctionSlot()
 		private.QueueRemove()
@@ -947,7 +956,7 @@ function private.LoadAuctionSlot(request)
 		GetAuctionSellItemInfo returns incorrect totalCount for battlepets (always returns 1)
 		to be removed when Blizzard fixes the API (CountAvailableItems is not a particularly efficient or reliable way to do this)
 	--]]
-	if itemId == 82800 then
+	if itemID == 82800 then
 		local _, tc = lib.CountAvailableItems(request.sig)
 		totalCount = tc
 	end
