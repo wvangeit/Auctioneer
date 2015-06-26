@@ -362,6 +362,7 @@ end
 
 --Add new reforged item position on all keys
 function private.update._3_01(server, player)
+	--[[ disabled: reforge no longer exists
 	for DB, data in pairs(BeanCounterDB[server][player]) do
 		for itemID, itemIDData in pairs(data) do
 			local del = {}
@@ -377,6 +378,7 @@ function private.update._3_01(server, player)
 			end
 		end
 	end
+	--]]
 	BeanCounterDBSettings[server][player].version = 3.01
 end
 
