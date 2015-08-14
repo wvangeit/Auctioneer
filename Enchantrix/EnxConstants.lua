@@ -582,7 +582,7 @@ const.baseDisenchantTable = {
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 476
    
    -- WoD - TODO - ccox - need more data
-   [ 800 ] = { { LUMINOUS, 1.0, 1.0 } },	-- lowest WoD blue is 505, highest is 645 so far
+   [ 800 ] = { { DRAENIC, 0.9, 10.0 }, { LUMINOUS , 0.1, 1.0 }, },	-- lowest WoD blue is 505, highest is 650 so far
   },
  },
  [EPIC] = {
