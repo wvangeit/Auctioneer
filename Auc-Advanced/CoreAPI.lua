@@ -508,6 +508,10 @@ lib.GetScanStats = AucAdvanced.Scan.GetScanStats
 -- Generates an independent copy of the current scan data image for the specified serverKey
 lib.GetImageCopy = AucAdvanced.Scan.GetImageCopy
 
+-- AucAdvanced.API.CompatibilityMode(mode, lock)
+-- Set scan compatibility modes, to help avoid having Auctioneer interfere with other AddOns using the AuctionHouse API
+lib.CompatibilityMode = AucAdvanced.Scan.CompatibilityMode
+
 function lib.ListUpdate()
 	if lib.IsBlocked() then return end
 	AucAdvanced.SendProcessorMessage("listupdate")
