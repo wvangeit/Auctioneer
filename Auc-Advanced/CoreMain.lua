@@ -378,7 +378,6 @@ local function OnEvent(self, event, arg1, arg2, ...)
 		-- they should check for their own name (lowercased) in arg1
 		AucAdvanced.SendProcessorMessage("loadfail", arg1, event)
 	elseif event == "PLAYER_LOGOUT" then
-		internal.Scan.Logout()
 		OnUnload()
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		OnEnteringWorld(self)

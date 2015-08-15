@@ -971,6 +971,7 @@ local Commitfunction = function()
 
 	local progresscounter = 0
 	local progresstotal = 3*oldCount + 7*scanCount
+	if progresstotal == 0 then progresstotal = 1 end -- dummy value to avoid potential div0. ### this needs a better solution
 
 	local filterOldCount, filterNewCount, updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount = 0,0,0,0, 0,0,0,0
 	local unresolvedCount = 0
@@ -2430,7 +2431,7 @@ local StorePageFunction = function()
 	if private.warningCanSendBug then
 		private.warningCanSendBug = nil
 		if not CanSendAuctionQuery() then
-			_G.message("The Server is not responding correctly.\nClosing and reopening the Auctionhouse may fix this problem.")
+			--_G.message("The Server is not responding correctly.\nClosing and reopening the Auctionhouse may fix this problem.") -- ### suppressed
 		end
 	end
 end
@@ -2682,12 +2683,30 @@ end
 private.CanSend = CanSendAuctionQuery
 
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
-	if not private.isAuctioneerQuery and not get("core.scan.scanallqueries")then
+	if not private.isAuctioneerQuery then
 		-- Optional bypass to handle compatibility problems with other AddOns
-		return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
+		local doBypass = false
+		if private.compatModeLocks then
+			local scanbit = private.isBlizzardQuery and 2 or 1
+			for lock, mode in pairs(private.compatModeLocks) do
+				if bitand(mode, scanbit) ~= 0 then -- another AddOn has requested we bypass this scan type
+					doBypass = true
+					break
+				end
+			end
+			private.compatModeLocks[""] = nil -- remove anonymous lock (if present)
+		end
+		doBypass = doBypass or not get("core.scan.scanallqueries")
+		if doBypass then
+			return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
+		end
 	end
 
 	private.isAuctioneerQuery = nil
+	private.isBlizzardQuery = nil
+	if private.compatModeLocks and not next(private.compatModeLocks) then
+		private.compatModeLocks = nil -- remove table if empty
+	end
 	if private.warnTaint then
 		_print("\nAuctioneer:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
@@ -2758,6 +2777,32 @@ end
 -- Function to indicate that the next call to QueryAuctionItems comes from Auctioneer itself.
 function lib.SetAuctioneerQuery()
 	private.isAuctioneerQuery = true
+end
+
+--[[ Function for third-party AddOns to change Auctioneer's scanning behaviour to avoid compatibility issues
+	Duplicates or overrides certain compatibility Config settings
+	mode 1 : don't scan next raw call to QueryAuctionItems (i.e. neither isAuctioneerQuery nor isBlizzardQuery is set)
+	mode 2 : don't scan next Blizzard query (i.e. isBlizzardQuery is set but isAuctioneerQuery is not set)
+
+	lock : optional lock "key" (preferably string containing AddOn name for uniqueness)
+		given mode will persist until cancelled: cancel by calling CompatibilityMode with mode 0 and the same lock "key"
+--]]
+function lib.CompatibilityMode(mode, lock)
+	if type(mode) ~= "number" or floor(mode) ~= mode then
+		error("AucAdvanced.Scan.CompatibilityMode(mode, lock)\nmode must be a number (bitfield)", 2)
+	end
+	lock = lock or "" -- use "" as key for anonymous locks, which are removed by the next call to QueryAuctionItems
+	if not private.compatModeLocks then
+		private.compatModeLocks = {}
+	end
+
+	if lock == "" then -- anonymous lock
+		private.compatModeLocks[lock] = bitor(private.compatModeLocks[lock] or 0, mode) -- merge modes
+	elseif mode == 0 then
+		private.compatModeLocks[lock] = nil
+	else
+		private.compatModeLocks[lock] = mode -- overwrite mode
+	end
 end
 
 function lib.SetPaused(pause)
@@ -3093,12 +3138,7 @@ function lib.GetStackedScanCount()
 	return scanCount
 end
 
-function lib.AHClosed()
-	lib.Interrupt()
-end
-
-function lib.Logout()
-	_G.AucAdvancedData.Scandata = nil -- delete obsolete data. it's here because CoreScan doesn't have an OnLoad processor
+function coremodule.OnUnload()
 	if (private.curQuery) then
 		private.Commit(true, false, false)
 	end
@@ -3109,8 +3149,16 @@ function lib.Logout()
 	end
 end
 
-
 coremodule.Processors = {}
+function coremodule.Processors.auctionui()
+	private.Hook.AuctionFrameBrowse_Search = AuctionFrameBrowse_Search
+	function AuctionFrameBrowse_Search()
+		private.isBlizzardQuery = true
+		private.Hook.AuctionFrameBrowse_Search()
+		private.isBlizzardQuery = nil
+	end
+end
+
 function coremodule.Processors.scanstats(event, scanstats)
 	private.clearImageCaches(event, scanstats)
 end
@@ -3119,6 +3167,7 @@ function coremodule.Processors.auctionclose(event)
 	-- clearup memory usage when AH closed
 	private.ResetItemInfoCache()
 	private.clearImageCaches(event)
+	lib.Interrupt()
 end
 
 if Resources.PlayerFaction == "Neutral" then
@@ -3149,8 +3198,5 @@ function internal.Scan.NotifyOwnedListUpdated()
 --		end
 --	end
 end
-
-internal.Scan.Logout = lib.Logout
-internal.Scan.AHClosed = lib.AHClosed
 
 _G.AucAdvanced.RegisterRevision("$URL$", "$Rev$")

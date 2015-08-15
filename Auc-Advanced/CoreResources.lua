@@ -126,7 +126,6 @@ local function OnEvent(self, event, ...)
 		if lib.AuctionHouseOpen then
 			lib.AuctionHouseOpen = false
 			AucAdvanced.SendProcessorMessage("auctionclose")
-			internal.Scan.AHClosed()
 		end
 	elseif event == "MAIL_SHOW" then
 		lib.MailboxOpen = true
