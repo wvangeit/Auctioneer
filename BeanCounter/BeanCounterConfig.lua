@@ -99,19 +99,18 @@ private.settingDefaults = {
 	["columnwidth.".._BC('UiTransactions')] = 100,
 	["columnwidth.".._BC('UiBidTransaction')] = 60,
 	["columnwidth.".._BC('UiBuyTransaction')] = 60,
-	["columnwidth.".._BC('UiNetHeader')] = 65,
+	["columnwidth.".._BC('UiNetHeader')] = 60,
 	["columnwidth.".._BC('UiQuantityHeader')] = 40,
-	["columnwidth.".._BC('UiPriceper')] = 70,
 
-	["columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer] = 90,
+	["columnwidth.".."|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer] = 100,
 
-	["columnwidth.".._BC('UiDepositTransaction')] = 58,
-	["columnwidth.".._BC('UiPriceper')] = 50,
-	["columnwidth.".._BC("UiFee")] = 70,
-	["columnwidth.".._BC('UiReason')] = 70,
-	["columnwidth.".._BC('UiDateHeader')] = 250,
+	["columnwidth.".._BC('UiDepositTransaction')] = 60,
+	["columnwidth.".._BC('UiPriceper')] = 60,
+	["columnwidth.".._BC("UiFee")] = 60,
+	["columnwidth.".._BC('UiReason')] = 90,
+	["columnwidth.".._BC('UiDateHeader')] = 140,
 
-	["columnwidth.".._BC('UiProfit')] = 65,
+	["columnwidth.".._BC('UiProfit')] = 60,
 	["ModTTShow"] = false,
     }
 
