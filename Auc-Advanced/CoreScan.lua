@@ -2073,38 +2073,20 @@ local StorePageFunction = function()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local maxPages = ceil(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE)
 	local isGetAll = false
-	local isGetAllFail = false -- used to handle Blizzard bug {ADV-595}
-	local hybridStartScanPage
-	if (numBatchAuctions > NUM_AUCTION_ITEMS_PER_PAGE) then
+	local isGetAllFail = false -- flag to handle certain GetAll failure situations
+	if numBatchAuctions > NUM_AUCTION_ITEMS_PER_PAGE then
 		isGetAll = true
 		maxPages = 1
-		if totalAuctions ~= numBatchAuctions then
-			-- Blizzard bug - these should be the same for a GetAll scan {ADV-595}
-			if get("core.scan.hybridscans") and not private.warningCanSendBug then
-				qryinfo.hybrid = true
-				hybridStartScanPage = floor(numBatchAuctions / NUM_AUCTION_ITEMS_PER_PAGE) -- where to start paged part of hybrid scan from
-				local wholePageAuctions = hybridStartScanPage * NUM_AUCTION_ITEMS_PER_PAGE -- where to end scanning GetAll to match up with paged part (this may be less than numBatchAuctions)
-				if nLog then
-					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "StorePage commencing Hybrid scan",
-						format("Batch size %d\nHybrid start page %d\nGetAll limit %d\nReported total auctions %d",
-						numBatchAuctions, hybridStartScanPage, wholePageAuctions, totalAuctions))
-				end
-
-				numBatchAuctions = wholePageAuctions
-				totalAuctions = numBatchAuctions
-				_print("|cffff7f3fThe Server has not sent all data for this GetAll scan.|r")
-				_print("Auctioneer will use Hybrid scanning to retrieve the missing auctions.")
-			else
-				isGetAllFail = true
-				if nLog then
-					nLog.AddMessage("Auctioneer", "Scan", N_INFO, "StorePage incomplete GetAll",
-						format("Batch size %d\nReported total auctions %d",
-						numBatchAuctions, totalAuctions))
-				end
-				totalAuctions = numBatchAuctions
-				_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete.|r")
-				_print("It may not be possible to complete a GetAll scan on this server at this time.")
+		if totalAuctions ~= numBatchAuctions then -- check for invalid values from server (residual test in case it starts to happen again...)
+			isGetAllFail = true
+			if nLog then
+				nLog.AddMessage("Auctioneer", "Scan", N_WARNING, "StorePage incomplete GetAll",
+					format("Batch size %d\nReported total auctions %d",
+					numBatchAuctions, totalAuctions))
 			end
+			totalAuctions = numBatchAuctions
+			_print("|cffff7f3fThe Server has not sent all data for this GetAll scan. The scan will be incomplete.|r")
+			_print("Please report this in the Auctioneer forums.")
 		end
 		EventFramesRegistered = {GetFramesRegisteredForEvent("AUCTION_ITEM_LIST_UPDATE")}
 		for _, frame in pairs(EventFramesRegistered) do
@@ -2360,20 +2342,7 @@ local StorePageFunction = function()
 	local endTime = GetTime()
 	if not private.breakStorePage then
 		-- Send the next page query or finish scanning
-		if qryinfo.hybrid then
-			if hybridStartScanPage then
-				-- we've just done the GetAll part of the hybrid; start the paged part
-				private.ScanPage(hybridStartScanPage)
-			else
-				if (page+1 < maxPages) then
-					private.ScanPage(page + 1)
-				else
-					elapsed = endTime - private.scanStarted - private.totalPaused
-					private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery)
-					private.Commit(false, false, false)
-				end
-			end
-		elseif isGetAll then
+		if isGetAll then
 				elapsed = endTime - private.scanStarted - private.totalPaused
 				private.UpdateScanProgress(nil, totalAuctions, #curScan, elapsed, page+2, maxPages, curQuery) -- page+2 signals that scan is done
 				private.Commit(isGetAllFail, false, true)
