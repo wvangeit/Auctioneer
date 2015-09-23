@@ -366,7 +366,7 @@ local function setter(setting, value)
 		c = setting
 		b = "flat"
 	end
-	AucAdvanced.SendProcessorMessage("configchanged", setting, callbackValue, c, b)
+	AucAdvanced.SendProcessorMessage("configchanged", setting, callbackValue, c, b, a)
 end
 
 function lib.SetSetting(...)

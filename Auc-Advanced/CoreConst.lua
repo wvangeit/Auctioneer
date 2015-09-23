@@ -145,7 +145,7 @@ local lib = {
 
 	MAXSKILLLEVEL = 700,
 	MAXUSERLEVEL = 100,
-	MAXITEMLEVEL = 710,
+	MAXITEMLEVEL = 750,
 	MAXBIDPRICE = 9999999999, -- copy from Blizzard_AuctionUI.lua, so it is available before AH loads
 
 }
