@@ -156,6 +156,7 @@ local Const = _G.AucAdvanced.Const
 local Resources = AucAdvanced.Resources
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = _G.AucAdvanced.GetModuleLocals()
 local GetFaction = _G.AucAdvanced.GetFaction
+local ResolveServerKey = AucAdvanced.ResolveServerKey
 local EquipCodeToInvIndex = _G.AucAdvanced.Const.EquipCodeToInvIndex
 
 local table, tinsert, tremove, gsub, string, coroutine, pcall, time = _G.table, _G.tinsert, _G.tremove, _G.gsub, _G.string, _G.coroutine, _G.pcall, _G.time
@@ -231,9 +232,14 @@ function private.LoadScanData()
 		-- cannot load Auc-ScanData, go to fallback image handler
 		local fallbackscandata = {}
 		private.GetScanData = function(serverKey)
+			serverKey = ResolveServerKey(serverKey)
+			if not serverKey then
+				debugPrint("Fallback-ScanData: invalid serverKey passed to GetScanData", "ScanData", "Invalid serverKey", "Error")
+				return
+			end
 			local scandata = fallbackscandata[serverKey]
 			if scandata then return scandata end
-			local test = _G.AucAdvanced.SplitServerKey(serverKey)
+			local test = AucAdvanced.SplitServerKey(serverKey)
 			if not test then return end
 			scandata = {image = {}, scanstats = {ImageUpdated = time()}}
 			fallbackscandata[serverKey] = scandata
