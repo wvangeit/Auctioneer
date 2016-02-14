@@ -246,10 +246,11 @@ function ENX_OnTooltipSetItem(this)
 end
 
 function pickupInventoryItemHook(slot)
-	--Enchantrix.Util.DebugPrintQuick("pickupInventoryItemHook", slot);
 	-- Remember last activated item
+	--Enchantrix.Util.DebugPrintQuick("pickupInventoryItemHook", slot);
 	if (not UnitCastingInfo("player")) then
 		if slot then
+			--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "item targetted by inventory", "info:", GetInventoryItemLink("player", slot))
 			DisenchantEvent.spellTarget = GetInventoryItemLink("player", slot)
 			DisenchantEvent.targetted = GetTime()
 		end
@@ -261,6 +262,7 @@ function useContainerItemHook(bag, slot)
 	--Enchantrix.Util.DebugPrintQuick("usecontaineritemhook", bag, slot);
 	if (not UnitCastingInfo("player")) then
 		if bag and slot then
+			--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "item targetted by bag", "info:", GetContainerItemLink(bag, slot))
 			DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
 			DisenchantEvent.targetted = GetTime()
 		end
@@ -274,6 +276,7 @@ function spellTargetItemHook(itemString)
 		if itemString then
 			local _, itemLink = GetItemInfo(itemString)
 			if itemLink then
+				--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "item targetted by item", "info:", itemLink)
 				DisenchantEvent.spellTarget = itemLink
 				DisenchantEvent.targetted = GetTime()
 			end
@@ -288,6 +291,7 @@ function useItemByNameHook(itemString)
 		if itemString then
 			local _, itemLink = GetItemInfo(itemString)
 			if itemLink then
+				--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "item targetted by name", "info:", itemLink)
 				DisenchantEvent.spellTarget = itemLink
 				DisenchantEvent.targetted = GetTime()
 			end
@@ -308,15 +312,18 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		end
 		DisenchantEvent.sent = nil
 	elseif event == "UNIT_SPELLCAST_FAILED" then
-		-- NOTE: we don't get the spell name here
-		-- Successful disenchant: SENT, START, STOP, SUCCEEDED
-		-- Events for failed disenchant are: SENT, (sometimes START), FAILED
-		-- For an item above our level, the events are: SENT, FAILED
+		-- NOTE: we do get the spell name here (Blizzard fixed the bug)
+		-- Successful disenchant: SENT, ItemTargeted, START, STOP, SUCCEEDED
+		-- Events for failed disenchant are: SENT, ItemTargeted, (sometimes START), FAILED
+		-- For an item above our level, the events are: SENT, ItemTargeted, FAILED
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed", "info:", funcVars, event, spell, rank, target )
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed 0", "info:", DisenchantEvent.sent, DisenchantEvent.spellTarget, (GetTime() - DisenchantEvent.targetted) )
 		if (DisenchantEvent.sent
 			and DisenchantEvent.spellTarget
-			and GetTime() - DisenchantEvent.targetted < 5) then
+			and ((GetTime() - DisenchantEvent.targetted) < 5)) then
 			-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
-			if ( (DisenchantEvent.spellname == _ENCH('ArgSpellname'))
+			--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed 1", "info:", spell, Enchantrix.Util.GetIType(DisenchantEvent.spellTarget) )
+			if ( (spell == _ENCH('ArgSpellname'))
 				and Enchantrix.Util.GetIType(DisenchantEvent.spellTarget) ) then
 				-- this means that the item is not disenchantable, but we think it is!
 				-- now make sure the user had enough skill to disenchant it
@@ -324,13 +331,16 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				local skill = Enchantrix.Util.GetUserEnchantingSkill();
 				local name, link, quality, itemLevel = GetItemInfo( DisenchantEvent.spellTarget );
 				local skillNeeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel, quality);
+				--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed 2", "info:", skill, skillNeeded )
 				if (skill >= skillNeeded) then
+					--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed 3", "info:" )
 					Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
 				end
 			end
 		end
 		DisenchantEvent.finished = nil
 		DisenchantEvent.sent = nil
+
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		-- disenchant interrupted
 		DisenchantEvent.finished = nil
@@ -350,13 +360,11 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		-- NOTE: we do get the spell name here
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast sent", "info:", funcVars, event, spell, rank, target )
 		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName') or (spell == _ENCH('ArgSpellMillingName'))) then
-			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
-				DisenchantEvent.sent = true;
-			end
-		else
-			DisenchantEvent.sent = nil;
-			DisenchantEvent.spellTarget = nil;
+			DisenchantEvent.sent = true;
+			DisenchantEvent.spellname = spell;
+			--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast sent 2", "info:", funcVars, event, spell, rank, target )
 		end
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
