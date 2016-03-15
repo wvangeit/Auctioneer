@@ -481,7 +481,7 @@ end
 
 -- take an ilevel and round it up to the corresponding bracket
 local function roundupLevel(level, level_list)
-	for _, bracket in pairs(level_list) do
+	for _, bracket in ipairs(level_list) do
 		if bracket >= level then
 			return bracket
 		end
