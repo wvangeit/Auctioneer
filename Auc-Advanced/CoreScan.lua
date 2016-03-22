@@ -738,20 +738,9 @@ private.prevQuery = {}
 -- private.prevQueryServerKey is nil initially
 
 function private.clearImageCaches(event, scanstats)
-	if event == "factionselect" then
-		-- if cache for home serverKey exists at this point it is a weak table - just dump the cache and let it rebuild
-		private.scandataIndex[Resources.ServerKeyHome] = nil
-	else
-		local serverKey = scanstats and scanstats.serverKey
-		if serverKey then
-			local cache = private.scandataIndex[serverKey]
-			if cache then
-				wipe(cache)
-			end
-		else -- no serverKey provided: affects multiple serverKeys (or unknown source), dump all caches
-			wipe(private.scandataIndex)
-		end
-	end
+	-- todo: different actions based on event & scanstats have been removed for now,
+	-- until new-style serverKey is fully implemented
+	wipe(private.scandataIndex)
 
 	private.prevQueryServerKey = nil
 	private.queryResults = nil -- not required but frees some memory
@@ -759,18 +748,14 @@ end
 
 local weaktablemeta = {__mode="kv"}
 function private.SubImageCache(itemId, serverKey)
+	local itemResults
+	serverKey = ResolveServerKey(serverKey)
+	if not serverKey then return end
 	local indexResults = private.scandataIndex[serverKey]
-	if not indexResults then
-		if not _G.AucAdvanced.SplitServerKey(serverKey) then return end -- valid serverKey format?
-		indexResults = {}
-		if serverKey ~= Resources.ServerKeyHome and serverKey ~= Resources.ServerKeyNeutral then
-			-- use weak tables for other serverKeys
-			indexResults = setmetatable(indexResults, weaktablemeta)
-		end
-		private.scandataIndex[serverKey] = indexResults
+	if indexResults then
+		itemResults = indexResults[itemId]
 	end
 
-	local itemResults = indexResults[itemId]
 	if not itemResults then
 		local scandata = private.GetScanData(serverKey)
 		if not scandata then return end
@@ -780,6 +765,14 @@ function private.SubImageCache(itemId, serverKey)
 				tinsert(itemResults, data)
 			end
 		end
+		if not indexResults then
+			indexResults = {}
+			if serverKey ~= Resources.ServerKey then
+				-- use weak table if not 'home' serverKey
+				indexResults = setmetatable(indexResults, weaktablemeta)
+			end
+			private.scandataIndex[serverKey] = indexResults
+		end
 		indexResults[itemId] = itemResults
 	end
 
@@ -787,7 +780,7 @@ function private.SubImageCache(itemId, serverKey)
 end
 
 function lib.QueryImage(query, serverKey, reserved, ...)
-	serverKey = serverKey or GetFaction()
+	serverKey = serverKey or Resources.ServerKey
 	local prevQuery = private.prevQuery
 	local queryResults = private.queryResults
 
@@ -3144,13 +3137,6 @@ function coremodule.Processors.auctionclose(event)
 	private.clearImageCaches(event)
 	lib.Interrupt()
 end
-
-if Resources.PlayerFaction == "Neutral" then
-	coremodule.Processors.factionselect = function(event)
-		private.clearImageCaches(event)
-	end
-end
-
 
 internal.Scan = {}
 function internal.Scan.NotifyItemListUpdated()
