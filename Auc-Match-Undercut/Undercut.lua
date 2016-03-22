@@ -89,11 +89,11 @@ function lib.Processors.auctionclose(callbackType, ...)
 end
 
 
-local query = {} -- resusable table
+local query = {} -- reusable table
 function lib.GetMatchArray(hyperlink, marketprice, serverKey)
 	if not get("match.undercut.enable") then return end
 
-	serverKey = serverKey or Resources.ServerKeyCurrect
+	serverKey = serverKey or Resources.ServerKey
 	marketprice = marketprice or 0
 	local linkType, id, suffix, factor = decode(hyperlink)
 	local cacheKey
