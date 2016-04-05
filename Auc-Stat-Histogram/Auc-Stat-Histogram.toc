@@ -5,7 +5,7 @@
 ## LoadOnDemand: 0
 ## Disabled: 1
 ## Dependencies: Auc-Advanced
-## SavedVariables: AucAdvancedStatHistogramData, AucAdvancedStatHistogramTotalData
+## SavedVariables: AucAdvancedStatHistogramData
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
