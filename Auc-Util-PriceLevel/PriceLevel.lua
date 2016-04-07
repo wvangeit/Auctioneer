@@ -52,8 +52,8 @@ lib.Processors = {
 		private.ListUpdate()
 	end,
 
-	configchanged = function(callbackType, setting, value, subsetting, module)
-		if module == "pricelevel" and AuctionFrameBrowse:IsVisible() then
+	configchanged = function(callbackType, setting, value, subsetting, module, base)
+		if (module == "pricelevel" or base == "profile") and (AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 			private.ListUpdate()
 		end
 	end,
