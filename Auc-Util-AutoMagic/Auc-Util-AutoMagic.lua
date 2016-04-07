@@ -240,9 +240,12 @@ function lib.mailShow()
 end
 
 function lib.mailClosed() --Fires on mail box closed event & hides mailgui
-	local x,y = lib.ammailgui:GetCenter()
-	set("util.automagic.ammailguix" ,x)
-	set("util.automagic.ammailguiy" ,y)
+	local x, y = lib.ammailgui:GetCenter()
+	if x and y then
+		-- round x, y to 1dp; the values returned by GetCenter vary in the very low order digits, even if frame hasn't moved
+		set("util.automagic.ammailguix", floor(x * 10) / 10)
+		set("util.automagic.ammailguiy", floor(y * 10) / 10)
+	end
 	lib.ammailgui:Hide()
 end
 
@@ -558,14 +561,14 @@ function lib.makeautosellgui()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
-	
+
 	autosellframe.slot = CreateFrame("Button", "AutoSellFrameSlot", autosellframe, "PopupButtonTemplate")
 	autosellframe.slot:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 23, -50)
 	autosellframe.slot:SetWidth(38)
 	autosellframe.slot:SetHeight(38)
 	autosellframe.slot:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	autosellframe.slot:SetScript("OnClick", lib.autoSellIconDrag)
-	autosellframe.slot:SetScript("OnReceiveDrag", lib.autoSellIconDrag)	
+	autosellframe.slot:SetScript("OnReceiveDrag", lib.autoSellIconDrag)
 
 	autosellframe.slot.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	autosellframe.slot.help:SetPoint("LEFT", autosellframe.slot, "RIGHT", 2, 7)
