@@ -41,8 +41,8 @@ local wipe, tinsert = wipe, tinsert
 local floor, ceil, max = floor, ceil, max
 local tonumber = tonumber
 local AucAdvanced = AucAdvanced
+local Resources = AucAdvanced.Resources
 local GetFaction = AucAdvanced.GetFaction
-local SplitServerKey = AucAdvanced.SplitServerKey
 local GetMarketValue = AucAdvanced.API.GetMarketValue
 local GetAlgorithmValue = AucAdvanced.API.GetAlgorithmValue
 local GetBestMatch = AucAdvanced.API.GetBestMatch
@@ -198,14 +198,12 @@ function lib.ProcessTooltip(tooltip, hyperlink, serverKey, quantity, decoded, ad
 end
 
 function lib.GetPrice(link, serverKey)
+	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
 	local sig = GetSigFromLink(link)
 	if not sig then
        	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
-	if not serverKey then
-		serverKey = GetFaction()
-	end
-	local newBuy, newBid, seen, curModelText, MatchString, stack, number, duration
+	if not serverKey then serverKey = GetFaction() end -- ### update to use Resources.ServerKey when other modules can handle it.
 
 	if pricecache then
 		local cacheSig = serverKey..sig
@@ -397,8 +395,7 @@ function private.GetPriceCore(sig, link, serverKey, match)
 			local subtract = get("util.appraiser.bid.subtract") or 0
 			local deposit = 0
 			if get("util.appraiser.bid.deposit") then
-				local _, faction = SplitServerKey(serverKey)
-				local dep = GetDepositCost(link, duration, faction, stack)
+				local dep = GetDepositCost(link, duration, nil, stack)
 				if dep and stack then
 					deposit = dep / stack
 				end

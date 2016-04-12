@@ -1032,7 +1032,6 @@ function private.CreateFrames()
 			local curNumber = frame.salebox.number:GetAdjustedValue()
 			-- used in GetDepositCost calls:
 			local depositHours = curDurationMins / 60
-			local depositFaction = AucAdvanced.GetFactionGroup()
 
 			if frame.salebox.stacksize > 1 then
 				local count = frame.salebox.count
@@ -1065,7 +1064,7 @@ function private.CreateFrames()
 						frame.manifest.lines:Clear()
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(maxStax, curSize))--%d lots of %dx stacks:
 						buyVal, bidVal = lib.RoundBuyBid(curBuy * curSize, curBid * curSize)
-						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
+						depositVal = GetDepositCost(frame.salebox.link, depositHours, nil, curSize)
 
 						r,g,b=nil,nil,nil
 						if colored then
@@ -1086,7 +1085,7 @@ function private.CreateFrames()
 					end
 					if curNumber == -1 and remain > 0 then
 						buyVal, bidVal = lib.RoundBuyBid(curBuy * remain, curBid * remain)
-						depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, remain)
+						depositVal = GetDepositCost(frame.salebox.link, depositHours, nil, remain)
 
 						frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks') :format(1, remain))--%d lots of %dx stacks:
 						r,g,b=nil,nil,nil
@@ -1111,7 +1110,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_LotsOfStacks'):format(curNumber, curSize))--%d lots of %dx stacks:
 					buyVal, bidVal = lib.RoundBuyBid(curBuy * curSize, curBid * curSize)
-					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction, curSize)
+					depositVal = GetDepositCost(frame.salebox.link, depositHours, nil, curSize)
 
 					r,g,b=nil,nil,nil
 					if colored then
@@ -1148,7 +1147,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Clear()
 					frame.manifest.lines:Add(_TRANS('APPR_Interface_Items'):format(curNumber))--%d items
 					buyVal, bidVal = lib.RoundBuyBid(curBuy, curBid)
-					depositVal = GetDepositCost(frame.salebox.link, depositHours, depositFaction)
+					depositVal = GetDepositCost(frame.salebox.link, depositHours)
 
 					r,g,b=nil,nil,nil
 					if colored then
