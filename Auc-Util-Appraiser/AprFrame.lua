@@ -655,7 +655,7 @@ function private.CreateFrames()
 
 		frame.UpdatePricing()
 		frame.UpdateDisplay()
-		frame.salebox.config = nil
+		frame.salebox.config = nil -- ### not used?
 	end
 
 	function frame.ShowOwnAuctionDetails(itemLink)
@@ -2885,12 +2885,23 @@ function private.CreateFrames()
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText(_TRANS('APPR_Interface_Appraiser') )--Appraiser
 	frame.ScanTab:Show()
-	PanelTemplates_DeselectTab(frame.ScanTab)
-
-	if get("util.appraiser.displayauctiontab") then
-		AucAdvanced.AddTab(frame.ScanTab, frame)
+	PanelTemplates_DeselectTab(frame.ScanTab) -- initialize tab layout
+	frame.ScanTab.isdisplayed = false
+	function frame.ScanTab:SetDisplay()
+		if get("util.appraiser.displayauctiontab") then
+			if not self.isdisplayed then
+				-- Avoid calling AddTab if tab is already displayed, as that would cause a warning chat message
+				AucAdvanced.AddTab(self, frame)
+				self.isdisplayed = true
+			end
+		else
+			if self.isdisplayed then
+				AucAdvanced.RemoveTab(self, frame)
+				self.isdisplayed = false
+			end
+		end
 	end
-
+	frame.ScanTab:SetDisplay()
 	function frame.ScanTab.OnClick(self)
 		local index = self:GetID()
 		local tab = _G["AuctionFrameTab"..index]

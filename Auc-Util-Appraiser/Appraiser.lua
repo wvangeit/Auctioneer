@@ -67,28 +67,31 @@ function lib.Processors.config(callbackType, ...)
 	private.SetupConfigGui(...)
 end
 
-function lib.Processors.configchanged(callbackType, ...)
-	local change, value = ... --get the reason if its a scrollframe color change re-render the window
+function lib.Processors.configchanged(callbackType, fullsetting, value, subsetting, module, base)
 	if private.frame then
-		private.frame.salebox.config = true
+		-- Appraiser pricing may be affected by changes in other modules, e.g. Stat module price calculation options
+		-- As we cannot practically predict which changes will affect Appraiser price, we update pricing for every change
+		-- ### todo: reduce amount of work in this event further: check if frame shown; move to OnUpdate handler; refine these functions; other?
+		private.frame.salebox.config = true -- ### not used?
 		--	private.frame.SetPriceFromModel()
 		private.frame.UpdatePricing()
 		private.frame.UpdateDisplay()
-		--	private.frame.salebox.config = nil
-		if change == "util.appraiser.color" or change == "util.appraiser.colordirection" then
-			private.frame.UpdateImage()
-		end
-		--show/hide the appraiser tab on the AH
-		if change == "util.appraiser.displayauctiontab" then
-			if value then
-				AucAdvanced.AddTab(private.frame.ScanTab, private.frame)
-			else
-				AucAdvanced.RemoveTab(private.frame.ScanTab, private.frame)
+		--	private.frame.salebox.config = nil -- ### not used?
+	end
+	local isprofile = base == "profile"
+	if isprofile or module == "appraiser" then
+		if private.frame then
+			if isprofile or fullsetting == "util.appraiser.color" or fullsetting == "util.appraiser.colordirection" then
+				private.frame.UpdateImage()
+			end
+			--show/hide the appraiser tab on the AH
+			if isprofile or fullsetting == "util.appraiser.displayauctiontab" then
+				private.frame.ScanTab:SetDisplay()
 			end
 		end
-	end
-	if change:sub(1, 20) == "util.appraiser.round" then
-		private.updateRoundExample()
+		if isprofile or fullsetting:sub(1, 20) == "util.appraiser.round" then
+			private.updateRoundExample()
+		end
 	end
 	-- clear cache for any changes, as we can't always predict what will change our cached values
 	wipe(tooltipcache)
