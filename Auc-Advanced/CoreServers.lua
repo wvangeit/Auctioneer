@@ -343,6 +343,54 @@ local function ResolveServerKey(testKey)
 	end
 end
 
+local function GetServerKeyList(useTable)
+	local list
+	if useTable then
+		list = useTable
+		wipe(list)
+	else
+		list = {}
+	end
+
+	for key in pairs(KnownServerKeys) do
+		tinsert(list, key)
+	end
+
+	list:sort()
+
+	return list
+end
+
+local rltab = {}
+local function GetRealmList(serverKey, useTable, expanded)
+	serverKey = ResolveServerKey(serverKey)
+	if not serverKey then return end
+	local list = type(useTable) == "table" and useTable or rltab
+	wipe(list)
+
+	local connected = ConnectedRealmTables[serverKey]
+	if not connected then
+		-- it's a valid serverKey and it's not connected, so serverKey should be the compact realm name
+		if expanded then
+			serverKey = ExpandedNames[serverKey] or serverKey
+		end
+		tinsert(list, serverKey)
+		return list
+	end
+
+	for _, realm in ipairs(connected) do
+		if expanded then
+			realm = ExpandedNames[realm] or realm
+		end
+		tinsert(list, realm)
+	end
+	return list
+end
+
+local function GetExpandedRealmName(realmName)
+	return ExpandedNames[realmName] or realmName
+end
+
 local function GetServerKeyText(serverKey)
 	-- return displayable text
 	local displayKey = displaycache[serverKey]
@@ -390,8 +438,36 @@ local function SplitServerKey(serverKey)
 	return split[1], split[2], split[3]
 end
 
+--[[ Exports ]]--
+
+-- serverKey = AucAdvanced.ResolveServerKey(providedServerKey)
+-- attempt to find a valid serverKey from providedServerKey. Returns nil if not recognised
+-- calling with nil serverKey will return home serverKey as default
 AucAdvanced.ResolveServerKey = ResolveServerKey
+
+-- list = AucAdvanced.GetServerKeyList([useTable])
+-- returns list of serverKeys known by the CoreServers
+-- if useTable is provided it will be populated with the list
+-- if useTable is not provided, caller must not store or modify the returned table object
+AucAdvanced.GetServerKeyList = GetServerKeyList
+
+-- list = AucAdvanced.GetRealmList(serverKey [, useTable [, expanded]])
+-- returns list of realm names associated with serverKey. returns nil for invalid serverKey
+-- if useTable is provided it will be populated with the list
+-- if useTable is not provided, caller must not store or modify the returned table object
+-- if expanded is true, GetRealmList will return expanded realm names (where known), otherwise compact names are returned
+AucAdvanced.GetRealmList = GetRealmList
+
+-- text = AucAdvanced.GetExpandedRealmName(realmName)
+-- attempt to find expanded realm name from a compact realm name. If not found, just returns realmName
+AucAdvanced.GetExpandedRealmName = GetExpandedRealmName
+
+-- text = AucAdvanced.GetServerKeyText(serverKey)
+-- return printable text version of serverKey. Returns nil if invalid serverKey
 AucAdvanced.GetServerKeyText = GetServerKeyText
+
+-- realm, faction, text = AucAdvanced.SplitServerKey(serverKey)
+-- backward-compatible function - avoid using in new code
 AucAdvanced.SplitServerKey = SplitServerKey
 
 
