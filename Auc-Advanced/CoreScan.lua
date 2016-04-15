@@ -230,20 +230,13 @@ function private.LoadScanData()
 	end
 	if private.loadingScanData == "fallback" then
 		-- cannot load Auc-ScanData, go to fallback image handler
-		local fallbackscandata = {}
+		-- we only support 'home' serverKey
+		local scandata = {image = {}, scanstats = {ImageUpdated = time()}}
 		private.GetScanData = function(serverKey)
 			serverKey = ResolveServerKey(serverKey)
-			if not serverKey then
-				debugPrint("Fallback-ScanData: invalid serverKey passed to GetScanData", "ScanData", "Invalid serverKey", "Error")
-				return
+			if serverKey == Resources.ServerKey then
+				return scandata
 			end
-			local scandata = fallbackscandata[serverKey]
-			if scandata then return scandata end
-			local test = AucAdvanced.SplitServerKey(serverKey)
-			if not test then return end
-			scandata = {image = {}, scanstats = {ImageUpdated = time()}}
-			fallbackscandata[serverKey] = scandata
-			return scandata
 		end
 		-- fallback message
 		local text = format(_TRANS("ADV_Interface_ScanDataNotLoaded"), private.FallbackScanData) --The Auc-ScanData storage module could not be loaded: %s
