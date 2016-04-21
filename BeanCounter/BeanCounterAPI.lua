@@ -61,7 +61,7 @@ function lib.API.search(name, settings, queryReturn)
 		--check for blank search request
 		if name == "" and not queryReturn then return end
 		name = tostring(name)
-		
+
 		--serverName is used as part of our cache ID string
 		local serverName
 		if settings and settings.servers and settings.servers[1] then
@@ -69,7 +69,7 @@ function lib.API.search(name, settings, queryReturn)
 		else
 			serverName = GetRealmName()
 		end
-		
+
 		--playerName is also used as part of our cache ID string
 		local playerName
 		if settings and settings.selectbox and settings.selectbox[2] then
@@ -79,14 +79,14 @@ function lib.API.search(name, settings, queryReturn)
 		end
 
 		--the function getItemInfo will return a plain text name on itemID or itemLink searches and nil if a plain text search is passed
-		local itemID, itemLink, itemName		
+		local itemID, itemLink, itemName
 		itemID, itemLink = private.getItemInfo(name, "itemid")
-		if not itemLink then 
+		if not itemLink then
 			itemName = name
 		else
 			_, itemName =  lib.API.getItemString(itemLink)
 		end
-		
+
 		local cached = private.checkSearchCache(itemName, serverName, playerName)
 		--return cached search
 		if queryReturn and cached then
@@ -96,7 +96,7 @@ function lib.API.search(name, settings, queryReturn)
 		if not settings then
 			settings = private.getCheckboxSettings()
 		end
-	
+
 		--search data
 		if itemLink then
 			--itemKey is used to filter results if exact is used. We need the key to remove of the XXX style items from returns
@@ -154,7 +154,7 @@ end
 function lib.API.getAHProfit(player, item, lowDate, highDate, includeMeta)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
-	
+
 	local sum, low, high, date = 0, 2051283600, 1  -- wow's date system errors when you go to far into the future 2035 seems like a good year
 	local settings = {["selectbox"] = {"1", player} , ["bid"] = true, ["auction"] = true, ["failedauction"] = true}
 	local tbl
@@ -165,23 +165,23 @@ function lib.API.getAHProfit(player, item, lowDate, highDate, includeMeta)
 		tbl = item
 	end
 	if not tbl then return end
-		
+
 	for i,v in pairs(tbl) do
 		date = tonumber(v[12])
 		--if user passes a low and high date to use, filter out any not in the range
 		local dateRange = true
-		if date and lowDate and highDate then--if we have high/low then set range to false 
+		if date and lowDate and highDate then--if we have high/low then set range to false
 			dateRange = false
 			if lowDate < date and date < highDate then --set back to true if we meet conditions
 				dateRange = true
 			end
 		end
-		
+
 		if dateRange then
 			--store lower and upper date ranges
 			if date and date < low then low = date end
 			if date and date > high then high = date end
-			--Sum the trxns	
+			--Sum the trxns
 			if v[2] == _BC('UiAucSuccessful') then
 				sum = sum + v[5] - v[9] --sum sale - deposit. fee's have already been subtracted
 			elseif v[2] == _BC('UiAucExpired') or v[2] == _BC('UiAucCancelled') then
@@ -207,24 +207,18 @@ end
 Get  Sold / Failed Ratio
 Used by match beancounter, made into an API  to allow other addons easier access to this data
 This returns the Sold/Failed number of auctions and Sold/Failed  number of items
-Adds ability to use  serverKey  ==  realm.."-"..faction
 ]]
-function lib.API.getAHSoldFailed(player, link, days, serverKey)
+function lib.API.getAHSoldFailed(player, link, days, realm)
 	if not link or not player then return end
-	--check for server key or use home
-	local server
-	if serverKey then
-		server = lib.API.SplitServerKey(serverKey)
-	else
-		server = private.realmName
-	end
-	
+	local server = private.ResolveRealmName(realm)
+	if not server then return end
+
 	if not BeanCounterDB[server] or not BeanCounterDB[server][player] then return end
 	local playerData = BeanCounterDB[server][player] --alias
-	
+
 	local itemID, suffix = lib.API.decodeLink(link)
 	if not itemID then return end
-		
+
 	local now = time()
 	local success, failed, successStack, failedStack = 0, 0, 0, 0
 	--if we want to filter to a date range then we use this, if we want EVERY trxn uses second lookup
@@ -238,7 +232,7 @@ function lib.API.getAHSoldFailed(player, link, days, serverKey)
 					for i, text in pairs(playerData["completedAuctions"][itemID][key]) do
 						local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 						auctime, stack = tonumber(auctime), tonumber(stack)
-						
+
 						if (now - auctime) < (days) then
 							success = success + 1
 							successStack = successStack + stack
@@ -254,7 +248,7 @@ function lib.API.getAHSoldFailed(player, link, days, serverKey)
 					for i, text in pairs(playerData["failedAuctions"][itemID][key]) do
 						local stack, _, _, _, _, _, _, auctime = strsplit(";", text)
 						auctime, stack = tonumber(auctime), tonumber(stack)
-						
+
 						if (now - auctime) < (days) then
 							failed = failed + 1
 							failedStack = failedStack + stack
@@ -289,17 +283,17 @@ end
 
 
 --[[Change or add a reason code to a transaction]]
-function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, stack, sellerName, deposit, fee, currentReason, Time)
+function  lib.API.updatedReason(realm, newReason, itemLink, bid, buy, net, stack, sellerName, deposit, fee, currentReason, Time)
 	--to string all number values for comparison to stored data
 	bid, buy, net, stack, deposit, fee, Time = tostringall(bid, buy, net, stack, deposit, fee, Time)
 	--convert ... back to 0
 	if currentReason == "..." then currentReason = "0" end
 	if sellerName == "..." then sellerName = "0" end
-	--if no serverKey provided use current server
-	local server =  lib.API.SplitServerKey(serverKey) or private.realmName
+	local server =  private.ResolveRealmName(realm)
+	if not server then return end
 	local itemString = lib.API.getItemString(itemLink)
 	local itemID, suffix = lib.API.decodeLink(itemLink)
-	
+
 	for  player, playerData in pairs(BeanCounterDB[server]) do
 		for DB, data in pairs(playerData) do
 			if data[itemID] and data[itemID][itemString] then
@@ -307,7 +301,7 @@ function  lib.API.updatedReason(serverKey, newReason, itemLink, bid, buy, net, s
 					local STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, CURRENTREASON, LOCATION = private.unpackString(text)
 					if currentReason == CURRENTREASON and stack == STACK and sellerName == SELLERNAME and bid == BID and buy == BUY and net == NET and deposit == DEPOSIT and Time == TIME then
 						local newText = private.packString(STACK, NET, DEPOSIT , FEE, BUY , BID, SELLERNAME, TIME, newReason, LOCATION)
-				
+
 						table.remove(data[itemID][itemString], i)
 						private.databaseAdd(DB, nil, itemString, newText)
 						private.wipeSearchCache() --clear cached searches
@@ -349,7 +343,7 @@ end
 function lib.API.storeItemLinkToArray(itemLink)
 	if not itemLink then return end
 	local color, itemID, suffix, name = itemLink:match("|(.-)|Hitem:(.-):.-:.-:.-:.-:.-:(.-):.+|h%[(.-)%]|h|r")
-	
+
 	if color and itemID and suffix and name then
 		BeanCounterDBNames[itemID..":"..suffix] =  color..";"..name
 	end
@@ -410,7 +404,7 @@ function lib.API.getBidReason(itemLink, quantity)
 			end
 		end
 	end
-	
+
 	return --if nothing found return nil
 end
 --[[Any itemlink passed into this function will be prompted to remove from the database]]
@@ -423,28 +417,65 @@ function lib.API.deleteItem(itemLink)
 	end
 end
 
---[[Duplicate of the function in auctioneer,  Splits and caches serverKey variable
- realm, faction, localizedFaction = lib.API.SplitServerKey(serverKey)   ]]
-local splitcache = {}
-local localizedfactions = {
-["Alliance"] = FACTION_ALLIANCE,
-["Horde"] = FACTION_HORDE,
-["Neutral"] = COMBATLOG_FILTER_STRING_NEUTRAL_UNITS, -- if this is not the right context in other locales, may need to create our own localizer entry
-}
-function lib.API.SplitServerKey(serverKey)
-	if not serverKey then return end
-	local split = splitcache[serverKey]
-	if not split then
-		local realm, faction = strmatch(serverKey, "^(.+)%-(%u%l+)$")
-		local transfaction = localizedfactions[faction]
-		if not transfaction then return end
-		split = {realm, faction, realm.." - "..transfaction}
-		splitcache[serverKey] = split
-	end
-	return split[1], split[2], split[3]
+
+--[[ private.ResolveRealmName : Resolve a parameter into a Realm Name that BeanCounter can work with.
+	Parameter could be:
+		A proper Realm Name
+		A new-style serverKey
+		An old-style serverKey
+--]]
+local realmcache = {}
+local factionlookup = {Alliance = true, Horde = true, Neutral = true}
+local AucResources, AucResolveServerKey, AucGetExpandedRealmName
+if AucAdvanced then
+	-- serverKey is an Auctioneer concept; we need Auctioneer's functions to resolve them
+	AucResources = AucAdvanced.Resources
+	AucResolveServerKey = AucAdvanced.ResolveServerKey
+	AucGetExpandedRealmName = AucAdvanced.GetExpandedRealmName
 end
+function private.ResolveRealmName(origrealm)
+	if not origrealm then return private.realmName end -- default
+	local newrealm = realmcache[origrealm] -- if we've seen this value before it should be cached
+	if newrealm then return newrealm end
 
+	local db = BeanCounterDB
+	if db[origrealm] then -- check if it's a known realm name in the BeanCounter DB
+		realmcache[origrealm] = origrealm
+		return origrealm
+	end
 
+	-- New-style Auctioneer serverKey
+	if AucGetExpandedRealmName then
+		local serverKey = AucResolveServerKey(origrealm)
+		if serverKey then
+			-- It's a known serverKey. We want to extract a single realm name if it's a connected serverKey
+			-- BeanCounter hasn't been updated for connected realm support yet!
+			if serverKey == AucResources.ServerKey then -- 'home' serverKey
+				realmcache[origrealm] = private.realmName
+				return private.realmName
+			end
+			-- try to extract realm name from *origrealm*
+			newrealm = origrealm -- but don't modify origrealm in the process
+			if newrealm:byte(1) == 35 then -- '#' marker for connected realm serverKeys
+				newrealm = newrealm:sub(2)
+			end
+			newrealm = AucGetExpandedRealmName(newrealm) -- try to restore any spaces to realm name
+			if db[newrealm] then
+				realmcache[origrealm] = newrealm
+				return newrealm
+			end
+		end
+	end
+	-- Old-style Auctioneer serverKey has "-Alliance", "-Horde" or "-Neutral" tagged on the end of a realm name
+	-- Try chopping these tails off and see what we end up with
+	-- (Note the pattern just chops off anything at the end of the format "-Xx...x", and we don't worry about
+	-- whether it is one of those three specific strings, we only check if we got a valid realm name.)
+	local newrealm = strmatch(origrealm, "^(.+)%-%u%l+$")
+	if db[newrealm] then
+		realmcache[origrealm] = newrealm
+		return newrealm
+	end
+end
 
 
 --[[===========================================================================
