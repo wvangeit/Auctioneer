@@ -42,7 +42,6 @@ local floor, ceil, max = floor, ceil, max
 local tonumber = tonumber
 local AucAdvanced = AucAdvanced
 local Resources = AucAdvanced.Resources
-local GetFaction = AucAdvanced.GetFaction
 local GetMarketValue = AucAdvanced.API.GetMarketValue
 local GetAlgorithmValue = AucAdvanced.API.GetAlgorithmValue
 local GetBestMatch = AucAdvanced.API.GetBestMatch
@@ -203,7 +202,7 @@ function lib.GetPrice(link, serverKey)
 	if not sig then
        	return 0, 0, false, 0, "Unknown", "", 0, 0, 0
 	end
-	if not serverKey then serverKey = GetFaction() end -- ### update to use Resources.ServerKey when other modules can handle it.
+	if not serverKey then serverKey = Resources.ServerKey end
 
 	if pricecache then
 		local cacheSig = serverKey..sig
