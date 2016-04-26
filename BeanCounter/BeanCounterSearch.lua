@@ -200,7 +200,7 @@ end
 --Helper functions for the Search
 function private.searchServerData(serverName, data, tbl, settings)
 	local server = BeanCounterDB[serverName]
-	if not server then return end
+	if not server then return data end -- return data table unchanged
 
 	--Retrives all matching results
 	for i in pairs(server) do
