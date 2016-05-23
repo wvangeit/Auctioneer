@@ -47,17 +47,11 @@ private.timeToWaitForResponse = 5
 private.playerName = UnitName("player")
 local AskPriceSentMessages = {}
 
-function lib.Processor(callbackType, ...)
-	if (callbackType == "config") then
-		private.SetupConfigGui(...)
-	end
-end
-
-lib.Processors = {}
-function lib.Processors.config(callbackType, ...)
-	private.SetupConfigGui(...)
-end
-
+lib.Processors = {
+	config = function(callbackType, gui)
+		if private.SetupConfigGui then private.SetupConfigGui(gui) end
+	end,
+}
 
 function lib.OnLoad(addon)
 	private.frame = CreateFrame("Frame")
@@ -94,7 +88,7 @@ function lib.OnLoad(addon)
 				return true
 			end
 		end
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter); 
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter);
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM", filter);
 	end
 
@@ -268,7 +262,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 		private.sendWhisper(
 			(_TRANS('ASKP_Interface_NeverSeenByAuctioneer') ):format(--%s: Never seen at %s by Auctioneer
 				link,
-				AucAdvanced.GetFaction()
+				AucAdvanced.GetServerKeyText(AucAdvanced.Resources.ServerKey)
 			),
 			player
 		)
@@ -553,6 +547,7 @@ function private.getOption(option)
 end
 
 function private.SetupConfigGui(gui)
+	private.SetupConfigGui = nil
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id = gui:AddTab(libName, libType.." Modules")
 	gui:MakeScrollable(id)
@@ -568,8 +563,8 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what triggers",
 		_TRANS('ASKP_Help_WhatTriggers'), --"What are these triggers, and how are they used?"
 		_TRANS('ASKP_Help_WhatTriggersAnswer')) --"The triggers control how someone needs to ask you for the price. \nThe Custom Smartwords allow Auctioneer to respond to natural language queries, while the Trigger Character allows for querying stack sizes \n\nCustom smartwords default respond to \'what is [item link] worth?\' \nTrigger character defaults respond to \'? (stack size) [item link]\'"
-	
-	
+
+
 	gui:AddControl(id, "Subhead",    0,    _TRANS('ASKP_Interface_SimpleTrigger')) --"Simple trigger:"
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", _TRANS('ASKP_Interface_TriggerCharacter')) --"Askprice Trigger character"
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_TriggerCharacter')) --"The trigger character allows for simple querying of a price."
@@ -594,7 +589,6 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_TutorialMessage')) --"If enabled, this will send players who ask for prices a message telling them how to use the trigger character in conjunction with a stack size parameter."
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", _TRANS('ASKP_Interface_Whisper')) --"Show outgoing whispers from Askprice"
 	gui:AddTip(id, _TRANS('ASKP_HelpTooltip_Whisper')) --"Shows (enabled) or hides (disabled) outgoing whispers from Askprice."
-
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
