@@ -264,7 +264,7 @@ function private.GetPetDistribution(hyperlink, serverKey, iSpeciesId, iLevel, iQ
 	return exact, suffix, base, myColors
 end
 function lib.GetDistribution(hyperlink, serverKey)
-	serverKey = serverKey or Resources.ServerKeyCurrent
+	serverKey = serverKey or Resources.ServerKey
 	local iType, iID, iSuffix, iFactor = decode(hyperlink)
 	if iType == "battlepet" then
 		return private.GetPetDistribution(hyperlink, serverKey, iID, iSuffix, iFactor)
