@@ -79,6 +79,11 @@ if tocVersion < MINIMUM_TOC or (MINIMUM_BUILD and tonumber(build) < MINIMUM_BUIL
 	lib.ABORTLOAD = "Incorrect WoW client version"
 end
 
+-- Legion Hybrid code check: flag HYBRID6 is used to indicate that the client is NOT yet updated to Legion
+if tocVersion < 70000 then
+	lib.HYBRID6 = true
+end
+
 -- Check that Stubby exists
 if not Stubby then
 	-- Can only occur if the Stubby AddOn has loaded, but failed to create the Stubby global table
@@ -135,7 +140,7 @@ lib.distribution = {--[[<%revisions%>]]} --Currently unused, needs a change in t
 
 if LibRevision then
 	function lib.RegisterRevision(path, revision)
-		if (not path and revision) then return end
+		if not (path and revision) then return end
 
 		local detail, file, rev = LibRevision:Set(path, revision, versionPrefix, "auctioneer", "libs")
 		if file then
