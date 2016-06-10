@@ -54,6 +54,8 @@ local PostAuctionClick = AucAdvanced.Post.PostAuctionClick
 local ShowItemLink = AucAdvanced.ShowItemLink
 local ShowPetLink = AucAdvanced.ShowPetLink
 
+local GetSettingStr = private.GetSettingStr -- Note: see function definition in AucSimple.lua
+
 local IsPlayerIgnored -- to be filled in when Auc-Filter-Basic loads
 AucAdvanced.RegisterModuleCallback("basic", function(lib) IsPlayerIgnored = lib.IsPlayerIgnored end)
 if not IsPlayerIgnored then IsPlayerIgnored = function() end end -- dummy function in case Filter-Basic never loads
@@ -339,7 +341,7 @@ function private.UpdateDisplay()
 	end
 	frame.info:SetText(text)
 
-	local deposit = GetDepositCost(oLink, duration, Resources.CurrentFaction, cStack)
+	local deposit = GetDepositCost(oLink, duration, nil, cStack)
 	if not deposit then
 		frame.fees:SetText("Unknown deposit cost")
 	elseif cNum > 1 then
@@ -759,7 +761,7 @@ end
 function private.LoadConfig()
 	if not frame.CurItem.link then return end
 	local id = GetSigFromLink(frame.CurItem.link)
-	local settingstring = get("util.simpleauc."..Resources.ServerKeyCurrent.."."..id)
+	local settingstring = GetSettingStr(id)
 	if not settingstring then return end
 	local bid, buy, duration, number, stack = strsplit(":", settingstring)
 	bid = tonumber(bid)
@@ -801,7 +803,7 @@ end
 function private.RemoveConfig()
 	if not frame.CurItem.link then return end
 	local id = GetSigFromLink(frame.CurItem.link)
-	set("util.simpleauc."..Resources.ServerKeyCurrent.."."..id, nil)
+	set("util.simpleauc."..Resources.ServerKey.."."..id, nil)
 end
 
 function private.SaveConfig()
@@ -814,7 +816,7 @@ function private.SaveConfig()
 		tostring(frame.CurItem.number),
 		tostring(frame.CurItem.stack)
 		)
-	set("util.simpleauc."..Resources.ServerKeyCurrent.."."..id, settingstring)
+	set("util.simpleauc."..Resources.ServerKey.."."..id, settingstring)
 end
 
 function private.ClearSetting()
@@ -931,13 +933,6 @@ function private.CreateFrames()
 	frame.CurItem = {match = false, undercut = false, remember = false}
 	frame.detail = {0,0,0,"",""}
 	Stubby.RegisterFunctionHook("PickupContainerItem", 200, private.postPickupContainerItemHook)
-
-	frame.SetButtonTooltip = function(text)
-		if text and get("util.appraiser.buttontips") then
-			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT")
-			GameTooltip:SetText(text)
-		end
-	end
 
 	frame:SetParent(AuctionFrame)
 	frame:SetPoint("TOPLEFT", AuctionFrame, "TOPLEFT")
