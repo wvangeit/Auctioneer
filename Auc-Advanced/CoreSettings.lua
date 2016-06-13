@@ -158,13 +158,7 @@ local settingDefaults = {
 }
 
 local function getDefault(setting)
-	local a,b,c = strsplit(".", setting)
-
-	-- basic settings
-	if (a == "show") then return true end
-	if (b == "enable") then return true end
-
-	--If settings is a function reference, call it.
+	-- If setting is a function reference, call it.
 	-- This was added to enable Protect Window to update its
 	-- status without a UI reload by calling a function rather
 	-- than a setting in the Control definition.
@@ -173,21 +167,18 @@ local function getDefault(setting)
 	end
 
 	-- lookup the simple settings
-	local result = settingDefaults[setting];
-
-	return result
+	return settingDefaults[setting]
 end
 
 function lib.GetDefault(setting)
-	local val = getDefault(setting);
-	return val;
+	return getDefault(setting)
 end
 
 function lib.SetDefault(setting, default)
 	settingDefaults[setting] = default
 end
 
-local function setter(setting, value)
+local function setter(setting, value, silent)
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
@@ -199,6 +190,7 @@ local function setter(setting, value)
 	-- This was added to enable Protect Window to update its
 	-- status without a UI reload by calling a function rather
 	-- than a setting in the Control definition.
+	-- setting function is responsible for issuing any appropriate "configchanged" processor message
 	if type(setting)=="function" then
 		return setting("set", value)
 	end
@@ -362,6 +354,12 @@ local function setter(setting, value)
 		lib.SetSetting("SelectedLocale", value)
 	end
 
+	if silent then
+		-- caller has specified that "configchanged" should not be sent - should only be used in exceptional circumstances
+		-- where a "configchanged" message might cause a conflict, e.g. from within the caller's configchanged handler!
+		-- where the setting is an obsolete setting being deleted
+		return
+	end
 	if not c then
 		c = setting
 		b = "flat"
@@ -378,7 +376,6 @@ end
 
 
 local function getter(setting)
-
 	--Is the setting actually a function reference? If so, call it.
 	-- This was added to enable Protect Window to update its
 	-- status without a UI reload by calling a function rather
@@ -766,35 +763,35 @@ end
 function private.CheckObsolete()
 	-- clean up obsolete setting(s)
 	if getter("matcherdynamiclist") then
-		setter("matcherdynamiclist", nil)
+		setter("matcherdynamiclist", nil, true)
 	end
 	if getter("alwaysHomeFaction") then
-		setter("alwaysHomeFaction", nil)
+		setter("alwaysHomeFaction", nil, true)
 	end
 	if getter("core.general.alwaysHomeFaction") then
-		setter("core.general.alwaysHomeFaction", nil)
+		setter("core.general.alwaysHomeFaction", nil, true)
 	end
 	if getter("core.scan.scannerthrottle") == true then
-		setter("core.scan.scannerthrottle", Const.ALEVEL_MED)
+		setter("core.scan.scannerthrottle", Const.ALEVEL_MED, true)
 	end
 	if getter("core.scan.hybridscans") then
-		setter("core.scan.hybridscans", nil)
+		setter("core.scan.hybridscans", nil, true)
 	end
 
 	local old
 	local old = getter("matcherlist")
 	if old then
 		if not getter("core.matcher.matcherlist") then
-			setter("core.matcher.matcherlist", old)
+			setter("core.matcher.matcherlist", old, true)
 		end
-		setter("matcherlist", nil)
+		setter("matcherlist", nil, true)
 	end
 	old = getter("marketvalue.accuracy")
 	if old then
 		if getter("core.marketvalue.tolerance") == getDefault("core.marketvalue.tolerance") then
-			setter("core.marketvalue.tolerance", old)
+			setter("core.marketvalue.tolerance", old, true)
 		end
-		setter("marketvalue.accuracy", nil)
+		setter("marketvalue.accuracy", nil, true)
 	end
 end
 
