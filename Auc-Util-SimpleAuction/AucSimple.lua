@@ -86,8 +86,8 @@ local function GetSettingStr(id)
 	-- see if it's stored under old-style serverKey
 	settingstr = get("util.simpleauc."..Resources.ServerKeyCurrent.."."..id)
 	if settingstr then
-		set("util.simpleauc."..Resources.ServerKey.."."..id, settingstr)
-		set("util.simpleauc."..Resources.ServerKeyCurrent.."."..id, nil)
+		set("util.simpleauc."..Resources.ServerKey.."."..id, settingstr, true) -- silent (3rd param 'true' inhibits "configchanged" messages)
+		set("util.simpleauc."..Resources.ServerKeyCurrent.."."..id, nil, true)
 		return settingstr
 	end
 end
