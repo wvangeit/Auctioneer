@@ -41,7 +41,10 @@ if not lib then return end
 Enchantrix.AucUtil = lib
 
 local get = Enchantrix.Settings.GetSetting
-
+local decode = AucAdvanced.DecodeLink
+local StaticPrices = Enchantrix.Constants.StaticPrices
+local ResolveServerKey = AucAdvanced.ResolveServerKey
+local Resources = AucAdvanced.Resources
 
 local priceTable = {}
 local priceTableAge
@@ -50,20 +53,21 @@ function lib.IsValidAlgorithm(hyperlink)
 
     if get("ScanValueType") == "adv:stat:Appraiser" then return false end  -- Stops infinite loop from using Appraiser prices which uses Market Price which uses Enchantrix.
 
-	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (linkType ~= "item") then return false end
+	local linkType, itemId = decode(hyperlink)
+	if linkType ~= "item" then return false end
 
-	if Enchantrix.Constants.StaticPrices[itemId] then
+	if StaticPrices[itemId] then
 		return true, itemId
 	end
 	return false
 end
 
-local array
-function lib.GetPriceArray(link)
+local array = {}
+function lib.GetPriceArray(link, serverKey)
+	serverKey = ResolveServerKey(serverKey)
+	if serverKey ~= Resources.ServerKey then return end -- current implementation only supports current serverKey
 	local usable, itemId = lib.IsValidAlgorithm(link)
     if not usable then return end
-	array = {}
 
 	if not priceTableAge or priceTableAge < GetTime() - 15 then
 		priceTable = Enchantrix.Util.CreateReagentPricingTable(priceTable)
