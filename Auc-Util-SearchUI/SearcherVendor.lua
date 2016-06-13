@@ -32,8 +32,9 @@
 if not AucSearchUI then return end
 local lib, parent, private = AucSearchUI.NewSearcher("Vendor")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
+--local aucPrint,decode,_,_,replicate,_,_,_,_,debugPrint,fill = AucAdvanced.GetModuleLocals()
 local get,set,default,Const = AucSearchUI.GetSearchLocals()
+local GetItemInfo = GetItemInfo
 lib.tabname = "Vendor"
 -- Set our defaults
 default("vendor.profit.min", 1)
@@ -45,6 +46,7 @@ default("vendor.maxprice.enable", false)
 
 -- This function is automatically called when we need to create our search parameters
 function lib:MakeGuiConfig(gui)
+	lib.MakeGuiConfig = nil
 	-- Get our tab and populate it with our controls
 	local id = gui:AddTab(lib.tabname, "Searchers")
 

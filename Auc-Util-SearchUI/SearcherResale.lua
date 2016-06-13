@@ -141,7 +141,7 @@ function lib.Search(item)
 		market = market * resources.CutAdjust
 	end
 	if get("resale.adjust.deposit") then
-		local amount = GetDepositCost(link, get("resale.adjust.deplength"), resources.Faction, count)
+		local amount = GetDepositCost(link, get("resale.adjust.deplength"), nil, count)
 		if amount then
 			market = market - amount * get("resale.adjust.listings")
 		end

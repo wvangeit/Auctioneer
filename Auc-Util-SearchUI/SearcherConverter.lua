@@ -309,7 +309,7 @@ function lib.Search (item)
 	end
 	if get("converter.adjust.deposit") then
 		-- note: GetDepositCost can handle numerical itemIDs instead of links
-		local amount = GetDepositCost(newID, get("converter.adjust.deplength"), resources.Faction, count)
+		local amount = GetDepositCost(newID, get("converter.adjust.deplength"), nil, count)
 		if amount then
 			market = market - amount * get("converter.adjust.listings")
 		end

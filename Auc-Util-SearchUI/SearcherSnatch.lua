@@ -33,7 +33,7 @@
 if not AucSearchUI then return end
 local lib, parent, private = AucSearchUI.NewSearcher("Snatch")
 if not lib then return end
-local print,decode,_,_,replicate,empty,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
+local aucPrint,decode,_,_,replicate,_,_,_,_,debugPrint,fill, _TRANS = AucAdvanced.GetModuleLocals()
 local get, set, default, Const, resources = parent.GetSearchLocals()
 lib.tabname = "Snatch"
 lib.Private = private
@@ -89,12 +89,12 @@ function lib.SlashCommand(cmd)
 	if itemlink and price and price > 0 then
 		lib.AddSnatch(itemlink, price)
 		price = tooltip:Coins(price)--convert to fancy gsc icon format
-		print("Added snatch for", itemlink, "at", price, "or lower")
+		aucPrint("Added snatch for", itemlink, "at", price, "or lower")
 	elseif itemlink and pct and pct > 0 then
 		lib.AddSnatch(itemlink, nil, pct)
-		print("Added snatch for", itemlink, "at", pct, "%  of market price or lower")
+		aucPrint("Added snatch for", itemlink, "at", pct, "%  of market price or lower")
 	else
-		print("FORMAT: <link> <price in copper> or <link> Xg Xs Xc or <link> X% or <link> Xp")
+		aucPrint("FORMAT: <link> <price in copper> or <link> Xg Xs Xc or <link> X% or <link> Xp")
 	end
 end
 
@@ -210,7 +210,7 @@ function lib:MakeGuiConfig(gui)
 
 	--If we have a saved order reapply
 	if get("snatch.columnorder") then
-		--print("saved order applied")
+		--aucPrint("saved order applied")
 		frame.snatchlist.sheet:SetOrder( get("snatch.columnorder") )
 	end
 	--Apply last column sort used
@@ -305,7 +305,7 @@ function lib:MakeGuiConfig(gui)
 									set("snatch.itemsList", private.snatchList)
 									private.refreshDisplay()
 								else
-									print("This will clear the snatch list permanently. To use hold ALT+CTRL+SHIFT while clicking this button")
+									aucPrint("This will clear the snatch list permanently. To use hold ALT+CTRL+SHIFT while clicking this button")
 								end
 							end)
 	frame.resetList:SetScript("OnEnter", function() lib.buttonTooltips( frame.resetList, "Shift+Ctrl+Alt Click to remove all items from the snatch list") end)
@@ -428,7 +428,7 @@ function private.OnClickSnatch(button, row, index)
 end
 
 function private.OnResize(...)
-	--print(...)
+	--aucPrint(...)
 end
 
 --Beginner Tooltips script display for all UI elements

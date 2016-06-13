@@ -28,6 +28,12 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+
+-- Connected Realms: inhibit Arbitrage until we decide what to do with it [ASER-324], [ADV-693]
+do
+	return
+end
+
 -- Create a new instance of our lib with our parent
 if not AucSearchUI then return end
 local lib, parent, private = AucSearchUI.NewSearcher("Arbitrage")
@@ -282,7 +288,7 @@ function lib.Search(item)
 		market = market * private.searchAdjust
 	end
 	if get("arbitrage.adjust.deposit") then
-		local amount = GetDepositCost(link, get("arbitrage.adjust.deplength"), private.searchFaction, count)
+		local amount = GetDepositCost(link, get("arbitrage.adjust.deplength"), nil, count)
 		if amount then
 			market = market - amount * get("arbitrage.adjust.listings")
 		end

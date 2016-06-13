@@ -78,19 +78,15 @@ local flagScanFinished = false
 local flagRescan
 
 -- Faction Resources
--- Commonly used values which change depending whether you are at home or neutral Auctionhouse
--- Modules should expect these to always contain valid values; nil tests should not be required
--- Actually handled by CoreResources, but we copy them into our own table for backward compatibility
+-- Commonly used values which may change during the session (though most of them are no longer subject to change after initialization)
+-- Actually handled by CoreResources - modules should probably convert to using CoreResources directly
+-- Initialized by the "gameactive" Processor message - values should not be accessed before then
 resources.Realm = Const.PlayerRealm -- will not change during session
 function private.UpdateFactionResources()
 	resources.Faction = coreResources.CurrentFaction
 	resources.faction = resources.Faction:lower() -- lowercase (deprecated - no longer needed by GetDepositCost)
-	resources.serverKey = coreResources.ServerKeyCurrent
+	resources.serverKey = coreResources.ServerKey
 	resources.CutAdjust = coreResources.AHCutAdjust -- multiply price by .CutAdjust to subtract the AH brokerage fees
-	if private.isSearching then
-		-- if we're part way through a search, cancel it as we don't want to do the rest of the search with a different serverKey
-		private.SearchCancel = true
-	end
 	lib.NotifyCallbacks("resources", "faction", resources.serverKey)
 end
 
@@ -152,7 +148,7 @@ do -- limit scope of locals
 
 	local function EnchantrixFunc(model, link, serverKey)
 		-- GetReagentPrice does not handle serverKey, and it does not return a seen count
-		if serverKey and serverKey ~= coreResources.ServerKeyCurrent then return end
+		if serverKey and serverKey ~= coreResources.ServerKeyCurrent and serverKey ~= coreResources.ServerKey then return end
 		local extra, mkt, five, _
 		_, extra = Enchantrix.Util.GetPricingModel()
 		_, _, mkt, five = Enchantrix.Util.GetReagentPrice(link, extra)
@@ -268,9 +264,6 @@ function lib.OnLoad(addon)
 	-- Notify that SearchUI is fully loaded
 	resources.isSearchUILoaded = true
 	lib.NotifyCallbacks("onload", addon)
-
-	-- Initialize
-	private.UpdateFactionResources()
 end
 
 lib.Processors = {}
@@ -289,7 +282,7 @@ function lib.Processors.auctionopen(callbackType, ...)
 	lib.NotifyCallbacks("auctionopen")
 end
 
-lib.Processors.serverkey = private.UpdateFactionResources
+lib.Processors.gameactive = private.UpdateFactionResources
 lib.Processors.factionselect = private.UpdateFactionResources
 
 function lib.Processors.auctionui(callbackType, ...)
@@ -452,7 +445,7 @@ local function setter(setting, value)
 
 	if (isGlobalSetting(setting)) then
 		AucAdvancedData.UtilSearchUiData.Global[setting] = value
-		return
+		return -- ### todo: this is bypassing processor messages and callbacks ###
 	end
 
 	-- for defaults, just remove the value and it'll fall through
@@ -476,7 +469,7 @@ local function setter(setting, value)
 	hasUnsaved = true
 	lib.UpdateSave()
 
-	AucAdvanced.SendProcessorMessage("configchanged", setting, value, setting, "searchui")
+	AucAdvanced.SendProcessorMessage("configchanged", setting, value, setting, "searchui", "util")
 	lib.NotifyCallbacks('config', 'changed', setting, value)
 end
 
@@ -528,7 +521,6 @@ end
 function lib.Show()
 	lib.MakeGuiConfig()
 	gui:Show()
-	private.UpdateFactionResources()
 end
 
 function lib.Hide()
@@ -1428,6 +1420,8 @@ function private.MakeGuiConfig()
 		elseif (callback == "OnClickCell") then
 			lib.OnClickSheet(button, row, column)
 		elseif (callback == "ColumnSort") then
+			-- ### todo: calling SetSetting can be very expensive (as it triggers a cascade of other calls), try to do it only when acutally needed?
+			-- ### however, looks like ColumnSort is the only way to detect when sort column or direction has changed
 			lib.SetSetting("columnsortcurDir", curDir)
 			lib.SetSetting("columnsortcurSort", column)
 		elseif (callback == "OnMouseDownCell") then

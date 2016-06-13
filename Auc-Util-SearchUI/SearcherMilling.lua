@@ -173,7 +173,7 @@ function lib.Search(item)
 
 		-- calculate deposit for each result
 		if includeDeposit then
-			local aadvdepcost = GetDepositCost(result, depositAucLength, depositFaction, nil) or 0
+			local aadvdepcost = GetDepositCost(result, depositAucLength) or 0
 			deposit = deposit + aadvdepcost * yield * depositRelistTimes
 		end
 	end
