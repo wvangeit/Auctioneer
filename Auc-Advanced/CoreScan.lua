@@ -155,7 +155,6 @@ local private = {}
 local Const = _G.AucAdvanced.Const
 local Resources = AucAdvanced.Resources
 local _print,decode,_,_,replicate,empty,get,set,default,debugPrint,fill, _TRANS = _G.AucAdvanced.GetModuleLocals()
-local GetFaction = _G.AucAdvanced.GetFaction
 local ResolveServerKey = AucAdvanced.ResolveServerKey
 local EquipCodeToInvIndex = _G.AucAdvanced.Const.EquipCodeToInvIndex
 
@@ -950,7 +949,7 @@ local Commitfunction = function()
 	end
 
 
-	local serverKey = TempcurQuery.qryinfo.serverKey or GetFaction()
+	local serverKey = Resources.ServerKey
 	local scandata = private.GetScanData(serverKey)
 	assert(scandata, "Critical error: scandata does not exist for serverKey "..serverKey)
 	local now = time()
@@ -2549,10 +2548,8 @@ function private.NewQueryTable(name, minLevel, maxLevel, invTypeIndex, classInde
 	private.querycount = private.querycount+1
 	qryinfo.sig = private.CreateQuerySig(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, exactMatch)
 
-	-- the return value from GetFaction() can change when the Auctionhouse closes
-	-- (Neutral Auctionhouse and "Always Home Faction" option enabled - this is on by default)
-	-- store the current return value - this will be used throughout processing to avoid problems
-	qryinfo.serverKey = GetFaction()
+	-- store the current serverKey value for compatibility, no longer used by Auctioneer code - ### deprecated
+	qryinfo.serverKey = Resources.ServerKey
 
 	local scanSize = false, ""
 	if ((not query.class) and (not query.subclass) and (not query.minUseLevel)

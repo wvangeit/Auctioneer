@@ -274,6 +274,9 @@ internal.Servers = {
 			-- ensure we can recognise old style home serverKey
 			cacheKnown[Resources.ServerKeyHome] = sessionKey
 		end
+
+		-- issue serverkey message for compatibility
+		AucAdvanced.SendProcessorMessage("serverkey",sessionKey)
 	end,
 }
 

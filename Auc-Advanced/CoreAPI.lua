@@ -45,11 +45,12 @@ local libinternal = internal.API
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
+local Resources = AucAdvanced.Resources
 local Data = AucAdvanced.Data
-local GetFaction = AucAdvanced.GetFaction
 local GetSetting = AucAdvanced.Settings.GetSetting
 local SanitizeLink = AucAdvanced.SanitizeLink
 local debugPrint = AucAdvanced.Debug.DebugPrint
+local ResolveServerKey = AucAdvanced.ResolveServerKey
 
 local tinsert = table.insert
 local tremove = table.remove
@@ -141,7 +142,8 @@ do
 		-- Rounded to a level that is effectively irrelevant to avoid FP errors
 		cacheSig = cacheSig .. (confidence == 0.5 and "" or ("-" .. floor(confidence * 10000)));
 
-		serverKey = serverKey or GetFaction() -- call GetFaction once here, instead of in every Stat module
+		serverKey = ResolveServerKey(serverKey)
+		if not serverKey then return end
 
         local cacheEntry = cache[serverKey][cacheSig]
         if cacheEntry then
@@ -335,10 +337,10 @@ do
 end
 
 function lib.ClearData(command)
-	local serverKey1, serverKey2, serverKey3
+	local serverKey
 
 	-- split command into keyword and extra parts
-	local keyword, extra = "faction", "" -- default
+	local keyword, extra = "server", "" -- default
 	if type(command) == "string" then
 		local _, ind, key = strfind(command, "(%S+)")
 		if key then
@@ -347,7 +349,7 @@ function lib.ClearData(command)
 				keyword = key -- recognised keyword
 				extra = strtrim(strsub(command, ind+1))
 			else
-				extra = strtrim(command) -- try to resolve whole command (as a "faction")
+				extra = strtrim(command) -- try to resolve whole command (as a realm name or serverKey)
 			end
 		end
 	elseif command then -- only valid types are string or nil
@@ -357,39 +359,33 @@ function lib.ClearData(command)
 	-- At this point keyword should be one of the strings in the following if-block
 	-- extra should be a string, where 'no extra information' is denoted by ""
 	if keyword == "ALL" then
-		if extra == "" then serverKey1 = "ALL" end
+		if extra == "" then serverKey = "ALL" end
 	elseif keyword == "server" then
-		if extra == "" then extra = Const.PlayerRealm end
-		-- otherwise assume the user typed the server name correctly
-		-- modules should silently ignore unrecognised serverKeys
-		serverKey1 = extra.."-Alliance"
-		serverKey2 = extra.."-Horde"
-		serverKey3 = extra.."-Neutral"
-	elseif keyword == "faction" then
 		if extra == "" then
-			serverKey1 = GetFaction()
-		elseif AucAdvanced.SplitServerKey(extra) then -- it's a valid serverKey
-			serverKey1 = extra
+			serverKey = Resources.ServerKey
 		else
-			local fac = AucAdvanced.IsFaction(extra) -- it's a valid faction group
-			if fac then
-				serverKey1 = Const.PlayerRealm.."-"..fac
-			end
+			serverKey = ResolveServerKey(extra)
+		end
+	elseif keyword == "faction" then
+	-- for compatibility we should still process 'faction' keyword, but factions are now irrelevant to serverKeys
+		if extra == "" or AucAdvanced.IsFaction(extra) then
+			-- previously this would have cleared the current or specified faction on the current server,
+			-- but with combined AuctionHouses we should just clear the current server.
+			serverKey = Resources.ServerKey
+		else
+			-- see if extra contains a valid serverKey
+			serverKey = ResolveServerKey(extra)
 		end
 	end
 
-	if serverKey1 then
+	if serverKey then
 		local modules = AucAdvanced.GetAllModules("ClearData")
 		for pos, lib in ipairs(modules) do
-			lib.ClearData(serverKey1)
-			if serverKey2 then
-				lib.ClearData(serverKey2)
-				lib.ClearData(serverKey3)
-			end
+			lib.ClearData(serverKey)
 		end
 		lib.ClearMarketCache()
 	else
-		lib.Print("Auctioneer: Unrecognized keyword or faction for ClearData {{"..command.."}}")
+		lib.Print("Auctioneer: Unrecognized keyword or server for ClearData {{"..command.."}}")
 	end
 end
 
@@ -410,6 +406,8 @@ do --[[ Algorithm Functions ]]--
 		local price, seen
 		local module = AucAdvanced.GetModule(algorithm)
 		if not module then return end
+		serverKey = ResolveServerKey(serverKey)
+		if not serverKey then return end
 		if type(itemLink) == "number" then
 			if itemLink == lastNumber then -- last number cache, to reduce spamming of GetItemInfo
 				itemLink = lastNumberLink
@@ -421,7 +419,6 @@ do --[[ Algorithm Functions ]]--
 			end
 		end
 		if not itemLink then return end
-		serverKey = serverKey or GetFaction()
 		local saneLink = SanitizeLink(itemLink)
 
 		if saneLink == lastLink and algorithm == lastAlgorithm and serverKey == lastKey then -- last item cache

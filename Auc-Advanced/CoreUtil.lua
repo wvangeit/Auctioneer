@@ -297,12 +297,12 @@ do -- Faction related functions
 	end
 
 	function lib.GetFaction()
-		-- Compatibility function
+		-- Compatibility function. Deprecated
 		return Resources.ServerKeyCurrent, Const.PlayerRealm, Resources.CurrentFaction
 	end
 
 	function lib.GetFactionGroup()
-		-- Compatibility function
+		-- Compatibility function. Deprecated
 		return Resources.CurrentFaction
 	end
 
@@ -531,7 +531,7 @@ do -- Module Functions
 		-- Flag it as loaded
 		module[MODULE_LOADED] = true
 		-- Flush the SPM cache
-		private.ResetSPMArray()
+		internalUtil.ResetSPMArray()
 		-- Send all the callbacks
 		if not moduleLoadCallbacks then return end
 		local moduleName = module:GetName():lower()
@@ -661,7 +661,7 @@ do -- Module Functions
 			end
 
 			private.resetPriceModels()
-			private.ResetSPMArray()
+			internalUtil.ResetSPMArray()
 
 			private.newmoduleCheckName = libName -- ### temp
 			lib.SendProcessorMessage("newmodule", libType, libName)
@@ -928,7 +928,7 @@ else
 	end
 end
 
-function private.ResetSPMArray()
+function internalUtil.ResetSPMArray() -- make available to CoreMain
 	wipe(spmArray)
 end
 

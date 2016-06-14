@@ -143,8 +143,7 @@ local function OnTooltip(calltype, tip, hyperlink, quantity, name, quality)
 
 	if AucAdvanced.Settings.GetSetting("core.tooltip.depositcost") then
 		local duration = AucAdvanced.Settings.GetSetting("core.tooltip.depositduration")
-		local faction = AucAdvanced.Resources.CurrentFaction
-		local deposit = GetDepositCost(saneLink, duration, faction, 1)
+		local deposit = GetDepositCost(saneLink, duration, nil, 1)
 		if not deposit then
 			tooltip:AddLine(L"ADV_Tooltip_UnknownDepositCost", .2, .4, .6)
 		else
@@ -152,7 +151,7 @@ local function OnTooltip(calltype, tip, hyperlink, quantity, name, quality)
 			local text = format(L"ADV_Tooltip_HourDepositCost", hours)
 			tooltip:AddLine(text..": ", deposit, .8, 1, .6)
 			if quantity > 1 and AucAdvanced.Settings.GetSetting("tooltip.marketprice.stacksize") then
-				local stackdeposit = GetDepositCost(saneLink, duration, faction, quantity) -- for now we won't worry if stacksize > maxstack: assume GetDepositCost will handle it
+				local stackdeposit = GetDepositCost(saneLink, duration, nil, quantity) -- for now we won't worry if stacksize > maxstack: assume GetDepositCost will handle it
 				if stackdeposit and stackdeposit ~= deposit then
 					tooltip:AddLine(text.." x"..tostring(quantity)..": ", stackdeposit, .8, 1, .6)
 				end
@@ -168,7 +167,7 @@ local function OnTooltip(calltype, tip, hyperlink, quantity, name, quality)
 		Modules whose tooltip does not depend on serverKey should check the order parameter to ensure they don't duplicate their output in the tooltip
 			usually they would only respond when order == 1
 		]]
-		local serverKey = AucAdvanced.Resources.ServerKeyCurrent
+		local serverKey = AucAdvanced.Resources.ServerKey
 		local order = 1
 		AucAdvanced.SendProcessorMessage("itemtooltip", tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 
@@ -186,7 +185,7 @@ local function OnTooltip(calltype, tip, hyperlink, quantity, name, quality)
 		end
 		AucAdvanced.SendProcessorMessage("tooltip", tooltip, name, hyperlink, quality, quantity, cost, extra)
 	elseif calltype == "battlepet" then
-		local serverKey = AucAdvanced.Resources.ServerKeyCurrent
+		local serverKey = AucAdvanced.Resources.ServerKey
 		local order = 1
 		AucAdvanced.SendProcessorMessage("battlepettooltip", tooltip, hyperlink, serverKey, quantity, decoded, additional, order)
 	end
@@ -350,6 +349,7 @@ local function OnEnteringWorld(frame)
 
 	-- send general activate message
 	AucAdvanced.SendProcessorMessage("gameactive")
+	internal.Util.ResetSPMArray() -- Modules may add Processors entries during 'gameactive', so must flush SPM cache to ensure they don't get missed.
 
 	if AucAdvanced.Settings.GetSetting("scandata.force") then
 		AucAdvanced.Scan.LoadScanData()

@@ -86,12 +86,12 @@ local function SetFaction()
 	end
 
 	lib.PlayerFaction = playerFaction
-	lib.ServerKeyHome = PLAYER_REALM.."-"..playerFaction
+	lib.ServerKeyHome = PLAYER_REALM.."-"..playerFaction -- Deprecated: old-style serverKey
 	lib.OpposingFaction = opposingFaction
-	lib.ServerKeyOpposing = PLAYER_REALM.."-"..opposingFaction
+	lib.ServerKeyOpposing = PLAYER_REALM.."-"..opposingFaction -- Deprecated: old-style serverKey
 
 	lib.CurrentFaction = lib.PlayerFaction
-	lib.ServerKeyCurrent = lib.ServerKeyHome
+	lib.ServerKeyCurrent = lib.ServerKeyHome -- Deprecated: old-style serverKey
 
 	if playerFaction == "Alliance" or playerFaction == "Horde" then
 		SetFaction = nil
@@ -99,7 +99,7 @@ local function SetFaction()
 end
 SetFaction()
 -- really constants, but included in Resources along with other serverKey values:
-lib.ServerKeyNeutral = PLAYER_REALM.."-Neutral"
+lib.ServerKeyNeutral = PLAYER_REALM.."-Neutral" -- Deprecated: old-style serverKey
 lib.AHCutRate = CUT_HOME
 lib.AHCutAdjust = 1 - CUT_HOME
 
@@ -109,8 +109,6 @@ local function OnFactionSelect()
 	EventFrame:UnregisterEvent("NEUTRAL_FACTION_SELECT_RESULT")
 	if SetFaction then
 		SetFaction()
-		-- issue serverkey message for compatibility
-		AucAdvanced.SendProcessorMessage("serverkey", lib.ServerKeyCurrent)
 	end
 	AucAdvanced.SendProcessorMessage("factionselect", lib.PlayerFaction)
 end
@@ -167,13 +165,11 @@ internal.Resources = {
 		else
 			OnFactionSelect = nil
 		end
-
-		-- issue serverkey message for compatibility
-		AucAdvanced.SendProcessorMessage("serverkey", lib.ServerKeyCurrent)
 	end,
 
 	-- SetResource: permits other Core files to set a resource
 	-- Other Cores/Modules must never modify AucAdvanced.Resources directly (or I may make it a read-only table in future!)
+	-- CoreServers will set ServerKey and ConnectedRealms resources
 	SetResource = function(key, value)
 		lib[key] = value
 	end
