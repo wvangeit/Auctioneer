@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Informant - An addon for World of Warcraft that shows pertinent information about
 	an item in a tooltip when you hover over the item in the game.
 	Version: <%version%> (<%codename%>)
@@ -519,7 +519,22 @@ function getLocale()
 	return GetLocale();
 end
 
-local categories = {GetAuctionItemClasses()};
+-- local categories = {GetAuctionItemClasses()} -- GetAuctionItemClasses removed in 7.0.0
+local categories = {
+		AUCTION_CATEGORY_WEAPONS,
+		AUCTION_CATEGORY_ARMOR,
+		AUCTION_CATEGORY_CONTAINERS,
+		AUCTION_CATEGORY_GEMS,
+		AUCTION_CATEGORY_ITEM_ENHANCEMENT,
+		AUCTION_CATEGORY_CONSUMABLES,
+		AUCTION_CATEGORY_GLYPHS,
+		AUCTION_CATEGORY_TRADE_GOODS,
+		AUCTION_CATEGORY_RECIPES,
+		AUCTION_CATEGORY_BATTLE_PETS,
+		AUCTION_CATEGORY_QUEST_ITEMS,
+		AUCTION_CATEGORY_MISCELLANEOUS
+		-- TOKEN_FILTER_LABEL
+}
 function getCatName(catID)
 	for cat, name in ipairs(categories) do
 		if (cat == catID) then
@@ -1267,4 +1282,3 @@ Informant = {
 }
 
 _G.Informant = Informant
-
