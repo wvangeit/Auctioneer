@@ -921,27 +921,29 @@ end
 
 -- Creates an AucAdvanced signature from an item or battlepet link
 function lib.GetSigFromLink(link)
-	local sig, bonus
+	local sig
 	local ptype = type(link)
 	if ptype == "number" then
 		return ("%d"):format(link), "item"
 	elseif ptype ~= "string" then
 		return
 	end
-	local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13 = strsplit(":", link, 14)
+	local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14 = strsplit(":", link, 15)
 	if not s1 then
 		return
 	end
 	local lType = header:sub(-4)
 	if lType == "item" then
 		-- sig format: itemID:suffix:factor:enchant:bonus1:...:bonusX {any trailing ":0" are ommitted}
-		-- s1 = itemID, s2 = enchant, s3,s4,s5,s6 = gems, s7 = suffix, s8 = uniqueID(factor), s9 = level, s10 = specID, s11 = upgrades, s12 = instance, s13 = bonuses
+		-- s1 = itemID, s2 = enchant, s3,s4,s5,s6 = gems, s7 = suffix, s8 = uniqueID(factor), s9 = level, s10 = specID, s11 = upgrades, s12 = instance
+		-- s13 = bonusIDcount, s14 = tail (including bonusIDs)
 		-- some entries are not used: gems, level, upgrades, instance
 		-- for compatibility with old or partial links, test for nils
-		if s13 and s13:byte(1) ~= 48 then -- bonus counter is not '0'
-			bonus = s13:match("%d+:([^|]+)")
-		end
-		if s8 and s7 ~= "0" then -- suffix
+
+		local bonus = private.GetBonuses(s13, s14)
+		if s2 == "" then s2 = "0" end -- HYBRID6 code, review after Legion
+
+		if s8 and s7 ~= "0" and s7 ~= "" then -- suffix
 			local factor = "0"
 			if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
 				local nseed = tonumber(s8) -- seed
@@ -1060,7 +1062,7 @@ function lib.GetStoreKeyFromLink(link, petBand)
 	local header,s1,s2,s3,s4,s5,s6,s7,s8 = strsplit(":", link)
 	local lType = header:sub(-4)
 	if lType == "item" then
-		if s7 and s7 ~= "0" then -- s7 = suffix
+		if s7 and s7 ~= "0" and s7 ~= "" then -- s7 = suffix
 			if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
 				local factor = tonumber(s8) -- s8 = seed
 				if factor then
@@ -1077,7 +1079,7 @@ function lib.GetStoreKeyFromLink(link, petBand)
 	elseif lType == "epet" then -- last 4 characters of "battlepet"
 		-- check that caller wants pet keys
 		-- also check valid quality (-1 represents 'unknown' and so is not valid for store key)
-		if petBand and s3 and s3 ~= "-1" then
+		if petBand and s3 and s3 ~= "-1" and s3 ~= "" then
 			local level = tonumber(s2) -- level
 			if not level or level < 1 then return end
 			if petBand > 1 then
@@ -1089,7 +1091,7 @@ function lib.GetStoreKeyFromLink(link, petBand)
 end
 
 -- Generate Store Key as above, but from a sig
-function lib.GetStoreKeyFromSig(sig, petBand)
+function lib.GetStoreKeyFromSig(sig, petBand) -- not used anywhere, consider deprecating
 	local s1,s2,s3,s4 = strsplit(":", sig)
 	if s1 == "P" then -- battlepet sig
 		if petBand and s4 and s4 ~= "-1" then
@@ -1136,25 +1138,23 @@ do -- Store key style 'B'
 			end
 		end
 		-- otherwise analyze link
-		local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13 = strsplit(":", link, 14)
+		local header,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14 = strsplit(":", link, 15)
 		if not s1 then return end
 		local lType = header:sub(-4)
 		if lType == "item" then
-			if s7 and s7 ~= "0" then -- s7 = suffix
+			if s7 and s7 ~= "0" and s7 ~= "" then -- s7 = suffix
 				if s7:byte(1) == 45 then -- look for '-' to see if it is a negative number
 					lastLink, lastID, lastProperty, lastLinktype = link, s1, s7, "item" -- link, itemId, suffix, linktype
 					return lastID, lastProperty, lastLinktype
 				end
 				-- if suffix is not 0 and not negative, then link is corrupt - will return nil
 			else
-				if s13 and s13:byte(1) ~= 48 then -- bonus counter is not '0'
-					local bonuses = s13:match("%d+:([^|]+)") -- extract just the bonusIDs
-					if bonuses then
-						local property = lib.GetBonusIDPropertyB(bonuses)
-						if property then
-							lastLink, lastID, lastProperty, lastLinktype = link, s1, property, "item" -- link, itemID, bonusIDproperty, linktype
-							return lastID, lastProperty, lastLinktype
-						end
+				local bonuses = private.GetBonuses(s13, s14)
+				if bonuses then
+					local property = lib.GetBonusIDPropertyB(bonuses)
+					if property then
+						lastLink, lastID, lastProperty, lastLinktype = link, s1, property, "item" -- link, itemID, bonusIDproperty, linktype
+						return lastID, lastProperty, lastLinktype
 					end
 				end
 				lastLink, lastID, lastProperty, lastLinktype = link, s1, "0", "item" -- itemID, 'suffix', linktype
@@ -1163,7 +1163,7 @@ do -- Store key style 'B'
 		elseif lType == "epet" then -- last 4 characters of "battlepet"
 			-- check that caller wants pet keys
 			-- also check valid quality (-1 represents 'unknown' and so is not valid for store key)
-			if petBand and s3 and s3 ~= "-1" then
+			if petBand and s3 and s3 ~= "-1" and s3 ~= "" then
 				local level = tonumber(s2) -- level
 				if not level or level < 1 then return end
 				if petBand > 1 then
@@ -1178,6 +1178,12 @@ do -- Store key style 'B'
 end
 
 do -- Auctioneer bonusID handling functions
+	local bonusIDPatterns = {
+		["1"] = "%d+",
+		["2"] = "%d+:%d+",
+		["3"] = "%d+:%d+:%d+",
+		["4"] = "%d+:%d+:%d+:%d+",
+	}
 	local LookupSuffix, LookupStat, LookupTier, LookupStage = {}, {}, {}, {}
 	local LookupWarforged, LookupSocket, LookupTertiary = {}, {}, {}
 	local LookupTierB = {} -- used by GetBonusIDPropertyB
@@ -1218,6 +1224,38 @@ do -- Auctioneer bonusID handling functions
 				LookupTierB[y] = y
 			end
 		end
+	end
+
+	-- todo: this is a temporary function, in future need to develop a more useable public lib version
+	function private.GetBonuses(s13, s14) -- expects the s13 and s14 results from strsplit, see above
+		if not s14 or s14 == "" or s13 == "" or s13 == 0 then return end
+		-- Code from TipHelper
+		-- s13 contains count of bonusIDs, s14 contains tail of string starting with bonusIDs plus other stuff after
+		-- we need to snip the bonudIDs off the front of s14
+		local pattern = bonusIDPatterns[s13]
+		if pattern then -- for small numbers of bonusIDs we can look up a pattern to save time
+			return s14:match(pattern)
+		else
+			-- we have to search for the end of the bonusIDs section within s14
+			-- if there are x bonusIDs, they should have x-1 ':' separators
+			-- look for the position x'th ':' seperator; we want everything before that point
+			local count = tonumber(s13)
+			if not count then -- probably an incomplete or invalid link, but can occur for certain obscure valid links too in 6.2.4
+				return
+			else
+				local found = 0
+				for i = 1, count do
+					found = s14:find(":", found + 1)
+					if not found then break end
+				end
+				if found and found > 0 then
+					return s14:sub(1, found - 1)
+				else
+					return s14:match("([^|]+)")
+				end
+			end
+		end
+
 	end
 
 	-- Function to identify bonusIDs representing suffixes, and to return a normlized version of that suffix
