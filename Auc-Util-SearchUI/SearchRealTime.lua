@@ -204,7 +204,7 @@ function lib.RefreshPage()
 	end
 	private.IsRefresh = true
 	AucAdvanced.Scan.SetAuctioneerQuery()
-	QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
+	QueryAuctionItems("", 0, 0, nil, nil, nil, page, nil, nil)
 	lib.SignalRTSButton()
 end
 
@@ -466,11 +466,9 @@ function lib.CreateRTSButton(parent, norightclick)
 	pulse:SetLooping("REPEAT")
 	local pulse1 = pulse:CreateAnimation("Alpha")
 	pulse1:SetStartDelay(1)
-	pulse1:SetChange(-0.8)
 	pulse1:SetDuration(.5)
 	pulse1:SetOrder(1)
 	local pulse2 = pulse:CreateAnimation("Alpha")
-	pulse2:SetChange(0.8)
 	pulse2:SetDuration(.5)
 	pulse2:SetOrder(2)
 	button.pulse = pulse

@@ -519,7 +519,21 @@ function getLocale()
 	return GetLocale();
 end
 
-local categories = {GetAuctionItemClasses()};
+--local categories = {GetAuctionItemClasses()};
+local categories = (AucAdvanced and AucAdvanced.Const and AucAdvanced.Const.CLASSES) or {
+	AUCTION_CATEGORY_WEAPONS,
+	AUCTION_CATEGORY_ARMOR,
+	AUCTION_CATEGORY_CONTAINERS,
+	AUCTION_CATEGORY_GEMS,
+	AUCTION_CATEGORY_ITEM_ENHANCEMENT,
+	AUCTION_CATEGORY_CONSUMABLES,
+	AUCTION_CATEGORY_GLYPHS,
+	AUCTION_CATEGORY_TRADE_GOODS,
+	AUCTION_CATEGORY_RECIPES,
+	AUCTION_CATEGORY_BATTLE_PETS,
+	AUCTION_CATEGORY_QUEST_ITEMS,
+	AUCTION_CATEGORY_MISCELLANEOUS
+}
 function getCatName(catID)
 	for cat, name in ipairs(categories) do
 		if (cat == catID) then

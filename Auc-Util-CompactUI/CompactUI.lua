@@ -389,7 +389,7 @@ function private.HookAH()
 	-- Column 3 special handling: label changes depending on queried class/subclass filters
 	local detail = private.headers[3]
 	function private.UpdateDetailColumn(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll)
-		local text = GetDetailColumnString(classIndex, subclassIndex)
+		local text = AuctionFrame_GetDetailColumnString(classIndex, subclassIndex)
 		if text == "SLOT_ABBR" then
 			detail.Text:SetText("Slot")
 		elseif text == "SKILL_ABBR" then

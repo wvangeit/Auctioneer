@@ -449,7 +449,7 @@ end
 function getSigFromLink(link)
 	assert(type(link) == "string")
 
-	local _, _, id, rand = link:find("item:(%d+):%d+:%d+:%d+:%d+:%d+:([-%d]+)")
+	local _, _, id, rand = link:find("item:(%d+):%d*:%d*:%d*:%d*:%d*:([-%d]+)")
 	if id and rand then
 		return id..":0:"..rand
 	elseif id then
@@ -730,12 +730,13 @@ Enchantrix.Util = {
 
 
 function Enchantrix.Util.GetIType(link)
-	if not link then return end
+	if not link or link == "" or link:match("^\[%s*\]$") then return end
 	local const = Enchantrix.Constants
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
 
 	if not (itemName and itemEquipLoc and itemRarity and itemLevel) then
-		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: " .. link)
+		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "link = >" .. link .. "<, length = " .. string.len(link))
+		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: <" .. link .. ">")
 		return
 	end
 
