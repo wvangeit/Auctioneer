@@ -177,9 +177,12 @@ local ItemDataAllowedNil = {
 	[Const.AMHIGH] = true,
 	[Const.CANUSE] = true,
 	[Const.DEP2] = true,
+	[Const.ITYPE] = true,
+	[Const.ISUB] = true,
 }
 
 function private.LoadScanData()
+	debugPrint("Start", "CoreScan.lua", "LoadScanData", "Debug")
 	if not private.loadingScanData then
 		local _, _, _, _, reason = GetAddOnInfo("Auc-ScanData")
 		if IsAddOnLoaded("Auc-ScanData") then
@@ -292,6 +295,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 	name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, exactMatch = private.QueryScrubParameters(
 		name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, exactMatch)
 
+	debugPrint("Start", "CoreScan.lua", "StartPushedScan", "Debug")
 	if private.scanStack then
 		for _, scan in ipairs(private.scanStack) do
 			if not scan[8] and private.QueryCompareParameters(scan[3], name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, exactMatch) then
@@ -327,6 +331,7 @@ function lib.StartPushedScan(name, minLevel, maxLevel, invTypeIndex, classIndex,
 end
 
 function lib.PushScan()
+	debugPrint("Start", "CoreScan.lua", "PushScan", "Debug")
 	if private.isGetAll then
 		-- A GetAll scan cannot be Popped; do not allow it to be Pushed
 		_print("Warning: Scan cannot be Pushed because it is a GetAll scan")
@@ -365,6 +370,7 @@ function lib.PushScan()
 end
 
 function lib.PopScan()
+	debugPrint("Start", "CoreScan.lua", "PopScan", "Debug")
 	if private.scanStack and #private.scanStack > 0 then
 		local now, pauseTime = GetTime()
 		private.scanStartTime,
@@ -408,6 +414,7 @@ function lib.ProgressBars(name, value, show, text, options)
 end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll, exactMatch, options)
+	debugPrint("Start" .. "\nname: " .. (name or '(nil)') .. "\nminUseLevel: " .. (minUseLevel or '(nil)') .. "\nmaxUseLevel: " .. (maxUseLevel or '(nil)') .. "\ninvTypeIndex: " .. (invTypeIndex or '(nil)') .. "\nclassIndex: " .. (classIndex or '(nil)') .. "\nsubclassIndex: " .. (subclassIndex or '(nil)') .. "\nisUsable: " .. (isUsable and 'usable' or 'not-usable') .. "\nqualityIndex: " .. (qualityIndex or '(nil)') .. "\nGetAll: " .. (GetAll and 'getall' or 'not-getall') .. "\nexactMatch: " .. (exactMatch and 'exactMatch' or 'not-exactMatch') .. "\noptions: " .. (options or '(nil)'), "CoreScan.lua", "StartScan", "Debug")
 	if _G.AuctionFrame and _G.AuctionFrame:IsVisible() then
 		if private.isPaused then
 			_G.message("Scanning is currently paused")
@@ -467,8 +474,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 
 		lib.SetAuctioneerQuery() -- flag the following query as coming from Auctioneer
 		SortAuctionClearSort("list")
-		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
-				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll, exactMatch)
+		QueryAuctionItems(name or "", minUseLevel or nil, maxUseLevel or nil,
+				invTypeIndex or nil, classindex or nil, subclassIndex or nil,
+				startPage, isUsable, qualityIndex, GetAll, exactMatch, filterData)
 		if not private.curQuery then
 			-- private.curQuery will have been set if QueryAuctionItems succeeded
 			-- this should never fail? we checked CanSendAuctionQuery() earlier
@@ -540,6 +548,7 @@ lib.UnpackImageItem = private.Unpack
 --The second parameter will be a number that is the max number of items in the scan.
 --The third parameter is the current progress of the scan.
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime, page, maxPages, query)
+	debugPrint("Start", "CoreScan.lua", "UpdateScanProgress", "Debug")
 	if (lib.IsScanning() or (state == false)) then
 		if (_G.nLog) then
 			_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_INFO, "UpdateScanProgress Called", state)
@@ -621,6 +630,7 @@ local statItem = { }
 local statItemOld = { }
 
 local function processStats(processors, operation, curItem, oldItem)
+	debugPrint("Start", "CoreScan.lua", "processStats", "Debug")
 	local filtered = false
 	if (not processors) then return end
 	if (curItem) then private.Unpack(curItem, statItem) end
@@ -677,8 +687,8 @@ end
 function private.IsInQuery(curQuery, data)
 	if 	(not curQuery.class or curQuery.class == data[Const.ITYPE])
 			and (not curQuery.subclass or (curQuery.subclass == data[Const.ISUB]))
-			and (not curQuery.minUseLevel or (data[Const.ULEVEL] >= curQuery.minUseLevel))
-			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
+			and (not curQuery.minUseLevel or (not data[Const.ULEVEL]) or (data[Const.ULEVEL] >= curQuery.minUseLevel))
+			and (not curQuery.maxUseLevel or (not data[Const.ULEVEL]) or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
 			and (not curQuery.isUsable or (private.CanUse(data[Const.LINK])))
 			and (not curQuery.invType or (EquipCodeToInvIndex[data[Const.IEQUIP]] == curQuery.invType)) -- must convert iEquip code to invTypeIndex for comparison
 			and (not curQuery.quality or (data[Const.QUALITY] >= curQuery.quality))
@@ -921,6 +931,7 @@ private.CommitQueue = {}
 
 local CommitRunning = false
 local Commitfunction = function()
+	debugPrint("Start", "CoreScan.lua", "Commit", "Debug")
 	local commitStarted = GetTime()
 	--local totalProcessingTime = 0 -- temp disabled, going to take some work to thread this back in with the broken GetTime / time changes
 
@@ -1053,42 +1064,42 @@ local Commitfunction = function()
 				doYield = false
 			end
 
-			local entryUnusable = false
+			local entryUnusable = 0
 			local data = TempcurScan[pos]
 			local success, reason, linkType = private.GetAuctionItemFillIn(data, true)
 			progresscounter = progresscounter + 1
 
 			if not success then
-				entryUnusable = true
-			else
-				-- full test
-				for i = 1, Const.LASTENTRY, 1 do
-					if not (data[i] or ItemDataAllowedNil[i]) then
-						entryUnusable = true
-						break
-					end
-				end
+				entryUnusable = -1
+			--else
+			--	-- full test
+			--	for i = 1, Const.LASTENTRY, 1 do
+			--		if not (data[i] or ItemDataAllowedNil[i]) then
+			--			entryUnusable = i
+			--			break
+			--		end
+			--	end
 			end
 
 
-			if entryUnusable then
+			if entryUnusable ~= 0 then
 				if _G.nLog then
 					-- Yes this is a mess.  However, it gives enough information to let us resolve problems in the future when blizzard breaks in a new way.
 					_G.nLog.AddMessage("Auctioneer", "Scan", _G.N_WARNING, "Incomplete Auction Seen",
 						(("%s%s%s%s%s%s"):format(
 						"Page %d, Index %d -- %s\n %s -- %d of %s sold by %s\n",
-						"Level %d, Quality %s, Item Level %s\n",
+						"Unusable %d, Level %d, Quality %s, Item Level %s\n",
 						"Item Type %s, Sub Type %s, Equipment Position %s\n",
 						"Price %s, Bid %s, NextBid %s, MinInc %s, Buyout %s\n Time Left %s, Time %s\n",
 						"High Bidder %s  Can Use: %s  Bonuses %s  Item ID %s  Suffix %s  Factor %s  Enchant %s  Seed %s\n",
-						"Deprecated2: %s")):format(
+						"Deprecated2: %s [reason:%s] [linkType:%s]")):format(
 						data.PAGE, data.PAGEINDEX, "too broken, can not use at all",
 						data[Const.LINK] or "(nil)", data[Const.COUNT] or -1, data[Const.NAME] or "(nil)", data[Const.SELLER] or "(UNKNOWN)",
-						data[Const.ULEVEL] or -1, data[Const.QUALITY] or -1, data[Const.ILEVEL] or -1,data[Const.ITYPE] or "(UNKNOWN)", data[Const.ISUB] or "(UNKNOWN)", data[Const.IEQUIP] or '(n/a)',
+						entryUnusable, data[Const.ULEVEL] or -1, data[Const.QUALITY] or -1, data[Const.ILEVEL] or -1,data[Const.ITYPE] or "(UNKNOWN)", data[Const.ISUB] or "(UNKNOWN)", data[Const.IEQUIP] or '(n/a)',
 						data[Const.PRICE] or -1, data[Const.CURBID] or -1, data[Const.MINBID] or -1, data[Const.MININC] or -1, data[Const.BUYOUT] or -1,
 						data[Const.TLEFT] or -1, data[Const.TIME] or "(nil)", data[Const.AMHIGH] and "Yes" or "No",
 						(data[Const.CANUSE]==false and "Yes") or (data[Const.CANUSE] and "No" or "(nil)"), data[Const.BONUSES] or '(nil)', data[Const.ITEMID] or '(nil)',
-						data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.DEP2] or '(nil)'))
+						data[Const.SUFFIX] or '(nil)', data[Const.FACTOR] or '(nil)', data[Const.ENCHANT] or '(nil)', data[Const.SEED] or '(nil)', data[Const.DEP2] or '(nil)', reason or '(nil)', linkType or '(nil)'))
 				end
 				tremove(TempcurScan, pos)
 				unresolvedCount = unresolvedCount + 1
@@ -1627,6 +1638,7 @@ local function CoroutineResume(...)
 end
 
 function private.Commit(wasEarlyTerm, wasEndPagesOnly, wasGetAll)
+	debugPrint("Start", "CoreScan.lua", "Commit", "Debug")
 	private.StopStorePage()
 	local curScan, curQuery, storeTime = private.curScan, private.curQuery, private.storeTime
 	local scanStarted, scanStartTime, totalPaused = private.scanStarted, private.scanStartTime, private.totalPaused
@@ -1662,6 +1674,7 @@ function private.QuerySent(query, isSearch, ...)
 end
 
 function private.FinishedPage(nextPage)
+	debugPrint("Start", "CoreScan.lua", "FinishedPage", "Debug")
 	-- Tell everyone that our stats are updated
 	local modules = _G.AucAdvanced.GetAllModules("FinishedPage")
 	for pos, engineLib in ipairs(modules) do
@@ -1680,6 +1693,7 @@ function private.FinishedPage(nextPage)
 end
 
 function private.ScanPage(nextPage, really)
+	debugPrint("Start", "CoreScan.lua", "ScanPage", "Debug")
 	if (private.isScanning) then
 		local CanQuery, CanQueryAll = CanSendAuctionQuery()
 		if not (CanQuery and private.FinishedPage(nextPage) and really) then
@@ -1692,9 +1706,9 @@ function private.ScanPage(nextPage, really)
 		private.auctionItemListUpdated = false
 		SortAuctionClearSort("list")
 		private.Hook.QueryAuctionItems(private.curQuery.name or "",
-			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
-			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
-			private.curQuery.isUsable, private.curQuery.quality, nil, private.curQuery.exactMatch)
+			private.curQuery.minUseLevel or nil, private.curQuery.maxUseLevel or nil,
+			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex,
+			nextPage, private.curQuery.isUsable, private.curQuery.quality, nil, private.curQuery.exactMatch)
 
 		_G.AuctionFrameBrowse.page = nextPage
 
@@ -1812,7 +1826,7 @@ do
 			end
 		else
 			linkType = "item"
-			if not itemData[Const.SEED] then
+			if not itemData[Const.SEED] or not itemData[Const.ILEVEL] then
 				local lkt, id, suffix, factor, enchant, seed, _, _, _, _, bonuses = AucAdvanced.DecodeLink(itemLink)
 				if lkt == "item" and id == itemID then
 					itemData[Const.BONUSES] = bonuses or ""
@@ -1916,7 +1930,7 @@ function private.GetAuctionItem(list, page, index, itemData)
 		return itemData
 	end
 
-	local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId = GetAuctionItemInfo(list, index)
+	local name, texture, count, quality, canUse, level, levelColHeader, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, owner, ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo(list, index)
 	-- Check critical values (if we got those, assume we got the rest as well - except possibly owner)
 	if not (itemId and minBid) then
 		return itemData
@@ -1934,7 +1948,7 @@ function private.GetAuctionItem(list, page, index, itemData)
 
 	itemData[Const.ITEMID] = itemId
 	itemData[Const.MINBID] = minBid
-
+	itemData[Const.ILEVEL] = level
 	itemData[Const.NAME] = name
 	itemData[Const.DEP2] = nil
 	itemData[Const.QUALITY] = quality
@@ -1971,6 +1985,13 @@ function private.GetAuctionItem(list, page, index, itemData)
 			itemData[Const.ULEVEL] = level
 		elseif levelColHeader == "ITEM_LEVEL_ABBR"  then
 			itemData[Const.ILEVEL] = level
+		elseif levelColHeader == "SKILL_ABBR"  then
+			itemData[Const.ILEVEL] = level
+		elseif levelColHeader == "SLOT_ABBR"  then
+			itemData[Const.ILEVEL] = level
+		else
+			itemData[Const.ILEVEL] = level
+			nLog.AddMessage("Auctioneer", "Scan", N_ERROR, "Unknown value for levelColHeader: " .. (levelColHeader or '(nil)'), levelColHeader or '(nil)')
 		end
 		-- todo: handle other possible values for levelColHeader
 	end
@@ -2037,6 +2058,7 @@ function private.isComplete(itemData)
 end
 
 local StorePageFunction = function()
+	debugPrint("Start", "CoreScan.lua", "StorePageFunction", "Debug")
 	if (not private.curQuery) or (private.curQuery.name == "empty page") then
 		return
 	end
@@ -2356,7 +2378,7 @@ local StorePageFunction = function()
 				-- ### temp fix: isUsable flag appears to be acting like a mini-getall, in this case we don't want to blank the results
 				if not curQuery.isUsable then
 					private.queryStarted = GetTime()
-					private.Hook.QueryAuctionItems("empty page", "", "", nil, nil, nil, nil, nil, nil, nil, nil)
+					private.Hook.QueryAuctionItems("empty page", nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 				end -- ###
 		elseif private.isScanning then
 			if (page+1 < maxPages) then
@@ -2412,6 +2434,7 @@ local StorePageFunction = function()
 end
 
 function private.StopStorePage(silent)
+	debugPrint("Start", "CoreScan.lua", "StopStorePage", "Debug")
 	if not CoStore or coroutine.status(CoStore) ~= "suspended" then return end
 	local isGetAll = private.isGetAll
 	-- flag to break out of the loop, or prevent the loop being entered, within the coroutine
@@ -2426,6 +2449,7 @@ function private.StopStorePage(silent)
 end
 
 function lib.StorePage()
+	debugPrint("Start", "CoreScan.lua", "StorePage", "Debug")
 	if not CoStore or coroutine.status(CoStore) == "dead" then
 		CoStore = coroutine.create(StorePageFunction)
 		CoroutineResume(CoStore)
@@ -2649,7 +2673,28 @@ function TakeInboxMoney(index, ...)
 	return private.Hook.TakeInboxMoney(index, ...)
 end
 
-private.Hook.QueryAuctionItems = QueryAuctionItems
+private.Hook.QAC = QueryAuctionItems
+
+private.Hook.QueryAuctionItems = function (name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
+	if filterData then
+		private.Hook.QAC(name, minLevel, maxLevel, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
+		return
+	end
+
+	-- Fix for Legion changes to type/category/subcategory.
+	local filterData;
+	if invTypeIndex and classindex and subclassIndex then
+	        filterData = AuctionCategories[invTypeIndex].subCategories[classindex].subCategories[subclassIndex].filters;
+	elseif invTypeIndex and classindex then
+	        filterData = AuctionCategories[invTypeIndex].subCategories[classindex].filters;
+	elseif invTypeIndex then
+                filterData = AuctionCategories[invTypeIndex].filters;
+	else
+	        -- not filtering by category, leave nil for all
+	end
+	debugPrint("name = " .. (name or '(nil)') .. "\ninvTypeIndex = " .. (invTypeIndex or '(nil)') .. "\nclassindex = " .. (classindex or '(nil)') .. "\nsubclassIndex = " .. (subclassIndex or '(nil)') .. "\nfilterData = " .. (filterData and 'yes' or '(nil)'), "CoreScan.lua", "StartScan", "Debug")
+	private.Hook.QAC(name, minLevel, maxLevel, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
+end
 
 local isSecure, taint = issecurevariable("CanSendAuctionQuery")
 if not isSecure then
@@ -2658,6 +2703,7 @@ end
 private.CanSend = CanSendAuctionQuery
 
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
+	debugPrint("Start", "CoreScan.lua", "QueryAuctionItems", "Debug")
 	if not private.isAuctioneerQuery then
 		-- Optional bypass to handle compatibility problems with other AddOns
 		local doBypass = false
@@ -2745,7 +2791,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	private.auctionItemListUpdated = false
 	return private.QuerySent(query, isSearch,
 		private.Hook.QueryAuctionItems(
-			name or "", minLevel or "", maxLevel or "", invTypeIndex, classIndex, subclassIndex,
+			name or "", minLevel or nil, maxLevel or nil, invTypeIndex, classIndex, subclassIndex,
 			page, isUsable, qualityIndex, GetAll, exactMatch, ...))
 end
 
@@ -2804,6 +2850,7 @@ local timeoutCanSend = 0 -- part of fix for Blizzard bug {ADV-595}
 
 function private.OnUpdate(me, dur)
 	if CoCommit then
+		debugPrint("Start: CoCommit", "CoreScan.lua", "OnUpdate", "Debug")
 		local costat = coroutine.status(CoCommit)
 		if costat == "suspended" then
 			CoroutineResume(CoCommit)
@@ -2822,6 +2869,7 @@ function private.OnUpdate(me, dur)
 	local isVisibleAucFrame = auctionFrame:IsVisible()
 
 	if private.queueScan then
+		debugPrint("Start: queueScan", "CoreScan.lua", "OnUpdate", "Debug")
 		if isVisibleAucFrame and CanSendAuctionQuery() then
 			local queued = private.queueScan
 			private.queueScan = nil
@@ -2831,9 +2879,11 @@ function private.OnUpdate(me, dur)
 	end
 
 	if CoStore and coroutine.status(CoStore) == "suspended" and isVisibleAucFrame then
+		debugPrint("Start: CoStore suspended", "CoreScan.lua", "OnUpdate", "Debug")
 		CoroutineResume(CoStore)
 	end
 	if private.scanNext then
+		debugPrint("Start: scanNext", "CoreScan.lua", "OnUpdate", "Debug")
 		if isVisibleAucFrame and CanSendAuctionQuery() then
 			local nextPage = private.scanNextPage
 			private.scanNext = nil
@@ -2851,20 +2901,24 @@ function private.OnUpdate(me, dur)
 
 		if private.sentQuery and private.auctionItemListUpdated then
 			if CanSendAuctionQuery() then
+				debugPrint("Start: isvisibleAucFrame && sentQuery/auctionItemListUpdated && CanSendAuctionQuery", "CoreScan.lua", "OnUpdate", "Debug")
 				timeoutCanSend = 0
 				lib.StorePage()
 			elseif timeoutCanSend > 15 then
+				debugPrint("Start: isvisibleAucFrame && sentQuery/auctionItemListUpdated && timeCanSend > 15", "CoreScan.lua", "OnUpdate", "Debug")
 				-- Fix for Blizzard Auctionhouse bug {ADV-595}
 				-- CanSendAuctionQuery continues to return nil indefinitely. We use a timeout
 				timeoutCanSend = 0
 				private.warningCanSendBug = true -- further handling required by StorePageFunction
 				lib.StorePage()
 			else
+				debugPrint("Start: isvisibleAucFrame && sentQuery/auctionItemListUpdated && !CanSendAuctionQuery/timeoutCanSend<=15", "CoreScan.lua", "OnUpdate", "Debug")
 				-- part of fix for Blizzard bug {ADV-595}
 				timeoutCanSend = timeoutCanSend + dur
 			end
  		end
 	elseif private.curQuery then
+		debugPrint("Start: curQuery", "CoreScan.lua", "OnUpdate", "Debug")
 		lib.Interrupt()
 	end
 end
@@ -2872,6 +2926,7 @@ private.updater = CreateFrame("Frame", nil, UIParent)
 private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
+	debugPrint("Start", "CoreScan.lua", "Cancel", "Debug")
 	if (private.curQuery) then
 		_print("Cancelling current scan")
 		private.Commit(true, false, false)
@@ -2880,6 +2935,7 @@ function lib.Cancel()
 end
 
 function lib.Interrupt()
+	debugPrint("Start", "CoreScan.lua", "Interrupt", "Debug")
 	if private.curQuery and not _G.AuctionFrame:IsVisible() then
 		if private.isGetAll then
 			-- GetAll cannot be pushed/popped so we have to commit here instead
@@ -2903,6 +2959,7 @@ function lib.Interrupt()
 end
 
 function lib.Abort()
+	debugPrint("Start", "CoreScan.lua", "Abort", "Debug")
 	if (private.curQuery) then
 		_print("Aborting current scan")
 	end
@@ -2910,6 +2967,7 @@ function lib.Abort()
 end
 
 function private.ResetAll()
+	debugPrint("Start", "CoreScan.lua", "ResetAll", "Debug")
 	private.StopStorePage(true)
 
 	-- Fallback in case private.isGetAll and related actions were not cleared during processing

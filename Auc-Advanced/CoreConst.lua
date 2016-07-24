@@ -138,16 +138,31 @@ local lib = {
 	ALEVEL_HI = 4,
 	ALEVEL_MAX = 5,
 
-	CLASSES = { GetAuctionItemClasses() },
+	-- CLASSES = { GetAuctionItemClasses() }, -- removed in 7.0.x
+	CLASSES = {
+		AUCTION_CATEGORY_WEAPONS,
+		AUCTION_CATEGORY_ARMOR,
+		AUCTION_CATEGORY_CONTAINERS,
+		AUCTION_CATEGORY_GEMS,
+		AUCTION_CATEGORY_ITEM_ENHANCEMENT,
+		AUCTION_CATEGORY_CONSUMABLES,
+		AUCTION_CATEGORY_GLYPHS,
+		AUCTION_CATEGORY_TRADE_GOODS,
+		AUCTION_CATEGORY_RECIPES,
+		AUCTION_CATEGORY_BATTLE_PETS,
+		AUCTION_CATEGORY_QUEST_ITEMS,
+		AUCTION_CATEGORY_MISCELLANEOUS,
+	},
+
 	SUBCLASSES = { },
 	CLASSESREV = { }, -- Table mapping names to index in CLASSES table
 	SUBCLASSESREV = { }, -- Table mapping from CLASS and SUBCLASSES names to index number in SUBCLASSES
 
-	MAXSKILLLEVEL = 700,
-	MAXUSERLEVEL = 100,
-	MAXITEMLEVEL = 750,
-	MAXBIDPRICE = 9999999999, -- copy from Blizzard_AuctionUI.lua, so it is available before AH loads
+	MAXSKILLLEVEL = 700, -- 7.x Note: Legion increases to 800
+	MAXUSERLEVEL = 100, -- 7.x Note: Legion increases to 110
 
+	MAXITEMLEVEL = 750, -- 7.x Note: Reports that Legion goes up as high as 950
+	MAXBIDPRICE = 9999999999, -- copy from Blizzard_AuctionUI.lua, so it is available before AH loads
 }
 
 lib.CompactRealm = lib.PlayerRealm:gsub(" ", "") -- CompactRealm is realm name with spaces removed
@@ -161,6 +176,7 @@ for i = 1, #lib.CLASSES do
 	end
 end
 
+--[[
 local function CompileInvTypes(...)
 	for i=1, select("#", ...), 2 do
 		-- each type has 2 args: token name(i), display in list(i+1)
@@ -179,6 +195,61 @@ local function CompileInvTypes(...)
 end
 
 CompileInvTypes(GetAuctionInvTypes(2, 1))
+--]]
+-- 7.x removed GetAuctionInvTypes() and now uses hardcoded globals
+local function CompileInvTypes()
+	local invtype_strformat = "INVTYPE_%s"
+	local le_invtype_strformat = "LE_INVENTORY_TYPE_%s_TYPE"
+	local invtype_strings = {
+		"HEAD",
+		"NECK",
+		"SHOULDER",
+		"BODY",
+		"CHEST",
+		"WAIST",
+		"LEGS",
+		"FEET",
+		"WRIST",
+		"HAND",
+		"FINGER",
+		"TRINKET",
+		"WEAPON",
+		"SHIELD",
+		"RANGEDRIGHT",
+		"CLOAK",
+		"2HWEAPON",
+		"BAG",
+		"TABARD",
+		"ROBE",
+		"WEAPONMAINHAND",
+		"WEAPONOFFHAND",
+		"HOLDABLE",
+		"AMMO",
+		"THROWN",
+		"RANGED"
+	}
+	local invstr
+	for _,invstr in ipairs(invtype_strings) do
+		-- each type has 2 args: token name(i), display in list(i+1)
+		-- However 7.x has removed GetAuctionInvTypes() so we need to be creative
+		local equipLoc = string.format(invtype_strformat, invstr)
+		local invTypeIndex = _G[string.format(le_invtype_strformat, invstr)]
+		local equipCode = lib.EquipEncode[equipLoc]
+
+		if not invTypeIndex == nil then
+			lib.EquipLocToInvIndex[equipLoc] = invTypeIndex
+			if equipCode then
+				lib.EquipCodeToInvIndex[equipCode] = invTypeIndex
+			else
+				-- All possible entries should exist in the table - warn if a missing entry is detected
+				print("AucAdvanced CoreConst error: missing EquipCode for Equip Location "..equipLoc)
+			end
+		else
+			print("AucAdvanced CoreConst error: missing invTypeIndex for Inventory Type "..invstr)
+		end
+	end
+end
+CompileInvTypes()
 
 AucAdvanced.Const = lib
 
