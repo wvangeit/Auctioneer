@@ -178,8 +178,8 @@ function private.updateInboxStart()
 				private.HideMailGUI(true)
 				wasRead = wasRead and 1 or 0 -- three possible states 0=unread 1=read by addon 2=read by player
 				private.mailReadOveride[n] = false -- set back to false so we don't read the same message more than once
-				local itemLink = GetInboxItemLink(n, 1)
-				local _, _, stack, _, _ = GetInboxItem(n)
+				local itemLink = GetInboxItemLink(n, 1) -- We only check the 1st attachment, as AH mail should never have more than 1
+				local _, _, _, stack = GetInboxItem(n, 1)
 				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
 				--subject now can contain a stack size. Remove them so only itemName remains
 				subject = subject:gsub("%s-%(%d-%)", "") --strips off the count (x) from the itemName
