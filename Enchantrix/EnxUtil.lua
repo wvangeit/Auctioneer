@@ -445,11 +445,16 @@ end
 
 
 -- itemId:enchantId:jewelId1:jewelId2:jewelId3:jewelId4:suffixId:uniqueId:linkLevel:reforgeId
+-- Legion: item:129104::::::::100:253::11
+-- Need to figure out what the random suffix is, but nobody seems to have documented the changes yet!
+
 -- we want to keep just the itemID and suffixID (random enchantment)
 function getSigFromLink(link)
 	assert(type(link) == "string")
 
-	local _, _, id, rand = link:find("item:(%d+):%d+:%d+:%d+:%d+:%d+:([-%d]+)")
+--	Enchantrix.Util.DebugPrint("getSigFromLink input", ENX_INFO, link )	-- debugging
+--	local _, _, id, rand = link:find("item:(%d+):%d+:%d+:%d+:%d+:%d+:([-%d]+)")	-- old version from Warlords
+	local _, _, id, rand = link:find("item:(%d+):%d*:%d*:%d*:%d*:%d*:([-%d]*)")
 	if id and rand then
 		return id..":0:"..rand
 	elseif id then
