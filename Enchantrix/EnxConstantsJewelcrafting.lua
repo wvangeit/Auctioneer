@@ -32,28 +32,34 @@ Enchantrix_RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Ench
 
 local const = Enchantrix.Constants
 
+-- Classic
 local COPPER_ORE = 2770
 local TIN_ORE = 2771
 local IRON_ORE = 2772
 local MITHRIL_ORE = 3858
 local THORIUM_ORE = 10620
+-- Burning Crusade
 local FEL_IRON_ORE = 23424
 local ADAMANTITE_ORE = 23425
+-- Lich King
 local COBALT_ORE = 36909
 local SARONITE_ORE = 36912
 local TITANIUM_ORE = 36910
+-- Cataclysm
 local OBSIDIUM_ORE = 53038
 local ELEMENTIUM_ORE = 52185
 local PYRITE_ORE = 52183
-
+-- Pandaria
 local GHOST_IRON_ORE = 72092
 local KYPARITE_ORE = 72093
 local WHITE_TRILLIUM_ORE = 72103
 local BLACK_TRILLIUM_ORE = 72094
-
--- prospectable Draenor ores
---local BLACKROCK = 109118	-- not prospectable
---local TRUEIRON = 109119	-- not prospectable
+-- Warlords
+--local BLACKROCK_ORE = 109118	-- not prospectable
+--local TRUEIRON_ORE = 109119	-- not prospectable
+-- Legion
+local LAYSTONE_ORE = 123918
+local FELSLATE_ORE = 123919
 
 
 local COPPERPOWDER = 24186
@@ -67,6 +73,7 @@ local TITANIUMPOWDER = 46849
 local VOLATILE_EARTH = 52327
 local SPARKLING_SHARD = 90407
 
+-- Classic
 local TIGERSEYE = 818
 local MALACHITE = 774
 local SHADOWGEM = 1210
@@ -80,6 +87,8 @@ local AZEROTHIANDIAMOND = 12800
 local BLUESAPPHIRE = 12361
 local LARGEOPAL = 12799
 local HUGEEMERALD = 12364
+
+-- Burning Crusade
 local BLOODGARNET = 23077
 local FLAMESPESSARITE = 21929
 local GOLDENDRAENITE = 23112
@@ -93,7 +102,7 @@ local TALASITE = 23437
 local STAROFELUNE = 23438
 local NIGHTSEYE = 23441
 
--- new for WOTLK
+-- WOTLK
 local CHALCEDONY = 36923
 local SHADOWCRYSTAL = 36926
 local TWILIGHTOPAL = 36927
@@ -114,7 +123,7 @@ local DREADSTONE = 36928
 local CARDINALRUBY = 36919
 local EYEOFZUL = 36934
 
--- new for Cataclysm
+-- Cataclysm
 local CARNELIAN = 52177
 local ZEPHYRITE = 52178
 local ALICITE = 52179
@@ -147,6 +156,29 @@ local SUNSRADIANCE = 76142
 -- Warlords of Draenor
 -- no prospectable gems, only craftable gems
 
+-- new for Legion
+local SANGRITE = 130172
+local DEEPAMBER = 130173
+local AZSUNITE = 130174
+local CHAOTICSPINEL = 130175
+local SKYSTONE = 130176
+local QUEENSOPAL = 130177
+
+local FURYSTONE = 130178
+local EYEOFPROPHECY = 130179
+local DAWNLIGHT = 130180
+local PANDEMONITE = 130181
+local MAELSTROMSAPPHIRE = 130182
+local SHADOWRUBY = 130183
+
+local REDGEMCHIP = 129099
+local GENERICGEMCHIP = 129100
+local ORANGEGEMCHIP = 130200
+local YELLOWGEMCHIP = 130201
+local GREENGEMCHIP = 130202
+local BLUEGEMCHIP = 130203
+local PURPLEGEMCHIP = 130204
+
 
 --[[
 	Prospectable ores and skill to prospect them
@@ -172,6 +204,8 @@ const.ProspectMinLevels = {
 	[BLACK_TRILLIUM_ORE] = 600,
 --	[BLACKROCK] = 600,			-- not prospectable
 --	[TRUEIRON] = 600,			-- not prospectable
+	[LAYSTONE_ORE] = 1,
+	[FELSLATE_ORE] = 1,
 }
 
 
@@ -310,7 +344,6 @@ const.ProspectableItems = {
 			[DREADSTONE] = 0.04,
 			[CARDINALRUBY] = 0.04,
 			[EYEOFZUL] = 0.04,
-			
 			},
 
 	[OBSIDIUM_ORE] = {
@@ -435,6 +468,54 @@ const.ProspectableItems = {
 			[SUNSRADIANCE] = 0.10,
 			},
 
+	-- TODO - ccox - determine yields
+	-- ARGH!   Prospecting isn't working yet!!
+	[LAYSTONE_ORE] = {
+			[SANGRITE] = 0.25,
+			[DEEPAMBER] = 0.25,
+			[AZSUNITE] = 0.25,
+			[CHAOTICSPINEL] = 0.25,
+			[SKYSTONE] = 0.25,
+			[QUEENSOPAL] = 0.25,
+			
+			[FURYSTONE] = 0.04,
+			[EYEOFPROPHECY] = 0.04,
+			[DAWNLIGHT] = 0.04,
+			[PANDEMONITE] = 0.04,
+			[MAELSTROMSAPPHIRE] = 0.04,
+			[SHADOWRUBY] = 0.04,
+			
+			[REDGEMCHIP] = 0.167,
+			[ORANGEGEMCHIP] = 0.167,
+			[YELLOWGEMCHIP] = 0.167,
+			[GREENGEMCHIP] = 0.167,
+			[BLUEGEMCHIP] = 0.167,
+			[PURPLEGEMCHIP] = 0.167,
+			},
+	
+	[FELSLATE_ORE] = {
+			[SANGRITE] = 0.25,
+			[DEEPAMBER] = 0.25,
+			[AZSUNITE] = 0.25,
+			[CHAOTICSPINEL] = 0.25,
+			[SKYSTONE] = 0.25,
+			[QUEENSOPAL] = 0.25,
+			
+			[FURYSTONE] = 0.04,
+			[EYEOFPROPHECY] = 0.04,
+			[DAWNLIGHT] = 0.04,
+			[PANDEMONITE] = 0.04,
+			[MAELSTROMSAPPHIRE] = 0.04,
+			[SHADOWRUBY] = 0.04,
+			
+			[REDGEMCHIP] = 0.167,
+			[ORANGEGEMCHIP] = 0.167,
+			[YELLOWGEMCHIP] = 0.167,
+			[GREENGEMCHIP] = 0.167,
+			[BLUEGEMCHIP] = 0.167,
+			[PURPLEGEMCHIP] = 0.167,
+			},
+	
 }
 
 
@@ -527,6 +608,29 @@ const.ReverseProspectingSources = {
 	[SUNSRADIANCE] = { GHOST_IRON_ORE, KYPARITE_ORE, WHITE_TRILLIUM_ORE, BLACK_TRILLIUM_ORE },
 
 	[SPARKLING_SHARD] = { GHOST_IRON_ORE, KYPARITE_ORE, WHITE_TRILLIUM_ORE, BLACK_TRILLIUM_ORE },
+	
+	[SANGRITE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[DEEPAMBER] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[AZSUNITE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[CHAOTICSPINEL] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[SKYSTONE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[QUEENSOPAL] = {LAYSTONE_ORE, FELSLATE_ORE },
+
+	[FURYSTONE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[EYEOFPROPHECY] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[DAWNLIGHT] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[PANDEMONITE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[MAELSTROMSAPPHIRE] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[SHADOWRUBY] = {LAYSTONE_ORE, FELSLATE_ORE },
+	
+	[REDGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[ORANGEGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[YELLOWGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[GREENGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[BLUEGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[PURPLEGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+	[GENERICGEMCHIP] = {LAYSTONE_ORE, FELSLATE_ORE },
+
 }
 
 

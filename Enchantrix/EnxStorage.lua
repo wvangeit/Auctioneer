@@ -173,6 +173,8 @@ end
 
 function saveDisenchant(sig, reagentID, count)
 	-- Update tables after a disenchant has been detected
+
+	--Enchantrix.Util.DebugPrint("saveDisenchant", ENX_INFO, sig, reagentID, count, type(sig) )	-- debugging
 	assert(type(sig) == "string");
 	assert(tonumber(reagentID));
 	assert(tonumber(count));

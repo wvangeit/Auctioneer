@@ -99,6 +99,12 @@ const.StaticPrices = {
 	[11137] =    8000, -- Vision Dust
 	[11083] =    5000, -- Soul Dust
 	[10940] =    7000, -- Strange Dust
+	
+	--- Legion - needs update
+	[124440] = 	100000, -- Arkhana
+	[124441] =  100000, -- Laylight Shard
+	[124442] =  100000, -- Chaos Crystal
+	[124124] =  500000, -- Blood of Sargaras (can't sell it, but needs a value)
 
 -- needs update
 	[2772] =   11500, -- Iron Ore
@@ -201,6 +207,10 @@ const.StaticPrices = {
 	[79251] =   70000,   -- SHADOW_PIGMENT
 	[79253] =  100000,   -- MISTY_PIGMENT
 	[114931] = 500000, 	-- Cerulean Pigment
+	
+	-- Legion, needs update
+	[129032] = 500000, -- Roseate Pigment
+	[129034] = 500000, -- Salllow Pigment
 
 -- needs update
 	[818] =      7500, 	-- TIGERSEYE
@@ -280,7 +290,30 @@ const.StaticPrices = {
 	[76141] =  100000,	-- IMPERIALAMETHYST
 	[76142] =  100000,	-- SUNSRADIANCE
 
--- TODO - ccox - WoD gems?
+	-- WoD has no raw gems
+
+	-- Legion Gems, needs update
+	[130172] = 10000, -- SANGRITE
+	[130173] = 10000, -- DEEPAMBER
+	[130174] = 10000, -- AZSUNITE
+	[130175] = 10000, -- CHAOTICSPINEL
+	[130176] = 10000, -- SKYSTONE
+	[130177] = 10000, -- QUEENSOPAL
+
+	[130178] = 10000, -- FURYSTONE
+	[130179] = 10000, -- EYEOFPROPHECY
+	[130180] = 10000, -- DAWNLIGHT
+	[130181] = 10000, -- PANDEMONITE
+	[130182] = 10000, -- MAELSTROMSAPPHIRE
+	[130183] = 10000, -- SHADOWRUBY
+
+	[129099] = 1, -- REDGEMCHIP
+	[129100] = 1, -- GENERICGEMCHIP
+	[130200] = 1, -- ORANGEGEMCHIP
+	[130201] = 1, -- YELLOWGEMCHIP
+	[130202] = 1, -- GREENGEMCHIP
+	[130203] = 1, -- BLUEGEMCHIP
+	[130204] = 1, -- PURPLEGEMCHIP
 
 }
 
@@ -395,12 +428,16 @@ local FRACTEMPORAL = 115504
 --local AZURIAN = 113589		-- no longer used, may be taken out
 --local BLACKFIRE = 111247		-- never used
 
-
+local ARKHANA	= 124440
+local LEYLIGHT_SHARD = 124441
+local CHAOS_CRYSTAL = 124442
+local BLOOD_SARGERAS = 124124
 
 -- and in a form we can iterate over, with a fixed order for the UI
 
 const.DisenchantReagentList = {
 
+	CHAOS_CRYSTAL,
 	TEMPORAL,
 	FRACTEMPORAL,
 	SHA_CRYSTAL,
@@ -410,6 +447,7 @@ const.DisenchantReagentList = {
 	VOID,
 	NEXUS,
 
+	LEYLIGHT_SHARD,
 	LUMINOUS,
 	ETHERAL,
 	52721, -- Heavenly Shard
@@ -452,6 +490,7 @@ const.DisenchantReagentList = {
 	10998, -- Lesser Astral Essence
 	10938, -- Lesser Magic Essence
 
+	ARKHANA,
 	DRAENIC,
 	SPIRIT,
 	52555, -- Hypnotic Dust
@@ -479,7 +518,7 @@ local EPIC = 4
 const.baseDisenchantTable = {
  [UNCOMMON] = {
   [const.WEAPON] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 482, 800 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 482, 650, 900 },
    [15]  = { { STRANGE , 0.20, 1.5 }, { LMAGIC  , 0.80, 1.5 }, },
    [20]  = { { STRANGE , 0.20, 2.5 }, { GMAGIC  , 0.75, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.15, 5.0 }, { LASTRAL , 0.75, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -511,11 +550,15 @@ const.baseDisenchantTable = {
    [482] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483, but it now gives draenic dust
    
    -- WoD
-   [ 800 ] = { { DRAENIC, 1.0, 3.0 } },	-- shard chance appears to have been taken out in patch, or reduced to less than 1%
+   [ 650 ] = { { DRAENIC, 1.0, 3.0 } },	-- highest WoD green weapon is 640, shard chance appears to have been taken out in patch, or reduced to less than 1%
 
-  },
+	-- TODO - determine item ranges
+	-- Legion -- TODO - determine yields
+	[ 900 ] =  { {ARKHANA, 1.0, 2.5 } },	-- first Legion green is 665, highest Legion green currently 740
+	
+   },
   [const.ARMOR] = {
-   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 482, 800 },
+   ["bounds"] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 99, 120, 151, 200, 275, 290, 305, 315, 325, 350, 380, 390, 410, 482, 650, 900 },
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
    [20]  = { { STRANGE , 0.75, 2.5 }, { GMAGIC  , 0.20, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
    [25]  = { { STRANGE , 0.75, 5.0 }, { LASTRAL , 0.15, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
@@ -547,7 +590,11 @@ const.baseDisenchantTable = {
    [482] = { { SPIRIT, 0.85, 4.0 }, { MYSTERIOUS , 0.15, 2.0 }, },	-- highest level Panda green is 483, but it now gives draenic dust
    
    -- WoD
-   [ 800 ] = { { DRAENIC, 1.0, 3.0 } },	-- shard chance appears to have been taken out in patch
+   [ 650 ] = { { DRAENIC, 1.0, 3.0 } },	-- highest WoD green armor is 640, shard chance appears to have been taken out in patch
+
+	-- TODO - determine item ranges
+	-- Legion -- TODO - determine yields
+	[ 900 ] =  { {ARKHANA, 1.0, 2.5 } },	-- first Legion green is 680, highest Legion green currently 820
    
   },
  },
@@ -555,7 +602,7 @@ const.baseDisenchantTable = {
  	-- weapon lookups will fall back to the armor table
  	-- 1% chance for better shard appears to have been removed in Cataclysm
   [const.ARMOR] = {
-   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 380, 424, 449, 450, 500, 800 },
+   ["bounds"] = { 25, 30, 35, 40, 45, 50, 55, 65, 99, 120, 164, 200, 316, 380, 424, 449, 450, 500, 700, 900 },
    [25]  = { { SGLIMMERING,     1.00, 1.0 } },
    [30]  = { { LGLIMMERING,     1.00, 1.0 } },
    [35]  = { { SGLOWING,        1.00, 1.0 } },
@@ -578,13 +625,17 @@ const.baseDisenchantTable = {
    [500] = { { ETHERAL,         1.00, 1.0 } },	-- highest level Panda blue is 476
    
    -- WoD
-   [ 800 ] = { { DRAENIC, 0.85, 10.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest WoD blue is 505
+	[ 700 ] = { { DRAENIC, 0.85, 10.0 }, { LUMINOUS , 0.15, 1.0 }, },	-- lowest WoD blue is 505, highest WoD blue is 700
+
+	-- Legion -- TODO - determine yields
+	[ 900 ] =  { {LEYLIGHT_SHARD, 1.0, 1.0 }, {BLOOD_SARGERAS, 0.1, 1.0} },	-- first Legion blue is 700 (ruh roh), highest Legion blue is currently 830
+
   },
  },
  [EPIC] = {
  	-- weapon lookups will fall back to the armor table
   [const.ARMOR] = {
-   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 495, 630, 800 },
+   ["bounds"] = { 40, 45, 50, 55, 60, 94, 99, 164, 299, 419, 495, 630, 790, 1000 },
    [40]  = { { SRADIANT,    1.00, 3.0 } },
    [45]  = { { SRADIANT,    1.00, 3.5 } },
    [50]  = { { LRADIANT,    1.00, 3.5 } },
@@ -601,7 +652,10 @@ const.baseDisenchantTable = {
    [630] = { { SHA_CRYSTAL, 1.00, 1.0 } },	-- highest level Panda epic so far is 600
    
    -- WoD
-   [ 800 ] = { { TEMPORAL, 1.00, 1.0 } },	-- first WoD epic is 640
+	[ 790 ] = { { TEMPORAL, 1.00, 1.0 } },	-- first WoD epic is 640, highest WoD epic is 715
+
+	-- Legion
+	[ 1000 ] =  { {CHAOS_CRYSTAL, 1.0, 1.0 }, {BLOOD_SARGERAS, 0.1, 1.0} },	-- first Legion epic is 800, highest Legion epic is currently 905
    
   },
  },
@@ -615,7 +669,9 @@ const.baseDisenchantTable = {
 const.ReverseDisenchantLevelList = {
 	
 -- ccox, needs update
-	[TEMPORAL]	  = { 631, 800 }, -- Temporal Crystal
+	
+	[CHAOS_CRYSTAL] = { 750, 900 },	-- Chaos Crystal
+	[TEMPORAL]	  = { 631, 749 }, -- Temporal Crystal
 --	[FRACTEMPORAL]	  = { 601, 800 }, -- Fractured Temporal Crystal			-- doesn't seem to come from Disenchanting, unless underskilled
 	[SHA_CRYSTAL] = { 496, 630 }, -- Sha Crystal
 	[SHA_FRAGMENT] = { 420, 495 }, -- Sha Crystal Fragment
@@ -624,7 +680,8 @@ const.ReverseDisenchantLevelList = {
 	[VOID]        = {  95, 164 }, -- Void Crystal
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
-	[LUMINOUS]		  = { 501, 800 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
+	[LEYLIGHT_SHARD]  = { 750, 900 }, -- Leylight Shard
+	[LUMINOUS]		  = { 501, 749 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
 --	[AZURIAN]		  =	{ 501, 800 }, -- Azurian Shards				-- not used
 	[ETHERAL] 		  = { 425, 500 }, -- Etheral Shard
 	[SETHERAL]        = { 380, 424 }, -- Small Etheral Shard
@@ -662,7 +719,8 @@ const.ReverseDisenchantLevelList = {
 	[GMAGIC]      = {  16,  20 }, -- Greater Magic Essence
 	[LMAGIC]      = {   1,  15 }, -- Lesser Magic Essence
 	
-	[DRAENIC]  = { 483, 800 }, -- Draenic Dust
+	[ARKHANA]  = { 750, 900 }, -- Arkhana
+	[DRAENIC]  = { 483, 749 }, -- Draenic Dust
 	[SPIRIT]   = { 351, 482 }, -- Spirit Dust
 	[HYPNOTIC] = { 201, 350 }, -- Hypnotic Dust
 	[INFINITE] = { 121, 200 }, -- Infinite Dust
