@@ -138,7 +138,7 @@ local HERB_GORGONDFLYTRAP = 109126
 local HERB_STARFLOWER = 109127
 local HERB_NAGRANDARROWBLOOM = 109128
 local HERB_TALADORORCHID = 109129
---local HERB_CHAMELEONLOTUS = 109130 -- appears to have been removed in beta
+--local HERB_CHAMELEONLOTUS = 109130 -- removed in beta
 
 -- Legion herbs
 local HERB_AETHRIL = 124101
@@ -492,7 +492,7 @@ local BLACKFALLOW_INK = 61978
 local INFERNO_INK = 61981
 local INK_DREAMS = 79254
 local STARLIGHT_INK = 79255
-local WARBINDER_INK = 113111
+local WARPAINT_INK = 112377
 
 -- Legion uses pigments directly instead of making inks
 
@@ -509,7 +509,7 @@ const.ReverseInkList = {
 	[ INKOFTHESEA_INK ] = { AZURE_PIGMENT },
 	[ BLACKFALLOW_INK ] = { ASHEN_PIGMENT },
 	[ INK_DREAMS ] = { SHADOW_PIGMENT },
-	[ WARBINDER_INK ] = { CERULEAN_PIGMENT },
+	[ WARPAINT_INK ] = { CERULEAN_PIGMENT },
 	
 	[ HUNTERS_INK ] = { VERDANT_PIGMENT },
 	[ DAWNSTAR_INK ] = { BURNT_PIGMENT },

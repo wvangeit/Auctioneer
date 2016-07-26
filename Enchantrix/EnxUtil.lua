@@ -311,7 +311,7 @@ function getLinkFromName(name)
 		end
 	end
 
-	-- max item is now about 69000
+	-- max item is now about 250000
 	-- we should NOT be doing a search item by item
 
 	return EnchantConfig.cache.names[name]
@@ -736,6 +736,8 @@ Enchantrix.Util = {
 
 function Enchantrix.Util.GetIType(link)
 	if not link then return end
+	--Enchantrix.Util.DebugPrintQuick("GetIType type: ", type(link), " link: ", link )	-- DEBUGGING
+	
 	local const = Enchantrix.Constants
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
 
@@ -762,17 +764,24 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		-- Enchantrix.Util.DebugPrintQuick( "nil level or quality", level, quality )		-- DEBUGGING
 		return 0
 	end
+	
+	-- heirlooms, legendaries, etc. cannot be disenchanted
+	if (quality > 4) then
+		return 0;
+	end
+
 
 	-- WoD items all require skill level 1
-	if (quality == 2 and level >= 480) then
+	-- Legion continues this
+	if (quality == 2 and level >= 483) then
 		-- all greens
 		return 1;
 	 elseif (quality == 3 and level >= 500) then
 		-- blues
 	 	return 1;
-	 elseif (level >= 610) then		-- TODO - ccox - verify lowest WoD epic
+	 elseif (level > 630) then
 	 	-- epics
-	 	return 1;				-- TODO - ccox - verify this!
+	 	return 1;
 	
 	-- Panda items
 	elseif (quality == 2 and level >= 340) then

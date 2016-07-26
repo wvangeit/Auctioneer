@@ -680,8 +680,8 @@ const.ReverseDisenchantLevelList = {
 	[VOID]        = {  95, 164 }, -- Void Crystal
 	[NEXUS]       = {  56,  94 }, -- Nexus Crystal
 	
-	[LEYLIGHT_SHARD]  = { 750, 900 }, -- Leylight Shard
-	[LUMINOUS]		  = { 501, 749 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
+	[LEYLIGHT_SHARD]  = { 700, 900 }, -- Leylight Shard
+	[LUMINOUS]		  = { 501, 700 }, -- Luminous Shards			TODO - ccox - what is highest WoD item level?
 --	[AZURIAN]		  =	{ 501, 800 }, -- Azurian Shards				-- not used
 	[ETHERAL] 		  = { 425, 500 }, -- Etheral Shard
 	[SETHERAL]        = { 380, 424 }, -- Small Etheral Shard
@@ -719,8 +719,8 @@ const.ReverseDisenchantLevelList = {
 	[GMAGIC]      = {  16,  20 }, -- Greater Magic Essence
 	[LMAGIC]      = {   1,  15 }, -- Lesser Magic Essence
 	
-	[ARKHANA]  = { 750, 900 }, -- Arkhana
-	[DRAENIC]  = { 483, 749 }, -- Draenic Dust
+	[ARKHANA]  = { 665, 900 }, -- Arkhana
+	[DRAENIC]  = { 483, 664 }, -- Draenic Dust
 	[SPIRIT]   = { 351, 482 }, -- Spirit Dust
 	[HYPNOTIC] = { 201, 350 }, -- Hypnotic Dust
 	[INFINITE] = { 121, 200 }, -- Infinite Dust

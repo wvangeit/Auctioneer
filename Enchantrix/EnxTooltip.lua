@@ -474,17 +474,25 @@ function itemTooltip(tooltip, name, link, itemType, itemId, quality, count)
 	end
 end
 
--- using the Trade APIs
-local function getReagentsFromTradeFrame(craftIndex)
+-- using the Recipe APIs
+local function getReagentsFromTradeFrame(recipe)
 	local reagentList = {}
 
-	local numReagents = GetTradeSkillNumReagents(craftIndex)
+	local numReagents = C_TradeSkillUI.GetRecipeNumReagents(recipe)
+	-- Enchantrix.Util.DebugPrintQuick("reagents count ", numReagents )	-- DEBUGGING
+
+	if (not numReagents) then
+		return nil
+	end
+
 	for i = 1, numReagents do
-		local link = GetTradeSkillReagentItemLink(craftIndex, i)
+		local link = C_TradeSkillUI.GetRecipeReagentItemLink(recipe, i);
+		-- Enchantrix.Util.DebugPrintQuick("reagent ", i, link )	-- DEBUGGING
 		if link then
 			local hlink = link:match("|H([^|]+)|h")
-			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(craftIndex, i)
-			table.insert(reagentList, {hlink, reagentCount})
+			-- Enchantrix.Util.DebugPrintQuick("reagent info ", C_TradeSkillUI.GetRecipeReagentInfo(recipe, i) )	-- DEBUGGING
+			local reagentName, reagentTexture, reagentCountNeeded, playerReagentCount = C_TradeSkillUI.GetRecipeReagentInfo(recipe, i)
+			table.insert(reagentList, {hlink, reagentCountNeeded})
 		end
 	end
 
@@ -574,16 +582,22 @@ function enchantTooltip(tooltip, name, link, isItem)
 		name = name:gsub("^%s*", "")	-- remove leading spaces
 		--Enchantrix.Util.DebugPrintQuick("cleaned name is ", name )
 		
-		for i = GetFirstTradeSkill(), GetNumTradeSkills() do
-			local tradeName = GetTradeSkillInfo(i);
-			if name == tradeName then
-				tradeIndex = i
-				break
+		local recipes = _G.C_TradeSkillUI.GetAllRecipeIDs()
+
+		-- Enchantrix.Util.DebugPrintQuick("recipe count is ", #recipes )		-- DEBUGGING
+		if recipes and (#recipes > 0) then
+			for i = 1, #recipes do
+				-- Enchantrix.Util.DebugPrintQuick("recipe ", i, " is ", recipes[i] )		-- DEBUGGING
+				if _G.C_TradeSkillUI.GetRecipeInfo(recipes[i]).name == name then
+					tradeIndex = i
+					-- Enchantrix.Util.DebugPrintQuick("recipe matched ", i, _G.C_TradeSkillUI.GetRecipeInfo(recipes[i]) )		-- DEBUGGING
+					break
+				end
 			end
 		end
 
 		if tradeIndex then
-			reagentList = getReagentsFromTradeFrame(tradeIndex)
+			reagentList = getReagentsFromTradeFrame( recipes[tradeIndex] )
 		else
 			-- if all else fails
 			reagentList = getReagentsFromTooltip(frame)

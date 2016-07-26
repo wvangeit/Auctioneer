@@ -494,6 +494,11 @@ end
 -- get entry from disenchant table (or nil if nothing found)
 local function getBaseTableDisenchants(level, quality, type, item)
 
+	-- heirlooms, legendaries, etc. are not disenchantable
+	if (quality > 4) then
+		return nil
+	end
+
 	if Enchantrix.Constants.baseDisenchantTable[quality] then
 		local baseTable = Enchantrix.Constants.baseDisenchantTable[quality][type];
 

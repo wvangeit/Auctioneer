@@ -219,7 +219,13 @@ function ENX_OnTooltipSetItem(this)
 		ENX_TooltipHooks[tooltipName].OnTooltipSetItem(tooltip);
 	end
 	local name, link = this:GetItem();
-	if (link) then
+	
+	if ( name == "" or (link == "[]") ) then
+		-- Wow 7.0 issue
+		--Enchantrix.Util.DebugPrintQuick("Tooltip1 item empty for ", name, link, type(name), type(link) )	-- DEBUGGING
+		return false;
+	elseif (link) then
+		--Enchantrix.Util.DebugPrintQuick("Tooltip0 item for ", name, link, type(name), type(link) )	-- DEBUGGING
 		-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
 		if (Enchantrix.Util.GetIType(link)) then
 			-- Ok, we think the item is disenchantable
