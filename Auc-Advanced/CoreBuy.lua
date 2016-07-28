@@ -217,12 +217,20 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosear
 		if strmatch(link, "|Hitem:") then
 			local name, _, quality, _, minlevel, classname, subclassname = GetItemInfo(link)
 			if not name then
-				local checkItemID = strmatch(link, ":(%d+):") -- this match string should find the itemID in any link
-				private.BuyItemInfoQueue[checkItemID].insert(function ()
-					lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosearch)
-				end)
-				return
-				--return QueueBuyErrorHelper(link, "NoItem")
+--				local checkItemID = strmatch(link, "item:(%d+):")
+--				if checkItemID then
+--					checkItemID = tonumber(checkItemID)
+--				end
+--				if not checkItemID then
+					return QueueBuyErrorHelper(link, "NoItem")
+--				end
+--				if not private.BuyItemInfoQueue[checkItemID] then
+--					private.BuyItemInfoQueue[checkItemID] = {}
+--				end
+--				table.insert(private.BuyItemInfoQueue[checkItemID], function ()
+--					lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosearch)
+--				end)
+--				return
 			end
 			request.itemname = name:lower()
 			request.uselevel = minlevel or 0
@@ -539,7 +547,7 @@ function private.ActivateEvents()
 		private.isActivated = true
 		private.updateFrame:Show() -- start timer
 		private.updateFrame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-		private.updateFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+		--private.updateFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
 
@@ -550,7 +558,7 @@ function private.DeactivateEvents()
 		private.isActivated = nil
 		private.updateFrame:Hide() -- stop timer
 		private.updateFrame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
-		private.updateFrame:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+		--private.updateFrame:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
 
@@ -569,12 +577,10 @@ local function OnEvent(frame, event, message, ...)
 		if private.BuyItemInfoQueue[message] then
 			local bqueue = private.BuyItemInfoQueue[message]
 			private.BuyItemInfoQueue[message] = nil
-			aucPrint(format("%sAuctioner: GET_ITEM_INFO_RECEIVED |r%s%s: %s", highlight, message, highlight, "re-queuing " .. bqueue.getn() .. " items"))
-			for buys in bqueue do
+			aucPrint(format("%sAuctioner: GET_ITEM_INFO_RECEIVED |r%s%s: %s", highlight, message, highlight, "re-queuing " .. table.getn(bqueue) .. " items"))
+			for idx,buys in ipairs(bqueue) do
 				buys()
 			end
-		else
-			aucPrint(format("%sAuctioner: GET_ITEM_INFO_RECEIVED |r%s%s: %s", highlight, message, highlight, "information on item not pending to purchase"))
 		end
 	elseif event == "AUCTION_ITEM_LIST_UPDATE" then
 		local request = private.CurRequest
