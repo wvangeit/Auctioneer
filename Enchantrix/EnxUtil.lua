@@ -742,7 +742,8 @@ function Enchantrix.Util.GetIType(link)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
 
 	if not (itemName and itemEquipLoc and itemRarity and itemLevel) then
-		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: " .. link)
+		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "link = >" .. link .. "<, length = " .. string.len(link))
+		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: <" .. link .. ">")
 		return
 	end
 

@@ -532,7 +532,7 @@ function private.databaseAdd(key, itemLink, itemString, value, compress, server,
 	local item, itemID, enchantID, jewelID1, jewelID2, jewelID3, jewelID4, suffixID, uniqueID, tail = strsplit(":", itemString, 10)
 	--if this will be a compressed entry replace uniqueID with 0 or its scaling factor
 	if compress then
-		suffixID = tonumber(suffixID)
+		suffixID = tonumber(suffixID) or 0
 		if suffixID < 0 then --scaling factor built into uniqueID, extract it and store so we can create properly scaled itemLinks
 			uniqueID = bit.band(uniqueID, 65535)
 		else

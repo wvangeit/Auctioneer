@@ -356,7 +356,7 @@ function private.play()
 				queueFinished = true --Used to clear the selected filters/highlights AFTER the last queued scan has completed
 			end
 		else
-			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedInvtypeIndex, AuctionFrameBrowse.selectedClassIndex, AuctionFrameBrowse.selectedSubclassIndex,  nil, nil)
+			AucAdvanced.Scan.StartScan("", "", "", AuctionFrameBrowse.selectedSubSubCategoryIndex, AuctionFrameBrowse.selectedCategoryIndex, AuctionFrameBrowse.selectedSubCategoryIndex,  nil, nil)
 		end
 	end
 	private.UpdateScanProgress()
@@ -514,7 +514,45 @@ function private.AuctionFrameFilters_UpdateClasses()
 				end
 			end
 			if ( info ) then
-				FilterButton_SetType(button, info[2], info[1], info[5])
+			-- Taken from Blizzard_AuctionUI 6.2.4
+			-- function FilterButton_SetType(button, type, text, isLast)
+				local type = info[2]
+				local text = info[1]
+				local isLast = info[5]
+				local normalText = _G[button:GetName().."NormalText"];
+				local normalTexture = _G[button:GetName().."NormalTexture"];
+				local line = _G[button:GetName().."Lines"];
+				local tex = button:GetNormalTexture();
+				if (text == TOKEN_FILTER_LABEL) then
+					tex:SetTexCoord(0, 1, 0, 1);
+					tex:SetAtlas("token-button-category");
+				else
+					tex:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-FilterBg");
+					tex:SetTexCoord(0, 0.53125, 0, 0.625);
+				end
+				if ( type == "class" ) then
+					button:SetText(text);
+					normalText:SetPoint("LEFT", button, "LEFT", 4, 0);
+					normalTexture:SetAlpha(1.0);	
+					line:Hide();
+				elseif ( type == "subclass" ) then
+					button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE);
+					normalText:SetPoint("LEFT", button, "LEFT", 12, 0);
+					normalTexture:SetAlpha(0.4);
+					line:Hide();
+				elseif ( type == "invtype" ) then
+					button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE);
+					normalText:SetPoint("LEFT", button, "LEFT", 20, 0);
+					normalTexture:SetAlpha(0.0);	
+					if ( isLast ) then
+						line:SetTexCoord(0.4375, 0.875, 0, 0.625);
+					else
+						line:SetTexCoord(0, 0.4375, 0, 0.625);
+					end
+					line:Show();
+				end
+				button.type = type; 
+				-- FilterButton_SetType(button, info[2], info[1], info[5])
 				button.index = info[3]
 				if ( info[4] ) then
 					button:LockHighlight()
