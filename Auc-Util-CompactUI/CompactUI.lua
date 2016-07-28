@@ -401,26 +401,26 @@ function private.HookAH()
 
 	local tex
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(0,0,0,0.5)
+	tex:SetColorTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].rLevel, "TOPLEFT")
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].rLevel, "BOTTOMRIGHT")
 	tinsert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(0,0,0,0.5)
+	tex:SetColorTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].tLeft, "TOPLEFT")
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].tLeft, "BOTTOMRIGHT")
 	tinsert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(0,0,0,0.5)
+	tex:SetColorTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].Owner, "TOPRIGHT", 2, 0)
 	tex:SetPoint("BOTTOM", private.buttons[NEW_NUM_BROWSE].Buy, "BOTTOM", 0, 0)
 	tex:SetPoint("RIGHT", private.buttons[1].Bid, "RIGHT", -10, 0)
 	tinsert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(0,0,0,0.5)
+	tex:SetColorTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[NEW_NUM_BROWSE].Count, "BOTTOMLEFT", 0, -1)
 	tex:SetWidth(610)
 	tex:SetHeight(38)
@@ -689,12 +689,12 @@ function private.SetAuction(button, pos)
 		return
 	end
 
-	if (selected) then --xyzzy
-		button.LineTexture:SetTexture(1,1,0.3, 1)
+	if (selected) then
+		button.LineTexture:SetColorTexture(1,1,0.3, 1)
 	elseif (pos % 2 == 0) then
-		button.LineTexture:SetTexture(0.3,0.3,0.4, 0.5)
+		button.LineTexture:SetColorTexture(0.3,0.3,0.4, 0.5)
 	else
-		button.LineTexture:SetTexture(0,0,0.1, 0.5)
+		button.LineTexture:SetColorTexture(0,0,0.1, 0.5)
 	end
 	button.id = id
 
