@@ -177,8 +177,8 @@ local ItemDataAllowedNil = {
 	[Const.AMHIGH] = true,
 	[Const.CANUSE] = true,
 	[Const.DEP2] = true,
-	[Const.ITYPE] = true,
-	[Const.ISUB] = true,
+	[Const.ITYPE] = true,	-- Workaround for Legion.
+	[Const.ISUB] = true,	-- Workaround for Legion.
 }
 
 function private.LoadScanData()
@@ -476,7 +476,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		SortAuctionClearSort("list")
 		QueryAuctionItems(name or "", minUseLevel or nil, maxUseLevel or nil,
 				invTypeIndex or nil, classindex or nil, subclassIndex or nil,
-				startPage, isUsable, qualityIndex, GetAll, exactMatch, filterData)
+				startPage, isUsable, qualityIndex, GetAll, exactMatch)
 		if not private.curQuery then
 			-- private.curQuery will have been set if QueryAuctionItems succeeded
 			-- this should never fail? we checked CanSendAuctionQuery() earlier
@@ -2675,22 +2675,20 @@ end
 
 private.Hook.QAC = QueryAuctionItems
 
-private.Hook.QueryAuctionItems = function (name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
-	if filterData then
-		private.Hook.QAC(name, minLevel, maxLevel, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
-		return
-	end
+private.Hook.QueryAuctionItems = function (name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
+	-- TODO: Check for calls that don't need kludge and forward without.
 
 	-- Fix for Legion changes to type/category/subcategory.
-	local filterData;
-	if invTypeIndex and classindex and subclassIndex then
-	        filterData = AuctionCategories[invTypeIndex].subCategories[classindex].subCategories[subclassIndex].filters;
-	elseif invTypeIndex and classindex then
-	        filterData = AuctionCategories[invTypeIndex].subCategories[classindex].filters;
-	elseif invTypeIndex then
-                filterData = AuctionCategories[invTypeIndex].filters;
-	else
-	        -- not filtering by category, leave nil for all
+	if not filterData then
+		if invTypeIndex and classindex and subclassIndex then
+		        filterData = AuctionCategories[classindex].subCategories[subclassIndex].subCategories[invTypeIndex].filters;
+		elseif classindex and subclassIndex then
+		        filterData = AuctionCategories[classindex].subCategories[subclassIndex].filters;
+		elseif classindex then
+			filterData = AuctionCategories[classindex].filters;
+		else
+		        -- not filtering by category, leave nil for all
+		end
 	end
 	debugPrint("name = " .. (name or '(nil)') .. "\ninvTypeIndex = " .. (invTypeIndex or '(nil)') .. "\nclassindex = " .. (classindex or '(nil)') .. "\nsubclassIndex = " .. (subclassIndex or '(nil)') .. "\nfilterData = " .. (filterData and 'yes' or '(nil)'), "CoreScan.lua", "StartScan", "Debug")
 	private.Hook.QAC(name, minLevel, maxLevel, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
@@ -2702,9 +2700,20 @@ if not isSecure then
 end
 private.CanSend = CanSendAuctionQuery
 
-function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, ...)
+function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...)
 	debugPrint("Start", "CoreScan.lua", "QueryAuctionItems", "Debug")
-	if not private.isAuctioneerQuery then
+	if private.isBlizzardQuery then
+		filterData = qualityIndex
+		exactMatch = isUsable
+		GetAll = page
+		qualityIndex = subclassIndex
+		isUsable = classIndex
+		page = invTypeIndex
+
+		classIndex = nil
+		subclassIndex = nil
+		invTypeIndex = nil
+	elseif not private.isAuctioneerQuery then
 		-- Optional bypass to handle compatibility problems with other AddOns
 		local doBypass = false
 		if private.compatModeLocks then
@@ -2723,6 +2732,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		end
 	end
 
+	--DEFAULT_CHAT_FRAME:AddMessage("QAC L1="..(classindex or "").." L2="..(subclassIndex or "").." L3="..(invTypeIndex or "").." filterData="..(filterData and "yes" or "no").." isbliz="..(private.isBlizzardQuery and "yes" or "no"))
 	private.isAuctioneerQuery = nil
 	private.isBlizzardQuery = nil
 	if private.compatModeLocks and not next(private.compatModeLocks) then
@@ -2792,7 +2802,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	return private.QuerySent(query, isSearch,
 		private.Hook.QueryAuctionItems(
 			name or "", minLevel or nil, maxLevel or nil, invTypeIndex, classIndex, subclassIndex,
-			page, isUsable, qualityIndex, GetAll, exactMatch, ...))
+			page, isUsable, qualityIndex, GetAll, exactMatch, filterData, ...))
 end
 
 -- Function to indicate that the next call to QueryAuctionItems comes from Auctioneer itself.

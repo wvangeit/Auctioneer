@@ -730,7 +730,7 @@ Enchantrix.Util = {
 
 
 function Enchantrix.Util.GetIType(link)
-	if not link or link == "" or link:match("^\[%s*\]$") then return end
+	if not link then return end
 	local const = Enchantrix.Constants
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
 

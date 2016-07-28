@@ -172,6 +172,7 @@ end
 
 
 function saveDisenchant(sig, reagentID, count)
+	--DEFAULT_CHAT_FRAME:AddMessage("sig="..(sig or '(nil)').." reagentID="..(reagentID or '(nil)').." count="..(count or '(nil)'))
 	-- Update tables after a disenchant has been detected
 	assert(type(sig) == "string");
 	assert(tonumber(reagentID));

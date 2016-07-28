@@ -204,7 +204,7 @@ function lib.RefreshPage()
 	end
 	private.IsRefresh = true
 	AucAdvanced.Scan.SetAuctioneerQuery()
-	QueryAuctionItems("", 0, 0, nil, nil, nil, page, nil, nil)
+	QueryAuctionItems("", nil, nil, nil, nil, nil, page, nil, nil)
 	lib.SignalRTSButton()
 end
 

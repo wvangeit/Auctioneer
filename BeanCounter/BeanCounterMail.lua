@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id$
+	Revision: $Id: BeanCounterMail.lua 5614 2016-07-25 19:43:49Z brykrys $
 	URL: http://auctioneeraddon.com/
 
 	BeanCounterMail - Handles recording of all auction house related mail
@@ -28,7 +28,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-LibStub("LibRevision"):Set("$URL$","$Rev$","5.1.DEV.", 'auctioneer', 'libs')
+LibStub("LibRevision"):Set("$URL: http://svn.norganna.org/auctioneer/trunk/BeanCounter/BeanCounterMail.lua $","$Rev: 5614 $","5.1.DEV.", 'auctioneer', 'libs')
 
 local lib = BeanCounter
 local private, print, get, set, _BC = lib.getLocals() --_BC localization function
@@ -178,8 +178,8 @@ function private.updateInboxStart()
 				private.HideMailGUI(true)
 				wasRead = wasRead and 1 or 0 -- three possible states 0=unread 1=read by addon 2=read by player
 				private.mailReadOveride[n] = false -- set back to false so we don't read the same message more than once
-				local itemLink = GetInboxItemLink(n, 1)
-				local _, _, stack, _, _ = GetInboxItem(n)
+				local itemLink = GetInboxItemLink(n, 1) -- We only check the 1st attachment, as AH mail should never have more than 1
+				local _, _, _, stack = GetInboxItem(n, 1)
 				local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
 				--subject now can contain a stack size. Remove them so only itemName remains
 				subject = subject:gsub("%s-%(%d-%)", "") --strips off the count (x) from the itemName

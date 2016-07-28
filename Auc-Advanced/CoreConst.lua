@@ -201,6 +201,7 @@ local function CompileInvTypes()
 	local invtype_strformat = "INVTYPE_%s"
 	local le_invtype_strformat = "LE_INVENTORY_TYPE_%s_TYPE"
 	local invtype_strings = {
+		"NON_EQUIP",
 		"HEAD",
 		"NECK",
 		"SHOULDER",
@@ -215,7 +216,7 @@ local function CompileInvTypes()
 		"TRINKET",
 		"WEAPON",
 		"SHIELD",
-		"RANGEDRIGHT",
+		"RANGED",
 		"CLOAK",
 		"2HWEAPON",
 		"BAG",
@@ -226,14 +227,18 @@ local function CompileInvTypes()
 		"HOLDABLE",
 		"AMMO",
 		"THROWN",
-		"RANGED"
+		"RANGEDRIGHT",
+		"QUIVER",
+		"RELIC",
 	}
+	assert(NUM_LE_INVENTORY_TYPES == 0x1D)
 	local invstr
 	for _,invstr in ipairs(invtype_strings) do
 		-- each type has 2 args: token name(i), display in list(i+1)
 		-- However 7.x has removed GetAuctionInvTypes() so we need to be creative
 		local equipLoc = string.format(invtype_strformat, invstr)
-		local invTypeIndex = _G[string.format(le_invtype_strformat, invstr)]
+		local invTypeName = string.format(le_invtype_strformat, invstr)
+		local invTypeIndex = _G[invTypeName]
 		local equipCode = lib.EquipEncode[equipLoc]
 
 		if not invTypeIndex == nil then
@@ -245,7 +250,7 @@ local function CompileInvTypes()
 				print("AucAdvanced CoreConst error: missing EquipCode for Equip Location "..equipLoc)
 			end
 		else
-			print("AucAdvanced CoreConst error: missing invTypeIndex for Inventory Type "..invstr)
+			print("AucAdvanced CoreConst error: missing invTypeIndex for Inventory Type "..invstr.." ("..invTypeName..")")
 		end
 	end
 end

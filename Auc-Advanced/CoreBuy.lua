@@ -82,6 +82,7 @@ function lib.GetErrorText(code)
 	return "Unknown Errorcode ("..code..")"
 end
 
+private.BuyItemInfoQueue = {}
 private.BuyRequests = {}
 private.PendingBids = {}
 --private.Searching = nil
@@ -216,7 +217,12 @@ function lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosear
 		if strmatch(link, "|Hitem:") then
 			local name, _, quality, _, minlevel, classname, subclassname = GetItemInfo(link)
 			if not name then
-				return QueueBuyErrorHelper(link, "NoItem")
+				local checkItemID = strmatch(link, ":(%d+):") -- this match string should find the itemID in any link
+				private.BuyItemInfoQueue[checkItemID].insert(function ()
+					lib.QueueBuy(link, seller, count, minbid, buyout, price, reason, nosearch)
+				end)
+				return
+				--return QueueBuyErrorHelper(link, "NoItem")
 			end
 			request.itemname = name:lower()
 			request.uselevel = minlevel or 0
@@ -533,6 +539,7 @@ function private.ActivateEvents()
 		private.isActivated = true
 		private.updateFrame:Show() -- start timer
 		private.updateFrame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+		private.updateFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
 
@@ -543,6 +550,7 @@ function private.DeactivateEvents()
 		private.isActivated = nil
 		private.updateFrame:Hide() -- stop timer
 		private.updateFrame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+		private.updateFrame:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 	end
 end
 
@@ -557,7 +565,18 @@ local function OnUpdate()
 end
 
 local function OnEvent(frame, event, message, ...)
-	if event == "AUCTION_ITEM_LIST_UPDATE" then
+	if event == "GET_ITEM_INFO_RECEIVED" then
+		if private.BuyItemInfoQueue[message] then
+			local bqueue = private.BuyItemInfoQueue[message]
+			private.BuyItemInfoQueue[message] = nil
+			aucPrint(format("%sAuctioner: GET_ITEM_INFO_RECEIVED |r%s%s: %s", highlight, message, highlight, "re-queuing " .. bqueue.getn() .. " items"))
+			for buys in bqueue do
+				buys()
+			end
+		else
+			aucPrint(format("%sAuctioner: GET_ITEM_INFO_RECEIVED |r%s%s: %s", highlight, message, highlight, "information on item not pending to purchase"))
+		end
+	elseif event == "AUCTION_ITEM_LIST_UPDATE" then
 		local request = private.CurRequest
 		if request then
 			-- We are currently prompting the user to bid on an auction

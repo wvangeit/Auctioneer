@@ -179,7 +179,7 @@ end
 
 function EnchantrixBarker_OnEvent(event,...)
 	--Returns "Enchanting" for enchantwindow
-	local GetTradeLineFunc = GetCraftDisplaySkillLine or GetTradeSkillLine	-- ccox - WoW 3.0 - GetCraft routines are gone
+	local GetTradeLineFunc = GetCraftDisplaySkillLine or C_TradeSkillUI.GetTradeSkillLine	-- ccox - WoW 3.0 - GetCraft routines are gone
 	local craftName, _rank, _maxRank = GetTradeLineFunc();
 
 	if craftName and craftName == _BARKLOC('Enchanting') then
